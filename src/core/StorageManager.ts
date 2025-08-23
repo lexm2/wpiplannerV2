@@ -178,6 +178,14 @@ export class StorageManager {
         if (value instanceof Set) {
             return { __type: 'Set', value: [...value] };
         }
+        // Break cyclic references - exclude department.courses when serializing courses
+        if (key === 'department' && value && value.courses) {
+            return {
+                abbreviation: value.abbreviation,
+                name: value.name
+                // Exclude courses array to prevent circular reference
+            };
+        }
         return value;
     };
 

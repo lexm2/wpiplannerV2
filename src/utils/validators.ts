@@ -123,8 +123,9 @@ export class Validators {
     }
 
     static validateCourseId(courseId: string): boolean {
-        // Format: DEPT-NUMBER (e.g., CS-1101, MA-2631)
-        return /^[A-Z]{2,4}-\d{4}$/.test(courseId);
+        // Format: DEPT-NUMBER (e.g., CS-1101, AB-1531, RBE-1001) 
+        // Allow 2-4 letter department codes and 3-4 digit course numbers
+        return /^[A-Z]{2,4}-\d{3,4}$/.test(courseId);
     }
 
     static validateSectionNumber(sectionNumber: string): boolean {

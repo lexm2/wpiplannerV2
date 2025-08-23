@@ -92,6 +92,7 @@ export class MainController {
             if (target.classList.contains('course-remove-btn')) {
                 const courseId = target.dataset.courseId;
                 if (courseId) {
+                    // Directly remove course (remove button means always unselect)
                     this.courseSelectionService.unselectCourse(courseId);
                 }
             }
