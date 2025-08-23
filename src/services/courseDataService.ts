@@ -1,4 +1,4 @@
-import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek } from './types'
+import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek } from '../types/types'
 
 export class CourseDataService {
     private static readonly WPI_COURSE_DATA_URL = './course-data.json';

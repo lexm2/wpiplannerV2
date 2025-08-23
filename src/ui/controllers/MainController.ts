@@ -1,7 +1,7 @@
-import { Course, Department, ScheduleDB } from './types'
-import { CourseDataService } from './courseDataService'
+import { Course, Department, ScheduleDB } from '../../types/types'
+import { CourseDataService } from '../../services/courseDataService'
 
-export class WPIPlanner {
+export class MainController {
     private courseDataService: CourseDataService;
     private courses: Course[] = [];
 
@@ -94,4 +94,3 @@ export class WPIPlanner {
         }
     }
 }
-

@@ -1,5 +1,5 @@
 import './style.css'
-import { WPIPlanner } from './index'
+import { MainController } from './ui/controllers/MainController'
 
 // Initialize the application
-new WPIPlanner()
+new MainController()
