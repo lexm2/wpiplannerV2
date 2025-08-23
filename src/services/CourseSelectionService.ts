@@ -59,18 +59,6 @@ export class CourseSelectionService {
         return this.courseManager.getSelectedSection(courseId);
     }
 
-    setSectionPreference(courseId: string, sectionNumber: string, preference: 'preferred' | 'denied'): void {
-        if (!courseId || !Validators.validateCourseId(courseId)) {
-            throw new Error('Invalid courseId provided');
-        }
-        if (!sectionNumber || !Validators.validateSectionNumber(sectionNumber)) {
-            throw new Error('Invalid sectionNumber provided');
-        }
-        if (!preference || !['preferred', 'denied'].includes(preference)) {
-            throw new Error('Invalid preference provided. Must be "preferred" or "denied"');
-        }
-        this.courseManager.updateSectionPreference(courseId, sectionNumber, preference);
-    }
 
     isCourseSelected(courseId: string): boolean {
         if (!courseId || !Validators.validateCourseId(courseId)) {
