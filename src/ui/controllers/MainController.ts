@@ -32,6 +32,12 @@ export class MainController {
         this.scheduleController = new ScheduleController(this.courseSelectionService);
         this.uiStateManager = new UIStateManager();
         this.timestampManager = new TimestampManager();
+        
+        // Wire up state preservation for dropdown states
+        this.scheduleController.setStatePreserver({
+            preserve: () => this.preserveDropdownStates(),
+            restore: (states) => this.restoreDropdownStates(states)
+        });
         this.init();
     }
 
@@ -68,6 +74,7 @@ export class MainController {
         document.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
             
+            
             if (target.classList.contains('department-item')) {
                 const deptId = target.dataset.deptId;
                 if (deptId) {
@@ -97,20 +104,9 @@ export class MainController {
                 }
             }
 
-            if (target.classList.contains('dropdown-trigger') || target.closest('.dropdown-trigger')) {
-                const triggerElement = target.classList.contains('dropdown-trigger') 
-                    ? target 
-                    : target.closest('.dropdown-trigger') as HTMLElement;
-                    
-                if (triggerElement) {
-                    // Don't trigger dropdown if clicking on the remove button
-                    if (!target.classList.contains('course-remove-btn')) {
-                        this.toggleCourseDropdown(triggerElement);
-                    }
-                }
-            }
-
+            // Handle section-related clicks FIRST (before dropdown logic)
             if (target.classList.contains('section-select-btn')) {
+                e.stopPropagation();
                 const courseId = target.dataset.courseId;
                 const sectionNumber = target.dataset.section;
                 if (courseId && sectionNumber) {
@@ -119,7 +115,42 @@ export class MainController {
                         this.scheduleController.renderScheduleGrids();
                     }
                 }
+                return;
             }
+
+            // Prevent dropdown closing for any other section-related clicks
+            if (target.classList.contains('section-option') || target.closest('.section-option') ||
+                target.classList.contains('section-info') || target.closest('.section-info') ||
+                target.classList.contains('section-number') || 
+                target.classList.contains('section-schedule') || 
+                target.classList.contains('section-professor')) {
+                e.stopPropagation();
+                e.preventDefault();
+                return;
+            }
+
+            if (target.classList.contains('dropdown-trigger') || target.closest('.dropdown-trigger')) {
+                const triggerElement = target.classList.contains('dropdown-trigger') 
+                    ? target 
+                    : target.closest('.dropdown-trigger') as HTMLElement;
+                    
+                if (triggerElement) {
+                    // Only trigger dropdown if clicking on course header area (not section-related elements)
+                    const shouldToggle = !target.classList.contains('course-remove-btn') && 
+                        !target.classList.contains('section-select-btn') &&
+                        !target.classList.contains('section-number') && 
+                        !target.classList.contains('section-schedule') && 
+                        !target.classList.contains('section-professor') &&
+                        !target.closest('.section-option') &&
+                        !target.closest('.section-info') &&
+                        !target.closest('.schedule-sections-container');
+                        
+                    if (shouldToggle) {
+                        this.toggleCourseDropdown(triggerElement);
+                    }
+                }
+            }
+
 
             if (target.closest('.course-item') && !target.classList.contains('course-select-btn') && !target.classList.contains('section-badge')) {
                 const courseItem = target.closest('.course-item') as HTMLElement;
@@ -267,6 +298,34 @@ export class MainController {
             courseItem.classList.remove('expanded');
             courseItem.classList.add('collapsed');
         }
+    }
+
+    private preserveDropdownStates(): Map<string, boolean> {
+        const states = new Map<string, boolean>();
+        document.querySelectorAll('.schedule-course-item').forEach(item => {
+            const courseId = (item as HTMLElement).dataset.courseId;
+            if (courseId) {
+                const isExpanded = item.classList.contains('expanded');
+                states.set(courseId, isExpanded);
+            }
+        });
+        return states;
+    }
+
+    private restoreDropdownStates(states: Map<string, boolean>): void {
+        document.querySelectorAll('.schedule-course-item').forEach(item => {
+            const courseId = (item as HTMLElement).dataset.courseId;
+            if (courseId && states.has(courseId)) {
+                const wasExpanded = states.get(courseId);
+                if (wasExpanded) {
+                    item.classList.remove('collapsed');
+                    item.classList.add('expanded');
+                } else {
+                    item.classList.remove('expanded');
+                    item.classList.add('collapsed');
+                }
+            }
+        });
     }
 
 

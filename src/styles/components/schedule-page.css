@@ -137,7 +137,7 @@
 }
 
 .schedule-course-item.expanded .schedule-sections-container {
-  max-height: 500px;
+  max-height: none;
   opacity: 1;
 }
 

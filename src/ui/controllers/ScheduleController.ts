@@ -4,9 +4,20 @@ import { TimeUtils } from '../utils/timeUtils'
 
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
+    private statePreserver?: { 
+        preserve: () => Map<string, boolean>, 
+        restore: (states: Map<string, boolean>) => void 
+    };
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
+    }
+
+    setStatePreserver(statePreserver: { 
+        preserve: () => Map<string, boolean>, 
+        restore: (states: Map<string, boolean>) => void 
+    }): void {
+        this.statePreserver = statePreserver;
     }
 
     displayScheduleSelectedCourses(): void {
@@ -14,6 +25,9 @@ export class ScheduleController {
         const countElement = document.getElementById('schedule-selected-count');
         
         if (!selectedCoursesContainer || !countElement) return;
+
+        // Preserve dropdown states before refresh
+        const dropdownStates = this.statePreserver?.preserve();
 
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
         
@@ -107,6 +121,14 @@ export class ScheduleController {
         });
 
         selectedCoursesContainer.innerHTML = html;
+
+        // Restore dropdown states after refresh
+        if (dropdownStates) {
+            // Use setTimeout to ensure DOM is fully updated
+            setTimeout(() => {
+                this.statePreserver?.restore(dropdownStates);
+            }, 0);
+        }
     }
 
     handleSectionSelection(courseId: string, sectionNumber: string): void {
@@ -116,9 +138,12 @@ export class ScheduleController {
             // Deselect current section
             this.courseSelectionService.setSelectedSection(courseId, null);
         } else {
-            // Select new section
+            // Select new section (automatically deselects any previous section)
             this.courseSelectionService.setSelectedSection(courseId, sectionNumber);
         }
+        
+        // Note: UI refresh is handled automatically by the selection change listener
+        // No need to call displayScheduleSelectedCourses() here as it would cause duplicate refreshes
     }
 
     renderScheduleGrids(): void {
