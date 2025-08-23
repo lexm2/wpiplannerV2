@@ -146,6 +146,41 @@ export class ScheduleController {
         // No need to call displayScheduleSelectedCourses() here as it would cause duplicate refreshes
     }
 
+    updateSectionButtonStates(courseId: string, selectedSection: string | null): void {
+        // Find the schedule course item specifically (not main course items)
+        const courseItem = document.querySelector(`.schedule-course-item[data-course-id="${courseId}"]`);
+        if (!courseItem) return;
+
+        const sectionButtons = courseItem.querySelectorAll('.section-select-btn');
+        const sectionOptions = courseItem.querySelectorAll('.section-option');
+
+        sectionButtons.forEach(button => {
+            const buttonSection = (button as HTMLElement).dataset.section;
+            const isSelected = buttonSection === selectedSection;
+            
+            // Update button appearance
+            if (isSelected) {
+                button.classList.add('selected');
+                button.textContent = '✓';
+            } else {
+                button.classList.remove('selected');
+                button.textContent = '+';
+            }
+        });
+
+        sectionOptions.forEach(option => {
+            const optionSection = (option as HTMLElement).dataset.section;
+            const isSelected = optionSection === selectedSection;
+            
+            // Update option appearance
+            if (isSelected) {
+                option.classList.add('selected');
+            } else {
+                option.classList.remove('selected');
+            }
+        });
+    }
+
     renderScheduleGrids(): void {
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
         const grids = ['A', 'B', 'C', 'D'];

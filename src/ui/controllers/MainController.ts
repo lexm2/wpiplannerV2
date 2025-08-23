@@ -38,6 +38,15 @@ export class MainController {
             preserve: () => this.preserveDropdownStates(),
             restore: (states) => this.restoreDropdownStates(states)
         });
+        
+        // Initialize tracking for course changes
+        const initialSelectedCourses = this.courseSelectionService.getSelectedCourses();
+        this.previousSelectedCoursesCount = initialSelectedCourses.length;
+        this.previousSelectedCoursesMap = new Map();
+        initialSelectedCourses.forEach(sc => {
+            this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSection);
+        });
+        
         this.init();
     }
 
@@ -111,9 +120,6 @@ export class MainController {
                 const sectionNumber = target.dataset.section;
                 if (courseId && sectionNumber) {
                     this.scheduleController.handleSectionSelection(courseId, sectionNumber);
-                    if (this.uiStateManager.currentPage === 'schedule') {
-                        this.scheduleController.renderScheduleGrids();
-                    }
                 }
                 return;
             }
@@ -258,13 +264,48 @@ export class MainController {
 
 
 
+    private previousSelectedCoursesCount = 0;
+    private previousSelectedCoursesMap = new Map<string, string | null>();
+
     private setupCourseSelectionListener(): void {
         this.courseSelectionService.onSelectionChange((selectedCourses) => {
-            console.log(`Selected courses updated: ${selectedCourses.length} courses selected`);
-            // Update UI to reflect changes
+            const currentCount = selectedCourses.length;
+            const isCoursesAddedOrRemoved = currentCount !== this.previousSelectedCoursesCount;
+            
+            // Create current state map for comparison
+            const currentCoursesMap = new Map<string, string | null>();
+            selectedCourses.forEach(sc => {
+                currentCoursesMap.set(sc.course.id, sc.selectedSection);
+            });
+            
+            // Always update main course UI
             this.courseController.refreshCourseSelectionUI();
             this.courseController.displaySelectedCourses();
-            this.scheduleController.displayScheduleSelectedCourses();
+            
+            if (isCoursesAddedOrRemoved) {
+                // Full refresh needed when courses are added/removed
+                this.scheduleController.displayScheduleSelectedCourses();
+            } else {
+                // Check if only section selections changed
+                let sectionSelectionsChanged = false;
+                for (const [courseId, selectedSection] of currentCoursesMap) {
+                    const previousSection = this.previousSelectedCoursesMap.get(courseId);
+                    if (previousSection !== selectedSection) {
+                        sectionSelectionsChanged = true;
+                        // Update just this course's section buttons
+                        this.scheduleController.updateSectionButtonStates(courseId, selectedSection);
+                    }
+                }
+                
+                // Update schedule grids if any sections changed
+                if (sectionSelectionsChanged && this.uiStateManager.currentPage === 'schedule') {
+                    this.scheduleController.renderScheduleGrids();
+                }
+            }
+            
+            // Update tracking state
+            this.previousSelectedCoursesCount = currentCount;
+            this.previousSelectedCoursesMap = new Map(currentCoursesMap);
         });
     }
 
