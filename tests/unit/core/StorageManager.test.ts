@@ -31,7 +31,6 @@ describe('StorageManager', () => {
           preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
           avoidBackToBackClasses: false,
           maxDailyHours: 8,
-          preferredBuildings: []
         }
       }
 
@@ -71,7 +70,6 @@ describe('StorageManager', () => {
           preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
           avoidBackToBackClasses: false,
           maxDailyHours: 8,
-          preferredBuildings: []
         }
       }
 
@@ -209,7 +207,6 @@ describe('StorageManager', () => {
         preferredDays: new Set(['mon', 'wed', 'fri']),
         avoidBackToBackClasses: true,
         maxDailyHours: 6,
-        preferredBuildings: ['Fuller Labs', 'Olin Hall']
       }
 
       storageManager.savePreferences(preferences)
@@ -229,7 +226,6 @@ describe('StorageManager', () => {
         preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
         avoidBackToBackClasses: false,
         maxDailyHours: 8,
-        preferredBuildings: [],
         theme: 'wpi-classic'
       })
     })
@@ -247,7 +243,6 @@ describe('StorageManager', () => {
         preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
         avoidBackToBackClasses: false,
         maxDailyHours: 8,
-        preferredBuildings: [],
         theme: 'wpi-classic'
       })
     })

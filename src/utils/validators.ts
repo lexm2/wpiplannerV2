@@ -66,8 +66,7 @@ export class Validators {
             this.isValidTimeRange(preferences.preferredTimeRange) &&
             preferences.preferredDays instanceof Set &&
             typeof preferences.avoidBackToBackClasses === 'boolean' &&
-            typeof preferences.maxDailyHours === 'number' &&
-            Array.isArray(preferences.preferredBuildings);
+            typeof preferences.maxDailyHours === 'number';
     }
 
     static isValidTimeRange(timeRange: any): boolean {

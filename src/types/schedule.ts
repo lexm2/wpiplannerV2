@@ -38,7 +38,6 @@ export interface SchedulePreferences {
     preferredDays: Set<string>;
     avoidBackToBackClasses: boolean;
     maxDailyHours: number;
-    preferredBuildings: string[];
     theme?: string;
 }
 
