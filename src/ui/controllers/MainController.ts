@@ -97,6 +97,19 @@ export class MainController {
                 }
             }
 
+            if (target.classList.contains('dropdown-trigger') || target.closest('.dropdown-trigger')) {
+                const triggerElement = target.classList.contains('dropdown-trigger') 
+                    ? target 
+                    : target.closest('.dropdown-trigger') as HTMLElement;
+                    
+                if (triggerElement) {
+                    // Don't trigger dropdown if clicking on the remove button
+                    if (!target.classList.contains('course-remove-btn')) {
+                        this.toggleCourseDropdown(triggerElement);
+                    }
+                }
+            }
+
             if (target.classList.contains('section-select-btn')) {
                 const courseId = target.dataset.courseId;
                 const sectionNumber = target.dataset.section;
@@ -237,6 +250,23 @@ export class MainController {
 
     public getCourseSelectionService(): CourseSelectionService {
         return this.courseSelectionService;
+    }
+
+    private toggleCourseDropdown(triggerElement: HTMLElement): void {
+        const courseItem = triggerElement.closest('.schedule-course-item');
+        if (!courseItem) return;
+
+        const isCollapsed = courseItem.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+            // Expand
+            courseItem.classList.remove('collapsed');
+            courseItem.classList.add('expanded');
+        } else {
+            // Collapse
+            courseItem.classList.remove('expanded');
+            courseItem.classList.add('collapsed');
+        }
     }
 
 

@@ -49,16 +49,19 @@ export class ScheduleController {
             });
 
             html += `
-                <div class="schedule-course-item" data-course-id="${course.id}">
-                    <div class="schedule-course-header">
+                <div class="schedule-course-item collapsed" data-course-id="${course.id}">
+                    <div class="schedule-course-header dropdown-trigger" data-course-id="${course.id}">
                         <div class="schedule-course-info">
                             <div class="schedule-course-code">${course.department.abbreviation}${course.number}</div>
                             <div class="schedule-course-name">${course.name}</div>
                             <div class="schedule-course-credits">${credits}</div>
                         </div>
-                        <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
-                            ×
-                        </button>
+                        <div class="header-controls">
+                            <span class="dropdown-arrow">▼</span>
+                            <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
+                                ×
+                            </button>
+                        </div>
                     </div>
                     <div class="schedule-sections-container">
             `;
