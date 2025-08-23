@@ -77,8 +77,6 @@ export class Validators {
     static isValidSelectedCourse(selectedCourse: any): selectedCourse is SelectedCourse {
         return selectedCourse &&
             this.isValidCourse(selectedCourse.course) &&
-            selectedCourse.preferredSections instanceof Set &&
-            selectedCourse.deniedSections instanceof Set &&
             typeof selectedCourse.isRequired === 'boolean';
     }
 

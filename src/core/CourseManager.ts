@@ -9,8 +9,6 @@ export class CourseManager {
         const selectedCourse: SelectedCourse = {
             course,
             selectedSection: null,
-            preferredSections: new Set<string>(),
-            deniedSections: new Set<string>(),
             isRequired
         };
         
@@ -23,20 +21,6 @@ export class CourseManager {
         this.notifyListeners();
     }
 
-    updateSectionPreference(courseId: string, sectionNumber: string, preference: 'preferred' | 'denied'): void {
-        const selectedCourse = this.selectedCourses.get(courseId);
-        if (!this.validateCourseExists(courseId, selectedCourse)) return;
-
-        if (preference === 'preferred') {
-            selectedCourse!.preferredSections.add(sectionNumber);
-            selectedCourse!.deniedSections.delete(sectionNumber);
-        } else {
-            selectedCourse!.deniedSections.add(sectionNumber);
-            selectedCourse!.preferredSections.delete(sectionNumber);
-        }
-        
-        this.notifyListeners();
-    }
 
     getSelectedCourses(): SelectedCourse[] {
         return Array.from(this.selectedCourses.values());
@@ -54,9 +38,7 @@ export class CourseManager {
         const selectedCourse = this.selectedCourses.get(courseId);
         if (!this.validateCourseExists(courseId, selectedCourse)) return [];
 
-        return selectedCourse!.course.sections.filter(section => 
-            !selectedCourse!.deniedSections.has(section.number)
-        );
+        return selectedCourse!.course.sections;
     }
 
     clearAll(): void {

@@ -42,15 +42,6 @@ describe('CourseManager', () => {
       expect(selectedCourse?.isRequired).toBe(false)
     })
 
-    it('should initialize with empty section preferences', () => {
-      courseManager.addCourse(mockCourse1)
-      
-      const selectedCourse = courseManager.getSelectedCourse('CS-1101')
-      expect(selectedCourse?.preferredSections).toBeInstanceOf(Set)
-      expect(selectedCourse?.preferredSections.size).toBe(0)
-      expect(selectedCourse?.deniedSections).toBeInstanceOf(Set)
-      expect(selectedCourse?.deniedSections.size).toBe(0)
-    })
   })
 
   describe('removeCourse', () => {
@@ -76,51 +67,6 @@ describe('CourseManager', () => {
     })
   })
 
-  describe('updateSectionPreference', () => {
-    beforeEach(() => {
-      courseManager.addCourse(mockCourse1)
-    })
-
-    it('should add section to preferred list', () => {
-      courseManager.updateSectionPreference('CS-1101', 'A01', 'preferred')
-      
-      const selectedCourse = courseManager.getSelectedCourse('CS-1101')
-      expect(selectedCourse?.preferredSections.has('A01')).toBe(true)
-      expect(selectedCourse?.deniedSections.has('A01')).toBe(false)
-    })
-
-    it('should add section to denied list', () => {
-      courseManager.updateSectionPreference('CS-1101', 'A01', 'denied')
-      
-      const selectedCourse = courseManager.getSelectedCourse('CS-1101')
-      expect(selectedCourse?.deniedSections.has('A01')).toBe(true)
-      expect(selectedCourse?.preferredSections.has('A01')).toBe(false)
-    })
-
-    it('should move section from denied to preferred', () => {
-      courseManager.updateSectionPreference('CS-1101', 'A01', 'denied')
-      courseManager.updateSectionPreference('CS-1101', 'A01', 'preferred')
-      
-      const selectedCourse = courseManager.getSelectedCourse('CS-1101')
-      expect(selectedCourse?.preferredSections.has('A01')).toBe(true)
-      expect(selectedCourse?.deniedSections.has('A01')).toBe(false)
-    })
-
-    it('should move section from preferred to denied', () => {
-      courseManager.updateSectionPreference('CS-1101', 'A01', 'preferred')
-      courseManager.updateSectionPreference('CS-1101', 'A01', 'denied')
-      
-      const selectedCourse = courseManager.getSelectedCourse('CS-1101')
-      expect(selectedCourse?.deniedSections.has('A01')).toBe(true)
-      expect(selectedCourse?.preferredSections.has('A01')).toBe(false)
-    })
-
-    it('should do nothing for non-existent course', () => {
-      courseManager.updateSectionPreference('NONEXISTENT', 'A01', 'preferred')
-      
-      expect(courseManager.getSelectedCourse('NONEXISTENT')).toBeUndefined()
-    })
-  })
 
   describe('getAvailableSections', () => {
     beforeEach(() => {
@@ -132,20 +78,11 @@ describe('CourseManager', () => {
       courseManager.addCourse(mockCourse1)
     })
 
-    it('should return all sections when none are denied', () => {
+    it('should return all sections', () => {
       const sections = courseManager.getAvailableSections('CS-1101')
       
       expect(sections).toHaveLength(3)
       expect(sections.map(s => s.number)).toEqual(['A01', 'A02', 'B01'])
-    })
-
-    it('should exclude denied sections', () => {
-      courseManager.updateSectionPreference('CS-1101', 'A02', 'denied')
-      
-      const sections = courseManager.getAvailableSections('CS-1101')
-      
-      expect(sections).toHaveLength(2)
-      expect(sections.map(s => s.number)).toEqual(['A01', 'B01'])
     })
 
     it('should return empty array for non-existent course', () => {
@@ -190,15 +127,6 @@ describe('CourseManager', () => {
       expect(listener).toHaveBeenCalledWith([])
     })
 
-    it('should notify listeners when section preference is updated', () => {
-      const listener = vi.fn()
-      courseManager.addCourse(mockCourse1)
-      courseManager.onSelectionChange(listener)
-      
-      courseManager.updateSectionPreference('CS-1101', 'A01', 'preferred')
-      
-      expect(listener).toHaveBeenCalled()
-    })
 
     it('should allow removing listeners', () => {
       const listener = vi.fn()

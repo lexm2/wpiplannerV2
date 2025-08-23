@@ -3,8 +3,6 @@ import { Course, Section } from './types'
 export interface SelectedCourse {
     course: Course;
     selectedSection: string | null;
-    preferredSections: Set<string>;
-    deniedSections: Set<string>;
     isRequired: boolean;
 }
 
