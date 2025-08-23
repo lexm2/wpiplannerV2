@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WPI Course Planner</title>
-  <script type="module" crossorigin src="/wpiplannerV2/assets/index-CUEhUhnl.js"></script>
-  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-BObJwXXH.css">
+  <script type="module" crossorigin src="/wpiplannerV2/assets/index-D4ShmtCf.js"></script>
+  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-Cmuvh-2j.css">
 </head>
 <body>
     <div id="app">
@@ -20,6 +20,9 @@
                             <span id="refresh-text">Refresh</span>
                         </button>
                     </div>
+                </div>
+                <div class="header-navigation">
+                    <button id="schedule-btn" class="btn btn-primary btn-schedule">Schedule</button>
                 </div>
                 <div class="header-controls">
                     <input type="text" id="search-input" placeholder="Search courses..." class="search-input">
@@ -37,7 +40,7 @@
             </div>
         </header>
         
-        <div class="app-body">
+        <div class="app-body" id="planner-page">
             <aside class="sidebar">
                 <div class="sidebar-header">
                     <h2>Departments</h2>
@@ -69,15 +72,65 @@
                         <div class="empty-state">Select a course to view description</div>
                     </div>
                 </div>
-                <div class="empty-section">
+                <div class="selected-courses-section">
                     <div class="panel-header">
-                        <h2>Additional Info</h2>
+                        <h2>Selected Courses <span id="selected-count" class="course-count">(0)</span></h2>
                     </div>
-                    <div class="empty-content">
-                        <!-- Empty placeholder for future features -->
+                    <div class="selected-courses-content" id="selected-courses-list">
+                        <div class="empty-state">No courses selected yet</div>
                     </div>
                 </div>
             </aside>
+        </div>
+        
+        <div class="app-body schedule-page" id="schedule-page" style="display: none;">
+            <div class="schedule-page-layout">
+                <aside class="schedule-sidebar">
+                    <div class="schedule-sidebar-header">
+                        <h2>Selected Courses <span id="schedule-selected-count" class="course-count">(0)</span></h2>
+                    </div>
+                    <div class="schedule-selected-courses" id="schedule-selected-courses">
+                        <div class="empty-state">No courses selected yet</div>
+                    </div>
+                </aside>
+                
+                <main class="schedule-main">
+                    <div class="terms-grid">
+                        <div class="term-graph" data-term="A">
+                            <div class="term-header">
+                                <h3>A Term</h3>
+                            </div>
+                            <div class="schedule-grid" id="schedule-grid-A">
+                                <!-- Schedule grid will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="term-graph" data-term="B">
+                            <div class="term-header">
+                                <h3>B Term</h3>
+                            </div>
+                            <div class="schedule-grid" id="schedule-grid-B">
+                                <!-- Schedule grid will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="term-graph" data-term="C">
+                            <div class="term-header">
+                                <h3>C Term</h3>
+                            </div>
+                            <div class="schedule-grid" id="schedule-grid-C">
+                                <!-- Schedule grid will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="term-graph" data-term="D">
+                            <div class="term-header">
+                                <h3>D Term</h3>
+                            </div>
+                            <div class="schedule-grid" id="schedule-grid-D">
+                                <!-- Schedule grid will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
         </div>
     </div>
     
