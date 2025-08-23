@@ -2,27 +2,32 @@ import { Course } from '../types/types'
 import { SelectedCourse } from '../types/schedule'
 import { CourseManager } from '../core/CourseManager'
 import { StorageManager } from '../core/StorageManager'
+import { Validators } from '../utils/validators'
 
 export class CourseSelectionService {
     private courseManager: CourseManager;
     private storageManager: StorageManager;
 
-    constructor() {
-        this.courseManager = new CourseManager();
-        this.storageManager = new StorageManager();
+    constructor(courseManager?: CourseManager, storageManager?: StorageManager) {
+        this.courseManager = courseManager || new CourseManager();
+        this.storageManager = storageManager || new StorageManager();
         
         this.loadPersistedSelections();
         this.setupPersistenceListener();
     }
 
     selectCourse(course: Course, isRequired: boolean = false): void {
+        if (!Validators.isValidCourse(course)) {
+            throw new Error('Invalid course object provided');
+        }
         this.courseManager.addCourse(course, isRequired);
-        this.persistSelections();
     }
 
     unselectCourse(courseId: string): void {
+        if (!courseId || !Validators.validateCourseId(courseId)) {
+            throw new Error('Invalid courseId provided');
+        }
         this.courseManager.removeCourse(courseId);
-        this.persistSelections();
     }
 
     toggleCourseSelection(course: Course, isRequired: boolean = false): boolean {
@@ -38,20 +43,39 @@ export class CourseSelectionService {
     }
 
     setSelectedSection(courseId: string, sectionNumber: string | null): void {
+        if (!courseId || !Validators.validateCourseId(courseId)) {
+            throw new Error('Invalid courseId provided');
+        }
+        if (sectionNumber !== null && !Validators.validateSectionNumber(sectionNumber)) {
+            throw new Error('Invalid sectionNumber provided');
+        }
         this.courseManager.setSelectedSection(courseId, sectionNumber);
-        this.persistSelections();
     }
 
     getSelectedSection(courseId: string): string | null {
+        if (!courseId || !Validators.validateCourseId(courseId)) {
+            throw new Error('Invalid courseId provided');
+        }
         return this.courseManager.getSelectedSection(courseId);
     }
 
     setSectionPreference(courseId: string, sectionNumber: string, preference: 'preferred' | 'denied'): void {
+        if (!courseId || !Validators.validateCourseId(courseId)) {
+            throw new Error('Invalid courseId provided');
+        }
+        if (!sectionNumber || !Validators.validateSectionNumber(sectionNumber)) {
+            throw new Error('Invalid sectionNumber provided');
+        }
+        if (!preference || !['preferred', 'denied'].includes(preference)) {
+            throw new Error('Invalid preference provided. Must be "preferred" or "denied"');
+        }
         this.courseManager.updateSectionPreference(courseId, sectionNumber, preference);
-        this.persistSelections();
     }
 
     isCourseSelected(courseId: string): boolean {
+        if (!courseId || !Validators.validateCourseId(courseId)) {
+            return false;
+        }
         return this.courseManager.isSelected(courseId);
     }
 
@@ -60,6 +84,9 @@ export class CourseSelectionService {
     }
 
     getSelectedCourse(courseId: string): SelectedCourse | undefined {
+        if (!courseId || !Validators.validateCourseId(courseId)) {
+            return undefined;
+        }
         return this.courseManager.getSelectedCourse(courseId);
     }
 

@@ -79,6 +79,19 @@ export class CourseDataService {
         const [, deptCode, courseNum, courseName] = courseTitleMatch;
         const deptName = entry.Academic_Units || entry.Subject || deptCode;
         
+        const department = this.getOrCreateDepartment(deptCode, deptName, departmentMap);
+        const course = this.getOrCreateCourse(deptCode, courseNum, courseName, entry, department);
+        const section = this.createSectionFromEntry(entry, course);
+        
+        if (entry.Meeting_Patterns && entry.Locations && entry.Instructors) {
+            const period = this.createPeriodFromEntry(entry, section);
+            section.periods.push(period);
+        }
+
+        course.sections.push(section);
+    }
+
+    private getOrCreateDepartment(deptCode: string, deptName: string, departmentMap: Map<string, Department>): Department {
         let department = departmentMap.get(deptCode);
         if (!department) {
             department = {
@@ -88,7 +101,10 @@ export class CourseDataService {
             };
             departmentMap.set(deptCode, department);
         }
+        return department;
+    }
 
+    private getOrCreateCourse(deptCode: string, courseNum: string, courseName: string, entry: any, department: Department): Course {
         const courseId = `${deptCode}-${courseNum}`;
         let course = department.courses.find(c => c.id === courseId);
         if (!course) {
@@ -104,14 +120,17 @@ export class CourseDataService {
             };
             department.courses.push(course);
         }
+        return course;
+    }
 
+    private createSectionFromEntry(entry: any, course: Course): Section {
         const sectionMatch = entry.Course_Section?.match(/([A-Z]+\s+\d+)-([A-Z0-9]+)/);
         const sectionNumber = sectionMatch ? sectionMatch[2] : '';
         
         const [enrolled, capacity] = (entry.Enrolled_Capacity || '0/0').split('/').map((n: string) => parseInt(n) || 0);
         const [waitlisted, waitlistCap] = (entry.Waitlist_Waitlist_Capacity || '0/0').split('/').map((n: string) => parseInt(n) || 0);
         
-        const section: Section = {
+        return {
             crn: 0, // Not available in new format
             number: sectionNumber,
             seats: capacity,
@@ -123,28 +142,28 @@ export class CourseDataService {
             term: entry.Offering_Period || '',
             periods: []
         };
+    }
 
-        if (entry.Meeting_Patterns && entry.Locations && entry.Instructors) {
-            const period: Period = {
-                type: entry.Instructional_Format || 'Lecture',
-                professor: entry.Instructors || '',
-                professorEmail: undefined,
-                startTime: this.parseTimeFromPattern(entry.Meeting_Patterns, true),
-                endTime: this.parseTimeFromPattern(entry.Meeting_Patterns, false),
-                building: this.extractBuilding(entry.Locations),
-                room: this.extractRoom(entry.Locations),
-                location: entry.Locations,
-                seats: capacity,
-                seatsAvailable: capacity - enrolled,
-                actualWaitlist: waitlisted,
-                maxWaitlist: waitlistCap,
-                days: this.parseDaysFromPattern(entry.Meeting_Day_Patterns || ''),
-                specificSection: sectionNumber
-            };
-            section.periods.push(period);
-        }
-
-        course.sections.push(section);
+    private createPeriodFromEntry(entry: any, section: Section): Period {
+        const [enrolled, capacity] = (entry.Enrolled_Capacity || '0/0').split('/').map((n: string) => parseInt(n) || 0);
+        const [waitlisted, waitlistCap] = (entry.Waitlist_Waitlist_Capacity || '0/0').split('/').map((n: string) => parseInt(n) || 0);
+        
+        return {
+            type: entry.Instructional_Format || 'Lecture',
+            professor: entry.Instructors || '',
+            professorEmail: undefined,
+            startTime: this.parseTimeFromPattern(entry.Meeting_Patterns, true),
+            endTime: this.parseTimeFromPattern(entry.Meeting_Patterns, false),
+            building: this.extractBuilding(entry.Locations),
+            room: this.extractRoom(entry.Locations),
+            location: entry.Locations,
+            seats: capacity,
+            seatsAvailable: capacity - enrolled,
+            actualWaitlist: waitlisted,
+            maxWaitlist: waitlistCap,
+            days: this.parseDaysFromPattern(entry.Meeting_Day_Patterns || ''),
+            specificSection: section.number
+        };
     }
 
     private stripHtml(html: string): string {
@@ -170,23 +189,7 @@ export class CourseDataService {
     }
 
     private parseDaysFromPattern(dayPattern: string): Set<DayOfWeek> {
-        const days = new Set<DayOfWeek>();
-        const dayMap: { [key: string]: DayOfWeek } = {
-            'M': DayOfWeek.MONDAY,
-            'T': DayOfWeek.TUESDAY, 
-            'W': DayOfWeek.WEDNESDAY,
-            'R': DayOfWeek.THURSDAY,
-            'F': DayOfWeek.FRIDAY,
-            'S': DayOfWeek.SATURDAY,
-            'U': DayOfWeek.SUNDAY
-        };
-
-        for (const char of dayPattern.replace(/-/g, '')) {
-            if (dayMap[char]) {
-                days.add(dayMap[char]);
-            }
-        }
-        return days;
+        return this.parseDays(dayPattern);
     }
 
     private parseTime(timeStr: string): Time {
@@ -216,12 +219,26 @@ export class CourseDataService {
         };
     }
 
-    private parseDays(daysStr: string): DayOfWeek[] {
+    private parseDays(daysStr: string): Set<DayOfWeek> {
+        const days = new Set<DayOfWeek>();
+        
         if (!daysStr || daysStr === '?') {
-            return [];
+            return days;
         }
 
-        const dayMap: { [key: string]: DayOfWeek } = {
+        // Handle pattern format (M, T, W, R, F, S, U)
+        const patternDayMap: { [key: string]: DayOfWeek } = {
+            'M': DayOfWeek.MONDAY,
+            'T': DayOfWeek.TUESDAY, 
+            'W': DayOfWeek.WEDNESDAY,
+            'R': DayOfWeek.THURSDAY,
+            'F': DayOfWeek.FRIDAY,
+            'S': DayOfWeek.SATURDAY,
+            'U': DayOfWeek.SUNDAY
+        };
+
+        // Handle full name format (mon, tue, wed, etc.)
+        const fullNameDayMap: { [key: string]: DayOfWeek } = {
             'mon': DayOfWeek.MONDAY,
             'tue': DayOfWeek.TUESDAY,
             'wed': DayOfWeek.WEDNESDAY,
@@ -231,7 +248,24 @@ export class CourseDataService {
             'sun': DayOfWeek.SUNDAY
         };
 
-        return daysStr.split(',').map(day => dayMap[day.trim().toLowerCase()]).filter(Boolean);
+        // Check if it's a pattern format (single characters)
+        if (daysStr.length <= 7 && /^[MTWRFSU-]+$/.test(daysStr)) {
+            for (const char of daysStr.replace(/-/g, '')) {
+                if (patternDayMap[char]) {
+                    days.add(patternDayMap[char]);
+                }
+            }
+        } else {
+            // Handle comma-separated full names
+            const dayNames = daysStr.split(',').map(day => day.trim().toLowerCase());
+            for (const dayName of dayNames) {
+                if (fullNameDayMap[dayName]) {
+                    days.add(fullNameDayMap[dayName]);
+                }
+            }
+        }
+
+        return days;
     }
 
     private getCachedData(): ScheduleDB | null {
