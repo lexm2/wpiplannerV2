@@ -19,6 +19,9 @@
                         </button>
                     </div>
                 </div>
+                <div class="header-navigation">
+                    <button id="schedule-btn" class="btn btn-primary btn-schedule">Schedule</button>
+                </div>
                 <div class="header-controls">
                     <input type="text" id="search-input" placeholder="Search courses..." class="search-input">
                     <div class="theme-selector">
@@ -35,7 +38,7 @@
             </div>
         </header>
         
-        <div class="app-body">
+        <div class="app-body" id="planner-page">
             <aside class="sidebar">
                 <div class="sidebar-header">
                     <h2>Departments</h2>
@@ -67,15 +70,24 @@
                         <div class="empty-state">Select a course to view description</div>
                     </div>
                 </div>
-                <div class="empty-section">
+                <div class="selected-courses-section">
                     <div class="panel-header">
-                        <h2>Additional Info</h2>
+                        <h2>Selected Courses <span id="selected-count" class="course-count">(0)</span></h2>
                     </div>
-                    <div class="empty-content">
-                        <!-- Empty placeholder for future features -->
+                    <div class="selected-courses-content" id="selected-courses-list">
+                        <div class="empty-state">No courses selected yet</div>
                     </div>
                 </div>
             </aside>
+        </div>
+        
+        <div class="app-body schedule-page" id="schedule-page" style="display: none;">
+            <div class="schedule-container">
+                <div class="schedule-content">
+                    <h2>Schedule View</h2>
+                    <p class="empty-state">Schedule functionality coming soon...</p>
+                </div>
+            </div>
         </div>
     </div>
     

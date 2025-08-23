@@ -1,0 +1,35 @@
+/* Schedule page */
+.schedule-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  grid-column: 1 / -1; /* Take up all grid columns when displayed */
+}
+
+.schedule-container {
+  flex: 1;
+  padding: 2rem;
+  background: var(--color-background);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.schedule-content {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+}
+
+.schedule-content h2 {
+  font-size: 2rem;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.schedule-content .empty-state {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  margin-top: 2rem;
+}

@@ -84,6 +84,19 @@
   to { transform: rotate(360deg); }
 }
 
+.header-navigation {
+  display: flex;
+  align-items: center;
+  margin-left: 2rem;
+}
+
+.btn-schedule {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 120px;
+}
+
 .header-controls {
   display: flex;
   gap: 1rem;

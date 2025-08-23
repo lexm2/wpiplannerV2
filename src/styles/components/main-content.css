@@ -12,12 +12,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: var(--synced-header-height);
+  min-height: fit-content;
 }
 
 .content-header h2 {
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text);
+  margin: 0;
 }
 
 .view-controls {

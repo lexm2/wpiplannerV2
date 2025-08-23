@@ -12,6 +12,8 @@ export class MainController {
     private allDepartments: Department[] = [];
     private selectedDepartment: Department | null = null;
     private selectedCourse: Course | null = null;
+    private currentView: 'list' | 'grid' = 'list';
+    private currentPage: 'planner' | 'schedule' = 'planner';
 
     // Department categories based on WPI structure
     private departmentCategories: { [key: string]: string } = {
@@ -84,6 +86,9 @@ export class MainController {
         this.setupEventListeners();
         this.setupDataRefreshListener();
         this.setupCourseSelectionListener();
+        this.displaySelectedCourses();
+        this.syncHeaderHeights();
+        this.setupHeaderResizeObserver();
     }
 
     private async loadCourseData(): Promise<void> {
@@ -185,6 +190,13 @@ export class MainController {
                 }
             }
 
+            if (target.classList.contains('course-remove-btn')) {
+                const courseId = target.dataset.courseId;
+                if (courseId) {
+                    this.courseSelectionService.unselectCourse(courseId);
+                }
+            }
+
             if (target.closest('.course-item') && !target.classList.contains('course-select-btn') && !target.classList.contains('section-badge')) {
                 const courseItem = target.closest('.course-item') as HTMLElement;
                 const courseId = courseItem.dataset.courseId;
@@ -209,6 +221,30 @@ export class MainController {
                 this.clearSelection();
             });
         }
+
+        // Schedule navigation
+        const scheduleButton = document.getElementById('schedule-btn');
+        if (scheduleButton) {
+            scheduleButton.addEventListener('click', () => {
+                this.switchToPage('schedule');
+            });
+        }
+
+        // View toggle buttons
+        const viewListBtn = document.getElementById('view-list');
+        const viewGridBtn = document.getElementById('view-grid');
+        
+        if (viewListBtn) {
+            viewListBtn.addEventListener('click', () => {
+                this.setView('list');
+            });
+        }
+        
+        if (viewGridBtn) {
+            viewGridBtn.addEventListener('click', () => {
+                this.setView('grid');
+            });
+        }
     }
 
     private selectDepartment(deptId: string): void {
@@ -226,6 +262,14 @@ export class MainController {
     }
 
     private displayCourses(courses: Course[]): void {
+        if (this.currentView === 'grid') {
+            this.displayCoursesGrid(courses);
+        } else {
+            this.displayCoursesList(courses);
+        }
+    }
+
+    private displayCoursesList(courses: Course[]): void {
         const courseContainer = document.getElementById('course-container');
         if (!courseContainer) return;
 
@@ -262,6 +306,49 @@ export class MainController {
                                 ).join('')}
                             </div>
                         </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        courseContainer.innerHTML = html;
+    }
+
+    private displayCoursesGrid(courses: Course[]): void {
+        const courseContainer = document.getElementById('course-container');
+        if (!courseContainer) return;
+
+        if (courses.length === 0) {
+            courseContainer.innerHTML = '<div class="empty-state">No courses found in this department.</div>';
+            return;
+        }
+
+        // Sort courses by course number
+        const sortedCourses = courses.sort((a, b) => a.number.localeCompare(b.number));
+
+        let html = '<div class="course-grid">';
+        
+        sortedCourses.forEach(course => {
+            const hasWarning = this.courseHasWarning(course);
+            const isSelected = this.courseSelectionService.isCourseSelected(course.id);
+            const credits = course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits}-${course.maxCredits}`;
+            
+            html += `
+                <div class="course-card ${isSelected ? 'selected' : ''}" data-course-id="${course.id}">
+                    <div class="course-card-header">
+                        <div class="course-code">${course.department.abbreviation}${course.number}</div>
+                        <button class="course-select-btn ${isSelected ? 'selected' : ''}" data-course-id="${course.id}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
+                            ${isSelected ? '✓' : '+'}
+                        </button>
+                    </div>
+                    <div class="course-title">
+                        ${course.name}
+                        ${hasWarning ? '<span class="warning-icon">⚠</span>' : ''}
+                    </div>
+                    <div class="course-info">
+                        <span class="course-credits">${credits} credits</span>
+                        <span class="course-sections-count">${course.sections.length} section${course.sections.length !== 1 ? 's' : ''}</span>
                     </div>
                 </div>
             `;
@@ -335,6 +422,7 @@ export class MainController {
         this.selectedDepartment = null;
         this.selectedCourse = null;
         this.clearCourseDescription();
+        this.displaySelectedCourses();
     }
 
     private selectCourse(courseId: string): void {
@@ -383,6 +471,53 @@ export class MainController {
         }
     }
 
+    private displaySelectedCourses(): void {
+        const selectedCoursesContainer = document.getElementById('selected-courses-list');
+        const countElement = document.getElementById('selected-count');
+        
+        if (!selectedCoursesContainer || !countElement) return;
+
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        
+        // Update count
+        countElement.textContent = `(${selectedCourses.length})`;
+
+        if (selectedCourses.length === 0) {
+            selectedCoursesContainer.innerHTML = '<div class="empty-state">No courses selected yet</div>';
+            return;
+        }
+
+        // Sort selected courses by department and number
+        const sortedCourses = selectedCourses.sort((a, b) => {
+            const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
+            if (deptCompare !== 0) return deptCompare;
+            return a.course.number.localeCompare(b.course.number);
+        });
+
+        let html = '';
+        sortedCourses.forEach(selectedCourse => {
+            const course = selectedCourse.course;
+            const credits = course.minCredits === course.maxCredits 
+                ? `${course.minCredits} credits` 
+                : `${course.minCredits}-${course.maxCredits} credits`;
+
+            html += `
+                <div class="selected-course-item" data-course-id="${course.id}">
+                    <div class="selected-course-info">
+                        <div class="selected-course-code">${course.department.abbreviation}${course.number}</div>
+                        <div class="selected-course-name">${course.name}</div>
+                        <div class="selected-course-credits">${credits}</div>
+                    </div>
+                    <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
+                        ×
+                    </button>
+                </div>
+            `;
+        });
+
+        selectedCoursesContainer.innerHTML = html;
+    }
+
     private toggleCourseSelection(courseId: string): void {
         // Find the course in all departments
         let course: Course | null = null;
@@ -419,6 +554,7 @@ export class MainController {
             console.log(`Selected courses updated: ${selectedCourses.length} courses selected`);
             // Update UI to reflect changes
             this.refreshCourseSelectionUI();
+            this.displaySelectedCourses();
         });
     }
 
@@ -481,5 +617,119 @@ export class MainController {
 
     public getCourseSelectionService(): CourseSelectionService {
         return this.courseSelectionService;
+    }
+
+    private setView(view: 'list' | 'grid'): void {
+        this.currentView = view;
+        
+        // Update button states
+        const viewListBtn = document.getElementById('view-list');
+        const viewGridBtn = document.getElementById('view-grid');
+        
+        if (viewListBtn && viewGridBtn) {
+            if (view === 'list') {
+                viewListBtn.classList.add('btn-primary', 'active');
+                viewListBtn.classList.remove('btn-secondary');
+                viewGridBtn.classList.add('btn-secondary');
+                viewGridBtn.classList.remove('btn-primary', 'active');
+            } else {
+                viewGridBtn.classList.add('btn-primary', 'active');
+                viewGridBtn.classList.remove('btn-secondary');
+                viewListBtn.classList.add('btn-secondary');
+                viewListBtn.classList.remove('btn-primary', 'active');
+            }
+        }
+        
+        // Re-render current courses if any are displayed
+        if (this.selectedDepartment) {
+            this.displayCourses(this.selectedDepartment.courses);
+        } else {
+            // Check if we're showing search results
+            const searchInput = document.getElementById('search-input') as HTMLInputElement;
+            if (searchInput?.value.trim()) {
+                this.handleSearch(searchInput.value);
+            }
+        }
+    }
+
+    private syncHeaderHeights(): void {
+        const sidebarHeader = document.querySelector('.sidebar-header') as HTMLElement;
+        const contentHeader = document.querySelector('.content-header') as HTMLElement;
+        const panelHeaders = document.querySelectorAll('.panel-header') as NodeListOf<HTMLElement>;
+
+        if (!sidebarHeader || !contentHeader || !panelHeaders.length) {
+            return;
+        }
+
+        // Reset heights to natural size to get accurate measurements
+        document.documentElement.style.setProperty('--synced-header-height', 'auto');
+        
+        // Allow layout to settle
+        requestAnimationFrame(() => {
+            // Get natural heights of all headers
+            const sidebarHeight = sidebarHeader.offsetHeight;
+            const contentHeight = contentHeader.offsetHeight;
+            const panelHeights = Array.from(panelHeaders).map(header => header.offsetHeight);
+            
+            // Find the maximum height
+            const maxHeight = Math.max(sidebarHeight, contentHeight, ...panelHeights);
+            
+            // Set the synced height to match the tallest header
+            document.documentElement.style.setProperty('--synced-header-height', `${maxHeight}px`);
+        });
+    }
+
+    private setupHeaderResizeObserver(): void {
+        if (!window.ResizeObserver) return;
+
+        const headers = [
+            document.querySelector('.sidebar-header'),
+            document.querySelector('.content-header'),
+            ...document.querySelectorAll('.panel-header')
+        ].filter(Boolean) as HTMLElement[];
+
+        if (!headers.length) return;
+
+        const resizeObserver = new ResizeObserver(() => {
+            this.syncHeaderHeights();
+        });
+
+        headers.forEach(header => {
+            resizeObserver.observe(header);
+        });
+    }
+
+    private switchToPage(page: 'planner' | 'schedule'): void {
+        if (page === this.currentPage) return;
+
+        this.currentPage = page;
+
+        // Update button text based on current page
+        const scheduleButton = document.getElementById('schedule-btn');
+        if (scheduleButton) {
+            if (page === 'schedule') {
+                scheduleButton.textContent = 'Back to Classes';
+                this.showSchedulePage();
+            } else {
+                scheduleButton.textContent = 'Schedule';
+                this.showPlannerPage();
+            }
+        }
+    }
+
+    private showPlannerPage(): void {
+        const plannerPage = document.getElementById('planner-page');
+        const schedulePage = document.getElementById('schedule-page');
+
+        if (plannerPage) plannerPage.style.display = 'grid';
+        if (schedulePage) schedulePage.style.display = 'none';
+    }
+
+    private showSchedulePage(): void {
+        const plannerPage = document.getElementById('planner-page');
+        const schedulePage = document.getElementById('schedule-page');
+
+        if (plannerPage) plannerPage.style.display = 'none';
+        if (schedulePage) schedulePage.style.display = 'flex';
     }
 }

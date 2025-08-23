@@ -5,3 +5,8 @@
   grid-template-columns: var(--spacing-sidebar-width) 1fr var(--spacing-right-panel-width);
   overflow: hidden;
 }
+
+/* Dynamic header height syncing */
+:root {
+  --synced-header-height: auto;
+}
