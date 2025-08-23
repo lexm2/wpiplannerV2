@@ -1,4 +1,4 @@
-import { Course } from '../types/types'
+import { Course, Department, Section } from '../types/types'
 import { SelectedCourse } from '../types/schedule'
 import { CourseManager } from '../core/CourseManager'
 import { StorageManager } from '../core/StorageManager'
@@ -138,5 +138,22 @@ export class CourseSelectionService {
             console.error('Failed to import selections:', error);
             return false;
         }
+    }
+
+    // Department and section management
+    setAllDepartments(departments: Department[]): void {
+        this.courseManager.setAllDepartments(departments);
+    }
+
+    getAllSections(): Section[] {
+        return this.courseManager.getAllSections();
+    }
+
+    getAllSectionsForCourse(courseId: string): Section[] {
+        return this.courseManager.getAllSectionsForCourse(courseId);
+    }
+
+    getAllSectionsForDepartment(deptAbbreviation: string): Section[] {
+        return this.courseManager.getAllSectionsForDepartment(deptAbbreviation);
     }
 }

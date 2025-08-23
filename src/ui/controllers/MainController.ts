@@ -68,6 +68,7 @@ export class MainController {
             this.allDepartments = scheduleDB.departments;
             this.departmentController.setAllDepartments(this.allDepartments);
             this.courseController.setAllDepartments(this.allDepartments);
+            this.courseSelectionService.setAllDepartments(this.allDepartments);
             console.log(`Loaded ${this.allDepartments.length} departments`);
             this.timestampManager.updateClientTimestamp();
             this.timestampManager.loadServerTimestamp();

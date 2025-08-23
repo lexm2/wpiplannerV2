@@ -19,8 +19,10 @@ async function fetchCourseData() {
     const data = await response.json();
     console.log('Data fetched successfully');
     
-    const outputPath = join(__dirname, '..', 'public', 'course-data.json');
-    writeFileSync(outputPath, JSON.stringify(data, null, 2));
+    // Save raw data for section construction pipeline
+    const rawOutputPath = join(__dirname, '..', 'public', 'prod-data-raw.json');
+    writeFileSync(rawOutputPath, JSON.stringify(data, null, 2));
+    console.log(`Raw data saved to ${rawOutputPath}`);
     
     // Create timestamp file with current UTC time
     const timestampPath = join(__dirname, '..', 'public', 'last-updated.json');
@@ -31,7 +33,7 @@ async function fetchCourseData() {
     };
     writeFileSync(timestampPath, JSON.stringify(timestamp, null, 2));
     
-    console.log(`Course data saved to ${outputPath}`);
+    console.log(`Raw data saved to ${rawOutputPath}`);
     console.log(`Timestamp saved to ${timestampPath}`);
     console.log(`Data contains ${Object.keys(data).length} top-level properties`);
     

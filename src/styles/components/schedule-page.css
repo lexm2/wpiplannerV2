@@ -414,17 +414,133 @@
 }
 
 /* Time slot cells */
-.time-slot {
+.time-slot,
+.schedule-cell {
   background: var(--color-surface);
   border: 1px solid transparent;
   position: relative;
 }
 
-.time-slot:hover {
+.time-slot:hover,
+.schedule-cell:hover {
   background: var(--color-background-alt);
 }
 
-/* Course blocks */
+.schedule-cell.occupied {
+  position: relative;
+}
+
+.schedule-cell.section-start {
+  /* First slot of a section */
+}
+
+.schedule-cell.section-continuation {
+  /* Continuation slots of a section */
+}
+
+/* Section blocks (new section-based display) */
+.section-block {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: 3px;
+  padding: 3px 6px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  text-align: left;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: var(--effect-transition);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.section-block:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  z-index: 20;
+  box-shadow: var(--effect-shadow-hover);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 3px;
+  gap: 6px;
+}
+
+.section-number {
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 2px 4px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.section-periods {
+  margin-bottom: 2px;
+}
+
+.period-type-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1px;
+  gap: 4px;
+}
+
+.period-type-info .period-type {
+  font-size: 0.55rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 1px 3px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+  min-width: 26px;
+  text-align: center;
+}
+
+.period-type-info .period-times {
+  font-size: 0.6rem;
+  opacity: 0.9;
+  font-family: var(--font-family-mono);
+}
+
+.section-enrollment {
+  font-size: 0.55rem;
+  opacity: 0.8;
+  text-align: center;
+  margin-top: auto;
+}
+
+/* Section continuation styling */
+.section-continuation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  border: 1px solid transparent;
+  border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Legacy course blocks for backward compatibility */
 .course-block {
   background: var(--color-primary);
   color: var(--color-text-inverse);
@@ -581,9 +697,16 @@
 .course-block.course-8 { background: #f97316; border-color: #f97316; }
 
 /* Conflict highlighting */
+.section-block.conflict,
 .course-block.conflict {
   background: var(--color-danger) !important;
   border-color: var(--color-danger) !important;
+  animation: pulse 1s infinite;
+}
+
+.section-continuation.conflict,
+.course-continuation.conflict {
+  border-left-color: var(--color-danger) !important;
   animation: pulse 1s infinite;
 }
 

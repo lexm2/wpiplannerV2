@@ -282,8 +282,8 @@ export class ScheduleController {
     }
 
     private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number): { content: string, classes: string } {
-        // Find all courses that occupy this cell
-        const occupyingCourses: any[] = [];
+        // Find all sections that occupy this cell
+        const occupyingSections: any[] = [];
         
         for (const selectedCourse of courses) {
             if (!selectedCourse.selectedSection) continue;
@@ -291,54 +291,111 @@ export class ScheduleController {
             const section = selectedCourse.course.sections.find((s: { number: any }) => s.number === selectedCourse.selectedSection);
             if (!section) continue;
             
-            for (const period of section.periods) {
-                if (!period.days.has(day)) continue;
-                
+            // Check if this section has any period that occupies this time slot on this day
+            const periodsOnThisDay = section.periods.filter((period: any) => period.days.has(day));
+            
+            let sectionOccupiesSlot = false;
+            let sectionStartSlot = Infinity;
+            let sectionEndSlot = -1;
+            let isFirstSlot = false;
+            
+            for (const period of periodsOnThisDay) {
                 const startSlot = TimeUtils.timeToGridRow(period.startTime);
                 const endSlot = TimeUtils.timeToGridRow(period.endTime);
                 
                 if (timeSlot >= startSlot && timeSlot < endSlot) {
-                    occupyingCourses.push({
-                        course: selectedCourse,
-                        section,
-                        period,
-                        startSlot,
-                        endSlot,
-                        isFirstSlot: timeSlot === startSlot
-                    });
+                    sectionOccupiesSlot = true;
+                    sectionStartSlot = Math.min(sectionStartSlot, startSlot);
+                    sectionEndSlot = Math.max(sectionEndSlot, endSlot);
                 }
+            }
+            
+            if (sectionOccupiesSlot) {
+                // Check if this is the first slot for this section on this day
+                isFirstSlot = timeSlot === sectionStartSlot;
+                
+                occupyingSections.push({
+                    course: selectedCourse,
+                    section,
+                    periodsOnThisDay,
+                    startSlot: sectionStartSlot,
+                    endSlot: sectionEndSlot,
+                    isFirstSlot
+                });
             }
         }
         
-        if (occupyingCourses.length === 0) {
+        if (occupyingSections.length === 0) {
             return { content: '', classes: '' };
         }
         
         // Check for conflicts
-        const hasConflict = occupyingCourses.length > 1;
-        const primaryCourse = occupyingCourses[0];
-        const courseColor = this.getCourseColor(primaryCourse.course.course.id);
+        const hasConflict = occupyingSections.length > 1;
+        const primarySection = occupyingSections[0];
+        const courseColor = this.getCourseColor(primarySection.course.course.id);
         
-        // Build content for the first course in the slot
-        const periodTypeClass = this.getPeriodTypeClass(primaryCourse.period.type);
-        const periodTypeLabel = this.getPeriodTypeLabel(primaryCourse.period.type);
-        
-        const content = primaryCourse.isFirstSlot ? `
-            <div class="course-block ${periodTypeClass} ${hasConflict ? 'conflict' : ''}" style="background-color: ${courseColor}">
-                <div class="course-header">
-                    <div class="course-title">${primaryCourse.course.course.department.abbreviation}${primaryCourse.course.course.number}</div>
-                    <div class="period-type-badge">${periodTypeLabel}</div>
+        // Build content for the first section in the slot
+        const content = primarySection.isFirstSlot ? `
+            <div class="section-block ${hasConflict ? 'conflict' : ''}" style="background-color: ${courseColor}">
+                <div class="section-header">
+                    <div class="course-title">${primarySection.course.course.department.abbreviation}${primarySection.course.course.number}</div>
+                    <div class="section-number">${primarySection.section.number}</div>
                 </div>
-                <div class="course-time">${TimeUtils.formatTimeRange(primaryCourse.period.startTime, primaryCourse.period.endTime)}</div>
-                <div class="course-location">${primaryCourse.period.location}</div>
-                <div class="course-professor">${primaryCourse.period.professor}</div>
+                <div class="section-periods">
+                    ${this.formatSectionPeriods(primarySection.periodsOnThisDay)}
+                </div>
+                <div class="section-enrollment">
+                    ${primarySection.section.seatsAvailable}/${primarySection.section.seats} seats
+                </div>
                 ${hasConflict ? '<div class="conflict-indicator">⚠ Conflict</div>' : ''}
             </div>
-        ` : `<div class="course-continuation ${periodTypeClass} ${hasConflict ? 'conflict' : ''}"></div>`;
+        ` : `<div class="section-continuation ${hasConflict ? 'conflict' : ''}"></div>`;
         
-        const classes = `occupied ${primaryCourse.isFirstSlot ? 'course-start' : 'course-continuation'} ${hasConflict ? 'has-conflict' : ''}`;
+        const classes = `occupied ${primarySection.isFirstSlot ? 'section-start' : 'section-continuation'} ${hasConflict ? 'has-conflict' : ''}`;
         
         return { content, classes };
+    }
+
+    private formatSectionPeriods(periods: any[]): string {
+        if (periods.length === 0) return '';
+        
+        // Group periods by type and format them
+        const periodsByType: { [type: string]: any[] } = {};
+        
+        for (const period of periods) {
+            const periodType = this.getPeriodTypeLabel(period.type);
+            if (!periodsByType[periodType]) {
+                periodsByType[periodType] = [];
+            }
+            periodsByType[periodType].push(period);
+        }
+        
+        // Create formatted list of periods
+        const periodStrings: string[] = [];
+        
+        // Sort by priority: Lecture, Lab, Discussion, etc.
+        const typeOrder = ['LEC', 'LAB', 'DIS', 'REC', 'SEM', 'STU', 'CONF'];
+        const sortedTypes = Object.keys(periodsByType).sort((a, b) => {
+            const indexA = typeOrder.indexOf(a);
+            const indexB = typeOrder.indexOf(b);
+            const priorityA = indexA === -1 ? 999 : indexA;
+            const priorityB = indexB === -1 ? 999 : indexB;
+            return priorityA - priorityB;
+        });
+        
+        for (const type of sortedTypes) {
+            const periodsOfType = periodsByType[type];
+            const timeRanges = periodsOfType.map(p => 
+                TimeUtils.formatTimeRange(p.startTime, p.endTime)
+            ).join(', ');
+            
+            periodStrings.push(`<div class="period-type-info">
+                <span class="period-type">${type}</span>
+                <span class="period-times">${timeRanges}</span>
+            </div>`);
+        }
+        
+        return periodStrings.join('');
     }
 
     private getCourseColor(courseId: string): string {

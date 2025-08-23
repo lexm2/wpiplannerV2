@@ -1,7 +1,7 @@
 import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek } from '../types/types'
 
 export class CourseDataService {
-    private static readonly WPI_COURSE_DATA_URL = './course-data.json';
+    private static readonly WPI_COURSE_DATA_URL = './course-data-constructed.json';
     private static readonly LOCAL_STORAGE_KEY = 'wpi-course-data';
     private static readonly CACHE_EXPIRY_HOURS = 1;
 
@@ -41,232 +41,168 @@ export class CourseDataService {
     }
 
     private parseJSONData(jsonData: any): ScheduleDB {
-        console.log('Parsing JSON data...');
-        const scheduleDB: ScheduleDB = {
-            departments: [],
-            generated: new Date().toISOString()
-        };
-
-        if (!jsonData.Report_Entry || !Array.isArray(jsonData.Report_Entry)) {
+        console.log('Parsing constructed JSON data...');
+        
+        if (!jsonData.departments || !Array.isArray(jsonData.departments)) {
             console.error('Invalid JSON data structure:', jsonData);
-            throw new Error('Invalid JSON data structure');
+            throw new Error('Invalid JSON data structure - missing departments array');
         }
 
-        console.log(`Processing ${jsonData.Report_Entry.length} course entries...`);
-        const departmentMap = new Map<string, Department>();
-
-        let processed = 0;
-        for (const entry of jsonData.Report_Entry) {
-            try {
-                this.processJSONEntry(entry, departmentMap);
-                processed++;
-            } catch (error) {
-                console.warn('Failed to process entry:', entry, error);
-            }
-        }
-
-        scheduleDB.departments = Array.from(departmentMap.values());
-        console.log(`Successfully processed ${processed}/${jsonData.Report_Entry.length} entries`);
+        console.log(`Processing ${jsonData.departments.length} departments...`);
+        
+        const scheduleDB: ScheduleDB = {
+            departments: this.parseConstructedDepartments(jsonData.departments),
+            generated: jsonData.generated || new Date().toISOString()
+        };
+        
         console.log(`Loaded ${scheduleDB.departments.length} departments with course data`);
+        
+        // Log sections for MA1024 specifically
+        this.logMA1024Sections(scheduleDB);
+        
         return scheduleDB;
     }
 
-    private processJSONEntry(entry: any, departmentMap: Map<string, Department>): void {
-        const courseTitle = entry.Course_Title || '';
-        const courseTitleMatch = courseTitle.match(/^([A-Z]+)\s+(\d+)\s*-\s*(.+)$/);
-        if (!courseTitleMatch) return;
-
-        const [, deptCode, courseNum, courseName] = courseTitleMatch;
-        const deptName = entry.Academic_Units || entry.Subject || deptCode;
-        
-        const department = this.getOrCreateDepartment(deptCode, deptName, departmentMap);
-        const course = this.getOrCreateCourse(deptCode, courseNum, courseName, entry, department);
-        const section = this.createSectionFromEntry(entry, course);
-        
-        if (entry.Meeting_Patterns && entry.Locations && entry.Instructors) {
-            const period = this.createPeriodFromEntry(entry, section);
-            section.periods.push(period);
-        }
-
-        course.sections.push(section);
-    }
-
-    private getOrCreateDepartment(deptCode: string, deptName: string, departmentMap: Map<string, Department>): Department {
-        let department = departmentMap.get(deptCode);
-        if (!department) {
-            department = {
-                abbreviation: deptCode,
-                name: deptName,
+    private parseConstructedDepartments(departments: any[]): Department[] {
+        return departments.map(deptData => {
+            const department: Department = {
+                abbreviation: deptData.abbreviation,
+                name: deptData.name,
                 courses: []
             };
-            departmentMap.set(deptCode, department);
-        }
-        return department;
+            
+            department.courses = deptData.courses.map((courseData: any) => {
+                const course: Course = {
+                    id: courseData.id,
+                    number: courseData.number,
+                    name: courseData.name,
+                    description: this.stripHtml(courseData.description || ''),
+                    department: department,
+                    sections: this.parseConstructedSections(courseData.sections || []),
+                    minCredits: courseData.min_credits || 0,
+                    maxCredits: courseData.max_credits || 0
+                };
+                return course;
+            });
+            
+            return department;
+        });
     }
 
-    private getOrCreateCourse(deptCode: string, courseNum: string, courseName: string, entry: any, department: Department): Course {
-        const courseId = `${deptCode}-${courseNum}`;
-        let course = department.courses.find(c => c.id === courseId);
-        if (!course) {
-            course = {
-                id: courseId,
-                number: courseNum,
-                name: courseName,
-                description: this.stripHtml(entry.Course_Description || ''),
-                department: department,
-                sections: [],
-                minCredits: parseFloat(entry.Credits || '3'),
-                maxCredits: parseFloat(entry.Credits || '3')
+    private parseConstructedSections(sections: any[]): Section[] {
+        return sections.map(sectionData => {
+            const section: Section = {
+                crn: sectionData.crn || 0,
+                number: sectionData.number || '',
+                seats: sectionData.seats || 0,
+                seatsAvailable: sectionData.seats_available || 0,
+                actualWaitlist: sectionData.actual_waitlist || 0,
+                maxWaitlist: sectionData.max_waitlist || 0,
+                note: sectionData.note,
+                description: this.stripHtml(sectionData.description || ''),
+                term: sectionData.term || '',
+                periods: this.parseConstructedPeriods(sectionData.periods || [])
             };
-            department.courses.push(course);
+            return section;
+        });
+    }
+    
+    private parseConstructedPeriods(periods: any[]): Period[] {
+        return periods.map(periodData => {
+            const period: Period = {
+                type: periodData.type || 'Lecture',
+                professor: periodData.professor || '',
+                professorEmail: undefined,
+                startTime: this.parseConstructedTime(periodData.start_time),
+                endTime: this.parseConstructedTime(periodData.end_time),
+                location: periodData.location || '',
+                building: periodData.building || '',
+                room: periodData.room || '',
+                seats: periodData.seats || 0,
+                seatsAvailable: periodData.seats_available || 0,
+                actualWaitlist: periodData.actual_waitlist || 0,
+                maxWaitlist: periodData.max_waitlist || 0,
+                days: this.parseConstructedDays(periodData.days || []),
+                specificSection: periodData.specific_section
+            };
+            return period;
+        });
+    }
+    
+    private parseConstructedTime(timeStr: string): Time {
+        if (!timeStr || timeStr === 'TBA') {
+            return { hours: 0, minutes: 0, displayTime: 'TBD' };
         }
-        return course;
+        
+        // Parse "HH:MM" format from constructed data
+        const match = timeStr.match(/(\d{1,2}):(\d{2})/);
+        if (!match) {
+            return { hours: 0, minutes: 0, displayTime: timeStr };
+        }
+        
+        const hours = parseInt(match[1]);
+        const minutes = parseInt(match[2]);
+        
+        // Convert to display format
+        const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const displayTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+        
+        return { hours, minutes, displayTime };
+    }
+    
+    private parseConstructedDays(days: string[]): Set<DayOfWeek> {
+        const daySet = new Set<DayOfWeek>();
+        
+        for (const day of days) {
+            switch (day.toLowerCase()) {
+                case 'mon': daySet.add(DayOfWeek.MONDAY); break;
+                case 'tue': daySet.add(DayOfWeek.TUESDAY); break;
+                case 'wed': daySet.add(DayOfWeek.WEDNESDAY); break;
+                case 'thu': daySet.add(DayOfWeek.THURSDAY); break;
+                case 'fri': daySet.add(DayOfWeek.FRIDAY); break;
+                case 'sat': daySet.add(DayOfWeek.SATURDAY); break;
+                case 'sun': daySet.add(DayOfWeek.SUNDAY); break;
+            }
+        }
+        
+        return daySet;
     }
 
-    private createSectionFromEntry(entry: any, course: Course): Section {
-        const sectionMatch = entry.Course_Section?.match(/([A-Z]+\s+\d+)-([A-Z0-9]+)/);
-        const sectionNumber = sectionMatch ? sectionMatch[2] : '';
+    private logMA1024Sections(scheduleDB: ScheduleDB): void {
+        const maDept = scheduleDB.departments.find(dept => dept.abbreviation === 'MA');
+        if (!maDept) {
+            console.log('MA department not found');
+            return;
+        }
         
-        const [enrolled, capacity] = (entry.Enrolled_Capacity || '0/0').split('/').map((n: string) => parseInt(n) || 0);
-        const [waitlisted, waitlistCap] = (entry.Waitlist_Waitlist_Capacity || '0/0').split('/').map((n: string) => parseInt(n) || 0);
+        const ma1024 = maDept.courses.find(course => course.number === '1024');
+        if (!ma1024) {
+            console.log('MA1024 course not found');
+            return;
+        }
         
-        return {
-            crn: 0, // Not available in new format
-            number: sectionNumber,
-            seats: capacity,
-            seatsAvailable: capacity - enrolled,
-            actualWaitlist: waitlisted,
-            maxWaitlist: waitlistCap,
-            note: entry.Section_Status === 'Waitlist' ? 'Waitlist Available' : undefined,
-            description: this.stripHtml(entry.Course_Section_Description || ''),
-            term: entry.Offering_Period || '',
-            periods: []
-        };
+        console.log(`\n=== MA1024 SECTIONS (${ma1024.sections.length} total) ===`);
+        ma1024.sections.forEach(section => {
+            console.log(`Section ${section.number}:`);
+            console.log(`  Term: ${section.term}`);
+            console.log(`  Enrollment: ${section.seatsAvailable}/${section.seats} available`);
+            console.log(`  Periods (${section.periods.length}):`);
+            section.periods.forEach((period, idx) => {
+                const days = Array.from(period.days).join(', ');
+                console.log(`    ${idx + 1}. ${period.type} - ${days} ${period.startTime.displayTime}-${period.endTime.displayTime} (${period.professor})`);
+            });
+            console.log('');
+        });
     }
 
-    private createPeriodFromEntry(entry: any, section: Section): Period {
-        const [enrolled, capacity] = (entry.Enrolled_Capacity || '0/0').split('/').map((n: string) => parseInt(n) || 0);
-        const [waitlisted, waitlistCap] = (entry.Waitlist_Waitlist_Capacity || '0/0').split('/').map((n: string) => parseInt(n) || 0);
-        
-        return {
-            type: entry.Instructional_Format || 'Lecture',
-            professor: entry.Instructors || '',
-            professorEmail: undefined,
-            startTime: this.parseTimeFromPattern(entry.Meeting_Patterns, true),
-            endTime: this.parseTimeFromPattern(entry.Meeting_Patterns, false),
-            building: this.extractBuilding(entry.Locations),
-            room: this.extractRoom(entry.Locations),
-            location: entry.Locations,
-            seats: capacity,
-            seatsAvailable: capacity - enrolled,
-            actualWaitlist: waitlisted,
-            maxWaitlist: waitlistCap,
-            days: this.parseDaysFromPattern(entry.Meeting_Day_Patterns || ''),
-            specificSection: section.number
-        };
-    }
+
 
     private stripHtml(html: string): string {
         return html.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim();
     }
 
-    private extractBuilding(location: string): string {
-        const match = location.match(/^([^0-9]+)/);
-        return match ? match[1].trim() : '';
-    }
 
-    private extractRoom(location: string): string {
-        const match = location.match(/([0-9]+[A-Z]*)$/);
-        return match ? match[1] : '';
-    }
-
-    private parseTimeFromPattern(pattern: string, isStart: boolean): Time {
-        const timeMatch = pattern.match(/(\d{1,2}:\d{2}\s*[AP]M)\s*-\s*(\d{1,2}:\d{2}\s*[AP]M)/);
-        if (!timeMatch) return { hours: 0, minutes: 0, displayTime: 'TBD' };
-        
-        const timeStr = isStart ? timeMatch[1] : timeMatch[2];
-        return this.parseTime(timeStr);
-    }
-
-    private parseDaysFromPattern(dayPattern: string): Set<DayOfWeek> {
-        return this.parseDays(dayPattern);
-    }
-
-    private parseTime(timeStr: string): Time {
-        if (!timeStr || timeStr === '?') {
-            return { hours: 0, minutes: 0, displayTime: 'TBD' };
-        }
-
-        const match = timeStr.match(/(\d{1,2}):(\d{2})(AM|PM)/i);
-        if (!match) {
-            return { hours: 0, minutes: 0, displayTime: timeStr };
-        }
-
-        let hours = parseInt(match[1]);
-        const minutes = parseInt(match[2]);
-        const ampm = match[3].toUpperCase();
-
-        if (ampm === 'PM' && hours !== 12) {
-            hours += 12;
-        } else if (ampm === 'AM' && hours === 12) {
-            hours = 0;
-        }
-
-        return {
-            hours,
-            minutes,
-            displayTime: timeStr
-        };
-    }
-
-    private parseDays(daysStr: string): Set<DayOfWeek> {
-        const days = new Set<DayOfWeek>();
-        
-        if (!daysStr || daysStr === '?') {
-            return days;
-        }
-
-        // Handle pattern format (M, T, W, R, F, S, U)
-        const patternDayMap: { [key: string]: DayOfWeek } = {
-            'M': DayOfWeek.MONDAY,
-            'T': DayOfWeek.TUESDAY, 
-            'W': DayOfWeek.WEDNESDAY,
-            'R': DayOfWeek.THURSDAY,
-            'F': DayOfWeek.FRIDAY,
-            'S': DayOfWeek.SATURDAY,
-            'U': DayOfWeek.SUNDAY
-        };
-
-        // Handle full name format (mon, tue, wed, etc.)
-        const fullNameDayMap: { [key: string]: DayOfWeek } = {
-            'mon': DayOfWeek.MONDAY,
-            'tue': DayOfWeek.TUESDAY,
-            'wed': DayOfWeek.WEDNESDAY,
-            'thu': DayOfWeek.THURSDAY,
-            'fri': DayOfWeek.FRIDAY,
-            'sat': DayOfWeek.SATURDAY,
-            'sun': DayOfWeek.SUNDAY
-        };
-
-        // Check if it's a pattern format (single characters)
-        if (daysStr.length <= 7 && /^[MTWRFSU-]+$/.test(daysStr)) {
-            for (const char of daysStr.replace(/-/g, '')) {
-                if (patternDayMap[char]) {
-                    days.add(patternDayMap[char]);
-                }
-            }
-        } else {
-            // Handle comma-separated full names
-            const dayNames = daysStr.split(',').map(day => day.trim().toLowerCase());
-            for (const dayName of dayNames) {
-                if (fullNameDayMap[dayName]) {
-                    days.add(fullNameDayMap[dayName]);
-                }
-            }
-        }
-
-        return days;
-    }
 
     private getCachedData(): ScheduleDB | null {
         try {

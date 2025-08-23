@@ -1,9 +1,11 @@
-import { Course, Section } from '../types/types'
+import { Course, Section, Department } from '../types/types'
 import { SelectedCourse, Schedule } from '../types/schedule'
 
 export class CourseManager {
     private selectedCourses: Map<string, SelectedCourse> = new Map();
     private listeners: Set<(courses: SelectedCourse[]) => void> = new Set();
+    private allSections: Set<Section> = new Set();
+    private allDepartments: Department[] = [];
 
     addCourse(course: Course, isRequired: boolean = false): void {
         const selectedCourse: SelectedCourse = {
@@ -87,5 +89,58 @@ export class CourseManager {
     private notifyListeners(): void {
         const courses = this.getSelectedCourses();
         this.listeners.forEach(listener => listener(courses));
+    }
+
+    // Section storage and access methods
+    setAllDepartments(departments: Department[]): void {
+        this.allDepartments = departments;
+        this.populateAllSections();
+    }
+
+    private populateAllSections(): void {
+        this.allSections.clear();
+        
+        for (const department of this.allDepartments) {
+            for (const course of department.courses) {
+                for (const section of course.sections) {
+                    this.allSections.add(section);
+                }
+            }
+        }
+        
+        console.log(`CourseManager: Populated ${this.allSections.size} sections from ${this.allDepartments.length} departments`);
+    }
+
+    getAllSections(): Section[] {
+        return Array.from(this.allSections);
+    }
+
+    getAllSectionsForCourse(courseId: string): Section[] {
+        return Array.from(this.allSections).filter(section => {
+            const course = this.findCourseContainingSection(section);
+            return course?.id === courseId;
+        });
+    }
+
+    getAllSectionsForDepartment(deptAbbreviation: string): Section[] {
+        const department = this.allDepartments.find(dept => dept.abbreviation === deptAbbreviation);
+        if (!department) return [];
+        
+        const sections: Section[] = [];
+        for (const course of department.courses) {
+            sections.push(...course.sections);
+        }
+        return sections;
+    }
+
+    private findCourseContainingSection(section: Section): Course | undefined {
+        for (const department of this.allDepartments) {
+            for (const course of department.courses) {
+                if (course.sections.includes(section)) {
+                    return course;
+                }
+            }
+        }
+        return undefined;
     }
 }
