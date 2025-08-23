@@ -1,7 +1,7 @@
-import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek } from './types.js';
+import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek } from './types'
 
 export class CourseDataService {
-    private static readonly WPI_COURSE_DATA_URL = './new.schedb';
+    private static readonly WPI_COURSE_DATA_URL = 'https://planner.wpi.edu/new.schedb';
     private static readonly LOCAL_STORAGE_KEY = 'wpi-course-data';
     private static readonly CACHE_EXPIRY_HOURS = 1;
 

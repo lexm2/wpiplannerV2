@@ -1,7 +1,7 @@
-import { Course, Department, ScheduleDB } from './types.js';
-import { CourseDataService } from './courseDataService.js';
+import { Course, Department, ScheduleDB } from './types'
+import { CourseDataService } from './courseDataService'
 
-class WPIPlanner {
+export class WPIPlanner {
     private courseDataService: CourseDataService;
     private courses: Course[] = [];
 
@@ -95,6 +95,3 @@ class WPIPlanner {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new WPIPlanner();
-});
