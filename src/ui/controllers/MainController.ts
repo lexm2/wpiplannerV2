@@ -9,6 +9,7 @@ export class MainController {
     private dataRefreshService: DataRefreshService;
     private allDepartments: Department[] = [];
     private selectedDepartment: Department | null = null;
+    private selectedCourse: Course | null = null;
 
     // Department categories based on WPI structure
     private departmentCategories: { [key: string]: string } = {
@@ -172,6 +173,14 @@ export class MainController {
             if (target.classList.contains('section-badge')) {
                 target.classList.toggle('selected');
             }
+            
+            if (target.closest('.course-item')) {
+                const courseItem = target.closest('.course-item') as HTMLElement;
+                const courseId = courseItem.dataset.courseId;
+                if (courseId) {
+                    this.selectCourse(courseId);
+                }
+            }
         });
 
         // Search functionality
@@ -309,6 +318,54 @@ export class MainController {
             item.classList.remove('active');
         });
         this.selectedDepartment = null;
+        this.selectedCourse = null;
+        this.clearCourseDescription();
+    }
+
+    private selectCourse(courseId: string): void {
+        // Find the course in all departments
+        let course: Course | null = null;
+        for (const dept of this.allDepartments) {
+            course = dept.courses.find(c => c.id === courseId) || null;
+            if (course) break;
+        }
+
+        if (!course) return;
+
+        this.selectedCourse = course;
+        this.displayCourseDescription(course);
+        
+        // Update active state for course items
+        document.querySelectorAll('.course-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        const selectedCourseElement = document.querySelector(`[data-course-id="${courseId}"]`);
+        if (selectedCourseElement) {
+            selectedCourseElement.classList.add('active');
+        }
+    }
+
+    private displayCourseDescription(course: Course): void {
+        const descriptionContainer = document.getElementById('course-description');
+        if (!descriptionContainer) return;
+
+        const html = `
+            <div class="course-info">
+                <div class="course-title">${course.name}</div>
+                <div class="course-code">${course.department.abbreviation}${course.number} (${course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits}-${course.maxCredits}`} credits)</div>
+            </div>
+            <div class="course-description-text">${course.description}</div>
+        `;
+
+        descriptionContainer.innerHTML = html;
+    }
+
+    private clearCourseDescription(): void {
+        const descriptionContainer = document.getElementById('course-description');
+        if (descriptionContainer) {
+            descriptionContainer.innerHTML = '<div class="empty-state">Select a course to view description</div>';
+        }
     }
 
     private setupDataRefreshListener(): void {

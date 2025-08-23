@@ -16,6 +16,13 @@
 .course-item:hover {
   border-color: var(--color-primary);
   box-shadow: var(--effect-shadow-hover);
+  cursor: pointer;
+}
+
+.course-item.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-background);
+  box-shadow: var(--effect-shadow-hover);
 }
 
 .course-header {

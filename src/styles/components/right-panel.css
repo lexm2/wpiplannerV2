@@ -3,8 +3,9 @@
   background: var(--color-background-alt);
   border-left: 1px solid var(--color-border);
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 0;
 }
 
 .panel-header {
@@ -18,18 +19,57 @@
   color: var(--color-text);
 }
 
-.selected-courses {
+/* Course description section - top half */
+.course-description-section {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.course-description-content {
   flex: 1;
   padding: 1rem 1.5rem;
+  overflow-y: auto;
 }
 
-.schedule-preview {
-  border-top: 1px solid var(--color-border);
-  padding: 1rem 1.5rem;
+.course-description-content .empty-state {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-align: center;
+  margin-top: 2rem;
 }
 
-.schedule-preview h3 {
+.course-info {
   margin-bottom: 1rem;
+}
+
+.course-title {
   font-size: 1.1rem;
   font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.course-code {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+}
+
+.course-description-text {
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+/* Empty section - bottom half */
+.empty-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty-content {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
 }
