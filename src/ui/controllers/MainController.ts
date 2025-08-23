@@ -1,13 +1,15 @@
-import { Course, Department } from '../../types/types'
+import { Course, Department, DayOfWeek } from '../../types/types'
 import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
+import { ConflictDetector } from '../../core/ConflictDetector'
 import { TimeUtils } from '../utils/timeUtils'
 
 export class MainController {
     private courseDataService: CourseDataService;
     private themeSelector: ThemeSelector;
     private courseSelectionService: CourseSelectionService;
+    private conflictDetector: ConflictDetector;
     private allDepartments: Department[] = [];
     private selectedDepartment: Department | null = null;
     private selectedCourse: Course | null = null;
@@ -74,6 +76,7 @@ export class MainController {
         this.courseDataService = new CourseDataService();
         this.themeSelector = new ThemeSelector();
         this.courseSelectionService = new CourseSelectionService();
+        this.conflictDetector = new ConflictDetector();
         this.init();
     }
 
@@ -365,6 +368,7 @@ export class MainController {
         courseContainer.innerHTML = html;
     }
 
+    // TODO: IMPLEMENT
     private courseHasWarning(course: Course): boolean {
         // Add logic to determine if a course has warnings
         // For now, randomly add warnings to some courses for demo
@@ -894,5 +898,148 @@ export class MainController {
         
         // Update schedule page with current selected courses
         this.displayScheduleSelectedCourses();
+        this.renderScheduleGrids();
     }
+
+    private renderScheduleGrids(): void {
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        const grids = ['A', 'B', 'C', 'D'];
+        
+        grids.forEach(term => {
+            const gridContainer = document.getElementById(`schedule-grid-${term}`);
+            if (!gridContainer) return;
+            
+            // Filter courses for this term
+            const termCourses = selectedCourses.filter(sc => 
+                sc.selectedSection && 
+                sc.course.sections.some(section => 
+                    section.number === sc.selectedSection && 
+                    section.term.toUpperCase().includes(term)
+                )
+            );
+            
+            if (termCourses.length === 0) {
+                this.renderEmptyGrid(gridContainer, term);
+                return;
+            }
+            
+            this.renderPopulatedGrid(gridContainer, termCourses, term);
+        });
+    }
+
+    private renderEmptyGrid(container: HTMLElement, term: string): void {
+        container.innerHTML = `
+            <div class="empty-schedule">
+                <div class="empty-message">No classes scheduled for ${term} term</div>
+            </div>
+        `;
+        container.classList.add('empty');
+    }
+
+    private renderPopulatedGrid(container: HTMLElement, courses: any[], term: string): void {
+        container.classList.remove('empty');
+        
+        // Create 5-day (Mon-Fri) × 24 time slot grid (7 AM - 7 PM, 30-min intervals)
+        const weekdays = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
+        const timeSlots = TimeUtils.TOTAL_TIME_SLOTS;
+        
+        let html = `
+            <div class="schedule-grid-header">
+                <div class="time-column-header"></div>
+                ${weekdays.map(day => `
+                    <div class="day-header">${TimeUtils.getDayAbbr(day)}</div>
+                `).join('')}
+            </div>
+            <div class="schedule-grid-body">
+        `;
+        
+        // Generate time rows
+        for (let slot = 0; slot < timeSlots; slot++) {
+            const hour = Math.floor(slot / 2) + TimeUtils.START_HOUR;
+            const minute = (slot % 2) * 30;
+            const timeLabel = slot % 2 === 0 ? TimeUtils.formatTime({ hours: hour, minutes: minute, displayTime: '' }) : '';
+            
+            html += `
+                <div class="schedule-row">
+                    <div class="time-label">${timeLabel}</div>
+                    ${weekdays.map(day => {
+                        const cell = this.getCellContent(courses, day, slot);
+                        return `<div class="schedule-cell ${cell.classes}" data-day="${day}" data-slot="${slot}">${cell.content}</div>`;
+                    }).join('')}
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number): { content: string, classes: string } {
+        // Find all courses that occupy this cell
+        const occupyingCourses: any[] = [];
+        
+        for (const selectedCourse of courses) {
+            if (!selectedCourse.selectedSection) continue;
+            
+            const section = selectedCourse.course.sections.find((s: { number: any }) => s.number === selectedCourse.selectedSection);
+            if (!section) continue;
+            
+            for (const period of section.periods) {
+                if (!period.days.has(day)) continue;
+                
+                const startSlot = TimeUtils.timeToGridRow(period.startTime);
+                const endSlot = TimeUtils.timeToGridRow(period.endTime);
+                
+                if (timeSlot >= startSlot && timeSlot < endSlot) {
+                    occupyingCourses.push({
+                        course: selectedCourse,
+                        section,
+                        period,
+                        startSlot,
+                        endSlot,
+                        isFirstSlot: timeSlot === startSlot
+                    });
+                }
+            }
+        }
+        
+        if (occupyingCourses.length === 0) {
+            return { content: '', classes: '' };
+        }
+        
+        // Check for conflicts
+        const hasConflict = occupyingCourses.length > 1;
+        const primaryCourse = occupyingCourses[0];
+        const courseColor = this.getCourseColor(primaryCourse.course.course.id);
+        
+        // Build content for the first course in the slot
+        const content = primaryCourse.isFirstSlot ? `
+            <div class="course-block ${hasConflict ? 'conflict' : ''}" style="background-color: ${courseColor}">
+                <div class="course-title">${primaryCourse.course.course.department.abbreviation}${primaryCourse.course.course.number}</div>
+                <div class="course-time">${TimeUtils.formatTimeRange(primaryCourse.period.startTime, primaryCourse.period.endTime)}</div>
+                <div class="course-location">${primaryCourse.period.location}</div>
+                ${hasConflict ? '<div class="conflict-indicator">⚠ Conflict</div>' : ''}
+            </div>
+        ` : `<div class="course-continuation ${hasConflict ? 'conflict' : ''}"></div>`;
+        
+        const classes = `occupied ${primaryCourse.isFirstSlot ? 'course-start' : 'course-continuation'} ${hasConflict ? 'has-conflict' : ''}`;
+        
+        return { content, classes };
+    }
+
+    private getCourseColor(courseId: string): string {
+        // Generate consistent colors for courses
+        const colors = [
+            '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336',
+            '#00BCD4', '#795548', '#607D8B', '#3F51B5', '#E91E63'
+        ];
+        
+        let hash = 0;
+        for (let i = 0; i < courseId.length; i++) {
+            hash = courseId.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        
+        return colors[Math.abs(hash) % colors.length];
+    }
+
 }
