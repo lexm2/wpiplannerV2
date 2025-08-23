@@ -1,0 +1,20 @@
+{
+  "name": "wpi-planner-v2",
+  "version": "1.0.0",
+  "description": "Modern WPI course planner built with TypeScript",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "serve": "http-server dist -p 3000",
+    "start": "npm run build && npm run serve"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "http-server": "^14.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "keywords": ["wpi", "planner", "course", "typescript"],
+  "author": "",
+  "license": "MIT"
+}
