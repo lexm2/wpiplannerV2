@@ -82,11 +82,52 @@
         </div>
         
         <div class="app-body schedule-page" id="schedule-page" style="display: none;">
-            <div class="schedule-container">
-                <div class="schedule-content">
-                    <h2>Schedule View</h2>
-                    <p class="empty-state">Schedule functionality coming soon...</p>
-                </div>
+            <div class="schedule-page-layout">
+                <aside class="schedule-sidebar">
+                    <div class="schedule-sidebar-header">
+                        <h2>Selected Courses <span id="schedule-selected-count" class="course-count">(0)</span></h2>
+                    </div>
+                    <div class="schedule-selected-courses" id="schedule-selected-courses">
+                        <div class="empty-state">No courses selected yet</div>
+                    </div>
+                </aside>
+                
+                <main class="schedule-main">
+                    <div class="terms-grid">
+                        <div class="term-graph" data-term="A">
+                            <div class="term-header">
+                                <h3>A Term</h3>
+                            </div>
+                            <div class="schedule-grid" id="schedule-grid-A">
+                                <!-- Schedule grid will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="term-graph" data-term="B">
+                            <div class="term-header">
+                                <h3>B Term</h3>
+                            </div>
+                            <div class="schedule-grid" id="schedule-grid-B">
+                                <!-- Schedule grid will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="term-graph" data-term="C">
+                            <div class="term-header">
+                                <h3>C Term</h3>
+                            </div>
+                            <div class="schedule-grid" id="schedule-grid-C">
+                                <!-- Schedule grid will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="term-graph" data-term="D">
+                            <div class="term-header">
+                                <h3>D Term</h3>
+                            </div>
+                            <div class="schedule-grid" id="schedule-grid-D">
+                                <!-- Schedule grid will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
         </div>
     </div>

@@ -3,6 +3,7 @@ import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { DataRefreshService } from '../../services/DataRefreshService'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
+import { TimeUtils } from '../utils/timeUtils'
 
 export class MainController {
     private courseDataService: CourseDataService;
@@ -194,6 +195,14 @@ export class MainController {
                 const courseId = target.dataset.courseId;
                 if (courseId) {
                     this.courseSelectionService.unselectCourse(courseId);
+                }
+            }
+
+            if (target.classList.contains('section-select-btn')) {
+                const courseId = target.dataset.courseId;
+                const sectionNumber = target.dataset.section;
+                if (courseId && sectionNumber) {
+                    this.handleSectionSelection(courseId, sectionNumber);
                 }
             }
 
@@ -518,6 +527,120 @@ export class MainController {
         selectedCoursesContainer.innerHTML = html;
     }
 
+    private displayScheduleSelectedCourses(): void {
+        const selectedCoursesContainer = document.getElementById('schedule-selected-courses');
+        const countElement = document.getElementById('schedule-selected-count');
+        
+        if (!selectedCoursesContainer || !countElement) return;
+
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        
+        // Update count
+        countElement.textContent = `(${selectedCourses.length})`;
+
+        if (selectedCourses.length === 0) {
+            selectedCoursesContainer.innerHTML = '<div class="empty-state">No courses selected yet</div>';
+            return;
+        }
+
+        // Sort selected courses by department and number
+        const sortedCourses = selectedCourses.sort((a, b) => {
+            const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
+            if (deptCompare !== 0) return deptCompare;
+            return a.course.number.localeCompare(b.course.number);
+        });
+
+        let html = '';
+        sortedCourses.forEach(selectedCourse => {
+            const course = selectedCourse.course;
+            const credits = course.minCredits === course.maxCredits 
+                ? `${course.minCredits} credits` 
+                : `${course.minCredits}-${course.maxCredits} credits`;
+
+            // Group sections by term
+            const sectionsByTerm: { [term: string]: typeof course.sections } = {};
+            course.sections.forEach(section => {
+                if (!sectionsByTerm[section.term]) {
+                    sectionsByTerm[section.term] = [];
+                }
+                sectionsByTerm[section.term].push(section);
+            });
+
+            html += `
+                <div class="schedule-course-item" data-course-id="${course.id}">
+                    <div class="schedule-course-header">
+                        <div class="schedule-course-info">
+                            <div class="schedule-course-code">${course.department.abbreviation}${course.number}</div>
+                            <div class="schedule-course-name">${course.name}</div>
+                            <div class="schedule-course-credits">${credits}</div>
+                        </div>
+                        <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
+                            ×
+                        </button>
+                    </div>
+                    <div class="schedule-sections-container">
+            `;
+
+            // Display sections grouped by term
+            const terms = Object.keys(sectionsByTerm).sort();
+            terms.forEach(term => {
+                html += `<div class="term-sections" data-term="${term}">`;
+                html += `<div class="term-label">${term} Term</div>`;
+                
+                sectionsByTerm[term].forEach(section => {
+                    const isSelected = selectedCourse.selectedSection === section.number;
+                    const selectedClass = isSelected ? 'selected' : '';
+                    
+                    // Get primary period for display
+                    const primaryPeriod = section.periods[0];
+                    if (primaryPeriod) {
+                        const timeRange = TimeUtils.formatTimeRange(primaryPeriod.startTime, primaryPeriod.endTime);
+                        const days = TimeUtils.formatDays(primaryPeriod.days);
+                        
+                        html += `
+                            <div class="section-option ${selectedClass}" data-course-id="${course.id}" data-section="${section.number}">
+                                <div class="section-info">
+                                    <div class="section-number">${section.number}</div>
+                                    <div class="section-schedule">${days} ${timeRange}</div>
+                                    <div class="section-professor">${primaryPeriod.professor}</div>
+                                </div>
+                                <button class="section-select-btn ${selectedClass}" data-course-id="${course.id}" data-section="${section.number}">
+                                    ${isSelected ? '✓' : '+'}
+                                </button>
+                            </div>
+                        `;
+                    }
+                });
+                
+                html += `</div>`;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+        });
+
+        selectedCoursesContainer.innerHTML = html;
+    }
+
+    private handleSectionSelection(courseId: string, sectionNumber: string): void {
+        const currentSelectedSection = this.courseSelectionService.getSelectedSection(courseId);
+        
+        if (currentSelectedSection === sectionNumber) {
+            // Deselect current section
+            this.courseSelectionService.setSelectedSection(courseId, null);
+        } else {
+            // Select new section
+            this.courseSelectionService.setSelectedSection(courseId, sectionNumber);
+        }
+        
+        // Update schedule grids if we're on the schedule page
+        if (this.currentPage === 'schedule') {
+            this.renderScheduleGrids();
+        }
+    }
+
     private toggleCourseSelection(courseId: string): void {
         // Find the course in all departments
         let course: Course | null = null;
@@ -555,6 +678,7 @@ export class MainController {
             // Update UI to reflect changes
             this.refreshCourseSelectionUI();
             this.displaySelectedCourses();
+            this.displayScheduleSelectedCourses();
         });
     }
 
@@ -736,5 +860,8 @@ export class MainController {
 
         if (plannerPage) plannerPage.style.display = 'none';
         if (schedulePage) schedulePage.style.display = 'flex';
+        
+        // Update schedule page with current selected courses
+        this.displayScheduleSelectedCourses();
     }
 }

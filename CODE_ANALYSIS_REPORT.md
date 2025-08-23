@@ -724,7 +724,551 @@ interface ScheduleGridCell<TCourse = Course> {
 
 ---
 
-## Next Steps
-1. Examine `ui/controllers/` for proper service integration  
-2. Analyze `utils/` for shared functionality patterns
-3. Review overall architecture integration patterns
+## UI Directory Analysis (`src/ui/` and `src/utils/`)
+
+### UI Architecture Principles
+1. **Component Encapsulation** - Self-contained UI components with clear boundaries
+2. **Event-Driven Architecture** - DOM event handling with proper delegation
+3. **Service Integration** - Clean integration between UI and business logic
+4. **State Management** - Consistent UI state tracking and updates
+5. **Accessibility** - Keyboard navigation and screen reader support
+6. **Responsive Design** - Mobile-first and cross-device compatibility
+7. **DOM Manipulation Safety** - Null checks and error handling for DOM operations
+
+### 1. MainController.ts (Primary UI Controller)
+
+#### ✅ **Best Practices Followed:**
+- **Single Responsibility**: Central coordination of all UI interactions
+- **Service Composition**: Proper integration of CourseDataService, ThemeSelector, DataRefreshService, CourseSelectionService
+- **Event Delegation**: Efficient single event listener with delegation pattern (lines 164-207)
+- **State Management**: Consistent tracking of `currentView`, `currentPage`, `selectedDepartment`, `selectedCourse`
+- **Dynamic Content**: Proper innerHTML generation with template literals for performance
+- **Header Height Syncing**: Advanced CSS custom properties and ResizeObserver integration
+- **Error Handling**: Try-catch blocks for data loading with user-friendly error messages
+
+#### ⚠️ **Areas for Optimization:**
+1. **Large Class Size**: 739 lines - violates single responsibility at method level
+   **Recommendation**: Extract specialized controllers (CourseDisplayController, NavigationController, etc.)
+
+2. **Mixed Concerns**: UI manipulation mixed with business logic
+   ```typescript
+   // UI manipulation in business method
+   private selectDepartment(deptId: string): void {
+       const department = this.allDepartments.find(d => d.abbreviation === deptId);
+       this.displayCourses(department.courses);  // UI update
+       const contentHeader = document.querySelector('.content-header h2');
+       if (contentHeader) contentHeader.textContent = `${department.name} Courses`;
+   }
+   ```
+   **Recommendation**: Separate data operations from UI updates
+
+3. **Direct DOM Manipulation**: Extensive use of `document.querySelector` throughout
+   **Recommendation**: Implement DOM element caching or abstraction layer
+
+4. **Hard-coded HTML Generation**: Large HTML string concatenation (lines 284-315)
+   ```typescript
+   html += `
+       <div class="course-item ${isSelected ? 'selected' : ''}" data-course-id="${course.id}">
+           // 20+ lines of HTML
+       </div>
+   `;
+   ```
+   **Recommendation**: Extract to template functions or use template literals
+
+5. **Missing Cleanup**: No cleanup method for event listeners and observers
+   **Recommendation**: Add destroy method for proper resource cleanup
+
+#### 🔧 **Suggested Improvements:**
+```typescript
+// Extract specialized controllers
+class CourseDisplayController {
+    displayCoursesList(courses: Course[]): void { ... }
+    displayCoursesGrid(courses: Course[]): void { ... }
+}
+
+class NavigationController {
+    switchToPage(page: 'planner' | 'schedule'): void { ... }
+    updateNavigationState(): void { ... }
+}
+
+// Add template abstraction
+class CourseTemplates {
+    static courseListItem(course: Course, isSelected: boolean): string { ... }
+    static courseGridCard(course: Course, isSelected: boolean): string { ... }
+}
+
+// Add cleanup capability
+class MainController {
+    private resizeObserver?: ResizeObserver;
+    
+    destroy(): void {
+        this.resizeObserver?.disconnect();
+        // Clean up other resources
+    }
+}
+```
+
+---
+
+### 2. ThemeSelector.ts (Theme Management Component)
+
+#### ✅ **Best Practices Followed:**
+- **Encapsulation**: Self-contained theme switching functionality
+- **Singleton Pattern Integration**: Proper use of ThemeManager.getInstance()
+- **Event Handling**: Clean dropdown toggle with outside-click detection
+- **State Management**: Consistent `isOpen` state tracking
+- **DOM Safety**: Null checks before DOM operations
+- **Dynamic Rendering**: Template-based option generation
+- **Storage Integration**: Automatic theme preference persistence
+
+#### ⚠️ **Areas for Optimization:**
+1. **Multiple DOM Queries**: Repeated element lookups without caching
+   ```typescript
+   // Elements looked up multiple times
+   const scheduleButton = document.getElementById('schedule-btn');
+   ```
+   **Recommendation**: Cache DOM elements in constructor
+
+2. **Direct Service Instantiation**: Tight coupling through `new StorageManager()`
+   ```typescript
+   constructor() {
+       this.themeManager = ThemeManager.getInstance();
+       this.storageManager = new StorageManager();  // Should be injected
+   }
+   ```
+   **Recommendation**: Use dependency injection
+
+3. **HTML String Generation**: Template literals for option rendering
+   **Recommendation**: Consider using DocumentFragment for better performance
+
+4. **Missing Keyboard Support**: No keyboard navigation for dropdown
+   **Recommendation**: Add arrow key navigation and Enter/Escape handling
+
+5. **No Error Handling**: Theme loading failures not handled gracefully
+   **Recommendation**: Add fallback theme handling
+
+#### 🔧 **Suggested Improvements:**
+```typescript
+class ThemeSelector {
+    constructor(
+        private themeManager = ThemeManager.getInstance(),
+        private storageManager = new StorageManager()
+    ) { ... }
+    
+    // Add keyboard support
+    private setupKeyboardNavigation(): void {
+        this.dropdownElement?.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowDown': this.navigateOptions(1); break;
+                case 'ArrowUp': this.navigateOptions(-1); break;
+                case 'Enter': this.selectCurrentOption(); break;
+                case 'Escape': this.closeDropdown(); break;
+            }
+        });
+    }
+    
+    // Use DocumentFragment for performance
+    private renderThemeOptions(): void {
+        const fragment = document.createDocumentFragment();
+        availableThemes.forEach(theme => {
+            const option = this.createThemeOption(theme);
+            fragment.appendChild(option);
+        });
+        this.optionsElement?.replaceChildren(fragment);
+    }
+}
+```
+
+---
+
+### 3. dateUtils.ts (Date/Time Utilities)
+
+#### ✅ **Best Practices Followed:**
+- **Static Utility Class**: Pure functions without state
+- **Academic Calendar Logic**: WPI-specific semester calculations
+- **Time Parsing**: Robust 12/24 hour time conversion
+- **Input Validation**: Null checks and regex validation
+- **Type Safety**: Strong return type definitions
+
+#### ⚠️ **Areas for Optimization:**
+1. **Hard-coded Date Logic**: Academic year logic may not handle edge cases
+   ```typescript
+   // May not handle all academic calendar variations
+   return currentMonth >= 7 ? currentYear : currentYear - 1;
+   ```
+   **Recommendation**: Make configurable or use external calendar data
+
+2. **Missing Timezone Support**: No timezone handling for different locales
+   **Recommendation**: Add timezone awareness
+
+3. **Limited Error Handling**: parseTime returns null but doesn't log errors
+   **Recommendation**: Add error logging or throw descriptive errors
+
+4. **Performance**: Creates new Date objects repeatedly
+   **Recommendation**: Cache common date calculations
+
+#### 🔧 **Suggested Improvements:**
+```typescript
+class DateUtils {
+    private static academicYearConfig = {
+        startMonth: 7,  // August (0-indexed)
+        fallStart: { month: 8, day: 1 },
+        springStart: { month: 0, day: 1 },
+        // ... configurable calendar
+    };
+    
+    // Add timezone support
+    static formatTimeWithTimezone(hours: number, minutes: number, timezone = 'America/New_York'): string {
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return date.toLocaleTimeString('en-US', { 
+            timeZone: timezone,
+            hour12: true 
+        });
+    }
+}
+```
+
+---
+
+### 4. validators.ts (Data Validation Utilities)
+
+#### ✅ **Best Practices Followed:**
+- **Type Guards**: Comprehensive use of TypeScript type predicates
+- **Validation Composition**: Complex validators built from simple ones
+- **Sanitization**: HTML stripping and input cleaning
+- **Regex Validation**: Pattern matching for IDs and formats
+- **Error Handling**: Try-catch blocks in sanitization methods
+
+#### ⚠️ **Areas for Optimization:**
+1. **Recursive Validation**: Deep object validation without cycle detection
+   ```typescript
+   // Could cause infinite loops with circular references
+   course.sections.every((s: any) => this.isValidSection(s))
+   ```
+   **Recommendation**: Add cycle detection or limit recursion depth
+
+2. **Performance**: Validates entire objects even for small changes
+   **Recommendation**: Add incremental validation
+
+3. **Limited Regex Patterns**: Course ID pattern may not cover all departments
+   ```typescript
+   // May not handle all WPI department codes
+   return /^[A-Z]{2,4}-\d{4}$/.test(courseId);
+   ```
+   **Recommendation**: Make patterns configurable
+
+4. **No Validation Context**: Errors provide no context about what failed
+   **Recommendation**: Return validation result objects with details
+
+#### 🔧 **Suggested Improvements:**
+```typescript
+interface ValidationResult {
+    isValid: boolean;
+    errors: string[];
+    warnings: string[];
+}
+
+class Validators {
+    private static visitedObjects = new WeakSet();
+    
+    static validateCourse(course: any, context = new Set()): ValidationResult {
+        if (context.has(course)) {
+            return { isValid: false, errors: ['Circular reference detected'], warnings: [] };
+        }
+        context.add(course);
+        
+        const result = { isValid: true, errors: [], warnings: [] };
+        
+        if (!course.id || !this.validateCourseId(course.id)) {
+            result.errors.push(`Invalid course ID: ${course.id}`);
+            result.isValid = false;
+        }
+        
+        return result;
+    }
+}
+```
+
+---
+
+## UI Architecture Assessment
+
+### 🎯 **Architecture Strengths:**
+1. **Service Integration**: Clean separation between UI controllers and business services
+2. **Event-Driven Design**: Proper DOM event delegation and custom event handling
+3. **State Management**: Consistent state tracking across components
+4. **Utility Organization**: Well-structured utility classes for common operations
+5. **Type Safety**: Comprehensive TypeScript validation and type guards
+
+### 🚀 **Optimization Opportunities:**
+1. **Component Extraction**: MainController is too large and needs decomposition
+2. **Dependency Injection**: Replace direct instantiation with injection patterns
+3. **Template Abstraction**: Move HTML generation to dedicated template functions
+4. **Performance**: Add DOM element caching and reduce repeated queries
+5. **Accessibility**: Add keyboard navigation and ARIA attributes
+
+### 📊 **Code Quality Score: 7.0/10**
+- **Maintainability**: Moderate - Large controller class but good utility organization
+- **Performance**: Good - Efficient event delegation but room for DOM optimization
+- **Accessibility**: Low - Missing keyboard navigation and ARIA support
+- **Testability**: Moderate - Tight coupling in some areas
+- **Scalability**: Good - Clear patterns for expansion
+
+---
+
+## Overall Architecture Integration Summary
+
+### Cross-Layer Architecture Assessment
+
+#### 🎯 **System-Wide Strengths:**
+1. **Layered Architecture**: Clear separation between core, services, UI, and utilities
+2. **Type Safety**: Comprehensive TypeScript usage throughout all layers
+3. **Service Composition**: Good dependency relationships and loose coupling
+4. **Event-Driven Design**: Consistent event patterns across UI and service layers
+5. **Error Resilience**: Comprehensive error handling with graceful degradation
+
+#### 🚀 **System-Wide Improvement Opportunities:**
+1. **Dependency Injection**: Implement DI container for better testability
+2. **Component Architecture**: Extract UI components for better maintainability  
+3. **Performance Optimization**: Add caching, indexing, and reduce linear operations
+4. **Accessibility Enhancement**: Comprehensive ARIA support and keyboard navigation
+5. **Testing Infrastructure**: Add comprehensive test coverage for all layers
+
+#### 📊 **Overall System Quality Score: 7.7/10**
+- **Architecture Design**: High - Well-structured layers with clear responsibilities
+- **Code Quality**: Good - Consistent patterns with optimization opportunities  
+- **Performance**: Moderate - Good algorithms but room for caching and optimization
+- **Maintainability**: Good - Clear organization but some large classes need extraction
+- **Scalability**: High - Architecture supports growth and feature expansion
+
+---
+
+## Styles Directory Analysis (`src/styles/` and `src/themes/`)
+
+### CSS Architecture Principles
+1. **Component-Based Organization** - Modular CSS files for specific UI components
+2. **CSS Custom Properties** - Centralized theming with CSS variables
+3. **Mobile-First Responsive Design** - Progressive enhancement for larger screens
+4. **Semantic Class Naming** - Clear, descriptive class names following BEM-like patterns
+5. **Design System Consistency** - Unified spacing, colors, and typography scales
+6. **Performance Optimization** - Efficient CSS with minimal redundancy
+7. **Accessibility Support** - Focus states, contrast, and screen reader considerations
+
+### 1. CSS Architecture Structure
+
+#### ✅ **Best Practices Followed:**
+- **Modular Organization**: Clear separation by component (buttons.css, course-list.css, header.css)
+- **Import Order**: Logical CSS import sequence (reset → theme → layout → components → responsive)
+- **CSS Custom Properties**: Comprehensive variable system for theming and consistency
+- **Component Encapsulation**: Each component has its own CSS file with clear boundaries
+- **Responsive Design**: Mobile-first approach with logical breakpoints
+- **Theme System Integration**: Proper CSS variable usage throughout all components
+
+#### ⚠️ **Areas for Optimization:**
+1. **CSS Variable Duplication**: Some color values repeated across components
+   ```css
+   /* In multiple files */
+   color: var(--color-text-secondary);
+   background: var(--color-surface);
+   ```
+   **Issue**: While using variables is good, some complex combinations could be abstracted
+
+2. **Selector Specificity**: Some overly specific selectors
+   ```css
+   .theme-high-contrast .course-item:hover,
+   .theme-high-contrast .btn:hover,
+   .theme-high-contrast .section-badge:hover {
+       border-width: 3px;
+   }
+   ```
+   **Recommendation**: Use CSS utility classes or data attributes
+
+3. **Responsive Breakpoint Inconsistency**: Different breakpoints across files
+   ```css
+   /* course-list.css */
+   @media (max-width: 768px) { ... }
+   @media (min-width: 1200px) { ... }
+   
+   /* responsive.css */  
+   @media (max-width: 1024px) { ... }
+   @media (max-width: 768px) { ... }
+   ```
+   **Recommendation**: Centralize breakpoint constants
+
+4. **Grid System Duplication**: Similar grid patterns in multiple components
+   **Recommendation**: Extract reusable grid utilities
+
+#### 🔧 **Suggested Improvements:**
+```css
+/* Add breakpoint constants */
+:root {
+  --breakpoint-mobile: 768px;
+  --breakpoint-tablet: 1024px;
+  --breakpoint-desktop: 1200px;
+}
+
+/* Extract common grid patterns */
+.grid-auto-fit-320 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-base-unit);
+}
+
+/* Utility classes for common patterns */
+.border-interactive {
+  border: 1px solid var(--color-border);
+  transition: var(--effect-transition);
+}
+
+.border-interactive:hover {
+  border-color: var(--color-primary);
+}
+```
+
+---
+
+### 2. Component-Specific Analysis
+
+#### **buttons.css** - Button Component Styles
+**✅ Strengths:**
+- Clear button state variations (primary, secondary, active)
+- Consistent hover/focus states
+- Proper use of CSS variables
+
+**⚠️ Issues:**
+- Limited button sizes (only one size defined)
+- No disabled state styling for all button types
+
+#### **course-list.css** - Course Display Components  
+**✅ Strengths:**
+- Comprehensive list and grid view implementations
+- Responsive grid with auto-fit columns
+- Consistent hover states and selection feedback
+- Well-organized section badge styles
+
+**⚠️ Issues:**
+- Large file (225 lines) could be split into list/grid components
+- Some duplicate hover state definitions
+- Hard-coded magic numbers in grid sizing
+
+#### **theme-selector.css** - Dropdown Theme Selector
+**✅ Strengths:**
+- Clean dropdown implementation with proper z-index
+- Smooth arrow rotation animation
+- Good keyboard accessibility support prep
+- Proper positioning and overflow handling
+
+**⚠️ Issues:**
+- No keyboard navigation styles implemented
+- Could use more semantic focus indicators
+
+#### **schedule-page.css** - Schedule Interface Layout
+**✅ Strengths:**
+- Clean grid-based layout for terms
+- Proper overflow handling for scrollable areas
+- Consistent spacing and alignment
+- Good empty state styling
+
+**⚠️ Issues:**
+- Hard-coded grid dimensions (2x2) not configurable
+- Limited responsiveness for smaller screens
+- No drag-and-drop styling preparation
+
+#### **responsive.css** - Mobile/Tablet Adaptations
+**✅ Strengths:**
+- Mobile-first approach
+- Logical collapse of sidebar/panels on mobile
+- Proper flex direction changes
+
+**⚠️ Issues:**
+- Limited breakpoints (only 768px and 1024px)
+- No intermediate tablet-portrait handling
+- Could be more granular for different screen sizes
+
+---
+
+### 3. Theme System Analysis
+
+#### **base.css** - CSS Custom Properties Foundation
+**✅ Strengths:**
+- Comprehensive color palette with semantic naming
+- Typography system with fallback fonts
+- Spacing scale with consistent base unit
+- Effect variables for transitions and shadows
+- Proper CSS custom property organization
+
+**⚠️ Issues:**
+- Some color values could have better semantic names
+- Missing dark mode color scheme definitions
+- No typography scale variations (font sizes)
+
+#### **theme-overrides.css** - Theme-Specific Customizations
+**✅ Strengths:**
+- Clean theme-specific override system
+- High contrast accessibility enhancements
+- Proper cascade without !important usage
+
+**⚠️ Issues:**
+- Limited theme variations implemented
+- Could benefit from more theme-specific customizations
+- Missing theme transition animations
+
+---
+
+### 4. CSS Performance & Best Practices
+
+#### ✅ **Performance Strengths:**
+- **Efficient Selectors**: Mostly class-based selectors with good specificity
+- **CSS Variables**: Centralized theming reduces redundancy
+- **Minimal Nesting**: Flat selector hierarchy for better performance
+- **Import Organization**: Logical CSS load order for cascade efficiency
+
+#### ⚠️ **Performance Issues:**
+1. **Universal Selector Usage**: `* { transition: var(--effect-transition); }` affects all elements
+   **Impact**: Could cause performance issues with large DOM trees
+   **Recommendation**: Apply transitions selectively
+
+2. **Shadow DOM Considerations**: No component isolation patterns
+   **Recommendation**: Consider CSS-in-JS or CSS modules for larger applications
+
+3. **Critical CSS**: No separation of above-fold vs below-fold styles
+   **Recommendation**: Extract critical CSS for faster initial render
+
+---
+
+## CSS Architecture Assessment
+
+### 🎯 **Architecture Strengths:**
+1. **Modular Organization**: Excellent component-based file structure
+2. **Theme System**: Robust CSS custom property implementation
+3. **Responsive Design**: Mobile-first approach with logical breakpoints
+4. **Semantic Naming**: Clear, descriptive class naming conventions
+5. **Maintainable Structure**: Easy to understand and modify component styles
+
+### 🚀 **Optimization Opportunities:**
+1. **Utility Classes**: Add common utility classes for spacing, colors, and layouts
+2. **Breakpoint Standardization**: Centralize responsive breakpoints
+3. **Performance**: Optimize universal selector usage and critical CSS
+4. **Theme Expansion**: Add more comprehensive theme variations
+5. **Component Splitting**: Break down large CSS files into smaller, focused modules
+
+### 📊 **CSS Quality Score: 8.5/10**
+- **Organization**: High - Excellent modular structure and clear separation
+- **Maintainability**: High - Easy to understand and modify
+- **Performance**: Good - Efficient selectors with minor optimization opportunities
+- **Accessibility**: Good - Basic focus states with room for enhancement
+- **Scalability**: High - Architecture supports growth and new themes
+
+### **Final Architecture Assessment**
+
+The CSS architecture demonstrates **excellent organizational patterns** with a well-structured component-based approach, comprehensive theming system, and mobile-first responsive design. The use of CSS custom properties provides a solid foundation for maintainable and scalable styling.
+
+**Key Architectural Achievements:**
+- ✅ **Modular Component Structure**: Clear separation of concerns
+- ✅ **Comprehensive Theme System**: Flexible CSS custom properties
+- ✅ **Responsive Design**: Mobile-first with logical breakpoints  
+- ✅ **Performance Optimization**: Efficient selectors and minimal redundancy
+- ✅ **Maintainable Codebase**: Easy to understand and extend
+
+The styles architecture successfully supports the application's functionality while maintaining clean, maintainable, and performant CSS code that follows modern best practices.
