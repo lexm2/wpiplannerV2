@@ -1,10 +1,12 @@
 import { Course, Department } from '../../types/types'
 import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
+import { DataRefreshService } from '../../services/DataRefreshService'
 
 export class MainController {
     private courseDataService: CourseDataService;
     private themeSelector: ThemeSelector;
+    private dataRefreshService: DataRefreshService;
     private allDepartments: Department[] = [];
     private selectedDepartment: Department | null = null;
 
@@ -67,6 +69,7 @@ export class MainController {
     constructor() {
         this.courseDataService = new CourseDataService();
         this.themeSelector = new ThemeSelector();
+        this.dataRefreshService = new DataRefreshService();
         this.init();
     }
 
@@ -75,6 +78,7 @@ export class MainController {
         await this.loadCourseData();
         this.displayDepartments();
         this.setupEventListeners();
+        this.setupDataRefreshListener();
     }
 
     private async loadCourseData(): Promise<void> {
@@ -305,6 +309,24 @@ export class MainController {
             item.classList.remove('active');
         });
         this.selectedDepartment = null;
+    }
+
+    private setupDataRefreshListener(): void {
+        window.addEventListener('data-refreshed', async () => {
+            console.log('Data refresh detected, reloading course data...');
+            this.showLoadingState();
+            await this.loadCourseData();
+            this.displayDepartments();
+            
+            // If we have a selected department, refresh its courses too
+            if (this.selectedDepartment) {
+                const updatedDept = this.allDepartments.find(d => d.abbreviation === this.selectedDepartment!.abbreviation);
+                if (updatedDept) {
+                    this.selectedDepartment = updatedDept;
+                    this.displayCourses(updatedDept.courses);
+                }
+            }
+        });
     }
 
     private showLoadingState(): void {
