@@ -2,11 +2,13 @@ import { Course, Department } from '../../types/types'
 import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { DataRefreshService } from '../../services/DataRefreshService'
+import { CourseSelectionService } from '../../services/CourseSelectionService'
 
 export class MainController {
     private courseDataService: CourseDataService;
     private themeSelector: ThemeSelector;
     private dataRefreshService: DataRefreshService;
+    private courseSelectionService: CourseSelectionService;
     private allDepartments: Department[] = [];
     private selectedDepartment: Department | null = null;
     private selectedCourse: Course | null = null;
@@ -71,6 +73,7 @@ export class MainController {
         this.courseDataService = new CourseDataService();
         this.themeSelector = new ThemeSelector();
         this.dataRefreshService = new DataRefreshService();
+        this.courseSelectionService = new CourseSelectionService();
         this.init();
     }
 
@@ -80,6 +83,7 @@ export class MainController {
         this.displayDepartments();
         this.setupEventListeners();
         this.setupDataRefreshListener();
+        this.setupCourseSelectionListener();
     }
 
     private async loadCourseData(): Promise<void> {
@@ -174,7 +178,14 @@ export class MainController {
                 target.classList.toggle('selected');
             }
             
-            if (target.closest('.course-item')) {
+            if (target.classList.contains('course-select-btn')) {
+                const courseId = target.dataset.courseId;
+                if (courseId) {
+                    this.toggleCourseSelection(courseId);
+                }
+            }
+
+            if (target.closest('.course-item') && !target.classList.contains('course-select-btn') && !target.classList.contains('section-badge')) {
                 const courseItem = target.closest('.course-item') as HTMLElement;
                 const courseId = courseItem.dataset.courseId;
                 if (courseId) {
@@ -231,10 +242,14 @@ export class MainController {
         sortedCourses.forEach(course => {
             const hasWarning = this.courseHasWarning(course);
             const sections = course.sections.map(s => s.number).filter(Boolean);
+            const isSelected = this.courseSelectionService.isCourseSelected(course.id);
             
             html += `
-                <div class="course-item" data-course-id="${course.id}">
+                <div class="course-item ${isSelected ? 'selected' : ''}" data-course-id="${course.id}">
                     <div class="course-header">
+                        <button class="course-select-btn ${isSelected ? 'selected' : ''}" data-course-id="${course.id}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
+                            ${isSelected ? '✓' : '+'}
+                        </button>
                         <div class="course-code">${course.department.abbreviation}${course.number}</div>
                         <div class="course-details">
                             <div class="course-name">
@@ -368,6 +383,56 @@ export class MainController {
         }
     }
 
+    private toggleCourseSelection(courseId: string): void {
+        // Find the course in all departments
+        let course: Course | null = null;
+        for (const dept of this.allDepartments) {
+            course = dept.courses.find(c => c.id === courseId) || null;
+            if (course) break;
+        }
+
+        if (!course) return;
+
+        const wasSelected = this.courseSelectionService.toggleCourseSelection(course);
+        this.updateCourseSelectionUI(courseId, wasSelected);
+    }
+
+    private updateCourseSelectionUI(courseId: string, isSelected: boolean): void {
+        const courseElement = document.querySelector(`[data-course-id="${courseId}"]`);
+        const selectBtn = courseElement?.querySelector('.course-select-btn');
+        
+        if (courseElement && selectBtn) {
+            if (isSelected) {
+                courseElement.classList.add('selected');
+                selectBtn.textContent = '✓';
+                selectBtn.classList.add('selected');
+            } else {
+                courseElement.classList.remove('selected');
+                selectBtn.textContent = '+';
+                selectBtn.classList.remove('selected');
+            }
+        }
+    }
+
+    private setupCourseSelectionListener(): void {
+        this.courseSelectionService.onSelectionChange((selectedCourses) => {
+            console.log(`Selected courses updated: ${selectedCourses.length} courses selected`);
+            // Update UI to reflect changes
+            this.refreshCourseSelectionUI();
+        });
+    }
+
+    private refreshCourseSelectionUI(): void {
+        // Update all course items to reflect current selection state
+        document.querySelectorAll('.course-item').forEach(item => {
+            const courseId = (item as HTMLElement).dataset.courseId;
+            if (courseId) {
+                const isSelected = this.courseSelectionService.isCourseSelected(courseId);
+                this.updateCourseSelectionUI(courseId, isSelected);
+            }
+        });
+    }
+
     private setupDataRefreshListener(): void {
         window.addEventListener('data-refreshed', async () => {
             console.log('Data refresh detected, reloading course data...');
@@ -403,5 +468,18 @@ export class MainController {
         if (courseContainer) {
             courseContainer.innerHTML = `<div class="error-message">${message}</div>`;
         }
+    }
+
+    // Public methods for easy access to selected courses
+    public getSelectedCourses() {
+        return this.courseSelectionService.getSelectedCourses();
+    }
+
+    public getSelectedCoursesCount(): number {
+        return this.courseSelectionService.getSelectedCoursesCount();
+    }
+
+    public getCourseSelectionService(): CourseSelectionService {
+        return this.courseSelectionService;
     }
 }

@@ -8,6 +8,7 @@ export class CourseManager {
     addCourse(course: Course, isRequired: boolean = false): void {
         const selectedCourse: SelectedCourse = {
             course,
+            selectedSection: null,
             preferredSections: [],
             deniedSections: [],
             isRequired
@@ -79,6 +80,31 @@ export class CourseManager {
 
     offSelectionChange(listener: (courses: SelectedCourse[]) => void): void {
         this.listeners.delete(listener);
+    }
+
+    setSelectedSection(courseId: string, sectionNumber: string | null): void {
+        const selectedCourse = this.selectedCourses.get(courseId);
+        if (!selectedCourse) return;
+
+        selectedCourse.selectedSection = sectionNumber;
+        this.notifyListeners();
+    }
+
+    getSelectedSection(courseId: string): string | null {
+        const selectedCourse = this.selectedCourses.get(courseId);
+        return selectedCourse?.selectedSection || null;
+    }
+
+    getSelectedCoursesWithSections(): SelectedCourse[] {
+        return this.getSelectedCourses();
+    }
+
+    loadSelectedCourses(selectedCourses: SelectedCourse[]): void {
+        this.selectedCourses.clear();
+        selectedCourses.forEach(course => {
+            this.selectedCourses.set(course.course.id, course);
+        });
+        this.notifyListeners();
     }
 
     private notifyListeners(): void {

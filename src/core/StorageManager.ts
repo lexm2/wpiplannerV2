@@ -1,10 +1,11 @@
-import { Schedule, UserScheduleState, SchedulePreferences } from '../types/schedule'
+import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
 
 export class StorageManager {
     private static readonly STORAGE_KEYS = {
         USER_STATE: 'wpi-planner-user-state',
         PREFERENCES: 'wpi-planner-preferences',
         SCHEDULES: 'wpi-planner-schedules',
+        SELECTED_COURSES: 'wpi-planner-selected-courses',
         THEME: 'wpi-planner-theme'
     };
 
@@ -229,6 +230,36 @@ export class StorageManager {
         } catch (error) {
             console.warn('Failed to load theme preference:', error);
             return 'wpi-classic';
+        }
+    }
+
+    saveSelectedCourses(selectedCourses: SelectedCourse[]): void {
+        try {
+            const serializedCourses = this.serializeWithSets(selectedCourses);
+            localStorage.setItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES, JSON.stringify(serializedCourses));
+        } catch (error) {
+            console.warn('Failed to save selected courses:', error);
+        }
+    }
+
+    loadSelectedCourses(): SelectedCourse[] {
+        try {
+            const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES);
+            if (!stored) return [];
+            
+            const parsed = JSON.parse(stored);
+            return this.deserializeWithSets(parsed);
+        } catch (error) {
+            console.warn('Failed to load selected courses:', error);
+            return [];
+        }
+    }
+
+    clearSelectedCourses(): void {
+        try {
+            localStorage.removeItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES);
+        } catch (error) {
+            console.warn('Failed to clear selected courses:', error);
         }
     }
 }

@@ -32,6 +32,40 @@
   margin-bottom: 0.75rem;
 }
 
+.course-select-btn {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--effect-transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.course-select-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-background);
+}
+
+.course-select-btn.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.course-item.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-background);
+}
+
 .course-code {
   font-weight: 700;
   font-size: 1rem;
