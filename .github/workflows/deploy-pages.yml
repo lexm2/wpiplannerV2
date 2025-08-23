@@ -32,6 +32,13 @@ jobs:
     - name: Build TypeScript
       run: npm run build
       
+    - name: List files before and after build
+      run: |
+        echo "Files in dist before build:"
+        ls -la dist/ || echo "dist directory doesn't exist"
+        echo "Files in dist after build:"
+        ls -la dist/
+      
     - name: Download initial course data
       run: |
         echo "Attempting to download initial course data..."
