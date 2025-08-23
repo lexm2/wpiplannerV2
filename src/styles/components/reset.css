@@ -1,0 +1,20 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: var(--effect-transition);
+}
+
+/* Main app layout */
+#app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

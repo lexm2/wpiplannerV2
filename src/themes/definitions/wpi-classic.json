@@ -1,0 +1,42 @@
+{
+  "name": "WPI Classic",
+  "id": "wpi-classic",
+  "description": "Traditional WPI colors and styling",
+  "colors": {
+    "primary": "#ac2b37",
+    "primaryHover": "#8e2329",
+    "primaryLight": "#d4424f",
+    "secondary": "#f5f5f7",
+    "secondaryHover": "#e5e5e7",
+    "background": "#f5f5f7",
+    "backgroundAlt": "#ffffff",
+    "surface": "#ffffff",
+    "surfaceHover": "#fbfbfd",
+    "text": "#1d1d1f",
+    "textSecondary": "#86868b",
+    "textInverse": "#ffffff",
+    "border": "#e5e5e7",
+    "borderHover": "#d2d2d7",
+    "success": "#30d158",
+    "warning": "#ff9500",
+    "error": "#d32f2f",
+    "info": "#007aff"
+  },
+  "typography": {
+    "fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "fontFamilyMono": "'SF Mono', Monaco, 'Cascadia Code', monospace"
+  },
+  "spacing": {
+    "baseUnit": "1rem",
+    "headerHeight": "64px",
+    "sidebarWidth": "280px",
+    "rightPanelWidth": "320px"
+  },
+  "effects": {
+    "borderRadius": "6px",
+    "borderRadiusLarge": "8px",
+    "shadow": "0 1px 3px rgba(0,0,0,0.1)",
+    "shadowHover": "0 2px 8px rgba(172, 43, 55, 0.1)",
+    "transition": "all 0.2s ease"
+  }
+}

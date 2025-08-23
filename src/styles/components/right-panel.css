@@ -1,0 +1,35 @@
+/* Right panel */
+.right-panel {
+  background: var(--color-background-alt);
+  border-left: 1px solid var(--color-border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.panel-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.selected-courses {
+  flex: 1;
+  padding: 1rem 1.5rem;
+}
+
+.schedule-preview {
+  border-top: 1px solid var(--color-border);
+  padding: 1rem 1.5rem;
+}
+
+.schedule-preview h3 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}

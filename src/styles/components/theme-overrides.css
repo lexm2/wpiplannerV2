@@ -1,0 +1,25 @@
+/* Theme-specific overrides */
+.theme-wpi-dark {
+  color-scheme: dark;
+}
+
+.theme-wpi-light {
+  color-scheme: light;
+}
+
+.theme-high-contrast {
+  /* Additional high contrast specific styles */
+  --effect-transition: all 0.1s ease;
+}
+
+.theme-high-contrast .course-item,
+.theme-high-contrast .btn,
+.theme-high-contrast .section-badge {
+  border-width: 2px;
+}
+
+.theme-high-contrast .course-item:hover,
+.theme-high-contrast .btn:hover,
+.theme-high-contrast .section-badge:hover {
+  border-width: 3px;
+}

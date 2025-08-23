@@ -1,0 +1,42 @@
+{
+  "name": "High Contrast",
+  "id": "high-contrast",
+  "description": "Accessibility-focused high contrast theme",
+  "colors": {
+    "primary": "#000000",
+    "primaryHover": "#333333",
+    "primaryLight": "#666666",
+    "secondary": "#ffffff",
+    "secondaryHover": "#f0f0f0",
+    "background": "#ffffff",
+    "backgroundAlt": "#f8f8f8",
+    "surface": "#ffffff",
+    "surfaceHover": "#f0f0f0",
+    "text": "#000000",
+    "textSecondary": "#444444",
+    "textInverse": "#ffffff",
+    "border": "#000000",
+    "borderHover": "#333333",
+    "success": "#006600",
+    "warning": "#cc6600",
+    "error": "#cc0000",
+    "info": "#0066cc"
+  },
+  "typography": {
+    "fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "fontFamilyMono": "'SF Mono', Monaco, 'Cascadia Code', monospace"
+  },
+  "spacing": {
+    "baseUnit": "1rem",
+    "headerHeight": "64px",
+    "sidebarWidth": "280px",
+    "rightPanelWidth": "320px"
+  },
+  "effects": {
+    "borderRadius": "2px",
+    "borderRadiusLarge": "4px",
+    "shadow": "0 0 0 2px #000000",
+    "shadowHover": "0 0 0 3px #000000",
+    "transition": "all 0.1s ease"
+  }
+}

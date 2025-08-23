@@ -1,0 +1,32 @@
+/* Main content */
+.main-content {
+  background: var(--color-background-alt);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-header {
+  padding: 1.5rem 2rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.view-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.course-container {
+  flex: 1;
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+}

@@ -1,0 +1,7 @@
+/* App body layout */
+.app-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: var(--spacing-sidebar-width) 1fr var(--spacing-right-panel-width);
+  overflow: hidden;
+}

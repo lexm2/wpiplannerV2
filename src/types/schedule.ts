@@ -38,6 +38,7 @@ export interface SchedulePreferences {
     avoidBackToBackClasses: boolean;
     maxDailyHours: number;
     preferredBuildings: string[];
+    theme?: string;
 }
 
 export enum ConflictType {

@@ -4,7 +4,8 @@ export class StorageManager {
     private static readonly STORAGE_KEYS = {
         USER_STATE: 'wpi-planner-user-state',
         PREFERENCES: 'wpi-planner-preferences',
-        SCHEDULES: 'wpi-planner-schedules'
+        SCHEDULES: 'wpi-planner-schedules',
+        THEME: 'wpi-planner-theme'
     };
 
     saveUserState(state: UserScheduleState): void {
@@ -111,7 +112,8 @@ export class StorageManager {
             preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
             avoidBackToBackClasses: false,
             maxDailyHours: 8,
-            preferredBuildings: []
+            preferredBuildings: [],
+            theme: 'wpi-classic'
         };
     }
 
@@ -210,5 +212,23 @@ export class StorageManager {
         }
         
         return obj;
+    }
+
+    saveThemePreference(themeId: string): void {
+        try {
+            localStorage.setItem(StorageManager.STORAGE_KEYS.THEME, themeId);
+        } catch (error) {
+            console.warn('Failed to save theme preference:', error);
+        }
+    }
+
+    loadThemePreference(): string {
+        try {
+            const savedTheme = localStorage.getItem(StorageManager.STORAGE_KEYS.THEME);
+            return savedTheme || 'wpi-classic';
+        } catch (error) {
+            console.warn('Failed to load theme preference:', error);
+            return 'wpi-classic';
+        }
     }
 }

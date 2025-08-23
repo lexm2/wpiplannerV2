@@ -1,0 +1,42 @@
+{
+  "name": "WPI Light",
+  "id": "wpi-light",
+  "description": "Clean light theme with softer WPI colors",
+  "colors": {
+    "primary": "#b8394a",
+    "primaryHover": "#9c2f3d",
+    "primaryLight": "#d4556b",
+    "secondary": "#f8f8fa",
+    "secondaryHover": "#ededef",
+    "background": "#ffffff",
+    "backgroundAlt": "#f8f8fa",
+    "surface": "#ffffff",
+    "surfaceHover": "#f8f8fa",
+    "text": "#2c2c2e",
+    "textSecondary": "#6d6d70",
+    "textInverse": "#ffffff",
+    "border": "#d1d1d6",
+    "borderHover": "#c7c7cc",
+    "success": "#28a745",
+    "warning": "#fd7e14",
+    "error": "#dc3545",
+    "info": "#17a2b8"
+  },
+  "typography": {
+    "fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "fontFamilyMono": "'SF Mono', Monaco, 'Cascadia Code', monospace"
+  },
+  "spacing": {
+    "baseUnit": "1rem",
+    "headerHeight": "64px",
+    "sidebarWidth": "280px",
+    "rightPanelWidth": "320px"
+  },
+  "effects": {
+    "borderRadius": "8px",
+    "borderRadiusLarge": "12px",
+    "shadow": "0 1px 4px rgba(0,0,0,0.08)",
+    "shadowHover": "0 3px 12px rgba(184, 57, 74, 0.15)",
+    "transition": "all 0.2s ease"
+  }
+}

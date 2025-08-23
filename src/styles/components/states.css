@@ -1,0 +1,13 @@
+/* Loading and empty states */
+.loading-message, .empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-error);
+}
