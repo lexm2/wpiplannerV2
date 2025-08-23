@@ -4,6 +4,10 @@ import { SearchFilter } from '../types/ui'
 export class SearchService {
     private courses: Course[] = [];
     private departments: Department[] = [];
+    private searchIndex: Map<string, Set<Course>> = new Map();
+    private professorCache: string[] | null = null;
+    private buildingCache: string[] | null = null;
+    private timeSlotMappings: Map<string, Course[]> = new Map();
 
     setCourseData(departments: Department[]): void {
         this.departments = departments;
@@ -12,6 +16,11 @@ export class SearchService {
         for (const dept of departments) {
             this.courses.push(...dept.courses);
         }
+        
+        // Clear caches and rebuild indexes
+        this.clearCaches();
+        this.buildSearchIndex();
+        this.buildTimeSlotMappings();
     }
 
     searchCourses(query: string, filters?: SearchFilter): Course[] {
@@ -33,8 +42,15 @@ export class SearchService {
     private performTextSearch(courses: Course[], query: string): Course[] {
         const queryLower = query.toLowerCase();
         
+        // Try to use search index first for better performance
+        const indexedResults = this.searchFromIndex(queryLower);
+        if (indexedResults.length > 0) {
+            // Filter indexed results against the current course set
+            return courses.filter(course => indexedResults.includes(course));
+        }
+        
+        // Fallback to original linear search with fuzzy matching
         return courses.filter(course => {
-            // Search in course ID, name, and description
             const courseText = [
                 course.id,
                 course.name,
@@ -44,7 +60,7 @@ export class SearchService {
                 course.number
             ].join(' ').toLowerCase();
 
-            return courseText.includes(queryLower);
+            return this.fuzzyMatch(courseText, queryLower);
         });
     }
 
@@ -170,6 +186,10 @@ export class SearchService {
     }
 
     getAvailableProfessors(): string[] {
+        if (this.professorCache) {
+            return this.professorCache;
+        }
+        
         const professors = new Set<string>();
         
         this.courses.forEach(course => {
@@ -182,10 +202,15 @@ export class SearchService {
             });
         });
 
-        return Array.from(professors).sort();
+        this.professorCache = Array.from(professors).sort();
+        return this.professorCache;
     }
 
     getAvailableBuildings(): string[] {
+        if (this.buildingCache) {
+            return this.buildingCache;
+        }
+        
         const buildings = new Set<string>();
         
         this.courses.forEach(course => {
@@ -198,7 +223,112 @@ export class SearchService {
             });
         });
 
-        return Array.from(buildings).sort();
+        this.buildingCache = Array.from(buildings).sort();
+        return this.buildingCache;
+    }
+
+    private clearCaches(): void {
+        this.professorCache = null;
+        this.buildingCache = null;
+        this.searchIndex.clear();
+        this.timeSlotMappings.clear();
+    }
+
+    private buildSearchIndex(): void {
+        this.courses.forEach(course => {
+            const keywords = this.extractKeywords(course);
+            keywords.forEach(keyword => {
+                if (!this.searchIndex.has(keyword)) {
+                    this.searchIndex.set(keyword, new Set());
+                }
+                this.searchIndex.get(keyword)!.add(course);
+            });
+        });
+    }
+
+    private extractKeywords(course: Course): string[] {
+        const keywords = [
+            course.id.toLowerCase(),
+            course.name.toLowerCase(),
+            course.number.toLowerCase(),
+            course.department.abbreviation.toLowerCase(),
+            course.department.name.toLowerCase(),
+            ...course.description.toLowerCase().split(/\s+/)
+        ];
+        
+        // Add partial keywords for better matching
+        keywords.forEach(keyword => {
+            if (keyword.length > 3) {
+                for (let i = 0; i < keyword.length - 2; i++) {
+                    keywords.push(keyword.substring(i, i + 3));
+                }
+            }
+        });
+        
+        return keywords.filter(k => k.length > 1);
+    }
+
+    private searchFromIndex(query: string): Course[] {
+        const results = new Set<Course>();
+        
+        // Direct keyword match
+        if (this.searchIndex.has(query)) {
+            this.searchIndex.get(query)!.forEach(course => results.add(course));
+        }
+        
+        // Partial matches
+        for (const [keyword, courses] of this.searchIndex.entries()) {
+            if (keyword.includes(query) || query.includes(keyword)) {
+                courses.forEach(course => results.add(course));
+            }
+        }
+        
+        return Array.from(results);
+    }
+
+    private fuzzyMatch(text: string, query: string): boolean {
+        // Simple fuzzy matching - exact match or contains
+        if (text.includes(query)) {
+            return true;
+        }
+        
+        // Allow for one character difference in short queries
+        if (query.length <= 3) {
+            return text.includes(query);
+        }
+        
+        // For longer queries, check if most characters match
+        const words = query.split(/\s+/);
+        return words.every(word => {
+            if (word.length <= 2) return text.includes(word);
+            
+            // Allow partial matches for longer words
+            const partial = word.substring(0, Math.floor(word.length * 0.8));
+            return text.includes(partial);
+        });
+    }
+
+    private buildTimeSlotMappings(): void {
+        this.courses.forEach(course => {
+            course.sections.forEach(section => {
+                section.periods.forEach(period => {
+                    const timeKey = this.getTimeSlotKey(period);
+                    if (!this.timeSlotMappings.has(timeKey)) {
+                        this.timeSlotMappings.set(timeKey, []);
+                    }
+                    if (!this.timeSlotMappings.get(timeKey)!.includes(course)) {
+                        this.timeSlotMappings.get(timeKey)!.push(course);
+                    }
+                });
+            });
+        });
+    }
+
+    private getTimeSlotKey(period: Period): string {
+        const startMinutes = period.startTime.hours * 60 + period.startTime.minutes;
+        const endMinutes = period.endTime.hours * 60 + period.endTime.minutes;
+        const days = Array.from(period.days).sort().join('');
+        return `${days}-${startMinutes}-${endMinutes}`;
     }
 
     getCreditRanges(): Array<{ min: number; max: number; label: string }> {
