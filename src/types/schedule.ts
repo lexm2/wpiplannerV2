@@ -20,7 +20,6 @@ export interface ScheduleCombination {
     sections: Section[];
     conflicts: TimeConflict[];
     isValid: boolean;
-    score: number;
 }
 
 export interface TimeConflict {
@@ -42,9 +41,7 @@ export interface SchedulePreferences {
 }
 
 export enum ConflictType {
-    TIME_OVERLAP = 'time_overlap',
-    SAME_PERIOD = 'same_period',
-    INSUFFICIENT_BREAK = 'insufficient_break'
+    TIME_OVERLAP = 'time_overlap'
 }
 
 export interface UserScheduleState {

@@ -1,0 +1,61 @@
+{
+  "Report_Entry": [
+    {
+      "Academic_Level": "Undergraduate",
+      "Academic_Units": "Computer Science Department",
+      "Academic_Year": "2024 - 2025 Academic Year",
+      "Course_Description": "<p>An introduction to the design and analysis of algorithms and data structures.</p>",
+      "Course_Section": "CS 1101-A01 - Introduction to Programming Design",
+      "Course_Section_Description": "<p>Lecture section for CS 1101</p>",
+      "Course_Title": "CS 1101 - Introduction to Programming Design",
+      "Credits": "3",
+      "Enrolled_Capacity": "25/30",
+      "Instructional_Format": "Lecture",
+      "Instructors": "Dr. Smith",
+      "Locations": "Fuller Labs 320",
+      "Meeting_Day_Patterns": "MWF",
+      "Meeting_Patterns": "9:00AM - 10:50AM",
+      "Offering_Period": "Fall 2024",
+      "Section_Status": "Open",
+      "Waitlist_Waitlist_Capacity": "2/10"
+    },
+    {
+      "Academic_Level": "Undergraduate", 
+      "Academic_Units": "Computer Science Department",
+      "Academic_Year": "2024 - 2025 Academic Year",
+      "Course_Description": "<p>Lab section for programming practice.</p>",
+      "Course_Section": "CS 1101-L01 - Introduction to Programming Design",
+      "Course_Section_Description": "<p>Lab section for CS 1101</p>",
+      "Course_Title": "CS 1101 - Introduction to Programming Design",
+      "Credits": "0",
+      "Enrolled_Capacity": "25/30",
+      "Instructional_Format": "Lab",
+      "Instructors": "TA Johnson",
+      "Locations": "Fuller Labs 246",
+      "Meeting_Day_Patterns": "T",
+      "Meeting_Patterns": "2:00PM - 3:50PM", 
+      "Offering_Period": "Fall 2024",
+      "Section_Status": "Open",
+      "Waitlist_Waitlist_Capacity": "0/5"
+    },
+    {
+      "Academic_Level": "Undergraduate",
+      "Academic_Units": "Mathematical Sciences Department", 
+      "Academic_Year": "2024 - 2025 Academic Year",
+      "Course_Description": "<p>Differential and integral calculus of functions of one variable.</p>",
+      "Course_Section": "MA 1021-A01 - Calculus I",
+      "Course_Section_Description": "<p>Lecture section for Calculus I</p>",
+      "Course_Title": "MA 1021 - Calculus I",
+      "Credits": "4",
+      "Enrolled_Capacity": "45/50",
+      "Instructional_Format": "Lecture",
+      "Instructors": "Dr. Wilson",
+      "Locations": "Olin Hall 107", 
+      "Meeting_Day_Patterns": "TR",
+      "Meeting_Patterns": "10:00AM - 11:50AM",
+      "Offering_Period": "Fall 2024",
+      "Section_Status": "Open",
+      "Waitlist_Waitlist_Capacity": "3/15"
+    }
+  ]
+}

@@ -9,7 +9,8 @@ export class StorageManager {
 
     saveUserState(state: UserScheduleState): void {
         try {
-            localStorage.setItem(StorageManager.STORAGE_KEYS.USER_STATE, JSON.stringify(state));
+            const serializedState = this.serializeWithSets(state);
+            localStorage.setItem(StorageManager.STORAGE_KEYS.USER_STATE, JSON.stringify(serializedState));
         } catch (error) {
             console.warn('Failed to save user state:', error);
         }
@@ -20,7 +21,8 @@ export class StorageManager {
             const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.USER_STATE);
             if (!stored) return null;
             
-            return JSON.parse(stored);
+            const parsed = JSON.parse(stored);
+            return this.deserializeWithSets(parsed);
         } catch (error) {
             console.warn('Failed to load user state:', error);
             return null;
@@ -38,7 +40,8 @@ export class StorageManager {
                 schedules.push(schedule);
             }
             
-            localStorage.setItem(StorageManager.STORAGE_KEYS.SCHEDULES, JSON.stringify(schedules));
+            const serializedSchedules = this.serializeWithSets(schedules);
+            localStorage.setItem(StorageManager.STORAGE_KEYS.SCHEDULES, JSON.stringify(serializedSchedules));
         } catch (error) {
             console.warn('Failed to save schedule:', error);
         }
@@ -59,7 +62,8 @@ export class StorageManager {
             const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.SCHEDULES);
             if (!stored) return [];
             
-            return JSON.parse(stored);
+            const parsed = JSON.parse(stored);
+            return this.deserializeWithSets(parsed);
         } catch (error) {
             console.warn('Failed to load schedules:', error);
             return [];
@@ -78,7 +82,8 @@ export class StorageManager {
 
     savePreferences(preferences: SchedulePreferences): void {
         try {
-            localStorage.setItem(StorageManager.STORAGE_KEYS.PREFERENCES, JSON.stringify(preferences));
+            const serializedPreferences = this.serializeWithSets(preferences);
+            localStorage.setItem(StorageManager.STORAGE_KEYS.PREFERENCES, JSON.stringify(serializedPreferences));
         } catch (error) {
             console.warn('Failed to save preferences:', error);
         }
@@ -89,7 +94,8 @@ export class StorageManager {
             const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.PREFERENCES);
             if (!stored) return this.getDefaultPreferences();
             
-            return JSON.parse(stored);
+            const parsed = JSON.parse(stored);
+            return this.deserializeWithSets(parsed);
         } catch (error) {
             console.warn('Failed to load preferences:', error);
             return this.getDefaultPreferences();
@@ -152,5 +158,57 @@ export class StorageManager {
             console.error('Failed to import data:', error);
             return false;
         }
+    }
+
+    private serializeWithSets(obj: any): any {
+        if (obj === null || obj === undefined) {
+            return obj;
+        }
+        
+        if (obj instanceof Set) {
+            return { __type: 'Set', value: Array.from(obj) };
+        }
+        
+        if (Array.isArray(obj)) {
+            return obj.map(item => this.serializeWithSets(item));
+        }
+        
+        if (typeof obj === 'object') {
+            const result: any = {};
+            for (const key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    result[key] = this.serializeWithSets(obj[key]);
+                }
+            }
+            return result;
+        }
+        
+        return obj;
+    }
+
+    private deserializeWithSets(obj: any): any {
+        if (obj === null || obj === undefined) {
+            return obj;
+        }
+        
+        if (typeof obj === 'object' && obj.__type === 'Set') {
+            return new Set(obj.value);
+        }
+        
+        if (Array.isArray(obj)) {
+            return obj.map(item => this.deserializeWithSets(item));
+        }
+        
+        if (typeof obj === 'object') {
+            const result: any = {};
+            for (const key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    result[key] = this.deserializeWithSets(obj[key]);
+                }
+            }
+            return result;
+        }
+        
+        return obj;
     }
 }

@@ -10,7 +10,7 @@ export class ScheduleGenerator {
         this.conflictDetector = new ConflictDetector();
     }
 
-    generateSchedules(selectedCourses: SelectedCourse[], preferences: SchedulePreferences): ScheduleCombination[] {
+    generateSchedules(selectedCourses: SelectedCourse[]): ScheduleCombination[] {
         const sectionCombinations = this.generateSectionCombinations(selectedCourses);
         const schedules: ScheduleCombination[] = [];
 
@@ -18,22 +18,20 @@ export class ScheduleGenerator {
             const sections = sectionCombinations[i];
             const conflicts = this.conflictDetector.detectConflicts(sections);
             const isValid = this.conflictDetector.isValidSchedule(sections);
-            const score = this.calculateScheduleScore(sections, preferences);
 
             schedules.push({
                 id: `schedule-${i}`,
                 sections,
                 conflicts,
-                isValid,
-                score
+                isValid
             });
         }
 
-        // Sort by score (highest first) and validity
+        // Sort by validity (valid schedules first)
         return schedules.sort((a, b) => {
             if (a.isValid && !b.isValid) return -1;
             if (!a.isValid && b.isValid) return 1;
-            return b.score - a.score;
+            return 0;
         });
     }
 
@@ -73,90 +71,6 @@ export class ScheduleGenerator {
         }
 
         return result;
-    }
-
-    private calculateScheduleScore(sections: Section[], preferences: SchedulePreferences): number {
-        let score = 0;
-
-        // Base score from conflict detection
-        score += this.conflictDetector.getConflictScore(sections);
-
-        // Time preference scoring
-        score += this.scoreTimePreferences(sections, preferences);
-
-        // Day preference scoring
-        score += this.scoreDayPreferences(sections, preferences);
-
-        // Building preference scoring
-        score += this.scoreBuildingPreferences(sections, preferences);
-
-        // Back-to-back class preference
-        if (preferences.avoidBackToBackClasses) {
-            score += this.scoreBackToBackClasses(sections);
-        }
-
-        return score;
-    }
-
-    private scoreTimePreferences(sections: Section[], preferences: SchedulePreferences): number {
-        let score = 0;
-        const preferredStart = preferences.preferredTimeRange.startTime.hours * 60 + preferences.preferredTimeRange.startTime.minutes;
-        const preferredEnd = preferences.preferredTimeRange.endTime.hours * 60 + preferences.preferredTimeRange.endTime.minutes;
-
-        for (const section of sections) {
-            for (const period of section.periods) {
-                const periodStart = period.startTime.hours * 60 + period.startTime.minutes;
-                const periodEnd = period.endTime.hours * 60 + period.endTime.minutes;
-
-                if (periodStart >= preferredStart && periodEnd <= preferredEnd) {
-                    score += 20; // Bonus for classes within preferred time
-                } else {
-                    // Penalty based on how far outside preferred range
-                    const startDeviation = Math.max(0, preferredStart - periodStart, periodStart - preferredEnd);
-                    const endDeviation = Math.max(0, preferredStart - periodEnd, periodEnd - preferredEnd);
-                    score -= (startDeviation + endDeviation) / 60 * 5; // 5 points per hour deviation
-                }
-            }
-        }
-
-        return score;
-    }
-
-    private scoreDayPreferences(sections: Section[], preferences: SchedulePreferences): number {
-        let score = 0;
-
-        for (const section of sections) {
-            for (const period of section.periods) {
-                for (const day of period.days) {
-                    if (preferences.preferredDays.has(day)) {
-                        score += 10; // Bonus for preferred days
-                    }
-                }
-            }
-        }
-
-        return score;
-    }
-
-    private scoreBuildingPreferences(sections: Section[], preferences: SchedulePreferences): number {
-        let score = 0;
-
-        for (const section of sections) {
-            for (const period of section.periods) {
-                if (preferences.preferredBuildings.includes(period.building)) {
-                    score += 5; // Small bonus for preferred buildings
-                }
-            }
-        }
-
-        return score;
-    }
-
-    private scoreBackToBackClasses(sections: Section[]): number {
-        let score = 0;
-        // Implementation would analyze class scheduling patterns
-        // For now, return neutral score
-        return score;
     }
 
     setMaxCombinations(max: number): void {
