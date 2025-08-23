@@ -41,7 +41,7 @@ export interface Period {
     seatsAvailable: number;
     actualWaitlist: number;
     maxWaitlist: number;
-    days: DayOfWeek[];
+    days: Set<DayOfWeek>;
     specificSection?: string;
 }
 

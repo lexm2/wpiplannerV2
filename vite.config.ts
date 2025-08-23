@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   base: '/wpiplannerV2/',
+  publicDir: 'public',
   build: {
     outDir: 'dist',
     sourcemap: true,

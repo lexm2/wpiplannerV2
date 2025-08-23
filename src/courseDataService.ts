@@ -1,7 +1,7 @@
 import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek } from './types'
 
 export class CourseDataService {
-    private static readonly WPI_COURSE_DATA_URL = 'https://planner.wpi.edu/new.schedb';
+    private static readonly WPI_COURSE_DATA_URL = '/course-data.json';
     private static readonly LOCAL_STORAGE_KEY = 'wpi-course-data';
     private static readonly CACHE_EXPIRY_HOURS = 1;
 
@@ -33,12 +33,12 @@ export class CourseDataService {
     }
 
     private async fetchFreshData(): Promise<ScheduleDB> {
-        console.log('Fetching fresh course data from GitHub Pages...');
+        console.log('Fetching course data from local static file...');
         
         const response = await fetch(CourseDataService.WPI_COURSE_DATA_URL, {
             method: 'GET',
             headers: {
-                'Accept': 'application/xml, text/xml',
+                'Accept': 'application/json',
             },
             cache: 'no-cache'
         });
@@ -47,120 +47,147 @@ export class CourseDataService {
             throw new Error(`Failed to fetch course data: ${response.status} ${response.statusText}`);
         }
 
-        const xmlText = await response.text();
-        return this.parseXMLData(xmlText);
+        const jsonData = await response.json();
+        return this.parseJSONData(jsonData);
     }
 
-    private parseXMLData(xmlText: string): ScheduleDB {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-        
+    private parseJSONData(jsonData: any): ScheduleDB {
         const scheduleDB: ScheduleDB = {
             departments: [],
-            generated: ''
+            generated: new Date().toISOString()
         };
 
-        const schedbElements = xmlDoc.getElementsByTagName('schedb');
-        if (schedbElements.length > 0) {
-            scheduleDB.generated = schedbElements[0].getAttribute('generated') || '';
+        if (!jsonData.Report_Entry || !Array.isArray(jsonData.Report_Entry)) {
+            throw new Error('Invalid JSON data structure');
         }
 
-        const deptElements = xmlDoc.getElementsByTagName('dept');
-        for (let i = 0; i < deptElements.length; i++) {
-            const deptElement = deptElements[i];
-            const department = this.parseDepartment(deptElement);
-            scheduleDB.departments.push(department);
+        const departmentMap = new Map<string, Department>();
+
+        for (const entry of jsonData.Report_Entry) {
+            this.processJSONEntry(entry, departmentMap);
         }
 
+        scheduleDB.departments = Array.from(departmentMap.values());
         console.log(`Loaded ${scheduleDB.departments.length} departments with course data`);
         return scheduleDB;
     }
 
-    private parseDepartment(deptElement: Element): Department {
-        const department: Department = {
-            abbreviation: deptElement.getAttribute('abbrev') || '',
-            name: deptElement.getAttribute('name') || '',
-            courses: []
-        };
+    private processJSONEntry(entry: any, departmentMap: Map<string, Department>): void {
+        const courseTitle = entry.Course_Title || '';
+        const courseTitleMatch = courseTitle.match(/^([A-Z]+)\s+(\d+)\s*-\s*(.+)$/);
+        if (!courseTitleMatch) return;
 
-        const courseElements = deptElement.getElementsByTagName('course');
-        for (let i = 0; i < courseElements.length; i++) {
-            const courseElement = courseElements[i];
-            const course = this.parseCourse(courseElement, department);
+        const [, deptCode, courseNum, courseName] = courseTitleMatch;
+        const deptName = entry.Academic_Units || entry.Subject || deptCode;
+        
+        let department = departmentMap.get(deptCode);
+        if (!department) {
+            department = {
+                abbreviation: deptCode,
+                name: deptName,
+                courses: []
+            };
+            departmentMap.set(deptCode, department);
+        }
+
+        const courseId = `${deptCode}-${courseNum}`;
+        let course = department.courses.find(c => c.id === courseId);
+        if (!course) {
+            course = {
+                id: courseId,
+                number: courseNum,
+                name: courseName,
+                description: this.stripHtml(entry.Course_Description || ''),
+                department: department,
+                sections: [],
+                minCredits: parseFloat(entry.Credits || '3'),
+                maxCredits: parseFloat(entry.Credits || '3')
+            };
             department.courses.push(course);
         }
 
-        return department;
-    }
-
-    private parseCourse(courseElement: Element, department: Department): Course {
-        const course: Course = {
-            id: `${department.abbreviation}-${courseElement.getAttribute('number')}`,
-            number: courseElement.getAttribute('number') || '',
-            name: courseElement.getAttribute('name') || '',
-            description: courseElement.getAttribute('course_desc') || '',
-            department: department,
-            sections: [],
-            minCredits: parseFloat(courseElement.getAttribute('min-credits') || '3'),
-            maxCredits: parseFloat(courseElement.getAttribute('max-credits') || '3')
-        };
-
-        const sectionElements = courseElement.getElementsByTagName('section');
-        for (let i = 0; i < sectionElements.length; i++) {
-            const sectionElement = sectionElements[i];
-            const section = this.parseSection(sectionElement);
-            course.sections.push(section);
-        }
-
-        return course;
-    }
-
-    private parseSection(sectionElement: Element): Section {
+        const sectionMatch = entry.Course_Section?.match(/([A-Z]+\s+\d+)-([A-Z0-9]+)/);
+        const sectionNumber = sectionMatch ? sectionMatch[2] : '';
+        
+        const [enrolled, capacity] = (entry.Enrolled_Capacity || '0/0').split('/').map((n: string) => parseInt(n) || 0);
+        const [waitlisted, waitlistCap] = (entry.Waitlist_Waitlist_Capacity || '0/0').split('/').map((n: string) => parseInt(n) || 0);
+        
         const section: Section = {
-            crn: parseInt(sectionElement.getAttribute('crn') || '0'),
-            number: sectionElement.getAttribute('number') || '',
-            seats: parseInt(sectionElement.getAttribute('seats') || '0'),
-            seatsAvailable: parseInt(sectionElement.getAttribute('availableseats') || '0'),
-            actualWaitlist: parseInt(sectionElement.getAttribute('actual_waitlist') || '0'),
-            maxWaitlist: parseInt(sectionElement.getAttribute('max_waitlist') || '0'),
-            note: sectionElement.getAttribute('note') || undefined,
-            description: sectionElement.getAttribute('sec_desc') || '',
-            term: sectionElement.getAttribute('part-of-term') || '',
+            crn: 0, // Not available in new format
+            number: sectionNumber,
+            seats: capacity,
+            seatsAvailable: capacity - enrolled,
+            actualWaitlist: waitlisted,
+            maxWaitlist: waitlistCap,
+            note: entry.Section_Status === 'Waitlist' ? 'Waitlist Available' : undefined,
+            description: this.stripHtml(entry.Course_Section_Description || ''),
+            term: entry.Offering_Period || '',
             periods: []
         };
 
-        const periodElements = sectionElement.getElementsByTagName('period');
-        for (let i = 0; i < periodElements.length; i++) {
-            const periodElement = periodElements[i];
-            const period = this.parsePeriod(periodElement);
+        if (entry.Meeting_Patterns && entry.Locations && entry.Instructors) {
+            const period: Period = {
+                type: entry.Instructional_Format || 'Lecture',
+                professor: entry.Instructors || '',
+                professorEmail: undefined,
+                startTime: this.parseTimeFromPattern(entry.Meeting_Patterns, true),
+                endTime: this.parseTimeFromPattern(entry.Meeting_Patterns, false),
+                building: this.extractBuilding(entry.Locations),
+                room: this.extractRoom(entry.Locations),
+                location: entry.Locations,
+                seats: capacity,
+                seatsAvailable: capacity - enrolled,
+                actualWaitlist: waitlisted,
+                maxWaitlist: waitlistCap,
+                days: this.parseDaysFromPattern(entry.Meeting_Day_Patterns || ''),
+                specificSection: sectionNumber
+            };
             section.periods.push(period);
         }
 
-        return section;
+        course.sections.push(section);
     }
 
-    private parsePeriod(periodElement: Element): Period {
-        const building = periodElement.getAttribute('building') || '';
-        const room = periodElement.getAttribute('room') || '';
+    private stripHtml(html: string): string {
+        return html.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim();
+    }
+
+    private extractBuilding(location: string): string {
+        const match = location.match(/^([^0-9]+)/);
+        return match ? match[1].trim() : '';
+    }
+
+    private extractRoom(location: string): string {
+        const match = location.match(/([0-9]+[A-Z]*)$/);
+        return match ? match[1] : '';
+    }
+
+    private parseTimeFromPattern(pattern: string, isStart: boolean): Time {
+        const timeMatch = pattern.match(/(\d{1,2}:\d{2}\s*[AP]M)\s*-\s*(\d{1,2}:\d{2}\s*[AP]M)/);
+        if (!timeMatch) return { hours: 0, minutes: 0, displayTime: 'TBD' };
         
-        const period: Period = {
-            type: periodElement.getAttribute('type') || '',
-            professor: periodElement.getAttribute('professor') || '',
-            professorEmail: periodElement.getAttribute('professor_email') || undefined,
-            startTime: this.parseTime(periodElement.getAttribute('starts') || ''),
-            endTime: this.parseTime(periodElement.getAttribute('ends') || ''),
-            building: building,
-            room: room,
-            location: `${building} ${room}`.trim(),
-            seats: parseInt(periodElement.getAttribute('seats') || '0'),
-            seatsAvailable: parseInt(periodElement.getAttribute('availableseats') || '0'),
-            actualWaitlist: parseInt(periodElement.getAttribute('actual_waitlist') || '0'),
-            maxWaitlist: parseInt(periodElement.getAttribute('max_waitlist') || '0'),
-            days: this.parseDays(periodElement.getAttribute('days') || ''),
-            specificSection: periodElement.getAttribute('section') || undefined
+        const timeStr = isStart ? timeMatch[1] : timeMatch[2];
+        return this.parseTime(timeStr);
+    }
+
+    private parseDaysFromPattern(dayPattern: string): Set<DayOfWeek> {
+        const days = new Set<DayOfWeek>();
+        const dayMap: { [key: string]: DayOfWeek } = {
+            'M': DayOfWeek.MONDAY,
+            'T': DayOfWeek.TUESDAY, 
+            'W': DayOfWeek.WEDNESDAY,
+            'R': DayOfWeek.THURSDAY,
+            'F': DayOfWeek.FRIDAY,
+            'S': DayOfWeek.SATURDAY,
+            'U': DayOfWeek.SUNDAY
         };
 
-        return period;
+        for (const char of dayPattern.replace(/-/g, '')) {
+            if (dayMap[char]) {
+                days.add(dayMap[char]);
+            }
+        }
+        return days;
     }
 
     private parseTime(timeStr: string): Time {
