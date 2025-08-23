@@ -4,14 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WPI Course Planner</title>
-  <script type="module" crossorigin src="/wpiplannerV2/assets/index-C8xh9Prr.js"></script>
-  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-BACJo5vg.css">
+  <script type="module" crossorigin src="/wpiplannerV2/assets/index-DBaOJP3v.js"></script>
+  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-BSCfNKf6.css">
 </head>
 <body>
     <div id="app">
         <header class="app-header">
             <div class="header-content">
-                <h1>WPI Course Planner</h1>
+                <div class="header-left">
+                    <h1>WPI Course Planner</h1>
+                    <div class="header-subtitle">
+                        <span id="data-timestamp">Loading data info...</span>
+                        <button id="refresh-data" class="btn btn-refresh" title="Refresh course data">
+                            <span class="refresh-icon">↻</span>
+                            <span id="refresh-text">Refresh</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="header-controls">
                     <input type="text" id="search-input" placeholder="Search courses..." class="search-input">
                     <div class="theme-selector">
