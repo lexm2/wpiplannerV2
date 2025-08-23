@@ -1,7 +1,7 @@
 import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek } from './types'
 
 export class CourseDataService {
-    private static readonly WPI_COURSE_DATA_URL = '/course-data.json';
+    private static readonly WPI_COURSE_DATA_URL = './course-data.json';
     private static readonly LOCAL_STORAGE_KEY = 'wpi-course-data';
     private static readonly CACHE_EXPIRY_HOURS = 1;
 
@@ -11,23 +11,12 @@ export class CourseDataService {
 
     async loadCourseData(): Promise<ScheduleDB> {
         try {
-            const cachedData = this.getCachedData();
-            if (cachedData && !this.isCacheExpired()) {
-                this.scheduleDB = cachedData;
-                return cachedData;
-            }
-
+            console.log('Loading course data...');
             const freshData = await this.fetchFreshData();
-            this.cacheData(freshData);
             this.scheduleDB = freshData;
             return freshData;
         } catch (error) {
-            console.warn('Failed to load fresh course data, falling back to cached data:', error);
-            const cachedData = this.getCachedData();
-            if (cachedData) {
-                this.scheduleDB = cachedData;
-                return cachedData;
-            }
+            console.error('Failed to load course data:', error);
             throw new Error('No course data available');
         }
     }
@@ -52,22 +41,32 @@ export class CourseDataService {
     }
 
     private parseJSONData(jsonData: any): ScheduleDB {
+        console.log('Parsing JSON data...');
         const scheduleDB: ScheduleDB = {
             departments: [],
             generated: new Date().toISOString()
         };
 
         if (!jsonData.Report_Entry || !Array.isArray(jsonData.Report_Entry)) {
+            console.error('Invalid JSON data structure:', jsonData);
             throw new Error('Invalid JSON data structure');
         }
 
+        console.log(`Processing ${jsonData.Report_Entry.length} course entries...`);
         const departmentMap = new Map<string, Department>();
 
+        let processed = 0;
         for (const entry of jsonData.Report_Entry) {
-            this.processJSONEntry(entry, departmentMap);
+            try {
+                this.processJSONEntry(entry, departmentMap);
+                processed++;
+            } catch (error) {
+                console.warn('Failed to process entry:', entry, error);
+            }
         }
 
         scheduleDB.departments = Array.from(departmentMap.values());
+        console.log(`Successfully processed ${processed}/${jsonData.Report_Entry.length} entries`);
         console.log(`Loaded ${scheduleDB.departments.length} departments with course data`);
         return scheduleDB;
     }
