@@ -25,11 +25,10 @@ jobs:
       - name: Download WPI course data
         run: |
           echo "Downloading course data from WPI..."
-          mkdir -p wpiplanner
-          wget --timeout=300 https://planner.wpi.edu/new.schedb -O wpiplanner/new.schedb
+          wget --timeout=300 https://planner.wpi.edu/new.schedb -O new.schedb
           
           # Add timestamp for debugging
-          echo "Course data updated at: $(date)" > wpiplanner/last-update.txt
+          echo "Course data updated at: $(date)" > last-update.txt
       
       # Commit and push the updated data
       - name: Commit updated course data
@@ -39,7 +38,7 @@ jobs:
           
           # Check if there are any changes to commit
           if [[ -n $(git status --porcelain) ]]; then
-            git add wpiplanner/new.schedb wpiplanner/last-update.txt
+            git add new.schedb last-update.txt
             git commit -m "Update course data - $(date)"
             echo "Changes committed"
           else

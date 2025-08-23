@@ -44,4 +44,4 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./dist
-        destination_dir: wpiplanner  # This will deploy to /wpiplanner subdirectory
+        # Deploy to root directory of gh-pages branch
