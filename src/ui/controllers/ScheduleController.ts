@@ -90,25 +90,52 @@ export class ScheduleController {
                     const isSelected = selectedCourse.selectedSection === section.number;
                     const selectedClass = isSelected ? 'selected' : '';
                     
-                    // Get primary period for display
-                    const primaryPeriod = section.periods[0];
-                    if (primaryPeriod) {
-                        const timeRange = TimeUtils.formatTimeRange(primaryPeriod.startTime, primaryPeriod.endTime);
-                        const days = TimeUtils.formatDays(primaryPeriod.days);
+                    // Sort periods by type priority (lecture first, then lab, then discussion)
+                    const sortedPeriods = [...section.periods].sort((a, b) => {
+                        const typePriority = (type: string) => {
+                            const lower = type.toLowerCase();
+                            if (lower.includes('lec') || lower.includes('lecture')) return 1;
+                            if (lower.includes('lab')) return 2;
+                            if (lower.includes('dis') || lower.includes('discussion') || lower.includes('rec')) return 3;
+                            return 4;
+                        };
+                        return typePriority(a.type) - typePriority(b.type);
+                    });
+                    
+                    html += `
+                        <div class="section-option ${selectedClass}" data-course-id="${course.id}" data-section="${section.number}">
+                            <div class="section-info">
+                                <div class="section-number">${section.number}</div>
+                                <div class="section-periods">`;
+                    
+                    // Display all periods for this section
+                    sortedPeriods.forEach((period, index) => {
+                        const timeRange = TimeUtils.formatTimeRange(period.startTime, period.endTime);
+                        const days = TimeUtils.formatDays(period.days);
+                        const periodTypeLabel = this.getPeriodTypeLabel(period.type);
                         
                         html += `
-                            <div class="section-option ${selectedClass}" data-course-id="${course.id}" data-section="${section.number}">
-                                <div class="section-info">
-                                    <div class="section-number">${section.number}</div>
-                                    <div class="section-schedule">${days} ${timeRange}</div>
-                                    <div class="section-professor">${primaryPeriod.professor}</div>
+                            <div class="period-info" data-period-type="${period.type.toLowerCase()}">
+                                <div class="period-header">
+                                    <span class="period-type-label">${periodTypeLabel}</span>
+                                    <span class="period-schedule">${days} ${timeRange}</span>
                                 </div>
-                                <button class="section-select-btn ${selectedClass}" data-course-id="${course.id}" data-section="${section.number}">
-                                    ${isSelected ? '✓' : '+'}
-                                </button>
+                                <div class="period-details">
+                                    <span class="period-professor">${period.professor}</span>
+                                    ${period.location ? `<span class="period-location">${period.location}</span>` : ''}
+                                </div>
                             </div>
                         `;
-                    }
+                    });
+                    
+                    html += `
+                                </div>
+                            </div>
+                            <button class="section-select-btn ${selectedClass}" data-course-id="${course.id}" data-section="${section.number}">
+                                ${isSelected ? '✓' : '+'}
+                            </button>
+                        </div>
+                    `;
                 });
                 
                 html += `</div>`;
@@ -293,14 +320,21 @@ export class ScheduleController {
         const courseColor = this.getCourseColor(primaryCourse.course.course.id);
         
         // Build content for the first course in the slot
+        const periodTypeClass = this.getPeriodTypeClass(primaryCourse.period.type);
+        const periodTypeLabel = this.getPeriodTypeLabel(primaryCourse.period.type);
+        
         const content = primaryCourse.isFirstSlot ? `
-            <div class="course-block ${hasConflict ? 'conflict' : ''}" style="background-color: ${courseColor}">
-                <div class="course-title">${primaryCourse.course.course.department.abbreviation}${primaryCourse.course.course.number}</div>
+            <div class="course-block ${periodTypeClass} ${hasConflict ? 'conflict' : ''}" style="background-color: ${courseColor}">
+                <div class="course-header">
+                    <div class="course-title">${primaryCourse.course.course.department.abbreviation}${primaryCourse.course.course.number}</div>
+                    <div class="period-type-badge">${periodTypeLabel}</div>
+                </div>
                 <div class="course-time">${TimeUtils.formatTimeRange(primaryCourse.period.startTime, primaryCourse.period.endTime)}</div>
                 <div class="course-location">${primaryCourse.period.location}</div>
+                <div class="course-professor">${primaryCourse.period.professor}</div>
                 ${hasConflict ? '<div class="conflict-indicator">⚠ Conflict</div>' : ''}
             </div>
-        ` : `<div class="course-continuation ${hasConflict ? 'conflict' : ''}"></div>`;
+        ` : `<div class="course-continuation ${periodTypeClass} ${hasConflict ? 'conflict' : ''}"></div>`;
         
         const classes = `occupied ${primaryCourse.isFirstSlot ? 'course-start' : 'course-continuation'} ${hasConflict ? 'has-conflict' : ''}`;
         
@@ -320,5 +354,34 @@ export class ScheduleController {
         }
         
         return colors[Math.abs(hash) % colors.length];
+    }
+
+    private getPeriodTypeLabel(type: string): string {
+        const lower = type.toLowerCase();
+        
+        if (lower.includes('lec') || lower.includes('lecture')) return 'LEC';
+        if (lower.includes('lab')) return 'LAB';
+        if (lower.includes('dis') || lower.includes('discussion')) return 'DIS';
+        if (lower.includes('rec') || lower.includes('recitation')) return 'REC';
+        if (lower.includes('sem') || lower.includes('seminar')) return 'SEM';
+        if (lower.includes('studio')) return 'STU';
+        if (lower.includes('conference') || lower.includes('conf')) return 'CONF';
+        
+        // Return abbreviated version for unknown types (first 3-4 chars)
+        return type.substring(0, Math.min(4, type.length)).toUpperCase();
+    }
+
+    private getPeriodTypeClass(type: string): string {
+        const lower = type.toLowerCase();
+        
+        if (lower.includes('lec') || lower.includes('lecture')) return 'period-lecture';
+        if (lower.includes('lab')) return 'period-lab';
+        if (lower.includes('dis') || lower.includes('discussion')) return 'period-discussion';
+        if (lower.includes('rec') || lower.includes('recitation')) return 'period-recitation';
+        if (lower.includes('sem') || lower.includes('seminar')) return 'period-seminar';
+        if (lower.includes('studio')) return 'period-studio';
+        if (lower.includes('conference') || lower.includes('conf')) return 'period-conference';
+        
+        return 'period-other';
     }
 }

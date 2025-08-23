@@ -194,9 +194,104 @@
   font-weight: 600;
   color: var(--color-primary);
   font-size: 0.8rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
+/* Enhanced period display styles */
+.section-periods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.period-info {
+  padding: 0.3rem 0;
+  border-left: 3px solid transparent;
+  padding-left: 0.5rem;
+  border-radius: 2px;
+  transition: var(--effect-transition);
+}
+
+.period-info[data-period-type*="lec"] {
+  border-left-color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.03);
+}
+
+.period-info[data-period-type*="lab"] {
+  border-left-color: #10b981;
+  background: rgba(16, 185, 129, 0.03);
+}
+
+.period-info[data-period-type*="dis"], 
+.period-info[data-period-type*="rec"] {
+  border-left-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.03);
+}
+
+.period-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.period-type-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-text-inverse);
+  background: var(--color-text-secondary);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+  min-width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.period-info[data-period-type*="lec"] .period-type-label {
+  background: var(--color-primary);
+}
+
+.period-info[data-period-type*="lab"] .period-type-label {
+  background: #10b981;
+}
+
+.period-info[data-period-type*="dis"] .period-type-label,
+.period-info[data-period-type*="rec"] .period-type-label {
+  background: #f59e0b;
+}
+
+.period-schedule {
+  font-size: 0.75rem;
+  color: var(--color-text);
+  font-family: var(--font-family-mono);
+  font-weight: 500;
+}
+
+.period-details {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.period-professor {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+.period-location {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.period-location::before {
+  content: "• ";
+  color: var(--color-border);
+}
+
+/* Legacy styles for backward compatibility */
 .section-schedule {
   font-size: 0.75rem;
   color: var(--color-text);
@@ -340,9 +435,9 @@
   font-weight: 500;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  justify-content: flex-start;
+  align-items: stretch;
+  text-align: left;
   line-height: 1.1;
   cursor: pointer;
   transition: var(--effect-transition);
@@ -352,6 +447,7 @@
   right: 0;
   bottom: 0;
   z-index: 10;
+  overflow: hidden;
 }
 
 .course-block:hover {
@@ -361,6 +457,109 @@
   box-shadow: var(--effect-shadow-hover);
 }
 
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2px;
+  gap: 4px;
+}
+
+.course-title {
+  font-weight: 600;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+.period-type-badge {
+  font-size: 0.55rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 1px 3px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.course-time {
+  font-size: 0.6rem;
+  opacity: 0.9;
+  margin-bottom: 1px;
+}
+
+.course-location {
+  font-size: 0.55rem;
+  opacity: 0.8;
+  margin-bottom: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.course-professor {
+  font-size: 0.55rem;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Period type styling variations */
+.course-block.period-lecture {
+  border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.course-block.period-lab {
+  opacity: 0.85;
+  border-left: 3px solid #10b981;
+}
+
+.course-block.period-lab .period-type-badge {
+  background: #10b981;
+}
+
+.course-block.period-discussion,
+.course-block.period-recitation {
+  opacity: 0.8;
+  border-left: 3px solid #f59e0b;
+}
+
+.course-block.period-discussion .period-type-badge,
+.course-block.period-recitation .period-type-badge {
+  background: #f59e0b;
+}
+
+.course-block.period-seminar {
+  border-left: 3px solid #8b5cf6;
+}
+
+.course-block.period-seminar .period-type-badge {
+  background: #8b5cf6;
+}
+
+/* Course continuation styling */
+.course-continuation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  border: 1px solid transparent;
+  border-left: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.course-continuation.period-lab {
+  border-left: 3px solid #10b981;
+}
+
+.course-continuation.period-discussion,
+.course-continuation.period-recitation {
+  border-left: 3px solid #f59e0b;
+}
+
+/* Legacy styles */
 .course-block .course-code {
   font-weight: 600;
   margin-bottom: 1px;
