@@ -226,7 +226,7 @@ export class MainController {
         const scheduleButton = document.getElementById('schedule-btn');
         if (scheduleButton) {
             scheduleButton.addEventListener('click', () => {
-                this.switchToPage('schedule');
+                this.togglePage();
             });
         }
 
@@ -697,6 +697,11 @@ export class MainController {
         headers.forEach(header => {
             resizeObserver.observe(header);
         });
+    }
+
+    private togglePage(): void {
+        const nextPage = this.currentPage === 'planner' ? 'schedule' : 'planner';
+        this.switchToPage(nextPage);
     }
 
     private switchToPage(page: 'planner' | 'schedule'): void {
