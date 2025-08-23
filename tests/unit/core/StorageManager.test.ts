@@ -30,7 +30,6 @@ describe('StorageManager', () => {
           },
           preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
           avoidBackToBackClasses: false,
-          maxDailyHours: 8,
         }
       }
 
@@ -69,7 +68,6 @@ describe('StorageManager', () => {
           },
           preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
           avoidBackToBackClasses: false,
-          maxDailyHours: 8,
         }
       }
 
@@ -206,7 +204,6 @@ describe('StorageManager', () => {
         },
         preferredDays: new Set(['mon', 'wed', 'fri']),
         avoidBackToBackClasses: true,
-        maxDailyHours: 6,
       }
 
       storageManager.savePreferences(preferences)
@@ -225,7 +222,6 @@ describe('StorageManager', () => {
         },
         preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
         avoidBackToBackClasses: false,
-        maxDailyHours: 8,
         theme: 'wpi-classic'
       })
     })
@@ -242,7 +238,6 @@ describe('StorageManager', () => {
         },
         preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
         avoidBackToBackClasses: false,
-        maxDailyHours: 8,
         theme: 'wpi-classic'
       })
     })
@@ -265,7 +260,6 @@ describe('StorageManager', () => {
         },
         preferredDays: new Set(['mon']),
         avoidBackToBackClasses: true,
-        maxDailyHours: 6,
         preferredBuildings: []
       }
 
@@ -298,7 +292,6 @@ describe('StorageManager', () => {
         },
         preferredDays: new Set(['mon']),
         avoidBackToBackClasses: true,
-        maxDailyHours: 6,
         preferredBuildings: []
       }
 
