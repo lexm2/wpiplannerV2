@@ -4,13 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WPI Course Planner</title>
-  <script type="module" crossorigin src="/wpiplannerV2/assets/index-BkbunPRN.js"></script>
-  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-DvpSo_Tg.css">
+  <script type="module" crossorigin src="/wpiplannerV2/assets/index-C8xh9Prr.js"></script>
+  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-BACJo5vg.css">
 </head>
 <body>
-    <div class="container">
-        <div id="app">
-            <div class="loading-message">Loading...</div>
+    <div id="app">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>WPI Course Planner</h1>
+                <div class="header-controls">
+                    <input type="text" id="search-input" placeholder="Search courses..." class="search-input">
+                    <div class="theme-selector">
+                        <div class="theme-dropdown" id="theme-dropdown">
+                            <span id="current-theme-name">WPI Classic</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="theme-options" id="theme-options">
+                            <!-- Theme options will be populated by ThemeSelector -->
+                        </div>
+                    </div>
+                    <button id="clear-selection" class="btn btn-secondary">Clear Selection</button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="app-body">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>Departments</h2>
+                </div>
+                <div class="department-categories" id="department-list">
+                    <div class="loading-message">Loading departments...</div>
+                </div>
+            </aside>
+            
+            <main class="main-content">
+                <div class="content-header">
+                    <h2>Course Listings</h2>
+                    <div class="view-controls">
+                        <button id="view-list" class="btn btn-primary active">List View</button>
+                        <button id="view-grid" class="btn btn-secondary">Grid View</button>
+                    </div>
+                </div>
+                <div class="course-container" id="course-container">
+                    <div class="loading-message">Select a department to view courses...</div>
+                </div>
+            </main>
+            
+            <aside class="right-panel">
+                <!-- Right panel content will be added later -->
+            </aside>
         </div>
     </div>
     
