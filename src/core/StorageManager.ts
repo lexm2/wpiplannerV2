@@ -112,7 +112,6 @@ export class StorageManager {
             },
             preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
             avoidBackToBackClasses: false,
-            maxDailyHours: 8,
             theme: 'wpi-classic'
         };
     }
