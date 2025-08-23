@@ -229,7 +229,8 @@ describe('StorageManager', () => {
         preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
         avoidBackToBackClasses: false,
         maxDailyHours: 8,
-        preferredBuildings: []
+        preferredBuildings: [],
+        theme: 'wpi-classic'
       })
     })
 
@@ -246,7 +247,8 @@ describe('StorageManager', () => {
         preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
         avoidBackToBackClasses: false,
         maxDailyHours: 8,
-        preferredBuildings: []
+        preferredBuildings: [],
+        theme: 'wpi-classic'
       })
     })
   })

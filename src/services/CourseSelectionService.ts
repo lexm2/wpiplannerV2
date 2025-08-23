@@ -56,7 +56,7 @@ export class CourseSelectionService {
     }
 
     getSelectedCourses(): SelectedCourse[] {
-        return this.courseManager.getSelectedCoursesWithSections();
+        return this.courseManager.getSelectedCourses();
     }
 
     getSelectedCourse(courseId: string): SelectedCourse | undefined {

@@ -9,8 +9,8 @@ export class CourseManager {
         const selectedCourse: SelectedCourse = {
             course,
             selectedSection: null,
-            preferredSections: [],
-            deniedSections: [],
+            preferredSections: new Set<string>(),
+            deniedSections: new Set<string>(),
             isRequired
         };
         
@@ -25,24 +25,14 @@ export class CourseManager {
 
     updateSectionPreference(courseId: string, sectionNumber: string, preference: 'preferred' | 'denied'): void {
         const selectedCourse = this.selectedCourses.get(courseId);
-        if (!selectedCourse) return;
+        if (!this.validateCourseExists(courseId, selectedCourse)) return;
 
         if (preference === 'preferred') {
-            if (!selectedCourse.preferredSections.includes(sectionNumber)) {
-                selectedCourse.preferredSections.push(sectionNumber);
-            }
-            const deniedIndex = selectedCourse.deniedSections.indexOf(sectionNumber);
-            if (deniedIndex > -1) {
-                selectedCourse.deniedSections.splice(deniedIndex, 1);
-            }
+            selectedCourse!.preferredSections.add(sectionNumber);
+            selectedCourse!.deniedSections.delete(sectionNumber);
         } else {
-            if (!selectedCourse.deniedSections.includes(sectionNumber)) {
-                selectedCourse.deniedSections.push(sectionNumber);
-            }
-            const preferredIndex = selectedCourse.preferredSections.indexOf(sectionNumber);
-            if (preferredIndex > -1) {
-                selectedCourse.preferredSections.splice(preferredIndex, 1);
-            }
+            selectedCourse!.deniedSections.add(sectionNumber);
+            selectedCourse!.preferredSections.delete(sectionNumber);
         }
         
         this.notifyListeners();
@@ -62,10 +52,10 @@ export class CourseManager {
 
     getAvailableSections(courseId: string): Section[] {
         const selectedCourse = this.selectedCourses.get(courseId);
-        if (!selectedCourse) return [];
+        if (!this.validateCourseExists(courseId, selectedCourse)) return [];
 
-        return selectedCourse.course.sections.filter(section => 
-            !selectedCourse.deniedSections.includes(section.number)
+        return selectedCourse!.course.sections.filter(section => 
+            !selectedCourse!.deniedSections.has(section.number)
         );
     }
 
@@ -84,9 +74,9 @@ export class CourseManager {
 
     setSelectedSection(courseId: string, sectionNumber: string | null): void {
         const selectedCourse = this.selectedCourses.get(courseId);
-        if (!selectedCourse) return;
+        if (!this.validateCourseExists(courseId, selectedCourse)) return;
 
-        selectedCourse.selectedSection = sectionNumber;
+        selectedCourse!.selectedSection = sectionNumber;
         this.notifyListeners();
     }
 
@@ -95,9 +85,6 @@ export class CourseManager {
         return selectedCourse?.selectedSection || null;
     }
 
-    getSelectedCoursesWithSections(): SelectedCourse[] {
-        return this.getSelectedCourses();
-    }
 
     loadSelectedCourses(selectedCourses: SelectedCourse[]): void {
         this.selectedCourses.clear();
@@ -105,6 +92,14 @@ export class CourseManager {
             this.selectedCourses.set(course.course.id, course);
         });
         this.notifyListeners();
+    }
+
+    private validateCourseExists(courseId: string, selectedCourse?: SelectedCourse): selectedCourse is SelectedCourse {
+        if (!selectedCourse) {
+            console.warn(`Course ${courseId} not found in selected courses`);
+            return false;
+        }
+        return true;
     }
 
     private notifyListeners(): void {

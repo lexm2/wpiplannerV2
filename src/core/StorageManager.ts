@@ -10,43 +10,44 @@ export class StorageManager {
     };
 
     saveUserState(state: UserScheduleState): void {
-        try {
-            const serializedState = this.serializeWithSets(state);
-            localStorage.setItem(StorageManager.STORAGE_KEYS.USER_STATE, JSON.stringify(serializedState));
-        } catch (error) {
-            console.warn('Failed to save user state:', error);
-        }
+        this.handleStorageOperation(
+            () => {
+                const serializedState = JSON.stringify(state, this.replacer);
+                localStorage.setItem(StorageManager.STORAGE_KEYS.USER_STATE, serializedState);
+            },
+            'Failed to save user state'
+        );
     }
 
     loadUserState(): UserScheduleState | null {
-        try {
-            const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.USER_STATE);
-            if (!stored) return null;
-            
-            const parsed = JSON.parse(stored);
-            return this.deserializeWithSets(parsed);
-        } catch (error) {
-            console.warn('Failed to load user state:', error);
-            return null;
-        }
+        return this.handleStorageOperation(
+            () => {
+                const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.USER_STATE);
+                if (!stored) return null;
+                return JSON.parse(stored, this.reviver);
+            },
+            'Failed to load user state',
+            null
+        );
     }
 
     saveSchedule(schedule: Schedule): void {
-        try {
-            const schedules = this.loadAllSchedules();
-            const existingIndex = schedules.findIndex(s => s.id === schedule.id);
-            
-            if (existingIndex >= 0) {
-                schedules[existingIndex] = schedule;
-            } else {
-                schedules.push(schedule);
-            }
-            
-            const serializedSchedules = this.serializeWithSets(schedules);
-            localStorage.setItem(StorageManager.STORAGE_KEYS.SCHEDULES, JSON.stringify(serializedSchedules));
-        } catch (error) {
-            console.warn('Failed to save schedule:', error);
-        }
+        this.handleStorageOperation(
+            () => {
+                const schedules = this.loadAllSchedules();
+                const existingIndex = schedules.findIndex(s => s.id === schedule.id);
+                
+                if (existingIndex >= 0) {
+                    schedules[existingIndex] = schedule;
+                } else {
+                    schedules.push(schedule);
+                }
+                
+                const serializedSchedules = JSON.stringify(schedules, this.replacer);
+                localStorage.setItem(StorageManager.STORAGE_KEYS.SCHEDULES, serializedSchedules);
+            },
+            'Failed to save schedule'
+        );
     }
 
     loadSchedule(scheduleId: string): Schedule | null {
@@ -60,16 +61,15 @@ export class StorageManager {
     }
 
     loadAllSchedules(): Schedule[] {
-        try {
-            const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.SCHEDULES);
-            if (!stored) return [];
-            
-            const parsed = JSON.parse(stored);
-            return this.deserializeWithSets(parsed);
-        } catch (error) {
-            console.warn('Failed to load schedules:', error);
-            return [];
-        }
+        return this.handleStorageOperation(
+            () => {
+                const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.SCHEDULES);
+                if (!stored) return [];
+                return JSON.parse(stored, this.reviver);
+            },
+            'Failed to load schedules',
+            []
+        );
     }
 
     deleteSchedule(scheduleId: string): void {
@@ -83,25 +83,25 @@ export class StorageManager {
     }
 
     savePreferences(preferences: SchedulePreferences): void {
-        try {
-            const serializedPreferences = this.serializeWithSets(preferences);
-            localStorage.setItem(StorageManager.STORAGE_KEYS.PREFERENCES, JSON.stringify(serializedPreferences));
-        } catch (error) {
-            console.warn('Failed to save preferences:', error);
-        }
+        this.handleStorageOperation(
+            () => {
+                const serializedPreferences = JSON.stringify(preferences, this.replacer);
+                localStorage.setItem(StorageManager.STORAGE_KEYS.PREFERENCES, serializedPreferences);
+            },
+            'Failed to save preferences'
+        );
     }
 
     loadPreferences(): SchedulePreferences | null {
-        try {
-            const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.PREFERENCES);
-            if (!stored) return this.getDefaultPreferences();
-            
-            const parsed = JSON.parse(stored);
-            return this.deserializeWithSets(parsed);
-        } catch (error) {
-            console.warn('Failed to load preferences:', error);
-            return this.getDefaultPreferences();
-        }
+        return this.handleStorageOperation(
+            () => {
+                const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.PREFERENCES);
+                if (!stored) return this.getDefaultPreferences();
+                return JSON.parse(stored, this.reviver);
+            },
+            'Failed to load preferences',
+            this.getDefaultPreferences()
+        );
     }
 
     private getDefaultPreferences(): SchedulePreferences {
@@ -163,57 +163,32 @@ export class StorageManager {
         }
     }
 
-    private serializeWithSets(obj: any): any {
-        if (obj === null || obj === undefined) {
-            return obj;
+    private handleStorageOperation<T>(
+        operation: () => T,
+        errorMessage: string,
+        fallback?: T
+    ): T | undefined {
+        try {
+            return operation();
+        } catch (error) {
+            console.warn(`${errorMessage}:`, error);
+            return fallback;
         }
-        
-        if (obj instanceof Set) {
-            return { __type: 'Set', value: Array.from(obj) };
-        }
-        
-        if (Array.isArray(obj)) {
-            return obj.map(item => this.serializeWithSets(item));
-        }
-        
-        if (typeof obj === 'object') {
-            const result: any = {};
-            for (const key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    result[key] = this.serializeWithSets(obj[key]);
-                }
-            }
-            return result;
-        }
-        
-        return obj;
     }
 
-    private deserializeWithSets(obj: any): any {
-        if (obj === null || obj === undefined) {
-            return obj;
+    private readonly replacer = (key: string, value: any): any => {
+        if (value instanceof Set) {
+            return { __type: 'Set', value: [...value] };
         }
-        
-        if (typeof obj === 'object' && obj.__type === 'Set') {
-            return new Set(obj.value);
+        return value;
+    };
+
+    private readonly reviver = (key: string, value: any): any => {
+        if (typeof value === 'object' && value !== null && value.__type === 'Set') {
+            return new Set(value.value);
         }
-        
-        if (Array.isArray(obj)) {
-            return obj.map(item => this.deserializeWithSets(item));
-        }
-        
-        if (typeof obj === 'object') {
-            const result: any = {};
-            for (const key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    result[key] = this.deserializeWithSets(obj[key]);
-                }
-            }
-            return result;
-        }
-        
-        return obj;
-    }
+        return value;
+    };
 
     saveThemePreference(themeId: string): void {
         try {
@@ -234,25 +209,25 @@ export class StorageManager {
     }
 
     saveSelectedCourses(selectedCourses: SelectedCourse[]): void {
-        try {
-            const serializedCourses = this.serializeWithSets(selectedCourses);
-            localStorage.setItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES, JSON.stringify(serializedCourses));
-        } catch (error) {
-            console.warn('Failed to save selected courses:', error);
-        }
+        this.handleStorageOperation(
+            () => {
+                const serializedCourses = JSON.stringify(selectedCourses, this.replacer);
+                localStorage.setItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES, serializedCourses);
+            },
+            'Failed to save selected courses'
+        );
     }
 
     loadSelectedCourses(): SelectedCourse[] {
-        try {
-            const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES);
-            if (!stored) return [];
-            
-            const parsed = JSON.parse(stored);
-            return this.deserializeWithSets(parsed);
-        } catch (error) {
-            console.warn('Failed to load selected courses:', error);
-            return [];
-        }
+        return this.handleStorageOperation(
+            () => {
+                const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES);
+                if (!stored) return [];
+                return JSON.parse(stored, this.reviver);
+            },
+            'Failed to load selected courses',
+            []
+        );
     }
 
     clearSelectedCourses(): void {

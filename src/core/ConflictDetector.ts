@@ -2,12 +2,20 @@ import { Section, Period, DayOfWeek } from '../types/types'
 import { TimeConflict, ConflictType } from '../types/schedule'
 
 export class ConflictDetector {
+    private conflictCache = new Map<string, TimeConflict[]>();
     detectConflicts(sections: Section[]): TimeConflict[] {
         const conflicts: TimeConflict[] = [];
         
         for (let i = 0; i < sections.length; i++) {
             for (let j = i + 1; j < sections.length; j++) {
-                const sectionConflicts = this.checkSectionConflicts(sections[i], sections[j]);
+                const cacheKey = this.getCacheKey(sections[i], sections[j]);
+                let sectionConflicts = this.conflictCache.get(cacheKey);
+                
+                if (!sectionConflicts) {
+                    sectionConflicts = this.checkSectionConflicts(sections[i], sections[j]);
+                    this.conflictCache.set(cacheKey, sectionConflicts);
+                }
+                
                 conflicts.push(...sectionConflicts);
             }
         }
@@ -47,13 +55,7 @@ export class ConflictDetector {
     }
 
     private getSharedDays(days1: Set<DayOfWeek>, days2: Set<DayOfWeek>): string[] {
-        const shared: string[] = [];
-        for (const day of days1) {
-            if (days2.has(day)) {
-                shared.push(day);
-            }
-        }
-        return shared;
+        return Array.from(new Set([...days1].filter(day => days2.has(day))));
     }
 
     private hasTimeOverlap(period1: Period, period2: Period): boolean {
@@ -72,5 +74,15 @@ export class ConflictDetector {
     isValidSchedule(sections: Section[]): boolean {
         const conflicts = this.detectConflicts(sections);
         return conflicts.length === 0;
+    }
+
+    clearCache(): void {
+        this.conflictCache.clear();
+    }
+
+    private getCacheKey(section1: Section, section2: Section): string {
+        const key1 = `${section1.crn}-${section2.crn}`;
+        const key2 = `${section2.crn}-${section1.crn}`;
+        return key1 < key2 ? key1 : key2;
     }
 }
