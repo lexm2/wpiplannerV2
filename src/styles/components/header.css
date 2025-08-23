@@ -38,51 +38,25 @@
   color: var(--color-text-secondary);
 }
 
-#data-timestamp {
+.timestamps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+#client-timestamp, #server-timestamp {
   font-weight: 500;
 }
 
-.btn-refresh {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
-  border-radius: var(--effect-border-radius);
-  cursor: pointer;
-  transition: var(--effect-transition);
-}
-
-.btn-refresh:hover:not(:disabled) {
-  background: var(--color-surface-hover);
-  border-color: var(--color-primary);
-}
-
-.btn-refresh:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-refresh.loading {
+#client-timestamp {
   color: var(--color-primary);
 }
 
-.refresh-icon {
-  font-size: 1rem;
-  line-height: 1;
+#server-timestamp {
+  color: var(--color-text-secondary);
 }
 
-.btn-refresh.loading .refresh-icon {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
 
 .header-navigation {
   display: flex;

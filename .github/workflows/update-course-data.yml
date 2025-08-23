@@ -40,8 +40,11 @@ jobs:
       - name: Commit and push if changed
         if: steps.changes.outputs.changed == 'true'
         run: |
+          # Create timestamp file with current UTC time
+          echo "{\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%S.000Z)\",\"utc\":\"$(date -u +%Y-%m-%d\ %H:%M\ UTC)\"}" > public/last-updated.json
+          
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add public/course-data.json
+          git add public/course-data.json public/last-updated.json
           git commit -m "Update course data $(date -u +%Y-%m-%d\ %H:%M\ UTC)"
           git push

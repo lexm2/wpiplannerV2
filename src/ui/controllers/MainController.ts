@@ -1,14 +1,12 @@
 import { Course, Department } from '../../types/types'
 import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
-import { DataRefreshService } from '../../services/DataRefreshService'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { TimeUtils } from '../utils/timeUtils'
 
 export class MainController {
     private courseDataService: CourseDataService;
     private themeSelector: ThemeSelector;
-    private dataRefreshService: DataRefreshService;
     private courseSelectionService: CourseSelectionService;
     private allDepartments: Department[] = [];
     private selectedDepartment: Department | null = null;
@@ -75,7 +73,6 @@ export class MainController {
     constructor() {
         this.courseDataService = new CourseDataService();
         this.themeSelector = new ThemeSelector();
-        this.dataRefreshService = new DataRefreshService();
         this.courseSelectionService = new CourseSelectionService();
         this.init();
     }
@@ -85,7 +82,6 @@ export class MainController {
         await this.loadCourseData();
         this.displayDepartments();
         this.setupEventListeners();
-        this.setupDataRefreshListener();
         this.setupCourseSelectionListener();
         this.displaySelectedCourses();
         this.syncHeaderHeights();
@@ -98,6 +94,8 @@ export class MainController {
             const scheduleDB = await this.courseDataService.loadCourseData();
             this.allDepartments = scheduleDB.departments;
             console.log(`Loaded ${this.allDepartments.length} departments`);
+            this.updateClientTimestamp();
+            this.loadServerTimestamp();
         } catch (error) {
             console.error('Failed to load course data:', error);
             this.showErrorMessage('Failed to load course data. Please try refreshing the page.');
@@ -693,22 +691,55 @@ export class MainController {
         });
     }
 
-    private setupDataRefreshListener(): void {
-        window.addEventListener('data-refreshed', async () => {
-            console.log('Data refresh detected, reloading course data...');
-            this.showLoadingState();
-            await this.loadCourseData();
-            this.displayDepartments();
+
+    private updateClientTimestamp(): void {
+        const clientTimestampElement = document.getElementById('client-timestamp');
+        if (clientTimestampElement) {
+            const now = new Date();
+            const options: Intl.DateTimeFormatOptions = {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            const formattedTime = now.toLocaleDateString('en-US', options).replace(',', ' at');
+            clientTimestampElement.textContent = `Client loaded: ${formattedTime}`;
+        }
+    }
+
+    private async loadServerTimestamp(): Promise<void> {
+        const serverTimestampElement = document.getElementById('server-timestamp');
+        if (!serverTimestampElement) return;
+
+        try {
+            const response = await fetch('./last-updated.json', {
+                cache: 'no-cache'
+            });
             
-            // If we have a selected department, refresh its courses too
-            if (this.selectedDepartment) {
-                const updatedDept = this.allDepartments.find(d => d.abbreviation === this.selectedDepartment!.abbreviation);
-                if (updatedDept) {
-                    this.selectedDepartment = updatedDept;
-                    this.displayCourses(updatedDept.courses);
-                }
+            if (response.ok) {
+                const timestampData = await response.json();
+                const serverDate = new Date(timestampData.timestamp);
+                const options: Intl.DateTimeFormatOptions = {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                };
+                const formattedTime = serverDate.toLocaleDateString('en-US', options).replace(',', ' at');
+                serverTimestampElement.textContent = `Server updated: ${formattedTime}`;
+            } else {
+                throw new Error(`Failed to fetch server timestamp: ${response.status}`);
             }
-        });
+        } catch (error) {
+            console.warn('Failed to load server timestamp:', error);
+            serverTimestampElement.textContent = 'Server timestamp unavailable';
+        }
     }
 
     private showLoadingState(): void {

@@ -307,4 +307,5 @@ export class CourseDataService {
     getAllDepartments(): Department[] {
         return this.scheduleDB?.departments || [];
     }
+
 }
