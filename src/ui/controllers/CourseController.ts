@@ -116,9 +116,8 @@ export class CourseController {
     }
 
     private courseHasWarning(course: Course): boolean {
-        // Add logic to determine if a course has warnings
-        // For now, randomly add warnings to some courses for demo
-        return Math.random() > 0.7;
+        // Check if ALL sections are fully enrolled (no available options)
+        return course.sections.every(section => section.seatsAvailable <= 0);
     }
 
     handleSearch(query: string, selectedDepartment: Department | null): Course[] {
