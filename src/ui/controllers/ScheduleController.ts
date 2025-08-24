@@ -1,9 +1,11 @@
 import { DayOfWeek, Course } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
+import { SectionInfoModalController } from './SectionInfoModalController'
 import { TimeUtils } from '../utils/timeUtils'
 
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
+    private sectionInfoModalController: SectionInfoModalController | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private statePreserver?: { 
         preserve: () => Map<string, boolean>, 
@@ -12,6 +14,10 @@ export class ScheduleController {
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
+    }
+
+    setSectionInfoModalController(sectionInfoModalController: SectionInfoModalController): void {
+        this.sectionInfoModalController = sectionInfoModalController;
     }
 
     setStatePreserver(statePreserver: { 
@@ -336,6 +342,9 @@ export class ScheduleController {
         }
         
         container.innerHTML = html;
+        
+        // Add click event listeners for section blocks
+        this.addSectionBlockEventListeners(container);
     }
 
     private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number): { content: string, classes: string } {
@@ -429,7 +438,11 @@ export class ScheduleController {
         
         // Build content for the first section in the slot - simplified to show only course name
         const content = primarySection.isFirstSlot ? `
-            <div class="section-block ${hasConflict ? 'conflict' : ''}" style="
+            <div class="section-block ${hasConflict ? 'conflict' : ''}" 
+                 data-course-id="${primarySection.course.course.id}"
+                 data-section-number="${primarySection.course.selectedSectionNumber || ''}"
+                 data-selected-course-index="${primarySection.courseIndex || 0}"
+                 style="
                 background-color: ${courseColor}; 
                 height: ${heightInPixels}px;
                 width: 100%;
@@ -574,6 +587,56 @@ export class ScheduleController {
         
         // Ultimate fallback
         return 'A';
+    }
+
+    private addSectionBlockEventListeners(container: HTMLElement): void {
+        // Use event delegation to handle clicks on section blocks
+        container.addEventListener('click', (event) => {
+            const target = event.target as HTMLElement;
+            
+            // Find the section block element (might be the target or a parent)
+            const sectionBlock = target.closest('.section-block');
+            if (!sectionBlock) return;
+            
+            // Get section information from data attributes
+            const courseId = (sectionBlock as HTMLElement).dataset.courseId;
+            const sectionNumber = (sectionBlock as HTMLElement).dataset.sectionNumber;
+            
+            if (courseId && sectionNumber) {
+                event.stopPropagation(); // Prevent event bubbling
+                this.showSectionInfoModal(courseId, sectionNumber);
+            }
+        });
+    }
+
+    showSectionInfoModal(courseId: string, sectionNumber: string): void {
+        if (!this.sectionInfoModalController) {
+            console.warn('Section info modal controller not available');
+            return;
+        }
+
+        // Find the selected course and section
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
+        
+        if (!selectedCourse || !selectedCourse.selectedSection) {
+            console.warn('Course or section not found:', courseId, sectionNumber);
+            return;
+        }
+
+        const course = selectedCourse.course;
+        const section = selectedCourse.selectedSection;
+
+        // Create section data for modal controller
+        const sectionData = {
+            courseCode: `${course.department.abbreviation}${course.number}`,
+            courseName: course.name,
+            section: section,
+            course: course
+        };
+
+        // Show modal using the dedicated controller
+        this.sectionInfoModalController.show(sectionData);
     }
 
 }

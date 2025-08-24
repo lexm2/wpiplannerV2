@@ -3,9 +3,12 @@ import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { ConflictDetector } from '../../core/ConflictDetector'
+import { ModalService } from '../../services/ModalService'
 import { DepartmentController } from './DepartmentController'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
+import { SectionInfoModalController } from './SectionInfoModalController'
+import { InfoModalController } from './InfoModalController'
 import { UIStateManager } from './UIStateManager'
 import { TimestampManager } from './TimestampManager'
 
@@ -14,9 +17,12 @@ export class MainController {
     private themeSelector: ThemeSelector;
     private courseSelectionService: CourseSelectionService;
     private conflictDetector: ConflictDetector;
+    private modalService: ModalService;
     private departmentController: DepartmentController;
     private courseController: CourseController;
     private scheduleController: ScheduleController;
+    private sectionInfoModalController: SectionInfoModalController;
+    private infoModalController: InfoModalController;
     private uiStateManager: UIStateManager;
     private timestampManager: TimestampManager;
     private allDepartments: Department[] = [];
@@ -27,9 +33,15 @@ export class MainController {
         this.themeSelector = new ThemeSelector();
         this.courseSelectionService = new CourseSelectionService();
         this.conflictDetector = new ConflictDetector();
+        this.modalService = new ModalService();
         this.departmentController = new DepartmentController();
         this.courseController = new CourseController(this.courseSelectionService);
         this.scheduleController = new ScheduleController(this.courseSelectionService);
+        this.sectionInfoModalController = new SectionInfoModalController(this.modalService);
+        this.infoModalController = new InfoModalController(this.modalService);
+        
+        // Set modal controllers for ScheduleController
+        this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
         this.uiStateManager = new UIStateManager();
         this.timestampManager = new TimestampManager();
         
@@ -371,6 +383,18 @@ export class MainController {
 
     public getCourseSelectionService(): CourseSelectionService {
         return this.courseSelectionService;
+    }
+
+    public getModalService(): ModalService {
+        return this.modalService;
+    }
+
+    public getSectionInfoModalController(): SectionInfoModalController {
+        return this.sectionInfoModalController;
+    }
+
+    public getInfoModalController(): InfoModalController {
+        return this.infoModalController;
     }
 
     private toggleCourseDropdown(triggerElement: HTMLElement): void {

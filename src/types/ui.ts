@@ -50,3 +50,41 @@ export interface ViewState {
     isLoading: boolean;
     error: string | null;
 }
+
+export enum ModalType {
+    INFO = 'info',
+    WARNING = 'warning',
+    ERROR = 'error',
+    CONFIRM = 'confirm',
+    CUSTOM = 'custom'
+}
+
+export interface ModalButton {
+    text: string;
+    style: 'primary' | 'secondary' | 'danger';
+    callback?: () => void;
+}
+
+export interface Modal {
+    id: string;
+    title: string;
+    content: string;
+    type: ModalType;
+    buttons?: ModalButton[];
+    closable?: boolean;
+    closeOnBackdrop?: boolean;
+    closeOnEscape?: boolean;
+    templatePath?: string;
+    customCSS?: string;
+    data?: any;
+}
+
+export interface TemplateModal {
+    id: string;
+    title: string;
+    template: string;
+    data: any;
+    closable?: boolean;
+    closeOnBackdrop?: boolean;
+    closeOnEscape?: boolean;
+}
