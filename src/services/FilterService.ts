@@ -205,6 +205,8 @@ export class FilterService {
                 return this.getProfessorOptions(allCourses);
             case 'term':
                 return this.getTermOptions(allCourses);
+            case 'location':
+                return this.getLocationOptions(allCourses);
             default:
                 return null;
         }
@@ -231,5 +233,10 @@ export class FilterService {
             });
         });
         return Array.from(terms).sort();
+    }
+    
+    private getLocationOptions(courses: Course[]): { buildings: string[] } {
+        const buildings = this.searchService.getAvailableBuildings();
+        return { buildings };
     }
 }

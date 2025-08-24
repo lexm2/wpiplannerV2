@@ -6,7 +6,8 @@ export class StorageManager {
         PREFERENCES: 'wpi-planner-preferences',
         SCHEDULES: 'wpi-planner-schedules',
         SELECTED_COURSES: 'wpi-planner-selected-courses',
-        THEME: 'wpi-planner-theme'
+        THEME: 'wpi-planner-theme',
+        ACTIVE_SCHEDULE_ID: 'wpi-planner-active-schedule-id'
     };
 
     saveUserState(state: UserScheduleState): void {
@@ -248,6 +249,36 @@ export class StorageManager {
             localStorage.removeItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES);
         } catch (error) {
             console.warn('Failed to clear selected courses:', error);
+        }
+    }
+
+    saveActiveScheduleId(scheduleId: string | null): void {
+        try {
+            if (scheduleId) {
+                localStorage.setItem(StorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID, scheduleId);
+            } else {
+                localStorage.removeItem(StorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID);
+            }
+        } catch (error) {
+            console.warn('Failed to save active schedule ID:', error);
+        }
+    }
+
+    loadActiveScheduleId(): string | null {
+        try {
+            const saved = localStorage.getItem(StorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID);
+            return saved && saved.length > 0 ? saved : null;
+        } catch (error) {
+            console.warn('Failed to load active schedule ID:', error);
+            return null;
+        }
+    }
+
+    clearActiveScheduleId(): void {
+        try {
+            localStorage.removeItem(StorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID);
+        } catch (error) {
+            console.warn('Failed to clear active schedule ID:', error);
         }
     }
 }

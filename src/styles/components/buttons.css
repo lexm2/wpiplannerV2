@@ -66,3 +66,24 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Save button states */
+#save-profile-btn.unsaved-changes {
+  background: var(--color-warning, #f59e0b);
+  color: var(--color-text-inverse);
+  animation: pulse-warning 2s infinite;
+}
+
+#save-profile-btn.unsaved-changes:hover {
+  background: var(--color-warning-hover, #d97706);
+}
+
+#save-profile-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes pulse-warning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}

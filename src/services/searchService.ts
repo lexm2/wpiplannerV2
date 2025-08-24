@@ -1,5 +1,5 @@
-import { Course, Department, Section, Period } from '../types/types'
-import { SearchFilter } from '../types/ui'
+import { Course, Department, Section, Period, DayOfWeek } from '../types/types'
+import { SearchFilter, TimeSlot } from '../types/ui'
 
 export class SearchService {
     private courses: Course[] = [];
@@ -120,7 +120,7 @@ export class SearchService {
         });
     }
 
-    private periodsOverlap(period: Period, timeSlot: any): boolean {
+    private periodsOverlap(period: Period, timeSlot: TimeSlot): boolean {
         const periodStart = period.startTime.hours * 60 + period.startTime.minutes;
         const periodEnd = period.endTime.hours * 60 + period.endTime.minutes;
         const slotStart = timeSlot.startTime.hours * 60 + timeSlot.startTime.minutes;
@@ -130,7 +130,7 @@ export class SearchService {
         const timeOverlaps = periodStart < slotEnd && slotStart < periodEnd;
         
         // Check for day overlap
-        const dayOverlaps = timeSlot.days.some((day: string) => period.days.has(day));
+        const dayOverlaps = timeSlot.days.some((day: string) => period.days.has(day as DayOfWeek));
 
         return timeOverlaps && dayOverlaps;
     }

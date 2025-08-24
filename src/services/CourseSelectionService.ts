@@ -114,9 +114,7 @@ export class CourseSelectionService {
     }
 
     private setupPersistenceListener(): void {
-        this.courseManager.onSelectionChange((courses) => {
-            this.storageManager.saveSelectedCourses(courses);
-        });
+        // Automatic persistence removed - now handled by manual save
     }
 
     private persistSelections(): void {

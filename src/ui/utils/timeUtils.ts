@@ -57,10 +57,6 @@ export class TimeUtils {
         const slot = Math.ceil(relativeMinutes / 30);
         const boundedSlot = Math.max(0, Math.min(slot, TimeUtils.TOTAL_TIME_SLOTS - 1));
         
-        // Log examples for debugging
-        if (relativeMinutes % 30 !== 0) {
-            console.log(`Rounded UP: ${time.hours}:${time.minutes.toString().padStart(2, '0')} -> slot ${slot} (${relativeMinutes} min = ${relativeMinutes/30} slots)`);
-        }
         
         return boundedSlot;
     }

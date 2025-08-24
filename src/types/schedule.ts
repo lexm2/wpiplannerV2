@@ -12,7 +12,6 @@ export interface Schedule {
     name: string;
     selectedCourses: SelectedCourse[];
     generatedSchedules: ScheduleCombination[];
-    preferences: SchedulePreferences;
 }
 
 export interface ScheduleCombination {

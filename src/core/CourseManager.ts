@@ -20,6 +20,7 @@ export class CourseManager {
     }
 
     removeCourse(course: Course): void {
+        console.log(`🗑️ CourseManager: Removing course ${course.department.abbreviation}${course.number}`);
         this.selectedCourses.delete(course);
         this.notifyListeners();
     }
@@ -60,6 +61,9 @@ export class CourseManager {
     setSelectedSection(course: Course, sectionNumber: string | null): void {
         const selectedCourse = this.selectedCourses.get(course);
         if (!this.validateCourseExists(course, selectedCourse)) return;
+
+        const previousSection = selectedCourse!.selectedSectionNumber;
+        console.log(`📝 CourseManager: Setting section for ${course.department.abbreviation}${course.number} from "${previousSection}" to "${sectionNumber}"`);
 
         // Find the actual Section object
         const sectionObject = sectionNumber ? 
@@ -117,6 +121,12 @@ export class CourseManager {
 
     private notifyListeners(): void {
         const courses = this.getSelectedCourses();
+        console.log(`🔔 CourseManager: Notifying ${this.listeners.size} listeners of course changes`);
+        console.log(`📊 Current selected courses: ${courses.length} total`);
+        courses.forEach(course => {
+            const sectionInfo = course.selectedSectionNumber ? `section ${course.selectedSectionNumber}` : 'no section selected';
+            console.log(`  • ${course.course.department.abbreviation}${course.course.number} (${sectionInfo})`);
+        });
         this.listeners.forEach(listener => listener(courses));
     }
 

@@ -22,6 +22,7 @@
                     <button id="schedule-btn" class="btn btn-primary btn-schedule">Schedule</button>
                 </div>
                 <div class="header-controls">
+                    <button id="save-profile-btn" class="btn btn-primary" title="Save current profile">💾 Save</button>
                     <div class="theme-selector">
                         <div class="theme-dropdown" id="theme-dropdown">
                             <span id="current-theme-name">WPI Classic</span>
@@ -87,6 +88,9 @@
             <div class="schedule-page-layout">
                 <aside class="schedule-sidebar">
                     <div class="schedule-sidebar-header">
+                        <div class="schedule-selector-container" id="schedule-selector-container">
+                            <!-- Schedule selector will be rendered here -->
+                        </div>
                         <h2>Selected Courses <span id="schedule-selected-count" class="course-count">(0)</span></h2>
                         <div class="schedule-filter-controls">
                             <input type="text" id="schedule-search-input" placeholder="Search selected courses..." class="search-input schedule-search-input">

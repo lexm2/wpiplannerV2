@@ -1,6 +1,7 @@
-import { DayOfWeek, Course } from '../../types/types'
+import { DayOfWeek, Course, Section } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { ScheduleFilterService } from '../../services/ScheduleFilterService'
+import { ScheduleManagementService } from '../../services/ScheduleManagementService'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { TimeUtils } from '../utils/timeUtils'
@@ -9,6 +10,7 @@ import { ConflictDetector } from '../../core/ConflictDetector'
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
     private scheduleFilterService: ScheduleFilterService | null = null;
+    private scheduleManagementService: ScheduleManagementService | null = null;
     private scheduleFilterModalController: ScheduleFilterModalController | null = null;
     private sectionInfoModalController: SectionInfoModalController | null = null;
     private conflictDetector: ConflictDetector | null = null;
@@ -53,6 +55,10 @@ export class ScheduleController {
         this.scheduleFilterModalController = scheduleFilterModalController;
     }
 
+    setScheduleManagementService(scheduleManagementService: ScheduleManagementService): void {
+        this.scheduleManagementService = scheduleManagementService;
+    }
+
     setStatePreserver(statePreserver: { 
         preserve: () => Map<string, boolean>, 
         restore: (states: Map<string, boolean>) => void 
@@ -61,15 +67,21 @@ export class ScheduleController {
     }
 
     displayScheduleSelectedCourses(): void {
+        console.log('🔍 displayScheduleSelectedCourses() called');
+        
         const selectedCoursesContainer = document.getElementById('schedule-selected-courses');
         const countElement = document.getElementById('schedule-selected-count');
         
-        if (!selectedCoursesContainer || !countElement) return;
+        if (!selectedCoursesContainer || !countElement) {
+            console.log('❌ Missing DOM elements - selectedCoursesContainer or countElement not found');
+            return;
+        }
 
         // Preserve dropdown states before refresh
         const dropdownStates = this.statePreserver?.preserve();
 
         let selectedCourses = this.courseSelectionService.getSelectedCourses();
+        console.log(`📊 CourseSelectionService reports ${selectedCourses.length} selected courses`);
         
         // Get filtered sections if filter service is available
         let filteredSections: Array<{course: any, section: any}> = [];
@@ -78,15 +90,18 @@ export class ScheduleController {
         if (this.scheduleFilterService && !this.scheduleFilterService.isEmpty()) {
             filteredSections = this.scheduleFilterService.filterSections(selectedCourses);
             hasActiveFilters = true;
+            console.log(`🔎 Filters active: ${filteredSections.length} sections match filters`);
         }
         
         if (selectedCourses.length === 0) {
+            console.log('⚠️ Early return: 0 selected courses - displaying empty state');
             countElement.textContent = '(0)';
             selectedCoursesContainer.innerHTML = '<div class="empty-state">No courses selected yet</div>';
             return;
         }
 
         if (hasActiveFilters && filteredSections.length === 0) {
+            console.log('⚠️ Early return: 0 sections match active filters - displaying empty state');
             countElement.textContent = '(0 sections match filters)';
             selectedCoursesContainer.innerHTML = '<div class="empty-state">No sections match the current filters</div>';
             return;
@@ -132,6 +147,11 @@ export class ScheduleController {
         if (dropdownStates) {
             this.statePreserver?.restore(dropdownStates);
         }
+
+        // Log how many schedule-course-items were created
+        const courseItemCount = selectedCoursesContainer.querySelectorAll('.schedule-course-item').length;
+        console.log(`✅ displayScheduleSelectedCourses() completed successfully`);
+        console.log(`📈 Final result: ${courseItemCount} schedule-course-items displayed for ${selectedCourses.length} selected courses`);
     }
     
     private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, selectedCourses: any[], dropdownStates?: Map<string, boolean>): string {
@@ -285,7 +305,7 @@ export class ScheduleController {
             
             // Group sections by term
             const sectionsByTerm: { [term: string]: typeof course.sections } = {};
-            course.sections.forEach(section => {
+            course.sections.forEach((section: Section) => {
                 if (!sectionsByTerm[section.computedTerm]) {
                     sectionsByTerm[section.computedTerm] = [];
                 }
@@ -300,7 +320,7 @@ export class ScheduleController {
                 html += `<div class="term-sections" data-term="${term}">`;
                 html += `<div class="term-label">${term} Term</div>`;
                 
-                sectionsByTerm[term].forEach(section => {
+                sectionsByTerm[term].forEach((section: Section) => {
                     const isSelected = selectedCourse.selectedSectionNumber === section.number;
                     const selectedClass = isSelected ? 'selected' : '';
                     
@@ -392,7 +412,7 @@ export class ScheduleController {
         const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
         
         // Get unique courses from filtered sections in the same order as displayed
-        const uniqueCourses = [];
+        const uniqueCourses: any[] = [];
         const seenCourseIds = new Set();
         
         filteredSections.forEach(fs => {
@@ -462,8 +482,10 @@ export class ScheduleController {
         
         if (!courseItem) return;
 
-        const sectionButtons = courseItem.querySelectorAll('.section-select-btn');
-        const sectionOptions = courseItem.querySelectorAll('.section-option');
+        // TypeScript assertion to ensure courseItem is HTMLElement
+        const validCourseItem = courseItem as HTMLElement;
+        const sectionButtons = validCourseItem.querySelectorAll('.section-select-btn');
+        const sectionOptions = validCourseItem.querySelectorAll('.section-option');
 
         sectionButtons.forEach(button => {
             const buttonSection = (button as HTMLElement).dataset.section;
@@ -496,8 +518,6 @@ export class ScheduleController {
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
         const grids = ['A', 'B', 'C', 'D'];
         
-        console.log('\n=== RENDER SCHEDULE GRIDS ===');
-        console.log(`Processing ${selectedCourses.length} selected courses for terms: ${grids.join(', ')}`);
         
         grids.forEach(term => {
             const gridContainer = document.getElementById(`schedule-grid-${term}`);
@@ -509,21 +529,11 @@ export class ScheduleController {
                 
                 if (!hasSelectedSection) return false;
                 
-                // Debug: log term matching
-                console.log(`  Checking course ${sc.course.department.abbreviation}${sc.course.number} with term "${sc.selectedSection!.term}" against grid term "${term}"`);
-                
                 // Use the pre-computed term letter from Java backend
                 const sectionTermLetter = sc.selectedSection!.computedTerm;
                 const matchesTerm = sectionTermLetter === term;
                 
-                console.log(`    Using pre-computed term letter: "${sectionTermLetter}" from section:"${sc.selectedSection!.number}"`);
-                
                 return matchesTerm;
-            });
-            
-            console.log(`Term ${term}: ${termCourses.length} courses`);
-            termCourses.forEach(tc => {
-                console.log(`  ${tc.course.department.abbreviation}${tc.course.number} (${tc.selectedSection!.periods.length} periods)`);
             });
             
             if (termCourses.length === 0) {
@@ -536,7 +546,6 @@ export class ScheduleController {
             this.renderPopulatedGrid(gridContainer, termCourses, term);
         });
         
-        console.log('=== END RENDER SCHEDULE GRIDS ===\n');
     }
 
     private renderEmptyGrid(container: HTMLElement, term: string, hasCoursesWithoutSections: boolean = false): void {
@@ -593,15 +602,6 @@ export class ScheduleController {
         // Find all sections that occupy this cell
         const occupyingSections: any[] = [];
         
-        // Log for a wider range to catch the course times
-        const shouldLog = timeSlot < 12 && courses.length > 0; // Log first 6 hours (7:00 AM - 1:00 PM)
-        
-        if (shouldLog && courses.length > 0) {
-            const hour = Math.floor(timeSlot / 2) + 7;
-            const minute = (timeSlot % 2) * 30;
-            console.log(`\n--- getCellContent: ${day} ${hour}:${minute.toString().padStart(2, '0')} (slot ${timeSlot}) ---`);
-            console.log(`Checking ${courses.length} courses for this time slot`);
-        }
         
         for (const selectedCourse of courses) {
             if (!selectedCourse.selectedSection) {
@@ -613,12 +613,6 @@ export class ScheduleController {
             // Check if this section has any period that occupies this time slot on this day
             const periodsOnThisDay = section.periods.filter((period: any) => period.days.has(day));
             
-            if (shouldLog && periodsOnThisDay.length > 0) {
-                console.log(`  Course ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number} has ${periodsOnThisDay.length} periods on ${day}:`);
-                periodsOnThisDay.forEach(p => {
-                    console.log(`    ${p.type}: ${p.startTime.hours}:${p.startTime.minutes.toString().padStart(2, '0')}-${p.endTime.hours}:${p.endTime.minutes.toString().padStart(2, '0')}`);
-                });
-            }
             
             let sectionOccupiesSlot = false;
             let sectionStartSlot = Infinity;
@@ -629,18 +623,12 @@ export class ScheduleController {
                 const startSlot = TimeUtils.timeToGridRowStart(period.startTime);
                 const endSlot = TimeUtils.timeToGridRowEnd(period.endTime);
                 
-                if (shouldLog) {
-                    console.log(`    Checking period ${period.type}: slots ${startSlot}-${endSlot} vs current slot ${timeSlot}`);
-                }
                 
                 if (timeSlot >= startSlot && timeSlot < endSlot) {
                     sectionOccupiesSlot = true;
                     sectionStartSlot = Math.min(sectionStartSlot, startSlot);
                     sectionEndSlot = Math.max(sectionEndSlot, endSlot);
                     
-                    if (shouldLog) {
-                        console.log(`      ✓ MATCHES! Period occupies slot ${timeSlot}`);
-                    }
                 }
             }
             
@@ -648,9 +636,6 @@ export class ScheduleController {
                 // Check if this is the first slot for this section on this day
                 isFirstSlot = timeSlot === sectionStartSlot;
                 
-                if (shouldLog) {
-                    console.log(`    Course ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number} occupies slot, isFirstSlot: ${isFirstSlot}`);
-                }
                 
                 occupyingSections.push({
                     course: selectedCourse,
@@ -676,7 +661,6 @@ export class ScheduleController {
         const rowSpan = primarySection.endSlot - primarySection.startSlot;
         const heightInPixels = rowSpan * 30; // 30px per row
         
-        console.log(`Course ${primarySection.course.course.department.abbreviation}${primarySection.course.course.number} should span ${rowSpan} rows (${heightInPixels}px) from slot ${primarySection.startSlot} to ${primarySection.endSlot}`);
         
         // Build content for the first section in the slot - simplified to show only course name
         const content = primarySection.isFirstSlot ? `

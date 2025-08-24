@@ -1,6 +1,7 @@
 import { Course, Department } from '../../types/types'
 import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
+import { ScheduleSelector } from '../components/ScheduleSelector'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { ConflictDetector } from '../../core/ConflictDetector'
 import { ModalService } from '../../services/ModalService'
@@ -19,10 +20,12 @@ import { UIStateManager } from './UIStateManager'
 import { TimestampManager } from './TimestampManager'
 import { OperationManager, DebouncedOperation } from '../../utils/RequestCancellation'
 import { DepartmentSyncService } from '../../services/DepartmentSyncService'
+import { ScheduleManagementService } from '../../services/ScheduleManagementService'
 
 export class MainController {
     private courseDataService: CourseDataService;
     private themeSelector: ThemeSelector;
+    private scheduleSelector: ScheduleSelector | null = null;
     private courseSelectionService: CourseSelectionService;
     private conflictDetector: ConflictDetector;
     private modalService: ModalService;
@@ -41,6 +44,7 @@ export class MainController {
     private operationManager: OperationManager;
     private debouncedSearch: DebouncedOperation;
     private departmentSyncService: DepartmentSyncService;
+    private scheduleManagementService: ScheduleManagementService;
     private allDepartments: Department[] = [];
 
 
@@ -56,6 +60,9 @@ export class MainController {
         this.searchService = new SearchService();
         this.filterService = new FilterService(this.searchService);
         this.scheduleFilterService = new ScheduleFilterService(this.searchService);
+        
+        // Initialize schedule management service with shared CourseSelectionService
+        this.scheduleManagementService = new ScheduleManagementService(undefined, this.courseSelectionService);
         
         // Initialize managers (before any event listeners that might use them)
         this.uiStateManager = new UIStateManager();
@@ -82,6 +89,7 @@ export class MainController {
         this.scheduleController.setConflictDetector(this.conflictDetector);
         this.scheduleController.setScheduleFilterService(this.scheduleFilterService);
         this.scheduleController.setScheduleFilterModalController(this.scheduleFilterModalController);
+        this.scheduleController.setScheduleManagementService(this.scheduleManagementService);
         
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
@@ -139,6 +147,7 @@ export class MainController {
         this.departmentController.displayDepartments();
         this.setupEventListeners();
         this.setupCourseSelectionListener();
+        this.setupSaveStateListener();
         this.courseController.displaySelectedCourses();
         
         
@@ -167,6 +176,9 @@ export class MainController {
             // IMPORTANT: Reconstruct Section objects after course data is loaded
             this.courseSelectionService.reconstructSectionObjects();
             
+            // Initialize default schedule if needed
+            this.scheduleManagementService.initializeDefaultScheduleIfNeeded();
+            
             this.timestampManager.updateClientTimestamp();
             this.timestampManager.loadServerTimestamp();
             
@@ -179,6 +191,31 @@ export class MainController {
                     disableDebug: () => this.departmentSyncService.disableDebugMode(),
                     getActive: () => this.departmentSyncService.getActiveDepartments(),
                     getDescription: () => this.departmentSyncService.getSelectionDescription()
+                };
+                
+                (window as any).debugScheduleManagement = {
+                    debug: () => this.scheduleManagementService.debugState(),
+                    getService: () => this.scheduleManagementService,
+                    createSchedule: (name: string) => this.scheduleManagementService.createNewSchedule(name),
+                    switchSchedule: (id: string) => this.scheduleManagementService.setActiveSchedule(id),
+                    getSchedules: () => this.scheduleManagementService.getAllSchedules(),
+                    getCurrentPage: () => this.uiStateManager.currentPage,
+                    createTestSchedules: () => {
+                        const schedule1 = this.scheduleManagementService.createNewSchedule('Test Schedule 1');
+                        const schedule2 = this.scheduleManagementService.createNewSchedule('Test Schedule 2');
+                        console.log('Created test schedules:', schedule1.id, schedule2.id);
+                        return { schedule1, schedule2 };
+                    },
+                    testCompleteSwitch: (scheduleId?: string) => {
+                        const schedules = this.scheduleManagementService.getAllSchedules();
+                        if (schedules.length < 2 && !scheduleId) {
+                            const { schedule1, schedule2 } = (window as any).debugScheduleManagement.createTestSchedules();
+                            scheduleId = schedule1.id;
+                        }
+                        const targetId = scheduleId || schedules[0].id;
+                        console.log('Testing complete schedule switch to:', targetId);
+                        this.scheduleManagementService.setActiveSchedule(targetId);
+                    }
                 };
             }
         } catch (error) {
@@ -330,6 +367,15 @@ export class MainController {
             scheduleButton.addEventListener('click', () => {
                 this.uiStateManager.togglePage();
                 if (this.uiStateManager.currentPage === 'schedule') {
+                    // Initialize schedule selector if not already created
+                    if (!this.scheduleSelector) {
+                        try {
+                            this.scheduleSelector = new ScheduleSelector(this.scheduleManagementService, 'schedule-selector-container');
+                        } catch (error) {
+                            console.error('Failed to initialize schedule selector:', error);
+                        }
+                    }
+                    
                     // Log selected section data for debugging  
                     const selectedCourses = this.courseSelectionService.getSelectedCourses();
                     console.log('=== SCHEDULE PAGE LOADED ===');
@@ -421,6 +467,14 @@ export class MainController {
                 
                 // Refresh the schedule page display
                 this.scheduleController.applyFiltersAndRefresh();
+            });
+        }
+
+        // Save profile button
+        const saveProfileButton = document.getElementById('save-profile-btn');
+        if (saveProfileButton) {
+            saveProfileButton.addEventListener('click', () => {
+                this.handleSaveProfile();
             });
         }
     }
@@ -612,6 +666,10 @@ export class MainController {
         return this.infoModalController;
     }
 
+    public getScheduleManagementService(): ScheduleManagementService {
+        return this.scheduleManagementService;
+    }
+
     private toggleCourseDropdown(triggerElement: HTMLElement): void {
         const courseItem = triggerElement.closest('.schedule-course-item');
         if (!courseItem) return;
@@ -715,6 +773,57 @@ export class MainController {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
             contentHeader.textContent = 'Course Listings';
+        }
+    }
+
+    private handleSaveProfile(): void {
+        const saveButton = document.getElementById('save-profile-btn') as HTMLButtonElement;
+        if (!saveButton) return;
+
+        // Visual feedback
+        const originalText = saveButton.innerHTML;
+        saveButton.innerHTML = '⏳ Saving...';
+        saveButton.disabled = true;
+
+        const success = this.scheduleManagementService.manualSaveCurrentProfile();
+        
+        setTimeout(() => {
+            if (success) {
+                saveButton.innerHTML = '✅ Saved!';
+                setTimeout(() => {
+                    saveButton.innerHTML = originalText;
+                    saveButton.disabled = false;
+                }, 1500);
+            } else {
+                saveButton.innerHTML = '❌ Error';
+                setTimeout(() => {
+                    saveButton.innerHTML = originalText;
+                    saveButton.disabled = false;
+                }, 2000);
+            }
+        }, 300);
+    }
+
+    private setupSaveStateListener(): void {
+        this.scheduleManagementService.onSaveStateChange((hasUnsavedChanges) => {
+            this.updateSaveButtonState(hasUnsavedChanges);
+        });
+    }
+
+    private updateSaveButtonState(hasUnsavedChanges: boolean): void {
+        const saveButton = document.getElementById('save-profile-btn') as HTMLButtonElement;
+        if (!saveButton) return;
+
+        if (hasUnsavedChanges) {
+            saveButton.classList.add('unsaved-changes');
+            saveButton.title = 'You have unsaved changes - Click to save';
+            if (!saveButton.innerHTML.includes('*')) {
+                saveButton.innerHTML = saveButton.innerHTML.replace('💾 Save', '💾 Save*');
+            }
+        } else {
+            saveButton.classList.remove('unsaved-changes');
+            saveButton.title = 'Save current profile';
+            saveButton.innerHTML = saveButton.innerHTML.replace('💾 Save*', '💾 Save');
         }
     }
 
