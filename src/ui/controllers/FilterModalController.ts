@@ -1,6 +1,7 @@
 import { ModalService } from '../../services/ModalService';
 import { FilterService } from '../../services/FilterService';
 import { Course, Department } from '../../types/types';
+import { getDepartmentCategory } from '../../utils/departmentUtils';
 
 export class FilterModalController {
     private modalService: ModalService;
@@ -569,8 +570,10 @@ export class FilterModalController {
                     if (checkboxes) {
                         const labels = checkboxes.querySelectorAll('.filter-checkbox-label');
                         labels.forEach((label: any) => {
-                            const text = label.textContent.toLowerCase();
-                            label.style.display = text.includes(query) ? 'flex' : 'none';
+                            const checkbox = label.querySelector('input[type="checkbox"]') as HTMLInputElement;
+                            const departmentAbbreviation = checkbox ? checkbox.value : '';
+                            const matches = this.departmentMatchesSearch(departmentAbbreviation, query);
+                            label.style.display = matches ? 'flex' : 'none';
                         });
                     }
                 } else if (filterType === 'location') {
@@ -610,6 +613,27 @@ export class FilterModalController {
         if (clearButton) {
             clearButton.style.display = query.length > 0 ? 'inline-block' : 'none';
         }
+    }
+
+    private departmentMatchesSearch(departmentAbbreviation: string, query: string): boolean {
+        if (!query) return true;
+        
+        const lowerQuery = query.toLowerCase();
+        const lowerDept = departmentAbbreviation.toLowerCase();
+        
+        // Check if query matches the department abbreviation
+        if (lowerDept.includes(lowerQuery)) {
+            return true;
+        }
+        
+        // Check if query matches the department category
+        const category = getDepartmentCategory(departmentAbbreviation);
+        const lowerCategory = category.toLowerCase();
+        if (lowerCategory.includes(lowerQuery)) {
+            return true;
+        }
+        
+        return false;
     }
 
     private updateDepartmentFilter(modalElement: HTMLElement): void {
