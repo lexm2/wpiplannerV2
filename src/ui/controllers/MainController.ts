@@ -133,9 +133,6 @@ export class MainController {
         this.filterService.addEventListener((event) => {
             this.refreshCurrentView();
         });
-
-        // Load saved filters from storage
-        this.filterService.loadFiltersFromStorage();
         
         // Initialize filter button state
         setTimeout(() => this.updateFilterButtonState(), 100);
@@ -146,7 +143,10 @@ export class MainController {
         await this.loadCourseData();
         this.departmentController.displayDepartments();
         
-        // Initialize the department sync service AFTER departments are rendered
+        // Load saved filters AFTER departments are rendered in DOM
+        this.filterService.loadFiltersFromStorage();
+        
+        // Initialize the department sync service AFTER filters are loaded
         this.departmentSyncService.initialize();
         
         this.setupEventListeners();
