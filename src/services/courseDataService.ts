@@ -11,7 +11,6 @@ export class CourseDataService {
 
     async loadCourseData(): Promise<ScheduleDB> {
         try {
-            console.log('Loading course data...');
             const freshData = await this.fetchFreshData();
             this.scheduleDB = freshData;
             return freshData;
@@ -22,7 +21,6 @@ export class CourseDataService {
     }
 
     private async fetchFreshData(): Promise<ScheduleDB> {
-        console.log('Fetching course data from local static file...');
         
         const response = await fetch(CourseDataService.WPI_COURSE_DATA_URL, {
             method: 'GET',
@@ -41,21 +39,18 @@ export class CourseDataService {
     }
 
     private parseJSONData(jsonData: any): ScheduleDB {
-        console.log('Parsing constructed JSON data...');
         
         if (!jsonData.departments || !Array.isArray(jsonData.departments)) {
             console.error('Invalid JSON data structure:', jsonData);
             throw new Error('Invalid JSON data structure - missing departments array');
         }
 
-        console.log(`Processing ${jsonData.departments.length} departments...`);
         
         const scheduleDB: ScheduleDB = {
             departments: this.parseConstructedDepartments(jsonData.departments),
             generated: jsonData.generated || new Date().toISOString()
         };
         
-        console.log(`Loaded ${scheduleDB.departments.length} departments with course data`);
         
         // Log sections for MA1024 specifically
         this.logMA1024Sections(scheduleDB);
@@ -170,30 +165,7 @@ export class CourseDataService {
     }
 
     private logMA1024Sections(scheduleDB: ScheduleDB): void {
-        const maDept = scheduleDB.departments.find(dept => dept.abbreviation === 'MA');
-        if (!maDept) {
-            console.log('MA department not found');
-            return;
-        }
-        
-        const ma1024 = maDept.courses.find(course => course.number === '1024');
-        if (!ma1024) {
-            console.log('MA1024 course not found');
-            return;
-        }
-        
-        console.log(`\n=== MA1024 SECTIONS (${ma1024.sections.length} total) ===`);
-        ma1024.sections.forEach(section => {
-            console.log(`Section ${section.number}:`);
-            console.log(`  Term: ${section.term}`);
-            console.log(`  Enrollment: ${section.seatsAvailable}/${section.seats} available`);
-            console.log(`  Periods (${section.periods.length}):`);
-            section.periods.forEach((period, idx) => {
-                const days = Array.from(period.days).join(', ');
-                console.log(`    ${idx + 1}. ${period.type} - ${days} ${period.startTime.displayTime}-${period.endTime.displayTime} (${period.professor})`);
-            });
-            console.log('');
-        });
+        // Debug logging method - keeping for development purposes but not logging on boot
     }
 
 
@@ -224,7 +196,6 @@ export class CourseDataService {
                 timestamp: Date.now()
             };
             localStorage.setItem(CourseDataService.LOCAL_STORAGE_KEY, JSON.stringify(cacheData));
-            console.log('Course data cached successfully');
         } catch (error) {
             console.warn('Failed to cache course data:', error);
         }

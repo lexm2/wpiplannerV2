@@ -136,7 +136,6 @@ export class MainController {
 
     private async loadCourseData(): Promise<void> {
         try {
-            console.log('Loading course data...');
             const scheduleDB = await this.courseDataService.loadCourseData();
             this.allDepartments = scheduleDB.departments;
             this.departmentController.setAllDepartments(this.allDepartments);
@@ -152,10 +151,8 @@ export class MainController {
             // Initialize the department sync service after all data is loaded
             this.departmentSyncService.initialize();
             
-            console.log(`Loaded ${this.allDepartments.length} departments`);
             
             // IMPORTANT: Reconstruct Section objects after course data is loaded
-            console.log('Reconstructing section objects for persisted selections...');
             this.courseSelectionService.reconstructSectionObjects();
             
             this.timestampManager.updateClientTimestamp();
@@ -171,7 +168,6 @@ export class MainController {
                     getActive: () => this.departmentSyncService.getActiveDepartments(),
                     getDescription: () => this.departmentSyncService.getSelectionDescription()
                 };
-                console.log('🛠️ Debug methods available: window.debugDepartmentSync.*');
             }
         } catch (error) {
             console.error('Failed to load course data:', error);
