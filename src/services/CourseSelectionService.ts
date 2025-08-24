@@ -25,6 +25,9 @@ export class CourseSelectionService {
 
     unselectCourse(course: Course): void {
         if (!Validators.isValidCourse(course)) {
+            console.error('Invalid course object passed to unselectCourse:', course);
+            console.error('Course type:', typeof course);
+            console.error('Course properties:', course ? Object.keys(course) : 'course is falsy');
             throw new Error('Invalid course object provided');
         }
         this.courseManager.removeCourse(course);
@@ -44,9 +47,16 @@ export class CourseSelectionService {
 
     setSelectedSection(course: Course, sectionNumber: string | null): void {
         if (!Validators.isValidCourse(course)) {
+            console.error('Invalid course object passed to setSelectedSection:', course);
+            console.error('Course type:', typeof course);
+            console.error('Course properties:', course ? Object.keys(course) : 'course is falsy');
             throw new Error('Invalid course object provided');
         }
         if (sectionNumber !== null && !Validators.validateSectionNumber(sectionNumber)) {
+            console.error('Invalid section number passed to setSelectedSection:', sectionNumber);
+            console.error('Section number type:', typeof sectionNumber);
+            console.error('Section number length:', sectionNumber?.length);
+            console.error('Section number characters:', sectionNumber ? sectionNumber.split('') : 'null');
             throw new Error('Invalid sectionNumber provided');
         }
         this.courseManager.setSelectedSection(course, sectionNumber);
@@ -54,6 +64,9 @@ export class CourseSelectionService {
 
     getSelectedSection(course: Course): string | null {
         if (!Validators.isValidCourse(course)) {
+            console.error('Invalid course object passed to getSelectedSection:', course);
+            console.error('Course type:', typeof course);
+            console.error('Course properties:', course ? Object.keys(course) : 'course is falsy');
             throw new Error('Invalid course object provided');
         }
         return this.courseManager.getSelectedSection(course);
@@ -62,6 +75,9 @@ export class CourseSelectionService {
 
     isCourseSelected(course: Course): boolean {
         if (!Validators.isValidCourse(course)) {
+            console.warn('Invalid course object passed to isCourseSelected:', course);
+            console.warn('Course type:', typeof course);
+            console.warn('Course properties:', course ? Object.keys(course) : 'course is falsy');
             return false;
         }
         return this.courseManager.isSelected(course);
@@ -73,6 +89,9 @@ export class CourseSelectionService {
 
     getSelectedCourse(course: Course): SelectedCourse | undefined {
         if (!Validators.isValidCourse(course)) {
+            console.warn('Invalid course object passed to getSelectedCourse:', course);
+            console.warn('Course type:', typeof course);
+            console.warn('Course properties:', course ? Object.keys(course) : 'course is falsy');
             return undefined;
         }
         return this.courseManager.getSelectedCourse(course);

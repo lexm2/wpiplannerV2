@@ -172,6 +172,12 @@ export class ScheduleController {
     }
 
     handleSectionSelection(course: Course, sectionNumber: string): void {
+        console.log('handleSectionSelection called with course:', course);
+        console.log('Course type:', typeof course);
+        console.log('Section number:', sectionNumber);
+        console.log('Section number type:', typeof sectionNumber);
+        console.log('Available sections for this course:', course.sections?.map(s => s.number));
+        
         const currentSelectedSection = this.courseSelectionService.getSelectedSection(course);
         
         if (currentSelectedSection === sectionNumber) {
@@ -464,6 +470,11 @@ export class ScheduleController {
     }
 
     getCourseFromElement(element: HTMLElement): Course | undefined {
-        return this.elementToCourseMap.get(element);
+        const course = this.elementToCourseMap.get(element);
+        console.log('ScheduleController.getCourseFromElement - element:', element);
+        console.log('ScheduleController.getCourseFromElement - element class:', element.className);
+        console.log('ScheduleController.getCourseFromElement - found course:', course);
+        console.log('ScheduleController.getCourseFromElement - WeakMap size:', this.elementToCourseMap);
+        return course;
     }
 }

@@ -19,7 +19,8 @@ export class Validators {
         return department &&
             typeof department.abbreviation === 'string' &&
             typeof department.name === 'string' &&
-            Array.isArray(department.courses);
+            // Make courses array optional - it may not be present in serialized data
+            (department.courses === undefined || Array.isArray(department.courses));
     }
 
     static isValidSection(section: any): section is Section {
@@ -127,8 +128,12 @@ export class Validators {
     }
 
     static validateSectionNumber(sectionNumber: string): boolean {
-        // Alphanumeric section numbers
-        return /^[A-Z0-9]+$/.test(sectionNumber);
+        // Very permissive section number validation - allow most printable characters
+        // WPI has diverse section formats: A01, Lab1, "Interest List-A Term", "AL02/AD02/AX01", etc.
+        // Just ensure it's a non-empty string with reasonable characters
+        return typeof sectionNumber === 'string' && 
+               sectionNumber.trim().length > 0 && 
+               /^[\w\s\-/]+$/.test(sectionNumber);
     }
 
     static validateEmail(email: string): boolean {

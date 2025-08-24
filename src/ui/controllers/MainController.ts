@@ -121,8 +121,13 @@ export class MainController {
                 const sectionNumber = target.dataset.section;
                 if (courseElement && sectionNumber) {
                     const course = this.scheduleController.getCourseFromElement(courseElement);
+                    console.log('MainController - Retrieved course from element:', course);
+                    console.log('MainController - Course element:', courseElement);
+                    console.log('MainController - Section number:', sectionNumber);
                     if (course) {
                         this.scheduleController.handleSectionSelection(course, sectionNumber);
+                    } else {
+                        console.error('MainController - No course found for element:', courseElement);
                     }
                 }
                 return;
