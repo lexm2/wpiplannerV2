@@ -257,7 +257,14 @@ export class MainController {
             }
 
             if (target.classList.contains('course-remove-btn')) {
-                const course = this.courseController.getCourseFromElement(target as HTMLElement);
+                // Determine which page we're on and use the appropriate controller
+                let course;
+                if (this.uiStateManager.currentPage === 'schedule') {
+                    course = this.scheduleController.getCourseFromElement(target as HTMLElement);
+                } else {
+                    course = this.courseController.getCourseFromElement(target as HTMLElement);
+                }
+                
                 if (course) {
                     // Directly remove course (remove button means always unselect)
                     this.courseSelectionService.unselectCourse(course);
