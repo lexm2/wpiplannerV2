@@ -145,6 +145,10 @@ export class MainController {
         this.uiStateManager.showLoadingState();
         await this.loadCourseData();
         this.departmentController.displayDepartments();
+        
+        // Initialize the department sync service AFTER departments are rendered
+        this.departmentSyncService.initialize();
+        
         this.setupEventListeners();
         this.setupCourseSelectionListener();
         this.setupSaveStateListener();
@@ -168,10 +172,6 @@ export class MainController {
             
             // Initialize filter modal with course data
             this.filterModalController.setCourseData(this.allDepartments);
-            
-            // Initialize the department sync service after all data is loaded
-            this.departmentSyncService.initialize();
-            
             
             // IMPORTANT: Reconstruct Section objects after course data is loaded
             this.courseSelectionService.reconstructSectionObjects();
