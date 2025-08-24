@@ -62,13 +62,13 @@ export class SectionInfoModalController {
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="modal-title">${data.courseCode} - ${data.courseName}</h3>
-                        <button class="modal-close" onclick="document.getElementById('${id}').querySelector('.modal-backdrop').click()">×</button>
+                        <button class="modal-close" onclick="document.getElementById('${id}').click()">×</button>
                     </div>
                     <div class="modal-body">
                         ${this.generateModalBody(data)}
                     </div>
                     <div class="modal-footer">
-                        <button class="modal-btn btn-primary" onclick="document.getElementById('${id}').querySelector('.modal-backdrop').click()">Close</button>
+                        <button class="modal-btn btn-primary" onclick="document.getElementById('${id}').click()">Close</button>
                     </div>
                 </div>
             </div>
@@ -105,11 +105,9 @@ export class SectionInfoModalController {
             return `
                 <div class="period-info">
                     <div class="period-type">${this.getPeriodTypeLabel(period.type)}</div>
-                    <div class="period-details">
-                        <div><strong>Days:</strong> <span>${daysStr}</span></div>
-                        <div><strong>Time:</strong> <span>${timeStr}</span></div>
-                        <div><strong>Location:</strong> <span>${location}</span></div>
-                        ${period.professor ? `<div><strong>Instructor:</strong> <span>${period.professor}</span></div>` : ''}
+                    <div class="period-schedule">
+                        <div>${daysStr} ${timeStr}</div>
+                        <div class="period-location">${location}</div>
                     </div>
                 </div>
             `;
@@ -367,32 +365,24 @@ export class SectionInfoModalController {
                 font-family: var(--font-family);
             }
 
-            .period-details {
+            .period-schedule {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
-                gap: 0.4rem;
+                gap: 0.3rem;
                 font-size: 0.875rem;
                 font-family: var(--font-family);
                 align-items: flex-start;
             }
 
-            .period-details div {
-                display: flex;
-                gap: 0.5rem;
-                align-items: baseline;
-                margin-bottom: 0.2rem;
+            .period-schedule div {
+                color: var(--color-text);
+                font-weight: 500;
             }
 
-            .period-details strong {
-                min-width: 90px;
-                color: var(--color-text);
-                font-weight: 600;
-                text-align: left;
-            }
-
-            .period-details span {
-                color: var(--color-text);
+            .period-location {
+                color: var(--color-text-secondary);
+                font-size: 0.8rem;
                 font-weight: normal;
             }
 
@@ -484,9 +474,6 @@ export class SectionInfoModalController {
                     width: fit-content;
                 }
                 
-                .period-details strong {
-                    min-width: 70px;
-                }
 
                 .modal-footer {
                     padding: 0.75rem 1rem 1rem 1rem;

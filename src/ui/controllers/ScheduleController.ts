@@ -127,10 +127,6 @@ export class ScheduleController {
                                     <span class="period-type-label">${periodTypeLabel}</span>
                                     <span class="period-schedule">${days} ${timeRange}</span>
                                 </div>
-                                <div class="period-details">
-                                    <span class="period-professor">${period.professor}</span>
-                                    ${period.location ? `<span class="period-location">${period.location}</span>` : ''}
-                                </div>
                             </div>
                         `;
                     });

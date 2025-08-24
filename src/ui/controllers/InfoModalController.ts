@@ -52,7 +52,7 @@ export class InfoModalController {
                 <div class="modal-content">
                     <div class="modal-header ${type}">
                         <h3 class="modal-title">${title}</h3>
-                        <button class="modal-close" onclick="document.getElementById('${id}').querySelector('.modal-backdrop').click()">×</button>
+                        <button class="modal-close" onclick="document.getElementById('${id}').click()">×</button>
                     </div>
                     <div class="modal-body">
                         <div class="modal-icon ${type}">
@@ -63,7 +63,7 @@ export class InfoModalController {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="modal-btn btn-${this.getButtonStyleForType(type)}" onclick="document.getElementById('${id}').querySelector('.modal-backdrop').click()">OK</button>
+                        <button class="modal-btn btn-${this.getButtonStyleForType(type)}" onclick="document.getElementById('${id}').click()">OK</button>
                     </div>
                 </div>
             </div>
