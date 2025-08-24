@@ -20,7 +20,7 @@ async function fetchCourseData() {
     console.log('Data fetched successfully');
     
     // Save raw data for section construction pipeline
-    const rawOutputPath = join(__dirname, '..', 'public', 'prod-data-raw.json');
+    const rawOutputPath = join(__dirname, '..', 'public', 'course-data.json');
     writeFileSync(rawOutputPath, JSON.stringify(data, null, 2));
     console.log(`Raw data saved to ${rawOutputPath}`);
     

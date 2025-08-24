@@ -23,15 +23,26 @@ jobs:
         with:
           node-version: '18'
       
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+      
       - name: Fetch latest course data
         run: |
           mkdir -p public
           node scripts/fetch-course-data.js
       
+      - name: Run course data converter
+        run: |
+          cd WorkdayToPlannerConverter-master
+          java -cp "lib/json-simple-1.1.1.jar:src" jsonToXml.Converter
+      
       - name: Check for changes
         id: changes
         run: |
-          if git diff --quiet public/course-data.json; then
+          if git diff --quiet public/course-data.json public/course-data-constructed.json; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
@@ -45,6 +56,6 @@ jobs:
           
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add public/course-data.json public/last-updated.json
+          git add public/course-data.json public/course-data-constructed.json public/last-updated.json
           git commit -m "Update course data $(date -u +%Y-%m-%d\ %H:%M\ UTC)"
           git push
