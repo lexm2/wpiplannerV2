@@ -3,7 +3,6 @@ import { SelectedCourse } from '../types/schedule';
 import { FilterService } from './FilterService';
 import { SearchService } from './searchService';
 import { CourseSelectionFilter } from '../core/filters/CourseSelectionFilter';
-import { PeriodTimeFilter } from '../core/filters/PeriodTimeFilter';
 import { PeriodDaysFilter } from '../core/filters/PeriodDaysFilter';
 import { PeriodProfessorFilter } from '../core/filters/PeriodProfessorFilter';
 import { PeriodTypeFilter } from '../core/filters/PeriodTypeFilter';
@@ -16,7 +15,6 @@ import { ConflictDetector } from '../core/ConflictDetector';
 export class ScheduleFilterService {
     private filterService: FilterService;
     private courseSelectionFilter: CourseSelectionFilter;
-    private periodTimeFilter: PeriodTimeFilter;
     private periodDaysFilter: PeriodDaysFilter;
     private periodProfessorFilter: PeriodProfessorFilter;
     private periodTypeFilter: PeriodTypeFilter;
@@ -27,7 +25,6 @@ export class ScheduleFilterService {
     constructor(searchService: SearchService) {
         this.filterService = new FilterService(searchService);
         this.courseSelectionFilter = new CourseSelectionFilter();
-        this.periodTimeFilter = new PeriodTimeFilter();
         this.periodDaysFilter = new PeriodDaysFilter();
         this.periodProfessorFilter = new PeriodProfessorFilter();
         this.periodTypeFilter = new PeriodTypeFilter();
@@ -49,7 +46,6 @@ export class ScheduleFilterService {
         
         // Register period-based filters
         this.filterService.registerFilter(this.courseSelectionFilter);
-        this.filterService.registerFilter(this.periodTimeFilter);
         this.filterService.registerFilter(this.periodDaysFilter);
         this.filterService.registerFilter(this.periodProfessorFilter);
         this.filterService.registerFilter(this.periodTypeFilter);
@@ -150,15 +146,15 @@ export class ScheduleFilterService {
         // Apply period-based filters
         for (const activeFilter of activeFilters) {
             switch (activeFilter.id) {
-                case 'periodTime':
-                    allPeriods = allPeriods.filter(item => 
-                        this.periodTimeFilter.applyToPeriods([item.period], activeFilter.criteria).length > 0
-                    );
-                    break;
                 case 'periodDays':
-                    allPeriods = allPeriods.filter(item => 
-                        this.periodDaysFilter.applyToPeriods([item.period], activeFilter.criteria).length > 0
-                    );
+                    // Exclude periods that are on excluded days
+                    const excludedDaysForPeriods = new Set(activeFilter.criteria.days.map((day: string) => day.toLowerCase()));
+                    allPeriods = allPeriods.filter(item => {
+                        // Exclude period if it's on any of the excluded days
+                        return !Array.from(item.period.days).some(day => 
+                            excludedDaysForPeriods.has(day.toLowerCase())
+                        );
+                    });
                     break;
                 case 'periodProfessor':
                     allPeriods = allPeriods.filter(item => 
@@ -334,15 +330,17 @@ export class ScheduleFilterService {
         // Apply section-based filters
         for (const activeFilter of activeFilters) {
             switch (activeFilter.id) {
-                case 'periodTime':
-                    allSections = allSections.filter(item => 
-                        this.periodTimeFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
-                    );
-                    break;
                 case 'periodDays':
-                    allSections = allSections.filter(item => 
-                        this.periodDaysFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
-                    );
+                    // Exclude entire sections if ANY period is on excluded days
+                    const excludedDaysForSections = new Set(activeFilter.criteria.days.map((day: string) => day.toLowerCase()));
+                    allSections = allSections.filter(item => {
+                        // Exclude section if ANY period is on any of the excluded days
+                        return !item.section.periods.some(period => 
+                            Array.from(period.days).some(day => 
+                                excludedDaysForSections.has(day.toLowerCase())
+                            )
+                        );
+                    });
                     break;
                 case 'periodProfessor':
                     allSections = allSections.filter(item => 

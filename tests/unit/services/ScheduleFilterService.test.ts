@@ -22,7 +22,7 @@ describe('ScheduleFilterService', () => {
         professor: 'Prof Smith',
         startTime: { hours: 9, minutes: 0 },
         endTime: { hours: 10, minutes: 50 },
-        days: ['mon', 'wed', 'fri'],
+        days: new Set(['mon', 'wed', 'fri']),
         location: 'SL 123',
         building: 'SL',
         room: '123'
@@ -33,7 +33,7 @@ describe('ScheduleFilterService', () => {
         professor: 'Prof Jones',
         startTime: { hours: 14, minutes: 0 },
         endTime: { hours: 15, minutes: 50 },
-        days: ['tue'],
+        days: new Set(['tue']),
         location: 'FL 320',
         building: 'FL',
         room: '320'
@@ -81,6 +81,8 @@ describe('ScheduleFilterService', () => {
         number: '101',
         description: 'Basic programming course',
         credits: '3.0',
+        minCredits: 3.0,
+        maxCredits: 3.0,
         department: department,
         sections: [testSection1, testSection2, testSection3]
     };
@@ -179,6 +181,52 @@ describe('ScheduleFilterService', () => {
             
             expect(result).toHaveLength(1);
             expect(result[0].section.number).toBe('A01'); // Only A01 matches both filters
+        });
+
+        test('should exclude sections with periods on Wednesday', () => {
+            // Add day exclusion filter for Wednesday
+            scheduleFilterService.addFilter('periodDays', { days: ['wed'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourse]);
+            
+            // Should exclude A01 and B01 (both have periods on Wednesday)
+            // Should keep AL01 (has periods only on Tuesday)
+            expect(result).toHaveLength(1);
+            expect(result[0].section.number).toBe('AL01');
+        });
+
+        test('should exclude sections with periods on Tuesday', () => {
+            // Add day exclusion filter for Tuesday
+            scheduleFilterService.addFilter('periodDays', { days: ['tue'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourse]);
+            
+            // Should exclude AL01 (has periods on Tuesday)
+            // Should keep A01 and B01 (have periods on Mon/Wed/Fri)
+            expect(result).toHaveLength(2);
+            const sectionNumbers = result.map(r => r.section.number).sort();
+            expect(sectionNumbers).toEqual(['A01', 'B01']);
+        });
+
+        test('should exclude sections with periods on multiple days', () => {
+            // Add day exclusion filter for Wednesday and Tuesday
+            scheduleFilterService.addFilter('periodDays', { days: ['wed', 'tue'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourse]);
+            
+            // Should exclude all sections (A01/B01 have Wed, AL01 has Tue)
+            expect(result).toHaveLength(0);
+        });
+
+        test('should return all sections when excluding non-existent days', () => {
+            // Add day exclusion filter for days not used by any section
+            scheduleFilterService.addFilter('periodDays', { days: ['sat', 'sun'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourse]);
+            
+            // Should return all sections since none have Saturday or Sunday periods
+            expect(result).toHaveLength(3);
+            expect(result.map(r => r.section.number)).toEqual(['A01', 'AL01', 'B01']);
         });
     });
 

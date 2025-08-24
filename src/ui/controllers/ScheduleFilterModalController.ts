@@ -107,37 +107,11 @@ export class ScheduleFilterModalController {
                         </div>
                     </div>
 
-                    <div class="filter-group">
-                        <h4>Time Range</h4>
-                        <div class="filter-option">
-                            <div class="time-range-inputs">
-                                <div class="time-input-group">
-                                    <label>Start Time:</label>
-                                    <select id="start-time-hour">
-                                        ${this.renderTimeOptions()}
-                                    </select>
-                                    <select id="start-time-minute">
-                                        <option value="0">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                </div>
-                                <div class="time-input-group">
-                                    <label>End Time:</label>
-                                    <select id="end-time-hour">
-                                        ${this.renderTimeOptions()}
-                                    </select>
-                                    <select id="end-time-minute">
-                                        <option value="0">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="filter-group">
-                        <h4>Days of Week</h4>
+                        <h4>Exclude Days</h4>
                         <div class="filter-option">
+                            <div class="filter-help-text">Hide sections with classes on selected days</div>
                             ${this.renderDaysCheckboxes()}
                         </div>
                     </div>
@@ -220,18 +194,6 @@ export class ScheduleFilterModalController {
         `).join('');
     }
 
-    private renderTimeOptions(): string {
-        const options = [];
-        options.push('<option value="">Any</option>');
-        
-        for (let hour = 8; hour <= 20; hour++) {
-            const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-            const ampm = hour >= 12 ? 'PM' : 'AM';
-            options.push(`<option value="${hour}">${displayHour}:00 ${ampm}</option>`);
-        }
-        
-        return options.join('');
-    }
 
     private renderDaysCheckboxes(): string {
         const dayOptions = this.scheduleFilterService!.getFilterOptions('periodDays', this.selectedCourses) || [];
@@ -376,20 +338,6 @@ export class ScheduleFilterModalController {
             });
         }
 
-        // Time range filters
-        const startTimeHour = modalElement.querySelector('#start-time-hour') as HTMLSelectElement;
-        const startTimeMinute = modalElement.querySelector('#start-time-minute') as HTMLSelectElement;
-        const endTimeHour = modalElement.querySelector('#end-time-hour') as HTMLSelectElement;
-        const endTimeMinute = modalElement.querySelector('#end-time-minute') as HTMLSelectElement;
-
-        [startTimeHour, startTimeMinute, endTimeHour, endTimeMinute].forEach(select => {
-            if (select) {
-                select.addEventListener('change', () => {
-                    this.updateTimeFilter();
-                    this.refreshActiveFilters();
-                });
-            }
-        });
 
         // Course selection checkboxes
         modalElement.querySelectorAll('input[name="courseSelection"]').forEach(checkbox => {
@@ -448,39 +396,6 @@ export class ScheduleFilterModalController {
         this.setupProfessorFilter(modalElement);
     }
 
-    private updateTimeFilter(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
-        if (modalElement) {
-            const startHour = (modalElement.querySelector('#start-time-hour') as HTMLSelectElement)?.value;
-            const startMinute = (modalElement.querySelector('#start-time-minute') as HTMLSelectElement)?.value;
-            const endHour = (modalElement.querySelector('#end-time-hour') as HTMLSelectElement)?.value;
-            const endMinute = (modalElement.querySelector('#end-time-minute') as HTMLSelectElement)?.value;
-
-            const criteria: any = {};
-            
-            if (startHour && startHour !== '') {
-                criteria.startTime = {
-                    hours: parseInt(startHour),
-                    minutes: startMinute ? parseInt(startMinute) : 0
-                };
-            }
-            
-            if (endHour && endHour !== '') {
-                criteria.endTime = {
-                    hours: parseInt(endHour),
-                    minutes: endMinute ? parseInt(endMinute) : 0
-                };
-            }
-
-            if (criteria.startTime || criteria.endTime) {
-                this.scheduleFilterService!.addFilter('periodTime', criteria);
-            } else {
-                this.scheduleFilterService!.removeFilter('periodTime');
-            }
-        }
-    }
 
     private updateCourseSelectionFilter(): void {
         if (!this.currentModalId) return;

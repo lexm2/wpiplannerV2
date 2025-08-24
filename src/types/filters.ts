@@ -78,10 +78,6 @@ export interface CourseSelectionFilterCriteria {
     selectedCourseIds: string[];
 }
 
-export interface PeriodTimeFilterCriteria {
-    startTime?: { hours: number; minutes: number };
-    endTime?: { hours: number; minutes: number };
-}
 
 export interface PeriodDaysFilterCriteria {
     days: string[];
