@@ -253,13 +253,16 @@ export class ScheduleController {
             if (!gridContainer) return;
             
             // Filter courses for this term - use direct Section object access
-            const termCourses = selectedCourses.filter(sc => 
-                sc.selectedSection && 
-                sc.selectedSection.term.toUpperCase().includes(term)
-            );
+            const termCourses = selectedCourses.filter(sc => {
+                const hasSelectedSection = sc.selectedSection !== null;
+                const matchesTerm = hasSelectedSection && sc.selectedSection!.term.toUpperCase().includes(term);
+                return hasSelectedSection && matchesTerm;
+            });
             
             if (termCourses.length === 0) {
-                this.renderEmptyGrid(gridContainer, term);
+                // Check if there are selected courses without sections for better messaging
+                const coursesWithoutSections = selectedCourses.filter(sc => !sc.selectedSection);
+                this.renderEmptyGrid(gridContainer, term, coursesWithoutSections.length > 0);
                 return;
             }
             
@@ -267,10 +270,14 @@ export class ScheduleController {
         });
     }
 
-    private renderEmptyGrid(container: HTMLElement, term: string): void {
+    private renderEmptyGrid(container: HTMLElement, term: string, hasCoursesWithoutSections: boolean = false): void {
+        const message = hasCoursesWithoutSections 
+            ? `No sections selected for ${term} term<br><small>Select specific sections in the left panel to see schedule</small>`
+            : `No classes scheduled for ${term} term`;
+            
         container.innerHTML = `
             <div class="empty-schedule">
-                <div class="empty-message">No classes scheduled for ${term} term</div>
+                <div class="empty-message">${message}</div>
             </div>
         `;
         container.classList.add('empty');
@@ -279,7 +286,7 @@ export class ScheduleController {
     private renderPopulatedGrid(container: HTMLElement, courses: any[], term: string): void {
         container.classList.remove('empty');
         
-        // Create 5-day (Mon-Fri) × 24 time slot grid (7 AM - 7 PM, 30-min intervals)
+        // Create 5-day (Mon-Fri) × 72 time slot grid (7 AM - 7 PM, 10-min intervals)
         const weekdays = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
         const timeSlots = TimeUtils.TOTAL_TIME_SLOTS;
         
@@ -295,9 +302,9 @@ export class ScheduleController {
         
         // Generate time rows
         for (let slot = 0; slot < timeSlots; slot++) {
-            const hour = Math.floor(slot / 2) + TimeUtils.START_HOUR;
-            const minute = (slot % 2) * 30;
-            const timeLabel = slot % 2 === 0 ? TimeUtils.formatTime({ hours: hour, minutes: minute, displayTime: '' }) : '';
+            const hour = Math.floor(slot / TimeUtils.SLOTS_PER_HOUR) + TimeUtils.START_HOUR;
+            const minutes = (slot % TimeUtils.SLOTS_PER_HOUR) * 10;
+            const timeLabel = minutes === 0 ? TimeUtils.formatTime({ hours: hour, minutes: 0, displayTime: '' }) : '';
             
             html += `
                 <div class="schedule-row">
@@ -319,7 +326,9 @@ export class ScheduleController {
         const occupyingSections: any[] = [];
         
         for (const selectedCourse of courses) {
-            if (!selectedCourse.selectedSection) continue;
+            if (!selectedCourse.selectedSection) {
+                continue;
+            }
             
             const section = selectedCourse.selectedSection;
             
@@ -339,6 +348,7 @@ export class ScheduleController {
                     sectionOccupiesSlot = true;
                     sectionStartSlot = Math.min(sectionStartSlot, startSlot);
                     sectionEndSlot = Math.max(sectionEndSlot, endSlot);
+                    
                 }
             }
             

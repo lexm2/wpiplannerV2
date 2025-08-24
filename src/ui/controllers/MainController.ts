@@ -298,8 +298,13 @@ export class MainController {
                     const previousSection = this.previousSelectedCoursesMap.get(courseId);
                     if (previousSection !== selectedSection) {
                         sectionSelectionsChanged = true;
+                        
+                        // Update visual state for this course
+                        const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
+                        if (selectedCourse) {
+                            this.scheduleController.updateSectionButtonStates(selectedCourse.course, selectedSection);
+                        }
                     }
-                    
                 }
                 
                 // Update schedule grids if any sections changed

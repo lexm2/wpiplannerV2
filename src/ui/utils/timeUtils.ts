@@ -5,7 +5,7 @@ export class TimeUtils {
     static readonly START_HOUR = 7;  // 7 AM
     static readonly END_HOUR = 19;   // 7 PM
     static readonly TOTAL_HOURS = 12;
-    static readonly SLOTS_PER_HOUR = 2; // 30-minute intervals
+    static readonly SLOTS_PER_HOUR = 6; // 10-minute intervals
     static readonly TOTAL_TIME_SLOTS = TimeUtils.TOTAL_HOURS * TimeUtils.SLOTS_PER_HOUR;
 
     // Days of the week in order
@@ -21,15 +21,16 @@ export class TimeUtils {
 
     /**
      * Convert a Time object to a grid row position (0-based)
-     * 7:00 AM = row 0, 7:30 AM = row 1, etc.
+     * 7:00 AM = row 0, 7:10 AM = row 1, 7:20 AM = row 2, etc.
      */
     static timeToGridRow(time: Time): number {
         const totalMinutes = time.hours * 60 + time.minutes;
         const startMinutes = TimeUtils.START_HOUR * 60;
         const relativeMinutes = totalMinutes - startMinutes;
         
-        // Convert to 30-minute slots
-        const slot = Math.floor(relativeMinutes / 30);
+        // Convert to 10-minute slots
+        const slot = Math.floor(relativeMinutes / 10);
+        
         
         // Ensure within bounds
         return Math.max(0, Math.min(slot, TimeUtils.TOTAL_TIME_SLOTS - 1));
@@ -112,16 +113,21 @@ export class TimeUtils {
     }
 
     /**
-     * Generate time labels for the grid (7:00 AM, 7:30 AM, etc.)
+     * Generate time labels for the grid (only hourly: 7:00 AM, 8:00 AM, etc.)
      */
     static generateTimeLabels(): string[] {
         const labels: string[] = [];
         
-        for (let hour = TimeUtils.START_HOUR; hour < TimeUtils.END_HOUR; hour++) {
-            // Add hour:00
-            labels.push(TimeUtils.formatTime({ hours: hour, minutes: 0, displayTime: '' }));
-            // Add hour:30
-            labels.push(TimeUtils.formatTime({ hours: hour, minutes: 30, displayTime: '' }));
+        for (let slot = 0; slot < TimeUtils.TOTAL_TIME_SLOTS; slot++) {
+            const hour = Math.floor(slot / TimeUtils.SLOTS_PER_HOUR) + TimeUtils.START_HOUR;
+            const minutes = (slot % TimeUtils.SLOTS_PER_HOUR) * 10;
+            
+            // Only show labels on the hour (when minutes = 0)
+            if (minutes === 0) {
+                labels.push(TimeUtils.formatTime({ hours: hour, minutes: 0, displayTime: '' }));
+            } else {
+                labels.push(''); // Empty string for non-hour slots
+            }
         }
         
         return labels;
