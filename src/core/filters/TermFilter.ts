@@ -12,14 +12,35 @@ export class TermFilter implements CourseFilter {
         }
         
         const termSet = new Set(
-            criteria.terms.map(term => term.toLowerCase())
+            criteria.terms.map(term => term.toUpperCase())
         );
         
         return courses.filter(course =>
-            course.sections.some(section =>
-                section.term && termSet.has(section.term.toLowerCase())
-            )
+            course.sections.some(section => {
+                const extractedTerm = this.extractTermLetter(section.term, section.number);
+                return termSet.has(extractedTerm);
+            })
         );
+    }
+    
+    private extractTermLetter(termString: string, sectionNumber?: string): string {
+        // Extract term from section numbers like "A01" -> A, "D01" -> D
+        if (sectionNumber) {
+            const sectionMatch = sectionNumber.match(/^([ABCD])/i);
+            if (sectionMatch) {
+                return sectionMatch[1].toUpperCase();
+            }
+        }
+        
+        // Text format for future compatibility ("2025 Fall A Term", "2026 Spring C Term")
+        if (termString) {
+            const textMatch = termString.match(/\b([ABCD])\s+Term/i);
+            if (textMatch) {
+                return textMatch[1].toUpperCase();
+            }
+        }
+        
+        return 'A'; // fallback
     }
     
     isValidCriteria(criteria: any): criteria is TermFilterCriteria {

@@ -37,6 +37,46 @@
   margin: 0;
 }
 
+.schedule-filter-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  align-items: center;
+}
+
+.schedule-search-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-btn.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* Filtered period highlighting */
+.filtered-section {
+  border-left: 3px solid var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.highlighted-period {
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border-left: 2px solid var(--color-primary);
+  padding-left: 0.5rem;
+}
+
+.highlighted-period .period-type-label {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.highlighted-period .period-schedule {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
 .schedule-selected-courses {
   flex: 1;
   padding: 1rem 1.5rem;

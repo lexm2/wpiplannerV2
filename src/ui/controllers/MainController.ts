@@ -10,7 +10,9 @@ import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
+import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { FilterService } from '../../services/FilterService'
+import { ScheduleFilterService } from '../../services/ScheduleFilterService'
 import { SearchService } from '../../services/searchService'
 import { createDefaultFilters, SearchTextFilter } from '../../core/filters'
 import { UIStateManager } from './UIStateManager'
@@ -30,8 +32,10 @@ export class MainController {
     private sectionInfoModalController: SectionInfoModalController;
     private infoModalController: InfoModalController;
     private filterModalController: FilterModalController;
+    private scheduleFilterModalController: ScheduleFilterModalController;
     private searchService: SearchService;
     private filterService: FilterService;
+    private scheduleFilterService: ScheduleFilterService;
     private uiStateManager: UIStateManager;
     private timestampManager: TimestampManager;
     private operationManager: OperationManager;
@@ -51,6 +55,7 @@ export class MainController {
         // Initialize search and filter services
         this.searchService = new SearchService();
         this.filterService = new FilterService(this.searchService);
+        this.scheduleFilterService = new ScheduleFilterService(this.searchService);
         
         // Initialize managers (before any event listeners that might use them)
         this.uiStateManager = new UIStateManager();
@@ -64,12 +69,18 @@ export class MainController {
         this.sectionInfoModalController = new SectionInfoModalController(this.modalService);
         this.infoModalController = new InfoModalController(this.modalService);
         this.filterModalController = new FilterModalController(this.modalService);
+        this.scheduleFilterModalController = new ScheduleFilterModalController(this.modalService);
         
         // Connect filter service to course controller
         this.courseController.setFilterService(this.filterService);
         
         // Connect filter service and course data to filter modal
         this.filterModalController.setFilterService(this.filterService);
+        
+        // Connect schedule filter service to controllers
+        this.scheduleFilterModalController.setScheduleFilterService(this.scheduleFilterService);
+        this.scheduleController.setScheduleFilterService(this.scheduleFilterService);
+        this.scheduleController.setScheduleFilterModalController(this.scheduleFilterModalController);
         
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
@@ -382,6 +393,33 @@ export class MainController {
         if (filterButton) {
             filterButton.addEventListener('click', () => {
                 this.filterModalController.show();
+            });
+        }
+
+        // Schedule filter button
+        const scheduleFilterButton = document.getElementById('schedule-filter-btn');
+        if (scheduleFilterButton) {
+            scheduleFilterButton.addEventListener('click', () => {
+                const selectedCourses = this.courseSelectionService.getSelectedCourses();
+                this.scheduleFilterModalController.setSelectedCourses(selectedCourses);
+                this.scheduleFilterModalController.show();
+            });
+        }
+
+        // Schedule search functionality
+        const scheduleSearchInput = document.getElementById('schedule-search-input') as HTMLInputElement;
+        if (scheduleSearchInput) {
+            scheduleSearchInput.addEventListener('input', () => {
+                const query = scheduleSearchInput.value.trim();
+                
+                if (query.length > 0) {
+                    this.scheduleFilterService.addFilter('searchText', { query });
+                } else {
+                    this.scheduleFilterService.removeFilter('searchText');
+                }
+                
+                // Refresh the schedule page display
+                this.scheduleController.applyFiltersAndRefresh();
             });
         }
     }

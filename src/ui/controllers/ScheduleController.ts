@@ -1,10 +1,14 @@
 import { DayOfWeek, Course } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
+import { ScheduleFilterService } from '../../services/ScheduleFilterService'
 import { SectionInfoModalController } from './SectionInfoModalController'
+import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { TimeUtils } from '../utils/timeUtils'
 
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
+    private scheduleFilterService: ScheduleFilterService | null = null;
+    private scheduleFilterModalController: ScheduleFilterModalController | null = null;
     private sectionInfoModalController: SectionInfoModalController | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private statePreserver?: { 
@@ -18,6 +22,19 @@ export class ScheduleController {
 
     setSectionInfoModalController(sectionInfoModalController: SectionInfoModalController): void {
         this.sectionInfoModalController = sectionInfoModalController;
+    }
+
+    setScheduleFilterService(scheduleFilterService: ScheduleFilterService): void {
+        this.scheduleFilterService = scheduleFilterService;
+        
+        // Set up filter change listener to refresh display
+        this.scheduleFilterService.addEventListener(() => {
+            this.applyFiltersAndRefresh();
+        });
+    }
+
+    setScheduleFilterModalController(scheduleFilterModalController: ScheduleFilterModalController): void {
+        this.scheduleFilterModalController = scheduleFilterModalController;
     }
 
     setStatePreserver(statePreserver: { 
@@ -36,30 +53,230 @@ export class ScheduleController {
         // Preserve dropdown states before refresh
         const dropdownStates = this.statePreserver?.preserve();
 
-        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        let selectedCourses = this.courseSelectionService.getSelectedCourses();
         
-        // Update count
-        countElement.textContent = `(${selectedCourses.length})`;
-
+        // Get filtered periods if filter service is available
+        let filteredPeriods: Array<{course: any, period: any}> = [];
+        let hasActiveFilters = false;
+        
+        if (this.scheduleFilterService && !this.scheduleFilterService.isEmpty()) {
+            filteredPeriods = this.scheduleFilterService.filterPeriods(selectedCourses);
+            hasActiveFilters = true;
+        }
+        
         if (selectedCourses.length === 0) {
+            countElement.textContent = '(0)';
             selectedCoursesContainer.innerHTML = '<div class="empty-state">No courses selected yet</div>';
             return;
         }
 
-        // Sort selected courses by department and number
-        const sortedCourses = selectedCourses.sort((a, b) => {
-            const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
-            if (deptCompare !== 0) return deptCompare;
-            return a.course.number.localeCompare(b.course.number);
-        });
+        if (hasActiveFilters && filteredPeriods.length === 0) {
+            countElement.textContent = '(0 periods match filters)';
+            selectedCoursesContainer.innerHTML = '<div class="empty-state">No periods match the current filters</div>';
+            return;
+        }
 
         let html = '';
+        
+        if (hasActiveFilters) {
+            // Display filtered periods grouped by course/section
+            html = this.buildFilteredPeriodsHTML(filteredPeriods, selectedCourses);
+            
+            // Update count to show period matches
+            const uniqueCourses = new Set(filteredPeriods.map(fp => fp.course.course.id)).size;
+            countElement.textContent = `(${filteredPeriods.length} periods in ${uniqueCourses} courses)`;
+        } else {
+            // Display all courses normally when no filters are active
+            const sortedCourses = selectedCourses.sort((a, b) => {
+                const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
+                if (deptCompare !== 0) return deptCompare;
+                return a.course.number.localeCompare(b.course.number);
+            });
+            
+            html = this.buildAllCoursesHTML(sortedCourses);
+            countElement.textContent = `(${selectedCourses.length})`;
+        }
+
+        selectedCoursesContainer.innerHTML = html;
+
+        // Set up DOM element mapping for course association
+        if (!hasActiveFilters) {
+            const sortedCourses = selectedCourses.sort((a, b) => {
+                const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
+                if (deptCompare !== 0) return deptCompare;
+                return a.course.number.localeCompare(b.course.number);
+            });
+            this.setupDOMElementMapping(selectedCoursesContainer, sortedCourses);
+        } else {
+            // For filtered view, we need to set up mapping differently
+            this.setupFilteredDOMElementMapping(selectedCoursesContainer, filteredPeriods);
+        }
+
+        // Restore dropdown states after refresh
+        if (dropdownStates) {
+            this.statePreserver?.restore(dropdownStates);
+        }
+    }
+    
+    private buildFilteredPeriodsHTML(filteredPeriods: Array<{course: any, period: any}>, selectedCourses: any[]): string {
+        // Group filtered periods by course
+        const periodsByCourse = new Map();
+        
+        filteredPeriods.forEach(fp => {
+            const courseId = fp.course.course.id;
+            if (!periodsByCourse.has(courseId)) {
+                periodsByCourse.set(courseId, {
+                    selectedCourse: fp.course,
+                    periods: []
+                });
+            }
+            periodsByCourse.get(courseId).periods.push(fp.period);
+        });
+        
+        let html = '';
+        
+        // Sort courses by department and number
+        const sortedEntries = Array.from(periodsByCourse.entries()).sort((a, b) => {
+            const courseA = a[1].selectedCourse.course;
+            const courseB = b[1].selectedCourse.course;
+            const deptCompare = courseA.department.abbreviation.localeCompare(courseB.department.abbreviation);
+            if (deptCompare !== 0) return deptCompare;
+            return courseA.number.localeCompare(courseB.number);
+        });
+        
+        sortedEntries.forEach(([courseId, data]) => {
+            const selectedCourse = data.selectedCourse;
+            const matchingPeriods = data.periods;
+            const course = selectedCourse.course;
+            
+            html += this.buildCourseHeaderHTML(course, selectedCourse);
+            
+            // Group periods by section
+            const periodsBySection = new Map();
+            matchingPeriods.forEach((period: any) => {
+                // Find the section this period belongs to
+                const section = course.sections.find((s: any) => s.periods.includes(period));
+                if (section) {
+                    if (!periodsBySection.has(section.number)) {
+                        periodsBySection.set(section.number, {
+                            section: section,
+                            periods: []
+                        });
+                    }
+                    periodsBySection.get(section.number).periods.push(period);
+                }
+            });
+            
+            html += '<div class="schedule-sections-container">';
+            
+            // Group sections by term
+            const sectionsByTerm: any = {};
+            periodsBySection.forEach((data, sectionNumber) => {
+                const section = data.section;
+                if (!sectionsByTerm[section.term]) {
+                    sectionsByTerm[section.term] = [];
+                }
+                sectionsByTerm[section.term].push({
+                    section: section,
+                    filteredPeriods: data.periods
+                });
+            });
+            
+            const terms = Object.keys(sectionsByTerm).sort();
+            terms.forEach((term: string) => {
+                html += `<div class="term-sections" data-term="${term}">`;
+                html += `<div class="term-label">${term} Term</div>`;
+                
+                sectionsByTerm[term].forEach((sectionData: any) => {
+                    const section = sectionData.section;
+                    const filteredPeriods = sectionData.filteredPeriods;
+                    const isSelected = selectedCourse.selectedSectionNumber === section.number;
+                    const selectedClass = isSelected ? 'selected' : '';
+                    
+                    html += `
+                        <div class="section-option ${selectedClass} filtered-section" data-section="${section.number}">
+                            <div class="section-info">
+                                <div class="section-number">${section.number}</div>
+                                <div class="section-periods">`;
+                    
+                    // Sort filtered periods by type priority
+                    const sortedPeriods = [...filteredPeriods].sort((a: any, b: any) => {
+                        const typePriority = (type: string) => {
+                            const lower = type.toLowerCase();
+                            if (lower.includes('lec') || lower.includes('lecture')) return 1;
+                            if (lower.includes('lab')) return 2;
+                            if (lower.includes('dis') || lower.includes('discussion') || lower.includes('rec')) return 3;
+                            return 4;
+                        };
+                        return typePriority(a.type) - typePriority(b.type);
+                    });
+                    
+                    // Display only the filtered periods (highlighted)
+                    sortedPeriods.forEach((period: any) => {
+                        const timeRange = TimeUtils.formatTimeRange(period.startTime, period.endTime);
+                        const days = TimeUtils.formatDays(period.days);
+                        const periodTypeLabel = this.getPeriodTypeLabel(period.type);
+                        
+                        html += `
+                            <div class="period-info highlighted-period" data-period-type="${period.type.toLowerCase()}">
+                                <div class="period-header">
+                                    <span class="period-type-label">${periodTypeLabel}</span>
+                                    <span class="period-schedule">${days} ${timeRange}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                                </div>
+                            </div>
+                            <button class="section-select-btn ${selectedClass}" data-section="${section.number}">
+                                ${isSelected ? '✓' : '+'}
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            });
+            
+            html += '</div></div>';
+        });
+        
+        return html;
+    }
+    
+    private buildCourseHeaderHTML(course: any, selectedCourse: any): string {
+        const credits = course.minCredits === course.maxCredits 
+            ? `${course.minCredits} credits` 
+            : `${course.minCredits}-${course.maxCredits} credits`;
+            
+        return `
+            <div class="schedule-course-item collapsed">
+                <div class="schedule-course-header dropdown-trigger">
+                    <div class="schedule-course-info">
+                        <div class="schedule-course-code">${course.department.abbreviation}${course.number}</div>
+                        <div class="schedule-course-name">${course.name}</div>
+                        <div class="schedule-course-credits">${credits}</div>
+                    </div>
+                    <div class="header-controls">
+                        <span class="dropdown-arrow">▼</span>
+                        <button class="course-remove-btn" title="Remove from selection">
+                            ×
+                        </button>
+                    </div>
+                </div>
+        `;
+    }
+    
+    private buildAllCoursesHTML(sortedCourses: any[]): string {
+        let html = '';
+        
         sortedCourses.forEach(selectedCourse => {
             const course = selectedCourse.course;
-            const credits = course.minCredits === course.maxCredits 
-                ? `${course.minCredits} credits` 
-                : `${course.minCredits}-${course.maxCredits} credits`;
-
+            
+            html += this.buildCourseHeaderHTML(course, selectedCourse);
+            
             // Group sections by term
             const sectionsByTerm: { [term: string]: typeof course.sections } = {};
             course.sections.forEach(section => {
@@ -69,23 +286,7 @@ export class ScheduleController {
                 sectionsByTerm[section.term].push(section);
             });
 
-            html += `
-                <div class="schedule-course-item collapsed" >
-                    <div class="schedule-course-header dropdown-trigger" >
-                        <div class="schedule-course-info">
-                            <div class="schedule-course-code">${course.department.abbreviation}${course.number}</div>
-                            <div class="schedule-course-name">${course.name}</div>
-                            <div class="schedule-course-credits">${credits}</div>
-                        </div>
-                        <div class="header-controls">
-                            <span class="dropdown-arrow">▼</span>
-                            <button class="course-remove-btn"  title="Remove from selection">
-                                ×
-                            </button>
-                        </div>
-                    </div>
-                    <div class="schedule-sections-container">
-            `;
+            html += '<div class="schedule-sections-container">';
 
             // Display sections grouped by term
             const terms = Object.keys(sectionsByTerm).sort();
@@ -134,24 +335,23 @@ export class ScheduleController {
                     html += `
                                 </div>
                             </div>
-                            <button class="section-select-btn ${selectedClass}"  data-section="${section.number}">
+                            <button class="section-select-btn ${selectedClass}" data-section="${section.number}">
                                 ${isSelected ? '✓' : '+'}
                             </button>
                         </div>
                     `;
                 });
                 
-                html += `</div>`;
+                html += '</div>';
             });
 
-            html += `
-                    </div>
-                </div>
-            `;
+            html += '</div></div>';
         });
-
-        selectedCoursesContainer.innerHTML = html;
-
+        
+        return html;
+    }
+    
+    private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: any[]): void {
         // Associate DOM elements with Course objects
         const courseElements = selectedCoursesContainer.querySelectorAll('.schedule-course-item');
         const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
@@ -178,14 +378,54 @@ export class ScheduleController {
                 }
             }
         });
+    }
+    
+    private setupFilteredDOMElementMapping(selectedCoursesContainer: HTMLElement, filteredPeriods: Array<{course: any, period: any}>): void {
+        // For filtered view, we need to map elements to courses differently
+        const courseElements = selectedCoursesContainer.querySelectorAll('.schedule-course-item');
+        const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
+        
+        // Get unique courses from filtered periods in the same order as displayed
+        const uniqueCourses = [];
+        const seenCourseIds = new Set();
+        
+        filteredPeriods.forEach(fp => {
+            const courseId = fp.course.course.id;
+            if (!seenCourseIds.has(courseId)) {
+                seenCourseIds.add(courseId);
+                uniqueCourses.push(fp.course);
+            }
+        });
+        
+        // Sort by department and number (same as display order)
+        uniqueCourses.sort((a, b) => {
+            const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
+            if (deptCompare !== 0) return deptCompare;
+            return a.course.number.localeCompare(b.course.number);
+        });
+        
+        courseElements.forEach((element, index) => {
+            const course = uniqueCourses[index]?.course;
+            this.elementToCourseMap.set(element as HTMLElement, course);
+        });
+        
+        removeButtons.forEach((button, index) => {
+            const course = uniqueCourses[index]?.course;
+            this.elementToCourseMap.set(button as HTMLElement, course);
+        });
 
-        // Restore dropdown states after refresh
-        if (dropdownStates) {
-            // Use setTimeout to ensure DOM is fully updated
-            setTimeout(() => {
-                this.statePreserver?.restore(dropdownStates);
-            }, 0);
-        }
+        // Associate section buttons with their Course objects
+        const sectionButtons = selectedCoursesContainer.querySelectorAll('.section-select-btn');
+        sectionButtons.forEach(button => {
+            const courseItem = button.closest('.schedule-course-item') as HTMLElement;
+            if (courseItem) {
+                const courseIndex = Array.from(courseElements).indexOf(courseItem);
+                if (courseIndex >= 0 && courseIndex < uniqueCourses.length) {
+                    const course = uniqueCourses[courseIndex].course;
+                    this.elementToCourseMap.set(button as HTMLElement, course);
+                }
+            }
+        });
     }
 
     handleSectionSelection(course: Course, sectionNumber: string): void {
@@ -559,6 +799,30 @@ export class ScheduleController {
 
     getCourseFromElement(element: HTMLElement): Course | undefined {
         return this.elementToCourseMap.get(element);
+    }
+
+    applyFiltersAndRefresh(): void {
+        // Refresh the selected courses display with current filters
+        this.displayScheduleSelectedCourses();
+        
+        // Update filter button state
+        this.updateScheduleFilterButtonState();
+    }
+
+    private updateScheduleFilterButtonState(): void {
+        const scheduleFilterButton = document.getElementById('schedule-filter-btn');
+        if (scheduleFilterButton && this.scheduleFilterService) {
+            const hasActiveFilters = !this.scheduleFilterService.isEmpty();
+            const filterCount = this.scheduleFilterService.getFilterCount();
+            
+            if (hasActiveFilters) {
+                scheduleFilterButton.classList.add('active');
+                scheduleFilterButton.title = `${filterCount} filter${filterCount === 1 ? '' : 's'} active - Click to modify`;
+            } else {
+                scheduleFilterButton.classList.remove('active');
+                scheduleFilterButton.title = 'Filter selected courses';
+            }
+        }
     }
 
     private extractTermLetter(termString: string, sectionNumber?: string): string {
