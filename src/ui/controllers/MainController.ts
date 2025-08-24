@@ -225,6 +225,12 @@ export class MainController {
                                     building: period.building,
                                     room: period.room
                                 });
+                                
+                                // Calculate and log time slots for debugging
+                                const startSlot = Math.floor(((period.startTime.hours * 60 + period.startTime.minutes) - (7 * 60)) / 10);
+                                const endSlot = Math.floor(((period.endTime.hours * 60 + period.endTime.minutes) - (7 * 60)) / 10);
+                                const duration = endSlot - startSlot;
+                                console.log(`      Time slots: ${startSlot} to ${endSlot} (span ${duration} rows)`);
                             });
                         }
                     });

@@ -329,7 +329,7 @@ export class ScheduleController {
             // Schedule cells for each day
             weekdays.forEach(day => {
                 const cell = this.getCellContent(courses, day, slot);
-                html += `<div class="schedule-cell ${cell.classes}" data-day="${day}" data-slot="${slot}">${cell.content}</div>`;
+                html += `<div class="schedule-cell ${cell.classes}" data-day="${day}" data-slot="${slot}" style="position: relative;">${cell.content}</div>`;
             });
         }
         
@@ -419,24 +419,43 @@ export class ScheduleController {
         const primarySection = occupyingSections[0];
         const courseColor = this.getCourseColor(primarySection.course.course.id);
         
-        // Build content for the first section in the slot
-        const content = primarySection.isFirstSlot ? `
-            <div class="section-block ${hasConflict ? 'conflict' : ''}" style="background-color: ${courseColor}">
-                <div class="section-header">
-                    <div class="course-title">${primarySection.course.course.department.abbreviation}${primarySection.course.course.number}</div>
-                    <div class="section-number">${primarySection.section.number}</div>
-                </div>
-                <div class="section-periods">
-                    ${this.formatSectionPeriods(primarySection.periodsOnThisDay)}
-                </div>
-                <div class="section-enrollment">
-                    ${primarySection.section.seatsAvailable}/${primarySection.section.seats} seats
-                </div>
-                ${hasConflict ? '<div class="conflict-indicator">⚠ Conflict</div>' : ''}
-            </div>
-        ` : `<div class="section-continuation ${hasConflict ? 'conflict' : ''}"></div>`;
+        // Calculate how many rows this section should span
+        const rowSpan = primarySection.endSlot - primarySection.startSlot;
+        const heightInPixels = rowSpan * 10; // 10px per row
         
-        const classes = `occupied ${primarySection.isFirstSlot ? 'section-start' : 'section-continuation'} ${hasConflict ? 'has-conflict' : ''}`;
+        console.log(`Course ${primarySection.course.course.department.abbreviation}${primarySection.course.course.number} should span ${rowSpan} rows (${heightInPixels}px) from slot ${primarySection.startSlot} to ${primarySection.endSlot}`);
+        
+        // Build content for the first section in the slot - simplified to show only course name
+        const content = primarySection.isFirstSlot ? `
+            <div class="section-block ${hasConflict ? 'conflict' : ''}" style="
+                background-color: ${courseColor}; 
+                height: ${heightInPixels}px;
+                width: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 10;
+                border: 1px solid rgba(0,0,0,0.2);
+                border-radius: 3px;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                font-weight: bold;
+                font-size: 0.8rem;
+                color: white;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+                cursor: pointer;
+            ">
+                ${primarySection.course.course.department.abbreviation}${primarySection.course.course.number}
+            </div>
+        ` : ``; // Empty for continuation slots - the spanning block covers them
+        
+        // Only add classes for the first slot (where content actually appears)
+        const classes = primarySection.isFirstSlot ? 
+            `occupied section-start ${hasConflict ? 'has-conflict' : ''}` :
+            ''; // No classes for continuation slots - they should be invisible
         
         return { content, classes };
     }
