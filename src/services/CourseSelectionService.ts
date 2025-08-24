@@ -202,4 +202,9 @@ export class CourseSelectionService {
         const course = this.findCourseById(courseId);
         return course ? this.getSelectedCourse(course) : undefined;
     }
+
+    // Reconstruct Section objects after course data is loaded
+    reconstructSectionObjects(): void {
+        this.courseManager.reconstructSectionObjects();
+    }
 }

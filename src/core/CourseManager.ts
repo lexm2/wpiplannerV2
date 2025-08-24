@@ -159,6 +159,42 @@ export class CourseManager {
         return this.allDepartments;
     }
 
+    reconstructSectionObjects(): void {
+        console.log('=== RECONSTRUCTING SECTION OBJECTS ===');
+        let reconstructedCount = 0;
+        let failedCount = 0;
+        
+        this.selectedCourses.forEach((selectedCourse, course) => {
+            if (selectedCourse.selectedSectionNumber && !selectedCourse.selectedSection) {
+                console.log(`Reconstructing section for ${course.department.abbreviation}${course.number}:`);
+                console.log(`  Looking for section: ${selectedCourse.selectedSectionNumber}`);
+                console.log(`  Course has ${course.sections.length} sections:`, course.sections.map(s => s.number));
+                
+                const sectionObject = course.sections.find(s => 
+                    s.number === selectedCourse.selectedSectionNumber
+                ) || null;
+                
+                if (sectionObject) {
+                    selectedCourse.selectedSection = sectionObject;
+                    reconstructedCount++;
+                    console.log(`  ✓ Successfully reconstructed section ${sectionObject.number}`);
+                } else {
+                    failedCount++;
+                    console.log(`  ✗ Failed to find section ${selectedCourse.selectedSectionNumber}`);
+                }
+            } else if (selectedCourse.selectedSection) {
+                console.log(`Section already exists for ${course.department.abbreviation}${course.number}: ${selectedCourse.selectedSection.number}`);
+            }
+        });
+        
+        console.log(`Reconstruction complete: ${reconstructedCount} succeeded, ${failedCount} failed`);
+        console.log('=== END SECTION RECONSTRUCTION ===\n');
+        
+        if (reconstructedCount > 0) {
+            this.notifyListeners(); // Trigger UI updates
+        }
+    }
+
     private findCourseContainingSection(section: Section): Course | undefined {
         for (const department of this.allDepartments) {
             for (const course of department.courses) {

@@ -72,6 +72,11 @@ export class MainController {
             this.courseController.setAllDepartments(this.allDepartments);
             this.courseSelectionService.setAllDepartments(this.allDepartments);
             console.log(`Loaded ${this.allDepartments.length} departments`);
+            
+            // IMPORTANT: Reconstruct Section objects after course data is loaded
+            console.log('Reconstructing section objects for persisted selections...');
+            this.courseSelectionService.reconstructSectionObjects();
+            
             this.timestampManager.updateClientTimestamp();
             this.timestampManager.loadServerTimestamp();
         } catch (error) {
@@ -196,6 +201,35 @@ export class MainController {
             scheduleButton.addEventListener('click', () => {
                 this.uiStateManager.togglePage();
                 if (this.uiStateManager.currentPage === 'schedule') {
+                    // Log selected section data for debugging  
+                    const selectedCourses = this.courseSelectionService.getSelectedCourses();
+                    console.log('=== SCHEDULE PAGE LOADED ===');
+                    console.log(`Found ${selectedCourses.length} selected courses with sections:`);
+                    
+                    selectedCourses.forEach(sc => {
+                        const hasSection = sc.selectedSection !== null;
+                        console.log(`${sc.course.department.abbreviation}${sc.course.number}: section ${sc.selectedSectionNumber} ${hasSection ? '✓' : '✗'}`);
+                        if (hasSection && sc.selectedSection) {
+                            console.log(`  Term: ${sc.selectedSection.term}, Periods: ${sc.selectedSection.periods.length}`);
+                            console.log(`  Full section object:`, sc.selectedSection);
+                            
+                            // Log each period in detail
+                            sc.selectedSection.periods.forEach((period, idx) => {
+                                console.log(`    Period ${idx + 1}:`, {
+                                    type: period.type,
+                                    professor: period.professor,
+                                    startTime: period.startTime,
+                                    endTime: period.endTime,
+                                    days: Array.from(period.days),
+                                    location: period.location,
+                                    building: period.building,
+                                    room: period.room
+                                });
+                            });
+                        }
+                    });
+                    console.log('=== END SCHEDULE SECTION DATA ===\n');
+                    
                     this.scheduleController.displayScheduleSelectedCourses();
                     this.scheduleController.renderScheduleGrids();
                 }

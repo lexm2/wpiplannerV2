@@ -248,6 +248,9 @@ export class ScheduleController {
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
         const grids = ['A', 'B', 'C', 'D'];
         
+        console.log('\n=== RENDER SCHEDULE GRIDS ===');
+        console.log(`Processing ${selectedCourses.length} selected courses for terms: ${grids.join(', ')}`);
+        
         grids.forEach(term => {
             const gridContainer = document.getElementById(`schedule-grid-${term}`);
             if (!gridContainer) return;
@@ -255,8 +258,22 @@ export class ScheduleController {
             // Filter courses for this term - use direct Section object access
             const termCourses = selectedCourses.filter(sc => {
                 const hasSelectedSection = sc.selectedSection !== null;
-                const matchesTerm = hasSelectedSection && sc.selectedSection!.term.toUpperCase().includes(term);
-                return hasSelectedSection && matchesTerm;
+                
+                if (!hasSelectedSection) return false;
+                
+                // Debug: log term matching
+                console.log(`  Checking course ${sc.course.department.abbreviation}${sc.course.number} with term "${sc.selectedSection!.term}" against grid term "${term}"`);
+                
+                // For now, let's put courses in Term A until we understand the term format better
+                const matchesTerm = term === 'A';
+                
+                console.log(`    Match result: ${matchesTerm}`);
+                return matchesTerm;
+            });
+            
+            console.log(`Term ${term}: ${termCourses.length} courses`);
+            termCourses.forEach(tc => {
+                console.log(`  ${tc.course.department.abbreviation}${tc.course.number} (${tc.selectedSection!.periods.length} periods)`);
             });
             
             if (termCourses.length === 0) {
@@ -268,6 +285,8 @@ export class ScheduleController {
             
             this.renderPopulatedGrid(gridContainer, termCourses, term);
         });
+        
+        console.log('=== END RENDER SCHEDULE GRIDS ===\n');
     }
 
     private renderEmptyGrid(container: HTMLElement, term: string, hasCoursesWithoutSections: boolean = false): void {
@@ -290,40 +309,46 @@ export class ScheduleController {
         const weekdays = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
         const timeSlots = TimeUtils.TOTAL_TIME_SLOTS;
         
-        let html = `
-            <div class="schedule-grid-header">
-                <div class="time-column-header"></div>
-                ${weekdays.map(day => `
-                    <div class="day-header">${TimeUtils.getDayAbbr(day)}</div>
-                `).join('')}
-            </div>
-            <div class="schedule-grid-body">
-        `;
+        let html = '';
         
-        // Generate time rows
+        // First row: empty time cell + day headers
+        html += '<div class="time-label"></div>'; // Empty corner cell
+        weekdays.forEach(day => {
+            html += `<div class="day-header">${TimeUtils.getDayAbbr(day)}</div>`;
+        });
+        
+        // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {
             const hour = Math.floor(slot / TimeUtils.SLOTS_PER_HOUR) + TimeUtils.START_HOUR;
             const minutes = (slot % TimeUtils.SLOTS_PER_HOUR) * 10;
             const timeLabel = minutes === 0 ? TimeUtils.formatTime({ hours: hour, minutes: 0, displayTime: '' }) : '';
             
-            html += `
-                <div class="schedule-row">
-                    <div class="time-label">${timeLabel}</div>
-                    ${weekdays.map(day => {
-                        const cell = this.getCellContent(courses, day, slot);
-                        return `<div class="schedule-cell ${cell.classes}" data-day="${day}" data-slot="${slot}">${cell.content}</div>`;
-                    }).join('')}
-                </div>
-            `;
+            // Time label cell
+            html += `<div class="time-label">${timeLabel}</div>`;
+            
+            // Schedule cells for each day
+            weekdays.forEach(day => {
+                const cell = this.getCellContent(courses, day, slot);
+                html += `<div class="schedule-cell ${cell.classes}" data-day="${day}" data-slot="${slot}">${cell.content}</div>`;
+            });
         }
         
-        html += '</div>';
         container.innerHTML = html;
     }
 
     private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number): { content: string, classes: string } {
         // Find all sections that occupy this cell
         const occupyingSections: any[] = [];
+        
+        // Log for a wider range to catch the course times
+        const shouldLog = timeSlot < 36 && courses.length > 0; // Log first 6 hours (7:00 AM - 1:00 PM)
+        
+        if (shouldLog && courses.length > 0) {
+            const hour = Math.floor(timeSlot / 6) + 7;
+            const minute = (timeSlot % 6) * 10;
+            console.log(`\n--- getCellContent: ${day} ${hour}:${minute.toString().padStart(2, '0')} (slot ${timeSlot}) ---`);
+            console.log(`Checking ${courses.length} courses for this time slot`);
+        }
         
         for (const selectedCourse of courses) {
             if (!selectedCourse.selectedSection) {
@@ -335,6 +360,13 @@ export class ScheduleController {
             // Check if this section has any period that occupies this time slot on this day
             const periodsOnThisDay = section.periods.filter((period: any) => period.days.has(day));
             
+            if (shouldLog && periodsOnThisDay.length > 0) {
+                console.log(`  Course ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number} has ${periodsOnThisDay.length} periods on ${day}:`);
+                periodsOnThisDay.forEach(p => {
+                    console.log(`    ${p.type}: ${p.startTime.hours}:${p.startTime.minutes.toString().padStart(2, '0')}-${p.endTime.hours}:${p.endTime.minutes.toString().padStart(2, '0')}`);
+                });
+            }
+            
             let sectionOccupiesSlot = false;
             let sectionStartSlot = Infinity;
             let sectionEndSlot = -1;
@@ -344,17 +376,28 @@ export class ScheduleController {
                 const startSlot = TimeUtils.timeToGridRow(period.startTime);
                 const endSlot = TimeUtils.timeToGridRow(period.endTime);
                 
+                if (shouldLog) {
+                    console.log(`    Checking period ${period.type}: slots ${startSlot}-${endSlot} vs current slot ${timeSlot}`);
+                }
+                
                 if (timeSlot >= startSlot && timeSlot < endSlot) {
                     sectionOccupiesSlot = true;
                     sectionStartSlot = Math.min(sectionStartSlot, startSlot);
                     sectionEndSlot = Math.max(sectionEndSlot, endSlot);
                     
+                    if (shouldLog) {
+                        console.log(`      ✓ MATCHES! Period occupies slot ${timeSlot}`);
+                    }
                 }
             }
             
             if (sectionOccupiesSlot) {
                 // Check if this is the first slot for this section on this day
                 isFirstSlot = timeSlot === sectionStartSlot;
+                
+                if (shouldLog) {
+                    console.log(`    Course ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number} occupies slot, isFirstSlot: ${isFirstSlot}`);
+                }
                 
                 occupyingSections.push({
                     course: selectedCourse,

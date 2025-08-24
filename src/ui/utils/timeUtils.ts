@@ -30,10 +30,15 @@ export class TimeUtils {
         
         // Convert to 10-minute slots
         const slot = Math.floor(relativeMinutes / 10);
+        const boundedSlot = Math.max(0, Math.min(slot, TimeUtils.TOTAL_TIME_SLOTS - 1));
         
+        // Log only problematic time calculations 
+        if (slot < 0 || slot >= TimeUtils.TOTAL_TIME_SLOTS || slot !== boundedSlot) {
+            console.log(`timeToGridRow: ${time.hours}:${time.minutes.toString().padStart(2, '0')} -> slot ${slot} (bounded: ${boundedSlot})`);
+        }
         
         // Ensure within bounds
-        return Math.max(0, Math.min(slot, TimeUtils.TOTAL_TIME_SLOTS - 1));
+        return boundedSlot;
     }
 
     /**
