@@ -45,14 +45,12 @@ export class FilterModalController {
     // Method to refresh department selection from external changes
     refreshDepartmentSelection(): void {
         if (this.isUpdatingFilter) {
-            console.log('🚫 refreshDepartmentSelection blocked - filter update in progress');
             return;
         }
         
         if (this.currentModalId) {
             const modalElement = document.getElementById(this.currentModalId);
             if (modalElement) {
-                console.log('🔄 refreshDepartmentSelection called');
                 this.updateDepartmentCheckboxes(modalElement);
             }
         }
@@ -60,8 +58,6 @@ export class FilterModalController {
 
     private updateDepartmentCheckboxes(modalElement: HTMLElement): void {
         if (!this.filterService) return;
-        
-        console.log('🔄 updateDepartmentCheckboxes called, category mode:', this.isCategoryMode);
         
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'department');
         const activeDepartments = activeFilter?.criteria?.departments || [];
@@ -81,11 +77,7 @@ export class FilterModalController {
                     activeDepartments.includes(dept)
                 );
                 
-                const shouldBeChecked = selectedInCategory.length > 0;
-                const wasChecked = checkbox.checked;
-                checkbox.checked = shouldBeChecked;
-                
-                console.log(`📊 Category "${categoryName}": ${selectedInCategory.length}/${categoryDepartments.length} selected, was checked: ${wasChecked}, now checked: ${shouldBeChecked}`);
+                checkbox.checked = selectedInCategory.length > 0;
                 
                 // Handle indeterminate state
                 const allSelected = selectedInCategory.length === categoryDepartments.length;
@@ -94,9 +86,7 @@ export class FilterModalController {
                 
             } else {
                 // For individual department checkboxes
-                const wasChecked = checkbox.checked;
                 checkbox.checked = activeDepartments.includes(checkbox.value);
-                console.log(`📋 Individual dept "${checkbox.value}": was checked: ${wasChecked}, now checked: ${checkbox.checked}`);
             }
         });
         
@@ -481,9 +471,7 @@ export class FilterModalController {
         }
         
         checkboxes.forEach((checkbox) => {
-            checkbox.addEventListener('change', (e) => {
-                const cb = e.target as HTMLInputElement;
-                console.log('🎯 Checkbox clicked:', cb.value, 'checked:', cb.checked, 'category mode:', this.isCategoryMode);
+            checkbox.addEventListener('change', () => {
                 this.updateDepartmentFilter(modalElement);
             });
         });
@@ -782,13 +770,6 @@ export class FilterModalController {
             
             const isChecked = allSelected || someSelected;
             
-            // During filter updates, preserve the existing checkbox state to prevent flicker
-            if (this.isUpdatingFilter) {
-                console.log(`🔒 Preserving checkbox state during update for "${category}": checked=${isChecked}`);
-            } else {
-                console.log(`📊 Category "${category}": ${selectedDepartmentsInCategory.length}/${categoryDepartments.length} selected, checked: ${isChecked}, indeterminate: ${isIndeterminate}`);
-            }
-            
             return `
                 <label class="filter-checkbox-label">
                     <input type="checkbox" value="${category}" ${isChecked ? 'checked' : ''} 
@@ -804,65 +785,43 @@ export class FilterModalController {
 
     private updateDepartmentFilter(modalElement: HTMLElement): void {
         if (this.isUpdatingFilter) {
-            console.log('🚫 updateDepartmentFilter blocked - already updating');
             return;
         }
         
         this.isUpdatingFilter = true;
-        console.log('🔒 Filter update started - setting isUpdatingFilter = true');
         
         try {
             const checkboxes = modalElement.querySelectorAll('input[data-filter="department"]:checked') as NodeListOf<HTMLInputElement>;
             let departments: string[] = [];
             
-            console.log('🔄 updateDepartmentFilter called, found', checkboxes.length, 'checked checkboxes');
-            
             if (this.isCategoryMode) {
                 // Handle category selections - convert categories to individual departments
                 const selectedCategories = Array.from(checkboxes).map(cb => cb.value);
-                console.log('📊 Selected categories:', selectedCategories);
-                
                 const allAvailableDepartments = this.filterService?.getFilterOptions('department', this.allCourses) as string[] || [];
                 
                 selectedCategories.forEach(category => {
                     const categoryDepartments = allAvailableDepartments.filter(dept => 
                         getDepartmentCategory(dept) === category
                     );
-                    console.log(`📊 Adding ${categoryDepartments.length} departments for category "${category}":`, categoryDepartments.slice(0, 3));
                     departments.push(...categoryDepartments);
                 });
             } else {
                 // Handle individual department selections
                 departments = Array.from(checkboxes).map(cb => cb.value);
-                console.log('📊 Selected individual departments:', departments);
             }
             
-            console.log('📊 Final departments array length:', departments.length);
-            
             if (departments.length > 0) {
-                console.log('➕ Adding department filter with', departments.length, 'departments');
                 this.filterService?.addFilter('department', { departments });
             } else {
-                console.log('➖ Removing department filter (no departments selected)');
                 this.filterService?.removeFilter('department');
             }
             
-            console.log('🔄 Updating preview...');
             this.updatePreview(modalElement);
-            console.log('✅ updateDepartmentFilter complete');
             
         } finally {
             // Small delay before releasing the lock to prevent immediate re-entry
             setTimeout(() => {
                 this.isUpdatingFilter = false;
-                console.log('🔓 Filter update complete - setting isUpdatingFilter = false');
-                
-                // Check if we need to refresh the UI after filter update
-                setTimeout(() => {
-                    console.log('🔍 Post-update check: Looking for checked checkboxes...');
-                    const postUpdateCheckboxes = modalElement.querySelectorAll('input[data-filter="department"]:checked');
-                    console.log('📊 Post-update checked checkboxes:', postUpdateCheckboxes.length);
-                }, 50);
             }, 100);
         }
     }
