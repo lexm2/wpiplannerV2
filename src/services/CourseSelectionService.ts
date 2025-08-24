@@ -23,18 +23,18 @@ export class CourseSelectionService {
         this.courseManager.addCourse(course, isRequired);
     }
 
-    unselectCourse(courseId: string): void {
-        if (!courseId || !Validators.validateCourseId(courseId)) {
-            throw new Error('Invalid courseId provided');
+    unselectCourse(course: Course): void {
+        if (!Validators.isValidCourse(course)) {
+            throw new Error('Invalid course object provided');
         }
-        this.courseManager.removeCourse(courseId);
+        this.courseManager.removeCourse(course);
     }
 
     toggleCourseSelection(course: Course, isRequired: boolean = false): boolean {
-        const isSelected = this.isCourseSelected(course.id);
+        const isSelected = this.isCourseSelected(course);
         
         if (isSelected) {
-            this.unselectCourse(course.id);
+            this.unselectCourse(course);
             return false;
         } else {
             this.selectCourse(course, isRequired);
@@ -42,40 +42,40 @@ export class CourseSelectionService {
         }
     }
 
-    setSelectedSection(courseId: string, sectionNumber: string | null): void {
-        if (!courseId || !Validators.validateCourseId(courseId)) {
-            throw new Error('Invalid courseId provided');
+    setSelectedSection(course: Course, sectionNumber: string | null): void {
+        if (!Validators.isValidCourse(course)) {
+            throw new Error('Invalid course object provided');
         }
         if (sectionNumber !== null && !Validators.validateSectionNumber(sectionNumber)) {
             throw new Error('Invalid sectionNumber provided');
         }
-        this.courseManager.setSelectedSection(courseId, sectionNumber);
+        this.courseManager.setSelectedSection(course, sectionNumber);
     }
 
-    getSelectedSection(courseId: string): string | null {
-        if (!courseId || !Validators.validateCourseId(courseId)) {
-            throw new Error('Invalid courseId provided');
+    getSelectedSection(course: Course): string | null {
+        if (!Validators.isValidCourse(course)) {
+            throw new Error('Invalid course object provided');
         }
-        return this.courseManager.getSelectedSection(courseId);
+        return this.courseManager.getSelectedSection(course);
     }
 
 
-    isCourseSelected(courseId: string): boolean {
-        if (!courseId || !Validators.validateCourseId(courseId)) {
+    isCourseSelected(course: Course): boolean {
+        if (!Validators.isValidCourse(course)) {
             return false;
         }
-        return this.courseManager.isSelected(courseId);
+        return this.courseManager.isSelected(course);
     }
 
     getSelectedCourses(): SelectedCourse[] {
         return this.courseManager.getSelectedCourses();
     }
 
-    getSelectedCourse(courseId: string): SelectedCourse | undefined {
-        if (!courseId || !Validators.validateCourseId(courseId)) {
+    getSelectedCourse(course: Course): SelectedCourse | undefined {
+        if (!Validators.isValidCourse(course)) {
             return undefined;
         }
-        return this.courseManager.getSelectedCourse(courseId);
+        return this.courseManager.getSelectedCourse(course);
     }
 
     clearAllSelections(): void {
@@ -149,11 +149,50 @@ export class CourseSelectionService {
         return this.courseManager.getAllSections();
     }
 
-    getAllSectionsForCourse(courseId: string): Section[] {
-        return this.courseManager.getAllSectionsForCourse(courseId);
+    getAllSectionsForCourse(course: Course): Section[] {
+        return this.courseManager.getAllSectionsForCourse(course);
     }
 
     getAllSectionsForDepartment(deptAbbreviation: string): Section[] {
         return this.courseManager.getAllSectionsForDepartment(deptAbbreviation);
+    }
+
+    // Helper methods for backward compatibility
+    findCourseById(courseId: string): Course | undefined {
+        for (const dept of this.courseManager.getAllDepartments()) {
+            const course = dept.courses.find(c => c.id === courseId);
+            if (course) return course;
+        }
+        return undefined;
+    }
+
+    // Legacy methods using courseId (for backward compatibility)
+    unselectCourseById(courseId: string): void {
+        const course = this.findCourseById(courseId);
+        if (course) {
+            this.unselectCourse(course);
+        }
+    }
+
+    isCourseSelectedById(courseId: string): boolean {
+        const course = this.findCourseById(courseId);
+        return course ? this.isCourseSelected(course) : false;
+    }
+
+    setSelectedSectionById(courseId: string, sectionNumber: string | null): void {
+        const course = this.findCourseById(courseId);
+        if (course) {
+            this.setSelectedSection(course, sectionNumber);
+        }
+    }
+
+    getSelectedSectionById(courseId: string): string | null {
+        const course = this.findCourseById(courseId);
+        return course ? this.getSelectedSection(course) : null;
+    }
+
+    getSelectedCourseById(courseId: string): SelectedCourse | undefined {
+        const course = this.findCourseById(courseId);
+        return course ? this.getSelectedCourse(course) : undefined;
     }
 }

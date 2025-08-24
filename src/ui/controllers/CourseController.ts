@@ -5,6 +5,7 @@ export class CourseController {
     private allDepartments: Department[] = [];
     private selectedCourse: Course | null = null;
     private courseSelectionService: CourseSelectionService;
+    private elementToCourseMap = new WeakMap<HTMLElement, Course>();
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
@@ -43,12 +44,12 @@ export class CourseController {
         sortedCourses.forEach(course => {
             const hasWarning = this.courseHasWarning(course);
             const sections = course.sections.map(s => s.number).filter(Boolean);
-            const isSelected = this.courseSelectionService.isCourseSelected(course.id);
+            const isSelected = this.courseSelectionService.isCourseSelected(course);
             
             html += `
-                <div class="course-item ${isSelected ? 'selected' : ''}" data-course-id="${course.id}">
+                <div class="course-item ${isSelected ? 'selected' : ''}">
                     <div class="course-header">
-                        <button class="course-select-btn ${isSelected ? 'selected' : ''}" data-course-id="${course.id}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
+                        <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
                             ${isSelected ? '✓' : '+'}
                         </button>
                         <div class="course-code">${course.department.abbreviation}${course.number}</div>
@@ -70,6 +71,12 @@ export class CourseController {
         
         html += '</div>';
         courseContainer.innerHTML = html;
+
+        // Associate DOM elements with Course objects
+        const courseElements = courseContainer.querySelectorAll('.course-item');
+        courseElements.forEach((element, index) => {
+            this.elementToCourseMap.set(element as HTMLElement, sortedCourses[index]);
+        });
     }
 
     private displayCoursesGrid(courses: Course[]): void {
@@ -88,14 +95,14 @@ export class CourseController {
         
         sortedCourses.forEach(course => {
             const hasWarning = this.courseHasWarning(course);
-            const isSelected = this.courseSelectionService.isCourseSelected(course.id);
+            const isSelected = this.courseSelectionService.isCourseSelected(course);
             const credits = course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits}-${course.maxCredits}`;
             
             html += `
-                <div class="course-card ${isSelected ? 'selected' : ''}" data-course-id="${course.id}">
+                <div class="course-card ${isSelected ? 'selected' : ''}">
                     <div class="course-card-header">
                         <div class="course-code">${course.department.abbreviation}${course.number}</div>
-                        <button class="course-select-btn ${isSelected ? 'selected' : ''}" data-course-id="${course.id}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
+                        <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
                             ${isSelected ? '✓' : '+'}
                         </button>
                     </div>
@@ -113,6 +120,12 @@ export class CourseController {
         
         html += '</div>';
         courseContainer.innerHTML = html;
+
+        // Associate DOM elements with Course objects
+        const courseElements = courseContainer.querySelectorAll('.course-card');
+        courseElements.forEach((element, index) => {
+            this.elementToCourseMap.set(element as HTMLElement, sortedCourses[index]);
+        });
     }
 
     private courseHasWarning(course: Course): boolean {
@@ -145,58 +158,73 @@ export class CourseController {
         return filteredCourses;
     }
 
-    selectCourse(courseId: string): Course | null {
-        // Find the course in all departments
-        let course: Course | null = null;
-        for (const dept of this.allDepartments) {
-            course = dept.courses.find(c => c.id === courseId) || null;
-            if (course) break;
-        }
-
+    selectCourse(element: HTMLElement): Course | null {
+        const course = this.elementToCourseMap.get(element);
         if (!course) return null;
 
         this.selectedCourse = course;
         this.displayCourseDescription(course);
         
         // Update active state for course items
-        document.querySelectorAll('.course-item').forEach(item => {
+        document.querySelectorAll('.course-item, .course-card').forEach(item => {
             item.classList.remove('active');
         });
         
-        const selectedCourseElement = document.querySelector(`[data-course-id="${courseId}"]`);
-        if (selectedCourseElement) {
-            selectedCourseElement.classList.add('active');
-        }
-
+        element.classList.add('active');
         return course;
     }
 
-    toggleCourseSelection(courseId: string): boolean {
-        // Find the course in all departments
-        let course: Course | null = null;
-        for (const dept of this.allDepartments) {
-            course = dept.courses.find(c => c.id === courseId) || null;
-            if (course) break;
-        }
+    // Legacy method for backward compatibility
+    selectCourseById(courseId: string): Course | null {
+        const course = this.courseSelectionService.findCourseById(courseId);
+        if (!course) return null;
 
+        // Find the associated element and call selectCourse
+        const allElements = document.querySelectorAll('.course-item, .course-card');
+        for (const element of allElements) {
+            const elementCourse = this.elementToCourseMap.get(element as HTMLElement);
+            if (elementCourse?.id === courseId) {
+                return this.selectCourse(element as HTMLElement);
+            }
+        }
+        return null;
+    }
+
+    toggleCourseSelection(element: HTMLElement): boolean {
+        const course = this.elementToCourseMap.get(element);
         if (!course) return false;
 
         const wasSelected = this.courseSelectionService.toggleCourseSelection(course);
-        this.updateCourseSelectionUI(courseId, wasSelected);
+        this.updateCourseSelectionUI(element, wasSelected);
         return wasSelected;
     }
 
-    private updateCourseSelectionUI(courseId: string, isSelected: boolean): void {
-        const courseElement = document.querySelector(`[data-course-id="${courseId}"]`);
-        const selectBtn = courseElement?.querySelector('.course-select-btn');
+    // Legacy method for backward compatibility
+    toggleCourseSelectionById(courseId: string): boolean {
+        const course = this.courseSelectionService.findCourseById(courseId);
+        if (!course) return false;
+
+        // Find the associated element and call toggleCourseSelection
+        const allElements = document.querySelectorAll('.course-item, .course-card');
+        for (const element of allElements) {
+            const elementCourse = this.elementToCourseMap.get(element as HTMLElement);
+            if (elementCourse?.id === courseId) {
+                return this.toggleCourseSelection(element as HTMLElement);
+            }
+        }
+        return false;
+    }
+
+    private updateCourseSelectionUI(element: HTMLElement, isSelected: boolean): void {
+        const selectBtn = element.querySelector('.course-select-btn');
         
-        if (courseElement && selectBtn) {
+        if (selectBtn) {
             if (isSelected) {
-                courseElement.classList.add('selected');
+                element.classList.add('selected');
                 selectBtn.textContent = '✓';
                 selectBtn.classList.add('selected');
             } else {
-                courseElement.classList.remove('selected');
+                element.classList.remove('selected');
                 selectBtn.textContent = '+';
                 selectBtn.classList.remove('selected');
             }
@@ -205,11 +233,11 @@ export class CourseController {
 
     refreshCourseSelectionUI(): void {
         // Update all course items to reflect current selection state
-        document.querySelectorAll('.course-item').forEach(item => {
-            const courseId = (item as HTMLElement).dataset.courseId;
-            if (courseId) {
-                const isSelected = this.courseSelectionService.isCourseSelected(courseId);
-                this.updateCourseSelectionUI(courseId, isSelected);
+        document.querySelectorAll('.course-item, .course-card').forEach(item => {
+            const course = this.elementToCourseMap.get(item as HTMLElement);
+            if (course) {
+                const isSelected = this.courseSelectionService.isCourseSelected(course);
+                this.updateCourseSelectionUI(item as HTMLElement, isSelected);
             }
         });
     }
@@ -272,13 +300,13 @@ export class CourseController {
                 : `${course.minCredits}-${course.maxCredits} credits`;
 
             html += `
-                <div class="selected-course-item" data-course-id="${course.id}">
+                <div class="selected-course-item">
                     <div class="selected-course-info">
                         <div class="selected-course-code">${course.department.abbreviation}${course.number}</div>
                         <div class="selected-course-name">${course.name}</div>
                         <div class="selected-course-credits">${credits}</div>
                     </div>
-                    <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
+                    <button class="course-remove-btn" title="Remove from selection">
                         ×
                     </button>
                 </div>
@@ -286,5 +314,15 @@ export class CourseController {
         });
 
         selectedCoursesContainer.innerHTML = html;
+
+        // Associate remove buttons with Course objects  
+        const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
+        removeButtons.forEach((button, index) => {
+            this.elementToCourseMap.set(button as HTMLElement, sortedCourses[index].course);
+        });
+    }
+
+    getCourseFromElement(element: HTMLElement): Course | undefined {
+        return this.elementToCourseMap.get(element);
     }
 }

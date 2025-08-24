@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { CourseManager } from '../../../src/core/CourseManager'
 import { createMockCourse } from '../../helpers/mockData'
 
@@ -23,7 +23,7 @@ describe('CourseManager', () => {
     it('should add a course to selected courses', () => {
       courseManager.addCourse(mockCourse1)
       
-      expect(courseManager.isSelected('CS-1101')).toBe(true)
+      expect(courseManager.isSelected(mockCourse1)).toBe(true)
       expect(courseManager.getSelectedCourses()).toHaveLength(1)
       expect(courseManager.getSelectedCourses()[0].course.id).toBe('CS-1101')
     })
@@ -31,14 +31,14 @@ describe('CourseManager', () => {
     it('should mark course as required when specified', () => {
       courseManager.addCourse(mockCourse1, true)
       
-      const selectedCourse = courseManager.getSelectedCourse('CS-1101')
+      const selectedCourse = courseManager.getSelectedCourse(mockCourse1)
       expect(selectedCourse?.isRequired).toBe(true)
     })
 
     it('should mark course as optional by default', () => {
       courseManager.addCourse(mockCourse1)
       
-      const selectedCourse = courseManager.getSelectedCourse('CS-1101')
+      const selectedCourse = courseManager.getSelectedCourse(mockCourse1)
       expect(selectedCourse?.isRequired).toBe(false)
     })
 
@@ -51,17 +51,18 @@ describe('CourseManager', () => {
       
       expect(courseManager.getSelectedCourses()).toHaveLength(2)
       
-      courseManager.removeCourse('CS-1101')
+      courseManager.removeCourse(mockCourse1)
       
-      expect(courseManager.isSelected('CS-1101')).toBe(false)
+      expect(courseManager.isSelected(mockCourse1)).toBe(false)
       expect(courseManager.getSelectedCourses()).toHaveLength(1)
       expect(courseManager.getSelectedCourses()[0].course.id).toBe('MA-1021')
     })
 
     it('should do nothing if course is not selected', () => {
       courseManager.addCourse(mockCourse1)
+      const nonExistentCourse = createMockCourse({ id: 'NONEXISTENT', name: 'Non-existent Course' })
       
-      courseManager.removeCourse('NONEXISTENT')
+      courseManager.removeCourse(nonExistentCourse)
       
       expect(courseManager.getSelectedCourses()).toHaveLength(1)
     })
@@ -79,14 +80,15 @@ describe('CourseManager', () => {
     })
 
     it('should return all sections', () => {
-      const sections = courseManager.getAvailableSections('CS-1101')
+      const sections = courseManager.getAvailableSections(mockCourse1)
       
       expect(sections).toHaveLength(3)
       expect(sections.map(s => s.number)).toEqual(['A01', 'A02', 'B01'])
     })
 
     it('should return empty array for non-existent course', () => {
-      const sections = courseManager.getAvailableSections('NONEXISTENT')
+      const nonExistentCourse = createMockCourse({ id: 'NONEXISTENT', name: 'Non-existent Course' })
+      const sections = courseManager.getAvailableSections(nonExistentCourse)
       
       expect(sections).toEqual([])
     })
@@ -122,7 +124,7 @@ describe('CourseManager', () => {
       courseManager.addCourse(mockCourse1)
       courseManager.onSelectionChange(listener)
       
-      courseManager.removeCourse('CS-1101')
+      courseManager.removeCourse(mockCourse1)
       
       expect(listener).toHaveBeenCalledWith([])
     })

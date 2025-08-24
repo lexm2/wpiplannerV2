@@ -2,7 +2,7 @@ import { Course, Section, Department } from '../types/types'
 import { SelectedCourse, Schedule } from '../types/schedule'
 
 export class CourseManager {
-    private selectedCourses: Map<string, SelectedCourse> = new Map();
+    private selectedCourses: Map<Course, SelectedCourse> = new Map();
     private listeners: Set<(courses: SelectedCourse[]) => void> = new Set();
     private allSections: Set<Section> = new Set();
     private allDepartments: Department[] = [];
@@ -14,12 +14,12 @@ export class CourseManager {
             isRequired
         };
         
-        this.selectedCourses.set(course.id, selectedCourse);
+        this.selectedCourses.set(course, selectedCourse);
         this.notifyListeners();
     }
 
-    removeCourse(courseId: string): void {
-        this.selectedCourses.delete(courseId);
+    removeCourse(course: Course): void {
+        this.selectedCourses.delete(course);
         this.notifyListeners();
     }
 
@@ -28,17 +28,17 @@ export class CourseManager {
         return Array.from(this.selectedCourses.values());
     }
 
-    getSelectedCourse(courseId: string): SelectedCourse | undefined {
-        return this.selectedCourses.get(courseId);
+    getSelectedCourse(course: Course): SelectedCourse | undefined {
+        return this.selectedCourses.get(course);
     }
 
-    isSelected(courseId: string): boolean {
-        return this.selectedCourses.has(courseId);
+    isSelected(course: Course): boolean {
+        return this.selectedCourses.has(course);
     }
 
-    getAvailableSections(courseId: string): Section[] {
-        const selectedCourse = this.selectedCourses.get(courseId);
-        if (!this.validateCourseExists(courseId, selectedCourse)) return [];
+    getAvailableSections(course: Course): Section[] {
+        const selectedCourse = this.selectedCourses.get(course);
+        if (!this.validateCourseExists(course, selectedCourse)) return [];
 
         return selectedCourse!.course.sections;
     }
@@ -56,31 +56,31 @@ export class CourseManager {
         this.listeners.delete(listener);
     }
 
-    setSelectedSection(courseId: string, sectionNumber: string | null): void {
-        const selectedCourse = this.selectedCourses.get(courseId);
-        if (!this.validateCourseExists(courseId, selectedCourse)) return;
+    setSelectedSection(course: Course, sectionNumber: string | null): void {
+        const selectedCourse = this.selectedCourses.get(course);
+        if (!this.validateCourseExists(course, selectedCourse)) return;
 
         selectedCourse!.selectedSection = sectionNumber;
         this.notifyListeners();
     }
 
-    getSelectedSection(courseId: string): string | null {
-        const selectedCourse = this.selectedCourses.get(courseId);
+    getSelectedSection(course: Course): string | null {
+        const selectedCourse = this.selectedCourses.get(course);
         return selectedCourse?.selectedSection || null;
     }
 
 
     loadSelectedCourses(selectedCourses: SelectedCourse[]): void {
         this.selectedCourses.clear();
-        selectedCourses.forEach(course => {
-            this.selectedCourses.set(course.course.id, course);
+        selectedCourses.forEach(selectedCourse => {
+            this.selectedCourses.set(selectedCourse.course, selectedCourse);
         });
         this.notifyListeners();
     }
 
-    private validateCourseExists(courseId: string, selectedCourse?: SelectedCourse): selectedCourse is SelectedCourse {
+    private validateCourseExists(course: Course, selectedCourse?: SelectedCourse): selectedCourse is SelectedCourse {
         if (!selectedCourse) {
-            console.warn(`Course ${courseId} not found in selected courses`);
+            console.warn(`Course ${course.id} not found in selected courses`);
             return false;
         }
         return true;
@@ -115,11 +115,8 @@ export class CourseManager {
         return Array.from(this.allSections);
     }
 
-    getAllSectionsForCourse(courseId: string): Section[] {
-        return Array.from(this.allSections).filter(section => {
-            const course = this.findCourseContainingSection(section);
-            return course?.id === courseId;
-        });
+    getAllSectionsForCourse(course: Course): Section[] {
+        return course.sections;
     }
 
     getAllSectionsForDepartment(deptAbbreviation: string): Section[] {
@@ -131,6 +128,10 @@ export class CourseManager {
             sections.push(...course.sections);
         }
         return sections;
+    }
+
+    getAllDepartments(): Department[] {
+        return this.allDepartments;
     }
 
     private findCourseContainingSection(section: Section): Course | undefined {

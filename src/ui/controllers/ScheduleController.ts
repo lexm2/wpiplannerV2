@@ -1,9 +1,10 @@
-import { DayOfWeek } from '../../types/types'
+import { DayOfWeek, Course } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { TimeUtils } from '../utils/timeUtils'
 
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
+    private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private statePreserver?: { 
         preserve: () => Map<string, boolean>, 
         restore: (states: Map<string, boolean>) => void 
@@ -63,8 +64,8 @@ export class ScheduleController {
             });
 
             html += `
-                <div class="schedule-course-item collapsed" data-course-id="${course.id}">
-                    <div class="schedule-course-header dropdown-trigger" data-course-id="${course.id}">
+                <div class="schedule-course-item collapsed" >
+                    <div class="schedule-course-header dropdown-trigger" >
                         <div class="schedule-course-info">
                             <div class="schedule-course-code">${course.department.abbreviation}${course.number}</div>
                             <div class="schedule-course-name">${course.name}</div>
@@ -72,7 +73,7 @@ export class ScheduleController {
                         </div>
                         <div class="header-controls">
                             <span class="dropdown-arrow">▼</span>
-                            <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
+                            <button class="course-remove-btn"  title="Remove from selection">
                                 ×
                             </button>
                         </div>
@@ -103,7 +104,7 @@ export class ScheduleController {
                     });
                     
                     html += `
-                        <div class="section-option ${selectedClass}" data-course-id="${course.id}" data-section="${section.number}">
+                        <div class="section-option ${selectedClass}"  data-section="${section.number}">
                             <div class="section-info">
                                 <div class="section-number">${section.number}</div>
                                 <div class="section-periods">`;
@@ -131,7 +132,7 @@ export class ScheduleController {
                     html += `
                                 </div>
                             </div>
-                            <button class="section-select-btn ${selectedClass}" data-course-id="${course.id}" data-section="${section.number}">
+                            <button class="section-select-btn ${selectedClass}"  data-section="${section.number}">
                                 ${isSelected ? '✓' : '+'}
                             </button>
                         </div>
@@ -149,6 +150,18 @@ export class ScheduleController {
 
         selectedCoursesContainer.innerHTML = html;
 
+        // Associate DOM elements with Course objects
+        const courseElements = selectedCoursesContainer.querySelectorAll('.schedule-course-item');
+        const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
+        
+        courseElements.forEach((element, index) => {
+            this.elementToCourseMap.set(element as HTMLElement, sortedCourses[index].course);
+        });
+        
+        removeButtons.forEach((button, index) => {
+            this.elementToCourseMap.set(button as HTMLElement, sortedCourses[index].course);
+        });
+
         // Restore dropdown states after refresh
         if (dropdownStates) {
             // Use setTimeout to ensure DOM is fully updated
@@ -158,24 +171,32 @@ export class ScheduleController {
         }
     }
 
-    handleSectionSelection(courseId: string, sectionNumber: string): void {
-        const currentSelectedSection = this.courseSelectionService.getSelectedSection(courseId);
+    handleSectionSelection(course: Course, sectionNumber: string): void {
+        const currentSelectedSection = this.courseSelectionService.getSelectedSection(course);
         
         if (currentSelectedSection === sectionNumber) {
             // Deselect current section
-            this.courseSelectionService.setSelectedSection(courseId, null);
+            this.courseSelectionService.setSelectedSection(course, null);
         } else {
             // Select new section (automatically deselects any previous section)
-            this.courseSelectionService.setSelectedSection(courseId, sectionNumber);
+            this.courseSelectionService.setSelectedSection(course, sectionNumber);
         }
         
         // Note: UI refresh is handled automatically by the selection change listener
         // No need to call displayScheduleSelectedCourses() here as it would cause duplicate refreshes
     }
 
-    updateSectionButtonStates(courseId: string, selectedSection: string | null): void {
-        // Find the schedule course item specifically (not main course items)
-        const courseItem = document.querySelector(`.schedule-course-item[data-course-id="${courseId}"]`);
+    updateSectionButtonStates(course: Course, selectedSection: string | null): void {
+        // Find the schedule course item by matching the associated Course object
+        let courseItem: HTMLElement | null = null;
+        
+        document.querySelectorAll('.schedule-course-item').forEach(item => {
+            const itemCourse = this.elementToCourseMap.get(item as HTMLElement);
+            if (itemCourse && itemCourse.id === course.id) {
+                courseItem = item as HTMLElement;
+            }
+        });
+        
         if (!courseItem) return;
 
         const sectionButtons = courseItem.querySelectorAll('.section-select-btn');
@@ -440,5 +461,9 @@ export class ScheduleController {
         if (lower.includes('conference') || lower.includes('conf')) return 'period-conference';
         
         return 'period-other';
+    }
+
+    getCourseFromElement(element: HTMLElement): Course | undefined {
+        return this.elementToCourseMap.get(element);
     }
 }

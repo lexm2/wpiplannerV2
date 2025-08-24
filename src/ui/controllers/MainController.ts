@@ -100,27 +100,30 @@ export class MainController {
             }
             
             if (target.classList.contains('course-select-btn')) {
-                const courseId = target.dataset.courseId;
-                if (courseId) {
-                    this.courseController.toggleCourseSelection(courseId);
+                const courseElement = target.closest('.course-item, .course-card') as HTMLElement;
+                if (courseElement) {
+                    this.courseController.toggleCourseSelection(courseElement);
                 }
             }
 
             if (target.classList.contains('course-remove-btn')) {
-                const courseId = target.dataset.courseId;
-                if (courseId) {
+                const course = this.courseController.getCourseFromElement(target as HTMLElement);
+                if (course) {
                     // Directly remove course (remove button means always unselect)
-                    this.courseSelectionService.unselectCourse(courseId);
+                    this.courseSelectionService.unselectCourse(course);
                 }
             }
 
             // Handle section-related clicks FIRST (before dropdown logic)
             if (target.classList.contains('section-select-btn')) {
                 e.stopPropagation();
-                const courseId = target.dataset.courseId;
+                const courseElement = target.closest('.schedule-course-item') as HTMLElement;
                 const sectionNumber = target.dataset.section;
-                if (courseId && sectionNumber) {
-                    this.scheduleController.handleSectionSelection(courseId, sectionNumber);
+                if (courseElement && sectionNumber) {
+                    const course = this.scheduleController.getCourseFromElement(courseElement);
+                    if (course) {
+                        this.scheduleController.handleSectionSelection(course, sectionNumber);
+                    }
                 }
                 return;
             }
@@ -159,11 +162,10 @@ export class MainController {
             }
 
 
-            if (target.closest('.course-item') && !target.classList.contains('course-select-btn') && !target.classList.contains('section-badge')) {
-                const courseItem = target.closest('.course-item') as HTMLElement;
-                const courseId = courseItem.dataset.courseId;
-                if (courseId) {
-                    this.courseController.selectCourse(courseId);
+            if (target.closest('.course-item, .course-card') && !target.classList.contains('course-select-btn') && !target.classList.contains('section-badge')) {
+                const courseElement = target.closest('.course-item, .course-card') as HTMLElement;
+                if (courseElement) {
+                    this.courseController.selectCourse(courseElement);
                 }
             }
         });
@@ -293,8 +295,11 @@ export class MainController {
                     const previousSection = this.previousSelectedCoursesMap.get(courseId);
                     if (previousSection !== selectedSection) {
                         sectionSelectionsChanged = true;
-                        // Update just this course's section buttons
-                        this.scheduleController.updateSectionButtonStates(courseId, selectedSection);
+                        // Find the course object and update section buttons
+                        const course = this.courseSelectionService.findCourseById(courseId);
+                        if (course) {
+                            this.scheduleController.updateSectionButtonStates(course, selectedSection);
+                        }
                     }
                 }
                 
@@ -345,10 +350,10 @@ export class MainController {
     private preserveDropdownStates(): Map<string, boolean> {
         const states = new Map<string, boolean>();
         document.querySelectorAll('.schedule-course-item').forEach(item => {
-            const courseId = (item as HTMLElement).dataset.courseId;
-            if (courseId) {
+            const course = this.scheduleController.getCourseFromElement(item as HTMLElement);
+            if (course) {
                 const isExpanded = item.classList.contains('expanded');
-                states.set(courseId, isExpanded);
+                states.set(course.id, isExpanded);
             }
         });
         return states;
@@ -356,9 +361,9 @@ export class MainController {
 
     private restoreDropdownStates(states: Map<string, boolean>): void {
         document.querySelectorAll('.schedule-course-item').forEach(item => {
-            const courseId = (item as HTMLElement).dataset.courseId;
-            if (courseId && states.has(courseId)) {
-                const wasExpanded = states.get(courseId);
+            const course = this.scheduleController.getCourseFromElement(item as HTMLElement);
+            if (course && states.has(course.id)) {
+                const wasExpanded = states.get(course.id);
                 if (wasExpanded) {
                     item.classList.remove('collapsed');
                     item.classList.add('expanded');
