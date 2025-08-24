@@ -305,7 +305,7 @@ export class ScheduleController {
     private renderPopulatedGrid(container: HTMLElement, courses: any[], term: string): void {
         container.classList.remove('empty');
         
-        // Create 5-day (Mon-Fri) × 72 time slot grid (7 AM - 7 PM, 10-min intervals)
+        // Create 5-day (Mon-Fri) × 24 time slot grid (7 AM - 7 PM, 30-min intervals)
         const weekdays = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
         const timeSlots = TimeUtils.TOTAL_TIME_SLOTS;
         
@@ -320,8 +320,8 @@ export class ScheduleController {
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {
             const hour = Math.floor(slot / TimeUtils.SLOTS_PER_HOUR) + TimeUtils.START_HOUR;
-            const minutes = (slot % TimeUtils.SLOTS_PER_HOUR) * 10;
-            const timeLabel = minutes === 0 ? TimeUtils.formatTime({ hours: hour, minutes: 0, displayTime: '' }) : '';
+            const minutes = (slot % TimeUtils.SLOTS_PER_HOUR) * 30;
+            const timeLabel = TimeUtils.formatTime({ hours: hour, minutes: minutes, displayTime: '' });
             
             // Time label cell
             html += `<div class="time-label">${timeLabel}</div>`;
@@ -341,11 +341,11 @@ export class ScheduleController {
         const occupyingSections: any[] = [];
         
         // Log for a wider range to catch the course times
-        const shouldLog = timeSlot < 36 && courses.length > 0; // Log first 6 hours (7:00 AM - 1:00 PM)
+        const shouldLog = timeSlot < 12 && courses.length > 0; // Log first 6 hours (7:00 AM - 1:00 PM)
         
         if (shouldLog && courses.length > 0) {
-            const hour = Math.floor(timeSlot / 6) + 7;
-            const minute = (timeSlot % 6) * 10;
+            const hour = Math.floor(timeSlot / 2) + 7;
+            const minute = (timeSlot % 2) * 30;
             console.log(`\n--- getCellContent: ${day} ${hour}:${minute.toString().padStart(2, '0')} (slot ${timeSlot}) ---`);
             console.log(`Checking ${courses.length} courses for this time slot`);
         }
@@ -373,8 +373,8 @@ export class ScheduleController {
             let isFirstSlot = false;
             
             for (const period of periodsOnThisDay) {
-                const startSlot = TimeUtils.timeToGridRow(period.startTime);
-                const endSlot = TimeUtils.timeToGridRow(period.endTime);
+                const startSlot = TimeUtils.timeToGridRowStart(period.startTime);
+                const endSlot = TimeUtils.timeToGridRowEnd(period.endTime);
                 
                 if (shouldLog) {
                     console.log(`    Checking period ${period.type}: slots ${startSlot}-${endSlot} vs current slot ${timeSlot}`);
@@ -421,7 +421,7 @@ export class ScheduleController {
         
         // Calculate how many rows this section should span
         const rowSpan = primarySection.endSlot - primarySection.startSlot;
-        const heightInPixels = rowSpan * 10; // 10px per row
+        const heightInPixels = rowSpan * 30; // 30px per row
         
         console.log(`Course ${primarySection.course.course.department.abbreviation}${primarySection.course.course.number} should span ${rowSpan} rows (${heightInPixels}px) from slot ${primarySection.startSlot} to ${primarySection.endSlot}`);
         

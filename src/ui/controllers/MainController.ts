@@ -130,7 +130,7 @@ export class MainController {
                 if (courseElement && sectionNumber) {
                     const course = this.scheduleController.getCourseFromElement(courseElement);
                     if (course) {
-                        this.courseSelectionService.setSelectedSection(course, sectionNumber);
+                        this.scheduleController.handleSectionSelection(course, sectionNumber);
                     }
                 }
                 return;

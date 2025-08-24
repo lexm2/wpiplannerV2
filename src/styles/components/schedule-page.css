@@ -380,7 +380,7 @@
   flex: 1;
   display: grid;
   grid-template-columns: 60px repeat(5, 1fr);
-  grid-template-rows: 30px repeat(72, 10px);
+  grid-template-rows: 30px repeat(24, 30px);
   gap: 1px;
   background: var(--color-border);
   font-size: 0.7rem;

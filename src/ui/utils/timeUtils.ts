@@ -5,7 +5,7 @@ export class TimeUtils {
     static readonly START_HOUR = 7;  // 7 AM
     static readonly END_HOUR = 19;   // 7 PM
     static readonly TOTAL_HOURS = 12;
-    static readonly SLOTS_PER_HOUR = 6; // 10-minute intervals
+    static readonly SLOTS_PER_HOUR = 2; // 30-minute intervals
     static readonly TOTAL_TIME_SLOTS = TimeUtils.TOTAL_HOURS * TimeUtils.SLOTS_PER_HOUR;
 
     // Days of the week in order
@@ -21,23 +21,47 @@ export class TimeUtils {
 
     /**
      * Convert a Time object to a grid row position (0-based)
-     * 7:00 AM = row 0, 7:10 AM = row 1, 7:20 AM = row 2, etc.
+     * 7:00 AM = row 0, 7:30 AM = row 1, 8:00 AM = row 2, etc.
+     * @deprecated Use timeToGridRowStart() or timeToGridRowEnd() instead
      */
     static timeToGridRow(time: Time): number {
+        return TimeUtils.timeToGridRowStart(time);
+    }
+
+    /**
+     * Convert start time to grid row position (rounds DOWN)
+     * Used for class start times - finds the slot the class starts in
+     */
+    static timeToGridRowStart(time: Time): number {
         const totalMinutes = time.hours * 60 + time.minutes;
         const startMinutes = TimeUtils.START_HOUR * 60;
         const relativeMinutes = totalMinutes - startMinutes;
         
-        // Convert to 10-minute slots
-        const slot = Math.floor(relativeMinutes / 10);
+        // Convert to 30-minute slots, round DOWN for start times
+        const slot = Math.floor(relativeMinutes / 30);
         const boundedSlot = Math.max(0, Math.min(slot, TimeUtils.TOTAL_TIME_SLOTS - 1));
         
-        // Log only problematic time calculations 
-        if (slot < 0 || slot >= TimeUtils.TOTAL_TIME_SLOTS || slot !== boundedSlot) {
-            console.log(`timeToGridRow: ${time.hours}:${time.minutes.toString().padStart(2, '0')} -> slot ${slot} (bounded: ${boundedSlot})`);
+        return boundedSlot;
+    }
+
+    /**
+     * Convert end time to grid row position (rounds UP)
+     * Used for class end times - ensures full duration is visually represented
+     */
+    static timeToGridRowEnd(time: Time): number {
+        const totalMinutes = time.hours * 60 + time.minutes;
+        const startMinutes = TimeUtils.START_HOUR * 60;
+        const relativeMinutes = totalMinutes - startMinutes;
+        
+        // Convert to 30-minute slots, round UP for end times
+        const slot = Math.ceil(relativeMinutes / 30);
+        const boundedSlot = Math.max(0, Math.min(slot, TimeUtils.TOTAL_TIME_SLOTS - 1));
+        
+        // Log examples for debugging
+        if (relativeMinutes % 30 !== 0) {
+            console.log(`Rounded UP: ${time.hours}:${time.minutes.toString().padStart(2, '0')} -> slot ${slot} (${relativeMinutes} min = ${relativeMinutes/30} slots)`);
         }
         
-        // Ensure within bounds
         return boundedSlot;
     }
 
@@ -125,14 +149,10 @@ export class TimeUtils {
         
         for (let slot = 0; slot < TimeUtils.TOTAL_TIME_SLOTS; slot++) {
             const hour = Math.floor(slot / TimeUtils.SLOTS_PER_HOUR) + TimeUtils.START_HOUR;
-            const minutes = (slot % TimeUtils.SLOTS_PER_HOUR) * 10;
+            const minutes = (slot % TimeUtils.SLOTS_PER_HOUR) * 30;
             
-            // Only show labels on the hour (when minutes = 0)
-            if (minutes === 0) {
-                labels.push(TimeUtils.formatTime({ hours: hour, minutes: 0, displayTime: '' }));
-            } else {
-                labels.push(''); // Empty string for non-hour slots
-            }
+            // Show labels for both :00 and :30 times
+            labels.push(TimeUtils.formatTime({ hours: hour, minutes: minutes, displayTime: '' }));
         }
         
         return labels;
