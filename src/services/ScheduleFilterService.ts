@@ -162,9 +162,13 @@ export class ScheduleFilterService {
                     );
                     break;
                 case 'periodType':
-                    allPeriods = allPeriods.filter(item => 
-                        this.periodTypeFilter.applyToPeriods([item.period], activeFilter.criteria).length > 0
-                    );
+                    // Exclude periods that are of excluded types
+                    const excludedTypesForPeriods = new Set(activeFilter.criteria.types.map((type: string) => this.periodTypeFilter.normalizeType(type)));
+                    allPeriods = allPeriods.filter(item => {
+                        // Exclude period if it's of any of the excluded types
+                        const normalizedPeriodType = this.periodTypeFilter.normalizeType(item.period.type);
+                        return !excludedTypesForPeriods.has(normalizedPeriodType);
+                    });
                     break;
                 case 'periodAvailability':
                     allPeriods = allPeriods.filter(item => 
@@ -348,9 +352,15 @@ export class ScheduleFilterService {
                     );
                     break;
                 case 'periodType':
-                    allSections = allSections.filter(item => 
-                        this.periodTypeFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
-                    );
+                    // Exclude entire sections if ANY period is of excluded types
+                    const excludedTypesForSections = new Set(activeFilter.criteria.types.map((type: string) => this.periodTypeFilter.normalizeType(type)));
+                    allSections = allSections.filter(item => {
+                        // Exclude section if ANY period is of any of the excluded types
+                        return !item.section.periods.some(period => {
+                            const normalizedPeriodType = this.periodTypeFilter.normalizeType(period.type);
+                            return excludedTypesForSections.has(normalizedPeriodType);
+                        });
+                    });
                     break;
                 case 'periodAvailability':
                     allSections = allSections.filter(item => 

@@ -124,8 +124,9 @@ export class ScheduleFilterModalController {
                     </div>
 
                     <div class="filter-group">
-                        <h4>Period Type</h4>
+                        <h4>Exclude Period Types</h4>
                         <div class="filter-option">
+                            <div class="filter-help-text">Hide sections with selected period types</div>
                             ${this.renderPeriodTypeCheckboxes()}
                         </div>
                     </div>

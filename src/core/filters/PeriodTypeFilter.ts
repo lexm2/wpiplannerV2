@@ -4,7 +4,7 @@ import { CourseFilter, PeriodTypeFilterCriteria } from '../../types/filters';
 export class PeriodTypeFilter implements CourseFilter {
     readonly id = 'periodType';
     readonly name = 'Period Type';
-    readonly description = 'Filter periods by type (Lecture, Lab, Discussion, etc.)';
+    readonly description = 'Exclude sections with selected period types';
     
     apply(courses: Course[], criteria: PeriodTypeFilterCriteria): Course[] {
         // This filter works on periods, so it's handled by the service layer
@@ -22,11 +22,11 @@ export class PeriodTypeFilter implements CourseFilter {
         
         return periods.filter(period => {
             const normalizedType = this.normalizeType(period.type);
-            return selectedTypes.has(normalizedType);
+            return !selectedTypes.has(normalizedType);
         });
     }
     
-    private normalizeType(type: string): string {
+    public normalizeType(type: string): string {
         const lower = type.toLowerCase().trim();
         
         // Normalize common type variations
@@ -42,24 +42,24 @@ export class PeriodTypeFilter implements CourseFilter {
     }
     
     isValidCriteria(criteria: any): criteria is PeriodTypeFilterCriteria {
-        return criteria && 
-               typeof criteria === 'object' && 
-               'types' in criteria && 
-               Array.isArray(criteria.types) &&
-               criteria.types.every((type: any) => typeof type === 'string');
+        return !!(criteria && 
+                 typeof criteria === 'object' && 
+                 'types' in criteria && 
+                 Array.isArray(criteria.types) &&
+                 criteria.types.every((type: any) => typeof type === 'string'));
     }
     
     getDisplayValue(criteria: PeriodTypeFilterCriteria): string {
         if (!criteria.types || criteria.types.length === 0) {
-            return 'Any Type';
+            return 'No exclusions';
         }
         
         if (criteria.types.length === 1) {
-            return this.formatTypeName(criteria.types[0]);
+            return `Exclude: ${this.formatTypeName(criteria.types[0])}`;
         }
         
         const typeNames = criteria.types.map(type => this.formatTypeName(type));
-        return typeNames.join(', ');
+        return `Exclude: ${typeNames.join(', ')}`;
     }
     
     private formatTypeName(type: string): string {

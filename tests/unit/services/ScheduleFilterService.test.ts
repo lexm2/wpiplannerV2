@@ -228,6 +228,62 @@ describe('ScheduleFilterService', () => {
             expect(result).toHaveLength(3);
             expect(result.map(r => r.section.number)).toEqual(['A01', 'AL01', 'B01']);
         });
+
+        test('should exclude sections with Lab period types', () => {
+            // Add period type exclusion filter for Lab
+            scheduleFilterService.addFilter('periodType', { types: ['lab'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourse]);
+            
+            // Should exclude AL01 (has Lab periods)
+            // Should keep A01 and B01 (have Lecture periods)
+            expect(result).toHaveLength(2);
+            const sectionNumbers = result.map(r => r.section.number).sort();
+            expect(sectionNumbers).toEqual(['A01', 'B01']);
+        });
+
+        test('should exclude sections with Lecture period types', () => {
+            // Add period type exclusion filter for Lecture
+            scheduleFilterService.addFilter('periodType', { types: ['lecture'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourse]);
+            
+            // Should exclude A01 and B01 (have Lecture periods)
+            // Should keep AL01 (has Lab periods)
+            expect(result).toHaveLength(1);
+            expect(result[0].section.number).toBe('AL01');
+        });
+
+        test('should exclude sections with multiple period types', () => {
+            // Add period type exclusion filter for both Lecture and Lab
+            scheduleFilterService.addFilter('periodType', { types: ['lecture', 'lab'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourse]);
+            
+            // Should exclude all sections (A01/B01 have Lecture, AL01 has Lab)
+            expect(result).toHaveLength(0);
+        });
+
+        test('should return all sections when excluding non-existent period types', () => {
+            // Add period type exclusion filter for types not used by any section
+            scheduleFilterService.addFilter('periodType', { types: ['seminar', 'discussion'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourse]);
+            
+            // Should return all sections since none have Seminar or Discussion periods
+            expect(result).toHaveLength(3);
+            expect(result.map(r => r.section.number)).toEqual(['A01', 'AL01', 'B01']);
+        });
+
+        test('should handle case insensitive period type exclusion', () => {
+            // Add period type exclusion filter with various cases
+            scheduleFilterService.addFilter('periodType', { types: ['LAB', 'lec'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourse]);
+            
+            // Should exclude all sections (LAB matches AL01's Lab, lec matches A01/B01's Lecture)
+            expect(result).toHaveLength(0);
+        });
     });
 
     describe('getAvailableSectionCodes', () => {
