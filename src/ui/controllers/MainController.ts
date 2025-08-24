@@ -52,15 +52,18 @@ export class MainController {
         this.searchService = new SearchService();
         this.filterService = new FilterService(this.searchService);
         
+        // Initialize managers (before any event listeners that might use them)
+        this.uiStateManager = new UIStateManager();
+        this.timestampManager = new TimestampManager();
+        this.operationManager = new OperationManager();
+        this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
+        
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService);
         this.scheduleController = new ScheduleController(this.courseSelectionService);
         this.sectionInfoModalController = new SectionInfoModalController(this.modalService);
         this.infoModalController = new InfoModalController(this.modalService);
         this.filterModalController = new FilterModalController(this.modalService);
-        
-        // Set up filter service with default filters
-        this.initializeFilters();
         
         // Connect filter service to course controller
         this.courseController.setFilterService(this.filterService);
@@ -70,12 +73,6 @@ export class MainController {
         
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
-        this.uiStateManager = new UIStateManager();
-        this.timestampManager = new TimestampManager();
-        
-        // Initialize operation management for cancellation
-        this.operationManager = new OperationManager();
-        this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
         
         // Initialize department synchronization service
         this.departmentSyncService = new DepartmentSyncService(this.filterService, this.departmentController);
@@ -95,6 +92,9 @@ export class MainController {
         initialSelectedCourses.forEach(sc => {
             this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
         });
+        
+        // IMPORTANT: Initialize filters LAST (triggers events that use operationManager)
+        this.initializeFilters();
         
         this.init();
     }

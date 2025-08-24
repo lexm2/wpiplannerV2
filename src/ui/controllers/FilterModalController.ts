@@ -1,7 +1,7 @@
 import { ModalService } from '../../services/ModalService';
 import { FilterService } from '../../services/FilterService';
 import { Course, Department } from '../../types/types';
-import { getDepartmentCategory } from '../../utils/departmentUtils';
+import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 
 export class FilterModalController {
     private modalService: ModalService;
@@ -9,6 +9,8 @@ export class FilterModalController {
     private allCourses: Course[] = [];
     private allDepartments: Department[] = [];
     private currentModalId: string | null = null;
+    private isCategoryMode: boolean = false;
+    private isUpdatingFilter: boolean = false;
 
     constructor(modalService: ModalService) {
         this.modalService = modalService;
@@ -42,9 +44,15 @@ export class FilterModalController {
 
     // Method to refresh department selection from external changes
     refreshDepartmentSelection(): void {
+        if (this.isUpdatingFilter) {
+            console.log('🚫 refreshDepartmentSelection blocked - filter update in progress');
+            return;
+        }
+        
         if (this.currentModalId) {
             const modalElement = document.getElementById(this.currentModalId);
             if (modalElement) {
+                console.log('🔄 refreshDepartmentSelection called');
                 this.updateDepartmentCheckboxes(modalElement);
             }
         }
@@ -53,13 +61,43 @@ export class FilterModalController {
     private updateDepartmentCheckboxes(modalElement: HTMLElement): void {
         if (!this.filterService) return;
         
+        console.log('🔄 updateDepartmentCheckboxes called, category mode:', this.isCategoryMode);
+        
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'department');
         const activeDepartments = activeFilter?.criteria?.departments || [];
         
         // Update all department checkboxes
         const checkboxes = modalElement.querySelectorAll('input[data-filter="department"]') as NodeListOf<HTMLInputElement>;
         checkboxes.forEach(checkbox => {
-            checkbox.checked = activeDepartments.includes(checkbox.value);
+            if (this.isCategoryMode && checkbox.dataset.category === 'true') {
+                // For category checkboxes, check if ANY department in that category is selected
+                const categoryName = checkbox.value;
+                const allAvailableDepartments = this.filterService!.getFilterOptions('department', this.allCourses) as string[];
+                const categoryDepartments = allAvailableDepartments.filter(dept => 
+                    getDepartmentCategory(dept) === categoryName
+                );
+                
+                const selectedInCategory = categoryDepartments.filter(dept => 
+                    activeDepartments.includes(dept)
+                );
+                
+                const shouldBeChecked = selectedInCategory.length > 0;
+                const wasChecked = checkbox.checked;
+                checkbox.checked = shouldBeChecked;
+                
+                console.log(`📊 Category "${categoryName}": ${selectedInCategory.length}/${categoryDepartments.length} selected, was checked: ${wasChecked}, now checked: ${shouldBeChecked}`);
+                
+                // Handle indeterminate state
+                const allSelected = selectedInCategory.length === categoryDepartments.length;
+                const someSelected = selectedInCategory.length > 0;
+                checkbox.indeterminate = someSelected && !allSelected;
+                
+            } else {
+                // For individual department checkboxes
+                const wasChecked = checkbox.checked;
+                checkbox.checked = activeDepartments.includes(checkbox.value);
+                console.log(`📋 Individual dept "${checkbox.value}": was checked: ${wasChecked}, now checked: ${checkbox.checked}`);
+            }
         });
         
         // Update preview
@@ -170,17 +208,13 @@ export class FilterModalController {
     private createDepartmentFilter(): string {
         if (!this.filterService) return '';
         
-        const departments = this.filterService.getFilterOptions('department', this.allCourses) as string[];
-        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'department');
-        const activeDepartments = activeFilter?.criteria?.departments || [];
-
-        const departmentCheckboxes = departments.map(dept => `
-            <label class="filter-checkbox-label">
-                <input type="checkbox" value="${dept}" ${activeDepartments.includes(dept) ? 'checked' : ''} 
-                       data-filter="department">
-                <span class="filter-checkbox-text">${dept}</span>
-            </label>
-        `).join('');
+        const checkboxesHtml = this.isCategoryMode ? 
+            this.createCategoryCheckboxes() : 
+            this.createIndividualDepartmentCheckboxes();
+        
+        const searchPlaceholder = this.isCategoryMode ? 
+            'Search categories...' : 
+            'Search departments...';
 
         return `
             <div class="filter-section">
@@ -192,15 +226,39 @@ export class FilterModalController {
                     </div>
                 </div>
                 <div class="filter-section-content">
+                    <div class="filter-toggle-container">
+                        <label class="filter-toggle-label">
+                            <input type="checkbox" class="filter-toggle" ${this.isCategoryMode ? 'checked' : ''} 
+                                   id="category-mode-toggle">
+                            <span class="filter-toggle-slider"></span>
+                            <span class="filter-toggle-text">Search by Credit Requirements</span>
+                        </label>
+                    </div>
                     <div class="filter-search-container">
-                        <input type="text" class="filter-search" placeholder="Search departments..." data-filter="department">
+                        <input type="text" class="filter-search" placeholder="${searchPlaceholder}" data-filter="department">
                     </div>
                     <div class="filter-checkbox-grid" id="department-checkboxes">
-                        ${departmentCheckboxes}
+                        ${checkboxesHtml}
                     </div>
                 </div>
             </div>
         `;
+    }
+
+    private createIndividualDepartmentCheckboxes(): string {
+        if (!this.filterService) return '';
+        
+        const departments = this.filterService.getFilterOptions('department', this.allCourses) as string[];
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'department');
+        const activeDepartments = activeFilter?.criteria?.departments || [];
+
+        return departments.map(dept => `
+            <label class="filter-checkbox-label">
+                <input type="checkbox" value="${dept}" ${activeDepartments.includes(dept) ? 'checked' : ''} 
+                       data-filter="department">
+                <span class="filter-checkbox-text">${dept}</span>
+            </label>
+        `).join('');
     }
 
     private createAvailabilityFilter(): string {
@@ -402,9 +460,32 @@ export class FilterModalController {
     }
 
     private setupDepartmentFilter(modalElement: HTMLElement): void {
+        // Setup toggle for category mode
+        const categoryToggle = modalElement.querySelector('#category-mode-toggle') as HTMLInputElement;
+        if (categoryToggle) {
+            categoryToggle.addEventListener('change', () => {
+                this.toggleDepartmentMode(modalElement);
+            });
+        }
+
         const checkboxes = modalElement.querySelectorAll('input[data-filter="department"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', () => this.updateDepartmentFilter(modalElement));
+        
+        // Set up indeterminate states for category mode checkboxes
+        if (this.isCategoryMode) {
+            checkboxes.forEach((checkbox) => {
+                const cb = checkbox as HTMLInputElement;
+                if (cb.dataset.indeterminate === 'true') {
+                    cb.indeterminate = true;
+                }
+            });
+        }
+        
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', (e) => {
+                const cb = e.target as HTMLInputElement;
+                console.log('🎯 Checkbox clicked:', cb.value, 'checked:', cb.checked, 'category mode:', this.isCategoryMode);
+                this.updateDepartmentFilter(modalElement);
+            });
         });
 
         const selectAll = modalElement.querySelector('.filter-select-all[data-filter="department"]');
@@ -571,8 +652,17 @@ export class FilterModalController {
                         const labels = checkboxes.querySelectorAll('.filter-checkbox-label');
                         labels.forEach((label: any) => {
                             const checkbox = label.querySelector('input[type="checkbox"]') as HTMLInputElement;
-                            const departmentAbbreviation = checkbox ? checkbox.value : '';
-                            const matches = this.departmentMatchesSearch(departmentAbbreviation, query);
+                            const value = checkbox ? checkbox.value : '';
+                            let matches = false;
+                            
+                            if (this.isCategoryMode) {
+                                // In category mode, search category names directly
+                                matches = value.toLowerCase().includes(query);
+                            } else {
+                                // In individual mode, use the enhanced search (dept + category)
+                                matches = this.departmentMatchesSearch(value, query);
+                            }
+                            
                             label.style.display = matches ? 'flex' : 'none';
                         });
                     }
@@ -636,16 +726,145 @@ export class FilterModalController {
         return false;
     }
 
-    private updateDepartmentFilter(modalElement: HTMLElement): void {
-        const checkboxes = modalElement.querySelectorAll('input[data-filter="department"]:checked') as NodeListOf<HTMLInputElement>;
-        const departments = Array.from(checkboxes).map(cb => cb.value);
+    private toggleDepartmentMode(modalElement: HTMLElement): void {
+        this.isCategoryMode = !this.isCategoryMode;
         
-        if (departments.length > 0) {
-            this.filterService?.addFilter('department', { departments });
-        } else {
-            this.filterService?.removeFilter('department');
+        // Refresh the department filter section
+        const allFilterSections = modalElement.querySelectorAll('.filter-section');
+        let departmentSection: Element | null = null;
+        
+        allFilterSections.forEach((section) => {
+            const titleElement = section.querySelector('.filter-section-title');
+            if (titleElement?.textContent === 'Departments') {
+                departmentSection = section;
+            }
+        });
+        
+        if (departmentSection) {
+            const newDepartmentFilter = this.createDepartmentFilter();
+            departmentSection.outerHTML = newDepartmentFilter;
+            
+            // Re-query the modal element to ensure we have fresh DOM references
+            const freshModalElement = document.getElementById(this.currentModalId || '') as HTMLElement;
+            if (freshModalElement) {
+                this.setupDepartmentFilter(freshModalElement);
+                this.setupFilterSearch(freshModalElement);
+            }
         }
-        this.updatePreview(modalElement);
+    }
+
+    private createCategoryCheckboxes(): string {
+        if (!this.filterService) return '';
+        
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'department');
+        const activeDepartments = activeFilter?.criteria?.departments || [];
+        
+        // Get all available departments to determine which categories should be checked
+        const allAvailableDepartments = this.filterService.getFilterOptions('department', this.allCourses) as string[];
+        
+        const categoriesToShow = CATEGORY_ORDER.filter(category => category !== 'Other');
+        
+        const categoryCheckboxes = categoriesToShow.map(category => {
+            // Get all departments in this category
+            const categoryDepartments = allAvailableDepartments.filter(dept => 
+                getDepartmentCategory(dept) === category
+            );
+            
+            // Calculate selection states
+            const selectedDepartmentsInCategory = categoryDepartments.filter(dept => 
+                activeDepartments.includes(dept)
+            );
+            
+            const allSelected = categoryDepartments.length > 0 && 
+                selectedDepartmentsInCategory.length === categoryDepartments.length;
+            const someSelected = selectedDepartmentsInCategory.length > 0;
+            const isIndeterminate = someSelected && !allSelected;
+            
+            const isChecked = allSelected || someSelected;
+            
+            // During filter updates, preserve the existing checkbox state to prevent flicker
+            if (this.isUpdatingFilter) {
+                console.log(`🔒 Preserving checkbox state during update for "${category}": checked=${isChecked}`);
+            } else {
+                console.log(`📊 Category "${category}": ${selectedDepartmentsInCategory.length}/${categoryDepartments.length} selected, checked: ${isChecked}, indeterminate: ${isIndeterminate}`);
+            }
+            
+            return `
+                <label class="filter-checkbox-label">
+                    <input type="checkbox" value="${category}" ${isChecked ? 'checked' : ''} 
+                           ${isIndeterminate ? 'data-indeterminate="true"' : ''}
+                           data-filter="department" data-category="true">
+                    <span class="filter-checkbox-text">${category}</span>
+                </label>
+            `;
+        }).join('');
+
+        return categoryCheckboxes;
+    }
+
+    private updateDepartmentFilter(modalElement: HTMLElement): void {
+        if (this.isUpdatingFilter) {
+            console.log('🚫 updateDepartmentFilter blocked - already updating');
+            return;
+        }
+        
+        this.isUpdatingFilter = true;
+        console.log('🔒 Filter update started - setting isUpdatingFilter = true');
+        
+        try {
+            const checkboxes = modalElement.querySelectorAll('input[data-filter="department"]:checked') as NodeListOf<HTMLInputElement>;
+            let departments: string[] = [];
+            
+            console.log('🔄 updateDepartmentFilter called, found', checkboxes.length, 'checked checkboxes');
+            
+            if (this.isCategoryMode) {
+                // Handle category selections - convert categories to individual departments
+                const selectedCategories = Array.from(checkboxes).map(cb => cb.value);
+                console.log('📊 Selected categories:', selectedCategories);
+                
+                const allAvailableDepartments = this.filterService?.getFilterOptions('department', this.allCourses) as string[] || [];
+                
+                selectedCategories.forEach(category => {
+                    const categoryDepartments = allAvailableDepartments.filter(dept => 
+                        getDepartmentCategory(dept) === category
+                    );
+                    console.log(`📊 Adding ${categoryDepartments.length} departments for category "${category}":`, categoryDepartments.slice(0, 3));
+                    departments.push(...categoryDepartments);
+                });
+            } else {
+                // Handle individual department selections
+                departments = Array.from(checkboxes).map(cb => cb.value);
+                console.log('📊 Selected individual departments:', departments);
+            }
+            
+            console.log('📊 Final departments array length:', departments.length);
+            
+            if (departments.length > 0) {
+                console.log('➕ Adding department filter with', departments.length, 'departments');
+                this.filterService?.addFilter('department', { departments });
+            } else {
+                console.log('➖ Removing department filter (no departments selected)');
+                this.filterService?.removeFilter('department');
+            }
+            
+            console.log('🔄 Updating preview...');
+            this.updatePreview(modalElement);
+            console.log('✅ updateDepartmentFilter complete');
+            
+        } finally {
+            // Small delay before releasing the lock to prevent immediate re-entry
+            setTimeout(() => {
+                this.isUpdatingFilter = false;
+                console.log('🔓 Filter update complete - setting isUpdatingFilter = false');
+                
+                // Check if we need to refresh the UI after filter update
+                setTimeout(() => {
+                    console.log('🔍 Post-update check: Looking for checked checkboxes...');
+                    const postUpdateCheckboxes = modalElement.querySelectorAll('input[data-filter="department"]:checked');
+                    console.log('📊 Post-update checked checkboxes:', postUpdateCheckboxes.length);
+                }, 50);
+            }, 100);
+        }
     }
 
     private updateAvailabilityFilter(modalElement: HTMLElement): void {
