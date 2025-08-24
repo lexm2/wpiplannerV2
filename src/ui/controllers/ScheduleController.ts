@@ -264,10 +264,12 @@ export class ScheduleController {
                 // Debug: log term matching
                 console.log(`  Checking course ${sc.course.department.abbreviation}${sc.course.number} with term "${sc.selectedSection!.term}" against grid term "${term}"`);
                 
-                // For now, let's put courses in Term A until we understand the term format better
-                const matchesTerm = term === 'A';
+                // Extract the actual term letter from the section's term string
+                const sectionTermLetter = this.extractTermLetter(sc.selectedSection!.term, sc.selectedSection!.number);
+                const matchesTerm = sectionTermLetter === term;
                 
-                console.log(`    Match result: ${matchesTerm}`);
+                console.log(`    Extracted term letter: "${sectionTermLetter}" from term:"${sc.selectedSection!.term}" section:"${sc.selectedSection!.number}"`);
+                
                 return matchesTerm;
             });
             
@@ -548,6 +550,30 @@ export class ScheduleController {
 
     getCourseFromElement(element: HTMLElement): Course | undefined {
         return this.elementToCourseMap.get(element);
+    }
+
+    private extractTermLetter(termString: string, sectionNumber?: string): string {
+        // Option 1: Section number pattern (primary method - most reliable)
+        // Extract term from section numbers like "A01" -> A, "D01" -> D
+        if (sectionNumber) {
+            const sectionMatch = sectionNumber.match(/^([ABCD])/i);
+            if (sectionMatch) {
+                return sectionMatch[1].toUpperCase();
+            }
+        }
+        
+        // Option 2: Text format for future compatibility ("2025 Fall A Term", "2026 Spring C Term")
+        if (termString) {
+            const textMatch = termString.match(/\b([ABCD])\s+Term/i);
+            if (textMatch) {
+                return textMatch[1].toUpperCase();
+            }
+        }
+        
+        // Note: Removed incorrect numeric mapping - "202201" is academic year code, not term-specific
+        
+        // Ultimate fallback
+        return 'A';
     }
 
 }
