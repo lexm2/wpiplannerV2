@@ -6,9 +6,11 @@ export class ScheduleSelector {
     private container: HTMLElement;
     private currentActiveSchedule: Schedule | null = null;
     private isDropdownOpen = false;
+    private scheduleListClickHandler: ((e: Event) => void) | null = null;
+    private scheduleListDblClickHandler: ((e: Event) => void) | null = null;
+    private lastScheduleListHTML = '';
 
     constructor(scheduleManagementService: ScheduleManagementService, containerId: string) {
-        console.log('🏗️ ScheduleSelector: Constructor called, initializing...');
         this.scheduleManagementService = scheduleManagementService;
         
         const container = document.getElementById(containerId);
@@ -17,9 +19,7 @@ export class ScheduleSelector {
         }
         
         this.container = container;
-        console.log('🏗️ ScheduleSelector: Container found, calling init()');
         this.init();
-        console.log('✅ ScheduleSelector: Initialization complete');
     }
 
     private init(): void {
@@ -110,17 +110,13 @@ export class ScheduleSelector {
     }
 
     private setupCourseSelectionListener(): void {
-        console.log('🔧 ScheduleSelector: Setting up course selection listener');
-        
         // Listen for course selection changes to update the course count display
         this.scheduleManagementService.getCourseSelectionService().onSelectionChange(() => {
-            console.log('🔄 ScheduleSelector: Course selection changed, updating display');
-            // Always update the schedule list to keep course counts current
-            console.log('📝 ScheduleSelector: Refreshing schedule list with updated course counts');
-            this.updateScheduleList();
+            // Only update the schedule list if dropdown is open to avoid unnecessary DOM work
+            if (this.isDropdownOpen) {
+                this.updateScheduleList();
+            }
         });
-        
-        console.log('✅ ScheduleSelector: Course selection listener setup complete');
     }
 
     private toggleDropdown(): void {
@@ -167,31 +163,27 @@ export class ScheduleSelector {
     }
 
     private updateScheduleList(): void {
-        console.log('📋 ScheduleSelector: updateScheduleList() called');
         const scheduleList = this.container.querySelector('#schedule-list') as HTMLElement;
         if (!scheduleList) return;
 
         const schedules = this.scheduleManagementService.getAllSchedules();
         const activeScheduleId = this.scheduleManagementService.getActiveScheduleId();
-        
-        console.log(`📊 ScheduleSelector: Found ${schedules.length} schedules, active: ${activeScheduleId}`);
 
         if (schedules.length === 0) {
-            scheduleList.innerHTML = '<div class="schedule-list-empty">No schedules found</div>';
+            const emptyHTML = '<div class="schedule-list-empty">No schedules found</div>';
+            if (scheduleList.innerHTML !== emptyHTML) {
+                scheduleList.innerHTML = emptyHTML;
+            }
             return;
         }
 
-        scheduleList.innerHTML = schedules.map(schedule => {
+        const newHTML = schedules.map(schedule => {
             const isActive = schedule.id === activeScheduleId;
             
             // For active schedule, get live course count; for others, use stored count
             const courseCount = isActive ? 
                 this.scheduleManagementService.getCourseSelectionService().getSelectedCourses().length :
                 schedule.selectedCourses.length;
-                
-            if (isActive) {
-                console.log(`🔢 ScheduleSelector: Active schedule "${schedule.name}" - live count: ${courseCount}, stored count: ${schedule.selectedCourses.length}`);
-            }
             
             return `
                 <div class="schedule-item ${isActive ? 'active' : ''}" data-schedule-id="${schedule.id}">
@@ -213,14 +205,23 @@ export class ScheduleSelector {
             `;
         }).join('');
 
-        this.setupScheduleItemListeners();
+        // Only update DOM if content has actually changed
+        if (this.lastScheduleListHTML !== newHTML) {
+            this.lastScheduleListHTML = newHTML;
+            scheduleList.innerHTML = newHTML;
+            this.setupScheduleItemListeners();
+        }
     }
 
     private setupScheduleItemListeners(): void {
         const scheduleList = this.container.querySelector('#schedule-list') as HTMLElement;
         if (!scheduleList) return;
 
-        scheduleList.addEventListener('click', (e) => {
+        // Remove existing listeners to prevent memory leaks
+        this.removeScheduleItemListeners();
+
+        // Create and store new handlers
+        this.scheduleListClickHandler = (e) => {
             const target = e.target as HTMLElement;
 
             if (target.classList.contains('switch-btn')) {
@@ -242,14 +243,30 @@ export class ScheduleSelector {
                     this.handleScheduleAction(action, scheduleId);
                 }
             }
-        });
+        };
 
-        scheduleList.addEventListener('dblclick', (e) => {
+        this.scheduleListDblClickHandler = (e) => {
             const target = e.target as HTMLElement;
             if (target.classList.contains('schedule-item-name')) {
                 this.startRenaming(target);
             }
-        });
+        };
+
+        // Add listeners
+        scheduleList.addEventListener('click', this.scheduleListClickHandler);
+        scheduleList.addEventListener('dblclick', this.scheduleListDblClickHandler);
+    }
+
+    private removeScheduleItemListeners(): void {
+        const scheduleList = this.container.querySelector('#schedule-list') as HTMLElement;
+        if (!scheduleList) return;
+
+        if (this.scheduleListClickHandler) {
+            scheduleList.removeEventListener('click', this.scheduleListClickHandler);
+        }
+        if (this.scheduleListDblClickHandler) {
+            scheduleList.removeEventListener('dblclick', this.scheduleListDblClickHandler);
+        }
     }
 
     private toggleScheduleMenu(menuBtn: HTMLElement): void {
@@ -287,30 +304,18 @@ export class ScheduleSelector {
     }
 
     private switchToSchedule(scheduleId: string): void {
-        // Show loading state
         this.setLoadingState(true);
         
         try {
-            console.log(`Switching to schedule: ${scheduleId}`);
             this.scheduleManagementService.setActiveSchedule(scheduleId);
-            console.log(`Schedule switch initiated for: ${scheduleId}`);
         } catch (error) {
             console.error('Failed to switch schedule:', error);
-            // Show error message to user
             alert('Failed to switch schedule. Please try again.');
-            this.setLoadingState(false);
         } finally {
-            // Give more time for complete UI refresh to finish
             setTimeout(() => {
                 this.setLoadingState(false);
                 this.closeDropdown();
-                const selectedCount = this.scheduleManagementService.getCourseSelectionService().getSelectedCourses().length;
-                console.log(`Schedule switch loading state cleared - ${selectedCount} selected courses`);
-                
-                // Force page reload to ensure proper display
-                console.log('🔄 Force reloading page after schedule switch');
-                window.location.reload();
-            }, 200); // Increased timeout for complete refresh
+            }, 100);
         }
     }
 
@@ -320,26 +325,16 @@ export class ScheduleSelector {
             this.setLoadingState(true);
             
             try {
-                console.log(`Creating new schedule: ${name.trim()}`);
                 const schedule = this.scheduleManagementService.createNewSchedule(name.trim());
                 this.scheduleManagementService.setActiveSchedule(schedule.id);
-                console.log(`Created and switched to new schedule: ${name.trim()} (${schedule.id})`);
             } catch (error) {
                 console.error('Failed to create new schedule:', error);
                 alert('Failed to create new schedule. Please try again.');
-                this.setLoadingState(false);
             } finally {
-                // Give time for complete UI refresh to finish
                 setTimeout(() => {
                     this.setLoadingState(false);
                     this.closeDropdown();
-                    const selectedCount = this.scheduleManagementService.getCourseSelectionService().getSelectedCourses().length;
-                    console.log(`New schedule creation loading state cleared - ${selectedCount} selected courses`);
-                    
-                    // Force page reload to ensure proper display
-                    console.log('🔄 Force reloading page after new schedule creation');
-                    window.location.reload();
-                }, 200);
+                }, 100);
             }
         }
     }
