@@ -64,3 +64,7 @@ export interface LocationFilterCriteria {
     buildings: string[];
     rooms: string[];
 }
+
+export interface SearchTextFilterCriteria {
+    query: string;
+}

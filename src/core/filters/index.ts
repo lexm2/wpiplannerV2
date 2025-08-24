@@ -4,6 +4,7 @@ export { CreditRangeFilter } from './CreditRangeFilter';
 export { ProfessorFilter } from './ProfessorFilter';
 export { TermFilter } from './TermFilter';
 export { LocationFilter } from './LocationFilter';
+export { SearchTextFilter } from './SearchTextFilter';
 
 import { CourseFilter } from '../../types/filters';
 import { DepartmentFilter } from './DepartmentFilter';

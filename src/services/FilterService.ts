@@ -108,11 +108,22 @@ export class FilterService {
         let filteredCourses = courses;
         const activeFilters = this.getActiveFilters();
         
-        // Apply each active filter sequentially
-        for (const activeFilter of activeFilters) {
-            const filter = this.registeredFilters.get(activeFilter.id);
+        // Apply search text filter first if it exists (for better performance)
+        const searchTextFilter = activeFilters.find(f => f.id === 'searchText');
+        if (searchTextFilter) {
+            const filter = this.registeredFilters.get(searchTextFilter.id);
             if (filter) {
-                filteredCourses = filter.apply(filteredCourses, activeFilter.criteria);
+                filteredCourses = filter.apply(filteredCourses, searchTextFilter.criteria);
+            }
+        }
+        
+        // Apply remaining filters sequentially
+        for (const activeFilter of activeFilters) {
+            if (activeFilter.id !== 'searchText') { // Skip searchText as it's already applied
+                const filter = this.registeredFilters.get(activeFilter.id);
+                if (filter) {
+                    filteredCourses = filter.apply(filteredCourses, activeFilter.criteria);
+                }
             }
         }
         
@@ -121,17 +132,15 @@ export class FilterService {
     
     // Combined Search and Filter
     searchAndFilter(query: string, courses: Course[]): Course[] {
-        // First apply filters
-        const filteredCourses = this.filterCourses(courses);
-        
-        // Then apply search if query exists
+        // If there's a query, add/update the search text filter
         if (query.trim()) {
-            // Convert active filters to SearchFilter format for SearchService
-            const searchFilter = this.convertToSearchFilter();
-            return this.searchService.searchCourses(query, searchFilter);
+            this.addFilter('searchText', { query: query.trim() });
+        } else {
+            this.removeFilter('searchText');
         }
         
-        return filteredCourses;
+        // Apply all filters (including search text if present)
+        return this.filterCourses(courses);
     }
     
     // Event Handling

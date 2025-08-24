@@ -420,6 +420,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
   overflow: visible;
+  margin: 0 1rem;
 }
 
 .filter-section-header {
@@ -490,6 +491,34 @@
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary)20;
+}
+
+.search-text-section {
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+}
+
+.search-text-section .filter-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-clear-search {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--effect-border-radius);
+  transition: var(--effect-transition);
+}
+
+.filter-clear-search:hover {
+  background: var(--color-secondary-hover);
+  color: var(--color-text);
 }
 
 .filter-checkbox-grid {

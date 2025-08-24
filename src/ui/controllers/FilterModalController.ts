@@ -25,6 +25,20 @@ export class FilterModalController {
         });
     }
 
+    // Method to sync search input from main controller
+    syncSearchInputFromMain(query: string): void {
+        if (this.currentModalId) {
+            const modalElement = document.getElementById(this.currentModalId);
+            if (modalElement) {
+                const searchInput = modalElement.querySelector('.search-text-input') as HTMLInputElement;
+                if (searchInput && searchInput.value !== query) {
+                    searchInput.value = query;
+                    this.updateClearSearchButton(modalElement, query);
+                }
+            }
+        }
+    }
+
     show(): string {
         if (!this.filterService) {
             console.error('FilterService not set on FilterModalController');
@@ -91,12 +105,37 @@ export class FilterModalController {
     private createFilterSections(): string {
         return `
             <div class="filter-sections">
+                ${this.createSearchTextFilter()}
                 ${this.createDepartmentFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createCreditRangeFilter()}
                 ${this.createProfessorFilter()}
                 ${this.createTermFilter()}
                 ${this.createLocationFilter()}
+            </div>
+        `;
+    }
+
+    private createSearchTextFilter(): string {
+        if (!this.filterService) return '';
+        
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'searchText');
+        const currentQuery = activeFilter?.criteria?.query || '';
+
+        return `
+            <div class="filter-section search-text-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Search Text</h4>
+                    <button class="filter-clear-search" ${currentQuery ? '' : 'style="display: none;"'}>Clear</button>
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-search-container">
+                        <input type="text" class="filter-search search-text-input" 
+                               placeholder="Search courses..." 
+                               value="${this.escapeHtml(currentQuery)}"
+                               data-filter="searchText">
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -301,6 +340,7 @@ export class FilterModalController {
     private initializeFilterUI(modalElement: HTMLElement): void {
         if (!this.filterService) return;
 
+        this.setupSearchTextFilter(modalElement);
         this.setupDepartmentFilter(modalElement);
         this.setupAvailabilityFilter(modalElement);
         this.setupCreditRangeFilter(modalElement);
@@ -309,6 +349,29 @@ export class FilterModalController {
         this.setupLocationFilter(modalElement);
         this.setupClearAllButton(modalElement);
         this.setupFilterSearch(modalElement);
+    }
+
+    private setupSearchTextFilter(modalElement: HTMLElement): void {
+        const searchInput = modalElement.querySelector('.search-text-input') as HTMLInputElement;
+        const clearButton = modalElement.querySelector('.filter-clear-search');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.trim();
+                this.updateSearchTextFilter(query, modalElement);
+                this.syncMainSearchInput(query);
+            });
+        }
+
+        if (clearButton) {
+            clearButton.addEventListener('click', () => {
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+                this.updateSearchTextFilter('', modalElement);
+                this.syncMainSearchInput('');
+            });
+        }
     }
 
     private setupDepartmentFilter(modalElement: HTMLElement): void {
@@ -455,6 +518,8 @@ export class FilterModalController {
             if (this.filterService) {
                 this.filterService.clearFilters();
                 this.updatePreview(modalElement);
+                // Sync main search input to clear it
+                this.syncMainSearchInput('');
                 // Refresh the modal content
                 const modalBody = modalElement.querySelector('.filter-modal-body');
                 if (modalBody) {
@@ -497,6 +562,30 @@ export class FilterModalController {
     }
 
     // Filter update methods
+    private updateSearchTextFilter(query: string, modalElement: HTMLElement): void {
+        if (query.length > 0) {
+            this.filterService?.addFilter('searchText', { query });
+        } else {
+            this.filterService?.removeFilter('searchText');
+        }
+        this.updatePreview(modalElement);
+        this.updateClearSearchButton(modalElement, query);
+    }
+
+    private syncMainSearchInput(query: string): void {
+        const mainSearchInput = document.getElementById('search-input') as HTMLInputElement;
+        if (mainSearchInput) {
+            mainSearchInput.value = query;
+        }
+    }
+
+    private updateClearSearchButton(modalElement: HTMLElement, query: string): void {
+        const clearButton = modalElement.querySelector('.filter-clear-search') as HTMLElement;
+        if (clearButton) {
+            clearButton.style.display = query.length > 0 ? 'inline-block' : 'none';
+        }
+    }
+
     private updateDepartmentFilter(modalElement: HTMLElement): void {
         const checkboxes = modalElement.querySelectorAll('input[data-filter="department"]:checked') as NodeListOf<HTMLInputElement>;
         const departments = Array.from(checkboxes).map(cb => cb.value);

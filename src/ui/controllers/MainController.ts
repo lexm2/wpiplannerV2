@@ -12,7 +12,7 @@ import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { FilterService } from '../../services/FilterService'
 import { SearchService } from '../../services/searchService'
-import { createDefaultFilters } from '../../core/filters'
+import { createDefaultFilters, SearchTextFilter } from '../../core/filters'
 import { UIStateManager } from './UIStateManager'
 import { TimestampManager } from './TimestampManager'
 
@@ -90,6 +90,10 @@ export class MainController {
         filters.forEach(filter => {
             this.filterService.registerFilter(filter);
         });
+
+        // Register SearchTextFilter
+        const searchTextFilter = new SearchTextFilter();
+        this.filterService.registerFilter(searchTextFilter);
 
         // Set up filter change listener to refresh UI
         this.filterService.addEventListener((event) => {
@@ -242,8 +246,15 @@ export class MainController {
         const searchInput = document.getElementById('search-input') as HTMLInputElement;
         if (searchInput) {
             searchInput.addEventListener('input', () => {
-                const filteredCourses = this.courseController.handleSearch(searchInput.value, this.departmentController.getSelectedDepartment());
-                this.courseController.displayCourses(filteredCourses, this.uiStateManager.currentView);
+                const query = searchInput.value.trim();
+                // Update search text filter in FilterService
+                if (query.length > 0) {
+                    this.filterService.addFilter('searchText', { query });
+                } else {
+                    this.filterService.removeFilter('searchText');
+                }
+                // Refresh view will be triggered by filter change event
+                this.syncModalSearchInput(query);
             });
         }
 
@@ -331,24 +342,23 @@ export class MainController {
 
     private refreshCurrentView(): void {
         const selectedDepartment = this.departmentController.getSelectedDepartment();
-        const searchInput = document.getElementById('search-input') as HTMLInputElement;
-        const hasSearch = searchInput?.value.trim();
         const hasFilters = !this.filterService.isEmpty();
         
         let coursesToDisplay: Course[] = [];
         
-        if (hasSearch) {
-            // Handle search (which may also include filters)
-            coursesToDisplay = this.courseController.handleSearch(searchInput.value, selectedDepartment);
-        } else if (hasFilters) {
-            // Handle filters only (no search)
-            coursesToDisplay = this.courseController.handleFilter(selectedDepartment);
+        if (hasFilters) {
+            // Handle all filters (including search text)
+            const baseCourses = selectedDepartment ? selectedDepartment.courses : this.getAllCourses();
+            coursesToDisplay = this.filterService.filterCourses(baseCourses);
+            this.updateFilteredHeader(coursesToDisplay.length, selectedDepartment);
         } else if (selectedDepartment) {
             // Show department courses without filters
             coursesToDisplay = selectedDepartment.courses;
+            this.updateDepartmentHeader(selectedDepartment);
         } else {
-            // No search, no filters, no department selected - show empty state
+            // No filters, no department selected - show empty state
             coursesToDisplay = [];
+            this.updateDefaultHeader();
         }
         
         this.courseController.displayCourses(coursesToDisplay, this.uiStateManager.currentView);
@@ -358,8 +368,9 @@ export class MainController {
             this.filterService.saveFiltersToStorage();
         }
         
-        // Update filter button appearance
+        // Update filter button appearance and sync search input
         this.updateFilterButtonState();
+        this.syncSearchInputFromFilters();
     }
 
     private updateFilterButtonState(): void {
@@ -535,8 +546,65 @@ export class MainController {
         });
     }
 
+    private getAllCourses(): Course[] {
+        const allCourses: Course[] = [];
+        this.allDepartments.forEach(dept => {
+            allCourses.push(...dept.courses);
+        });
+        return allCourses;
+    }
 
+    private syncModalSearchInput(query: string): void {
+        // Sync the modal search input if the modal is currently open
+        this.filterModalController.syncSearchInputFromMain(query);
+    }
 
+    private syncSearchInputFromFilters(): void {
+        const searchInput = document.getElementById('search-input') as HTMLInputElement;
+        if (searchInput) {
+            const searchTextFilter = this.filterService.getActiveFilters().find(f => f.id === 'searchText');
+            const currentQuery = searchTextFilter?.criteria?.query || '';
+            if (searchInput.value !== currentQuery) {
+                searchInput.value = currentQuery;
+            }
+        }
+    }
 
+    private updateFilteredHeader(resultCount: number, selectedDepartment: Department | null): void {
+        const contentHeader = document.querySelector('.content-header h2');
+        if (contentHeader) {
+            const filters = this.filterService.getActiveFilters();
+            const searchTextFilter = filters.find(f => f.id === 'searchText');
+            
+            if (searchTextFilter && filters.length === 1) {
+                // Only search text filter
+                const query = searchTextFilter.criteria.query;
+                contentHeader.textContent = `Search: "${query}" (${resultCount} results)`;
+            } else if (searchTextFilter) {
+                // Search text + other filters
+                const query = searchTextFilter.criteria.query;
+                const otherFilters = filters.length - 1;
+                contentHeader.textContent = `Search: "${query}" + ${otherFilters} filter${otherFilters === 1 ? '' : 's'} (${resultCount} results)`;
+            } else {
+                // Only other filters
+                const filterCount = filters.length;
+                contentHeader.textContent = `Filtered Results: ${filterCount} filter${filterCount === 1 ? '' : 's'} (${resultCount} courses)`;
+            }
+        }
+    }
+
+    private updateDepartmentHeader(department: Department): void {
+        const contentHeader = document.querySelector('.content-header h2');
+        if (contentHeader) {
+            contentHeader.textContent = `${department.name} (${department.abbreviation})`;
+        }
+    }
+
+    private updateDefaultHeader(): void {
+        const contentHeader = document.querySelector('.content-header h2');
+        if (contentHeader) {
+            contentHeader.textContent = 'Course Listings';
+        }
+    }
 
 }
