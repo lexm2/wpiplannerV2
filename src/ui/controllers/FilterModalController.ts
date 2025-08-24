@@ -39,6 +39,32 @@ export class FilterModalController {
         }
     }
 
+    // Method to refresh department selection from external changes
+    refreshDepartmentSelection(): void {
+        if (this.currentModalId) {
+            const modalElement = document.getElementById(this.currentModalId);
+            if (modalElement) {
+                this.updateDepartmentCheckboxes(modalElement);
+            }
+        }
+    }
+
+    private updateDepartmentCheckboxes(modalElement: HTMLElement): void {
+        if (!this.filterService) return;
+        
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'department');
+        const activeDepartments = activeFilter?.criteria?.departments || [];
+        
+        // Update all department checkboxes
+        const checkboxes = modalElement.querySelectorAll('input[data-filter="department"]') as NodeListOf<HTMLInputElement>;
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = activeDepartments.includes(checkbox.value);
+        });
+        
+        // Update preview
+        this.updatePreview(modalElement);
+    }
+
     show(): string {
         if (!this.filterService) {
             console.error('FilterService not set on FilterModalController');

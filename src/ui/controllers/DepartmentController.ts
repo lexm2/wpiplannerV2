@@ -1,8 +1,10 @@
 import { Department } from '../../types/types'
+import { DepartmentSyncService } from '../../services/DepartmentSyncService'
 
 export class DepartmentController {
     private allDepartments: Department[] = [];
     private selectedDepartment: Department | null = null;
+    private departmentSyncService: DepartmentSyncService | null = null;
 
     // Department categories based on WPI structure
     private departmentCategories: { [key: string]: string } = {
@@ -62,12 +64,20 @@ export class DepartmentController {
 
     constructor() {}
 
+    setDepartmentSyncService(departmentSyncService: DepartmentSyncService): void {
+        this.departmentSyncService = departmentSyncService;
+    }
+
     setAllDepartments(departments: Department[]): void {
         this.allDepartments = departments;
     }
 
     getSelectedDepartment(): Department | null {
         return this.selectedDepartment;
+    }
+
+    getDepartmentById(deptId: string): Department | null {
+        return this.allDepartments.find(d => d.abbreviation === deptId) || null;
     }
 
     selectDepartment(deptId: string): Department | null {
@@ -143,17 +153,26 @@ export class DepartmentController {
         return categories;
     }
 
-    handleDepartmentClick(deptId: string): Department | null {
-        const department = this.selectDepartment(deptId);
-        
-        // Update active state
-        document.querySelectorAll('.department-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        
-        const clickedElement = document.querySelector(`[data-dept-id="${deptId}"]`);
-        if (clickedElement) {
-            clickedElement.classList.add('active');
+    handleDepartmentClick(deptId: string, multiSelect: boolean = false): Department | null {
+        const department = this.allDepartments.find(d => d.abbreviation === deptId);
+        if (!department) return null;
+
+        // Use sync service if available, otherwise fall back to old behavior
+        if (this.departmentSyncService) {
+            this.departmentSyncService.syncSidebarToFilter(deptId, multiSelect);
+        } else {
+            // Fallback to old behavior for backward compatibility
+            const selectedDept = this.selectDepartment(deptId);
+            
+            // Update active state manually if no sync service
+            document.querySelectorAll('.department-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const clickedElement = document.querySelector(`[data-dept-id="${deptId}"]`);
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
         }
 
         return department;
@@ -162,9 +181,21 @@ export class DepartmentController {
     clearDepartmentSelection(): void {
         this.selectedDepartment = null;
         
-        // Clear active department
+        // Clear active department visual state
         document.querySelectorAll('.department-item').forEach(item => {
             item.classList.remove('active');
         });
+        
+        // Reset sidebar header
+        const sidebarHeader = document.querySelector('.sidebar-header h2');
+        if (sidebarHeader) {
+            sidebarHeader.textContent = 'Departments';
+        }
+        
+        // Remove multi-select indicator
+        const departmentList = document.getElementById('department-list');
+        if (departmentList) {
+            departmentList.classList.remove('multi-select-active');
+        }
     }
 }

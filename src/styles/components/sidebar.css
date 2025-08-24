@@ -48,13 +48,69 @@
   border-radius: var(--effect-border-radius);
   transition: var(--effect-transition);
   font-size: 0.9rem;
+  position: relative;
 }
 
 .department-item:hover {
   background: var(--color-surface-hover);
+  transform: translateX(2px);
 }
 
 .department-item.active {
-  background: var(--color-primary);
+  background: var(--color-primary) !important;
+  color: var(--color-text-inverse) !important;
+}
+
+.department-item.active:hover {
+  background: var(--color-primary-hover) !important;
+}
+
+/* Multi-selection indicators */
+.department-list.multi-select-active .department-item.active {
+  position: relative;
+  background: var(--color-primary) !important;
+  color: var(--color-text-inverse) !important;
+}
+
+.department-list.multi-select-active .department-item.active::after {
+  content: '✓';
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  font-size: 0.8rem;
   color: var(--color-text-inverse);
+  z-index: 1;
+}
+
+/* Ensure active state is visible in all scenarios */
+.department-item[data-dept-id].active {
+  background: var(--color-primary) !important;
+  color: var(--color-text-inverse) !important;
+  font-weight: 500;
+}
+
+/* Enhanced visual feedback for multiple selections */
+.department-list.multi-select-active .department-item.active {
+  border-left: 3px solid var(--color-accent, var(--color-text-inverse));
+  padding-left: calc(0.75rem - 3px);
+}
+
+/* Debugging class for visual verification */
+.department-item.debug-selected {
+  outline: 2px solid red !important;
+  outline-offset: 1px;
+}
+
+.sidebar-header h2 {
+  transition: var(--effect-transition);
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+/* Visual indicator when multiple departments are selected */
+.department-list.multi-select-active {
+  border-left: 3px solid var(--color-primary);
+  padding-left: calc(1rem - 3px);
 }

@@ -16,6 +16,7 @@ import { createDefaultFilters, SearchTextFilter } from '../../core/filters'
 import { UIStateManager } from './UIStateManager'
 import { TimestampManager } from './TimestampManager'
 import { OperationManager, DebouncedOperation } from '../../utils/RequestCancellation'
+import { DepartmentSyncService } from '../../services/DepartmentSyncService'
 
 export class MainController {
     private courseDataService: CourseDataService;
@@ -35,6 +36,7 @@ export class MainController {
     private timestampManager: TimestampManager;
     private operationManager: OperationManager;
     private debouncedSearch: DebouncedOperation;
+    private departmentSyncService: DepartmentSyncService;
     private allDepartments: Department[] = [];
 
 
@@ -74,6 +76,11 @@ export class MainController {
         // Initialize operation management for cancellation
         this.operationManager = new OperationManager();
         this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
+        
+        // Initialize department synchronization service
+        this.departmentSyncService = new DepartmentSyncService(this.filterService, this.departmentController);
+        this.departmentController.setDepartmentSyncService(this.departmentSyncService);
+        this.departmentSyncService.setFilterModalController(this.filterModalController);
         
         // Wire up state preservation for dropdown states
         this.scheduleController.setStatePreserver({
@@ -142,6 +149,9 @@ export class MainController {
             // Initialize filter modal with course data
             this.filterModalController.setCourseData(this.allDepartments);
             
+            // Initialize the department sync service after all data is loaded
+            this.departmentSyncService.initialize();
+            
             console.log(`Loaded ${this.allDepartments.length} departments`);
             
             // IMPORTANT: Reconstruct Section objects after course data is loaded
@@ -150,6 +160,19 @@ export class MainController {
             
             this.timestampManager.updateClientTimestamp();
             this.timestampManager.loadServerTimestamp();
+            
+            // Expose debug methods globally for testing (development only)
+            if (typeof window !== 'undefined') {
+                (window as any).debugDepartmentSync = {
+                    debug: () => this.departmentSyncService.debugVisualSync(),
+                    refresh: () => this.departmentSyncService.forceVisualRefresh(),
+                    enableDebug: () => this.departmentSyncService.enableDebugMode(),
+                    disableDebug: () => this.departmentSyncService.disableDebugMode(),
+                    getActive: () => this.departmentSyncService.getActiveDepartments(),
+                    getDescription: () => this.departmentSyncService.getSelectionDescription()
+                };
+                console.log('🛠️ Debug methods available: window.debugDepartmentSync.*');
+            }
         } catch (error) {
             console.error('Failed to load course data:', error);
             this.uiStateManager.showErrorMessage('Failed to load course data. Please try refreshing the page.');
@@ -166,12 +189,14 @@ export class MainController {
             if (target.classList.contains('department-item')) {
                 const deptId = target.dataset.deptId;
                 if (deptId) {
-                    const department = this.departmentController.handleDepartmentClick(deptId);
-                    if (department) {
-                        this.courseController.displayCourses(department.courses, this.uiStateManager.currentView).catch(error => {
-                            console.error('Error displaying courses:', error);
-                        });
-                    }
+                    // Check if this is a multi-select click (Ctrl/Cmd key)
+                    const multiSelect = (e as MouseEvent).ctrlKey || (e as MouseEvent).metaKey;
+                    
+                    // Use the department controller which will now use the sync service
+                    this.departmentController.handleDepartmentClick(deptId, multiSelect);
+                    
+                    // The sync service will trigger refreshCurrentView through filter changes
+                    // No need to manually display courses anymore
                 }
             }
             
