@@ -406,9 +406,7 @@ export class FilterModalController {
         if (chipsContainer) {
             chipsContainer.addEventListener('click', (e) => {
                 const target = e.target as HTMLElement;
-                console.log('Chips container click event:', target.className, target.tagName);
                 if (target.classList.contains('filter-chip-remove')) {
-                    console.log('Filter chip remove clicked:', target.dataset.professor);
                     e.stopPropagation();
                     e.preventDefault();
                     const professor = this.unescapeHtml(target.dataset.professor!);
@@ -552,14 +550,11 @@ export class FilterModalController {
     }
 
     private removeProfessorFilter(professor: string, modalElement: HTMLElement): void {
-        console.log('removeProfessorFilter called for:', professor);
         if (!this.filterService) return;
         
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'professor');
         const currentProfessors = activeFilter?.criteria?.professors || [];
-        console.log('Current professors:', currentProfessors);
         const updatedProfessors = currentProfessors.filter((p: string) => p !== professor);
-        console.log('Updated professors:', updatedProfessors);
         
         if (updatedProfessors.length > 0) {
             this.filterService.addFilter('professor', { professors: updatedProfessors });
