@@ -156,17 +156,6 @@ export class ScheduleFilterModalController {
                         </div>
                     </div>
 
-                    <div class="filter-group">
-                        <h4>Location</h4>
-                        <div class="filter-option">
-                            <div class="location-filters">
-                                <div class="location-subgroup">
-                                    <label>Buildings:</label>
-                                    ${this.renderBuildingCheckboxes()}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="filter-group">
                         <h4>Availability</h4>
@@ -301,22 +290,6 @@ export class ScheduleFilterModalController {
         `).join('');
     }
 
-    private renderBuildingCheckboxes(): string {
-        const locationOptions = this.scheduleFilterService!.getFilterOptions('periodLocation', this.selectedCourses);
-        const activeBuildings = this.getActiveBuildings();
-
-        if (!locationOptions || !locationOptions.buildings || locationOptions.buildings.length === 0) {
-            return '<div class="no-options">No buildings available</div>';
-        }
-
-        return locationOptions.buildings.slice(0, 15).map((option: any) => `
-            <label class="checkbox-label">
-                <input type="checkbox" name="periodLocation" value="${option.value}" 
-                       ${activeBuildings.includes(option.value) ? 'checked' : ''}>
-                <span class="checkbox-text">${option.label}</span>
-            </label>
-        `).join('') + (locationOptions.buildings.length > 15 ? '<div class="more-options">... and more</div>' : '');
-    }
 
     private getSearchValue(): string {
         const searchFilter = this.scheduleFilterService.getActiveFilters().find(f => f.id === 'searchText');
@@ -343,10 +316,6 @@ export class ScheduleFilterModalController {
         return filter?.criteria?.types || [];
     }
 
-    private getActiveBuildings(): string[] {
-        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodLocation');
-        return filter?.criteria?.buildings || [];
-    }
 
     private getActiveTimeRange(): { startTime?: { hours: number; minutes: number }; endTime?: { hours: number; minutes: number } } {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodTime');
@@ -447,13 +416,6 @@ export class ScheduleFilterModalController {
             });
         });
 
-        // Location checkboxes
-        modalElement.querySelectorAll('input[name="periodLocation"]').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                this.updateLocationFilter();
-                this.refreshActiveFilters();
-            });
-        });
 
         // Availability filters
         const availableOnlyCheckbox = modalElement.querySelector('#available-only-filter') as HTMLInputElement;
@@ -569,21 +531,6 @@ export class ScheduleFilterModalController {
         }
     }
 
-    private updateLocationFilter(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
-        if (modalElement) {
-            const checkedBuildings = Array.from(modalElement.querySelectorAll('input[name="periodLocation"]:checked'))
-                .map(cb => (cb as HTMLInputElement).value);
-
-            if (checkedBuildings.length > 0) {
-                this.scheduleFilterService!.addFilter('periodLocation', { buildings: checkedBuildings });
-            } else {
-                this.scheduleFilterService!.removeFilter('periodLocation');
-            }
-        }
-    }
 
     private updateAvailabilityFilter(): void {
         if (!this.currentModalId) return;

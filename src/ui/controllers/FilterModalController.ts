@@ -654,15 +654,6 @@ export class FilterModalController {
                             label.style.display = matches ? 'flex' : 'none';
                         });
                     }
-                } else if (filterType === 'location') {
-                    const checkboxes = modalElement.querySelector('#location-checkboxes');
-                    if (checkboxes) {
-                        const labels = checkboxes.querySelectorAll('.filter-checkbox-label');
-                        labels.forEach((label: any) => {
-                            const text = label.textContent.toLowerCase();
-                            label.style.display = text.includes(query) ? 'flex' : 'none';
-                        });
-                    }
                 }
             });
         });

@@ -7,7 +7,6 @@ import { PeriodTimeFilter } from '../core/filters/PeriodTimeFilter';
 import { PeriodDaysFilter } from '../core/filters/PeriodDaysFilter';
 import { PeriodProfessorFilter } from '../core/filters/PeriodProfessorFilter';
 import { PeriodTypeFilter } from '../core/filters/PeriodTypeFilter';
-import { PeriodLocationFilter } from '../core/filters/PeriodLocationFilter';
 import { PeriodAvailabilityFilter } from '../core/filters/PeriodAvailabilityFilter';
 import { PeriodConflictFilter } from '../core/filters/PeriodConflictFilter';
 import { SectionCodeFilter } from '../core/filters/SectionCodeFilter';
@@ -21,7 +20,6 @@ export class ScheduleFilterService {
     private periodDaysFilter: PeriodDaysFilter;
     private periodProfessorFilter: PeriodProfessorFilter;
     private periodTypeFilter: PeriodTypeFilter;
-    private periodLocationFilter: PeriodLocationFilter;
     private periodAvailabilityFilter: PeriodAvailabilityFilter;
     private periodConflictFilter: PeriodConflictFilter | null = null;
     private sectionCodeFilter: SectionCodeFilter;
@@ -33,7 +31,6 @@ export class ScheduleFilterService {
         this.periodDaysFilter = new PeriodDaysFilter();
         this.periodProfessorFilter = new PeriodProfessorFilter();
         this.periodTypeFilter = new PeriodTypeFilter();
-        this.periodLocationFilter = new PeriodLocationFilter();
         this.periodAvailabilityFilter = new PeriodAvailabilityFilter();
         this.sectionCodeFilter = new SectionCodeFilter();
         
@@ -56,7 +53,6 @@ export class ScheduleFilterService {
         this.filterService.registerFilter(this.periodDaysFilter);
         this.filterService.registerFilter(this.periodProfessorFilter);
         this.filterService.registerFilter(this.periodTypeFilter);
-        this.filterService.registerFilter(this.periodLocationFilter);
         this.filterService.registerFilter(this.periodAvailabilityFilter);
         this.filterService.registerFilter(this.sectionCodeFilter);
     }
@@ -172,11 +168,6 @@ export class ScheduleFilterService {
                 case 'periodType':
                     allPeriods = allPeriods.filter(item => 
                         this.periodTypeFilter.applyToPeriods([item.period], activeFilter.criteria).length > 0
-                    );
-                    break;
-                case 'periodLocation':
-                    allPeriods = allPeriods.filter(item => 
-                        this.periodLocationFilter.applyToPeriods([item.period], activeFilter.criteria).length > 0
                     );
                     break;
                 case 'periodAvailability':
@@ -363,11 +354,6 @@ export class ScheduleFilterService {
                         this.periodTypeFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
                     );
                     break;
-                case 'periodLocation':
-                    allSections = allSections.filter(item => 
-                        this.periodLocationFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
-                    );
-                    break;
                 case 'periodAvailability':
                     allSections = allSections.filter(item => 
                         this.periodAvailabilityFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
@@ -416,8 +402,6 @@ export class ScheduleFilterService {
                 return this.getAvailableProfessors(selectedCourses);
             case 'periodType':
                 return this.getAvailablePeriodTypes(selectedCourses);
-            case 'periodLocation':
-                return this.getAvailableLocations(selectedCourses);
             case 'sectionCode':
                 return this.getAvailableSectionCodes(selectedCourses);
             default:
@@ -535,34 +519,6 @@ export class ScheduleFilterService {
         }));
     }
     
-    private getAvailableLocations(selectedCourses: SelectedCourse[]): { buildings: { value: string; label: string }[]; rooms: { value: string; label: string }[] } {
-        const buildings = new Set<string>();
-        const rooms = new Set<string>();
-        
-        selectedCourses.forEach(sc => {
-            sc.course.sections.forEach(section => {
-                section.periods.forEach(period => {
-                    if (period.building && period.building.trim()) {
-                        buildings.add(period.building.trim());
-                    }
-                    if (period.room && period.room.trim()) {
-                        rooms.add(period.room.trim());
-                    }
-                });
-            });
-        });
-        
-        return {
-            buildings: Array.from(buildings).sort().map(building => ({
-                value: building,
-                label: building
-            })),
-            rooms: Array.from(rooms).sort().map(room => ({
-                value: room,
-                label: room
-            }))
-        };
-    }
     
     private formatPeriodType(type: string): string {
         const lower = type.toLowerCase();

@@ -203,8 +203,6 @@ export class FilterService {
                 return this.getDepartmentOptions(allCourses);
             case 'professor':
                 return this.getProfessorOptions(allCourses);
-            case 'location':
-                return this.getLocationOptions(allCourses);
             case 'term':
                 return this.getTermOptions(allCourses);
             default:
@@ -222,12 +220,6 @@ export class FilterService {
         return this.searchService.getAvailableProfessors();
     }
     
-    private getLocationOptions(courses: Course[]): { buildings: string[]; rooms: string[] } {
-        return {
-            buildings: this.searchService.getAvailableBuildings(),
-            rooms: [] // Could be extended to include room details
-        };
-    }
     
     private getTermOptions(courses: Course[]): string[] {
         const terms = new Set<string>();

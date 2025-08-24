@@ -60,10 +60,6 @@ export interface TermFilterCriteria {
     terms: string[];
 }
 
-export interface LocationFilterCriteria {
-    buildings: string[];
-    rooms: string[];
-}
 
 export interface SearchTextFilterCriteria {
     query: string;
@@ -99,10 +95,6 @@ export interface PeriodTypeFilterCriteria {
     types: string[];
 }
 
-export interface PeriodLocationFilterCriteria {
-    buildings: string[];
-    rooms: string[];
-}
 
 export interface PeriodAvailabilityFilterCriteria {
     availableOnly: boolean;
