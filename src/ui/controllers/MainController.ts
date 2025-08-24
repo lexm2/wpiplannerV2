@@ -143,10 +143,7 @@ export class MainController {
         await this.loadCourseData();
         this.departmentController.displayDepartments();
         
-        // Load saved filters AFTER departments are rendered in DOM
-        this.filterService.loadFiltersFromStorage();
-        
-        // Initialize the department sync service AFTER filters are loaded
+        // Initialize the department sync service AFTER departments are rendered
         this.departmentSyncService.initialize();
         
         this.setupEventListeners();
@@ -154,6 +151,8 @@ export class MainController {
         this.setupSaveStateListener();
         this.courseController.displaySelectedCourses();
         
+        // Load saved filters AFTER all services are fully connected and ready
+        this.filterService.loadFiltersFromStorage();
         
         this.uiStateManager.syncHeaderHeights();
         this.uiStateManager.setupHeaderResizeObserver();
