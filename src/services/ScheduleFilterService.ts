@@ -9,7 +9,10 @@ import { PeriodProfessorFilter } from '../core/filters/PeriodProfessorFilter';
 import { PeriodTypeFilter } from '../core/filters/PeriodTypeFilter';
 import { PeriodLocationFilter } from '../core/filters/PeriodLocationFilter';
 import { PeriodAvailabilityFilter } from '../core/filters/PeriodAvailabilityFilter';
+import { PeriodConflictFilter } from '../core/filters/PeriodConflictFilter';
+import { SectionCodeFilter } from '../core/filters/SectionCodeFilter';
 import { SearchTextFilter } from '../core/filters';
+import { ConflictDetector } from '../core/ConflictDetector';
 
 export class ScheduleFilterService {
     private filterService: FilterService;
@@ -20,6 +23,8 @@ export class ScheduleFilterService {
     private periodTypeFilter: PeriodTypeFilter;
     private periodLocationFilter: PeriodLocationFilter;
     private periodAvailabilityFilter: PeriodAvailabilityFilter;
+    private periodConflictFilter: PeriodConflictFilter | null = null;
+    private sectionCodeFilter: SectionCodeFilter;
     
     constructor(searchService: SearchService) {
         this.filterService = new FilterService(searchService);
@@ -30,8 +35,14 @@ export class ScheduleFilterService {
         this.periodTypeFilter = new PeriodTypeFilter();
         this.periodLocationFilter = new PeriodLocationFilter();
         this.periodAvailabilityFilter = new PeriodAvailabilityFilter();
+        this.sectionCodeFilter = new SectionCodeFilter();
         
         this.initializeFilters();
+    }
+    
+    setConflictDetector(conflictDetector: ConflictDetector): void {
+        this.periodConflictFilter = new PeriodConflictFilter(conflictDetector);
+        this.filterService.registerFilter(this.periodConflictFilter);
     }
     
     private initializeFilters(): void {
@@ -47,6 +58,7 @@ export class ScheduleFilterService {
         this.filterService.registerFilter(this.periodTypeFilter);
         this.filterService.registerFilter(this.periodLocationFilter);
         this.filterService.registerFilter(this.periodAvailabilityFilter);
+        this.filterService.registerFilter(this.sectionCodeFilter);
     }
     
     // Delegate basic filter management to FilterService
@@ -172,12 +184,78 @@ export class ScheduleFilterService {
                         this.periodAvailabilityFilter.applyToPeriods([item.period], activeFilter.criteria).length > 0
                     );
                     break;
+                case 'periodConflict':
+                    if (this.periodConflictFilter) {
+                        // Convert periods to sections for section-based conflict checking
+                        const sections = this.periodsToSections(allPeriods);
+                        const validSections = this.periodConflictFilter.applyToSectionsWithContext(sections, {
+                            ...activeFilter.criteria,
+                            selectedCourses: selectedCourses
+                        });
+                        // Convert back to periods for consistent return type
+                        allPeriods = this.sectionsToPeriodsWithContext(validSections);
+                    }
+                    break;
             }
         }
         
         return allPeriods;
     }
     
+    // Helper method to extract all sections with their course context
+    private getAllSectionsWithContext(selectedCourses: SelectedCourse[]): Array<{course: SelectedCourse, section: Section}> {
+        const sectionsWithContext: Array<{course: SelectedCourse, section: Section}> = [];
+        
+        for (const selectedCourse of selectedCourses) {
+            // Get all sections for this course
+            for (const section of selectedCourse.course.sections) {
+                sectionsWithContext.push({
+                    course: selectedCourse,
+                    section: section
+                });
+            }
+        }
+        
+        return sectionsWithContext;
+    }
+
+    // Convert sections back to periods with course context
+    private sectionsToPeriodsWithContext(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>): Array<{course: SelectedCourse, period: Period}> {
+        const periodsWithContext: Array<{course: SelectedCourse, period: Period}> = [];
+        
+        for (const item of sectionsWithContext) {
+            for (const period of item.section.periods) {
+                periodsWithContext.push({
+                    course: item.course,
+                    period: period
+                });
+            }
+        }
+        
+        return periodsWithContext;
+    }
+
+    // Convert periods back to sections (used for conflict detection)
+    private periodsToSections(periodsWithContext: Array<{course: SelectedCourse, period: Period}>): Array<{course: SelectedCourse, section: Section}> {
+        const sectionMap = new Map<string, {course: SelectedCourse, section: Section}>();
+        
+        for (const item of periodsWithContext) {
+            // Find the section that contains this period
+            const section = item.course.course.sections.find(s => s.periods.includes(item.period));
+            if (section) {
+                const sectionKey = `${item.course.course.id}-${section.number}`;
+                if (!sectionMap.has(sectionKey)) {
+                    sectionMap.set(sectionKey, {
+                        course: item.course,
+                        section: section
+                    });
+                }
+            }
+        }
+        
+        return Array.from(sectionMap.values());
+    }
+
     // Helper method to extract all periods with their course context
     private getAllPeriodsWithContext(selectedCourses: SelectedCourse[]): Array<{course: SelectedCourse, period: Period}> {
         const periodsWithContext: Array<{course: SelectedCourse, period: Period}> = [];
@@ -229,6 +307,86 @@ export class ScheduleFilterService {
         });
     }
     
+    // Section-based filtering method - returns filtered sections with course context
+    filterSections(selectedCourses: SelectedCourse[]): Array<{course: SelectedCourse, section: Section}> {
+        if (this.isEmpty()) {
+            return this.getAllSectionsWithContext(selectedCourses);
+        }
+        
+        const activeFilters = this.getActiveFilters();
+        
+        // First, filter courses by course selection filter
+        let coursesToSearch = selectedCourses;
+        const courseSelectionFilter = activeFilters.find(f => f.id === 'courseSelection');
+        if (courseSelectionFilter) {
+            coursesToSearch = this.courseSelectionFilter.applyToSelectedCourses(
+                selectedCourses, 
+                courseSelectionFilter.criteria
+            );
+        }
+        
+        // Get all sections from selected courses  
+        let allSections = this.getAllSectionsWithContext(coursesToSearch);
+        
+        // Apply section code filter
+        const sectionCodeFilter = activeFilters.find(f => f.id === 'sectionCode');
+        if (sectionCodeFilter) {
+            allSections = this.applySectionCodeFilter(allSections, sectionCodeFilter.criteria.codes);
+        }
+        
+        // Apply search text filter to sections (search course name, professor, etc.)
+        const searchTextFilter = activeFilters.find(f => f.id === 'searchText');
+        if (searchTextFilter) {
+            allSections = this.applySearchTextToSections(allSections, searchTextFilter.criteria.query);
+        }
+        
+        // Apply section-based filters
+        for (const activeFilter of activeFilters) {
+            switch (activeFilter.id) {
+                case 'periodTime':
+                    allSections = allSections.filter(item => 
+                        this.periodTimeFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
+                    );
+                    break;
+                case 'periodDays':
+                    allSections = allSections.filter(item => 
+                        this.periodDaysFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
+                    );
+                    break;
+                case 'periodProfessor':
+                    allSections = allSections.filter(item => 
+                        this.periodProfessorFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
+                    );
+                    break;
+                case 'periodType':
+                    allSections = allSections.filter(item => 
+                        this.periodTypeFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
+                    );
+                    break;
+                case 'periodLocation':
+                    allSections = allSections.filter(item => 
+                        this.periodLocationFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
+                    );
+                    break;
+                case 'periodAvailability':
+                    allSections = allSections.filter(item => 
+                        this.periodAvailabilityFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
+                    );
+                    break;
+                case 'periodConflict':
+                    if (this.periodConflictFilter) {
+                        allSections = this.periodConflictFilter.applyToSectionsWithContext(allSections, {
+                            ...activeFilter.criteria,
+                            selectedCourses: selectedCourses
+                        });
+                    }
+                    break;
+            }
+        }
+        
+        return allSections;
+    }
+    
     // Convert filtered periods back to unique selected courses for display
     filterSelectedCourses(selectedCourses: SelectedCourse[]): SelectedCourse[] {
         const filteredPeriods = this.filterPeriods(selectedCourses);
@@ -260,9 +418,81 @@ export class ScheduleFilterService {
                 return this.getAvailablePeriodTypes(selectedCourses);
             case 'periodLocation':
                 return this.getAvailableLocations(selectedCourses);
+            case 'sectionCode':
+                return this.getAvailableSectionCodes(selectedCourses);
             default:
                 return null;
         }
+    }
+    
+    // Apply section code filtering
+    private applySectionCodeFilter(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, codes: string[]): Array<{course: SelectedCourse, section: Section}> {
+        if (!codes || codes.length === 0) {
+            return sectionsWithContext;
+        }
+        
+        const searchCodes = codes.map(code => code.toLowerCase().trim()).filter(code => code.length > 0);
+        if (searchCodes.length === 0) {
+            return sectionsWithContext;
+        }
+        
+        return sectionsWithContext.filter(item => {
+            const sectionNumber = item.section.number.toLowerCase();
+            
+            // Check if any of the search codes match this section
+            return searchCodes.some(searchCode => {
+                // Exact match
+                if (sectionNumber === searchCode) {
+                    return true;
+                }
+                
+                // Partial match - section contains the search code
+                if (sectionNumber.includes(searchCode)) {
+                    return true;
+                }
+                
+                // Pattern match for composite sections like "A01/AL01"
+                const sectionParts = sectionNumber.split('/');
+                return sectionParts.some(part => 
+                    part.trim() === searchCode || part.trim().includes(searchCode)
+                );
+            });
+        });
+    }
+    
+    // Apply search text to sections
+    private applySearchTextToSections(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, query: string): Array<{course: SelectedCourse, section: Section}> {
+        if (!query || !query.trim()) {
+            return sectionsWithContext;
+        }
+        
+        const searchQuery = query.toLowerCase().trim();
+        
+        return sectionsWithContext.filter(item => {
+            const course = item.course.course;
+            const section = item.section;
+            
+            // Search in course info
+            if (course.name.toLowerCase().includes(searchQuery) ||
+                course.number.toLowerCase().includes(searchQuery) ||
+                course.department.abbreviation.toLowerCase().includes(searchQuery)) {
+                return true;
+            }
+            
+            // Search in section number
+            if (section.number.toLowerCase().includes(searchQuery)) {
+                return true;
+            }
+            
+            // Search in any period info within the section
+            return section.periods.some(period =>
+                period.professor.toLowerCase().includes(searchQuery) ||
+                period.type.toLowerCase().includes(searchQuery) ||
+                period.building.toLowerCase().includes(searchQuery) ||
+                period.room.toLowerCase().includes(searchQuery) ||
+                period.location.toLowerCase().includes(searchQuery)
+            );
+        });
     }
     
     private getAvailableProfessors(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
@@ -346,5 +576,23 @@ export class ScheduleFilterService {
         if (lower.includes('conference') || lower.includes('conf')) return 'Conference';
         
         return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+    }
+    
+    private getAvailableSectionCodes(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
+        const sectionCodes = new Set<string>();
+        
+        selectedCourses.forEach(sc => {
+            sc.course.sections.forEach(section => {
+                if (section.number && section.number.trim()) {
+                    sectionCodes.add(section.number.trim());
+                }
+            });
+        });
+        
+        const codeArray = Array.from(sectionCodes).sort();
+        return codeArray.map(code => ({
+            value: code,
+            label: code
+        }));
     }
 }

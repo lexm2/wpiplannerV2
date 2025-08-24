@@ -34,7 +34,10 @@ export class ScheduleFilterModalController {
         this.modalService.setupModalBehavior(modalElement, id, { closeOnBackdrop: true, closeOnEscape: true });
 
         // Set up event listeners after modal is shown
-        setTimeout(() => this.setupFilterModalEventListeners(), 50);
+        setTimeout(() => {
+            this.setupFilterModalEventListeners();
+            this.initializeFormState();
+        }, 50);
 
         return id;
     }
@@ -176,6 +179,15 @@ export class ScheduleFilterModalController {
                                 <label>Minimum Available Seats:</label>
                                 <input type="number" id="min-seats-filter" min="0" max="999" placeholder="Any">
                             </div>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <h4>Schedule Conflicts</h4>
+                        <div class="filter-option">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="avoid-conflicts-filter">
+                                <span class="checkbox-text">Hide periods that conflict with selected sections</span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -346,6 +358,11 @@ export class ScheduleFilterModalController {
         return filter?.criteria || { availableOnly: false };
     }
 
+    private getActiveConflictDetection(): { avoidConflicts: boolean } {
+        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
+        return filter?.criteria || { avoidConflicts: false };
+    }
+
     private setupFilterModalEventListeners(): void {
         if (!this.currentModalId) return;
         
@@ -452,6 +469,15 @@ export class ScheduleFilterModalController {
         if (minSeatsInput) {
             minSeatsInput.addEventListener('input', () => {
                 this.updateAvailabilityFilter();
+                this.refreshActiveFilters();
+            });
+        }
+
+        // Conflict detection filter
+        const avoidConflictsCheckbox = modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement;
+        if (avoidConflictsCheckbox) {
+            avoidConflictsCheckbox.addEventListener('change', () => {
+                this.updateConflictFilter();
                 this.refreshActiveFilters();
             });
         }
@@ -577,6 +603,48 @@ export class ScheduleFilterModalController {
             } else {
                 this.scheduleFilterService!.removeFilter('periodAvailability');
             }
+        }
+    }
+
+    private updateConflictFilter(): void {
+        if (!this.currentModalId) return;
+        
+        const modalElement = document.getElementById(this.currentModalId);
+        if (modalElement) {
+            const avoidConflicts = (modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement)?.checked || false;
+
+            if (avoidConflicts) {
+                this.scheduleFilterService!.addFilter('periodConflict', { avoidConflicts: true });
+            } else {
+                this.scheduleFilterService!.removeFilter('periodConflict');
+            }
+        }
+    }
+
+    private initializeFormState(): void {
+        if (!this.currentModalId) return;
+        
+        const modalElement = document.getElementById(this.currentModalId);
+        if (!modalElement) return;
+
+        // Initialize availability filter states
+        const activeAvailability = this.getActiveAvailability();
+        const availableOnlyCheckbox = modalElement.querySelector('#available-only-filter') as HTMLInputElement;
+        const minSeatsInput = modalElement.querySelector('#min-seats-filter') as HTMLInputElement;
+        
+        if (availableOnlyCheckbox) {
+            availableOnlyCheckbox.checked = activeAvailability.availableOnly;
+        }
+        if (minSeatsInput && activeAvailability.minAvailable) {
+            minSeatsInput.value = activeAvailability.minAvailable.toString();
+        }
+
+        // Initialize conflict detection filter state
+        const activeConflictDetection = this.getActiveConflictDetection();
+        const avoidConflictsCheckbox = modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement;
+        
+        if (avoidConflictsCheckbox) {
+            avoidConflictsCheckbox.checked = activeConflictDetection.avoidConflicts;
         }
     }
 

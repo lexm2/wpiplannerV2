@@ -79,6 +79,7 @@ export class MainController {
         
         // Connect schedule filter service to controllers
         this.scheduleFilterModalController.setScheduleFilterService(this.scheduleFilterService);
+        this.scheduleController.setConflictDetector(this.conflictDetector);
         this.scheduleController.setScheduleFilterService(this.scheduleFilterService);
         this.scheduleController.setScheduleFilterModalController(this.scheduleFilterModalController);
         

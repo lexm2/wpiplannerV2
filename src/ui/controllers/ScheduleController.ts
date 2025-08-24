@@ -4,12 +4,14 @@ import { ScheduleFilterService } from '../../services/ScheduleFilterService'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { TimeUtils } from '../utils/timeUtils'
+import { ConflictDetector } from '../../core/ConflictDetector'
 
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
     private scheduleFilterService: ScheduleFilterService | null = null;
     private scheduleFilterModalController: ScheduleFilterModalController | null = null;
     private sectionInfoModalController: SectionInfoModalController | null = null;
+    private conflictDetector: ConflictDetector | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private statePreserver?: { 
         preserve: () => Map<string, boolean>, 
@@ -24,8 +26,22 @@ export class ScheduleController {
         this.sectionInfoModalController = sectionInfoModalController;
     }
 
+    setConflictDetector(conflictDetector: ConflictDetector): void {
+        this.conflictDetector = conflictDetector;
+        
+        // If we already have ScheduleFilterService, update it with ConflictDetector
+        if (this.scheduleFilterService) {
+            this.scheduleFilterService.setConflictDetector(conflictDetector);
+        }
+    }
+
     setScheduleFilterService(scheduleFilterService: ScheduleFilterService): void {
         this.scheduleFilterService = scheduleFilterService;
+        
+        // If we already have ConflictDetector, pass it to the service
+        if (this.conflictDetector) {
+            this.scheduleFilterService.setConflictDetector(this.conflictDetector);
+        }
         
         // Set up filter change listener to refresh display
         this.scheduleFilterService.addEventListener(() => {
@@ -55,12 +71,12 @@ export class ScheduleController {
 
         let selectedCourses = this.courseSelectionService.getSelectedCourses();
         
-        // Get filtered periods if filter service is available
-        let filteredPeriods: Array<{course: any, period: any}> = [];
+        // Get filtered sections if filter service is available
+        let filteredSections: Array<{course: any, section: any}> = [];
         let hasActiveFilters = false;
         
         if (this.scheduleFilterService && !this.scheduleFilterService.isEmpty()) {
-            filteredPeriods = this.scheduleFilterService.filterPeriods(selectedCourses);
+            filteredSections = this.scheduleFilterService.filterSections(selectedCourses);
             hasActiveFilters = true;
         }
         
@@ -70,21 +86,21 @@ export class ScheduleController {
             return;
         }
 
-        if (hasActiveFilters && filteredPeriods.length === 0) {
-            countElement.textContent = '(0 periods match filters)';
-            selectedCoursesContainer.innerHTML = '<div class="empty-state">No periods match the current filters</div>';
+        if (hasActiveFilters && filteredSections.length === 0) {
+            countElement.textContent = '(0 sections match filters)';
+            selectedCoursesContainer.innerHTML = '<div class="empty-state">No sections match the current filters</div>';
             return;
         }
 
         let html = '';
         
         if (hasActiveFilters) {
-            // Display filtered periods grouped by course/section
-            html = this.buildFilteredPeriodsHTML(filteredPeriods, selectedCourses);
+            // Display filtered sections
+            html = this.buildFilteredSectionsHTML(filteredSections, selectedCourses, dropdownStates);
             
-            // Update count to show period matches
-            const uniqueCourses = new Set(filteredPeriods.map(fp => fp.course.course.id)).size;
-            countElement.textContent = `(${filteredPeriods.length} periods in ${uniqueCourses} courses)`;
+            // Update count to show section matches
+            const uniqueCourses = new Set(filteredSections.map(fs => fs.course.course.id)).size;
+            countElement.textContent = `(${filteredSections.length} sections in ${uniqueCourses} courses)`;
         } else {
             // Display all courses normally when no filters are active
             const sortedCourses = selectedCourses.sort((a, b) => {
@@ -109,7 +125,7 @@ export class ScheduleController {
             this.setupDOMElementMapping(selectedCoursesContainer, sortedCourses);
         } else {
             // For filtered view, we need to set up mapping differently
-            this.setupFilteredDOMElementMapping(selectedCoursesContainer, filteredPeriods);
+            this.setupFilteredDOMElementMapping(selectedCoursesContainer, filteredSections);
         }
 
         // Restore dropdown states after refresh
@@ -118,25 +134,25 @@ export class ScheduleController {
         }
     }
     
-    private buildFilteredPeriodsHTML(filteredPeriods: Array<{course: any, period: any}>, selectedCourses: any[]): string {
-        // Group filtered periods by course
-        const periodsByCourse = new Map();
+    private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, selectedCourses: any[], dropdownStates?: Map<string, boolean>): string {
+        // Group filtered sections by course
+        const sectionsByCourse = new Map();
         
-        filteredPeriods.forEach(fp => {
-            const courseId = fp.course.course.id;
-            if (!periodsByCourse.has(courseId)) {
-                periodsByCourse.set(courseId, {
-                    selectedCourse: fp.course,
-                    periods: []
+        filteredSections.forEach(fs => {
+            const courseId = fs.course.course.id;
+            if (!sectionsByCourse.has(courseId)) {
+                sectionsByCourse.set(courseId, {
+                    selectedCourse: fs.course,
+                    sections: []
                 });
             }
-            periodsByCourse.get(courseId).periods.push(fp.period);
+            sectionsByCourse.get(courseId).sections.push(fs.section);
         });
         
         let html = '';
         
         // Sort courses by department and number
-        const sortedEntries = Array.from(periodsByCourse.entries()).sort((a, b) => {
+        const sortedEntries = Array.from(sectionsByCourse.entries()).sort((a, b) => {
             const courseA = a[1].selectedCourse.course;
             const courseB = b[1].selectedCourse.course;
             const deptCompare = courseA.department.abbreviation.localeCompare(courseB.department.abbreviation);
@@ -146,39 +162,27 @@ export class ScheduleController {
         
         sortedEntries.forEach(([courseId, data]) => {
             const selectedCourse = data.selectedCourse;
-            const matchingPeriods = data.periods;
+            const matchingSections = data.sections;
             const course = selectedCourse.course;
             
-            html += this.buildCourseHeaderHTML(course, selectedCourse);
+            // Determine if this course should be expanded
+            // Default to expanded when filtering (so users can see the results)
+            // But preserve any explicit state from previous interactions
+            const isExpanded = dropdownStates?.has(course.id) ? dropdownStates.get(course.id)! : true;
             
-            // Group periods by section
-            const periodsBySection = new Map();
-            matchingPeriods.forEach((period: any) => {
-                // Find the section this period belongs to
-                const section = course.sections.find((s: any) => s.periods.includes(period));
-                if (section) {
-                    if (!periodsBySection.has(section.number)) {
-                        periodsBySection.set(section.number, {
-                            section: section,
-                            periods: []
-                        });
-                    }
-                    periodsBySection.get(section.number).periods.push(period);
-                }
-            });
+            html += this.buildCourseHeaderHTML(course, selectedCourse, isExpanded);
             
             html += '<div class="schedule-sections-container">';
             
             // Group sections by term
             const sectionsByTerm: any = {};
-            periodsBySection.forEach((data, sectionNumber) => {
-                const section = data.section;
+            matchingSections.forEach((section: any) => {
                 if (!sectionsByTerm[section.term]) {
                     sectionsByTerm[section.term] = [];
                 }
                 sectionsByTerm[section.term].push({
                     section: section,
-                    filteredPeriods: data.periods
+                    filteredPeriods: section.periods // Show all periods in the section
                 });
             });
             
@@ -246,13 +250,15 @@ export class ScheduleController {
         return html;
     }
     
-    private buildCourseHeaderHTML(course: any, selectedCourse: any): string {
+    private buildCourseHeaderHTML(course: any, selectedCourse: any, isExpanded: boolean = false): string {
         const credits = course.minCredits === course.maxCredits 
             ? `${course.minCredits} credits` 
             : `${course.minCredits}-${course.maxCredits} credits`;
+        
+        const expansionClass = isExpanded ? 'expanded' : 'collapsed';
             
         return `
-            <div class="schedule-course-item collapsed">
+            <div class="schedule-course-item ${expansionClass}">
                 <div class="schedule-course-header dropdown-trigger">
                     <div class="schedule-course-info">
                         <div class="schedule-course-code">${course.department.abbreviation}${course.number}</div>
@@ -380,20 +386,20 @@ export class ScheduleController {
         });
     }
     
-    private setupFilteredDOMElementMapping(selectedCoursesContainer: HTMLElement, filteredPeriods: Array<{course: any, period: any}>): void {
+    private setupFilteredDOMElementMapping(selectedCoursesContainer: HTMLElement, filteredSections: Array<{course: any, section: any}>): void {
         // For filtered view, we need to map elements to courses differently
         const courseElements = selectedCoursesContainer.querySelectorAll('.schedule-course-item');
         const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
         
-        // Get unique courses from filtered periods in the same order as displayed
+        // Get unique courses from filtered sections in the same order as displayed
         const uniqueCourses = [];
         const seenCourseIds = new Set();
         
-        filteredPeriods.forEach(fp => {
-            const courseId = fp.course.course.id;
+        filteredSections.forEach(fs => {
+            const courseId = fs.course.course.id;
             if (!seenCourseIds.has(courseId)) {
                 seenCourseIds.add(courseId);
-                uniqueCourses.push(fp.course);
+                uniqueCourses.push(fs.course);
             }
         });
         

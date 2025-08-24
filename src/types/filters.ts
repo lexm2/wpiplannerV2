@@ -108,3 +108,11 @@ export interface PeriodAvailabilityFilterCriteria {
     availableOnly: boolean;
     minAvailable?: number;
 }
+
+export interface PeriodConflictFilterCriteria {
+    avoidConflicts: boolean;
+}
+
+export interface SectionCodeFilterCriteria {
+    codes: string[];
+}
