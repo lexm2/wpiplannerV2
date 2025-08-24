@@ -15,6 +15,7 @@ import { SearchService } from '../../services/searchService'
 import { createDefaultFilters, SearchTextFilter } from '../../core/filters'
 import { UIStateManager } from './UIStateManager'
 import { TimestampManager } from './TimestampManager'
+import { OperationManager, DebouncedOperation } from '../../utils/RequestCancellation'
 
 export class MainController {
     private courseDataService: CourseDataService;
@@ -32,6 +33,8 @@ export class MainController {
     private filterService: FilterService;
     private uiStateManager: UIStateManager;
     private timestampManager: TimestampManager;
+    private operationManager: OperationManager;
+    private debouncedSearch: DebouncedOperation;
     private allDepartments: Department[] = [];
 
 
@@ -67,6 +70,10 @@ export class MainController {
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
         this.uiStateManager = new UIStateManager();
         this.timestampManager = new TimestampManager();
+        
+        // Initialize operation management for cancellation
+        this.operationManager = new OperationManager();
+        this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
         
         // Wire up state preservation for dropdown states
         this.scheduleController.setStatePreserver({
@@ -161,7 +168,9 @@ export class MainController {
                 if (deptId) {
                     const department = this.departmentController.handleDepartmentClick(deptId);
                     if (department) {
-                        this.courseController.displayCourses(department.courses, this.uiStateManager.currentView);
+                        this.courseController.displayCourses(department.courses, this.uiStateManager.currentView).catch(error => {
+                            console.error('Error displaying courses:', error);
+                        });
                     }
                 }
             }
@@ -242,19 +251,35 @@ export class MainController {
             }
         });
 
-        // Search functionality
+        // Search functionality with debouncing and cancellation
         const searchInput = document.getElementById('search-input') as HTMLInputElement;
         if (searchInput) {
             searchInput.addEventListener('input', () => {
                 const query = searchInput.value.trim();
-                // Update search text filter in FilterService
-                if (query.length > 0) {
-                    this.filterService.addFilter('searchText', { query });
-                } else {
-                    this.filterService.removeFilter('searchText');
-                }
-                // Refresh view will be triggered by filter change event
-                this.syncModalSearchInput(query);
+                
+                // Use debounced operation for search to prevent excessive filtering
+                this.debouncedSearch.execute(async (cancellationToken) => {
+                    cancellationToken.throwIfCancelled();
+                    
+                    // Update search text filter in FilterService
+                    if (query.length > 0) {
+                        this.filterService.addFilter('searchText', { query });
+                    } else {
+                        this.filterService.removeFilter('searchText');
+                    }
+                    
+                    cancellationToken.throwIfCancelled();
+                    
+                    // Sync modal search input
+                    this.syncModalSearchInput(query);
+                    
+                    return Promise.resolve();
+                }).catch(error => {
+                    // Ignore cancellation errors, log others
+                    if (error.name !== 'CancellationError') {
+                        console.error('Search error:', error);
+                    }
+                });
             });
         }
 
@@ -344,6 +369,9 @@ export class MainController {
         const selectedDepartment = this.departmentController.getSelectedDepartment();
         const hasFilters = !this.filterService.isEmpty();
         
+        // Start a new render operation with cancellation support
+        const cancellationToken = this.operationManager.startOperation('render', 'New render requested');
+        
         let coursesToDisplay: Course[] = [];
         
         if (hasFilters) {
@@ -361,7 +389,8 @@ export class MainController {
             this.updateDefaultHeader();
         }
         
-        this.courseController.displayCourses(coursesToDisplay, this.uiStateManager.currentView);
+        // Display courses with cancellation support
+        this.displayCoursesWithCancellation(coursesToDisplay, cancellationToken);
         
         // Save current filter state
         if (hasFilters) {
@@ -371,6 +400,28 @@ export class MainController {
         // Update filter button appearance and sync search input
         this.updateFilterButtonState();
         this.syncSearchInputFromFilters();
+    }
+    
+    private async displayCoursesWithCancellation(coursesToDisplay: Course[], cancellationToken: any): Promise<void> {
+        try {
+            // Pass cancellation token to the progressive renderer
+            await this.courseController.displayCoursesWithCancellation(
+                coursesToDisplay, 
+                this.uiStateManager.currentView,
+                cancellationToken
+            );
+            
+            // Mark operation as complete
+            this.operationManager.completeOperation('render');
+            
+        } catch (error) {
+            if (error.name === 'CancellationError') {
+                // Render was cancelled, not an error
+                return;
+            }
+            console.error('Error displaying courses:', error);
+            this.operationManager.completeOperation('render');
+        }
     }
 
     private updateFilterButtonState(): void {

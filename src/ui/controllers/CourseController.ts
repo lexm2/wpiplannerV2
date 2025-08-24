@@ -1,6 +1,9 @@
 import { Course, Department } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { FilterService } from '../../services/FilterService'
+import { ProgressiveRenderer, ProgressiveRenderOptions } from '../utils/ProgressiveRenderer'
+import { CancellationToken } from '../../utils/RequestCancellation'
+import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
 
 export class CourseController {
     private allDepartments: Department[] = [];
@@ -8,9 +11,43 @@ export class CourseController {
     private courseSelectionService: CourseSelectionService;
     private filterService: FilterService | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
+    private progressiveRenderer: ProgressiveRenderer;
+    private performanceMetrics: PerformanceMetrics;
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
+        
+        // Initialize performance metrics
+        this.performanceMetrics = new PerformanceMetrics();
+        
+        // Initialize progressive renderer with performance callbacks
+        const renderOptions: ProgressiveRenderOptions = {
+            batchSize: 10,
+            batchDelay: 16, // 60 FPS
+            performanceMetrics: this.performanceMetrics,
+            onBatch: (batchIndex, totalBatches, totalCount) => {
+                // Update any progress indicators if needed
+                console.log(`Rendered batch ${batchIndex}/${totalBatches} (${totalCount} total courses)`);
+            },
+            onComplete: (totalRendered, totalTime) => {
+                console.log(`Progressive rendering complete: ${totalRendered} courses in ${totalTime.toFixed(2)}ms`);
+                
+                // Log performance insights periodically
+                if (Math.random() < 0.1) { // 10% chance to log insights
+                    const insights = this.performanceMetrics.getInsights();
+                    console.log('Performance insights:', insights.join(', '));
+                    
+                    // Auto-adjust batch size based on performance
+                    const optimalBatchSize = this.performanceMetrics.getOptimalBatchSize(this.progressiveRenderer.getBatchSize());
+                    if (optimalBatchSize !== this.progressiveRenderer.getBatchSize()) {
+                        console.log(`Adjusting batch size from ${this.progressiveRenderer.getBatchSize()} to ${optimalBatchSize}`);
+                        this.progressiveRenderer.setBatchSize(optimalBatchSize);
+                    }
+                }
+            }
+        };
+        
+        this.progressiveRenderer = new ProgressiveRenderer(renderOptions);
     }
 
     setFilterService(filterService: FilterService): void {
@@ -25,15 +62,22 @@ export class CourseController {
         return this.selectedCourse;
     }
 
-    displayCourses(courses: Course[], currentView: 'list' | 'grid'): void {
+    async displayCourses(courses: Course[], currentView: 'list' | 'grid'): Promise<void> {
+        return this.displayCoursesWithCancellation(courses, currentView);
+    }
+    
+    async displayCoursesWithCancellation(courses: Course[], currentView: 'list' | 'grid', cancellationToken?: CancellationToken): Promise<void> {
+        // Cancel any existing render operations
+        this.progressiveRenderer.cancelCurrentRender();
+        
         if (currentView === 'grid') {
-            this.displayCoursesGrid(courses);
+            await this.displayCoursesGrid(courses, cancellationToken);
         } else {
-            this.displayCoursesList(courses);
+            await this.displayCoursesList(courses, cancellationToken);
         }
     }
 
-    private displayCoursesList(courses: Course[]): void {
+    private async displayCoursesList(courses: Course[], cancellationToken?: CancellationToken): Promise<void> {
         const courseContainer = document.getElementById('course-container');
         if (!courseContainer) return;
 
@@ -45,48 +89,17 @@ export class CourseController {
         // Sort courses by course number
         const sortedCourses = courses.sort((a, b) => a.number.localeCompare(b.number));
 
-        let html = '<div class="course-list">';
-        
-        sortedCourses.forEach(course => {
-            const hasWarning = this.courseHasWarning(course);
-            const sections = course.sections.map(s => s.number).filter(Boolean);
-            const isSelected = this.courseSelectionService.isCourseSelected(course);
-            
-            html += `
-                <div class="course-item ${isSelected ? 'selected' : ''}">
-                    <div class="course-header">
-                        <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
-                            ${isSelected ? '✓' : '+'}
-                        </button>
-                        <div class="course-code">${course.department.abbreviation}${course.number}</div>
-                        <div class="course-details">
-                            <div class="course-name">
-                                ${course.name}
-                                ${hasWarning ? '<span class="warning-icon">⚠</span>' : ''}
-                            </div>
-                            <div class="course-sections">
-                                ${course.sections.map(section => {
-                                    const isFull = section.seatsAvailable <= 0;
-                                    return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${section.number}">${section.number}</span>`;
-                                }).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-        
-        html += '</div>';
-        courseContainer.innerHTML = html;
-
-        // Associate DOM elements with Course objects
-        const courseElements = courseContainer.querySelectorAll('.course-item');
-        courseElements.forEach((element, index) => {
-            this.elementToCourseMap.set(element as HTMLElement, sortedCourses[index]);
-        });
+        // Use progressive rendering for better performance
+        await this.progressiveRenderer.renderCourseList(
+            sortedCourses, 
+            this.courseSelectionService, 
+            courseContainer,
+            this.elementToCourseMap,
+            cancellationToken
+        );
     }
 
-    private displayCoursesGrid(courses: Course[]): void {
+    private async displayCoursesGrid(courses: Course[], cancellationToken?: CancellationToken): Promise<void> {
         const courseContainer = document.getElementById('course-container');
         if (!courseContainer) return;
 
@@ -98,41 +111,14 @@ export class CourseController {
         // Sort courses by course number
         const sortedCourses = courses.sort((a, b) => a.number.localeCompare(b.number));
 
-        let html = '<div class="course-grid">';
-        
-        sortedCourses.forEach(course => {
-            const hasWarning = this.courseHasWarning(course);
-            const isSelected = this.courseSelectionService.isCourseSelected(course);
-            const credits = course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits}-${course.maxCredits}`;
-            
-            html += `
-                <div class="course-card ${isSelected ? 'selected' : ''}">
-                    <div class="course-card-header">
-                        <div class="course-code">${course.department.abbreviation}${course.number}</div>
-                        <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
-                            ${isSelected ? '✓' : '+'}
-                        </button>
-                    </div>
-                    <div class="course-title">
-                        ${course.name}
-                        ${hasWarning ? '<span class="warning-icon">⚠</span>' : ''}
-                    </div>
-                    <div class="course-info">
-                        <span class="course-credits">${credits} credits</span>
-                        <span class="course-sections-count">${course.sections.length} section${course.sections.length !== 1 ? 's' : ''}</span>
-                    </div>
-                </div>
-            `;
-        });
-        
-        html += '</div>';
-        courseContainer.innerHTML = html;
-
-        // Associate DOM elements with Course objects
-        const courseElements = courseContainer.querySelectorAll('.course-card');
-        courseElements.forEach((element, index) => {
-            this.elementToCourseMap.set(element as HTMLElement, sortedCourses[index]);
-        });
+        // Use progressive rendering for better performance
+        await this.progressiveRenderer.renderCourseGrid(
+            sortedCourses, 
+            this.courseSelectionService, 
+            courseContainer,
+            this.elementToCourseMap,
+            cancellationToken
+        );
     }
 
     private courseHasWarning(course: Course): boolean {
