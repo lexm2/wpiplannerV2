@@ -2,7 +2,8 @@ import { Course, Section } from './types'
 
 export interface SelectedCourse {
     course: Course;
-    selectedSection: string | null;
+    selectedSection: Section | null;  // Store the full Section object for direct access
+    selectedSectionNumber: string | null;  // Keep for backward compatibility and serialization
     isRequired: boolean;
 }
 

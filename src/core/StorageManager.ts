@@ -186,6 +186,13 @@ export class StorageManager {
                 // Exclude courses array to prevent circular reference
             };
         }
+
+        // For SelectedCourse serialization, exclude the Section object to prevent circular references
+        // but keep the selectedSectionNumber for reconstruction
+        if (key === 'selectedSection' && value && typeof value === 'object' && value.number) {
+            return undefined; // Don't serialize the full Section object
+        }
+
         return value;
     };
 

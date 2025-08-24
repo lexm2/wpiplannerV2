@@ -63,7 +63,9 @@ export class UIStateManager {
 
         if (plannerPage) plannerPage.style.display = 'none';
         if (schedulePage) schedulePage.style.display = 'flex';
+        
     }
+
 
     showLoadingState(): void {
         const departmentList = document.getElementById('department-list');

@@ -88,7 +88,7 @@ export class ScheduleController {
                 html += `<div class="term-label">${term} Term</div>`;
                 
                 sectionsByTerm[term].forEach(section => {
-                    const isSelected = selectedCourse.selectedSection === section.number;
+                    const isSelected = selectedCourse.selectedSectionNumber === section.number;
                     const selectedClass = isSelected ? 'selected' : '';
                     
                     // Sort periods by type priority (lecture first, then lab, then discussion)
@@ -155,11 +155,26 @@ export class ScheduleController {
         const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
         
         courseElements.forEach((element, index) => {
-            this.elementToCourseMap.set(element as HTMLElement, sortedCourses[index].course);
+            const course = sortedCourses[index]?.course;
+            this.elementToCourseMap.set(element as HTMLElement, course);
         });
         
         removeButtons.forEach((button, index) => {
-            this.elementToCourseMap.set(button as HTMLElement, sortedCourses[index].course);
+            const course = sortedCourses[index]?.course;
+            this.elementToCourseMap.set(button as HTMLElement, course);
+        });
+
+        // IMPORTANT: Associate section buttons with their Course objects
+        const sectionButtons = selectedCoursesContainer.querySelectorAll('.section-select-btn');
+        sectionButtons.forEach(button => {
+            const courseItem = button.closest('.schedule-course-item') as HTMLElement;
+            if (courseItem) {
+                const courseIndex = Array.from(courseElements).indexOf(courseItem);
+                if (courseIndex >= 0 && courseIndex < sortedCourses.length) {
+                    const course = sortedCourses[courseIndex].course;
+                    this.elementToCourseMap.set(button as HTMLElement, course);
+                }
+            }
         });
 
         // Restore dropdown states after refresh
@@ -237,13 +252,10 @@ export class ScheduleController {
             const gridContainer = document.getElementById(`schedule-grid-${term}`);
             if (!gridContainer) return;
             
-            // Filter courses for this term
+            // Filter courses for this term - use direct Section object access
             const termCourses = selectedCourses.filter(sc => 
                 sc.selectedSection && 
-                sc.course.sections.some(section => 
-                    section.number === sc.selectedSection && 
-                    section.term.toUpperCase().includes(term)
-                )
+                sc.selectedSection.term.toUpperCase().includes(term)
             );
             
             if (termCourses.length === 0) {
@@ -309,8 +321,7 @@ export class ScheduleController {
         for (const selectedCourse of courses) {
             if (!selectedCourse.selectedSection) continue;
             
-            const section = selectedCourse.course.sections.find((s: { number: any }) => s.number === selectedCourse.selectedSection);
-            if (!section) continue;
+            const section = selectedCourse.selectedSection;
             
             // Check if this section has any period that occupies this time slot on this day
             const periodsOnThisDay = section.periods.filter((period: any) => period.days.has(day));
@@ -466,4 +477,5 @@ export class ScheduleController {
     getCourseFromElement(element: HTMLElement): Course | undefined {
         return this.elementToCourseMap.get(element);
     }
+
 }

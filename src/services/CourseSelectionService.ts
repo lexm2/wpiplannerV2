@@ -59,6 +59,13 @@ export class CourseSelectionService {
         return this.courseManager.getSelectedSection(course);
     }
 
+    getSelectedSectionObject(course: Course): Section | null {
+        if (!Validators.isValidCourse(course)) {
+            throw new Error('Invalid course object provided');
+        }
+        return this.courseManager.getSelectedSectionObject(course);
+    }
+
 
     isCourseSelected(course: Course): boolean {
         if (!Validators.isValidCourse(course)) {

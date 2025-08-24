@@ -44,7 +44,7 @@ export class MainController {
         this.previousSelectedCoursesCount = initialSelectedCourses.length;
         this.previousSelectedCoursesMap = new Map();
         initialSelectedCourses.forEach(sc => {
-            this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSection);
+            this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
         });
         
         this.init();
@@ -57,6 +57,8 @@ export class MainController {
         this.setupEventListeners();
         this.setupCourseSelectionListener();
         this.courseController.displaySelectedCourses();
+        
+        
         this.uiStateManager.syncHeaderHeights();
         this.uiStateManager.setupHeaderResizeObserver();
     }
@@ -119,10 +121,11 @@ export class MainController {
                 e.stopPropagation();
                 const courseElement = target.closest('.schedule-course-item') as HTMLElement;
                 const sectionNumber = target.dataset.section;
+                
                 if (courseElement && sectionNumber) {
                     const course = this.scheduleController.getCourseFromElement(courseElement);
                     if (course) {
-                        this.scheduleController.handleSectionSelection(course, sectionNumber);
+                        this.courseSelectionService.setSelectedSection(course, sectionNumber);
                     }
                 }
                 return;
@@ -278,7 +281,7 @@ export class MainController {
             // Create current state map for comparison
             const currentCoursesMap = new Map<string, string | null>();
             selectedCourses.forEach(sc => {
-                currentCoursesMap.set(sc.course.id, sc.selectedSection);
+                currentCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
             });
             
             // Always update main course UI
@@ -295,12 +298,8 @@ export class MainController {
                     const previousSection = this.previousSelectedCoursesMap.get(courseId);
                     if (previousSection !== selectedSection) {
                         sectionSelectionsChanged = true;
-                        // Find the course object and update section buttons
-                        const course = this.courseSelectionService.findCourseById(courseId);
-                        if (course) {
-                            this.scheduleController.updateSectionButtonStates(course, selectedSection);
-                        }
                     }
+                    
                 }
                 
                 // Update schedule grids if any sections changed
@@ -314,7 +313,6 @@ export class MainController {
             this.previousSelectedCoursesMap = new Map(currentCoursesMap);
         });
     }
-
 
 
     // Public methods for easy access to selected courses

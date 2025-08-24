@@ -11,6 +11,7 @@ export class CourseManager {
         const selectedCourse: SelectedCourse = {
             course,
             selectedSection: null,
+            selectedSectionNumber: null,
             isRequired
         };
         
@@ -60,11 +61,22 @@ export class CourseManager {
         const selectedCourse = this.selectedCourses.get(course);
         if (!this.validateCourseExists(course, selectedCourse)) return;
 
-        selectedCourse!.selectedSection = sectionNumber;
+        // Find the actual Section object
+        const sectionObject = sectionNumber ? 
+            course.sections.find(s => s.number === sectionNumber) || null : 
+            null;
+
+        selectedCourse!.selectedSection = sectionObject;
+        selectedCourse!.selectedSectionNumber = sectionNumber;
         this.notifyListeners();
     }
 
     getSelectedSection(course: Course): string | null {
+        const selectedCourse = this.selectedCourses.get(course);
+        return selectedCourse?.selectedSectionNumber || null;
+    }
+
+    getSelectedSectionObject(course: Course): Section | null {
         const selectedCourse = this.selectedCourses.get(course);
         return selectedCourse?.selectedSection || null;
     }
@@ -73,6 +85,19 @@ export class CourseManager {
     loadSelectedCourses(selectedCourses: SelectedCourse[]): void {
         this.selectedCourses.clear();
         selectedCourses.forEach(selectedCourse => {
+            // Handle backward compatibility: if old format only has selectedSection as string
+            if (selectedCourse.selectedSection && typeof selectedCourse.selectedSection === 'string') {
+                const sectionNumber = selectedCourse.selectedSection as any as string;
+                const sectionObject = selectedCourse.course.sections.find(s => s.number === sectionNumber) || null;
+                
+                selectedCourse.selectedSection = sectionObject;
+                selectedCourse.selectedSectionNumber = sectionNumber;
+            }
+            // Ensure selectedSectionNumber is set if we have a Section object but no string
+            else if (selectedCourse.selectedSection && !selectedCourse.selectedSectionNumber) {
+                selectedCourse.selectedSectionNumber = selectedCourse.selectedSection.number;
+            }
+            
             this.selectedCourses.set(selectedCourse.course, selectedCourse);
         });
         this.notifyListeners();
