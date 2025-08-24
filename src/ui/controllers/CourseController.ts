@@ -59,9 +59,10 @@ export class CourseController {
                                 ${hasWarning ? '<span class="warning-icon">⚠</span>' : ''}
                             </div>
                             <div class="course-sections">
-                                ${sections.map(section => 
-                                    `<span class="section-badge" data-section="${section}">${section}</span>`
-                                ).join('')}
+                                ${course.sections.map(section => {
+                                    const isFull = section.seatsAvailable <= 0;
+                                    return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${section.number}">${section.number}</span>`;
+                                }).join('')}
                             </div>
                         </div>
                     </div>
