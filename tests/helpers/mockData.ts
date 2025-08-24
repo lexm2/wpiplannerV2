@@ -34,6 +34,7 @@ export const createMockSection = (overrides: Partial<Section> = {}): Section => 
   note: undefined,
   description: 'Test section description',
   term: 'Fall 2024',
+  computedTerm: 'A',
   periods: [createMockPeriod()],
   ...overrides
 })

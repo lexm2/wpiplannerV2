@@ -177,10 +177,10 @@ export class ScheduleController {
             // Group sections by term
             const sectionsByTerm: any = {};
             matchingSections.forEach((section: any) => {
-                if (!sectionsByTerm[section.term]) {
-                    sectionsByTerm[section.term] = [];
+                if (!sectionsByTerm[section.computedTerm]) {
+                    sectionsByTerm[section.computedTerm] = [];
                 }
-                sectionsByTerm[section.term].push({
+                sectionsByTerm[section.computedTerm].push({
                     section: section,
                     filteredPeriods: section.periods // Show all periods in the section
                 });
@@ -286,10 +286,10 @@ export class ScheduleController {
             // Group sections by term
             const sectionsByTerm: { [term: string]: typeof course.sections } = {};
             course.sections.forEach(section => {
-                if (!sectionsByTerm[section.term]) {
-                    sectionsByTerm[section.term] = [];
+                if (!sectionsByTerm[section.computedTerm]) {
+                    sectionsByTerm[section.computedTerm] = [];
                 }
-                sectionsByTerm[section.term].push(section);
+                sectionsByTerm[section.computedTerm].push(section);
             });
 
             html += '<div class="schedule-sections-container">';
@@ -512,11 +512,11 @@ export class ScheduleController {
                 // Debug: log term matching
                 console.log(`  Checking course ${sc.course.department.abbreviation}${sc.course.number} with term "${sc.selectedSection!.term}" against grid term "${term}"`);
                 
-                // Extract the actual term letter from the section's term string
-                const sectionTermLetter = this.extractTermLetter(sc.selectedSection!.term, sc.selectedSection!.number);
+                // Use the pre-computed term letter from Java backend
+                const sectionTermLetter = sc.selectedSection!.computedTerm;
                 const matchesTerm = sectionTermLetter === term;
                 
-                console.log(`    Extracted term letter: "${sectionTermLetter}" from term:"${sc.selectedSection!.term}" section:"${sc.selectedSection!.number}"`);
+                console.log(`    Using pre-computed term letter: "${sectionTermLetter}" from section:"${sc.selectedSection!.number}"`);
                 
                 return matchesTerm;
             });
@@ -829,30 +829,6 @@ export class ScheduleController {
                 scheduleFilterButton.title = 'Filter selected courses';
             }
         }
-    }
-
-    private extractTermLetter(termString: string, sectionNumber?: string): string {
-        // Option 1: Section number pattern (primary method - most reliable)
-        // Extract term from section numbers like "A01" -> A, "D01" -> D
-        if (sectionNumber) {
-            const sectionMatch = sectionNumber.match(/^([ABCD])/i);
-            if (sectionMatch) {
-                return sectionMatch[1].toUpperCase();
-            }
-        }
-        
-        // Option 2: Text format for future compatibility ("2025 Fall A Term", "2026 Spring C Term")
-        if (termString) {
-            const textMatch = termString.match(/\b([ABCD])\s+Term/i);
-            if (textMatch) {
-                return textMatch[1].toUpperCase();
-            }
-        }
-        
-        // Note: Removed incorrect numeric mapping - "202201" is academic year code, not term-specific
-        
-        // Ultimate fallback
-        return 'A';
     }
 
     private addSectionBlockEventListeners(container: HTMLElement): void {

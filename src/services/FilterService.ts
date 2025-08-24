@@ -225,8 +225,8 @@ export class FilterService {
         const terms = new Set<string>();
         courses.forEach(course => {
             course.sections.forEach(section => {
-                if (section.term) {
-                    terms.add(section.term);
+                if (section.computedTerm) {
+                    terms.add(section.computedTerm);
                 }
             });
         });

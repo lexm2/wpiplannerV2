@@ -1,6 +1,8 @@
 package jsonToXml;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class section {
 	private ArrayList<period> periods;
@@ -12,6 +14,7 @@ public class section {
 	private long actualWaitlist;
 	private String term;  //number code 202201 (term)
 	private String partOfTerm;  //"A Term", "B Term", or "A Term, B Term" for semester courses
+	private String computedTerm;  //computed academic term letter (A, B, C, D)
 	private String note;
 	private boolean isGPS;
 	private String description;
@@ -28,6 +31,7 @@ public class section {
 		this.term = term;
 		this.partOfTerm = partOfTerm;
 		this.description = description;
+		this.computedTerm = extractTermLetter(number); // Compute term from section number
 	}
 	
 	section(long crn, String number, int seats, long availableseats, int maxWaitlist, long actualWaitlist, String term, String partOfTerm, String note, String description){
@@ -42,6 +46,7 @@ public class section {
 		this.partOfTerm = partOfTerm;
 		this.note = note;
 		this.description = description;
+		this.computedTerm = extractTermLetter(number); // Compute term from section number
 	}
 
 	public ArrayList<period> getPeriods() {
@@ -148,5 +153,34 @@ public class section {
 		this.isInterestList = isInterestList;
 	}
 	
+	public String getComputedTerm() {
+		return computedTerm;
+	}
+	
+	public void setComputedTerm(String computedTerm) {
+		this.computedTerm = computedTerm;
+	}
+	
+	/**
+	 * Extracts the academic term letter (A, B, C, D) from WPI section data
+	 * 
+	 * @param sectionNumber - Section number (e.g., "A01", "B02", "DL08/DD08/DX10")
+	 * @return Single letter representing the academic term (A, B, C, or D)
+	 */
+	public static String extractTermLetter(String sectionNumber) {
+		if (sectionNumber == null || sectionNumber.isEmpty()) {
+			return "A"; // fallback
+		}
+		
+		// Extract term from section numbers like "A01" -> A, "DL08/DD08/DX10" -> D
+		Pattern pattern = Pattern.compile("^([ABCD])", Pattern.CASE_INSENSITIVE);
+		Matcher matcher = pattern.matcher(sectionNumber);
+		
+		if (matcher.find()) {
+			return matcher.group(1).toUpperCase();
+		}
+		
+		return "A"; // ultimate fallback
+	}
 	
 }

@@ -198,6 +198,11 @@ export class CourseSelectionService {
         return course ? this.getSelectedSection(course) : null;
     }
 
+    // Testing support method
+    getCourseManager(): CourseManager {
+        return this.courseManager;
+    }
+
     getSelectedCourseById(courseId: string): SelectedCourse | undefined {
         const course = this.findCourseById(courseId);
         return course ? this.getSelectedCourse(course) : undefined;

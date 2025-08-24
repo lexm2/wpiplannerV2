@@ -49,6 +49,7 @@ function createSection(crn: number, sectionNumber: string, periods: Period[]): S
         maxWaitlist: 10,
         description: `Test Section ${sectionNumber}`,
         term: 'A 2024',
+        computedTerm: 'A',
         periods
     };
 }

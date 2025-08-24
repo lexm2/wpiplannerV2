@@ -48,6 +48,7 @@ describe('ScheduleFilterService', () => {
         maxWaitlist: 10,
         description: 'Regular section',
         term: 'A',
+        computedTerm: 'A',
         periods: [testPeriod1]
     };
 
@@ -60,6 +61,7 @@ describe('ScheduleFilterService', () => {
         maxWaitlist: 10,
         description: 'Lab section',
         term: 'A',
+        computedTerm: 'A',
         periods: [testPeriod2]
     };
 
@@ -72,6 +74,7 @@ describe('ScheduleFilterService', () => {
         maxWaitlist: 5,
         description: 'Alternative section',
         term: 'A',
+        computedTerm: 'A',
         periods: [testPeriod1]
     };
 
@@ -293,6 +296,174 @@ describe('ScheduleFilterService', () => {
             expect(options).toHaveLength(3);
             expect(options.map((opt: any) => opt.value)).toEqual(['A01', 'AL01', 'B01']);
             expect(options.map((opt: any) => opt.label)).toEqual(['A01', 'AL01', 'B01']);
+        });
+    });
+
+    describe('term filtering', () => {
+        // Create test data with different terms
+        const testSectionBTerm: Section = {
+            crn: 12348,
+            number: 'A01',
+            seats: 30,
+            seatsAvailable: 10,
+            actualWaitlist: 0,
+            maxWaitlist: 10,
+            description: 'B Term section',
+            term: 'B',
+            computedTerm: 'B',
+            periods: [testPeriod1]
+        };
+
+        const testSectionCTerm: Section = {
+            crn: 12349,
+            number: 'A01',
+            seats: 30,
+            seatsAvailable: 15,
+            actualWaitlist: 0,
+            maxWaitlist: 10,
+            description: 'C Term section',
+            term: 'C',
+            computedTerm: 'C',
+            periods: [testPeriod1]
+        };
+
+        const testCourseWithMultipleTerms: Course = {
+            id: 'CS-102',
+            name: 'Data Structures',
+            number: '102',
+            description: 'Data structures course',
+            credits: '3.0',
+            minCredits: 3.0,
+            maxCredits: 3.0,
+            department: department,
+            sections: [testSection1, testSectionBTerm, testSectionCTerm] // A, B, C terms
+        };
+
+        const selectedCourseWithTerms: SelectedCourse = {
+            course: testCourseWithMultipleTerms,
+            selectedSectionNumber: null,
+            deniedSections: new Set(),
+            preferredSections: new Set(),
+            isRequired: false
+        };
+
+        test('should return all sections when no term filter is active', () => {
+            const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
+            
+            expect(result).toHaveLength(3);
+            expect(result.map(r => r.section.computedTerm)).toEqual(['A', 'B', 'C']);
+        });
+
+        test('should filter sections to show only A term', () => {
+            scheduleFilterService.addFilter('periodTerm', { terms: ['A'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
+            
+            expect(result).toHaveLength(1);
+            expect(result[0].section.computedTerm).toBe('A');
+        });
+
+        test('should filter sections to show only B term', () => {
+            scheduleFilterService.addFilter('periodTerm', { terms: ['B'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
+            
+            expect(result).toHaveLength(1);
+            expect(result[0].section.computedTerm).toBe('B');
+        });
+
+        test('should filter sections to show multiple terms', () => {
+            scheduleFilterService.addFilter('periodTerm', { terms: ['A', 'C'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
+            
+            expect(result).toHaveLength(2);
+            const terms = result.map(r => r.section.computedTerm).sort();
+            expect(terms).toEqual(['A', 'C']);
+        });
+
+        test('should return empty array when no sections match selected terms', () => {
+            scheduleFilterService.addFilter('periodTerm', { terms: ['D'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
+            
+            expect(result).toHaveLength(0);
+        });
+
+        test('should handle case insensitive term filtering', () => {
+            scheduleFilterService.addFilter('periodTerm', { terms: ['a', 'b'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
+            
+            expect(result).toHaveLength(2);
+            const terms = result.map(r => r.section.computedTerm).sort();
+            expect(terms).toEqual(['A', 'B']);
+        });
+
+        test('should combine term filter with other filters', () => {
+            // Add both term filter and section code filter
+            scheduleFilterService.addFilter('periodTerm', { terms: ['A', 'B'] });
+            scheduleFilterService.addFilter('sectionCode', { codes: ['A01'] });
+            
+            const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
+            
+            // Should return sections that match both filters (A01 sections in A or B term)
+            expect(result).toHaveLength(2);
+            const terms = result.map(r => r.section.computedTerm).sort();
+            expect(terms).toEqual(['A', 'B']);
+            const sectionNumbers = result.map(r => r.section.number);
+            expect(sectionNumbers).toEqual(['A01', 'A01']);
+        });
+    });
+
+    describe('getAvailableTerms', () => {
+        const testSectionDTerm: Section = {
+            crn: 12350,
+            number: 'A01',
+            seats: 30,
+            seatsAvailable: 5,
+            actualWaitlist: 0,
+            maxWaitlist: 10,
+            description: 'D Term section',
+            term: 'D',
+            computedTerm: 'D',
+            periods: [testPeriod1]
+        };
+
+        const testCourseAllTerms: Course = {
+            id: 'CS-103',
+            name: 'Algorithms',
+            number: '103',
+            description: 'Algorithms course',
+            credits: '3.0',
+            minCredits: 3.0,
+            maxCredits: 3.0,
+            department: department,
+            sections: [testSection1, testSection2, testSection3, testSectionDTerm] // All A term + 1 D term
+        };
+
+        const selectedCourseAllTerms: SelectedCourse = {
+            course: testCourseAllTerms,
+            selectedSectionNumber: null,
+            deniedSections: new Set(),
+            preferredSections: new Set(),
+            isRequired: false
+        };
+
+        test('should return available terms with proper formatting', () => {
+            const options = scheduleFilterService.getFilterOptions('periodTerm', [selectedCourseAllTerms]);
+            
+            expect(options).toHaveLength(2); // A and D terms
+            expect(options.map((opt: any) => opt.value)).toEqual(['A', 'D']);
+            expect(options.map((opt: any) => opt.label)).toEqual(['A Term', 'D Term']);
+        });
+
+        test('should return unique terms only', () => {
+            // All original sections are A term, plus one D term section
+            const options = scheduleFilterService.getFilterOptions('periodTerm', [selectedCourseAllTerms]);
+            
+            // Should not duplicate A term
+            expect(options.filter((opt: any) => opt.value === 'A')).toHaveLength(1);
         });
     });
 });

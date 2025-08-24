@@ -131,6 +131,13 @@ export class ScheduleFilterModalController {
                         </div>
                     </div>
 
+                    <div class="filter-group">
+                        <h4>Academic Terms</h4>
+                        <div class="filter-option">
+                            <div class="filter-help-text">Show sections from selected academic terms</div>
+                            ${this.renderTermCheckboxes()}
+                        </div>
+                    </div>
 
                     <div class="filter-group">
                         <h4>Availability</h4>
@@ -253,6 +260,22 @@ export class ScheduleFilterModalController {
         `).join('');
     }
 
+    private renderTermCheckboxes(): string {
+        const termOptions = this.scheduleFilterService!.getFilterOptions('periodTerm', this.selectedCourses) || [];
+        const activeTerms = this.getActiveTerms();
+
+        if (termOptions.length === 0) {
+            return '<div class="no-options">No academic terms available</div>';
+        }
+
+        return termOptions.map((option: any) => `
+            <label class="checkbox-label">
+                <input type="checkbox" name="periodTerm" value="${option.value}" 
+                       ${activeTerms.includes(option.value) ? 'checked' : ''}>
+                <span class="checkbox-text">${option.label}</span>
+            </label>
+        `).join('');
+    }
 
     private getSearchValue(): string {
         const searchFilter = this.scheduleFilterService.getActiveFilters().find(f => f.id === 'searchText');
@@ -279,6 +302,10 @@ export class ScheduleFilterModalController {
         return filter?.criteria?.types || [];
     }
 
+    private getActiveTerms(): string[] {
+        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodTerm');
+        return filter?.criteria?.terms || [];
+    }
 
     private getActiveTimeRange(): { startTime?: { hours: number; minutes: number }; endTime?: { hours: number; minutes: number } } {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodTime');
@@ -365,6 +392,13 @@ export class ScheduleFilterModalController {
             });
         });
 
+        // Term checkboxes
+        modalElement.querySelectorAll('input[name="periodTerm"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                this.updateTermFilter();
+                this.refreshActiveFilters();
+            });
+        });
 
         // Availability filters
         const availableOnlyCheckbox = modalElement.querySelector('#available-only-filter') as HTMLInputElement;
@@ -447,6 +481,21 @@ export class ScheduleFilterModalController {
         }
     }
 
+    private updateTermFilter(): void {
+        if (!this.currentModalId) return;
+        
+        const modalElement = document.getElementById(this.currentModalId);
+        if (modalElement) {
+            const checkedTerms = Array.from(modalElement.querySelectorAll('input[name="periodTerm"]:checked'))
+                .map(cb => (cb as HTMLInputElement).value);
+
+            if (checkedTerms.length > 0) {
+                this.scheduleFilterService!.addFilter('periodTerm', { terms: checkedTerms });
+            } else {
+                this.scheduleFilterService!.removeFilter('periodTerm');
+            }
+        }
+    }
 
     private updateAvailabilityFilter(): void {
         if (!this.currentModalId) return;

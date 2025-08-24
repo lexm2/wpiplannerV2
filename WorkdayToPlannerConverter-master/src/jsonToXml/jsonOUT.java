@@ -53,6 +53,7 @@ public class jsonOUT {
 						sectionObj.put("note", thisSection.getNote());
 						sectionObj.put("description", thisSection.getDescription());
 						sectionObj.put("term", thisSection.getTerm());
+						sectionObj.put("computedTerm", thisSection.getComputedTerm()); // Include pre-computed term letter
 						sectionObj.put("is_gps", false); // Add GPS flag if available in data model
 						sectionObj.put("is_interest_list", false); // Add Interest List flag if available
 						

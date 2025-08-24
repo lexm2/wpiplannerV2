@@ -1,5 +1,5 @@
 import { Course, Section, Department } from '../types/types'
-import { SelectedCourse, Schedule } from '../types/schedule'
+import { SelectedCourse } from '../types/schedule'
 
 export class CourseManager {
     private selectedCourses: Map<Course, SelectedCourse> = new Map();
@@ -84,6 +84,7 @@ export class CourseManager {
 
     loadSelectedCourses(selectedCourses: SelectedCourse[]): void {
         this.selectedCourses.clear();
+        
         selectedCourses.forEach(selectedCourse => {
             // Handle backward compatibility: if old format only has selectedSection as string
             if (selectedCourse.selectedSection && typeof selectedCourse.selectedSection === 'string') {
@@ -98,8 +99,11 @@ export class CourseManager {
                 selectedCourse.selectedSectionNumber = selectedCourse.selectedSection.number;
             }
             
+            // Note: computedTerm values are now pre-computed by Java backend - no migration needed
+            
             this.selectedCourses.set(selectedCourse.course, selectedCourse);
         });
+        
         this.notifyListeners();
     }
 
@@ -120,6 +124,7 @@ export class CourseManager {
     setAllDepartments(departments: Department[]): void {
         this.allDepartments = departments;
         this.populateAllSections();
+        this.refreshSelectedCoursesWithFreshData();
     }
 
     private populateAllSections(): void {
@@ -156,6 +161,60 @@ export class CourseManager {
 
     getAllDepartments(): Department[] {
         return this.allDepartments;
+    }
+
+    private refreshSelectedCoursesWithFreshData(): void {
+        if (this.allDepartments.length === 0) {
+            return;
+        }
+        
+        let refreshedCount = 0;
+        const updatedSelections = new Map<Course, SelectedCourse>();
+        
+        this.selectedCourses.forEach((selectedCourse, oldCourse) => {
+            const freshCourse = this.findFreshCourse(oldCourse);
+            
+            if (freshCourse) {
+                const updatedSelectedCourse: SelectedCourse = {
+                    course: freshCourse,
+                    selectedSection: null,
+                    selectedSectionNumber: selectedCourse.selectedSectionNumber,
+                    isRequired: selectedCourse.isRequired
+                };
+                
+                if (selectedCourse.selectedSectionNumber) {
+                    const freshSection = freshCourse.sections.find(s => 
+                        s.number === selectedCourse.selectedSectionNumber
+                    );
+                    if (freshSection) {
+                        updatedSelectedCourse.selectedSection = freshSection;
+                    }
+                }
+                
+                updatedSelections.set(freshCourse, updatedSelectedCourse);
+                refreshedCount++;
+            } else {
+                updatedSelections.set(oldCourse, selectedCourse);
+            }
+        });
+        
+        this.selectedCourses = updatedSelections;
+        
+        if (refreshedCount > 0) {
+            console.log(`[CourseManager] Refreshed ${refreshedCount} selected courses with fresh data`);
+            this.notifyListeners();
+        }
+    }
+
+    private findFreshCourse(oldCourse: Course): Course | null {
+        for (const department of this.allDepartments) {
+            for (const course of department.courses) {
+                if (course.id === oldCourse.id && course.number === oldCourse.number) {
+                    return course;
+                }
+            }
+        }
+        return null;
     }
 
     reconstructSectionObjects(): void {

@@ -41,6 +41,7 @@ describe('ScheduleController Expansion State', () => {
         maxWaitlist: 10,
         description: 'Regular section',
         term: 'A',
+        computedTerm: 'A',
         periods: [testPeriod]
     };
 

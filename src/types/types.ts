@@ -25,6 +25,7 @@ export interface Section {
     note?: string;
     description: string;
     term: string;
+    computedTerm: string; // Computed academic term letter (A, B, C, D)
     periods: Period[];
 }
 

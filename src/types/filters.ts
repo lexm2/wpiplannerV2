@@ -91,6 +91,9 @@ export interface PeriodTypeFilterCriteria {
     types: string[];
 }
 
+export interface PeriodTermFilterCriteria {
+    terms: string[];
+}
 
 export interface PeriodAvailabilityFilterCriteria {
     availableOnly: boolean;

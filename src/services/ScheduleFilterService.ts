@@ -6,6 +6,7 @@ import { CourseSelectionFilter } from '../core/filters/CourseSelectionFilter';
 import { PeriodDaysFilter } from '../core/filters/PeriodDaysFilter';
 import { PeriodProfessorFilter } from '../core/filters/PeriodProfessorFilter';
 import { PeriodTypeFilter } from '../core/filters/PeriodTypeFilter';
+import { PeriodTermFilter } from '../core/filters/PeriodTermFilter';
 import { PeriodAvailabilityFilter } from '../core/filters/PeriodAvailabilityFilter';
 import { PeriodConflictFilter } from '../core/filters/PeriodConflictFilter';
 import { SectionCodeFilter } from '../core/filters/SectionCodeFilter';
@@ -18,6 +19,7 @@ export class ScheduleFilterService {
     private periodDaysFilter: PeriodDaysFilter;
     private periodProfessorFilter: PeriodProfessorFilter;
     private periodTypeFilter: PeriodTypeFilter;
+    private periodTermFilter: PeriodTermFilter;
     private periodAvailabilityFilter: PeriodAvailabilityFilter;
     private periodConflictFilter: PeriodConflictFilter | null = null;
     private sectionCodeFilter: SectionCodeFilter;
@@ -28,6 +30,7 @@ export class ScheduleFilterService {
         this.periodDaysFilter = new PeriodDaysFilter();
         this.periodProfessorFilter = new PeriodProfessorFilter();
         this.periodTypeFilter = new PeriodTypeFilter();
+        this.periodTermFilter = new PeriodTermFilter();
         this.periodAvailabilityFilter = new PeriodAvailabilityFilter();
         this.sectionCodeFilter = new SectionCodeFilter();
         
@@ -49,6 +52,7 @@ export class ScheduleFilterService {
         this.filterService.registerFilter(this.periodDaysFilter);
         this.filterService.registerFilter(this.periodProfessorFilter);
         this.filterService.registerFilter(this.periodTypeFilter);
+        this.filterService.registerFilter(this.periodTermFilter);
         this.filterService.registerFilter(this.periodAvailabilityFilter);
         this.filterService.registerFilter(this.sectionCodeFilter);
     }
@@ -64,6 +68,10 @@ export class ScheduleFilterService {
     
     removeFilter(filterId: string): boolean {
         return this.filterService.removeFilter(filterId);
+    }
+    
+    clearAllFilters(): void {
+        this.filterService.clearFilters();
     }
     
     clearFilters(): void {
@@ -362,6 +370,10 @@ export class ScheduleFilterService {
                         });
                     });
                     break;
+                case 'periodTerm':
+                    // Include only sections from selected terms
+                    allSections = this.periodTermFilter.applyToSections(allSections, activeFilter.criteria);
+                    break;
                 case 'periodAvailability':
                     allSections = allSections.filter(item => 
                         this.periodAvailabilityFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
@@ -410,6 +422,8 @@ export class ScheduleFilterService {
                 return this.getAvailableProfessors(selectedCourses);
             case 'periodType':
                 return this.getAvailablePeriodTypes(selectedCourses);
+            case 'periodTerm':
+                return this.getAvailableTerms(selectedCourses);
             case 'sectionCode':
                 return this.getAvailableSectionCodes(selectedCourses);
             default:
@@ -558,5 +572,47 @@ export class ScheduleFilterService {
             value: code,
             label: code
         }));
+    }
+    
+    private getAvailableTerms(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
+        console.log(`[DEBUG] getAvailableTerms called with ${selectedCourses.length} courses`);
+        const terms = new Set<string>();
+        
+        selectedCourses.forEach(sc => {
+            console.log(`[DEBUG] Processing course ${sc.course.id} with ${sc.course.sections.length} sections`);
+            sc.course.sections.forEach(section => {
+                console.log(`[DEBUG] Section ${section.number}: computedTerm = "${section.computedTerm}"`);
+                
+                // Filter out invalid computed terms
+                if (section.computedTerm && 
+                    section.computedTerm.trim() && 
+                    section.computedTerm !== 'undefined' && 
+                    typeof section.computedTerm === 'string') {
+                    terms.add(section.computedTerm.trim());
+                } else {
+                    console.warn(`[WARN] Invalid computedTerm for section ${section.number}: "${section.computedTerm}"`);
+                }
+            });
+        });
+        
+        const termArray = Array.from(terms).sort();
+        console.log(`[DEBUG] Available terms found:`, termArray);
+        return termArray.map(term => ({
+            value: term,
+            label: this.formatTermName(term)
+        }));
+    }
+    
+    private formatTermName(term: string): string {
+        const normalized = term.toUpperCase().trim();
+        
+        const termMap: { [key: string]: string } = {
+            'A': 'A Term',
+            'B': 'B Term',
+            'C': 'C Term', 
+            'D': 'D Term'
+        };
+        
+        return termMap[normalized] || term.toUpperCase();
     }
 }

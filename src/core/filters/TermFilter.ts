@@ -17,30 +17,9 @@ export class TermFilter implements CourseFilter {
         
         return courses.filter(course =>
             course.sections.some(section => {
-                const extractedTerm = this.extractTermLetter(section.term, section.number);
-                return termSet.has(extractedTerm);
+                return termSet.has(section.computedTerm);
             })
         );
-    }
-    
-    private extractTermLetter(termString: string, sectionNumber?: string): string {
-        // Extract term from section numbers like "A01" -> A, "D01" -> D
-        if (sectionNumber) {
-            const sectionMatch = sectionNumber.match(/^([ABCD])/i);
-            if (sectionMatch) {
-                return sectionMatch[1].toUpperCase();
-            }
-        }
-        
-        // Text format for future compatibility ("2025 Fall A Term", "2026 Spring C Term")
-        if (termString) {
-            const textMatch = termString.match(/\b([ABCD])\s+Term/i);
-            if (textMatch) {
-                return textMatch[1].toUpperCase();
-            }
-        }
-        
-        return 'A'; // fallback
     }
     
     isValidCriteria(criteria: any): criteria is TermFilterCriteria {
