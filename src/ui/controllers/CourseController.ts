@@ -1,14 +1,20 @@
 import { Course, Department } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
+import { FilterService } from '../../services/FilterService'
 
 export class CourseController {
     private allDepartments: Department[] = [];
     private selectedCourse: Course | null = null;
     private courseSelectionService: CourseSelectionService;
+    private filterService: FilterService | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
+    }
+
+    setFilterService(filterService: FilterService): void {
+        this.filterService = filterService;
     }
 
     setAllDepartments(departments: Department[]): void {
@@ -135,28 +141,78 @@ export class CourseController {
     }
 
     handleSearch(query: string, selectedDepartment: Department | null): Course[] {
+        const baseCourses = selectedDepartment ? selectedDepartment.courses : this.getAllCourses();
+        
+        // If we have a FilterService, use it for search and filtering
+        if (this.filterService) {
+            const results = this.filterService.searchAndFilter(query, baseCourses);
+            this.updateSearchHeader(query, results.length, selectedDepartment);
+            return results;
+        }
+        
+        // Fallback to simple search if no FilterService
         if (!query.trim()) {
-            return selectedDepartment ? selectedDepartment.courses : [];
+            return baseCourses;
         }
 
-        const allCourses: Course[] = [];
-        this.allDepartments.forEach(dept => {
-            allCourses.push(...dept.courses);
-        });
-
-        const filteredCourses = allCourses.filter(course => 
+        const filteredCourses = baseCourses.filter(course => 
             course.name.toLowerCase().includes(query.toLowerCase()) ||
             course.number.toLowerCase().includes(query.toLowerCase()) ||
             course.id.toLowerCase().includes(query.toLowerCase())
         );
 
-        // Update header for search results
+        this.updateSearchHeader(query, filteredCourses.length, selectedDepartment);
+        return filteredCourses;
+    }
+
+    // New method to handle courses with filters (no search query)
+    handleFilter(selectedDepartment: Department | null): Course[] {
+        const baseCourses = selectedDepartment ? selectedDepartment.courses : this.getAllCourses();
+        
+        if (this.filterService && !this.filterService.isEmpty()) {
+            const results = this.filterService.filterCourses(baseCourses);
+            this.updateFilterHeader(results.length, selectedDepartment);
+            return results;
+        }
+        
+        return baseCourses;
+    }
+
+    private getAllCourses(): Course[] {
+        const allCourses: Course[] = [];
+        this.allDepartments.forEach(dept => {
+            allCourses.push(...dept.courses);
+        });
+        return allCourses;
+    }
+
+    private updateSearchHeader(query: string, resultCount: number, selectedDepartment: Department | null): void {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
-            contentHeader.textContent = `Search Results (${filteredCourses.length})`;
+            if (query.trim()) {
+                contentHeader.textContent = `Search Results (${resultCount})`;
+            } else if (selectedDepartment) {
+                contentHeader.textContent = `${selectedDepartment.name} (${resultCount})`;
+            } else {
+                contentHeader.textContent = `All Courses (${resultCount})`;
+            }
         }
+    }
 
-        return filteredCourses;
+    private updateFilterHeader(resultCount: number, selectedDepartment: Department | null): void {
+        const contentHeader = document.querySelector('.content-header h2');
+        if (contentHeader) {
+            let title = selectedDepartment ? selectedDepartment.name : 'All Courses';
+            
+            if (this.filterService && !this.filterService.isEmpty()) {
+                const filterSummary = this.filterService.getFilterSummary();
+                title += ` (${resultCount}) - ${filterSummary}`;
+            } else {
+                title += ` (${resultCount})`;
+            }
+            
+            contentHeader.textContent = title;
+        }
     }
 
     selectCourse(element: HTMLElement): Course | null {

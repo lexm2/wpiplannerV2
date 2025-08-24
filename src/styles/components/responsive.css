@@ -20,7 +20,17 @@
     gap: 0.5rem;
   }
   
-  .search-input {
-    width: 100%;
+  .content-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .search-controls {
+    max-width: none;
+  }
+  
+  .content-header .search-input {
+    max-width: none;
   }
 }

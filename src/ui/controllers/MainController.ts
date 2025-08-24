@@ -9,6 +9,10 @@ import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
+import { FilterModalController } from './FilterModalController'
+import { FilterService } from '../../services/FilterService'
+import { SearchService } from '../../services/searchService'
+import { createDefaultFilters } from '../../core/filters'
 import { UIStateManager } from './UIStateManager'
 import { TimestampManager } from './TimestampManager'
 
@@ -23,6 +27,9 @@ export class MainController {
     private scheduleController: ScheduleController;
     private sectionInfoModalController: SectionInfoModalController;
     private infoModalController: InfoModalController;
+    private filterModalController: FilterModalController;
+    private searchService: SearchService;
+    private filterService: FilterService;
     private uiStateManager: UIStateManager;
     private timestampManager: TimestampManager;
     private allDepartments: Department[] = [];
@@ -35,10 +42,26 @@ export class MainController {
         this.conflictDetector = new ConflictDetector();
         this.modalService = new ModalService();
         this.departmentController = new DepartmentController();
+        
+        // Initialize search and filter services
+        this.searchService = new SearchService();
+        this.filterService = new FilterService(this.searchService);
+        
+        // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService);
         this.scheduleController = new ScheduleController(this.courseSelectionService);
         this.sectionInfoModalController = new SectionInfoModalController(this.modalService);
         this.infoModalController = new InfoModalController(this.modalService);
+        this.filterModalController = new FilterModalController(this.modalService);
+        
+        // Set up filter service with default filters
+        this.initializeFilters();
+        
+        // Connect filter service to course controller
+        this.courseController.setFilterService(this.filterService);
+        
+        // Connect filter service and course data to filter modal
+        this.filterModalController.setFilterService(this.filterService);
         
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
@@ -62,6 +85,24 @@ export class MainController {
         this.init();
     }
 
+    private initializeFilters(): void {
+        const filters = createDefaultFilters();
+        filters.forEach(filter => {
+            this.filterService.registerFilter(filter);
+        });
+
+        // Set up filter change listener to refresh UI
+        this.filterService.addEventListener((event) => {
+            this.refreshCurrentView();
+        });
+
+        // Load saved filters from storage
+        this.filterService.loadFiltersFromStorage();
+        
+        // Initialize filter button state
+        setTimeout(() => this.updateFilterButtonState(), 100);
+    }
+
     private async init(): Promise<void> {
         this.uiStateManager.showLoadingState();
         await this.loadCourseData();
@@ -83,6 +124,13 @@ export class MainController {
             this.departmentController.setAllDepartments(this.allDepartments);
             this.courseController.setAllDepartments(this.allDepartments);
             this.courseSelectionService.setAllDepartments(this.allDepartments);
+            
+            // Initialize search service with course data
+            this.searchService.setCourseData(this.allDepartments);
+            
+            // Initialize filter modal with course data
+            this.filterModalController.setCourseData(this.allDepartments);
+            
             console.log(`Loaded ${this.allDepartments.length} departments`);
             
             // IMPORTANT: Reconstruct Section objects after course data is loaded
@@ -271,23 +319,64 @@ export class MainController {
                 this.refreshCurrentView();
             });
         }
+
+        // Filter button
+        const filterButton = document.getElementById('filter-btn');
+        if (filterButton) {
+            filterButton.addEventListener('click', () => {
+                this.filterModalController.show();
+            });
+        }
     }
 
     private refreshCurrentView(): void {
         const selectedDepartment = this.departmentController.getSelectedDepartment();
-        if (selectedDepartment) {
-            this.courseController.displayCourses(selectedDepartment.courses, this.uiStateManager.currentView);
+        const searchInput = document.getElementById('search-input') as HTMLInputElement;
+        const hasSearch = searchInput?.value.trim();
+        const hasFilters = !this.filterService.isEmpty();
+        
+        let coursesToDisplay: Course[] = [];
+        
+        if (hasSearch) {
+            // Handle search (which may also include filters)
+            coursesToDisplay = this.courseController.handleSearch(searchInput.value, selectedDepartment);
+        } else if (hasFilters) {
+            // Handle filters only (no search)
+            coursesToDisplay = this.courseController.handleFilter(selectedDepartment);
+        } else if (selectedDepartment) {
+            // Show department courses without filters
+            coursesToDisplay = selectedDepartment.courses;
         } else {
-            // Check if we're showing search results
-            const searchInput = document.getElementById('search-input') as HTMLInputElement;
-            if (searchInput?.value.trim()) {
-                const filteredCourses = this.courseController.handleSearch(searchInput.value, null);
-                this.courseController.displayCourses(filteredCourses, this.uiStateManager.currentView);
+            // No search, no filters, no department selected - show empty state
+            coursesToDisplay = [];
+        }
+        
+        this.courseController.displayCourses(coursesToDisplay, this.uiStateManager.currentView);
+        
+        // Save current filter state
+        if (hasFilters) {
+            this.filterService.saveFiltersToStorage();
+        }
+        
+        // Update filter button appearance
+        this.updateFilterButtonState();
+    }
+
+    private updateFilterButtonState(): void {
+        const filterButton = document.getElementById('filter-btn');
+        if (filterButton && this.filterService) {
+            const hasActiveFilters = !this.filterService.isEmpty();
+            const filterCount = this.filterService.getFilterCount();
+            
+            if (hasActiveFilters) {
+                filterButton.classList.add('active');
+                filterButton.title = `${filterCount} filter${filterCount === 1 ? '' : 's'} active - Click to modify`;
+            } else {
+                filterButton.classList.remove('active');
+                filterButton.title = 'Filter courses';
             }
         }
     }
-
-
 
     private clearSelection(): void {
         // Clear selected sections
@@ -383,6 +472,10 @@ export class MainController {
 
     public getCourseSelectionService(): CourseSelectionService {
         return this.courseSelectionService;
+    }
+
+    public getFilterService(): FilterService {
+        return this.filterService;
     }
 
     public getModalService(): ModalService {

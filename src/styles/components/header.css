@@ -77,23 +77,3 @@
   align-items: center;
 }
 
-.search-input {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  font-size: 14px;
-  width: 300px;
-  transition: var(--effect-transition);
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary)20;
-}
-
-.search-input::placeholder {
-  color: var(--color-text-secondary);
-}
