@@ -23,16 +23,7 @@ The application has undergone a major storage architecture refactor to eliminate
 
 #### Key Architectural Changes
 
-**Before (Conflicting Systems):**
-```
-StorageManager (direct localStorage) ←→ Data Corruption ←→
-ProfileStateManager (transactional storage)
-           ↓
-    ThemeSelector
-CourseSelectionService
-```
-
-**After (Unified System):**
+**Current Unified Architecture:**
 ```
                 ProfileStateManager (Single Source of Truth)
                             ↓
@@ -42,8 +33,7 @@ CourseSelectionService
                             ↑
       ┌─────────────────────────────────────────────────────┐
       │                                                     │
- StorageService ←→ ThemeManager    CourseSelectionService
-MainController
+ StorageService ←→ ThemeManager    CourseSelectionService    MainController
       ↑
  ThemeSelector
 ```
@@ -62,10 +52,6 @@ MainController
 - Provides atomic operations for data consistency
 - Foundation layer that ProfileStateManager builds upon
 
-**StorageManager.ts** (Deprecated)
-- Legacy persistence layer - marked for removal
-- All functionality redirected to ProfileStateManager
-- Maintains backward compatibility during transition period
 
 **ProfileMigrationService.ts**
 - Handles migration between different storage formats
@@ -81,11 +67,6 @@ MainController
 
 ### Course & Schedule Management
 
-**CourseManager.ts**
-- Core business logic for course selection and management
-- Tracks selected courses with section preferences
-- Manages course metadata (credits, requirements, etc.)
-- Provides event-driven notifications for UI updates
 
 **ConflictDetector.ts**
 - Analyzes time conflicts between course sections
@@ -131,14 +112,105 @@ The filtering system provides a flexible, composable architecture for filtering 
 1. **Data Ingestion**: Course data fetched from WPI's APIs via services layer
 2. **Processing**: Raw data validated and transformed by core utilities  
 3. **Storage**: Processed data persisted using ProfileStateManager
-4. **Business Logic**: CourseManager coordinates course selection and validation
+4. **Business Logic**: ProfileStateManager coordinates course selection and validation
 5. **Filtering**: Filter system narrows down available options based on user criteria
 6. **Conflict Detection**: ConflictDetector validates schedule feasibility
 7. **UI Updates**: Event-driven notifications update the user interface
 
+## Services Layer (`src/services/`)
+
+The services layer provides high-level business logic coordination and external integrations. Services orchestrate interactions between core components and provide clean APIs for the UI layer.
+
+### Data & External Integration Services
+
+**courseDataService.ts**
+- **Purpose**: Fetches and parses WPI course data from external JSON files
+- **Connections**: Used by MainController for initial data loading
+- **Key Features**: JSON parsing, data transformation, error handling
+- **Data Flow**: External JSON → Parse/Transform → ScheduleDB → Application
+
+**StorageService.ts** 
+- **Purpose**: Unified singleton interface to ProfileStateManager
+- **Connections**: Used by ThemeManager and other components needing storage
+- **Key Features**: Singleton pattern, implements ThemeStorage interface
+- **Architecture Role**: Bridge between UI components and core storage system
+
+### Course & Schedule Management Services
+
+**CourseSelectionService.ts**
+- **Purpose**: High-level API for course selection and management
+- **Core Dependencies**: ProfileStateManager, DataValidator, RetryManager
+- **UI Connections**: Used by MainController, CourseController, ScheduleController
+- **Key Features**: Event-driven updates, validation, persistence, import/export
+- **Events**: course_added, course_removed, section_changed, selection_cleared
+
+**ScheduleManagementService.ts**
+- **Purpose**: Manages multiple schedules and schedule operations
+- **Dependencies**: CourseSelectionService, ProfileStateManager, DataValidator
+- **UI Connections**: ScheduleController, ScheduleSelector component
+- **Key Features**: Schedule CRUD operations, activation, event notifications
+- **Events**: schedule_created, schedule_deleted, schedule_updated, schedule_activated
+
+### Search & Filtering Services
+
+**searchService.ts**
+- **Purpose**: Full-text search across courses, professors, and course content
+- **Key Features**: Search indexing, ranking algorithms, caching
+- **Performance**: Pre-built indexes for fast search on large datasets
+- **Used By**: FilterService, SearchTextFilter, UI search components
+
+**FilterService.ts**
+- **Purpose**: Coordinating service for the filtering system
+- **Dependencies**: SearchService, FilterState (core)
+- **Connections**: Used by ScheduleFilterService and FilterModalController
+- **Key Features**: Filter registration, state management, event coordination
+- **Architecture**: Bridge between core filter system and UI controllers
+
+**ScheduleFilterService.ts**
+- **Purpose**: Specialized filtering for schedule generation and conflict detection
+- **Dependencies**: FilterService, SearchService, ConflictDetector
+- **Filter Types**: PeriodConflictFilter, PeriodDaysFilter, PeriodTypeFilter
+- **Used By**: ScheduleController for generating valid schedules
+
+**DepartmentSyncService.ts**
+- **Purpose**: Synchronizes department selection between UI components
+- **Connections**: FilterService ↔ DepartmentController ↔ FilterModalController
+- **Key Features**: Prevents circular updates, maintains UI consistency
+- **Architecture Role**: Coordination layer preventing tight coupling between UI components
+
+### UI Support Services
+
+**ModalService.ts**
+- **Purpose**: Centralized modal management and z-index coordination
+- **Key Features**: Modal lifecycle, z-index stacking, animation coordination
+- **Used By**: Various modal controllers throughout the UI layer
+- **Benefits**: Prevents modal conflicts, consistent behavior
+
+### Service Interconnection Patterns
+
+```
+Data Flow:
+courseDataService → SearchService → FilterService → UI Controllers
+                 → CourseSelectionService → ScheduleManagementService
+
+Storage Flow:
+UI Components → Services → StorageService → ProfileStateManager → localStorage
+
+Event Flow:
+Core Changes → Service Events → UI Updates
+UI Actions → Service Coordination → Core Updates
+```
+
+### Key Architectural Benefits
+
+- **Separation of Concerns**: Services handle coordination, core handles business logic
+- **Event-Driven Architecture**: Services provide clean event interfaces for UI updates
+- **Dependency Injection**: Services can be mocked/replaced for testing
+- **Single Responsibility**: Each service has a focused purpose
+- **Loose Coupling**: UI components interact through service APIs, not directly with core
+
 ## Next Sections
 
-- Services Layer Architecture
 - UI Components & Controllers  
 - Utilities & Helper Functions
 - Type System & Data Models

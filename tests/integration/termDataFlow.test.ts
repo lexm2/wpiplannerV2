@@ -4,8 +4,7 @@ import { CourseSelectionService } from '../../src/services/CourseSelectionServic
 import { ScheduleController } from '../../src/ui/controllers/ScheduleController';
 import { ScheduleFilterService } from '../../src/services/ScheduleFilterService';
 import { SearchService } from '../../src/services/searchService';
-import { CourseManager } from '../../src/core/CourseManager';
-import { StorageManager } from '../../src/core/StorageManager';
+import { ProfileStateManager } from '../../src/core/ProfileStateManager';
 import { extractTermLetter } from '../../src/utils/termUtils';
 import { Course, Department, Section, Period } from '../../src/types/types';
 import { SelectedCourse } from '../../src/types/schedule';
@@ -114,9 +113,8 @@ describe('Term Data Flow Integration Tests', () => {
         localStorage.clear();
         
         // Initialize services
-        const courseManager = new CourseManager();
-        const storageManager = new StorageManager();
-        courseSelectionService = new CourseSelectionService(courseManager, storageManager);
+        const profileStateManager = new ProfileStateManager();
+        courseSelectionService = new CourseSelectionService(profileStateManager);
         
         const searchService = new SearchService();
         scheduleFilterService = new ScheduleFilterService(searchService);
