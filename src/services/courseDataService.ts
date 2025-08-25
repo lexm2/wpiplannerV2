@@ -59,7 +59,12 @@ export class CourseDataService {
     }
 
     private parseConstructedDepartments(departments: any[]): Department[] {
-        return departments.map(deptData => {
+        const seenIds = new Set<string>();
+        const duplicateIds = new Set<string>();
+        let totalCoursesProcessed = 0;
+        let duplicatesFixed = 0;
+        
+        const result = departments.map(deptData => {
             const department: Department = {
                 abbreviation: deptData.abbreviation,
                 name: deptData.name,
@@ -67,8 +72,30 @@ export class CourseDataService {
             };
             
             department.courses = deptData.courses.map((courseData: any) => {
+                totalCoursesProcessed++;
+                let courseId = courseData.id;
+                
+                // Check for duplicate ID
+                if (seenIds.has(courseId)) {
+                    duplicateIds.add(courseId);
+                    const fallbackId = `${department.abbreviation}-${courseData.number}`;
+                    console.warn(`🔍 Duplicate course ID detected: "${courseId}" for ${department.abbreviation}${courseData.number}`);
+                    console.warn(`   Using fallback ID: "${fallbackId}"`);
+                    courseId = fallbackId;
+                    duplicatesFixed++;
+                    
+                    // If fallback is also duplicate, add a counter
+                    let counter = 2;
+                    while (seenIds.has(courseId)) {
+                        courseId = `${fallbackId}-${counter}`;
+                        counter++;
+                    }
+                }
+                
+                seenIds.add(courseId);
+                
                 const course: Course = {
-                    id: courseData.id,
+                    id: courseId,
                     number: courseData.number,
                     name: courseData.name,
                     description: this.stripHtml(courseData.description || ''),
@@ -82,6 +109,18 @@ export class CourseDataService {
             
             return department;
         });
+        
+        // Log summary of duplicate ID fixes
+        if (duplicatesFixed > 0) {
+            console.log(`📋 Course ID Deduplication Summary:`);
+            console.log(`   Total courses processed: ${totalCoursesProcessed}`);
+            console.log(`   Duplicate IDs fixed: ${duplicatesFixed}`);
+            console.log(`   Affected original IDs: [${Array.from(duplicateIds).join(', ')}]`);
+        } else {
+            console.log(`✅ Course ID validation complete: ${totalCoursesProcessed} courses, no duplicates found`);
+        }
+        
+        return result;
     }
 
     private parseConstructedSections(sections: any[]): Section[] {
