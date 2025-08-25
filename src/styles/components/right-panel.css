@@ -46,19 +46,23 @@
 
 .course-info {
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .course-title {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-text);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
 .course-code {
   font-size: 0.9rem;
   color: var(--color-text-secondary);
-  margin-bottom: 1rem;
+  margin-bottom: 0;
+  flex-shrink: 0;
 }
 
 .course-description-text {

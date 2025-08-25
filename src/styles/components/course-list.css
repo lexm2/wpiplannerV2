@@ -27,9 +27,15 @@
 
 .course-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 1rem;
   margin-bottom: 0.75rem;
+}
+
+.course-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .course-select-btn {
@@ -159,6 +165,14 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+}
+
+.course-card-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  justify-content: space-between;
 }
 
 .course-card .course-code {

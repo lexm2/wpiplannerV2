@@ -182,10 +182,12 @@ export class ProgressiveRenderer {
                 return `
                     <div class="course-item ${isSelected ? 'selected' : ''}" data-course-id="${course.id}">
                         <div class="course-header">
-                            <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
-                                ${isSelected ? '✓' : '+'}
-                            </button>
-                            <div class="course-code">${course.department.abbreviation}${course.number}</div>
+                            <div class="course-header-controls">
+                                <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
+                                    ${isSelected ? '✓' : '+'}
+                                </button>
+                                <div class="course-code">${course.department.abbreviation}${course.number}</div>
+                            </div>
                             <div class="course-details">
                                 <div class="course-name">
                                     ${course.name}
@@ -299,10 +301,12 @@ export class ProgressiveRenderer {
                 return `
                     <div class="course-card ${isSelected ? 'selected' : ''}" data-course-id="${course.id}">
                         <div class="course-card-header">
-                            <div class="course-code">${course.department.abbreviation}${course.number}</div>
-                            <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
-                                ${isSelected ? '✓' : '+'}
-                            </button>
+                            <div class="course-card-controls">
+                                <div class="course-code">${course.department.abbreviation}${course.number}</div>
+                                <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
+                                    ${isSelected ? '✓' : '+'}
+                                </button>
+                            </div>
                         </div>
                         <div class="course-title">
                             ${course.name}
