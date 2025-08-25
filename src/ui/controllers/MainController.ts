@@ -784,9 +784,23 @@ export class MainController {
     private previousSelectedCoursesMap = new Map<string, string | null>();
 
     private setupCourseSelectionListener(): void {
-        this.courseSelectionService.onSelectionChange((selectedCourses) => {
+        this.courseSelectionService.onSelectionChangeWithType((event) => {
+            const selectedCourses = event.selectedCourses;
             const currentCount = selectedCourses.length;
             const isCoursesAddedOrRemoved = currentCount !== this.previousSelectedCoursesCount;
+            
+            // Handle schedule changes and data loads with full refresh
+            const requiresFullRefresh = event.type === 'data_loaded' || event.type === 'selection_cleared';
+            if (requiresFullRefresh) {
+                this.courseController.refreshCourseSelectionUI(selectedCourses, new Map());
+                this.courseController.displaySelectedCourses();
+                this.scheduleController.displayScheduleSelectedCourses();
+                if (this.uiStateManager.currentPage === 'schedule') {
+                    this.scheduleController.renderScheduleGrids();
+                }
+                this.updateSelectedCoursesState(selectedCourses);
+                return;
+            }
             
             // Create current state map for comparison
             const currentCoursesMap = new Map<string, string | null>();
@@ -833,8 +847,15 @@ export class MainController {
             }
             
             // Update tracking state
-            this.previousSelectedCoursesCount = currentCount;
-            this.previousSelectedCoursesMap = new Map(currentCoursesMap);
+            this.updateSelectedCoursesState(selectedCourses);
+        });
+    }
+
+    private updateSelectedCoursesState(selectedCourses: SelectedCourse[]): void {
+        this.previousSelectedCoursesCount = selectedCourses.length;
+        this.previousSelectedCoursesMap = new Map<string, string | null>();
+        selectedCourses.forEach(sc => {
+            this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
         });
     }
 

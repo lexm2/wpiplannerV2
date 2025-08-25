@@ -519,6 +519,11 @@ export class CourseSelectionService {
         this.addSelectionListener(listener);
     }
 
+    // Enhanced listener that provides event type for better UI handling
+    onSelectionChangeWithType(callback: (event: SelectionChangeEvent) => void): void {
+        this.addSelectionListener(callback);
+    }
+
     // Department and section management
     setAllDepartments(departments: Department[]): void {
         // This would typically be handled by a separate service
@@ -708,11 +713,29 @@ export class CourseSelectionService {
                     // Refresh optimistic UI cache with new schedule's data
                     this.uiStateBuffer.refreshFromBackend();
                     
+                    // Force complete UI refresh for schedule changes
+                    const newSelectedCourses = this.profileStateManager.getSelectedCourses();
+                    
+                    // Dispatch data_loaded event to trigger complete UI refresh
                     this.notifySelectionListeners({
                         type: 'data_loaded',
-                        selectedCourses: this.profileStateManager.getSelectedCourses(),
+                        selectedCourses: newSelectedCourses,
                         timestamp: event.timestamp
                     });
+                    
+                    // Also dispatch a specific schedule change event for components that need it
+                    setTimeout(() => {
+                        this.notifySelectionListeners({
+                            type: 'selection_cleared',
+                            selectedCourses: [],
+                            timestamp: event.timestamp
+                        });
+                        this.notifySelectionListeners({
+                            type: 'data_loaded',
+                            selectedCourses: newSelectedCourses,
+                            timestamp: event.timestamp + 1
+                        });
+                    }, 10);
                     break;
             }
         };
