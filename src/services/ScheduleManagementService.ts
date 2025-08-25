@@ -58,77 +58,39 @@ export class ScheduleManagementService {
 
     // Initialization
     async initialize(): Promise<boolean> {
-        console.log('🚀 [ScheduleManagementService] initialize() called');
-        console.log('📊 [ScheduleManagementService] isInitialized:', this.isInitialized);
-        console.log('📊 [ScheduleManagementService] initializationPromise exists:', !!this.initializationPromise);
-        
-        if (this.isInitialized) {
-            console.log('✅ [ScheduleManagementService] Already initialized, returning true');
-            return true;
-        }
-        
-        if (this.initializationPromise) {
-            console.log('⏳ [ScheduleManagementService] Initialization already in progress, awaiting...');
-            return this.initializationPromise;
-        }
+        if (this.isInitialized) return true;
+        if (this.initializationPromise) return this.initializationPromise;
 
-        console.log('🔄 [ScheduleManagementService] Starting new initialization...');
         this.initializationPromise = this.performInitialization();
-        const result = await this.initializationPromise;
-        console.log('📊 [ScheduleManagementService] initialize() completed with result:', result);
-        return result;
+        return await this.initializationPromise;
     }
 
     private async performInitialization(): Promise<boolean> {
         try {
-            console.log('🚀 [ScheduleManagementService] performInitialization() starting...');
-
-            console.log('🔄 [ScheduleManagementService] Step 1: Initializing CourseSelectionService...');
             // Initialize dependencies first
-            const courseServiceStart = Date.now();
             await this.courseSelectionService.initialize();
-            const courseServiceDuration = Date.now() - courseServiceStart;
-            console.log(`✅ [ScheduleManagementService] CourseSelectionService initialized in ${courseServiceDuration}ms`);
 
-            console.log('🔄 [ScheduleManagementService] Step 2: Loading ProfileStateManager from storage...');
             // Ensure profile state is loaded
-            const storageStart = Date.now();
             await this.profileStateManager.loadFromStorage();
-            const storageDuration = Date.now() - storageStart;
-            console.log(`✅ [ScheduleManagementService] ProfileStateManager loaded in ${storageDuration}ms`);
 
-            console.log('🔄 [ScheduleManagementService] Step 3: Initializing default schedule if needed...');
             // Initialize default schedule if needed
-            const defaultScheduleStart = Date.now();
             await this.initializeDefaultScheduleIfNeeded();
-            const defaultScheduleDuration = Date.now() - defaultScheduleStart;
-            console.log(`✅ [ScheduleManagementService] Default schedule check completed in ${defaultScheduleDuration}ms`);
 
             this.isInitialized = true;
-            console.log('🎉 [ScheduleManagementService] All initialization steps completed successfully!');
             return true;
 
         } catch (error) {
-            console.error('💥 [ScheduleManagementService] Initialization failed with error:', error);
-            console.error('💥 [ScheduleManagementService] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+            console.error('ScheduleManagementService initialization failed:', error);
             this.isInitialized = false;
             return false;
         } finally {
-            console.log('🔚 [ScheduleManagementService] performInitialization() finally block executing');
             this.initializationPromise = null;
-            console.log('🔚 [ScheduleManagementService] Cleared initializationPromise');
         }
     }
 
     // Schedule creation
     async createNewSchedule(name: string, options: ScheduleCreationOptions = {}): Promise<ScheduleOperationResult> {
-        console.log('🚀 [ScheduleManagementService] createNewSchedule() called');
-        console.log('📋 [ScheduleManagementService] Schedule name:', name);
-        console.log('📋 [ScheduleManagementService] Options:', options);
-        
-        console.log('🔄 [ScheduleManagementService] Ensuring initialization...');
         await this.ensureInitialized();
-        console.log('✅ [ScheduleManagementService] Initialization completed');
 
         const {
             includeCurrentCourses = false,
@@ -136,80 +98,52 @@ export class ScheduleManagementService {
             autoActivate = false,
             autoSave = true
         } = options;
-        
-        console.log('📋 [ScheduleManagementService] Processed options:', {
-            includeCurrentCourses,
-            copyFromSchedule,
-            autoActivate,
-            autoSave
-        });
 
         try {
-            console.log('🔍 [ScheduleManagementService] Validating schedule name...');
             // Validate schedule name
             if (!name || name.trim().length === 0) {
-                console.log('❌ [ScheduleManagementService] Empty schedule name validation failed');
                 return {
                     success: false,
                     error: 'Schedule name cannot be empty'
                 };
             }
 
-            console.log('🔍 [ScheduleManagementService] Checking for duplicate names and auto-generating unique name if needed...');
             // Auto-generate unique name instead of rejecting duplicates
             const existingSchedules = this.profileStateManager.getAllSchedules();
-            console.log(`📊 [ScheduleManagementService] Found ${existingSchedules.length} existing schedules`);
-            
             const uniqueName = this.generateUniqueScheduleName(name);
-            if (uniqueName !== name) {
-                console.log(`🔄 [ScheduleManagementService] Name "${name}" already exists, auto-generated unique name: "${uniqueName}"`);
-            } else {
-                console.log(`✅ [ScheduleManagementService] Name "${name}" is available`);
-            }
             
             // Use the unique name for creation
             name = uniqueName;
 
-            console.log('📋 [ScheduleManagementService] Preparing selected courses...');
             let selectedCourses: SelectedCourse[] = [];
 
             if (copyFromSchedule) {
-                console.log(`🔄 [ScheduleManagementService] Copying courses from schedule ID: ${copyFromSchedule}`);
                 // Copy from existing schedule
                 const sourceSchedule = existingSchedules.find(s => s.id === copyFromSchedule);
                 if (!sourceSchedule) {
-                    console.log(`❌ [ScheduleManagementService] Source schedule not found: ${copyFromSchedule}`);
                     return {
                         success: false,
                         error: `Source schedule with ID "${copyFromSchedule}" not found`
                     };
                 }
                 selectedCourses = [...sourceSchedule.selectedCourses];
-                console.log(`📊 [ScheduleManagementService] Copied ${selectedCourses.length} courses from source schedule`);
             } else if (includeCurrentCourses) {
-                console.log('📋 [ScheduleManagementService] Including current course selections...');
                 // Include current course selections
                 selectedCourses = this.profileStateManager.getSelectedCourses();
-                console.log(`📊 [ScheduleManagementService] Found ${selectedCourses.length} current selected courses`);
-            } else {
-                console.log('📋 [ScheduleManagementService] No courses to include - creating empty schedule');
             }
 
-            console.log(`🔄 [ScheduleManagementService] Creating schedule "${name}" with retry mechanism...`);
             // Create the schedule with retry using the unique name
             const result = await this.retryManager.executeWithRetry(
                 () => {
-                    console.log(`🚀 [ScheduleManagementService] Executing profileStateManager.createSchedule("${name}")`);
                     return this.profileStateManager.createSchedule(name, 'api');
                 },
                 {
                     operationName: `create schedule "${name}"`,
                     onRetry: (attempt, error) => {
-                        console.warn(`⚠️ [ScheduleManagementService] Schedule creation failed, retrying (attempt ${attempt}):`, error.message);
+                        console.warn(`Schedule creation retry ${attempt}:`, error.message);
                     }
                 }
             );
-            console.log('📊 [ScheduleManagementService] Retry mechanism completed, result:', result);
 
             if (!result.success || !result.result) {
                 return {
@@ -849,16 +783,9 @@ export class ScheduleManagementService {
 
     // Private helper methods
     private async ensureInitialized(): Promise<void> {
-        console.log('🔄 [ScheduleManagementService] ensureInitialized() called');
-        console.log('📊 [ScheduleManagementService] Current initialization state:', this.isInitialized);
-        
         if (!this.isInitialized) {
-            console.log('🚀 [ScheduleManagementService] Not initialized, calling initialize()...');
             await this.initialize();
-        } else {
-            console.log('✅ [ScheduleManagementService] Already initialized, skipping');
         }
-        console.log('✅ [ScheduleManagementService] ensureInitialized() completed');
     }
 
     private setupStateManagerListeners(): void {
@@ -910,37 +837,25 @@ export class ScheduleManagementService {
     }
 
     async initializeDefaultScheduleIfNeeded(): Promise<void> {
-        console.log('🔄 [ScheduleManagementService] initializeDefaultScheduleIfNeeded() called');
         const existingSchedules = this.profileStateManager.getAllSchedules();
-        console.log(`📊 [ScheduleManagementService] Found ${existingSchedules.length} existing schedules`);
         
         if (existingSchedules.length === 0) {
-            console.log('🆕 [ScheduleManagementService] No existing schedules, creating default schedule directly via ProfileStateManager...');
-            
             // Use ProfileStateManager directly to avoid circular dependency
             const defaultSchedule = this.profileStateManager.createSchedule('My Schedule', 'system');
-            console.log('✅ [ScheduleManagementService] Default schedule created:', defaultSchedule);
             
             // Set as active
-            const activated = this.profileStateManager.setActiveSchedule(defaultSchedule.id, 'system');
-            console.log('📊 [ScheduleManagementService] Default schedule activation result:', activated);
+            this.profileStateManager.setActiveSchedule(defaultSchedule.id, 'system');
             
             // Save the changes
             try {
                 await this.profileStateManager.save();
-                console.log('✅ [ScheduleManagementService] Default schedule saved successfully');
             } catch (error) {
-                console.warn('⚠️ [ScheduleManagementService] Failed to save default schedule:', error);
+                console.warn('Failed to save default schedule:', error);
             }
         } else if (!this.getActiveScheduleId()) {
-            console.log('🔄 [ScheduleManagementService] Schedules exist but no active one, activating first schedule...');
-            // Activate first schedule if no active one - use ProfileStateManager directly
-            const activated = this.profileStateManager.setActiveSchedule(existingSchedules[0].id, 'system');
-            console.log('📊 [ScheduleManagementService] First schedule activation result:', activated);
-        } else {
-            console.log('✅ [ScheduleManagementService] Active schedule already exists, no action needed');
+            // Activate first schedule if no active one
+            this.profileStateManager.setActiveSchedule(existingSchedules[0].id, 'system');
         }
-        console.log('✅ [ScheduleManagementService] initializeDefaultScheduleIfNeeded() completed');
     }
 
     private generateScheduleId(): string {

@@ -199,9 +199,7 @@ export class MainController {
             this.courseSelectionService.reconstructSectionObjects();
             
             // Initialize default schedule if needed (await to ensure it completes)
-            console.log('🔄 [MainController] Initializing default schedule if needed...');
             await this.scheduleManagementService.initializeDefaultScheduleIfNeeded();
-            console.log('✅ [MainController] Default schedule initialization completed');
             
             this.timestampManager.updateClientTimestamp();
             this.timestampManager.loadServerTimestamp();
@@ -420,17 +418,12 @@ export class MainController {
                     // Initialize schedule selector if not already created
                     if (!this.scheduleSelector) {
                         try {
-                            console.log('🔄 [MainController] Initializing ScheduleSelector...');
-                            
                             // Ensure the schedule management service is initialized before creating selector
-                            console.log('🔄 [MainController] Ensuring ScheduleManagementService is initialized...');
                             await this.scheduleManagementService.initialize();
-                            console.log('✅ [MainController] ScheduleManagementService initialization confirmed');
                             
                             this.scheduleSelector = new ScheduleSelector(this.scheduleManagementService, 'schedule-selector-container');
-                            console.log('✅ [MainController] ScheduleSelector created successfully');
                         } catch (error) {
-                            console.error('❌ [MainController] Failed to initialize schedule selector:', error);
+                            console.error('Failed to initialize schedule selector:', error);
                         }
                     }
                     
