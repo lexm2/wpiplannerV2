@@ -77,7 +77,6 @@ export class RetryManager {
                     }
                 }
 
-                console.log(`✅ ${operationName} succeeded on attempt ${attempt}/${this.config.maxAttempts} after ${totalTime}ms`);
 
                 return {
                     success: true,

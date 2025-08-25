@@ -21,6 +21,145 @@ export interface ProfileState {
 
 export type StateChangeListener = (event: StateChangeEvent, state: ProfileState) => void;
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * ProfileStateManager - Unified Application State & Persistence Foundation
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Single source of truth for all application data and state management
+ * - Central coordination hub for course selections, schedules, and user preferences
+ * - Foundation layer that eliminates data corruption through unified persistence
+ * - Event-driven state management with real-time notifications across all components
+ * - Core persistence coordinator integrating with transactional storage system
+ * 
+ * DEPENDENCIES:
+ * - TransactionalStorageManager → Low-level storage operations with atomic transactions
+ * - Schedule, SelectedCourse, SchedulePreferences types → Data models and contracts
+ * - Course type → Core academic data structure for course selection operations
+ * - StateChangeEvent system → Event-driven architecture for cross-component notifications
+ * - localStorage (via TransactionalStorageManager) → Browser persistence layer
+ * 
+ * USED BY:
+ * - CourseSelectionService → High-level course selection API with ProfileStateManager coordination
+ * - ScheduleManagementService → Schedule operations and multi-schedule management
+ * - StorageService → Singleton bridge to ProfileStateManager for legacy components
+ * - MainController → Application initialization and core functionality coordination  
+ * - ThemeManager → User preferences and theme persistence
+ * - ALL UI Controllers → State access and event-driven updates
+ * - ALL Services → Shared state access and persistence operations
+ * 
+ * UNIFIED STORAGE ARCHITECTURE:
+ * Before (Multiple Storage Systems - Data Corruption Issues):
+ * ```
+ * CourseManager ←→ localStorage
+ * StorageManager ←→ localStorage  
+ * ThemeManager ←→ localStorage
+ * [Competing writes, data corruption, inconsistent state]
+ * ```
+ * 
+ * After (Unified Architecture - Single Source of Truth):
+ * ```
+ *                ProfileStateManager (Single Source of Truth)
+ *                            ↓
+ *                TransactionalStorageManager
+ *                            ↓
+ *                       localStorage
+ *                            ↑
+ *      ┌─────────────────────────────────────────────────────┐
+ *      │                                                     │
+ * StorageService ←→ ThemeManager    CourseSelectionService    MainController
+ *      ↑
+ * ThemeSelector
+ * ```
+ * 
+ * DATA FLOW & STATE MANAGEMENT:
+ * State Update Process:
+ * 1. External component calls ProfileStateManager method (selectCourse, createSchedule, etc.)
+ * 2. withStateUpdate() wrapper executes the state change atomically
+ * 3. hasUnsavedChanges flag set to true, save state change event emitted
+ * 4. Debounced save (500ms) triggers background persistence via TransactionalStorageManager
+ * 5. StateChangeEvent emitted to all registered listeners with new state
+ * 6. Event queue processes events asynchronously to prevent recursion
+ * 7. UI components receive events and update accordingly
+ * 
+ * Persistence Flow:
+ * 1. State changes trigger debouncedSave() to batch operations
+ * 2. save() method creates transactional operations array
+ * 3. TransactionalStorageManager.executeTransaction() ensures atomicity
+ * 4. On success: hasUnsavedChanges = false, lastSaved timestamp updated
+ * 5. save_state_changed event emitted for UI feedback
+ * 
+ * Loading Flow:
+ * 1. initializeFromStorage() during constructor
+ * 2. loadFromStorage() coordinates data loading from multiple storage keys
+ * 3. Preferences, schedules, active schedule ID loaded in sequence
+ * 4. Selected courses loaded from active schedule or fallback to standalone
+ * 5. Default schedule created if none exist
+ * 6. Loading flags cleared, state marked as clean (no unsaved changes)
+ * 
+ * KEY FEATURES:
+ * - Atomic state updates with transactional persistence
+ * - Event-driven architecture with cross-component notifications
+ * - Debounced saves (500ms) to prevent excessive storage operations
+ * - Multi-schedule support with active schedule management
+ * - Course selection with section tracking and preferences
+ * - Schedule preferences management (time ranges, preferred days, themes)
+ * - Export/import functionality for data portability
+ * - Health checking and consistency validation
+ * - Comprehensive state access API with immutable getters
+ * - Debug utilities for development and troubleshooting
+ * 
+ * STATE MANAGEMENT FEATURES:
+ * Course Selection:
+ * - selectCourse() / unselectCourse() with required/optional flagging
+ * - setSelectedSection() for section-specific choices
+ * - clearAllSelections() for bulk operations
+ * - Automatic active schedule synchronization
+ * 
+ * Schedule Management:
+ * - createSchedule() / saveCurrentAsSchedule() for schedule creation
+ * - setActiveSchedule() for switching between saved schedules
+ * - updateSchedule() / deleteSchedule() for schedule maintenance
+ * - renameSchedule() / duplicateSchedule() for schedule management
+ * - Automatic course loading when switching schedules
+ * 
+ * INTEGRATION POINTS:
+ * - Foundation for unified storage system replacing competing storage systems
+ * - Event hub for all application state changes and cross-component coordination
+ * - Persistence coordinator ensuring data consistency across browser sessions
+ * - State provider for all services requiring course selection or schedule data
+ * - Bridge to TransactionalStorageManager for atomic storage operations
+ * - Initialization target for MainController during application startup
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Singleton: Single instance shared across all application components
+ * - Observer: Event-driven notifications to registered listeners
+ * - Command: State update methods encapsulate business logic
+ * - Repository: Centralized data access with consistent API
+ * - Transaction: Atomic persistence operations via TransactionalStorageManager
+ * - Facade: Simplified state management API hiding complex persistence logic
+ * 
+ * BENEFITS ACHIEVED:
+ * - Eliminated data corruption from competing storage systems
+ * - Single source of truth prevents inconsistent state
+ * - Event-driven updates ensure UI consistency across components
+ * - Debounced saves optimize performance and reduce storage overhead
+ * - Transactional persistence prevents partial data corruption
+ * - Comprehensive state management reduces component coupling
+ * - Health checking enables proactive issue detection
+ * - Export/import enables data portability and backup functionality
+ * 
+ * RECENT ARCHITECTURAL EVOLUTION:
+ * - Replaced CourseManager + StorageManager dual system
+ * - Integrated TransactionalStorageManager for atomic operations
+ * - Added comprehensive event system for cross-component coordination
+ * - Implemented debounced saving for performance optimization
+ * - Added multi-schedule support with active schedule management
+ * - Integrated health checking and consistency validation
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 export class ProfileStateManager {
     private state: ProfileState;
     private listeners = new Set<StateChangeListener>();
@@ -279,12 +418,6 @@ export class ProfileStateManager {
             },
             () => {
                 // Save selected courses
-                console.log(`💾 ProfileStateManager: Saving ${this.state.selectedCourses.length} selected courses to storage:`, 
-                    this.state.selectedCourses.map(sc => ({
-                        course: `${sc.course.department.abbreviation}${sc.course.number}`,
-                        selectedSection: sc.selectedSectionNumber,
-                        hasSection: sc.selectedSection !== null
-                    })));
                 this.storageManager.saveSelectedCourses(this.state.selectedCourses);
             },
             () => {

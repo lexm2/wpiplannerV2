@@ -161,7 +161,6 @@ export class CourseSelectionService {
 
             // Auto-save if requested
             if (autoSave) {
-                console.log('💾 CourseSelectionService: Auto-saving after course selection...');
                 const saveResult = await this.profileStateManager.save();
                 if (!saveResult.success) {
                     console.warn('❌ Failed to auto-save after course selection:', saveResult.error);

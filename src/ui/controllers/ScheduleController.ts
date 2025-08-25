@@ -68,7 +68,6 @@ export class ScheduleController {
     }
 
     displayScheduleSelectedCourses(): void {
-        console.log('🔍 displayScheduleSelectedCourses() called');
         
         const selectedCoursesContainer = document.getElementById('schedule-selected-courses');
         const countElement = document.getElementById('schedule-selected-count');
@@ -82,7 +81,6 @@ export class ScheduleController {
         const dropdownStates = this.statePreserver?.preserve();
 
         let selectedCourses = this.courseSelectionService.getSelectedCourses();
-        console.log(`📊 CourseSelectionService reports ${selectedCourses.length} selected courses`);
         
         // Get filtered sections if filter service is available
         let filteredSections: Array<{course: any, section: any}> = [];
@@ -151,8 +149,6 @@ export class ScheduleController {
 
         // Log how many schedule-course-items were created
         const courseItemCount = selectedCoursesContainer.querySelectorAll('.schedule-course-item').length;
-        console.log(`✅ displayScheduleSelectedCourses() completed successfully`);
-        console.log(`📈 Final result: ${courseItemCount} schedule-course-items displayed for ${selectedCourses.length} selected courses`);
     }
     
     private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, selectedCourses: any[], dropdownStates?: Map<string, boolean>): string {
