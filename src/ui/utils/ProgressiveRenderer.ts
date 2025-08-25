@@ -141,7 +141,7 @@ export class ProgressiveRenderer {
                 this.performanceMetrics?.endOperation(operationId, {
                     completed: false,
                     cancelled: false,
-                    error: error.message
+                    error: error instanceof Error ? error.message : String(error)
                 });
             }
         }
@@ -169,6 +169,9 @@ export class ProgressiveRenderer {
                 // Find existing course list for append
                 allHtml = '';
                 renderedCourses = [];
+                // Clean up any existing loading indicators from previous renders
+                const existingIndicators = container.querySelectorAll('.loading-indicator');
+                existingIndicators.forEach(indicator => indicator.remove());
             }
 
             // Build HTML for this batch
@@ -237,8 +240,17 @@ export class ProgressiveRenderer {
                 }
             }
 
-            // Add loading indicator if not complete
-            if (!isComplete && courseListContainer) {
+            // Handle loading indicator
+            if (isComplete && courseListContainer) {
+                // Remove any existing loading indicators when rendering is complete
+                const existingIndicators = courseListContainer.querySelectorAll('.loading-indicator');
+                existingIndicators.forEach(indicator => indicator.remove());
+            } else if (!isComplete && courseListContainer) {
+                // Remove any existing loading indicators before adding new one
+                const existingIndicators = courseListContainer.querySelectorAll('.loading-indicator');
+                existingIndicators.forEach(indicator => indicator.remove());
+                
+                // Add new loading indicator
                 const loadingIndicator = document.createElement('div');
                 loadingIndicator.className = 'loading-indicator';
                 loadingIndicator.innerHTML = `
@@ -274,6 +286,9 @@ export class ProgressiveRenderer {
                 // Find existing course grid for append
                 allHtml = '';
                 renderedCourses = [];
+                // Clean up any existing loading indicators from previous renders
+                const existingIndicators = container.querySelectorAll('.loading-indicator, .grid-loading');
+                existingIndicators.forEach(indicator => indicator.remove());
             }
 
             const batchHtml = batchCourses.map(course => {
@@ -337,8 +352,17 @@ export class ProgressiveRenderer {
                 }
             }
 
-            // Add loading indicator if not complete
-            if (!isComplete && courseGridContainer) {
+            // Handle loading indicator
+            if (isComplete && courseGridContainer) {
+                // Remove any existing loading indicators when rendering is complete
+                const existingIndicators = courseGridContainer.querySelectorAll('.loading-indicator, .grid-loading');
+                existingIndicators.forEach(indicator => indicator.remove());
+            } else if (!isComplete && courseGridContainer) {
+                // Remove any existing loading indicators before adding new one
+                const existingIndicators = courseGridContainer.querySelectorAll('.loading-indicator, .grid-loading');
+                existingIndicators.forEach(indicator => indicator.remove());
+                
+                // Add new loading indicator
                 const loadingIndicator = document.createElement('div');
                 loadingIndicator.className = 'loading-indicator grid-loading';
                 loadingIndicator.innerHTML = `
@@ -356,6 +380,10 @@ export class ProgressiveRenderer {
         if (this.currentRenderToken !== null) {
             this.currentRenderToken = null;
             this.isRendering = false;
+            
+            // Clean up any loading indicators from cancelled renders
+            const loadingIndicators = document.querySelectorAll('.loading-indicator, .grid-loading');
+            loadingIndicators.forEach(indicator => indicator.remove());
         }
     }
 

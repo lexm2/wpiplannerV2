@@ -169,10 +169,8 @@ export class CourseController {
             isLoadMore
         );
         
-        // Add or update Load More button if not in load more mode
-        if (!isLoadMore) {
-            this.addLoadMoreButton();
-        }
+        // Always add Load More button if there are more courses
+        this.addLoadMoreButton();
     }
 
     private async displayCoursesGrid(courses: Course[], cancellationToken?: CancellationToken, isLoadMore: boolean = false): Promise<void> {
@@ -197,10 +195,8 @@ export class CourseController {
             isLoadMore
         );
         
-        // Add or update Load More button if not in load more mode
-        if (!isLoadMore) {
-            this.addLoadMoreButton();
-        }
+        // Always add Load More button if there are more courses
+        this.addLoadMoreButton();
     }
 
     private courseHasWarning(course: Course): boolean {
@@ -463,18 +459,23 @@ export class CourseController {
         if (!courseContainer || !this.hasMore) return;
 
         // Remove existing load more button
-        const existingButton = courseContainer.querySelector('.load-more-button');
+        const existingButton = courseContainer.querySelector('.load-more-container');
         if (existingButton) {
             existingButton.remove();
         }
 
         if (this.hasMore) {
             const remainingCount = this.getRemainingCoursesCount();
+            const nextBatchSize = Math.min(this.INITIAL_PAGE_SIZE, remainingCount);
+            const buttonText = nextBatchSize < this.INITIAL_PAGE_SIZE 
+                ? `Load ${remainingCount} more courses` 
+                : `Load next ${this.INITIAL_PAGE_SIZE} courses`;
+            
             const loadMoreButton = document.createElement('div');
             loadMoreButton.className = 'load-more-container';
             loadMoreButton.innerHTML = `
                 <button class="load-more-button btn btn-secondary">
-                    Load ${remainingCount} more courses
+                    ${buttonText}
                 </button>
             `;
             
@@ -484,16 +485,29 @@ export class CourseController {
 
     private updateLoadMoreButton(): void {
         const loadMoreContainer = document.querySelector('.load-more-container');
-        if (!loadMoreContainer) return;
-
+        
         if (this.hasMore) {
             const remainingCount = this.getRemainingCoursesCount();
-            const button = loadMoreContainer.querySelector('.load-more-button');
-            if (button) {
-                button.textContent = `Load ${remainingCount} more courses`;
+            const nextBatchSize = Math.min(this.INITIAL_PAGE_SIZE, remainingCount);
+            const buttonText = nextBatchSize < this.INITIAL_PAGE_SIZE 
+                ? `Load ${remainingCount} more courses` 
+                : `Load next ${this.INITIAL_PAGE_SIZE} courses`;
+
+            if (loadMoreContainer) {
+                // Update existing button
+                const button = loadMoreContainer.querySelector('.load-more-button');
+                if (button) {
+                    button.textContent = buttonText;
+                }
+            } else {
+                // Button doesn't exist, add it
+                this.addLoadMoreButton();
             }
         } else {
-            loadMoreContainer.remove();
+            // No more courses, remove button if it exists
+            if (loadMoreContainer) {
+                loadMoreContainer.remove();
+            }
         }
     }
 }
