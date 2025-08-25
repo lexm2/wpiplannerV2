@@ -193,7 +193,7 @@ export class MainController {
         
         // Initialize search and filter services
         this.searchService = new SearchService();
-        this.filterService = new FilterService(this.searchService);
+        this.filterService = new FilterService(this.searchService, this.courseSelectionService);
         this.scheduleFilterService = new ScheduleFilterService(this.searchService);
         
         // Initialize schedule management service with shared ProfileStateManager and CourseSelectionService
@@ -259,7 +259,7 @@ export class MainController {
     }
 
     private initializeFilters(): void {
-        const filters = createDefaultFilters();
+        const filters = createDefaultFilters(this.conflictDetector);
         filters.forEach(filter => {
             this.filterService.registerFilter(filter);
         });

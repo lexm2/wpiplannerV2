@@ -712,12 +712,13 @@ export class FilterModalController {
         const allFilterSections = modalElement.querySelectorAll('.filter-section');
         let departmentSection: Element | null = null;
         
-        allFilterSections.forEach((section) => {
+        for (const section of allFilterSections) {
             const titleElement = section.querySelector('.filter-section-title');
             if (titleElement?.textContent === 'Departments') {
                 departmentSection = section;
+                break;
             }
-        });
+        }
         
         if (departmentSection) {
             const newDepartmentFilter = this.createDepartmentFilter();

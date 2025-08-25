@@ -11,19 +11,20 @@ import { AvailabilityFilter } from './AvailabilityFilter';
 import { CreditRangeFilter } from './CreditRangeFilter';
 import { ProfessorFilter } from './ProfessorFilter';
 import { TermFilter } from './TermFilter';
+import { ConflictDetector } from '../ConflictDetector';
 
 // Default filter instances
-export const createDefaultFilters = (): CourseFilter[] => [
+export const createDefaultFilters = (conflictDetector?: ConflictDetector): CourseFilter[] => [
     new DepartmentFilter(),
-    new AvailabilityFilter(),
+    new AvailabilityFilter(conflictDetector || new ConflictDetector()),
     new CreditRangeFilter(),
     new ProfessorFilter(),
     new TermFilter(),
 ];
 
 // Filter registry utility
-export const createFilterRegistry = (): Map<string, CourseFilter> => {
-    const filters = createDefaultFilters();
+export const createFilterRegistry = (conflictDetector?: ConflictDetector): Map<string, CourseFilter> => {
+    const filters = createDefaultFilters(conflictDetector);
     const registry = new Map<string, CourseFilter>();
     
     filters.forEach(filter => {

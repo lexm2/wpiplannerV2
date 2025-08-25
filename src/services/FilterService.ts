@@ -2,6 +2,7 @@ import { Course, Department } from '../types/types';
 import { CourseFilter, FilterEventListener, ActiveFilter } from '../types/filters';
 import { FilterState } from '../core/FilterState';
 import { SearchService } from './searchService';
+import { CourseSelectionService } from './CourseSelectionService';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -127,10 +128,12 @@ export class FilterService {
     private filterState: FilterState;
     private registeredFilters: Map<string, CourseFilter> = new Map();
     private searchService: SearchService;
+    private courseSelectionService?: CourseSelectionService;
     
-    constructor(searchService: SearchService) {
+    constructor(searchService: SearchService, courseSelectionService?: CourseSelectionService) {
         this.filterState = new FilterState();
         this.searchService = searchService;
+        this.courseSelectionService = courseSelectionService;
     }
     
     // Filter Registration
@@ -242,11 +245,24 @@ export class FilterService {
             if (activeFilter.id !== 'searchText') { // Skip searchText as it's already applied
                 const filter = this.registeredFilters.get(activeFilter.id);
                 if (filter) {
-                    // Special handling for availability filter to pass active terms
+                    // Special handling for availability filter to pass other active filters
                     if (activeFilter.id === 'availability') {
                         const termFilter = activeFilters.find(f => f.id === 'term');
                         const activeTerms = termFilter?.criteria?.terms || [];
-                        filteredCourses = filter.apply(filteredCourses, activeFilter.criteria, activeTerms);
+                        
+                        // Get all other active filters (excluding availability and search)
+                        const otherActiveFilters = activeFilters.filter(f => 
+                            f.id !== 'availability' && f.id !== 'searchText'
+                        );
+                        
+                        // Get selected courses for conflict detection
+                        const selectedCourses = this.courseSelectionService?.getSelectedCourses() || [];
+                        
+                        filteredCourses = filter.apply(filteredCourses, activeFilter.criteria, {
+                            activeTerms,
+                            otherActiveFilters,
+                            selectedCourses
+                        });
                     } else {
                         filteredCourses = filter.apply(filteredCourses, activeFilter.criteria);
                     }

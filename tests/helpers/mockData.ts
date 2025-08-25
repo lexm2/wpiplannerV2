@@ -1,4 +1,5 @@
 import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB } from '../../src/types/types'
+import { SelectedCourse } from '../../src/types/schedule'
 
 export const createMockTime = (hours: number, minutes: number): Time => ({
   hours,
@@ -124,3 +125,14 @@ export const createMockWPIData = () => ({
     })
   ]
 })
+
+export const createMockSelectedCourse = (overrides: Partial<SelectedCourse> = {}): SelectedCourse => {
+  const course = createMockCourse()
+  return {
+    course,
+    selectedSection: null,
+    selectedSectionNumber: null,
+    isRequired: false,
+    ...overrides
+  }
+}
