@@ -53,6 +53,12 @@ export class DepartmentSyncService {
         this.isUpdating = true;
         
         try {
+            // Handle "All Departments" special case
+            if (deptId === 'all') {
+                this.clearAllDepartmentSelections();
+                return;
+            }
+
             const currentDepartments = this.getActiveDepartments();
             let newDepartments: string[];
 
@@ -68,7 +74,7 @@ export class DepartmentSyncService {
             } else {
                 // Single select mode - replace current selection
                 if (currentDepartments.length === 1 && currentDepartments[0] === deptId) {
-                    // Same department clicked, clear selection
+                    // Same department clicked, clear selection (show all departments)
                     newDepartments = [];
                 } else {
                     // Select only this department
@@ -199,6 +205,16 @@ export class DepartmentSyncService {
             }
             item.classList.remove('active');
         });
+
+        // If no departments are selected, show "All Departments" as active
+        if (activeDepartments.length === 0) {
+            const allDepartmentsElement = document.querySelector(`[data-dept-id="all"]`);
+            if (allDepartmentsElement) {
+                allDepartmentsElement.classList.add('active');
+                console.log('✅ Set "All Departments" as active (no specific departments selected)');
+            }
+            return;
+        }
 
         // Set active states for selected departments with enhanced error checking
         let successCount = 0;

@@ -13,6 +13,13 @@ export class CourseController {
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private progressiveRenderer: ProgressiveRenderer;
     private performanceMetrics: PerformanceMetrics;
+    
+    // Pagination state
+    private allCoursesToDisplay: Course[] = [];
+    private displayedCourses: Course[] = [];
+    private readonly INITIAL_PAGE_SIZE = 100;
+    private currentPageSize: number = this.INITIAL_PAGE_SIZE;
+    private hasMore: boolean = false;
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
@@ -58,6 +65,39 @@ export class CourseController {
         this.allDepartments = departments;
     }
 
+    // Pagination management methods
+    private resetPagination(): void {
+        this.displayedCourses = [];
+        this.currentPageSize = this.INITIAL_PAGE_SIZE;
+        this.hasMore = false;
+    }
+
+    private setInitialCourses(courses: Course[]): void {
+        this.allCoursesToDisplay = courses;
+        this.displayedCourses = courses.slice(0, this.INITIAL_PAGE_SIZE);
+        this.hasMore = courses.length > this.INITIAL_PAGE_SIZE;
+        this.currentPageSize = Math.min(this.INITIAL_PAGE_SIZE, courses.length);
+    }
+
+    loadMoreCourses(): void {
+        if (!this.hasMore) return;
+
+        const nextBatchStart = this.displayedCourses.length;
+        const nextBatchEnd = Math.min(nextBatchStart + this.INITIAL_PAGE_SIZE, this.allCoursesToDisplay.length);
+        const nextBatch = this.allCoursesToDisplay.slice(nextBatchStart, nextBatchEnd);
+        
+        this.displayedCourses.push(...nextBatch);
+        this.hasMore = this.displayedCourses.length < this.allCoursesToDisplay.length;
+    }
+
+    getRemainingCoursesCount(): number {
+        return this.allCoursesToDisplay.length - this.displayedCourses.length;
+    }
+
+    hasMoreCourses(): boolean {
+        return this.hasMore;
+    }
+
     getSelectedCourse(): Course | null {
         return this.selectedCourse;
     }
@@ -66,22 +106,52 @@ export class CourseController {
         return this.displayCoursesWithCancellation(courses, currentView);
     }
     
-    async displayCoursesWithCancellation(courses: Course[], currentView: 'list' | 'grid', cancellationToken?: CancellationToken): Promise<void> {
+    async displayCoursesWithCancellation(courses: Course[], currentView: 'list' | 'grid', cancellationToken?: CancellationToken, isLoadMore: boolean = false): Promise<void> {
         // Cancel any existing render operations
         this.progressiveRenderer.cancelCurrentRender();
         
+        // Handle pagination setup for initial load
+        if (!isLoadMore) {
+            this.resetPagination();
+            this.setInitialCourses(courses);
+        }
+        
+        // Use displayed courses (paginated) instead of all courses
+        const coursesToRender = isLoadMore ? 
+            this.allCoursesToDisplay.slice(this.displayedCourses.length - this.INITIAL_PAGE_SIZE) : 
+            this.displayedCourses;
+        
         if (currentView === 'grid') {
-            await this.displayCoursesGrid(courses, cancellationToken);
+            await this.displayCoursesGrid(coursesToRender, cancellationToken, isLoadMore);
         } else {
-            await this.displayCoursesList(courses, cancellationToken);
+            await this.displayCoursesList(coursesToRender, cancellationToken, isLoadMore);
         }
     }
 
-    private async displayCoursesList(courses: Course[], cancellationToken?: CancellationToken): Promise<void> {
+    async displayMoreCourses(currentView: 'list' | 'grid', cancellationToken?: CancellationToken): Promise<void> {
+        if (!this.hasMore) return;
+        
+        const previousCount = this.displayedCourses.length;
+        this.loadMoreCourses();
+        
+        // Get the newly loaded courses
+        const newCourses = this.displayedCourses.slice(previousCount);
+        
+        if (currentView === 'grid') {
+            await this.displayCoursesGrid(newCourses, cancellationToken, true);
+        } else {
+            await this.displayCoursesList(newCourses, cancellationToken, true);
+        }
+        
+        // Update the Load More button
+        this.updateLoadMoreButton();
+    }
+
+    private async displayCoursesList(courses: Course[], cancellationToken?: CancellationToken, isLoadMore: boolean = false): Promise<void> {
         const courseContainer = document.getElementById('course-container');
         if (!courseContainer) return;
 
-        if (courses.length === 0) {
+        if (courses.length === 0 && !isLoadMore) {
             courseContainer.innerHTML = '<div class="empty-state">No courses found in this department.</div>';
             return;
         }
@@ -95,15 +165,21 @@ export class CourseController {
             this.courseSelectionService, 
             courseContainer,
             this.elementToCourseMap,
-            cancellationToken
+            cancellationToken,
+            isLoadMore
         );
+        
+        // Add or update Load More button if not in load more mode
+        if (!isLoadMore) {
+            this.addLoadMoreButton();
+        }
     }
 
-    private async displayCoursesGrid(courses: Course[], cancellationToken?: CancellationToken): Promise<void> {
+    private async displayCoursesGrid(courses: Course[], cancellationToken?: CancellationToken, isLoadMore: boolean = false): Promise<void> {
         const courseContainer = document.getElementById('course-container');
         if (!courseContainer) return;
 
-        if (courses.length === 0) {
+        if (courses.length === 0 && !isLoadMore) {
             courseContainer.innerHTML = '<div class="empty-state">No courses found in this department.</div>';
             return;
         }
@@ -117,8 +193,14 @@ export class CourseController {
             this.courseSelectionService, 
             courseContainer,
             this.elementToCourseMap,
-            cancellationToken
+            cancellationToken,
+            isLoadMore
         );
+        
+        // Add or update Load More button if not in load more mode
+        if (!isLoadMore) {
+            this.addLoadMoreButton();
+        }
     }
 
     private courseHasWarning(course: Course): boolean {
@@ -373,5 +455,45 @@ export class CourseController {
 
     getCourseFromElement(element: HTMLElement): Course | undefined {
         return this.elementToCourseMap.get(element);
+    }
+
+    // Load More button management
+    private addLoadMoreButton(): void {
+        const courseContainer = document.getElementById('course-container');
+        if (!courseContainer || !this.hasMore) return;
+
+        // Remove existing load more button
+        const existingButton = courseContainer.querySelector('.load-more-button');
+        if (existingButton) {
+            existingButton.remove();
+        }
+
+        if (this.hasMore) {
+            const remainingCount = this.getRemainingCoursesCount();
+            const loadMoreButton = document.createElement('div');
+            loadMoreButton.className = 'load-more-container';
+            loadMoreButton.innerHTML = `
+                <button class="load-more-button btn btn-secondary">
+                    Load ${remainingCount} more courses
+                </button>
+            `;
+            
+            courseContainer.appendChild(loadMoreButton);
+        }
+    }
+
+    private updateLoadMoreButton(): void {
+        const loadMoreContainer = document.querySelector('.load-more-container');
+        if (!loadMoreContainer) return;
+
+        if (this.hasMore) {
+            const remainingCount = this.getRemainingCoursesCount();
+            const button = loadMoreContainer.querySelector('.load-more-button');
+            if (button) {
+                button.textContent = `Load ${remainingCount} more courses`;
+            }
+        } else {
+            loadMoreContainer.remove();
+        }
     }
 }

@@ -45,10 +45,23 @@ export class DepartmentController {
         const departmentList = document.getElementById('department-list');
         if (!departmentList) return;
 
+        // Calculate total course count across all departments
+        const totalCourseCount = this.allDepartments.reduce((total, dept) => total + dept.courses.length, 0);
+
+        // Start with "All Departments" option
+        let html = `
+            <div class="department-category">
+                <div class="department-list">
+                    <div class="department-item all-departments active" data-dept-id="all">
+                        All Departments (${totalCourseCount})
+                    </div>
+                </div>
+            </div>
+        `;
+
         // Group departments by category
         const categories = this.groupDepartmentsByCategory();
         
-        let html = '';
         Object.entries(categories).forEach(([categoryName, departments]) => {
             if (departments.length === 0) return;
             
@@ -81,6 +94,34 @@ export class DepartmentController {
     }
 
     handleDepartmentClick(deptId: string, multiSelect: boolean = false): Department | null {
+        // Handle "All Departments" special case
+        if (deptId === 'all') {
+            if (this.departmentSyncService) {
+                this.departmentSyncService.clearAllDepartmentSelections();
+            } else {
+                // Fallback to old behavior
+                this.clearDepartmentSelection();
+            }
+            
+            // Update visual state to show "All Departments" as selected
+            document.querySelectorAll('.department-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const allDepartmentsElement = document.querySelector(`[data-dept-id="all"]`);
+            if (allDepartmentsElement) {
+                allDepartmentsElement.classList.add('active');
+            }
+            
+            // Update header to show "All Departments"
+            const contentHeader = document.querySelector('.content-header h2');
+            if (contentHeader) {
+                contentHeader.textContent = 'All Departments';
+            }
+            
+            return null; // Return null to indicate "all departments" selection
+        }
+
         const department = this.allDepartments.find(d => d.abbreviation === deptId);
         if (!department) return null;
 
@@ -108,10 +149,15 @@ export class DepartmentController {
     clearDepartmentSelection(): void {
         this.selectedDepartment = null;
         
-        // Clear active department visual state
+        // Clear active department visual state and set "All Departments" as active
         document.querySelectorAll('.department-item').forEach(item => {
             item.classList.remove('active');
         });
+        
+        const allDepartmentsElement = document.querySelector(`[data-dept-id="all"]`);
+        if (allDepartmentsElement) {
+            allDepartmentsElement.classList.add('active');
+        }
         
         // Reset sidebar header
         const sidebarHeader = document.querySelector('.sidebar-header h2');
@@ -123,6 +169,12 @@ export class DepartmentController {
         const departmentList = document.getElementById('department-list');
         if (departmentList) {
             departmentList.classList.remove('multi-select-active');
+        }
+        
+        // Update main content header to show "All Departments"
+        const contentHeader = document.querySelector('.content-header h2');
+        if (contentHeader) {
+            contentHeader.textContent = 'All Departments';
         }
     }
 }

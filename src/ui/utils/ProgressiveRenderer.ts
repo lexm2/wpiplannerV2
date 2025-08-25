@@ -153,15 +153,20 @@ export class ProgressiveRenderer {
         courseSelectionService: any, 
         container: HTMLElement,
         elementToCourseMap: WeakMap<HTMLElement, Course>,
-        cancellationToken?: CancellationToken
+        cancellationToken?: CancellationToken,
+        isLoadMore: boolean = false
     ): Promise<void> {
         let allHtml = '';
         let renderedCourses: Course[] = [];
 
         const renderFunction = (batchCourses: Course[], isFirstBatch: boolean, isComplete: boolean) => {
-            if (isFirstBatch) {
-                // Clear container and start fresh
+            if (isFirstBatch && !isLoadMore) {
+                // Clear container and start fresh (only for initial load)
                 container.innerHTML = '<div class="course-list"></div>';
+                allHtml = '';
+                renderedCourses = [];
+            } else if (isFirstBatch && isLoadMore) {
+                // Find existing course list for append
                 allHtml = '';
                 renderedCourses = [];
             }
@@ -201,15 +206,35 @@ export class ProgressiveRenderer {
             // Update DOM
             const courseListContainer = container.querySelector('.course-list');
             if (courseListContainer) {
-                courseListContainer.innerHTML = allHtml;
-                
-                // Update course mapping for newly rendered elements
-                const courseElements = courseListContainer.querySelectorAll('.course-item');
-                courseElements.forEach((element, index) => {
-                    if (index < renderedCourses.length) {
-                        elementToCourseMap.set(element as HTMLElement, renderedCourses[index]);
+                if (isLoadMore) {
+                    // Remove load more button before appending
+                    const loadMoreContainer = container.querySelector('.load-more-container');
+                    if (loadMoreContainer) {
+                        loadMoreContainer.remove();
                     }
-                });
+                    courseListContainer.insertAdjacentHTML('beforeend', batchHtml);
+                    
+                    // Map only the newly added elements
+                    const allElements = courseListContainer.querySelectorAll('.course-item');
+                    const startIndex = allElements.length - batchCourses.length;
+                    for (let i = 0; i < batchCourses.length; i++) {
+                        const element = allElements[startIndex + i];
+                        if (element) {
+                            elementToCourseMap.set(element as HTMLElement, batchCourses[i]);
+                        }
+                    }
+                } else {
+                    // Replace content completely
+                    courseListContainer.innerHTML = allHtml;
+                    
+                    // Update course mapping for all rendered elements
+                    const courseElements = courseListContainer.querySelectorAll('.course-item');
+                    courseElements.forEach((element, index) => {
+                        if (index < renderedCourses.length) {
+                            elementToCourseMap.set(element as HTMLElement, renderedCourses[index]);
+                        }
+                    });
+                }
             }
 
             // Add loading indicator if not complete
@@ -233,14 +258,20 @@ export class ProgressiveRenderer {
         courseSelectionService: any, 
         container: HTMLElement,
         elementToCourseMap: WeakMap<HTMLElement, Course>,
-        cancellationToken?: CancellationToken
+        cancellationToken?: CancellationToken,
+        isLoadMore: boolean = false
     ): Promise<void> {
         let allHtml = '';
         let renderedCourses: Course[] = [];
 
         const renderFunction = (batchCourses: Course[], isFirstBatch: boolean, isComplete: boolean) => {
-            if (isFirstBatch) {
+            if (isFirstBatch && !isLoadMore) {
+                // Clear container and start fresh (only for initial load)
                 container.innerHTML = '<div class="course-grid"></div>';
+                allHtml = '';
+                renderedCourses = [];
+            } else if (isFirstBatch && isLoadMore) {
+                // Find existing course grid for append
                 allHtml = '';
                 renderedCourses = [];
             }
@@ -275,15 +306,35 @@ export class ProgressiveRenderer {
 
             const courseGridContainer = container.querySelector('.course-grid');
             if (courseGridContainer) {
-                courseGridContainer.innerHTML = allHtml;
-                
-                // Update course mapping
-                const courseElements = courseGridContainer.querySelectorAll('.course-card');
-                courseElements.forEach((element, index) => {
-                    if (index < renderedCourses.length) {
-                        elementToCourseMap.set(element as HTMLElement, renderedCourses[index]);
+                if (isLoadMore) {
+                    // Remove load more button before appending
+                    const loadMoreContainer = container.querySelector('.load-more-container');
+                    if (loadMoreContainer) {
+                        loadMoreContainer.remove();
                     }
-                });
+                    courseGridContainer.insertAdjacentHTML('beforeend', batchHtml);
+                    
+                    // Map only the newly added elements
+                    const allElements = courseGridContainer.querySelectorAll('.course-card');
+                    const startIndex = allElements.length - batchCourses.length;
+                    for (let i = 0; i < batchCourses.length; i++) {
+                        const element = allElements[startIndex + i];
+                        if (element) {
+                            elementToCourseMap.set(element as HTMLElement, batchCourses[i]);
+                        }
+                    }
+                } else {
+                    // Replace content completely
+                    courseGridContainer.innerHTML = allHtml;
+                    
+                    // Update course mapping for all elements
+                    const courseElements = courseGridContainer.querySelectorAll('.course-card');
+                    courseElements.forEach((element, index) => {
+                        if (index < renderedCourses.length) {
+                            elementToCourseMap.set(element as HTMLElement, renderedCourses[index]);
+                        }
+                    });
+                }
             }
 
             // Add loading indicator if not complete

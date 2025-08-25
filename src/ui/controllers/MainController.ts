@@ -161,6 +161,9 @@ export class MainController {
             // Initialize the department sync service AFTER departments are rendered
             this.departmentSyncService.initialize();
             
+            // Set "All Departments" as the default selection on startup
+            this.initializeDefaultDepartmentView();
+            
             this.setupEventListeners();
             this.setupCourseSelectionListener();
             this.setupSaveStateListener();
@@ -277,6 +280,15 @@ export class MainController {
                         this.uiStateManager.showErrorMessage('Failed to update course selection. Please try again.');
                     });
                 }
+            }
+
+            if (target.classList.contains('load-more-button')) {
+                // Handle Load More button click
+                this.handleLoadMoreClick().catch(error => {
+                    console.error('Failed to load more courses:', error);
+                    this.uiStateManager.showErrorMessage('Failed to load more courses. Please try again.');
+                });
+                return;
             }
 
             if (target.classList.contains('course-remove-btn')) {
@@ -534,9 +546,9 @@ export class MainController {
             coursesToDisplay = selectedDepartment.courses;
             this.updateDepartmentHeader(selectedDepartment);
         } else {
-            // No filters, no department selected - show empty state
-            coursesToDisplay = [];
-            this.updateDefaultHeader();
+            // No filters, no department selected - show all courses ("All Departments" view)
+            coursesToDisplay = this.getAllCourses();
+            this.updateAllDepartmentsHeader();
         }
         
         // Display courses with cancellation support
@@ -596,24 +608,19 @@ export class MainController {
             badge.classList.remove('selected');
         });
 
-        // Clear search
+        // Clear search and filters
         const searchInput = document.getElementById('search-input') as HTMLInputElement;
         if (searchInput) {
             searchInput.value = '';
         }
+        this.filterService.removeFilter('searchText');
 
-        // Reset to default state
-        const courseContainer = document.getElementById('course-container');
-        if (courseContainer) {
-            courseContainer.innerHTML = '<div class="loading-message">Select a department to view courses...</div>';
-        }
-
-        const contentHeader = document.querySelector('.content-header h2');
-        if (contentHeader) {
-            contentHeader.textContent = 'Course Listings';
-        }
-
+        // Clear department selection (this will activate "All Departments")
         this.departmentController.clearDepartmentSelection();
+        
+        // Reset to "All Departments" state 
+        this.refreshCurrentView(); // This will now show all courses since no department/filters are selected
+
         this.courseController.clearCourseSelection();
         this.courseController.displaySelectedCourses();
     }
@@ -809,6 +816,42 @@ export class MainController {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
             contentHeader.textContent = 'Course Listings';
+        }
+    }
+
+    private updateAllDepartmentsHeader(): void {
+        const contentHeader = document.querySelector('.content-header h2');
+        if (contentHeader) {
+            const totalCourses = this.getAllCourses().length;
+            contentHeader.textContent = `All Departments (${totalCourses} courses)`;
+        }
+    }
+
+    private initializeDefaultDepartmentView(): void {
+        // Make sure "All Departments" is visually selected (it already has 'active' class from displayDepartments)
+        // and show all courses by triggering a refresh
+        this.refreshCurrentView();
+    }
+
+    private async handleLoadMoreClick(): Promise<void> {
+        // Show loading state on the button
+        const loadMoreButton = document.querySelector('.load-more-button') as HTMLButtonElement;
+        if (!loadMoreButton) return;
+        
+        const originalText = loadMoreButton.textContent;
+        loadMoreButton.textContent = 'Loading...';
+        loadMoreButton.disabled = true;
+        
+        try {
+            // Load more courses using the current view
+            const currentView = this.uiStateManager.currentView;
+            await this.courseController.displayMoreCourses(currentView);
+        } catch (error) {
+            console.error('Error loading more courses:', error);
+            // Restore button state on error
+            loadMoreButton.textContent = originalText;
+            loadMoreButton.disabled = false;
+            throw error; // Re-throw so the caller can handle it
         }
     }
 
