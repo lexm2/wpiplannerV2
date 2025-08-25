@@ -648,10 +648,14 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Create new schedule with imported data
+            // Resolve name conflicts automatically
+            const uniqueName = this.generateUniqueScheduleName(data.schedule.name);
+
+            // Create new schedule with imported data and unique name
             const importedSchedule: Schedule = {
                 ...data.schedule,
-                id: this.generateScheduleId() // Generate new ID to avoid conflicts
+                id: this.generateScheduleId(), // Generate new ID to avoid conflicts
+                name: uniqueName
             };
 
             const result = await this.retryManager.executeWithRetry(
@@ -833,6 +837,27 @@ export class ScheduleManagementService {
 
     private generateScheduleId(): string {
         return `schedule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    private generateUniqueScheduleName(baseName: string): string {
+        const existingSchedules = this.getAllSchedules();
+        const existingNames = new Set(existingSchedules.map(s => s.name));
+        
+        // If name doesn't conflict, use it as-is
+        if (!existingNames.has(baseName)) {
+            return baseName;
+        }
+        
+        // Try appending numbers until we find a unique name
+        let counter = 1;
+        let candidateName: string;
+        
+        do {
+            candidateName = `${baseName} (${counter})`;
+            counter++;
+        } while (existingNames.has(candidateName));
+        
+        return candidateName;
     }
 
     // Debug methods
