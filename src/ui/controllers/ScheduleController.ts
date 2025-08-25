@@ -517,8 +517,34 @@ export class ScheduleController {
         });
     }
 
+    private syncSectionObjects(selectedCourses: any[]): void {
+        selectedCourses.forEach(sc => {
+            // If we have a selectedSectionNumber but no selectedSection object (or invalid object)
+            if (sc.selectedSectionNumber && (!sc.selectedSection || !sc.selectedSection.computedTerm)) {
+                // Find the section object in the course
+                const sectionObject = sc.course.sections?.find((s: any) => s.number === sc.selectedSectionNumber);
+                
+                if (sectionObject && sectionObject.computedTerm) {
+                    console.log(`🔄 Syncing section object for ${sc.course.department.abbreviation}${sc.course.number} section ${sc.selectedSectionNumber}`);
+                    sc.selectedSection = sectionObject;
+                } else {
+                    console.warn(`⚠️ Could not find valid section ${sc.selectedSectionNumber} for course ${sc.course.department.abbreviation}${sc.course.number}`);
+                }
+            }
+            
+            // If we have a selectedSection but no selectedSectionNumber, sync the other way
+            if (sc.selectedSection && sc.selectedSection.number && !sc.selectedSectionNumber) {
+                sc.selectedSectionNumber = sc.selectedSection.number;
+            }
+        });
+    }
+
     renderScheduleGrids(): void {
         const rawSelectedCourses = this.courseSelectionService.getSelectedCourses();
+        
+        // Sync section objects with section numbers before validation
+        this.syncSectionObjects(rawSelectedCourses);
+        
         const selectedCourses = validateSelectedCourses(rawSelectedCourses);
         const grids = ['A', 'B', 'C', 'D'];
         

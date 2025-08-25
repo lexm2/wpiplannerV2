@@ -393,7 +393,25 @@ export class CourseSelectionService {
 
     getSelectedCourses(): SelectedCourse[] {
         if (!this.isInitialized) return [];
-        return this.profileStateManager.getSelectedCourses();
+        const selectedCourses = this.profileStateManager.getSelectedCourses();
+        // Ensure section objects are synchronized
+        this.syncSectionObjects(selectedCourses);
+        return selectedCourses;
+    }
+
+    private syncSectionObjects(selectedCourses: SelectedCourse[]): void {
+        selectedCourses.forEach(sc => {
+            // If we have a selectedSectionNumber but no selectedSection object (or invalid object)
+            if (sc.selectedSectionNumber && (!sc.selectedSection || !sc.selectedSection.computedTerm)) {
+                // Find the section object in the course
+                const sectionObject = sc.course.sections?.find(s => s.number === sc.selectedSectionNumber);
+                
+                if (sectionObject && sectionObject.computedTerm) {
+                    console.log(`🔄 CourseSelectionService: Syncing section object for ${sc.course.department.abbreviation}${sc.course.number} section ${sc.selectedSectionNumber}`);
+                    sc.selectedSection = sectionObject;
+                }
+            }
+        });
     }
 
     getSelectedSection(course: Course): string | null {
