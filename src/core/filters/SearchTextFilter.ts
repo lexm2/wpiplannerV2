@@ -14,13 +14,15 @@ export class SearchTextFilter implements CourseFilter {
         const query = criteria.query.trim().toLowerCase();
         
         return courses.filter(course => {
+            const courseCode = `${course.department.abbreviation}${course.number}`;
             const courseText = [
                 course.id,
                 course.name,
                 course.description,
                 course.department.abbreviation,
                 course.department.name,
-                course.number
+                course.number,
+                courseCode
             ].join(' ').toLowerCase();
 
             return courseText.includes(query) || this.fuzzyMatch(courseText, query);

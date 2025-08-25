@@ -51,13 +51,15 @@ export class SearchService {
         
         // Fallback to original linear search with fuzzy matching
         return courses.filter(course => {
+            const courseCode = `${course.department.abbreviation}${course.number}`;
             const courseText = [
                 course.id,
                 course.name,
                 course.description,
                 course.department.abbreviation,
                 course.department.name,
-                course.number
+                course.number,
+                courseCode
             ].join(' ').toLowerCase();
 
             return this.fuzzyMatch(courseText, queryLower);
@@ -149,17 +151,21 @@ export class SearchService {
 
     private calculateRelevanceScore(course: Course, query: string): number {
         let score = 0;
+        const courseCode = `${course.department.abbreviation}${course.number}`.toLowerCase();
 
         // Exact matches get highest score
+        if (courseCode === query) score += 110; // Highest priority for exact course code match
         if (course.id.toLowerCase() === query) score += 100;
         if (course.name.toLowerCase() === query) score += 90;
 
         // Prefix matches
+        if (courseCode.startsWith(query)) score += 85; // High priority for course code prefix
         if (course.id.toLowerCase().startsWith(query)) score += 80;
         if (course.name.toLowerCase().startsWith(query)) score += 70;
         if (course.department.abbreviation.toLowerCase().startsWith(query)) score += 60;
 
         // Contains matches
+        if (courseCode.includes(query)) score += 45; // Higher than other contains matches
         if (course.id.toLowerCase().includes(query)) score += 40;
         if (course.name.toLowerCase().includes(query)) score += 30;
         if (course.description.toLowerCase().includes(query)) score += 10;
@@ -247,12 +253,14 @@ export class SearchService {
     }
 
     private extractKeywords(course: Course): string[] {
+        const courseCode = `${course.department.abbreviation}${course.number}`.toLowerCase();
         const keywords = [
             course.id.toLowerCase(),
             course.name.toLowerCase(),
             course.number.toLowerCase(),
             course.department.abbreviation.toLowerCase(),
             course.department.name.toLowerCase(),
+            courseCode,
             ...course.description.toLowerCase().split(/\s+/)
         ];
         
