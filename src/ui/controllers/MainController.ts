@@ -140,22 +140,41 @@ export class MainController {
 
     private async init(): Promise<void> {
         this.uiStateManager.showLoadingState();
-        await this.loadCourseData();
-        this.departmentController.displayDepartments();
         
-        // Initialize the department sync service AFTER departments are rendered
-        this.departmentSyncService.initialize();
-        
-        this.setupEventListeners();
-        this.setupCourseSelectionListener();
-        this.setupSaveStateListener();
-        this.courseController.displaySelectedCourses();
-        
-        // Load saved filters AFTER all services are fully connected and ready
-        this.filterService.loadFiltersFromStorage();
-        
-        this.uiStateManager.syncHeaderHeights();
-        this.uiStateManager.setupHeaderResizeObserver();
+        try {
+            // Initialize CourseSelectionService FIRST to load persisted data
+            console.log('🔄 MainController: Initializing CourseSelectionService...');
+            const initResult = await this.courseSelectionService.initialize();
+            console.log('📊 CourseSelectionService initialized:', initResult);
+            
+            // Check what was loaded from storage
+            const loadedCourses = this.courseSelectionService.getSelectedCourses();
+            console.log(`📦 Loaded ${loadedCourses.length} selected courses from storage:`, loadedCourses.map(sc => ({
+                course: `${sc.course.department.abbreviation}${sc.course.number}`,
+                selectedSection: sc.selectedSectionNumber,
+                hasSection: sc.selectedSection !== null
+            })));
+            
+            await this.loadCourseData();
+            this.departmentController.displayDepartments();
+            
+            // Initialize the department sync service AFTER departments are rendered
+            this.departmentSyncService.initialize();
+            
+            this.setupEventListeners();
+            this.setupCourseSelectionListener();
+            this.setupSaveStateListener();
+            this.courseController.displaySelectedCourses();
+            
+            // Load saved filters AFTER all services are fully connected and ready
+            this.filterService.loadFiltersFromStorage();
+            
+            this.uiStateManager.syncHeaderHeights();
+            this.uiStateManager.setupHeaderResizeObserver();
+        } catch (error) {
+            console.error('Failed to initialize application:', error);
+            this.uiStateManager.showErrorMessage('Failed to initialize application. Some features may not work properly.');
+        }
     }
 
     private async loadCourseData(): Promise<void> {
@@ -173,6 +192,7 @@ export class MainController {
             this.filterModalController.setCourseData(this.allDepartments);
             
             // IMPORTANT: Reconstruct Section objects after course data is loaded
+            // This must happen after course data is loaded but service is already initialized
             this.courseSelectionService.reconstructSectionObjects();
             
             // Initialize default schedule if needed
@@ -251,7 +271,11 @@ export class MainController {
             if (target.classList.contains('course-select-btn')) {
                 const courseElement = target.closest('.course-item, .course-card') as HTMLElement;
                 if (courseElement) {
-                    this.courseController.toggleCourseSelection(courseElement);
+                    // Make async call and handle potential errors
+                    this.courseController.toggleCourseSelection(courseElement).catch(error => {
+                        console.error('Failed to toggle course selection:', error);
+                        this.uiStateManager.showErrorMessage('Failed to update course selection. Please try again.');
+                    });
                 }
             }
 
@@ -266,7 +290,10 @@ export class MainController {
                 
                 if (course) {
                     // Directly remove course (remove button means always unselect)
-                    this.courseSelectionService.unselectCourse(course);
+                    this.courseSelectionService.unselectCourse(course).catch(error => {
+                        console.error('Failed to unselect course:', error);
+                        this.uiStateManager.showErrorMessage('Failed to remove course. Please try again.');
+                    });
                 }
             }
 
@@ -279,7 +306,10 @@ export class MainController {
                 if (courseElement && sectionNumber) {
                     const course = this.scheduleController.getCourseFromElement(courseElement);
                     if (course) {
-                        this.scheduleController.handleSectionSelection(course, sectionNumber);
+                        this.scheduleController.handleSectionSelection(course, sectionNumber).catch(error => {
+                            console.error('Failed to handle section selection:', error);
+                            this.uiStateManager.showErrorMessage('Failed to update section selection. Please try again.');
+                        });
                     }
                 }
                 return;

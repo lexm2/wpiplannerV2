@@ -165,18 +165,26 @@ export class TransactionalStorageManager {
     }
 
     saveSelectedCourses(selectedCourses: SelectedCourse[]): TransactionResult {
-        return this.executeSyncTransaction(() => {
+        console.log(`🗄️ TransactionalStorageManager: Saving ${selectedCourses.length} courses to localStorage key '${TransactionalStorageManager.STORAGE_KEYS.SELECTED_COURSES}'`);
+        const result = this.executeSyncTransaction(() => {
             const serializedCourses = this.safeStringify(selectedCourses);
+            console.log('🗄️ Serialized data length:', serializedCourses.length, 'characters');
             localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.SELECTED_COURSES, serializedCourses);
+            console.log('✅ Saved to localStorage successfully');
         });
+        console.log('🗄️ Transaction result:', result.success ? 'SUCCESS' : 'FAILED', result.error || '');
+        return result;
     }
 
     loadSelectedCourses(): { data: SelectedCourse[]; valid: boolean; error?: string } {
+        console.log(`📂 TransactionalStorageManager: Loading courses from localStorage key '${TransactionalStorageManager.STORAGE_KEYS.SELECTED_COURSES}'`);
         const result = this.safeLoad<SelectedCourse[]>(
             TransactionalStorageManager.STORAGE_KEYS.SELECTED_COURSES,
             [],
             'selected courses'
         );
+        
+        console.log(`📂 Load result - Valid: ${result.valid}, Data length: ${result.data?.length || 0}`, result.error ? `Error: ${result.error}` : '');
         
         return {
             data: result.data || [],

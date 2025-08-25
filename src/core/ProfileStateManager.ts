@@ -279,6 +279,12 @@ export class ProfileStateManager {
             },
             () => {
                 // Save selected courses
+                console.log(`💾 ProfileStateManager: Saving ${this.state.selectedCourses.length} selected courses to storage:`, 
+                    this.state.selectedCourses.map(sc => ({
+                        course: `${sc.course.department.abbreviation}${sc.course.number}`,
+                        selectedSection: sc.selectedSectionNumber,
+                        hasSection: sc.selectedSection !== null
+                    })));
                 this.storageManager.saveSelectedCourses(this.state.selectedCourses);
             },
             () => {
@@ -332,6 +338,7 @@ export class ProfileStateManager {
                 const activeSchedule = this.state.schedules.find(s => s.id === this.state.activeScheduleId);
                 if (activeSchedule) {
                     loadedCourses = activeSchedule.selectedCourses;
+                    console.log(`📂 ProfileStateManager: Loaded ${loadedCourses.length} courses from active schedule "${activeSchedule.name}"`);
                 }
             }
 
@@ -340,10 +347,14 @@ export class ProfileStateManager {
                 const coursesResult = this.storageManager.loadSelectedCourses();
                 if (coursesResult.valid && coursesResult.data) {
                     loadedCourses = coursesResult.data;
+                    console.log(`📂 ProfileStateManager: Loaded ${loadedCourses.length} standalone courses from storage`);
+                } else {
+                    console.log('📂 ProfileStateManager: No standalone courses found in storage');
                 }
             }
 
             this.state.selectedCourses = loadedCourses;
+            console.log(`📊 ProfileStateManager: Final loaded course count: ${loadedCourses.length}`);
 
             // If no schedules exist, create a default one
             if (this.state.schedules.length === 0) {

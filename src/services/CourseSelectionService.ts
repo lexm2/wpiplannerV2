@@ -161,9 +161,12 @@ export class CourseSelectionService {
 
             // Auto-save if requested
             if (autoSave) {
+                console.log('💾 CourseSelectionService: Auto-saving after course selection...');
                 const saveResult = await this.profileStateManager.save();
                 if (!saveResult.success) {
-                    console.warn('Failed to auto-save after course selection:', saveResult.error);
+                    console.warn('❌ Failed to auto-save after course selection:', saveResult.error);
+                } else {
+                    console.log('✅ Auto-save successful after course selection');
                 }
             }
 
@@ -219,9 +222,12 @@ export class CourseSelectionService {
 
             // Auto-save if requested
             if (autoSave) {
+                console.log('💾 CourseSelectionService: Auto-saving after course removal...');
                 const saveResult = await this.profileStateManager.save();
                 if (!saveResult.success) {
-                    console.warn('Failed to auto-save after course removal:', saveResult.error);
+                    console.warn('❌ Failed to auto-save after course removal:', saveResult.error);
+                } else {
+                    console.log('✅ Auto-save successful after course removal');
                 }
             }
 
@@ -304,9 +310,12 @@ export class CourseSelectionService {
 
             // Auto-save if requested
             if (autoSave) {
+                console.log('💾 CourseSelectionService: Auto-saving after section selection...');
                 const saveResult = await this.profileStateManager.save();
                 if (!saveResult.success) {
-                    console.warn('Failed to auto-save after section selection:', saveResult.error);
+                    console.warn('❌ Failed to auto-save after section selection:', saveResult.error);
+                } else {
+                    console.log('✅ Auto-save successful after section selection');
                 }
             }
 

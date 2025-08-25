@@ -233,17 +233,23 @@ export class CourseController {
         return null;
     }
 
-    toggleCourseSelection(element: HTMLElement): boolean {
+    async toggleCourseSelection(element: HTMLElement): Promise<boolean> {
         const course = this.elementToCourseMap.get(element);
         if (!course) return false;
 
-        const wasSelected = this.courseSelectionService.toggleCourseSelection(course);
-        this.updateCourseSelectionUI(element, wasSelected);
-        return wasSelected;
+        try {
+            const result = await this.courseSelectionService.toggleCourseSelection(course);
+            const wasSelected = result.success && result.course !== undefined;
+            this.updateCourseSelectionUI(element, wasSelected);
+            return wasSelected;
+        } catch (error) {
+            console.error('Error toggling course selection:', error);
+            return false;
+        }
     }
 
     // Legacy method for backward compatibility
-    toggleCourseSelectionById(courseId: string): boolean {
+    async toggleCourseSelectionById(courseId: string): Promise<boolean> {
         const course = this.courseSelectionService.findCourseById(courseId);
         if (!course) return false;
 
@@ -252,7 +258,7 @@ export class CourseController {
         for (const element of allElements) {
             const elementCourse = this.elementToCourseMap.get(element as HTMLElement);
             if (elementCourse?.id === courseId) {
-                return this.toggleCourseSelection(element as HTMLElement);
+                return await this.toggleCourseSelection(element as HTMLElement);
             }
         }
         return false;

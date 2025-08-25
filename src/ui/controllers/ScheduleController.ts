@@ -455,15 +455,20 @@ export class ScheduleController {
         });
     }
 
-    handleSectionSelection(course: Course, sectionNumber: string): void {
+    async handleSectionSelection(course: Course, sectionNumber: string): Promise<void> {
         const currentSelectedSection = this.courseSelectionService.getSelectedSection(course);
         
-        if (currentSelectedSection === sectionNumber) {
-            // Deselect current section
-            this.courseSelectionService.setSelectedSection(course, null);
-        } else {
-            // Select new section (automatically deselects any previous section)
-            this.courseSelectionService.setSelectedSection(course, sectionNumber);
+        try {
+            if (currentSelectedSection === sectionNumber) {
+                // Deselect current section
+                await this.courseSelectionService.setSelectedSection(course, null);
+            } else {
+                // Select new section (automatically deselects any previous section)
+                await this.courseSelectionService.setSelectedSection(course, sectionNumber);
+            }
+        } catch (error) {
+            console.error('Failed to update section selection:', error);
+            // TODO: Show error message to user
         }
         
         // Note: UI refresh is handled automatically by the selection change listener
