@@ -611,13 +611,11 @@ export class MainController {
                     
                     // Force refresh of schedule content to ensure optimistic UI data is current
                     // This is critical for first course selection after reload to appear immediately
-                    console.log('🔄 Forcing schedule refresh to sync with optimistic UI cache');
                     this.scheduleController.displayScheduleSelectedCourses();
                     this.scheduleController.renderScheduleGrids();
                     
                     // Additional safety refresh after a brief delay to catch any async updates
                     setTimeout(() => {
-                        console.log('🔄 Secondary schedule refresh for optimistic UI sync');
                         this.scheduleController.displayScheduleSelectedCourses();
                     }, 50);
                 }

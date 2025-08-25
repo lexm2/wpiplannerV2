@@ -330,9 +330,6 @@ export class UIStateBuffer {
         // Keep pending operations for background sync
         this.uiState.pendingOperations = pendingOperations;
         
-        console.log(`🔄 UIStateBuffer.refreshFromBackend(): Merged ${backendCourses.length} backend courses with ${pendingOperations.length} pending operations`);
-        console.log(`📊 Final optimistic cache has ${this.uiState.selectedCourses.length} courses`);
-        
         this.notifyListeners();
     }
 

@@ -459,13 +459,6 @@ export class CourseSelectionService {
         
         // Use optimistic UI state for instant response
         const selectedCourses = this.uiStateBuffer.getSelectedCourses();
-        
-        // Debug logging for first course selection timing issue
-        console.log(`🎯 CourseSelectionService.getSelectedCourses() returning ${selectedCourses.length} courses from optimistic UI cache`);
-        if (selectedCourses.length === 0) {
-            console.log('  ⚠️  No courses in optimistic UI cache - this may indicate timing issue');
-        }
-        
         this.syncSectionObjects(selectedCourses);
         return selectedCourses;
     }
@@ -862,19 +855,13 @@ export class CourseSelectionService {
     // Optimistic UI Implementation Methods
     private selectCourseOptimistic(course: Course, isRequired: boolean): CourseSelectionResult {
         try {
-            // Debug logging for first course selection timing issue
-            console.log(`🚀 CourseSelectionService.selectCourseOptimistic() called for ${course.department?.abbreviation || 'NO_DEPT'}${course.number}: ${course.name}`);
-            
             // Instant UI update via UIStateBuffer (0ms response)
             this.uiStateBuffer.selectCourse(course, isRequired);
-            
-            console.log(`✅ Course added to optimistic UI cache. Cache now has ${this.uiStateBuffer.getSelectedCoursesCount()} courses`);
             
             // Get updated course from UI state buffer
             const selectedCourse = this.uiStateBuffer.getSelectedCourse(course);
             
             // Emit event for immediate UI updates
-            console.log(`📢 Emitting course_added event to ${this.selectionListeners.size} listeners`);
             this.notifySelectionListeners({
                 type: 'course_added',
                 course,

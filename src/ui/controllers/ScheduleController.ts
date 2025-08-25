@@ -83,17 +83,6 @@ export class ScheduleController {
 
         let selectedCourses = this.courseSelectionService.getSelectedCourses();
         
-        // Debug logging for first course selection timing issue
-        console.log('📋 ScheduleController.displayScheduleSelectedCourses() called');
-        console.log(`📊 Found ${selectedCourses.length} selected courses from CourseSelectionService`);
-        if (selectedCourses.length > 0) {
-            selectedCourses.forEach((sc, idx) => {
-                console.log(`  ${idx + 1}. ${sc.course.department?.abbreviation || 'NO_DEPT'}${sc.course.number}: ${sc.course.name}`);
-            });
-        } else {
-            console.log('  📭 No selected courses found - checking optimistic UI cache state');
-        }
-        
         // Get filtered sections if filter service is available
         let filteredSections: Array<{course: any, section: any}> = [];
         let hasActiveFilters = false;
