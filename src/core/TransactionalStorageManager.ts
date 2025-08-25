@@ -93,7 +93,7 @@ export class TransactionalStorageManager {
     }
 
     loadUserState(): { data: UserScheduleState | null; valid: boolean; error?: string } {
-        return this.safeLoad<UserScheduleState>(
+        return this.safeLoad<UserScheduleState | null>(
             TransactionalStorageManager.STORAGE_KEYS.USER_STATE,
             null,
             'user state'

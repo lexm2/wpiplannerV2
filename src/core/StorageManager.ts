@@ -1,5 +1,10 @@
 import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
+import { TransactionalStorageManager } from './TransactionalStorageManager'
 
+/**
+ * @deprecated Use ProfileStateManager instead - this class will be removed in a future version
+ * This class exists only for backward compatibility and redirects all calls to TransactionalStorageManager
+ */
 export class StorageManager {
     private static readonly STORAGE_KEYS = {
         USER_STATE: 'wpi-planner-user-state',
@@ -10,275 +15,111 @@ export class StorageManager {
         ACTIVE_SCHEDULE_ID: 'wpi-planner-active-schedule-id'
     };
 
+    private transactionalStorage = new TransactionalStorageManager();
+
     saveUserState(state: UserScheduleState): void {
-        this.handleStorageOperation(
-            () => {
-                const serializedState = JSON.stringify(state, this.replacer);
-                localStorage.setItem(StorageManager.STORAGE_KEYS.USER_STATE, serializedState);
-            },
-            'Failed to save user state'
-        );
+        console.warn('StorageManager.saveUserState is deprecated. Use ProfileStateManager instead.');
+        this.transactionalStorage.saveUserState(state);
     }
 
     loadUserState(): UserScheduleState | null {
-        return this.handleStorageOperation(
-            () => {
-                const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.USER_STATE);
-                if (!stored) return null;
-                return JSON.parse(stored, this.reviver);
-            },
-            'Failed to load user state',
-            null
-        );
+        console.warn('StorageManager.loadUserState is deprecated. Use ProfileStateManager instead.');
+        const result = this.transactionalStorage.loadUserState();
+        return result.data;
     }
 
     saveSchedule(schedule: Schedule): void {
-        this.handleStorageOperation(
-            () => {
-                const schedules = this.loadAllSchedules();
-                const existingIndex = schedules.findIndex(s => s.id === schedule.id);
-                
-                if (existingIndex >= 0) {
-                    schedules[existingIndex] = schedule;
-                } else {
-                    schedules.push(schedule);
-                }
-                
-                const serializedSchedules = JSON.stringify(schedules, this.replacer);
-                localStorage.setItem(StorageManager.STORAGE_KEYS.SCHEDULES, serializedSchedules);
-            },
-            'Failed to save schedule'
-        );
+        console.warn('StorageManager.saveSchedule is deprecated. Use ProfileStateManager instead.');
+        this.transactionalStorage.saveSchedule(schedule);
     }
 
     loadSchedule(scheduleId: string): Schedule | null {
-        try {
-            const schedules = this.loadAllSchedules();
-            return schedules.find(s => s.id === scheduleId) || null;
-        } catch (error) {
-            console.warn('Failed to load schedule:', error);
-            return null;
-        }
+        console.warn('StorageManager.loadSchedule is deprecated. Use ProfileStateManager instead.');
+        const result = this.transactionalStorage.loadSchedule(scheduleId);
+        return result.data;
     }
 
     loadAllSchedules(): Schedule[] {
-        return this.handleStorageOperation(
-            () => {
-                const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.SCHEDULES);
-                if (!stored) return [];
-                return JSON.parse(stored, this.reviver);
-            },
-            'Failed to load schedules',
-            []
-        );
+        console.warn('StorageManager.loadAllSchedules is deprecated. Use ProfileStateManager instead.');
+        const result = this.transactionalStorage.loadAllSchedules();
+        return result.data || [];
     }
 
     deleteSchedule(scheduleId: string): void {
-        try {
-            const schedules = this.loadAllSchedules();
-            const filtered = schedules.filter(s => s.id !== scheduleId);
-            localStorage.setItem(StorageManager.STORAGE_KEYS.SCHEDULES, JSON.stringify(filtered));
-        } catch (error) {
-            console.warn('Failed to delete schedule:', error);
-        }
+        console.warn('StorageManager.deleteSchedule is deprecated. Use ProfileStateManager instead.');
+        this.transactionalStorage.deleteSchedule(scheduleId);
     }
 
     savePreferences(preferences: SchedulePreferences): void {
-        this.handleStorageOperation(
-            () => {
-                const serializedPreferences = JSON.stringify(preferences, this.replacer);
-                localStorage.setItem(StorageManager.STORAGE_KEYS.PREFERENCES, serializedPreferences);
-            },
-            'Failed to save preferences'
-        );
+        console.warn('StorageManager.savePreferences is deprecated. Use ProfileStateManager instead.');
+        this.transactionalStorage.savePreferences(preferences);
     }
 
     loadPreferences(): SchedulePreferences | null {
-        return this.handleStorageOperation(
-            () => {
-                const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.PREFERENCES);
-                if (!stored) return this.getDefaultPreferences();
-                return JSON.parse(stored, this.reviver);
-            },
-            'Failed to load preferences',
-            this.getDefaultPreferences()
-        );
+        console.warn('StorageManager.loadPreferences is deprecated. Use ProfileStateManager instead.');
+        const result = this.transactionalStorage.loadPreferences();
+        return result.data;
     }
 
-    private getDefaultPreferences(): SchedulePreferences {
-        return {
-            preferredTimeRange: {
-                startTime: { hours: 8, minutes: 0 },
-                endTime: { hours: 18, minutes: 0 }
-            },
-            preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
-            avoidBackToBackClasses: false,
-            theme: 'wpi-classic'
-        };
-    }
 
     clearAllData(): void {
-        try {
-            Object.values(StorageManager.STORAGE_KEYS).forEach(key => {
-                localStorage.removeItem(key);
-            });
-        } catch (error) {
-            console.warn('Failed to clear storage:', error);
-        }
+        console.warn('StorageManager.clearAllData is deprecated. Use ProfileStateManager instead.');
+        this.transactionalStorage.clearAllData();
     }
 
     exportData(): string {
-        const state = this.loadUserState();
-        const schedules = this.loadAllSchedules();
-        const preferences = this.loadPreferences();
-
-        const exportData = {
-            version: '1.0',
-            timestamp: new Date().toISOString(),
-            state,
-            schedules,
-            preferences
-        };
-
-        return JSON.stringify(exportData, null, 2);
+        console.warn('StorageManager.exportData is deprecated. Use ProfileStateManager instead.');
+        const result = this.transactionalStorage.exportData();
+        return result.data || '{}';
     }
 
     importData(jsonData: string): boolean {
-        try {
-            const data = JSON.parse(jsonData);
-            
-            if (data.state) this.saveUserState(data.state);
-            if (data.preferences) this.savePreferences(data.preferences);
-            if (data.schedules) {
-                data.schedules.forEach((schedule: Schedule) => {
-                    this.saveSchedule(schedule);
-                });
-            }
-            
-            return true;
-        } catch (error) {
-            console.error('Failed to import data:', error);
-            return false;
-        }
+        console.warn('StorageManager.importData is deprecated. Use ProfileStateManager instead.');
+        const result = this.transactionalStorage.importData(jsonData);
+        return result.success;
     }
 
-    private handleStorageOperation<T>(
-        operation: () => T,
-        errorMessage: string,
-        fallback?: T
-    ): T | undefined {
-        try {
-            return operation();
-        } catch (error) {
-            console.warn(`${errorMessage}:`, error);
-            return fallback;
-        }
-    }
-
-    private readonly replacer = (key: string, value: any): any => {
-        if (value instanceof Set) {
-            return { __type: 'Set', value: [...value] };
-        }
-
-        if (key === 'department' && value && value.courses) {
-            return {
-                abbreviation: value.abbreviation,
-                name: value.name
-                // Exclude courses array to prevent circular reference
-            };
-        }
-
-        // For SelectedCourse serialization, exclude the Section object to prevent circular references
-        // but keep the selectedSectionNumber for reconstruction
-        if (key === 'selectedSection' && value && typeof value === 'object' && value.number) {
-            return undefined; // Don't serialize the full Section object
-        }
-
-        return value;
-    };
-
-    private readonly reviver = (key: string, value: any): any => {
-        if (typeof value === 'object' && value !== null && value.__type === 'Set') {
-            return new Set(value.value);
-        }
-        return value;
-    };
 
     saveThemePreference(themeId: string): void {
-        try {
-            localStorage.setItem(StorageManager.STORAGE_KEYS.THEME, themeId);
-        } catch (error) {
-            console.warn('Failed to save theme preference:', error);
-        }
+        console.warn('StorageManager.saveThemePreference is deprecated. Use ProfileStateManager instead.');
+        this.transactionalStorage.saveThemePreference(themeId);
     }
 
     loadThemePreference(): string {
-        try {
-            const savedTheme = localStorage.getItem(StorageManager.STORAGE_KEYS.THEME);
-            return savedTheme || 'wpi-classic';
-        } catch (error) {
-            console.warn('Failed to load theme preference:', error);
-            return 'wpi-classic';
-        }
+        console.warn('StorageManager.loadThemePreference is deprecated. Use ProfileStateManager instead.');
+        const result = this.transactionalStorage.loadThemePreference();
+        return result.data;
     }
 
     saveSelectedCourses(selectedCourses: SelectedCourse[]): void {
-        this.handleStorageOperation(
-            () => {
-                const serializedCourses = JSON.stringify(selectedCourses, this.replacer);
-                localStorage.setItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES, serializedCourses);
-            },
-            'Failed to save selected courses'
-        );
+        console.warn('StorageManager.saveSelectedCourses is deprecated. Use ProfileStateManager instead.');
+        this.transactionalStorage.saveSelectedCourses(selectedCourses);
     }
 
     loadSelectedCourses(): SelectedCourse[] {
-        return this.handleStorageOperation(
-            () => {
-                const stored = localStorage.getItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES);
-                if (!stored) return [];
-                return JSON.parse(stored, this.reviver);
-            },
-            'Failed to load selected courses',
-            []
-        );
+        console.warn('StorageManager.loadSelectedCourses is deprecated. Use ProfileStateManager instead.');
+        const result = this.transactionalStorage.loadSelectedCourses();
+        return result.data || [];
     }
 
     clearSelectedCourses(): void {
-        try {
-            localStorage.removeItem(StorageManager.STORAGE_KEYS.SELECTED_COURSES);
-        } catch (error) {
-            console.warn('Failed to clear selected courses:', error);
-        }
+        console.warn('StorageManager.clearSelectedCourses is deprecated. Use ProfileStateManager instead.');
+        this.saveSelectedCourses([]);
     }
 
     saveActiveScheduleId(scheduleId: string | null): void {
-        try {
-            if (scheduleId) {
-                localStorage.setItem(StorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID, scheduleId);
-            } else {
-                localStorage.removeItem(StorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID);
-            }
-        } catch (error) {
-            console.warn('Failed to save active schedule ID:', error);
-        }
+        console.warn('StorageManager.saveActiveScheduleId is deprecated. Use ProfileStateManager instead.');
+        this.transactionalStorage.saveActiveScheduleId(scheduleId);
     }
 
     loadActiveScheduleId(): string | null {
-        try {
-            const saved = localStorage.getItem(StorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID);
-            return saved && saved.length > 0 ? saved : null;
-        } catch (error) {
-            console.warn('Failed to load active schedule ID:', error);
-            return null;
-        }
+        console.warn('StorageManager.loadActiveScheduleId is deprecated. Use ProfileStateManager instead.');
+        const result = this.transactionalStorage.loadActiveScheduleId();
+        return result.data;
     }
 
     clearActiveScheduleId(): void {
-        try {
-            localStorage.removeItem(StorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID);
-        } catch (error) {
-            console.warn('Failed to clear active schedule ID:', error);
-        }
+        console.warn('StorageManager.clearActiveScheduleId is deprecated. Use ProfileStateManager instead.');
+        this.saveActiveScheduleId(null);
     }
 }

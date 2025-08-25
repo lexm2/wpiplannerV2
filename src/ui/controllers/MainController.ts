@@ -21,11 +21,16 @@ import { TimestampManager } from './TimestampManager'
 import { OperationManager, DebouncedOperation } from '../../utils/RequestCancellation'
 import { DepartmentSyncService } from '../../services/DepartmentSyncService'
 import { ScheduleManagementService } from '../../services/ScheduleManagementService'
+import { ProfileStateManager } from '../../core/ProfileStateManager'
+import { StorageService } from '../../services/StorageService'
+import { ThemeManager } from '../../themes/ThemeManager'
 
 export class MainController {
     private courseDataService: CourseDataService;
     private themeSelector: ThemeSelector;
     private scheduleSelector: ScheduleSelector | null = null;
+    private profileStateManager: ProfileStateManager;
+    private storageService: StorageService;
     private courseSelectionService: CourseSelectionService;
     private conflictDetector: ConflictDetector;
     private modalService: ModalService;
@@ -49,9 +54,18 @@ export class MainController {
 
 
     constructor() {
+        // Initialize core storage and state management first
+        this.profileStateManager = new ProfileStateManager();
+        this.storageService = StorageService.getInstance(this.profileStateManager);
+        
+        // Connect ThemeManager to use our unified storage
+        const themeManager = ThemeManager.getInstance();
+        themeManager.setStorage(this.storageService);
+        
+        // Initialize services with shared ProfileStateManager
         this.courseDataService = new CourseDataService();
         this.themeSelector = new ThemeSelector();
-        this.courseSelectionService = new CourseSelectionService();
+        this.courseSelectionService = new CourseSelectionService(this.profileStateManager);
         this.conflictDetector = new ConflictDetector();
         this.modalService = new ModalService();
         this.departmentController = new DepartmentController();
@@ -61,8 +75,8 @@ export class MainController {
         this.filterService = new FilterService(this.searchService);
         this.scheduleFilterService = new ScheduleFilterService(this.searchService);
         
-        // Initialize schedule management service with shared CourseSelectionService
-        this.scheduleManagementService = new ScheduleManagementService(undefined, this.courseSelectionService);
+        // Initialize schedule management service with shared ProfileStateManager and CourseSelectionService
+        this.scheduleManagementService = new ScheduleManagementService(this.profileStateManager, this.courseSelectionService);
         
         // Initialize managers (before any event listeners that might use them)
         this.uiStateManager = new UIStateManager();
@@ -142,7 +156,12 @@ export class MainController {
         this.uiStateManager.showLoadingState();
         
         try {
-            // Initialize CourseSelectionService FIRST to load persisted data
+            // Initialize StorageService FIRST
+            console.log('🔄 MainController: Initializing StorageService...');
+            const storageInitResult = await this.storageService.initialize();
+            console.log('📊 StorageService initialized:', storageInitResult);
+
+            // Initialize CourseSelectionService SECOND to load persisted data
             console.log('🔄 MainController: Initializing CourseSelectionService...');
             const initResult = await this.courseSelectionService.initialize();
             console.log('📊 CourseSelectionService initialized:', initResult);

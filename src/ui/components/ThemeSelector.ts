@@ -1,9 +1,9 @@
 import { ThemeManager } from '../../themes/ThemeManager'
-import { StorageManager } from '../../core/StorageManager'
+import { StorageService } from '../../services/StorageService'
 
 export class ThemeSelector {
     private themeManager: ThemeManager;
-    private storageManager: StorageManager;
+    private storageService: StorageService;
     private dropdownElement: HTMLElement | null = null;
     private optionsElement: HTMLElement | null = null;
     private currentThemeNameElement: HTMLElement | null = null;
@@ -11,7 +11,7 @@ export class ThemeSelector {
 
     constructor() {
         this.themeManager = ThemeManager.getInstance();
-        this.storageManager = new StorageManager();
+        this.storageService = StorageService.getInstance();
         this.init();
     }
 
@@ -29,7 +29,7 @@ export class ThemeSelector {
     }
 
     private loadSavedTheme(): void {
-        const savedTheme = this.storageManager.loadThemePreference();
+        const savedTheme = this.storageService.loadThemePreference();
         this.themeManager.setTheme(savedTheme);
         this.updateCurrentThemeDisplay();
     }
@@ -114,7 +114,7 @@ export class ThemeSelector {
         if (!success) return;
 
         // Save to storage
-        this.storageManager.saveThemePreference(themeId);
+        this.storageService.saveThemePreference(themeId);
 
         // Update UI
         this.updateCurrentThemeDisplay();

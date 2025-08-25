@@ -6,12 +6,39 @@ import wpiDark from './definitions/wpi-dark.json'
 import wpiLight from './definitions/wpi-light.json'
 import highContrast from './definitions/high-contrast.json'
 
+export interface ThemeStorage {
+    loadThemePreference(): string;
+    saveThemePreference(themeId: string): void;
+}
+
+class DefaultThemeStorage implements ThemeStorage {
+    private readonly storageKey = 'wpi-planner-theme';
+
+    loadThemePreference(): string {
+        try {
+            const savedTheme = localStorage.getItem(this.storageKey);
+            return savedTheme || 'wpi-classic';
+        } catch (error) {
+            console.warn('Failed to load theme preference:', error);
+            return 'wpi-classic';
+        }
+    }
+
+    saveThemePreference(themeId: string): void {
+        try {
+            localStorage.setItem(this.storageKey, themeId);
+        } catch (error) {
+            console.warn('Failed to save theme preference:', error);
+        }
+    }
+}
+
 export class ThemeManager {
     private static instance: ThemeManager;
     private currentTheme: ThemeId = 'wpi-classic';
     private themes: Map<ThemeId, ThemeDefinition> = new Map();
     private listeners: Set<ThemeChangeListener> = new Set();
-    private readonly storageKey = 'wpi-planner-theme';
+    private storage: ThemeStorage = new DefaultThemeStorage();
 
     private constructor() {
         this.initializeThemes();
@@ -25,6 +52,15 @@ export class ThemeManager {
         return ThemeManager.instance;
     }
 
+    static resetInstance(): void {
+        ThemeManager.instance = null as any;
+    }
+
+    setStorage(storage: ThemeStorage): void {
+        this.storage = storage;
+        this.loadSavedTheme();
+    }
+
     private initializeThemes(): void {
         // Register built-in themes
         this.registerTheme(wpiClassic as ThemeDefinition);
@@ -34,13 +70,9 @@ export class ThemeManager {
     }
 
     private loadSavedTheme(): void {
-        try {
-            const savedTheme = localStorage.getItem(this.storageKey);
-            if (savedTheme && this.themes.has(savedTheme)) {
-                this.currentTheme = savedTheme;
-            }
-        } catch (error) {
-            console.warn('Failed to load saved theme preference:', error);
+        const savedTheme = this.storage.loadThemePreference();
+        if (savedTheme && this.themes.has(savedTheme as ThemeId)) {
+            this.currentTheme = savedTheme as ThemeId;
         }
         
         // Apply the current theme
@@ -142,11 +174,7 @@ export class ThemeManager {
     }
 
     private saveThemePreference(themeId: ThemeId): void {
-        try {
-            localStorage.setItem(this.storageKey, themeId);
-        } catch (error) {
-            console.warn('Failed to save theme preference:', error);
-        }
+        this.storage.saveThemePreference(themeId);
     }
 
     // System preference detection

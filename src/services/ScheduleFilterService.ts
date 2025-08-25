@@ -1,4 +1,4 @@
-import { Course, Period } from '../types/types';
+import { Course, Period, Section } from '../types/types';
 import { SelectedCourse } from '../types/schedule';
 import { FilterService } from './FilterService';
 import { SearchService } from './searchService';

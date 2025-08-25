@@ -19,14 +19,6 @@ export class TimeUtils {
         DayOfWeek.SUNDAY
     ];
 
-    /**
-     * Convert a Time object to a grid row position (0-based)
-     * 7:00 AM = row 0, 7:30 AM = row 1, 8:00 AM = row 2, etc.
-     * @deprecated Use timeToGridRowStart() or timeToGridRowEnd() instead
-     */
-    static timeToGridRow(time: Time): number {
-        return TimeUtils.timeToGridRowStart(time);
-    }
 
     /**
      * Convert start time to grid row position (rounds DOWN)
@@ -73,8 +65,8 @@ export class TimeUtils {
      * Calculate how many grid rows a time period spans
      */
     static calculateDuration(startTime: Time, endTime: Time): number {
-        const startRow = TimeUtils.timeToGridRow(startTime);
-        const endRow = TimeUtils.timeToGridRow(endTime);
+        const startRow = TimeUtils.timeToGridRowStart(startTime);
+        const endRow = TimeUtils.timeToGridRowEnd(endTime);
         return Math.max(1, endRow - startRow);
     }
 
