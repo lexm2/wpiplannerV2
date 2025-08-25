@@ -5,7 +5,7 @@ export interface CourseFilter {
     readonly name: string;
     readonly description: string;
     
-    apply(courses: Course[], criteria: any): Course[];
+    apply(courses: Course[], criteria: any, additionalData?: any): Course[];
     isValidCriteria(criteria: any): boolean;
     getDisplayValue(criteria: any): string;
 }

@@ -242,7 +242,14 @@ export class FilterService {
             if (activeFilter.id !== 'searchText') { // Skip searchText as it's already applied
                 const filter = this.registeredFilters.get(activeFilter.id);
                 if (filter) {
-                    filteredCourses = filter.apply(filteredCourses, activeFilter.criteria);
+                    // Special handling for availability filter to pass active terms
+                    if (activeFilter.id === 'availability') {
+                        const termFilter = activeFilters.find(f => f.id === 'term');
+                        const activeTerms = termFilter?.criteria?.terms || [];
+                        filteredCourses = filter.apply(filteredCourses, activeFilter.criteria, activeTerms);
+                    } else {
+                        filteredCourses = filter.apply(filteredCourses, activeFilter.criteria);
+                    }
                 }
             }
         }
