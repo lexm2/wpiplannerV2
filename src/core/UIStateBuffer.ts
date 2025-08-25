@@ -310,11 +310,28 @@ export class UIStateBuffer {
     // Force refresh from backend (for schedule changes)
     refreshFromBackend(): void {
         const backendCourses = this.profileStateManager.getSelectedCourses();
+        
+        // Preserve pending operations to avoid losing optimistic updates
+        const pendingOperations = [...this.uiState.pendingOperations];
+        
+        // Start with backend state as base
         this.uiState.selectedCourses = backendCourses.map(sc => ({ ...sc }));
         this.uiState.lastSyncTimestamp = Date.now();
         
-        // Clear any pending operations since we're starting fresh from backend
-        this.uiState.pendingOperations = [];
+        // Reapply pending operations to maintain optimistic updates
+        for (const operation of pendingOperations) {
+            try {
+                this.reapplyPendingOperation(operation);
+            } catch (error) {
+                console.error(`Failed to reapply pending operation ${operation.id}:`, error);
+            }
+        }
+        
+        // Keep pending operations for background sync
+        this.uiState.pendingOperations = pendingOperations;
+        
+        console.log(`🔄 UIStateBuffer.refreshFromBackend(): Merged ${backendCourses.length} backend courses with ${pendingOperations.length} pending operations`);
+        console.log(`📊 Final optimistic cache has ${this.uiState.selectedCourses.length} courses`);
         
         this.notifyListeners();
     }
@@ -421,6 +438,70 @@ export class UIStateBuffer {
 
     private generateOperationId(): string {
         return `ui_op_${Date.now()}_${++this.operationIdCounter}`;
+    }
+
+    private reapplyPendingOperation(operation: PendingOperation): void {
+        switch (operation.type) {
+            case 'select_course':
+                const course = operation.data.course;
+                const isRequired = operation.data.isRequired;
+                
+                // Apply the same logic as selectCourse but without queuing another operation
+                const existingIndex = this.uiState.selectedCourses.findIndex(sc => sc.course.id === course.id);
+                
+                if (existingIndex >= 0) {
+                    // Update existing selection
+                    this.uiState.selectedCourses[existingIndex] = {
+                        ...this.uiState.selectedCourses[existingIndex],
+                        isRequired
+                    };
+                } else {
+                    // Add new selection
+                    const selectedCourse: SelectedCourse = {
+                        course,
+                        selectedSection: null,
+                        selectedSectionNumber: null,
+                        isRequired
+                    };
+                    this.uiState.selectedCourses.push(selectedCourse);
+                }
+                break;
+                
+            case 'unselect_course':
+                if (operation.data.clearAll) {
+                    this.uiState.selectedCourses = [];
+                } else {
+                    const course = operation.data.course;
+                    const index = this.uiState.selectedCourses.findIndex(sc => sc.course.id === course.id);
+                    if (index >= 0) {
+                        this.uiState.selectedCourses.splice(index, 1);
+                    }
+                }
+                break;
+                
+            case 'set_section':
+                const sectionCourse = operation.data.course;
+                const sectionNumber = operation.data.sectionNumber;
+                const selectedCourse = this.uiState.selectedCourses.find(sc => sc.course.id === sectionCourse.id);
+                if (selectedCourse) {
+                    let sectionObject: Section | null = null;
+                    
+                    if (sectionNumber) {
+                        sectionObject = sectionCourse.sections.find(s => s.number === sectionNumber) || null;
+                        if (sectionObject && !sectionObject.computedTerm) {
+                            console.warn(`Section ${sectionNumber} missing computedTerm property`);
+                            sectionObject = null;
+                        }
+                    }
+
+                    selectedCourse.selectedSection = sectionObject;
+                    selectedCourse.selectedSectionNumber = sectionObject ? sectionNumber : null;
+                }
+                break;
+                
+            default:
+                console.warn(`Unknown operation type for reapplication: ${operation.type}`);
+        }
     }
 
     private notifyListeners(): void {
