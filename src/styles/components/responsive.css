@@ -15,6 +15,11 @@
     display: none;
   }
   
+  .header-navigation {
+    margin-left: 1rem;
+    min-width: 140px;
+  }
+  
   .header-controls {
     flex-direction: column;
     gap: 0.5rem;

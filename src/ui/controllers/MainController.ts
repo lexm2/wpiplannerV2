@@ -1121,18 +1121,25 @@ export class MainController {
     private findOrCreateStatusIndicator(): HTMLElement {
         let indicator = document.getElementById('optimistic-ui-status');
         if (!indicator) {
+            // Status indicator should now be pre-existing in HTML, but fallback to creation if needed
             indicator = document.createElement('div');
             indicator.id = 'optimistic-ui-status';
             indicator.className = 'optimistic-status idle';
             
-            // Insert before save button (to the left side)
-            const saveButton = document.getElementById('save-profile-btn');
-            if (saveButton && saveButton.parentNode) {
-                saveButton.parentNode.insertBefore(indicator, saveButton);
+            // Try to insert in dedicated container first, fallback to old behavior
+            const statusContainer = document.querySelector('.status-indicator-container');
+            if (statusContainer) {
+                statusContainer.appendChild(indicator);
             } else {
-                const header = document.querySelector('.controls, .header-controls, .content-header');
-                if (header) {
-                    header.appendChild(indicator);
+                // Fallback: insert before save button (old behavior)
+                const saveButton = document.getElementById('save-profile-btn');
+                if (saveButton && saveButton.parentNode) {
+                    saveButton.parentNode.insertBefore(indicator, saveButton);
+                } else {
+                    const header = document.querySelector('.controls, .header-controls, .content-header');
+                    if (header) {
+                        header.appendChild(indicator);
+                    }
                 }
             }
         }

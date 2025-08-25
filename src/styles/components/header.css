@@ -61,7 +61,10 @@
 .header-navigation {
   display: flex;
   align-items: center;
+  justify-content: center;
   margin-left: 2rem;
+  flex-shrink: 0;
+  min-width: 160px;
 }
 
 .btn-schedule {
@@ -75,5 +78,16 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+}
+
+.status-indicator-container {
+  display: flex;
+  align-items: center;
+  min-width: 120px;
+  height: 1.5rem;
+}
+
+#save-profile-btn {
+  min-width: 80px;
 }
 
