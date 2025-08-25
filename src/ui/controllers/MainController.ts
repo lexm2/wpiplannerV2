@@ -199,10 +199,10 @@ export class MainController {
                     switchSchedule: (id: string) => this.scheduleManagementService.setActiveSchedule(id),
                     getSchedules: () => this.scheduleManagementService.getAllSchedules(),
                     getCurrentPage: () => this.uiStateManager.currentPage,
-                    createTestSchedules: () => {
-                        const schedule1 = this.scheduleManagementService.createNewSchedule('Test Schedule 1');
-                        const schedule2 = this.scheduleManagementService.createNewSchedule('Test Schedule 2');
-                        console.log('Created test schedules:', schedule1.id, schedule2.id);
+                    createTestSchedules: async () => {
+                        const schedule1 = await this.scheduleManagementService.createNewSchedule('Test Schedule 1');
+                        const schedule2 = await this.scheduleManagementService.createNewSchedule('Test Schedule 2');
+                        console.log('Created test schedules:', schedule1.schedule?.id, schedule2.schedule?.id);
                         return { schedule1, schedule2 };
                     },
                     testCompleteSwitch: (scheduleId?: string) => {
@@ -782,7 +782,7 @@ export class MainController {
         }
     }
 
-    private handleSaveProfile(): void {
+    private async handleSaveProfile(): Promise<void> {
         const saveButton = document.getElementById('save-profile-btn') as HTMLButtonElement;
         if (!saveButton) return;
 
@@ -791,7 +791,8 @@ export class MainController {
         saveButton.innerHTML = '⏳ Saving...';
         saveButton.disabled = true;
 
-        const success = this.scheduleManagementService.manualSaveCurrentProfile();
+        const result = await this.scheduleManagementService.manualSaveCurrentProfile();
+        const success = result.success;
         
         setTimeout(() => {
             if (success) {

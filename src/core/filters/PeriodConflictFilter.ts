@@ -50,7 +50,8 @@ export class PeriodConflictFilter implements CourseFilter {
                 actualWaitlist: 0,
                 maxWaitlist: 0,
                 description: 'Temporary section for conflict detection',
-                term: 'TEMP'
+                term: 'TEMP',
+                computedTerm: 'TEMP'
             };
 
             // Test if this temporary section conflicts with any selected sections
@@ -115,7 +116,8 @@ export class PeriodConflictFilter implements CourseFilter {
                 actualWaitlist: 0,
                 maxWaitlist: 0,
                 description: 'Temporary section for conflict detection',
-                term: 'TEMP'
+                term: 'TEMP',
+                computedTerm: 'TEMP'
             };
 
             // Test if this temporary section conflicts with selected sections from OTHER courses only
@@ -182,7 +184,8 @@ export class PeriodConflictFilter implements CourseFilter {
                     actualWaitlist: 0,
                     maxWaitlist: 0,
                     description: 'Temporary section for conflict detection',
-                    term: 'TEMP'
+                    term: 'TEMP',
+                    computedTerm: 'TEMP'
                 };
 
                 // Test if this period conflicts with any selected sections from OTHER courses

@@ -19,6 +19,7 @@ export interface RetryResult<T> {
 export interface RetryOptions {
     operationName?: string;
     timeout?: number;
+    maxAttempts?: number;
     onRetry?: (attempt: number, error: Error, nextDelay: number) => void;
     onSuccess?: (result: any, attempts: number) => void;
     onFinalFailure?: (error: Error, attempts: number) => void;
@@ -429,7 +430,7 @@ export class RetryManager {
         config?: Partial<RetryConfig>,
         options?: RetryOptions
     ): Promise<RetryResult<T>> {
-        const manager = new RetryManager(config);
+        const manager = new RetryManager(config ? { ...RetryManager.DEFAULT_CONFIG, ...config } : RetryManager.DEFAULT_CONFIG);
         return manager.executeWithRetry(operation, options);
     }
 

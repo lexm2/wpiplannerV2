@@ -369,14 +369,18 @@ export class ScheduleSelector {
         }
     }
 
-    private createNewSchedule(): void {
+    private async createNewSchedule(): Promise<void> {
         const name = prompt('Enter name for new schedule:', 'New Schedule');
         if (name && name.trim()) {
             this.setLoadingState(true);
             
             try {
-                const schedule = this.scheduleManagementService.createNewSchedule(name.trim());
-                this.scheduleManagementService.setActiveSchedule(schedule.id);
+                const result = await this.scheduleManagementService.createNewSchedule(name.trim());
+                if (result.success && result.schedule) {
+                    await this.scheduleManagementService.setActiveSchedule(result.schedule.id);
+                } else {
+                    throw new Error(result.error || 'Failed to create schedule');
+                }
             } catch (error) {
                 console.error('Failed to create new schedule:', error);
                 alert('Failed to create new schedule. Please try again.');
@@ -411,27 +415,29 @@ export class ScheduleSelector {
         }
     }
 
-    private deleteSchedule(scheduleId: string): void {
+    private async deleteSchedule(scheduleId: string): Promise<void> {
         const schedule = this.scheduleManagementService.loadSchedule(scheduleId);
         if (!schedule) return;
 
         const confirmDelete = confirm(`Are you sure you want to delete "${schedule.name}"? This action cannot be undone.`);
         if (confirmDelete) {
-            const success = this.scheduleManagementService.deleteSchedule(scheduleId);
-            if (success) {
+            const result = await this.scheduleManagementService.deleteSchedule(scheduleId);
+            if (result.success) {
                 this.updateScheduleList();
             } else {
-                alert('Cannot delete the last remaining schedule.');
+                alert(result.error || 'Cannot delete the last remaining schedule.');
             }
         }
     }
 
-    private exportSchedule(scheduleId: string): void {
-        const exportData = this.scheduleManagementService.exportSchedule(scheduleId);
-        if (exportData) {
+    private async exportSchedule(scheduleId: string): Promise<void> {
+        const exportResult = await this.scheduleManagementService.exportSchedule(scheduleId);
+        if (exportResult.success && exportResult.data) {
             const schedule = this.scheduleManagementService.loadSchedule(scheduleId);
             const filename = `${schedule?.name || 'schedule'}.json`;
-            this.downloadJSON(exportData, filename);
+            this.downloadJSON(exportResult.data, filename);
+        } else {
+            alert(exportResult.error || 'Failed to export schedule');
         }
     }
 
@@ -452,15 +458,15 @@ export class ScheduleSelector {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = (event) => {
+                reader.onload = async (event) => {
                     const jsonData = event.target?.result as string;
-                    const importedSchedule = this.scheduleManagementService.importSchedule(jsonData);
+                    const importResult = await this.scheduleManagementService.importSchedule(jsonData);
                     
-                    if (importedSchedule) {
-                        alert(`Successfully imported "${importedSchedule.name}"`);
+                    if (importResult.success && importResult.schedule) {
+                        alert(`Successfully imported "${importResult.schedule.name}"`);
                         this.updateScheduleList();
                     } else {
-                        alert('Failed to import schedule. Please check the file format.');
+                        alert(importResult.error || 'Failed to import schedule. Please check the file format.');
                     }
                 };
                 reader.readAsText(file);

@@ -1,5 +1,5 @@
-import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
-import { Course, Section } from '../types/types'
+import { Schedule, SchedulePreferences, SelectedCourse } from '../types/schedule'
+import { Course } from '../types/types'
 import { TransactionalStorageManager, TransactionResult } from './TransactionalStorageManager'
 
 export interface StateChangeEvent {

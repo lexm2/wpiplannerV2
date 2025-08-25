@@ -519,6 +519,15 @@ export class ScheduleManagementService {
         return schedules.find(s => s.id === scheduleId) || null;
     }
 
+    // Legacy compatibility methods
+    loadSchedule(scheduleId: string): Schedule | null {
+        return this.getScheduleById(scheduleId);
+    }
+
+    async manualSaveCurrentProfile(): Promise<{ success: boolean; error?: string }> {
+        return this.save();
+    }
+
     // Course management within schedules
     private async updateScheduleCourses(scheduleId: string, selectedCourses: SelectedCourse[]): Promise<{ success: boolean; error?: string }> {
         try {
@@ -832,7 +841,7 @@ export class ScheduleManagementService {
         });
     }
 
-    private async initializeDefaultScheduleIfNeeded(): Promise<void> {
+    async initializeDefaultScheduleIfNeeded(): Promise<void> {
         const existingSchedules = this.profileStateManager.getAllSchedules();
         
         if (existingSchedules.length === 0) {
