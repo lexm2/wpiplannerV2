@@ -23,12 +23,24 @@ export class ScheduleSelector {
     }
 
     private init(): void {
+        console.log('🚀 [ScheduleSelector] init() called');
         this.render();
         this.setupEventListeners();
         this.setupScheduleChangeListener();
         this.setupCourseSelectionListener();
+        
+        console.log('🔄 [ScheduleSelector] Getting initial active schedule...');
         this.currentActiveSchedule = this.scheduleManagementService.getActiveSchedule();
+        console.log('📋 [ScheduleSelector] Initial active schedule:', this.currentActiveSchedule);
+        
         this.updateDisplay();
+        
+        // IMPORTANT: Always populate the schedule list during initialization
+        // This ensures schedules show up even if dropdown hasn't been opened yet
+        console.log('🔄 [ScheduleSelector] Performing initial schedule list population...');
+        this.initialScheduleListPopulation();
+        
+        console.log('✅ [ScheduleSelector] init() completed');
     }
 
     private render(): void {
@@ -84,6 +96,7 @@ export class ScheduleSelector {
         });
 
         newScheduleBtn?.addEventListener('click', (e) => {
+            console.log('🆕 [ScheduleSelector] "+ New" button clicked');
             e.stopPropagation();
             this.createNewSchedule();
         });
@@ -105,9 +118,25 @@ export class ScheduleSelector {
     }
 
     private setupScheduleChangeListener(): void {
+        // Listen for active schedule changes
         this.scheduleManagementService.onActiveScheduleChange((activeSchedule) => {
+            console.log('🔄 [ScheduleSelector] Active schedule change event received');
+            console.log('📋 [ScheduleSelector] Previous active schedule:', this.currentActiveSchedule);
+            console.log('📋 [ScheduleSelector] New active schedule:', activeSchedule);
+            
             this.currentActiveSchedule = activeSchedule;
+            console.log('🔄 [ScheduleSelector] Updated currentActiveSchedule, calling updateDisplay()');
             this.updateDisplay();
+        });
+        
+        // Listen for schedule list changes (creation, deletion, etc.)
+        this.scheduleManagementService.addScheduleListener((event) => {
+            console.log('📋 [ScheduleSelector] Schedule list change event received:', event.type);
+            console.log('📋 [ScheduleSelector] Event details:', event);
+            
+            // Always refresh the schedule list when schedules are created/deleted/updated
+            console.log('🔄 [ScheduleSelector] Refreshing schedule list due to schedule change');
+            this.refreshScheduleList();
         });
     }
 
@@ -155,27 +184,67 @@ export class ScheduleSelector {
     }
 
     private updateDisplay(): void {
+        console.log('🖼️ [ScheduleSelector] updateDisplay() called');
+        console.log('📋 [ScheduleSelector] Current active schedule:', this.currentActiveSchedule);
+        
         const activeScheduleNameEl = this.container.querySelector('#active-schedule-name') as HTMLElement;
         
         if (activeScheduleNameEl) {
+            const previousText = activeScheduleNameEl.textContent;
+            
             if (this.currentActiveSchedule) {
                 activeScheduleNameEl.textContent = this.currentActiveSchedule.name;
+                console.log(`✅ [ScheduleSelector] Updated display text from "${previousText}" to "${this.currentActiveSchedule.name}"`);
             } else {
                 activeScheduleNameEl.textContent = 'No Schedule';
+                console.log(`⚠️ [ScheduleSelector] No active schedule - updated display text from "${previousText}" to "No Schedule"`);
             }
+        } else {
+            console.error('❌ [ScheduleSelector] updateDisplay failed - activeScheduleNameEl element not found');
         }
 
         if (this.isDropdownOpen) {
+            console.log('📋 [ScheduleSelector] Dropdown is open, updating schedule list');
             this.updateScheduleList();
+        } else {
+            console.log('📋 [ScheduleSelector] Dropdown is closed, skipping schedule list update');
         }
+        
+        console.log('✅ [ScheduleSelector] updateDisplay() completed');
+    }
+
+    private initialScheduleListPopulation(): void {
+        console.log('🔄 [ScheduleSelector] initialScheduleListPopulation() called');
+        
+        try {
+            const schedules = this.scheduleManagementService.getAllSchedules();
+            console.log(`📊 [ScheduleSelector] Found ${schedules.length} schedules during initialization`);
+            
+            if (schedules.length > 0) {
+                console.log('📋 [ScheduleSelector] Schedules found, populating list immediately');
+                this.updateScheduleList();
+            } else {
+                console.log('⚠️ [ScheduleSelector] No schedules found during initialization, will retry when dropdown opens');
+            }
+        } catch (error) {
+            console.error('❌ [ScheduleSelector] Error during initial schedule population:', error);
+            console.log('🔄 [ScheduleSelector] Will retry schedule population when dropdown opens');
+        }
+        
+        console.log('✅ [ScheduleSelector] initialScheduleListPopulation() completed');
     }
 
     private updateScheduleList(): void {
+        console.log('🔄 [ScheduleSelector] updateScheduleList() called');
         const scheduleList = this.container.querySelector('#schedule-list') as HTMLElement;
-        if (!scheduleList) return;
+        if (!scheduleList) {
+            console.error('❌ [ScheduleSelector] Schedule list element not found');
+            return;
+        }
 
         const schedules = this.scheduleManagementService.getAllSchedules();
         const activeScheduleId = this.scheduleManagementService.getActiveScheduleId();
+        console.log(`📊 [ScheduleSelector] updateScheduleList: ${schedules.length} schedules, active: ${activeScheduleId}`);
 
         if (schedules.length === 0) {
             const emptyHTML = '<div class="schedule-list-empty">No schedules found</div>';
@@ -370,26 +439,54 @@ export class ScheduleSelector {
     }
 
     private async createNewSchedule(): Promise<void> {
+        console.log('🔄 [ScheduleSelector] Starting new schedule creation process');
+        
         const name = prompt('Enter name for new schedule:', 'New Schedule');
+        console.log(`📝 [ScheduleSelector] User entered schedule name: "${name}"`);
+        
         if (name && name.trim()) {
+            const trimmedName = name.trim();
+            console.log(`✅ [ScheduleSelector] Name validation passed, proceeding with: "${trimmedName}"`);
+            console.log('⏳ [ScheduleSelector] Setting loading state to true');
             this.setLoadingState(true);
             
             try {
-                const result = await this.scheduleManagementService.createNewSchedule(name.trim());
+                console.log('🚀 [ScheduleSelector] Calling scheduleManagementService.createNewSchedule()');
+                const startTime = Date.now();
+                const result = await this.scheduleManagementService.createNewSchedule(trimmedName);
+                const createDuration = Date.now() - startTime;
+                console.log(`📊 [ScheduleSelector] createNewSchedule completed in ${createDuration}ms`);
+                console.log('📋 [ScheduleSelector] Create result:', result);
+                
                 if (result.success && result.schedule) {
+                    console.log(`✅ [ScheduleSelector] Schedule created successfully with ID: ${result.schedule.id}`);
+                    console.log('🔄 [ScheduleSelector] Setting new schedule as active');
+                    
+                    const activateStartTime = Date.now();
                     await this.scheduleManagementService.setActiveSchedule(result.schedule.id);
+                    const activateDuration = Date.now() - activateStartTime;
+                    console.log(`📊 [ScheduleSelector] setActiveSchedule completed in ${activateDuration}ms`);
+                    console.log('✅ [ScheduleSelector] Schedule activation successful');
                 } else {
+                    console.error('❌ [ScheduleSelector] Schedule creation failed:', result.error);
                     throw new Error(result.error || 'Failed to create schedule');
                 }
             } catch (error) {
-                console.error('Failed to create new schedule:', error);
+                console.error('💥 [ScheduleSelector] Exception during schedule creation:', error);
+                console.error('💥 [ScheduleSelector] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
                 alert('Failed to create new schedule. Please try again.');
             } finally {
+                console.log('🔚 [ScheduleSelector] Entering finally block - scheduling cleanup');
                 setTimeout(() => {
+                    console.log('🧹 [ScheduleSelector] Cleanup timeout executing - clearing loading state');
                     this.setLoadingState(false);
+                    console.log('📤 [ScheduleSelector] Closing dropdown');
                     this.closeDropdown();
+                    console.log('✅ [ScheduleSelector] Schedule creation process complete');
                 }, 100);
             }
+        } else {
+            console.log('❌ [ScheduleSelector] No valid schedule name provided, canceling creation');
         }
     }
 
@@ -527,24 +624,53 @@ export class ScheduleSelector {
     }
 
     public refresh(): void {
+        console.log('🔄 [ScheduleSelector] refresh() called explicitly');
+        const previousSchedule = this.currentActiveSchedule;
         this.currentActiveSchedule = this.scheduleManagementService.getActiveSchedule();
+        console.log('📋 [ScheduleSelector] Previous schedule in refresh:', previousSchedule);
+        console.log('📋 [ScheduleSelector] New schedule from service:', this.currentActiveSchedule);
         this.updateDisplay();
+        this.refreshScheduleList();
+    }
+
+    public refreshScheduleList(): void {
+        console.log('🔄 [ScheduleSelector] refreshScheduleList() called');
+        
+        // Always update the schedule list, regardless of dropdown state
+        // This ensures the list is current when the dropdown is opened
+        try {
+            this.updateScheduleList();
+            console.log('✅ [ScheduleSelector] Schedule list refreshed successfully');
+        } catch (error) {
+            console.error('❌ [ScheduleSelector] Error refreshing schedule list:', error);
+        }
     }
 
     private setLoadingState(loading: boolean): void {
+        console.log(`🎨 [ScheduleSelector] setLoadingState called with loading=${loading}`);
+        
         const trigger = this.container.querySelector('#schedule-selector-trigger') as HTMLElement;
         const activeScheduleName = this.container.querySelector('#active-schedule-name') as HTMLElement;
         
         if (trigger && activeScheduleName) {
             if (loading) {
+                console.log('⏳ [ScheduleSelector] Applying loading state - dimming UI and showing "Switching..."');
                 trigger.style.opacity = '0.6';
                 trigger.style.pointerEvents = 'none';
                 activeScheduleName.textContent = 'Switching...';
+                console.log('✅ [ScheduleSelector] Loading state applied successfully');
             } else {
+                console.log('🔄 [ScheduleSelector] Clearing loading state - restoring UI and updating display');
                 trigger.style.opacity = '1';
                 trigger.style.pointerEvents = 'auto';
-                // The display will be updated through the normal refresh cycle
+                console.log('🔄 [ScheduleSelector] Calling updateDisplay() to refresh schedule name');
+                this.updateDisplay();
+                console.log('✅ [ScheduleSelector] Loading state cleared and display updated');
             }
+        } else {
+            console.error('❌ [ScheduleSelector] setLoadingState failed - trigger or activeScheduleName element not found');
+            console.error('🔍 [ScheduleSelector] trigger element:', trigger);
+            console.error('🔍 [ScheduleSelector] activeScheduleName element:', activeScheduleName);
         }
     }
 }
