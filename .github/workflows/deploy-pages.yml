@@ -1,9 +1,9 @@
-name: Build and Deploy
+# DISABLED: This workflow has been merged into update-course-data.yml
+# to ensure automatic deployments when course data updates
+name: Build and Deploy (DISABLED)
 
 on:
-  push:
-    branches: [ main, master ]
-  # Allow manual trigger
+  # Disabled - workflow merged into update-course-data.yml
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN 

@@ -1,4 +1,4 @@
-name: Update Course Data
+name: Update Course Data and Deploy
 
 on:
   schedule:
@@ -7,9 +7,11 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  update-data:
+  update-data-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
@@ -22,6 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'npm'
       
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -48,7 +51,7 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
       
-      - name: Commit and push if changed
+      - name: Commit course data changes
         if: steps.changes.outputs.changed == 'true'
         run: |
           # Create timestamp file with current UTC time
@@ -59,3 +62,24 @@ jobs:
           git add public/course-data.json public/course-data-constructed.json public/last-updated.json
           git commit -m "Update course data $(date -u +%Y-%m-%d\ %H:%M\ UTC)"
           git push
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Build TypeScript application
+        run: npm run build
+      
+      - name: Copy course data to build output
+        run: |
+          cp public/course-data.json dist/
+          cp public/course-data-constructed.json dist/
+          cp public/last-updated.json dist/
+          echo "Course data files copied to dist/"
+          ls -la dist/*.json
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          enable_jekyll: false
