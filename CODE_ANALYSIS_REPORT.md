@@ -209,8 +209,139 @@ UI Actions → Service Coordination → Core Updates
 - **Single Responsibility**: Each service has a focused purpose
 - **Loose Coupling**: UI components interact through service APIs, not directly with core
 
+## UI Layer (`src/ui/`)
+
+The UI layer implements the Model-View-Controller (MVC) pattern with specialized controllers managing different aspects of the user interface, reusable components, and performance-optimized utilities.
+
+### Core Controllers (`src/ui/controllers/`)
+
+**MainController.ts** - Application Orchestrator
+- **Purpose**: Central coordinator for the entire application
+- **Dependencies**: All major services (CourseSelectionService, ScheduleManagementService, etc.)
+- **Responsibilities**: 
+  - Application initialization and service coordination
+  - Integration of all sub-controllers (Department, Course, Schedule)
+  - Theme management integration via ThemeSelector
+  - Search coordination with debouncing and operation management
+- **Architecture Role**: Single entry point that wires together all application components
+
+**CourseController.ts** - Course Display & Selection
+- **Purpose**: Manages course listing, filtering, and selection UI
+- **Key Features**: 
+  - Progressive rendering for large course datasets (ProgressiveRenderer)
+  - Performance monitoring and metrics collection
+  - Pagination with dynamic page sizing
+  - WeakMap-based element-to-course mapping for memory efficiency
+- **Service Integration**: CourseSelectionService, FilterService
+- **Performance**: Optimized for datasets of 1000+ courses
+
+**ScheduleController.ts** - Schedule Visualization & Management  
+- **Purpose**: Renders schedule grids and manages schedule interactions
+- **Dependencies**: ScheduleManagementService, ScheduleFilterService, ConflictDetector
+- **Key Features**:
+  - Schedule conflict visualization and resolution
+  - Section selection and schedule generation
+  - Modal integration for detailed section information
+  - State preservation for UI consistency
+- **Integration**: Works closely with ScheduleFilterModalController
+
+**DepartmentController.ts** - Department Navigation
+- **Purpose**: Manages department selection and categorization
+- **Features**: Department filtering, category-based organization
+- **Synchronization**: Integrates with DepartmentSyncService to maintain consistency
+
+### Modal Controllers
+
+**FilterModalController.ts** - Advanced Filtering Interface  
+- **Purpose**: Provides comprehensive filtering UI for course discovery
+- **Integration**: FilterService, SearchService coordination
+- **Features**: Multi-criteria filtering, real-time filter application
+
+**ScheduleFilterModalController.ts** - Schedule-Specific Filtering
+- **Purpose**: Specialized filtering for schedule generation
+- **Focus**: Time conflicts, availability, schedule constraints
+
+**SectionInfoModalController.ts** - Detailed Course Information
+- **Purpose**: Displays comprehensive course and section details
+- **Features**: Section comparison, enrollment information, scheduling details
+
+**InfoModalController.ts** - General Information Modals
+- **Purpose**: Handles help, about, and informational content
+
+### Reusable Components (`src/ui/components/`)
+
+**ThemeSelector.ts**
+- **Purpose**: Theme switching interface with persistence
+- **Integration**: ThemeManager, StorageService
+- **Features**: Dropdown UI, theme preview, automatic theme persistence
+
+**ScheduleSelector.ts** 
+- **Purpose**: Schedule management interface
+- **Integration**: ScheduleManagementService
+- **Features**: Schedule switching, creation, deletion
+
+### UI Management & State
+
+**UIStateManager.ts**
+- **Purpose**: Manages global UI state (view modes, page navigation)
+- **State Management**: Current view (list/grid), current page (planner/schedule)
+- **Features**: Button state synchronization, page transitions
+
+**TimestampManager.ts**
+- **Purpose**: Manages data freshness indicators and update timestamps
+- **Features**: Real-time timestamp updates, data refresh coordination
+
+### Performance & Rendering (`src/ui/utils/`)
+
+**ProgressiveRenderer.ts**
+- **Purpose**: High-performance rendering for large datasets
+- **Features**: 
+  - Batch rendering with configurable batch sizes
+  - Frame-rate aware rendering (60 FPS targeting)
+  - Cancellation support for interrupted operations
+  - Performance metrics integration
+  - Memory-efficient virtualization options
+- **Use Cases**: Course list rendering, search results, large schedule displays
+
+**timeUtils.ts**
+- **Purpose**: Time-related UI utilities and formatting
+- **Features**: Time formatting, grid positioning, schedule visualization helpers
+
+### UI Architecture Patterns
+
+#### Controller Coordination Pattern
+```
+MainController (Orchestrator)
+    ├── DepartmentController ←→ DepartmentSyncService ←→ FilterService  
+    ├── CourseController ←→ FilterService ←→ SearchService
+    ├── ScheduleController ←→ ScheduleFilterService ←→ ConflictDetector
+    └── Modal Controllers ←→ ModalService (z-index management)
+```
+
+#### Service Integration Pattern
+```
+UI Controllers → Services → Core Business Logic
+    ↓              ↓            ↓
+  DOM Updates ← Events ← State Changes
+```
+
+#### Performance Optimization Strategy
+- **Progressive Rendering**: Large datasets rendered in batches
+- **WeakMap Usage**: Memory-efficient element-to-data mapping  
+- **Debounced Operations**: Search and filter operations optimized
+- **Cancellation Tokens**: Prevent outdated operations from completing
+- **Performance Metrics**: Real-time monitoring of rendering performance
+
+### Key UI Architectural Benefits
+
+- **Separation of Concerns**: Each controller has specific responsibilities
+- **Performance-First**: Optimized for large WPI course datasets (8MB+)
+- **Event-Driven**: Reactive UI that responds to service layer events
+- **Memory Efficient**: WeakMaps and cancellation prevent memory leaks
+- **Accessibility**: Consistent modal management and keyboard navigation
+- **Testability**: Controllers can be unit tested with mocked services
+
 ## Next Sections
 
-- UI Components & Controllers  
 - Utilities & Helper Functions
 - Type System & Data Models
