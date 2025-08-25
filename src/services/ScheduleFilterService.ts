@@ -13,6 +13,96 @@ import { SectionCodeFilter } from '../core/filters/SectionCodeFilter';
 import { SearchTextFilter } from '../core/filters';
 import { ConflictDetector } from '../core/ConflictDetector';
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * ScheduleFilterService - Specialized Schedule-Level Filtering Engine
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Schedule-specific filtering engine extending base FilterService capabilities
+ * - Period and Section level constraint processing for schedule generation
+ * - Time conflict detection and resolution during filtering
+ * - Advanced filtering coordinator for complex schedule requirements
+ * - Bridge between course-level filtering and schedule generation algorithms
+ * 
+ * DEPENDENCIES:
+ * - FilterService → Base filtering infrastructure and filter registration
+ * - SearchService → Text-based search coordination across filtered data
+ * - ConflictDetector → Time conflict detection between course sections
+ * - Period/Section/Course types → Deep data structure access for filtering
+ * - SelectedCourse types → User selection state integration
+ * - 9 specialized filter classes → Period-level and section-level constraints
+ * 
+ * USED BY:
+ * - ScheduleController → Schedule generation UI with advanced filtering
+ * - ScheduleFilterModalController → Modal UI for schedule-specific filter controls
+ * - MainController → Service initialization and cross-service wiring
+ * - Schedule generation algorithms → Pre-filtering courses for valid combinations
+ * 
+ * FILTER SPECIALIZATION (Period-Level Filters):
+ * Time-Based:
+ * - PeriodDaysFilter → Filter by specific days of week
+ * - PeriodAvailabilityFilter → Filter by seat availability
+ * - PeriodConflictFilter → Detect and resolve time conflicts
+ * 
+ * Content-Based:
+ * - PeriodProfessorFilter → Filter by instructor preferences
+ * - PeriodTypeFilter → Filter by class type (Lecture, Lab, Discussion)
+ * - PeriodTermFilter → Filter by academic term
+ * 
+ * Section-Based:
+ * - SectionCodeFilter → Filter by section codes (A01, B02, etc.)
+ * - CourseSelectionFilter → Filter based on user selections
+ * - SearchTextFilter → Text search across course content
+ * 
+ * DATA FLOW:
+ * Schedule Filtering Process:
+ * 1. Receive course list with user selections (SelectedCourse[])
+ * 2. Apply course-level filters from base FilterService
+ * 3. For each course, dive into Section[] and Period[] arrays
+ * 4. Apply period-specific filters (time, professor, type, conflicts)
+ * 5. Filter sections based on availability and user constraints
+ * 6. Return filtered data suitable for schedule generation
+ * 7. Coordinate with ConflictDetector for final validation
+ * 
+ * Filter Coordination:
+ * 1. Extends FilterService filter registration system
+ * 2. Adds schedule-specific filter implementations
+ * 3. Coordinates with SearchService for text-based filtering
+ * 4. Integrates ConflictDetector for time-based validation
+ * 5. Provides localStorage persistence for filter state
+ * 
+ * KEY FEATURES:
+ * - Deep data structure filtering (Course → Section → Period hierarchy)
+ * - Time conflict detection integration during filtering process
+ * - Schedule-specific constraint processing (availability, time slots, conflicts)
+ * - Advanced filter combinations with persistent state
+ * - Real-time filter application with performance optimization
+ * - Integration with schedule generation algorithms
+ * - Modal UI coordination for complex filter controls
+ * 
+ * INTEGRATION POINTS:
+ * - Extends FilterService base class functionality
+ * - Coordinates with SearchService for unified search experience
+ * - Integrates ConflictDetector for schedule validation
+ * - Provides data to ScheduleController for UI rendering
+ * - Coordinates with ScheduleFilterModalController for user interaction
+ * - Supports schedule generation algorithms with pre-filtered data
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Decorator: Extends FilterService with schedule-specific capabilities
+ * - Strategy: Pluggable filter implementations for different constraints
+ * - Composite: Combines multiple filter types for complex filtering
+ * - Coordinator: Manages interaction between filtering and conflict detection
+ * 
+ * RECENT CHANGES:
+ * - Added missing Section type import during storage system cleanup
+ * - Fixed TypeScript compilation errors during deprecated class removal
+ * - Maintained functionality while removing CourseManager dependencies
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
+
 export class ScheduleFilterService {
     private filterService: FilterService;
     private courseSelectionFilter: CourseSelectionFilter;

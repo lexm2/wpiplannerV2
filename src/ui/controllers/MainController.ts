@@ -25,6 +25,108 @@ import { ProfileStateManager } from '../../core/ProfileStateManager'
 import { StorageService } from '../../services/StorageService'
 import { ThemeManager } from '../../themes/ThemeManager'
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * MainController - Application Orchestrator & Dependency Injection Container
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Central application coordinator and dependency injection container
+ * - Service initialization orchestrator with shared instance management
+ * - System integration hub connecting all major architectural layers
+ * - Event wiring coordinator establishing inter-service communication
+ * - Application lifecycle manager (initialization → operation → cleanup)
+ * 
+ * MAJOR DEPENDENCIES (25+ services):
+ * Core Systems:
+ * - ProfileStateManager → Shared state management (injected to all services)
+ * - StorageService → Unified storage interface (wraps ProfileStateManager)
+ * - ThemeManager → Theme system coordination via storage injection
+ * 
+ * Data Services:
+ * - CourseDataService → WPI course data fetching and caching
+ * - CourseSelectionService → Course selection with shared ProfileStateManager
+ * - ScheduleManagementService → Schedule operations with shared state
+ * 
+ * UI Controllers:
+ * - DepartmentController, CourseController, ScheduleController → Specialized UI management
+ * - Modal Controllers (5x) → Popup content management with shared ModalService
+ * 
+ * Filter & Search:
+ * - FilterService, ScheduleFilterService → Advanced filtering capabilities
+ * - SearchService → Course search across all data
+ * - DepartmentSyncService → Department/filter synchronization
+ * 
+ * Utility Services:
+ * - UIStateManager, TimestampManager → State and time management
+ * - OperationManager → Request debouncing and cancellation
+ * - ConflictDetector → Schedule conflict resolution
+ * 
+ * USED BY:
+ * - Application Entry Point (main.ts) → Single initialization call
+ * - All UI Components → Access shared services via MainController
+ * - Event Handlers → Central coordination through MainController methods
+ * 
+ * INITIALIZATION FLOW (Critical Order):
+ * 1. Core Storage Setup:
+ *    - Create ProfileStateManager instance
+ *    - Initialize StorageService with shared ProfileStateManager
+ *    - Configure ThemeManager to use StorageService (unified storage)
+ * 
+ * 2. Service Layer Initialization:
+ *    - CourseSelectionService with shared ProfileStateManager
+ *    - ScheduleManagementService with shared ProfileStateManager + CourseSelectionService
+ *    - Filter services with SearchService coordination
+ * 
+ * 3. UI Controller Setup:
+ *    - Department, Course, Schedule controllers with service injection
+ *    - Modal controllers with shared ModalService
+ *    - UI state managers and utility services
+ * 
+ * 4. Service Wiring:
+ *    - Cross-service dependencies (FilterService ↔ CourseController)
+ *    - Event listener setup (CourseSelection changes → UI updates)
+ *    - Synchronization services (DepartmentSync ↔ FilterService)
+ * 
+ * 5. Application Startup:
+ *    - StorageService initialization
+ *    - CourseSelectionService data loading
+ *    - Course data fetching
+ *    - UI rendering and event binding
+ * 
+ * DATA FLOW COORDINATION:
+ * Storage Unification:
+ * ProfileStateManager → StorageService → ThemeManager (via ThemeStorage interface)
+ * All services share the same ProfileStateManager instance for consistency
+ * 
+ * UI Update Flow:
+ * User Interaction → Controller → Service → ProfileStateManager → Event → UI Update
+ * MainController ensures all event handlers are properly wired
+ * 
+ * KEY FEATURES:
+ * - Shared instance management (ProfileStateManager across all services)
+ * - Unified storage coordination (ThemeManager integration)
+ * - Service dependency injection and wiring
+ * - Event system coordination (listeners, handlers, cross-service communication)
+ * - Application lifecycle management (startup, operation, error handling)
+ * - Performance optimization (debounced operations, request cancellation)
+ * 
+ * INTEGRATION POINTS:
+ * - Creates and manages all singleton service instances
+ * - Establishes ProfileStateManager as single source of truth
+ * - Coordinates ThemeManager storage strategy injection
+ * - Wires all cross-service dependencies and event handlers
+ * - Provides public API for accessing shared services
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Dependency Injection Container: Manages service lifecycle and injection
+ * - Orchestrator: Coordinates initialization and operation of all subsystems
+ * - Facade: Provides simplified interface to complex service ecosystem
+ * - Event Coordinator: Manages event flow between decoupled components
+ * - Service Locator: Centralized access point for shared services
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 export class MainController {
     private courseDataService: CourseDataService;
     private themeSelector: ThemeSelector;

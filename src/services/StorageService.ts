@@ -3,8 +3,56 @@ import { SchedulePreferences, Schedule, SelectedCourse } from '../types/schedule
 import { ThemeStorage } from '../themes/ThemeManager'
 
 /**
- * Unified storage service that provides a simple interface to ProfileStateManager
- * This is the recommended way to access persistent storage throughout the application
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * StorageService - Unified Storage Interface & Coordination Hub
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Central storage coordinator implementing Singleton pattern
+ * - Unified interface abstracting ProfileStateManager complexity
+ * - Strategy pattern implementation for ThemeStorage interface
+ * - Bridge between UI components and core storage system
+ * 
+ * DEPENDENCIES:
+ * - ProfileStateManager → Core state management with transactional storage
+ * - ThemeStorage interface → Pluggable theme persistence strategy
+ * - Schedule/SelectedCourse types → Data structure definitions
+ * 
+ * USED BY:
+ * - ThemeSelector → Theme preference persistence
+ * - ThemeManager → Pluggable storage via ThemeStorage interface
+ * - MainController → Singleton instance coordination
+ * - Any component requiring persistent storage operations
+ * 
+ * DATA FLOW:
+ * 1. UI Component calls StorageService method
+ * 2. StorageService translates to ProfileStateManager operation
+ * 3. ProfileStateManager coordinates with TransactionalStorageManager
+ * 4. TransactionalStorageManager handles localStorage with rollback support
+ * 5. Events propagate back through ProfileStateManager listeners
+ * 6. UI components receive state change notifications
+ * 
+ * KEY FEATURES:
+ * - Singleton instance management with dependency injection support
+ * - Auto-initialization with error handling
+ * - Theme storage integration via interface implementation
+ * - Simplified API hiding ProfileStateManager complexity
+ * - Comprehensive CRUD operations for all persistent data types
+ * - Health monitoring and data integrity checks
+ * 
+ * INTEGRATION POINTS:
+ * - Implements ThemeStorage for ThemeManager dependency injection
+ * - Shares ProfileStateManager instance across application
+ * - Coordinates with MainController for service initialization
+ * - Provides unified error handling and logging
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Singleton: Single instance across application lifetime
+ * - Facade: Simplified interface to complex ProfileStateManager
+ * - Strategy: Implements ThemeStorage interface for theme system
+ * - Dependency Injection: Accepts ProfileStateManager in constructor
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 export class StorageService implements ThemeStorage {
     private static instance: StorageService | null = null;

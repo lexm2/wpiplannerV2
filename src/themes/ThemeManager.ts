@@ -6,6 +6,76 @@ import wpiDark from './definitions/wpi-dark.json'
 import wpiLight from './definitions/wpi-light.json'
 import highContrast from './definitions/high-contrast.json'
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * ThemeManager - Singleton Theme System with Pluggable Storage Strategy
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Singleton theme management system coordinating all theme operations
+ * - Theme definition registry with JSON-based theme loading
+ * - CSS variable application engine for dynamic theme switching
+ * - Storage abstraction layer using Strategy pattern for persistence
+ * - Event broadcasting system for theme change notifications
+ * 
+ * DEPENDENCIES:
+ * - ThemeStorage interface → Pluggable storage strategy (StorageService or DefaultThemeStorage)
+ * - Theme JSON definitions → wpi-classic.json, wpi-dark.json, wpi-light.json, high-contrast.json
+ * - ThemeDefinition types → Type safety for theme structure validation
+ * - DOM CSS Custom Properties → :root CSS variable manipulation
+ * 
+ * USED BY:
+ * - ThemeSelector → UI component for theme selection interface
+ * - MainController → Initialization and StorageService integration
+ * - StorageService → Implements ThemeStorage interface for unified persistence
+ * - Application CSS → Consumes CSS custom properties set by theme system
+ * 
+ * STORAGE STRATEGY PATTERN:
+ * 1. Default: Uses DefaultThemeStorage with direct localStorage access
+ * 2. Injected: MainController injects StorageService via setStorage()
+ * 3. Strategy allows swapping between storage implementations
+ * 4. Unified storage integration through StorageService ThemeStorage implementation
+ * 
+ * DATA FLOW:
+ * Theme Loading:
+ * 1. initializeThemes() loads JSON theme definitions
+ * 2. loadSavedTheme() retrieves preference via storage strategy
+ * 3. applyTheme() sets CSS custom properties on :root
+ * 4. DOM reflects new theme variables throughout application
+ * 
+ * Theme Changing:
+ * 1. setTheme(themeId) validates theme exists
+ * 2. applyTheme() updates CSS custom properties
+ * 3. saveThemePreference() persists via storage strategy
+ * 4. notifyListeners() broadcasts ThemeChangeEvent
+ * 5. UI components update to reflect theme change
+ * 
+ * KEY FEATURES:
+ * - Singleton pattern ensuring single theme management instance
+ * - Strategy pattern for pluggable storage (DefaultThemeStorage ↔ StorageService)
+ * - Observer pattern for theme change event broadcasting
+ * - JSON-based theme definition system with validation
+ * - CSS custom property management for dynamic styling
+ * - Theme registration system for extensibility
+ * - System preference detection (light/dark mode)
+ * 
+ * INTEGRATION POINTS:
+ * - Implements dependency injection for storage strategy
+ * - Coordinates with MainController for unified storage setup
+ * - Provides ThemeStorage interface for StorageService implementation
+ * - Integrates with CSS system via custom property manipulation
+ * - Event system integration for UI component notifications
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Singleton: Single instance across application lifetime
+ * - Strategy: Pluggable storage implementation (ThemeStorage interface)
+ * - Observer: Event-driven theme change notifications
+ * - Registry: Theme definition registration and management
+ * - Dependency Injection: Storage strategy injection via setStorage()
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
+
 export interface ThemeStorage {
     loadThemePreference(): string;
     saveThemePreference(themeId: string): void;

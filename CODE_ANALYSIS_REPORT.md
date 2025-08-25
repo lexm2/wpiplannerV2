@@ -454,6 +454,192 @@ Term System → termUtils → Legacy/Test Support
 - **Cross-Layer Support**: Utilities serve all application layers consistently
 - **Testing Support**: Validation and metrics enable robust testing strategies
 
-## Next Sections
+## Type System & Data Models (`src/types/`)
 
-- Type System & Data Models
+The type system provides comprehensive TypeScript interfaces that define the application's data structures and contracts. These types ensure type safety, enable IDE support, and serve as documentation for the data models throughout the application.
+
+### Core Data Models (`types.ts`)
+
+#### Academic Data Structure
+
+**Course Interface**
+- **Purpose**: Represents a WPI course with all associated metadata
+- **Key Properties**: id, number, name, description, department, sections[], credits
+- **Relationships**: Contains Department reference, array of Section objects
+- **Usage**: Central data structure used throughout filtering, selection, and display
+
+**Department Interface**  
+- **Purpose**: Represents academic departments (CS, ECE, ME, etc.)
+- **Key Properties**: abbreviation, name, courses[]
+- **Relationships**: Bidirectional relationship with Course objects
+- **Usage**: Used for department-based organization and filtering
+
+**Section Interface**
+- **Purpose**: Represents course section with enrollment and scheduling data
+- **Key Properties**: crn, number, seats, availability, periods[], term, computedTerm
+- **Relationships**: Contains array of Period objects for scheduling
+- **Features**: Enrollment tracking, waitlist management, academic term computation
+
+**Period Interface**
+- **Purpose**: Represents individual class periods (lectures, labs, discussions)
+- **Key Properties**: type, professor, times, location, days, enrollment limits
+- **Relationships**: Belongs to Section, references Time and DayOfWeek
+- **Usage**: Core building block for schedule conflict detection and time display
+
+#### Time & Scheduling Models
+
+**Time Interface**
+- **Properties**: hours, minutes, displayTime (optional)
+- **Usage**: Standardized time representation for schedule calculations
+
+**DayOfWeek Enum**
+- **Values**: MONDAY through SUNDAY
+- **Usage**: Type-safe day representation in Sets for period scheduling
+
+**ScheduleDB Interface**
+- **Purpose**: Root data structure containing all course data
+- **Properties**: departments[], metadata
+- **Usage**: Top-level container loaded from WPI course data
+
+### Schedule Management Models (`schedule.ts`)
+
+**SelectedCourse Interface**
+- **Purpose**: Tracks user's course selections with section preferences
+- **Key Properties**: course, selectedSection, selectedSectionNumber, isRequired
+- **Dual Section Storage**: Full Section object + string for compatibility
+- **Usage**: Core model for persistent course selection state
+
+**Schedule Interface**  
+- **Purpose**: Represents saved schedule configurations
+- **Properties**: id, name, selectedCourses[], generatedSchedules[]
+- **Usage**: Multiple schedule management and saved configurations
+
+**ScheduleCombination Interface**
+- **Purpose**: Generated valid schedule combinations
+- **Properties**: id, sections[], conflicts[], isValid
+- **Usage**: Output of schedule generation algorithms
+
+**TimeConflict Interface**
+- **Purpose**: Represents detected time conflicts between sections
+- **Properties**: section1, section2, conflictType, description
+- **Usage**: Conflict detection and resolution guidance
+
+**SchedulePreferences Interface**
+- **Purpose**: User preferences for schedule generation
+- **Properties**: preferredTimeRange, preferredDays, avoidBackToBackClasses, theme
+- **Usage**: Constraints and preferences for schedule algorithms
+
+### Filter System Types (`filters.ts`)
+
+**CourseFilter Interface**
+- **Purpose**: Contract for all filter implementations  
+- **Methods**: apply(), isValidCriteria(), getDisplayValue()
+- **Pattern**: Strategy pattern for pluggable filtering system
+- **Usage**: Base interface for all 15+ filter implementations
+
+**FilterCriteria Interface**
+- **Purpose**: Generic criteria storage for any filter type
+- **Pattern**: Dictionary pattern with filterId → criteria mapping
+- **Usage**: State management for active filter combinations
+
+**ActiveFilter Interface**
+- **Purpose**: Runtime representation of applied filters
+- **Properties**: id, name, criteria, displayValue
+- **Usage**: UI display and filter state management
+
+**FilterChangeEvent Interface**
+- **Purpose**: Event system for filter state changes
+- **Types**: add, remove, clear, update events  
+- **Usage**: Event-driven UI updates when filters change
+
+#### Specific Filter Criteria Types
+- **DepartmentFilterCriteria**: Department selection arrays
+- **AvailabilityFilterCriteria**: Availability-only boolean flags
+- **CreditRangeFilterCriteria**: Min/max credit constraints
+- **TimeSlotFilterCriteria**: Time-based filtering parameters
+
+### UI-Specific Types (`ui.ts`)
+
+**SearchFilter Interface**
+- **Purpose**: UI-specific search constraints
+- **Properties**: departments[], timeSlots[], professors[], creditRange
+- **Usage**: Search interface and form validation
+
+**CourseDisplayProps Interface**
+- **Purpose**: UI display configuration options
+- **Properties**: showDescription, showSections, showEnrollment, highlightConflicts
+- **Usage**: Customizable course display modes
+
+**ScheduleGridCell Interface**
+- **Purpose**: Schedule grid visualization data
+- **Properties**: timeSlot, day, course (optional), isConflict
+- **Usage**: Schedule grid rendering and conflict visualization
+
+**DragDropState Interface**
+- **Purpose**: Drag-and-drop operation state management
+- **Usage**: Interactive schedule building features
+
+### Theme System Types (`themes/types.ts`)
+
+**ThemeDefinition Interface**
+- **Purpose**: Complete theme configuration specification
+- **Properties**: name, id, description, colors, typography, spacing, effects
+- **Usage**: Theme system configuration and CSS variable generation
+
+**ThemeColors Interface**
+- **Purpose**: Comprehensive color palette definition
+- **Properties**: 20+ semantic color tokens (primary, background, text, etc.)
+- **Usage**: CSS custom property generation and consistency
+
+**ThemeChangeEvent Interface**
+- **Purpose**: Theme system change notifications
+- **Properties**: oldTheme, newTheme, themeDefinition
+- **Usage**: Event-driven theme updates across components
+
+### Type System Architecture Patterns
+
+#### Domain-Driven Design
+```
+Academic Domain:
+Course ←→ Department ←→ Section ←→ Period ←→ Time/DayOfWeek
+
+User Domain:  
+SelectedCourse ←→ Schedule ←→ SchedulePreferences ←→ ScheduleCombination
+
+System Domain:
+Filter Interfaces ←→ UI Types ←→ Theme Definitions
+```
+
+#### Type Safety Strategy
+- **Strict TypeScript**: All data structures fully typed
+- **Interface Contracts**: Clear API boundaries between layers  
+- **Enum Usage**: Type-safe constants (DayOfWeek, ConflictType)
+- **Generic Constraints**: Flexible but safe filter system
+- **Runtime Validation**: Validators.ts provides runtime type checking
+
+#### Relationship Modeling
+- **Compositional**: Course contains Sections, Sections contain Periods
+- **Bidirectional**: Course ←→ Department references
+- **Temporal**: Schedule captures point-in-time selections
+- **Behavioral**: Filter interfaces define system behavior
+
+### Key Type System Benefits
+
+- **IDE Support**: Full IntelliSense and error detection
+- **Refactoring Safety**: Type-safe refactoring across large codebase  
+- **API Documentation**: Interfaces serve as living documentation
+- **Runtime Safety**: Combined with validators for full type checking
+- **Cross-Layer Consistency**: Same types used from data loading to UI display
+- **Extensibility**: Interface-based design enables easy feature additions
+
+## Architecture Summary
+
+WPI Course Planner V2 demonstrates a sophisticated layered architecture optimized for handling large datasets (8MB+ course data) while maintaining performance and user experience:
+
+- **Core Layer**: Unified storage system with conflict detection and filtering
+- **Services Layer**: Event-driven coordination and external integrations  
+- **UI Layer**: Performance-optimized controllers with progressive rendering
+- **Utilities Layer**: Cross-cutting concerns and WPI domain expertise
+- **Type System**: Comprehensive type safety and clear data contracts
+
+The architecture successfully balances complexity management, performance optimization, and maintainability for a production academic planning system.

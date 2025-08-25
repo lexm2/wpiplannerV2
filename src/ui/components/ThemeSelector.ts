@@ -1,6 +1,64 @@
 import { ThemeManager } from '../../themes/ThemeManager'
 import { StorageService } from '../../services/StorageService'
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * ThemeSelector - Theme Switching UI Component with Persistent Storage
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - UI component bridging user theme selection with theme management system
+ * - Dropdown interface controller with event-driven state management
+ * - Integration point between theme system and unified storage architecture
+ * - Persistent storage coordinator for theme preferences
+ * 
+ * DEPENDENCIES:
+ * - ThemeManager → Theme application, available theme registry, current theme state
+ * - StorageService → Unified storage interface for theme preference persistence
+ * - DOM Elements → #theme-dropdown, #theme-options, #current-theme-name
+ * 
+ * USED BY:
+ * - MainController → Instantiated and integrated into main application
+ * - End Users → Direct interaction through dropdown UI element
+ * - Theme system → Responds to theme changes via ThemeManager events
+ * 
+ * DATA FLOW:
+ * 1. User clicks theme dropdown → toggleDropdown()
+ * 2. User selects theme option → selectTheme(themeId)
+ * 3. ThemeManager.setTheme() applies theme to DOM
+ * 4. StorageService.saveThemePreference() persists selection
+ * 5. UI updates: current theme display, dropdown state, active option
+ * 6. Dropdown closes and state resets
+ * 
+ * Initialization Flow:
+ * 1. Constructor gets ThemeManager + StorageService singletons
+ * 2. setupElements() binds DOM references
+ * 3. loadSavedTheme() restores persisted preference
+ * 4. setupEventListeners() binds UI interactions
+ * 5. renderThemeOptions() populates dropdown content
+ * 
+ * KEY FEATURES:
+ * - Dropdown UI management (open/close state, outside click handling)
+ * - Theme option rendering with active state indication
+ * - Persistent theme preference loading/saving via unified storage
+ * - Real-time UI updates reflecting theme changes
+ * - Event delegation for dynamically generated theme options
+ * - Public API for programmatic theme changes
+ * 
+ * INTEGRATION POINTS:
+ * - Connected to unified storage system via StorageService
+ * - Integrates with ThemeManager singleton for theme operations
+ * - Coordinated by MainController during application initialization
+ * - DOM-dependent component requiring specific HTML structure
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - MVC: Model (ThemeManager), View (DOM), Controller (ThemeSelector)
+ * - Observer: Responds to theme system changes and user interactions
+ * - Singleton Integration: Uses ThemeManager and StorageService singletons
+ * - Event Delegation: Dynamic theme option handling
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 export class ThemeSelector {
     private themeManager: ThemeManager;
     private storageService: StorageService;

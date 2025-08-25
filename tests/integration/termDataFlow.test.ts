@@ -9,6 +9,78 @@ import { extractTermLetter } from '../../src/utils/termUtils';
 import { Course, Department, Section, Period } from '../../src/types/types';
 import { SelectedCourse } from '../../src/types/schedule';
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * Term Data Flow Integration Tests - Post-Architecture Migration Validation
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * TEST ARCHITECTURE ROLE:
+ * - Integration test suite validating data flow through unified storage system
+ * - Architecture migration validation after deprecated class removal
+ * - End-to-end testing of ProfileStateManager integration across services
+ * - Data consistency verification between storage, selection, and UI layers
+ * - Regression testing for storage system unification changes
+ * 
+ * DEPENDENCIES UPDATED:
+ * Before (Deprecated):
+ * - CourseManager → Legacy course selection management
+ * - StorageManager → Direct localStorage operations with conflicts
+ * 
+ * After (Unified):
+ * - ProfileStateManager → Unified state management with transactional storage
+ * - CourseSelectionService → Updated to use ProfileStateManager exclusively
+ * 
+ * SERVICES UNDER TEST:
+ * - CourseSelectionService → Course selection with ProfileStateManager integration
+ * - ScheduleController → UI controller with course selection coordination
+ * - ScheduleFilterService → Schedule-specific filtering with state management
+ * - ProfileStateManager → Core state management and persistence layer
+ * 
+ * TEST SCOPE AND COVERAGE:
+ * Data Flow Validation:
+ * 1. Course data loading and transformation
+ * 2. Course selection state management through ProfileStateManager
+ * 3. Section selection and persistence across services
+ * 4. Schedule filtering with complex section patterns
+ * 5. UI controller integration with unified storage system
+ * 
+ * Architecture Migration Testing:
+ * 1. Ensures deprecated CourseManager/StorageManager removal doesn't break functionality
+ * 2. Validates ProfileStateManager as single source of truth for state
+ * 3. Tests service coordination through unified storage layer
+ * 4. Verifies event propagation through new architecture
+ * 
+ * DATA PATTERNS TESTED:
+ * - Complex section numbers (A01, B02, L01, etc.)
+ * - Term letter extraction and processing
+ * - Course selection persistence across service boundaries
+ * - Schedule generation with filtered course data
+ * - Time conflict detection with various section patterns
+ * 
+ * INTEGRATION POINTS VALIDATED:
+ * - CourseSelectionService ↔ ProfileStateManager data flow
+ * - ScheduleController ↔ CourseSelectionService UI integration
+ * - ScheduleFilterService ↔ SearchService filtering coordination
+ * - ProfileStateManager ↔ TransactionalStorageManager persistence layer
+ * - Event system propagation through unified architecture
+ * 
+ * ARCHITECTURE PATTERNS TESTED:
+ * - Service coordination through shared ProfileStateManager instance
+ * - Event-driven updates across service boundaries
+ * - Data persistence and retrieval through unified storage
+ * - UI controller integration with service layer
+ * - Filter system coordination with state management
+ * 
+ * MIGRATION VALIDATION:
+ * - Tests written originally for CourseManager/StorageManager architecture
+ * - Updated to use ProfileStateManager during storage system unification
+ * - Maintains same test coverage while using new architecture
+ * - Validates that functionality remains intact after deprecated class removal
+ * - Ensures no regression in data flow or state management
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
+
 describe('Term Data Flow Integration Tests', () => {
     let courseDataService: CourseDataService;
     let courseSelectionService: CourseSelectionService;
