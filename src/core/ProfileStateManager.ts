@@ -3,7 +3,7 @@ import { Course, Section } from '../types/types'
 import { TransactionalStorageManager, TransactionResult } from './TransactionalStorageManager'
 
 export interface StateChangeEvent {
-    type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed';
+    type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
     data: any;
     timestamp: number;
     source: string;
@@ -53,6 +53,10 @@ export class ProfileStateManager {
 
     getSelectedCourses(): SelectedCourse[] {
         return [...this.state.selectedCourses];
+    }
+
+    getSelectedCourse(course: Course): SelectedCourse | undefined {
+        return this.state.selectedCourses.find(sc => sc.course.id === course.id);
     }
 
     getPreferences(): SchedulePreferences {
@@ -286,8 +290,14 @@ export class ProfileStateManager {
         const result = await this.storageManager.executeTransaction(operations);
         
         if (result.success) {
+            const previousUnsavedState = this.state.hasUnsavedChanges;
             this.state.hasUnsavedChanges = false;
             this.state.lastSaved = Date.now();
+            
+            // Emit save state change event if state actually changed
+            if (previousUnsavedState) {
+                this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
+            }
         }
 
         return result;
@@ -417,15 +427,29 @@ export class ProfileStateManager {
     }
 
     private withStateUpdate<T>(updateFn: () => T): T {
+        const previousUnsavedState = this.state.hasUnsavedChanges;
         const result = updateFn();
         this.state.hasUnsavedChanges = true;
+        
+        // Emit save state change event if state actually changed
+        if (!previousUnsavedState) {
+            this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
+        }
+        
         this.debouncedSave();
         return result;
     }
 
     private withStateUpdateSync<T>(updateFn: () => T): T {
+        const previousUnsavedState = this.state.hasUnsavedChanges;
         const result = updateFn();
         this.state.hasUnsavedChanges = true;
+        
+        // Emit save state change event if state actually changed
+        if (!previousUnsavedState) {
+            this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
+        }
+        
         this.debouncedSave();
         return result;
     }

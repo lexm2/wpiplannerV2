@@ -419,6 +419,14 @@ export class CourseSelectionService {
         this.selectionListeners.clear();
     }
 
+    // Convenience method for backward compatibility
+    onSelectionChange(callback: (selectedCourses: SelectedCourse[]) => void): void {
+        const listener: SelectionChangeListener = (event) => {
+            callback(event.selectedCourses);
+        };
+        this.addSelectionListener(listener);
+    }
+
     // Department and section management
     setAllDepartments(departments: Department[]): void {
         // This would typically be handled by a separate service
@@ -560,6 +568,34 @@ export class CourseSelectionService {
     isCourseSelectedById(courseId: string): boolean {
         console.warn('isCourseSelectedById: Use isCourseSelected with course object instead');
         return false;
+    }
+
+    reconstructSectionObjects(): void {
+        try {
+            let reconstructedCount = 0;
+            const selectedCourses = this.getSelectedCourses();
+            
+            selectedCourses.forEach(selectedCourse => {
+                if (selectedCourse.selectedSectionNumber && !selectedCourse.selectedSection) {
+                    const sectionObject = selectedCourse.course.sections.find(s => 
+                        s.number === selectedCourse.selectedSectionNumber
+                    ) || null;
+                    
+                    if (sectionObject) {
+                        selectedCourse.selectedSection = sectionObject;
+                        reconstructedCount++;
+                    }
+                }
+            });
+            
+            if (reconstructedCount > 0) {
+                console.log(`🔗 Reconstructed ${reconstructedCount} section objects`);
+                // Save changes and notify listeners
+                this.profileStateManager.save();
+            }
+        } catch (error) {
+            console.error('Failed to reconstruct section objects:', error);
+        }
     }
 
     // Private helper methods

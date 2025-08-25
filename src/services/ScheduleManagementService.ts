@@ -716,6 +716,26 @@ export class ScheduleManagementService {
         this.scheduleListeners.clear();
     }
 
+    // Convenience method for backward compatibility
+    onActiveScheduleChange(callback: (activeSchedule: Schedule | null) => void): void {
+        const listener: ScheduleChangeListener = (event) => {
+            if (event.type === 'schedule_activated') {
+                callback(event.schedule || null);
+            }
+        };
+        this.addScheduleListener(listener);
+    }
+
+    // Convenience method for save state changes
+    onSaveStateChange(callback: (hasUnsavedChanges: boolean) => void): void {
+        const stateListener = (event: StateChangeEvent) => {
+            if (event.type === 'save_state_changed') {
+                callback(event.data.hasUnsavedChanges);
+            }
+        };
+        this.profileStateManager.addListener(stateListener);
+    }
+
     // Access to course selection service
     getCourseSelectionService(): CourseSelectionService {
         return this.courseSelectionService;
