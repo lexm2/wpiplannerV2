@@ -15,5 +15,6 @@
 @import url('./styles/components/modal.css');
 @import url('./styles/components/buttons.css');
 @import url('./styles/components/states.css');
+@import url('./styles/optimistic-ui.css'); /* Optimistic UI feedback styles */
 @import url('./styles/components/responsive.css');
 @import url('./styles/components/theme-overrides.css');

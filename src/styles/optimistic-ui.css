@@ -1,0 +1,98 @@
+/**
+ * Optimistic UI Styles
+ * Visual feedback for instant course selection responses
+ */
+
+/* Course elements with optimistic feedback */
+.course-item.optimistic-pending,
+.course-card.optimistic-pending {
+    opacity: 0.8;
+    transform: scale(0.98);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.course-select-btn.optimistic-pending {
+    background-color: #ffd700;
+    border-color: #ffd700;
+    color: #333;
+    transform: scale(0.95);
+    transition: all 0.15s ease;
+}
+
+.course-item.optimistic-saving,
+.course-card.optimistic-saving {
+    border-left: 3px solid #007bff;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.course-select-btn.optimistic-saving {
+    background-color: #007bff;
+    border-color: #007bff;
+    animation: optimistic-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes optimistic-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Optimistic status indicator */
+.optimistic-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 500;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+}
+
+.optimistic-status.idle {
+    display: none;
+}
+
+.optimistic-status.saving {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.optimistic-status.saved {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.optimistic-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Batch operation feedback */
+.save-profile-btn.saving {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.save-profile-btn.saved {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.save-profile-btn.error {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Performance enhancement: reduce animations on low-end devices */
+@media (prefers-reduced-motion: reduce) {
+    .course-item.optimistic-pending,
+    .course-card.optimistic-pending,
+    .course-select-btn.optimistic-pending,
+    .course-select-btn.optimistic-saving,
+    .optimistic-status {
+        transition: none;
+        animation: none;
+        transform: none;
+    }
+}

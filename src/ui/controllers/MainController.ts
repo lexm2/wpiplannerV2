@@ -37,15 +37,19 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * - Event wiring coordinator establishing inter-service communication
  * - Application lifecycle manager (initialization → operation → cleanup)
  * 
- * MAJOR DEPENDENCIES (25+ services):
+ * MAJOR DEPENDENCIES (27+ services including optimistic UI):
  * Core Systems:
- * - ProfileStateManager → Shared state management (injected to all services)
+ * - ProfileStateManager → Backend state management and persistent storage coordination
  * - StorageService → Unified storage interface (wraps ProfileStateManager)
  * - ThemeManager → Theme system coordination via storage injection
  * 
+ * Optimistic UI Layer:
+ * - UIStateBuffer → 0ms response optimistic state management (via CourseSelectionService)
+ * - BatchOperationManager → Background sync with visual feedback (via CourseSelectionService)
+ * 
  * Data Services:
  * - CourseDataService → WPI course data fetching and caching
- * - CourseSelectionService → Course selection with shared ProfileStateManager
+ * - CourseSelectionService → Optimistic course selection with instant UI feedback
  * - ScheduleManagementService → Schedule operations with shared state
  * 
  * UI Controllers:
@@ -62,6 +66,11 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * - OperationManager → Request debouncing and cancellation
  * - ConflictDetector → Schedule conflict resolution
  * 
+ * Performance Optimization:
+ * - Optimistic UI event handlers → Real-time save status coordination
+ * - Batch operation feedback → Visual indicators for background sync operations
+ * - Debug instrumentation → Development tools for optimistic UI monitoring
+ * 
  * USED BY:
  * - Application Entry Point (main.ts) → Single initialization call
  * - All UI Components → Access shared services via MainController
@@ -74,7 +83,9 @@ import { ThemeManager } from '../../themes/ThemeManager'
  *    - Configure ThemeManager to use StorageService (unified storage)
  * 
  * 2. Service Layer Initialization:
- *    - CourseSelectionService with shared ProfileStateManager
+ *    - CourseSelectionService with shared ProfileStateManager + Optimistic UI integration
+ *    - UIStateBuffer initialization within CourseSelectionService (automatic)
+ *    - BatchOperationManager setup with visual feedback coordination (automatic)
  *    - ScheduleManagementService with shared ProfileStateManager + CourseSelectionService
  *    - Filter services with SearchService coordination
  * 
@@ -86,30 +97,38 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * 4. Service Wiring:
  *    - Cross-service dependencies (FilterService ↔ CourseController)
  *    - Event listener setup (CourseSelection changes → UI updates)
+ *    - Optimistic UI event handlers (batch operation state changes → visual feedback)
  *    - Synchronization services (DepartmentSync ↔ FilterService)
+ *    - Debug instrumentation setup for optimistic UI monitoring
  * 
  * 5. Application Startup:
  *    - StorageService initialization
- *    - CourseSelectionService data loading
+ *    - CourseSelectionService data loading with UIStateBuffer sync
+ *    - BatchOperationManager timer activation for background processing
  *    - Course data fetching
  *    - UI rendering and event binding
+ *    - Optimistic UI debug tools registration
  * 
  * DATA FLOW COORDINATION:
  * Storage Unification:
  * ProfileStateManager → StorageService → ThemeManager (via ThemeStorage interface)
  * All services share the same ProfileStateManager instance for consistency
  * 
- * UI Update Flow:
- * User Interaction → Controller → Service → ProfileStateManager → Event → UI Update
- * MainController ensures all event handlers are properly wired
+ * UI Update Flow (Optimistic):
+ * User Interaction → Controller → CourseSelectionService → UIStateBuffer (0ms) → Event → UI Update
+ * Background: UIStateBuffer → BatchOperationManager → ProfileStateManager → Storage
+ * Visual Feedback: BatchOperationManager → Custom Events → MainController → UI Indicators
+ * MainController coordinates both optimistic updates and background sync feedback
  * 
  * KEY FEATURES:
  * - Shared instance management (ProfileStateManager across all services)
+ * - Optimistic UI coordination (0ms course selection response)
+ * - Background sync management (batch operations with visual feedback)
  * - Unified storage coordination (ThemeManager integration)
  * - Service dependency injection and wiring
  * - Event system coordination (listeners, handlers, cross-service communication)
  * - Application lifecycle management (startup, operation, error handling)
- * - Performance optimization (debounced operations, request cancellation)
+ * - Performance optimization (debounced operations, request cancellation, batch processing)
  * 
  * INTEGRATION POINTS:
  * - Creates and manages all singleton service instances
@@ -229,6 +248,10 @@ export class MainController {
             this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
         });
         
+        // Setup optimistic UI event handlers
+        this.setupOptimisticUIEventHandlers();
+        this.enableOptimisticUIDebug();
+        
         // IMPORTANT: Initialize filters LAST (triggers events that use operationManager)
         this.initializeFilters();
         
@@ -289,6 +312,9 @@ export class MainController {
             this.setupCourseSelectionListener();
             this.setupSaveStateListener();
             this.courseController.displaySelectedCourses();
+            
+            // Initial UI sync for selected courses (use efficient targeted updates)
+            this.syncInitialCourseSelectionUI();
             
             // Load saved filters AFTER all services are fully connected and ready
             this.filterService.loadFiltersFromStorage();
@@ -768,8 +794,12 @@ export class MainController {
                 currentCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
             });
             
-            // Always update main course UI
-            this.courseController.refreshCourseSelectionUI();
+            // Use targeted updates instead of global refresh for better performance
+            if (isCoursesAddedOrRemoved) {
+                this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
+            }
+            
+            // Always update the selected courses sidebar
             this.courseController.displaySelectedCourses();
             
             if (isCoursesAddedOrRemoved) {
@@ -806,6 +836,20 @@ export class MainController {
             this.previousSelectedCoursesCount = currentCount;
             this.previousSelectedCoursesMap = new Map(currentCoursesMap);
         });
+    }
+
+    /**
+     * Efficiently sync UI for initially selected courses without global refresh
+     */
+    private syncInitialCourseSelectionUI(): void {
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        
+        // Use targeted updates for each selected course
+        selectedCourses.forEach(selectedCourse => {
+            this.courseController.updateCourseUIById(selectedCourse.course.id, true);
+        });
+        
+        console.log(`✅ Initial UI sync complete: Updated ${selectedCourses.length} selected courses`);
     }
 
 
@@ -990,7 +1034,7 @@ export class MainController {
 
         // Visual feedback
         const originalText = saveButton.innerHTML;
-        saveButton.innerHTML = '⏳ Saving...';
+        saveButton.innerHTML = 'Saving...';
         saveButton.disabled = true;
 
         const result = await this.scheduleManagementService.manualSaveCurrentProfile();
@@ -998,13 +1042,13 @@ export class MainController {
         
         setTimeout(() => {
             if (success) {
-                saveButton.innerHTML = '✅ Saved!';
+                saveButton.innerHTML = 'Saved!';
                 setTimeout(() => {
                     saveButton.innerHTML = originalText;
                     saveButton.disabled = false;
                 }, 1500);
             } else {
-                saveButton.innerHTML = '❌ Error';
+                saveButton.innerHTML = 'Error';
                 setTimeout(() => {
                     saveButton.innerHTML = originalText;
                     saveButton.disabled = false;
@@ -1026,13 +1070,86 @@ export class MainController {
         if (hasUnsavedChanges) {
             saveButton.classList.add('unsaved-changes');
             saveButton.title = 'You have unsaved changes - Click to save';
-            if (!saveButton.innerHTML.includes('*')) {
-                saveButton.innerHTML = saveButton.innerHTML.replace('💾 Save', '💾 Save*');
-            }
         } else {
             saveButton.classList.remove('unsaved-changes');
             saveButton.title = 'Save current profile';
-            saveButton.innerHTML = saveButton.innerHTML.replace('💾 Save*', '💾 Save');
+        }
+    }
+
+    // Optimistic UI Integration Methods
+    private setupOptimisticUIEventHandlers(): void {
+        // Listen for batch operation state changes
+        document.addEventListener('batchOperationStateChange', (e: any) => {
+            const { state, pendingOperations, isProcessing } = e.detail;
+            this.updateOptimisticUIFeedback(state, pendingOperations, isProcessing);
+        });
+    }
+
+    private updateOptimisticUIFeedback(state: string, pendingOperations: number, isProcessing: boolean): void {
+        // Update UI to show optimistic operation status
+        const statusIndicator = this.findOrCreateStatusIndicator();
+        
+        switch (state) {
+            case 'saving':
+                statusIndicator.textContent = `Saving ${pendingOperations} change${pendingOperations === 1 ? '' : 's'}...`;
+                statusIndicator.className = 'optimistic-status saving';
+                break;
+            case 'saved':
+                statusIndicator.textContent = 'All changes saved';
+                statusIndicator.className = 'optimistic-status saved';
+                break;
+            case 'error':
+                statusIndicator.textContent = 'Save failed - will retry';
+                statusIndicator.className = 'optimistic-status error';
+                break;
+            case 'idle':
+            default:
+                statusIndicator.textContent = '';
+                statusIndicator.className = 'optimistic-status idle';
+                break;
+        }
+        
+        // Auto-hide saved/error messages
+        if (state === 'saved' || state === 'error') {
+            setTimeout(() => {
+                statusIndicator.textContent = '';
+                statusIndicator.className = 'optimistic-status idle';
+            }, state === 'saved' ? 2000 : 4000);
+        }
+    }
+
+    private findOrCreateStatusIndicator(): HTMLElement {
+        let indicator = document.getElementById('optimistic-ui-status');
+        if (!indicator) {
+            indicator = document.createElement('div');
+            indicator.id = 'optimistic-ui-status';
+            indicator.className = 'optimistic-status idle';
+            
+            // Insert before save button (to the left side)
+            const saveButton = document.getElementById('save-profile-btn');
+            if (saveButton && saveButton.parentNode) {
+                saveButton.parentNode.insertBefore(indicator, saveButton);
+            } else {
+                const header = document.querySelector('.controls, .header-controls, .content-header');
+                if (header) {
+                    header.appendChild(indicator);
+                }
+            }
+        }
+        return indicator;
+    }
+
+    // Debug methods for optimistic UI testing
+    enableOptimisticUIDebug(): void {
+        console.log('🔧 Enabling optimistic UI debug mode');
+        
+        // Add debug info to window for testing
+        if (typeof window !== 'undefined') {
+            (window as any).optimisticUIDebug = {
+                debugService: () => this.courseSelectionService.debugState(),
+                getPendingOps: () => this.courseSelectionService['uiStateBuffer']?.getPendingOperationsCount() || 0,
+                forceBatchSync: () => this.courseSelectionService['batchOperationManager']?.processBatchNow()
+            };
         }
     }
 
