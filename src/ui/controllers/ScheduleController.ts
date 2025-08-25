@@ -525,10 +525,7 @@ export class ScheduleController {
                 const sectionObject = sc.course.sections?.find((s: any) => s.number === sc.selectedSectionNumber);
                 
                 if (sectionObject && sectionObject.computedTerm) {
-                    console.log(`🔄 Syncing section object for ${sc.course.department.abbreviation}${sc.course.number} section ${sc.selectedSectionNumber}`);
                     sc.selectedSection = sectionObject;
-                } else {
-                    console.warn(`⚠️ Could not find valid section ${sc.selectedSectionNumber} for course ${sc.course.department.abbreviation}${sc.course.number}`);
                 }
             }
             

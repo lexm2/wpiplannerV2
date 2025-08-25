@@ -565,7 +565,6 @@ export class CourseSelectionService {
                 const sectionObject = sc.course.sections?.find(s => s.number === sc.selectedSectionNumber);
                 
                 if (sectionObject && sectionObject.computedTerm) {
-                    console.log(`🔄 CourseSelectionService: Syncing section object for ${sc.course.department.abbreviation}${sc.course.number} section ${sc.selectedSectionNumber}`);
                     sc.selectedSection = sectionObject;
                 }
             }

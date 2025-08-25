@@ -317,8 +317,9 @@ export class ProfileStateManager {
             this.isLoadingFlag = true;
             this.state.activeScheduleId = scheduleId;
 
-            // Load schedule's courses
+            // Load schedule's courses and sync section objects
             this.state.selectedCourses = [...schedule.selectedCourses];
+            this.syncScheduleCoursesSectionObjects();
 
             this.emitEvent('active_schedule_changed', { schedule }, source);
             this.emitEvent('courses_changed', { action: 'loaded_from_schedule', schedule }, source);
@@ -673,6 +674,24 @@ export class ProfileStateManager {
                 this.processEventQueue();
             }
         }, 0);
+    }
+
+    private syncScheduleCoursesSectionObjects(): void {
+        this.state.selectedCourses.forEach(sc => {
+            // If we have a selectedSectionNumber but no selectedSection object (or invalid object)
+            if (sc.selectedSectionNumber && (!sc.selectedSection || !sc.selectedSection.computedTerm)) {
+                // Find the section object in the course
+                const sectionObject = sc.course.sections?.find(s => s.number === sc.selectedSectionNumber);
+                
+                if (sectionObject && sectionObject.computedTerm) {
+                    sc.selectedSection = sectionObject;
+                } else {
+                    // Clear invalid section references
+                    sc.selectedSection = null;
+                    sc.selectedSectionNumber = null;
+                }
+            }
+        });
     }
 
     private generateScheduleId(): string {

@@ -775,6 +775,11 @@ export class MainController {
             if (isCoursesAddedOrRemoved) {
                 // Full refresh needed when courses are added/removed
                 this.scheduleController.displayScheduleSelectedCourses();
+                
+                // Also refresh schedule grids if we're on the schedule page
+                if (this.uiStateManager.currentPage === 'schedule') {
+                    this.scheduleController.renderScheduleGrids();
+                }
             } else {
                 // Check if only section selections changed
                 let sectionSelectionsChanged = false;
