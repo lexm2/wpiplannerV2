@@ -29,6 +29,164 @@ export interface SelectionChangeEvent {
 
 export type SelectionChangeListener = (event: SelectionChangeEvent) => void;
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * CourseSelectionService - High-Level Course Selection API & Coordination Layer
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - High-level service API providing course selection operations with validation
+ * - Coordination layer between UI components and ProfileStateManager core system
+ * - Event-driven service with comprehensive listeners and change notifications
+ * - Data integrity guardian with validation, retry logic, and repair capabilities
+ * - Migration coordinator ensuring backward compatibility across application updates
+ * 
+ * DEPENDENCIES:
+ * Core Systems:
+ * - ProfileStateManager → Central state management and persistence coordination
+ * - DataValidator → Runtime type checking and data integrity validation
+ * - RetryManager → Fault-tolerant operations with exponential backoff strategies
+ * - ProfileMigrationService → Data format migration and backward compatibility
+ * - Validators utility → Type-safe validation helpers and constraints
+ * 
+ * Data Models:
+ * - Course, Department, Section types → Core academic data structures
+ * - SelectedCourse type → User selection state with section preferences
+ * - CourseSelectionOptions, CourseSelectionResult → Service operation contracts
+ * 
+ * USED BY:
+ * Primary Controllers:
+ * - MainController → Service initialization and cross-service coordination
+ * - CourseController → Course listing, selection UI, and user interactions
+ * - ScheduleController → Schedule-specific course operations and section management
+ * 
+ * Service Layer:
+ * - ScheduleManagementService → Schedule operations requiring course selection state
+ * 
+ * UI Components:
+ * - ScheduleSelector → Schedule switching and course state coordination
+ * - All course selection UI components → Through controller abstraction layer
+ * 
+ * INITIALIZATION & LIFECYCLE:
+ * 1. Constructor Phase:
+ *    - Dependency injection with fallback to default instances
+ *    - ProfileStateManager instance sharing (or singleton creation)
+ *    - RetryManager configuration for storage operations
+ *    - ProfileMigrationService setup with validator integration
+ * 
+ * 2. Initialization Phase (async):
+ *    - Data migration check and execution if needed
+ *    - ProfileStateManager state loading from persistent storage
+ *    - Health check validation of loaded data integrity
+ *    - Automatic data repair for recoverable integrity issues
+ *    - State listener setup for ProfileStateManager event coordination
+ * 
+ * 3. Operation Phase:
+ *    - High-level course selection APIs with validation and retry logic
+ *    - Event-driven change notifications to registered listeners
+ *    - Automatic section object reconstruction and data synchronization
+ *    - Debounced auto-saving with transactional persistence
+ * 
+ * DATA FLOW & OPERATIONS:
+ * Course Selection Flow:
+ * 1. UI Component calls selectCourse() with Course object and options
+ * 2. CourseSelectionService validates course data integrity (if enabled)
+ * 3. RetryManager executes ProfileStateManager.selectCourse() with fault tolerance
+ * 4. ProfileStateManager updates internal state and triggers persistence
+ * 5. CourseSelectionService emits SelectionChangeEvent to registered listeners
+ * 6. Auto-save coordination (if enabled) persists changes to storage
+ * 7. UI components receive event notifications and update displays
+ * 
+ * Section Management Flow:
+ * 1. setSelectedSection() validates section existence within course
+ * 2. ProfileStateManager updates both section number and section object
+ * 3. Section object reconstruction ensures data consistency
+ * 4. Change events emitted for UI synchronization
+ * 5. Schedule grids and displays automatically updated via event system
+ * 
+ * Event System Architecture:
+ * ```
+ * CourseSelectionService Events → UI Controllers → DOM Updates
+ *           ↓                           ↑
+ * ProfileStateManager ←→ TransactionalStorageManager ←→ localStorage
+ * ```
+ * 
+ * KEY FEATURES:
+ * Course Selection Operations:
+ * - selectCourse() / unselectCourse() with configurable validation and auto-save
+ * - toggleCourseSelection() for UI convenience with state detection
+ * - setSelectedSection() with section existence validation and object reconstruction
+ * - clearAllSelections() for bulk operations with event coordination
+ * 
+ * Data Integrity & Validation:
+ * - Pre-operation validation with DataValidator integration
+ * - Runtime type checking and constraint validation
+ * - Section object reconstruction ensuring consistency
+ * - Health checking with automated repair capabilities
+ * - Migration coordination for backward compatibility
+ * 
+ * Event-Driven Architecture:
+ * - SelectionChangeListener system for UI coordination
+ * - Real-time change notifications with typed event objects
+ * - ProfileStateManager event bridge for state synchronization
+ * - Backward compatibility layer for legacy callback patterns
+ * 
+ * Fault Tolerance & Reliability:
+ * - RetryManager integration for transient failure recovery
+ * - Exponential backoff strategies for storage operations
+ * - Automatic data repair for recoverable corruption
+ * - Health checking and diagnostic reporting
+ * - Graceful degradation for initialization failures
+ * 
+ * INTEGRATION POINTS:
+ * ProfileStateManager Integration:
+ * - Shared instance coordination via MainController dependency injection
+ * - Direct state management delegation with event bridge layer
+ * - Transactional persistence coordination via ProfileStateManager.save()
+ * - State listener setup for bidirectional synchronization
+ * 
+ * UI Controller Integration:
+ * - High-level API abstraction hiding ProfileStateManager complexity
+ * - Event-driven updates eliminating tight coupling between UI components
+ * - Validation and error handling with user-friendly result objects
+ * - Section object management simplifying UI rendering logic
+ * 
+ * Service Layer Integration:
+ * - ScheduleManagementService coordination for multi-schedule functionality
+ * - Data export/import operations for schedule portability
+ * - Migration service integration for version compatibility
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Service Layer: High-level business logic abstraction over core systems
+ * - Event-Driven Architecture: Decoupled components with event coordination
+ * - Retry Pattern: Fault-tolerant operations with exponential backoff
+ * - Facade: Simplified interface hiding ProfileStateManager complexity
+ * - Observer: Event listener system for change notifications
+ * - Strategy: Configurable validation and save behavior via options
+ * - Migration: Backward compatibility with data format evolution
+ * 
+ * PERFORMANCE OPTIMIZATIONS:
+ * - Debounced auto-saving prevents excessive storage operations
+ * - Lazy initialization with promise caching
+ * - Efficient event batching and listener management
+ * - Section object reconstruction with caching
+ * - Health check optimization with cached validation results
+ * 
+ * DATA CONSISTENCY FEATURES:
+ * - Section object reconstruction ensures UI rendering consistency
+ * - Validation before operations prevents data corruption
+ * - Automatic repair capabilities for recoverable issues
+ * - Migration coordination maintaining backward compatibility
+ * - Health checking with detailed diagnostic reporting
+ * 
+ * BACKWARD COMPATIBILITY:
+ * - Legacy method support with deprecation warnings
+ * - ProfileMigrationService integration for data format evolution
+ * - Fallback mechanisms for missing dependencies
+ * - Gradual API evolution with compatibility layers
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 export class CourseSelectionService {
     private profileStateManager: ProfileStateManager;
     private dataValidator: DataValidator;
