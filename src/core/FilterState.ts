@@ -111,14 +111,16 @@ export class FilterState {
     }
     
     // Serialization for persistence
-    serialize(): string {
+    serialize(excludeFilters: string[] = []): string {
         const data = {
-            filters: Array.from(this.activeFilters.entries()).map(([id, filter]) => ({
-                id: filter.id,
-                name: filter.name,
-                criteria: filter.criteria,
-                displayValue: filter.displayValue
-            }))
+            filters: Array.from(this.activeFilters.entries())
+                .filter(([id, filter]) => !excludeFilters.includes(id))
+                .map(([id, filter]) => ({
+                    id: filter.id,
+                    name: filter.name,
+                    criteria: filter.criteria,
+                    displayValue: filter.displayValue
+                }))
         };
         return JSON.stringify(data);
     }
@@ -130,7 +132,10 @@ export class FilterState {
             
             if (parsed.filters && Array.isArray(parsed.filters)) {
                 parsed.filters.forEach((filter: ActiveFilter) => {
-                    this.activeFilters.set(filter.id, filter);
+                    // Skip search and department filters during deserialization
+                    if (filter.id !== 'searchText' && filter.id !== 'department') {
+                        this.activeFilters.set(filter.id, filter);
+                    }
                 });
             }
             

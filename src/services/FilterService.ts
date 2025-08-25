@@ -154,14 +154,18 @@ export class FilterService {
     
     // Persistence
     saveFiltersToStorage(): void {
-        const serialized = this.filterState.serialize();
+        const serialized = this.filterState.serialize(['searchText', 'department']);
         localStorage.setItem('wpi-course-filters', serialized);
     }
     
     loadFiltersFromStorage(): boolean {
         const stored = localStorage.getItem('wpi-course-filters');
         if (stored) {
-            return this.filterState.deserialize(stored);
+            const success = this.filterState.deserialize(stored);
+            // Remove any loaded search or department filters
+            this.removeFilter('searchText');
+            this.removeFilter('department');
+            return success;
         }
         return false;
     }
