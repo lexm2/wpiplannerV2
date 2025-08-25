@@ -1,360 +1,852 @@
 import { Schedule, SelectedCourse, SchedulePreferences } from '../types/schedule'
-import { StorageManager } from '../core/StorageManager'
+import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../core/ProfileStateManager'
+import { DataValidator, ValidationResult } from '../core/DataValidator'
+import { RetryManager } from '../core/RetryManager'
 import { CourseSelectionService } from './CourseSelectionService'
 
+export interface ScheduleOperationResult {
+    success: boolean;
+    schedule?: Schedule;
+    error?: string;
+    warnings?: string[];
+}
+
+export interface ScheduleChangeEvent {
+    type: 'schedule_created' | 'schedule_deleted' | 'schedule_updated' | 'schedule_activated' | 'schedules_loaded';
+    schedule?: Schedule;
+    schedules?: Schedule[];
+    timestamp: number;
+}
+
+export type ScheduleChangeListener = (event: ScheduleChangeEvent) => void;
+
+export interface ScheduleCreationOptions {
+    includeCurrentCourses?: boolean;
+    copyFromSchedule?: string;
+    autoActivate?: boolean;
+    autoSave?: boolean;
+}
+
+export interface ScheduleUpdateOptions {
+    updateName?: string;
+    updateCourses?: boolean;
+    autoSave?: boolean;
+}
+
 export class ScheduleManagementService {
-    private storageManager: StorageManager;
+    private profileStateManager: ProfileStateManager;
     private courseSelectionService: CourseSelectionService;
-    private activeScheduleId: string | null = null;
-    private listeners: Array<(activeSchedule: Schedule | null) => void> = [];
-    private isLoadingSchedule: boolean = false;
-    private hasUnsavedChanges: boolean = false;
-    private saveStateListeners: Array<(hasUnsavedChanges: boolean) => void> = [];
+    private dataValidator: DataValidator;
+    private retryManager: RetryManager;
+    private scheduleListeners = new Set<ScheduleChangeListener>();
+    private isInitialized = false;
+    private initializationPromise: Promise<boolean> | null = null;
 
-    constructor(storageManager?: StorageManager, courseSelectionService?: CourseSelectionService) {
-        this.storageManager = storageManager || new StorageManager();
-        this.courseSelectionService = courseSelectionService || new CourseSelectionService();
-        this.loadActiveScheduleId();
+    constructor(
+        profileStateManager?: ProfileStateManager,
+        courseSelectionService?: CourseSelectionService,
+        dataValidator?: DataValidator,
+        retryManager?: RetryManager
+    ) {
+        this.profileStateManager = profileStateManager || new ProfileStateManager();
+        this.courseSelectionService = courseSelectionService || new CourseSelectionService(this.profileStateManager);
+        this.dataValidator = dataValidator || new DataValidator();
+        this.retryManager = retryManager || RetryManager.createStorageRetryManager();
+
+        this.setupStateManagerListeners();
     }
 
-    createNewSchedule(name: string): Schedule {
-        const schedule: Schedule = {
-            id: this.generateScheduleId(),
-            name: name,
-            selectedCourses: [],
-            generatedSchedules: []
-        };
+    // Initialization
+    async initialize(): Promise<boolean> {
+        if (this.isInitialized) return true;
+        if (this.initializationPromise) return this.initializationPromise;
 
-        this.storageManager.saveSchedule(schedule);
-        return schedule;
+        this.initializationPromise = this.performInitialization();
+        return this.initializationPromise;
     }
 
-    createScheduleFromCurrent(name: string): Schedule {
-        const currentSelectedCourses = this.courseSelectionService.getSelectedCourses();
-        
-        const schedule: Schedule = {
-            id: this.generateScheduleId(),
-            name: name,
-            selectedCourses: [...currentSelectedCourses],
-            generatedSchedules: []
-        };
+    private async performInitialization(): Promise<boolean> {
+        try {
+            console.log('🚀 Initializing ScheduleManagementService...');
 
-        this.storageManager.saveSchedule(schedule);
-        return schedule;
+            // Initialize dependencies first
+            await this.courseSelectionService.initialize();
+
+            // Ensure profile state is loaded
+            await this.profileStateManager.loadFromStorage();
+
+            // Initialize default schedule if needed
+            await this.initializeDefaultScheduleIfNeeded();
+
+            this.isInitialized = true;
+            console.log('✅ ScheduleManagementService initialized successfully');
+            return true;
+
+        } catch (error) {
+            console.error('❌ Failed to initialize ScheduleManagementService:', error);
+            this.isInitialized = false;
+            return false;
+        } finally {
+            this.initializationPromise = null;
+        }
     }
 
-    saveCurrentAsSchedule(name: string): Schedule {
+    // Schedule creation
+    async createNewSchedule(name: string, options: ScheduleCreationOptions = {}): Promise<ScheduleOperationResult> {
+        await this.ensureInitialized();
+
+        const {
+            includeCurrentCourses = false,
+            copyFromSchedule,
+            autoActivate = false,
+            autoSave = true
+        } = options;
+
+        try {
+            // Validate schedule name
+            if (!name || name.trim().length === 0) {
+                return {
+                    success: false,
+                    error: 'Schedule name cannot be empty'
+                };
+            }
+
+            // Check for duplicate names
+            const existingSchedules = this.profileStateManager.getAllSchedules();
+            if (existingSchedules.some(s => s.name === name)) {
+                return {
+                    success: false,
+                    error: `A schedule with the name "${name}" already exists`
+                };
+            }
+
+            let selectedCourses: SelectedCourse[] = [];
+
+            if (copyFromSchedule) {
+                // Copy from existing schedule
+                const sourceSchedule = existingSchedules.find(s => s.id === copyFromSchedule);
+                if (!sourceSchedule) {
+                    return {
+                        success: false,
+                        error: `Source schedule with ID "${copyFromSchedule}" not found`
+                    };
+                }
+                selectedCourses = [...sourceSchedule.selectedCourses];
+            } else if (includeCurrentCourses) {
+                // Include current course selections
+                selectedCourses = this.profileStateManager.getSelectedCourses();
+            }
+
+            // Create the schedule with retry
+            const result = await this.retryManager.executeWithRetry(
+                () => {
+                    return this.profileStateManager.createSchedule(name, 'api');
+                },
+                {
+                    operationName: `create schedule "${name}"`,
+                    onRetry: (attempt, error) => {
+                        console.warn(`Schedule creation failed, retrying (attempt ${attempt}):`, error.message);
+                    }
+                }
+            );
+
+            if (!result.success || !result.result) {
+                return {
+                    success: false,
+                    error: `Failed to create schedule: ${result.error?.message || 'Unknown error'}`
+                };
+            }
+
+            const schedule = result.result;
+
+            // Update with selected courses if needed
+            if (selectedCourses.length > 0) {
+                const updateResult = await this.updateScheduleCourses(schedule.id, selectedCourses);
+                if (!updateResult.success) {
+                    return {
+                        success: false,
+                        error: `Schedule created but failed to add courses: ${updateResult.error}`
+                    };
+                }
+            }
+
+            // Activate if requested
+            if (autoActivate) {
+                const activateResult = await this.setActiveSchedule(schedule.id);
+                if (!activateResult.success) {
+                    console.warn('Schedule created but failed to activate:', activateResult.error);
+                }
+            }
+
+            // Auto-save if requested
+            if (autoSave) {
+                const saveResult = await this.profileStateManager.save();
+                if (!saveResult.success) {
+                    console.warn('Failed to auto-save after schedule creation:', saveResult.error);
+                }
+            }
+
+            // Notify listeners
+            this.notifyScheduleListeners({
+                type: 'schedule_created',
+                schedule,
+                timestamp: Date.now()
+            });
+
+            return {
+                success: true,
+                schedule
+            };
+
+        } catch (error) {
+            console.error('Error creating schedule:', error);
+            return {
+                success: false,
+                error: `Error creating schedule: ${error}`
+            };
+        }
+    }
+
+    async createScheduleFromCurrent(name: string): Promise<ScheduleOperationResult> {
+        return this.createNewSchedule(name, {
+            includeCurrentCourses: true,
+            autoActivate: false,
+            autoSave: true
+        });
+    }
+
+    async saveCurrentAsSchedule(name: string): Promise<ScheduleOperationResult> {
         return this.createScheduleFromCurrent(name);
     }
 
-    loadSchedule(scheduleId: string): Schedule | null {
-        return this.storageManager.loadSchedule(scheduleId);
-    }
+    // Schedule loading and activation
+    async setActiveSchedule(scheduleId: string): Promise<ScheduleOperationResult> {
+        await this.ensureInitialized();
 
-    saveSchedule(schedule: Schedule): void {
-        this.storageManager.saveSchedule(schedule);
-        
-        if (this.activeScheduleId === schedule.id) {
-            this.notifyListeners(schedule);
-        }
-    }
+        try {
+            const schedules = this.profileStateManager.getAllSchedules();
+            const schedule = schedules.find(s => s.id === scheduleId);
 
-    deleteSchedule(scheduleId: string): boolean {
-        const schedules = this.getAllSchedules();
-        if (schedules.length <= 1) {
-            return false;
-        }
-
-        this.storageManager.deleteSchedule(scheduleId);
-
-        if (this.activeScheduleId === scheduleId) {
-            const remainingSchedules = this.getAllSchedules();
-            if (remainingSchedules.length > 0) {
-                this.setActiveSchedule(remainingSchedules[0].id);
-            } else {
-                this.activeScheduleId = null;
-                this.saveActiveScheduleId();
-                this.notifyListeners(null);
+            if (!schedule) {
+                return {
+                    success: false,
+                    error: `Schedule with ID "${scheduleId}" not found`
+                };
             }
-        }
 
-        return true;
-    }
-
-    getAllSchedules(): Schedule[] {
-        return this.storageManager.loadAllSchedules();
-    }
-
-    setActiveSchedule(scheduleId: string): void {
-        const schedule = this.loadSchedule(scheduleId);
-        if (!schedule) {
-            console.warn('Schedule not found:', scheduleId);
-            return;
-        }
-
-        console.log(`Switching to schedule: ${schedule.name} (${scheduleId})`);
-        console.log(`Schedule contains ${schedule.selectedCourses.length} selected courses`);
-
-        // Set loading flag to prevent course selection listener from triggering
-        this.isLoadingSchedule = true;
-
-        this.activeScheduleId = scheduleId;
-        this.saveActiveScheduleId();
-
-        // Clear current selections first
-        this.courseSelectionService.clearAllSelections();
-        
-        // Load the schedule's selected courses
-        schedule.selectedCourses.forEach(selectedCourse => {
-            console.log(`Loading course: ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number}`);
-            this.courseSelectionService.selectCourse(selectedCourse.course, selectedCourse.isRequired);
-            if (selectedCourse.selectedSectionNumber) {
-                console.log(`  Setting section: ${selectedCourse.selectedSectionNumber}`);
-                this.courseSelectionService.setSelectedSection(selectedCourse.course, selectedCourse.selectedSectionNumber);
+            // Validate schedule before activation
+            const validation = this.dataValidator.validateSchedule(schedule);
+            if (!validation.valid) {
+                return {
+                    success: false,
+                    error: `Schedule validation failed: ${validation.errors.map(e => e.message).join(', ')}`,
+                    warnings: validation.warnings.map(w => w.message)
+                };
             }
-        });
 
-        // Clear loading flag before final operations
-        this.isLoadingSchedule = false;
+            // Activate with retry
+            const result = await this.retryManager.executeWithRetry(
+                () => {
+                    return this.profileStateManager.setActiveSchedule(scheduleId, 'api');
+                },
+                {
+                    operationName: `activate schedule "${schedule.name}"`,
+                }
+            );
 
-        // Manually update the schedule once with final selections to ensure it's saved
-        this.updateActiveScheduleFromCurrentSelections();
+            if (!result.success) {
+                return {
+                    success: false,
+                    error: `Failed to activate schedule: ${result.error?.message || 'Unknown error'}`
+                };
+            }
 
-        // Notify listeners
-        this.notifyListeners(schedule);
+            // Notify listeners
+            this.notifyScheduleListeners({
+                type: 'schedule_activated',
+                schedule,
+                timestamp: Date.now()
+            });
+
+            return {
+                success: true,
+                schedule
+            };
+
+        } catch (error) {
+            console.error('Error setting active schedule:', error);
+            return {
+                success: false,
+                error: `Error setting active schedule: ${error}`
+            };
+        }
     }
 
+    // Schedule updates
+    async updateSchedule(scheduleId: string, updates: Partial<Schedule>, options: ScheduleUpdateOptions = {}): Promise<ScheduleOperationResult> {
+        await this.ensureInitialized();
+        const { autoSave = true } = options;
+
+        try {
+            const schedules = this.profileStateManager.getAllSchedules();
+            const existingSchedule = schedules.find(s => s.id === scheduleId);
+
+            if (!existingSchedule) {
+                return {
+                    success: false,
+                    error: `Schedule with ID "${scheduleId}" not found`
+                };
+            }
+
+            // Validate updates
+            const updatedSchedule = { ...existingSchedule, ...updates };
+            const validation = this.dataValidator.validateSchedule(updatedSchedule);
+            if (!validation.valid) {
+                return {
+                    success: false,
+                    error: `Schedule update validation failed: ${validation.errors.map(e => e.message).join(', ')}`,
+                    warnings: validation.warnings.map(w => w.message)
+                };
+            }
+
+            // Update with retry
+            const result = await this.retryManager.executeWithRetry(
+                () => {
+                    return this.profileStateManager.updateSchedule(scheduleId, updates, 'api');
+                },
+                {
+                    operationName: `update schedule "${existingSchedule.name}"`,
+                }
+            );
+
+            if (!result.success) {
+                return {
+                    success: false,
+                    error: `Failed to update schedule: ${result.error?.message || 'Unknown error'}`
+                };
+            }
+
+            // Auto-save if requested
+            if (autoSave) {
+                const saveResult = await this.profileStateManager.save();
+                if (!saveResult.success) {
+                    console.warn('Failed to auto-save after schedule update:', saveResult.error);
+                }
+            }
+
+            // Get updated schedule
+            const finalSchedule = this.profileStateManager.getAllSchedules().find(s => s.id === scheduleId);
+
+            // Notify listeners
+            this.notifyScheduleListeners({
+                type: 'schedule_updated',
+                schedule: finalSchedule,
+                timestamp: Date.now()
+            });
+
+            return {
+                success: true,
+                schedule: finalSchedule
+            };
+
+        } catch (error) {
+            console.error('Error updating schedule:', error);
+            return {
+                success: false,
+                error: `Error updating schedule: ${error}`
+            };
+        }
+    }
+
+    async renameSchedule(scheduleId: string, newName: string): Promise<ScheduleOperationResult> {
+        if (!newName || newName.trim().length === 0) {
+            return {
+                success: false,
+                error: 'Schedule name cannot be empty'
+            };
+        }
+
+        // Check for duplicate names
+        const existingSchedules = this.profileStateManager.getAllSchedules();
+        if (existingSchedules.some(s => s.name === newName && s.id !== scheduleId)) {
+            return {
+                success: false,
+                error: `A schedule with the name "${newName}" already exists`
+            };
+        }
+
+        return this.updateSchedule(scheduleId, { name: newName });
+    }
+
+    async duplicateSchedule(scheduleId: string, newName: string): Promise<ScheduleOperationResult> {
+        await this.ensureInitialized();
+
+        try {
+            if (!newName || newName.trim().length === 0) {
+                return {
+                    success: false,
+                    error: 'Schedule name cannot be empty'
+                };
+            }
+
+            const result = await this.retryManager.executeWithRetry(
+                () => {
+                    return this.profileStateManager.duplicateSchedule(scheduleId, newName, 'api');
+                },
+                {
+                    operationName: `duplicate schedule to "${newName}"`,
+                }
+            );
+
+            if (!result.success || !result.result) {
+                return {
+                    success: false,
+                    error: `Failed to duplicate schedule: ${result.error?.message || 'Unknown error'}`
+                };
+            }
+
+            const duplicatedSchedule = result.result;
+
+            // Auto-save
+            const saveResult = await this.profileStateManager.save();
+            if (!saveResult.success) {
+                console.warn('Failed to auto-save after schedule duplication:', saveResult.error);
+            }
+
+            // Notify listeners
+            this.notifyScheduleListeners({
+                type: 'schedule_created',
+                schedule: duplicatedSchedule,
+                timestamp: Date.now()
+            });
+
+            return {
+                success: true,
+                schedule: duplicatedSchedule
+            };
+
+        } catch (error) {
+            console.error('Error duplicating schedule:', error);
+            return {
+                success: false,
+                error: `Error duplicating schedule: ${error}`
+            };
+        }
+    }
+
+    // Schedule deletion
+    async deleteSchedule(scheduleId: string, options: { force?: boolean } = {}): Promise<{ success: boolean; error?: string }> {
+        await this.ensureInitialized();
+        const { force = false } = options;
+
+        try {
+            const schedules = this.profileStateManager.getAllSchedules();
+            const scheduleToDelete = schedules.find(s => s.id === scheduleId);
+
+            if (!scheduleToDelete) {
+                return {
+                    success: false,
+                    error: `Schedule with ID "${scheduleId}" not found`
+                };
+            }
+
+            // Prevent deletion of last schedule unless forced
+            if (schedules.length <= 1 && !force) {
+                return {
+                    success: false,
+                    error: 'Cannot delete the last schedule. At least one schedule must exist.'
+                };
+            }
+
+            const result = await this.retryManager.executeWithRetry(
+                () => {
+                    return this.profileStateManager.deleteSchedule(scheduleId, 'api');
+                },
+                {
+                    operationName: `delete schedule "${scheduleToDelete.name}"`,
+                }
+            );
+
+            if (!result.success) {
+                return {
+                    success: false,
+                    error: `Failed to delete schedule: ${result.error?.message || 'Unknown error'}`
+                };
+            }
+
+            // Auto-save
+            const saveResult = await this.profileStateManager.save();
+            if (!saveResult.success) {
+                console.warn('Failed to auto-save after schedule deletion:', saveResult.error);
+            }
+
+            // Notify listeners
+            this.notifyScheduleListeners({
+                type: 'schedule_deleted',
+                schedule: scheduleToDelete,
+                timestamp: Date.now()
+            });
+
+            return { success: true };
+
+        } catch (error) {
+            console.error('Error deleting schedule:', error);
+            return {
+                success: false,
+                error: `Error deleting schedule: ${error}`
+            };
+        }
+    }
+
+    // Schedule queries
     getActiveSchedule(): Schedule | null {
-        if (!this.activeScheduleId) {
-            return null;
-        }
-        return this.loadSchedule(this.activeScheduleId);
+        if (!this.isInitialized) return null;
+        return this.profileStateManager.getActiveSchedule();
     }
 
     getActiveScheduleId(): string | null {
-        return this.activeScheduleId;
-    }
-
-    updateActiveScheduleFromCurrentSelections(): void {
-        console.log('🔄 updateActiveScheduleFromCurrentSelections: Starting update');
-        
-        if (!this.activeScheduleId) {
-            console.log('❌ updateActiveScheduleFromCurrentSelections: No active schedule ID');
-            return;
-        }
-
         const activeSchedule = this.getActiveSchedule();
-        if (!activeSchedule) {
-            console.log('❌ updateActiveScheduleFromCurrentSelections: No active schedule found');
-            return;
-        }
-
-        const currentSelectedCourses = this.courseSelectionService.getSelectedCourses();
-        console.log(`📋 updateActiveScheduleFromCurrentSelections: Found ${currentSelectedCourses.length} selected courses`);
-
-        const updatedSchedule: Schedule = {
-            ...activeSchedule,
-            selectedCourses: [...currentSelectedCourses]
-        };
-
-        console.log(`💾 updateActiveScheduleFromCurrentSelections: Saving schedule "${activeSchedule.name}" with ${updatedSchedule.selectedCourses.length} courses`);
-        this.saveSchedule(updatedSchedule);
+        return activeSchedule?.id || null;
     }
 
-    manualSaveCurrentProfile(): boolean {
+    getAllSchedules(): Schedule[] {
+        if (!this.isInitialized) return [];
+        return this.profileStateManager.getAllSchedules();
+    }
+
+    getScheduleById(scheduleId: string): Schedule | null {
+        const schedules = this.getAllSchedules();
+        return schedules.find(s => s.id === scheduleId) || null;
+    }
+
+    // Course management within schedules
+    private async updateScheduleCourses(scheduleId: string, selectedCourses: SelectedCourse[]): Promise<{ success: boolean; error?: string }> {
         try {
-            this.updateActiveScheduleFromCurrentSelections();
-            this.setUnsavedChanges(false);
-            return true;
-        } catch (error) {
-            console.error('Failed to save profile:', error);
-            return false;
-        }
-    }
+            // Validate all courses first
+            const validation = this.dataValidator.validateBatch(
+                selectedCourses,
+                (course) => this.dataValidator.validateSelectedCourse(course)
+            );
 
-    hasUnsavedChangesStatus(): boolean {
-        return this.hasUnsavedChanges;
-    }
-
-    markAsUnsaved(): void {
-        this.setUnsavedChanges(true);
-    }
-
-    private setUnsavedChanges(hasChanges: boolean): void {
-        if (this.hasUnsavedChanges !== hasChanges) {
-            this.hasUnsavedChanges = hasChanges;
-            this.notifySaveStateListeners(hasChanges);
-        }
-    }
-
-    onSaveStateChange(listener: (hasUnsavedChanges: boolean) => void): void {
-        this.saveStateListeners.push(listener);
-    }
-
-    offSaveStateChange(listener: (hasUnsavedChanges: boolean) => void): void {
-        const index = this.saveStateListeners.indexOf(listener);
-        if (index > -1) {
-            this.saveStateListeners.splice(index, 1);
-        }
-    }
-
-    private notifySaveStateListeners(hasUnsavedChanges: boolean): void {
-        this.saveStateListeners.forEach(listener => {
-            try {
-                listener(hasUnsavedChanges);
-            } catch (error) {
-                console.error('Error in save state listener:', error);
+            if (!validation.valid) {
+                return {
+                    success: false,
+                    error: `Course validation failed: ${validation.errors.map(e => e.message).join(', ')}`
+                };
             }
-        });
+
+            const updateResult = await this.updateSchedule(scheduleId, {
+                selectedCourses: [...selectedCourses]
+            });
+
+            return {
+                success: updateResult.success,
+                error: updateResult.error
+            };
+
+        } catch (error) {
+            return {
+                success: false,
+                error: `Failed to update schedule courses: ${error}`
+            };
+        }
     }
 
-    renameSchedule(scheduleId: string, newName: string): boolean {
-        const schedule = this.loadSchedule(scheduleId);
-        if (!schedule) {
-            return false;
-        }
+    async syncActiveScheduleWithCurrentSelections(): Promise<{ success: boolean; error?: string }> {
+        await this.ensureInitialized();
 
-        schedule.name = newName;
-        this.saveSchedule(schedule);
-        return true;
+        try {
+            const activeScheduleId = this.getActiveScheduleId();
+            if (!activeScheduleId) {
+                return {
+                    success: false,
+                    error: 'No active schedule to sync'
+                };
+            }
+
+            const currentSelections = this.profileStateManager.getSelectedCourses();
+            return this.updateScheduleCourses(activeScheduleId, currentSelections);
+
+        } catch (error) {
+            return {
+                success: false,
+                error: `Failed to sync schedule: ${error}`
+            };
+        }
     }
 
-    duplicateSchedule(scheduleId: string, newName: string): Schedule | null {
-        const originalSchedule = this.loadSchedule(scheduleId);
-        if (!originalSchedule) {
-            return null;
+    // Save and persistence
+    async save(): Promise<{ success: boolean; error?: string }> {
+        try {
+            await this.ensureInitialized();
+            const result = await this.profileStateManager.save();
+            return {
+                success: result.success,
+                error: result.error?.message
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: `Save failed: ${error}`
+            };
+        }
+    }
+
+    hasUnsavedChanges(): boolean {
+        if (!this.isInitialized) return false;
+        return this.profileStateManager.hasUnsavedChanges();
+    }
+
+    // Export/Import
+    async exportSchedule(scheduleId: string): Promise<{ success: boolean; data?: string; error?: string }> {
+        try {
+            const schedule = this.getScheduleById(scheduleId);
+            if (!schedule) {
+                return {
+                    success: false,
+                    error: `Schedule with ID "${scheduleId}" not found`
+                };
+            }
+
+            const exportData = {
+                version: '2.0',
+                timestamp: new Date().toISOString(),
+                schedule: schedule
+            };
+
+            return {
+                success: true,
+                data: JSON.stringify(exportData, null, 2)
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: `Export failed: ${error}`
+            };
+        }
+    }
+
+    async importSchedule(jsonData: string): Promise<ScheduleOperationResult> {
+        try {
+            await this.ensureInitialized();
+
+            const data = JSON.parse(jsonData);
+            if (!data.schedule) {
+                return {
+                    success: false,
+                    error: 'Import data does not contain a valid schedule'
+                };
+            }
+
+            // Validate imported schedule
+            const validation = this.dataValidator.validateSchedule(data.schedule);
+            if (!validation.valid) {
+                return {
+                    success: false,
+                    error: `Imported schedule validation failed: ${validation.errors.map(e => e.message).join(', ')}`,
+                    warnings: validation.warnings.map(w => w.message)
+                };
+            }
+
+            // Create new schedule with imported data
+            const importedSchedule: Schedule = {
+                ...data.schedule,
+                id: this.generateScheduleId() // Generate new ID to avoid conflicts
+            };
+
+            const result = await this.retryManager.executeWithRetry(
+                () => {
+                    // Manually add to state
+                    const schedules = this.profileStateManager.getAllSchedules();
+                    schedules.push(importedSchedule);
+                    return importedSchedule;
+                },
+                {
+                    operationName: `import schedule "${importedSchedule.name}"`,
+                }
+            );
+
+            if (!result.success) {
+                return {
+                    success: false,
+                    error: `Failed to import schedule: ${result.error?.message || 'Unknown error'}`
+                };
+            }
+
+            // Auto-save
+            const saveResult = await this.profileStateManager.save();
+            if (!saveResult.success) {
+                console.warn('Failed to auto-save after schedule import:', saveResult.error);
+            }
+
+            // Notify listeners
+            this.notifyScheduleListeners({
+                type: 'schedule_created',
+                schedule: importedSchedule,
+                timestamp: Date.now()
+            });
+
+            return {
+                success: true,
+                schedule: importedSchedule
+            };
+
+        } catch (error) {
+            return {
+                success: false,
+                error: `Import failed: ${error}`
+            };
+        }
+    }
+
+    // Event handling
+    addScheduleListener(listener: ScheduleChangeListener): void {
+        this.scheduleListeners.add(listener);
+    }
+
+    removeScheduleListener(listener: ScheduleChangeListener): void {
+        this.scheduleListeners.delete(listener);
+    }
+
+    removeAllScheduleListeners(): void {
+        this.scheduleListeners.clear();
+    }
+
+    // Access to course selection service
+    getCourseSelectionService(): CourseSelectionService {
+        return this.courseSelectionService;
+    }
+
+    // Health check
+    async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
+        const issues: string[] = [];
+
+        try {
+            if (!this.isInitialized) {
+                issues.push('Service not initialized');
+            }
+
+            // Check all schedules
+            const schedules = this.getAllSchedules();
+            const validation = this.dataValidator.validateBatch(
+                schedules,
+                (schedule) => this.dataValidator.validateSchedule(schedule)
+            );
+
+            if (!validation.valid) {
+                issues.push(`Schedule validation: ${validation.errors.length} errors found`);
+            }
+
+            // Check active schedule consistency
+            const activeScheduleId = this.getActiveScheduleId();
+            if (activeScheduleId && !schedules.some(s => s.id === activeScheduleId)) {
+                issues.push('Active schedule ID references non-existent schedule');
+            }
+
+        } catch (error) {
+            issues.push(`Health check error: ${error}`);
         }
 
-        const duplicatedSchedule: Schedule = {
-            id: this.generateScheduleId(),
-            name: newName,
-            selectedCourses: [...originalSchedule.selectedCourses],
-            generatedSchedules: [...originalSchedule.generatedSchedules]
+        return {
+            healthy: issues.length === 0,
+            issues
+        };
+    }
+
+    // Private helper methods
+    private async ensureInitialized(): Promise<void> {
+        if (!this.isInitialized) {
+            await this.initialize();
+        }
+    }
+
+    private setupStateManagerListeners(): void {
+        const stateListener: StateChangeListener = (event: StateChangeEvent) => {
+            // Convert state events to schedule events as needed
+            switch (event.type) {
+                case 'schedule_changed':
+                    if (event.data.action === 'created') {
+                        this.notifyScheduleListeners({
+                            type: 'schedule_created',
+                            schedule: event.data.schedule,
+                            timestamp: event.timestamp
+                        });
+                    } else if (event.data.action === 'deleted') {
+                        this.notifyScheduleListeners({
+                            type: 'schedule_deleted',
+                            schedule: event.data.schedule,
+                            timestamp: event.timestamp
+                        });
+                    } else if (event.data.action === 'updated') {
+                        this.notifyScheduleListeners({
+                            type: 'schedule_updated',
+                            schedule: event.data.schedule,
+                            timestamp: event.timestamp
+                        });
+                    }
+                    break;
+                case 'active_schedule_changed':
+                    this.notifyScheduleListeners({
+                        type: 'schedule_activated',
+                        schedule: event.data.schedule,
+                        timestamp: event.timestamp
+                    });
+                    break;
+            }
         };
 
-        this.storageManager.saveSchedule(duplicatedSchedule);
-        return duplicatedSchedule;
+        this.profileStateManager.addListener(stateListener);
     }
 
-    initializeDefaultScheduleIfNeeded(): void {
-        const existingSchedules = this.getAllSchedules();
-        
-        if (existingSchedules.length === 0) {
-            const currentSelectedCourses = this.courseSelectionService.getSelectedCourses();
-            const defaultSchedule = this.createNewSchedule('My Schedule');
-            
-            if (currentSelectedCourses.length > 0) {
-                defaultSchedule.selectedCourses = [...currentSelectedCourses];
-                this.saveSchedule(defaultSchedule);
-            }
-            
-            this.setActiveSchedule(defaultSchedule.id);
-        } else if (!this.activeScheduleId) {
-            this.setActiveSchedule(existingSchedules[0].id);
-        }
-        
-        this.setupCourseSelectionListener();
-    }
-
-    private setupCourseSelectionListener(): void {
-        this.courseSelectionService.onSelectionChange(() => {
-            console.log('📞 ScheduleManagementService: Received course selection change event');
-            
-            // Don't mark as unsaved if we're currently loading a schedule
-            if (this.isLoadingSchedule) {
-                console.log('⏸️ ScheduleManagementService: Skipping unsaved mark - currently loading schedule');
-                return;
-            }
-            
-            console.log('🔄 ScheduleManagementService: Marking changes as unsaved');
-            this.markAsUnsaved();
-        });
-    }
-
-    // Debug method to inspect the current state
-    debugState(): void {
-        console.log('=== SCHEDULE MANAGEMENT DEBUG ===');
-        console.log('Active Schedule ID:', this.activeScheduleId);
-        console.log('All Schedules:', this.getAllSchedules().map(s => ({
-            id: s.id,
-            name: s.name,
-            courseCount: s.selectedCourses.length
-        })));
-        console.log('Active Schedule:', this.getActiveSchedule());
-        console.log('Current Selected Courses:', this.courseSelectionService.getSelectedCourses().length);
-        console.log('=================================');
-    }
-
-    onActiveScheduleChange(listener: (activeSchedule: Schedule | null) => void): void {
-        this.listeners.push(listener);
-    }
-
-    offActiveScheduleChange(listener: (activeSchedule: Schedule | null) => void): void {
-        const index = this.listeners.indexOf(listener);
-        if (index > -1) {
-            this.listeners.splice(index, 1);
-        }
-    }
-
-    private notifyListeners(activeSchedule: Schedule | null): void {
-        this.listeners.forEach(listener => {
+    private notifyScheduleListeners(event: ScheduleChangeEvent): void {
+        this.scheduleListeners.forEach(listener => {
             try {
-                listener(activeSchedule);
+                listener(event);
             } catch (error) {
                 console.error('Error in schedule change listener:', error);
             }
         });
     }
 
+    private async initializeDefaultScheduleIfNeeded(): Promise<void> {
+        const existingSchedules = this.profileStateManager.getAllSchedules();
+        
+        if (existingSchedules.length === 0) {
+            console.log('🔄 Creating default schedule...');
+            const defaultResult = await this.createNewSchedule('My Schedule', {
+                includeCurrentCourses: true,
+                autoActivate: true,
+                autoSave: true
+            });
+            
+            if (!defaultResult.success) {
+                console.warn('Failed to create default schedule:', defaultResult.error);
+            }
+        } else if (!this.getActiveScheduleId()) {
+            // Activate first schedule if no active one
+            const activateResult = await this.setActiveSchedule(existingSchedules[0].id);
+            if (!activateResult.success) {
+                console.warn('Failed to activate first schedule:', activateResult.error);
+            }
+        }
+    }
+
     private generateScheduleId(): string {
         return `schedule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
 
-    private saveActiveScheduleId(): void {
-        this.storageManager.saveActiveScheduleId(this.activeScheduleId);
-    }
-
-    private loadActiveScheduleId(): void {
-        this.activeScheduleId = this.storageManager.loadActiveScheduleId();
-    }
-
-    exportSchedule(scheduleId: string): string | null {
-        const schedule = this.loadSchedule(scheduleId);
-        if (!schedule) {
-            return null;
-        }
-
-        const exportData = {
-            version: '1.0',
-            timestamp: new Date().toISOString(),
-            schedule: schedule
-        };
-
-        return JSON.stringify(exportData, null, 2);
-    }
-
-    importSchedule(jsonData: string): Schedule | null {
-        try {
-            const data = JSON.parse(jsonData);
-            
-            if (!data.schedule) {
-                return null;
-            }
-
-            const importedSchedule: Schedule = {
-                ...data.schedule,
-                id: this.generateScheduleId()
-            };
-
-            this.storageManager.saveSchedule(importedSchedule);
-            return importedSchedule;
-        } catch (error) {
-            console.error('Failed to import schedule:', error);
-            return null;
-        }
-    }
-
-    getCourseSelectionService(): CourseSelectionService {
-        return this.courseSelectionService;
+    // Debug methods
+    debugState(): void {
+        console.log('=== SCHEDULE MANAGEMENT SERVICE DEBUG ===');
+        console.log('Initialized:', this.isInitialized);
+        console.log('Active Schedule ID:', this.getActiveScheduleId());
+        console.log('Total Schedules:', this.getAllSchedules().length);
+        console.log('Listeners:', this.scheduleListeners.size);
+        console.log('Has Unsaved Changes:', this.hasUnsavedChanges());
+        
+        this.profileStateManager.debugState();
+        
+        console.log('Health Check:', this.performHealthCheck());
+        console.log('===============================================');
     }
 }

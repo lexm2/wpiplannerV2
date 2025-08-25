@@ -1,93 +1,401 @@
 import { Course, Department, Section } from '../types/types'
 import { SelectedCourse } from '../types/schedule'
-import { CourseManager } from '../core/CourseManager'
-import { StorageManager } from '../core/StorageManager'
+import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../core/ProfileStateManager'
+import { DataValidator, ValidationResult } from '../core/DataValidator'
+import { RetryManager } from '../core/RetryManager'
+import { ProfileMigrationService } from '../core/ProfileMigrationService'
 import { Validators } from '../utils/validators'
 
+export interface CourseSelectionOptions {
+    isRequired?: boolean;
+    autoSave?: boolean;
+    validateBeforeAdd?: boolean;
+}
+
+export interface CourseSelectionResult {
+    success: boolean;
+    course?: SelectedCourse;
+    error?: string;
+    warnings?: string[];
+}
+
+export interface SelectionChangeEvent {
+    type: 'course_added' | 'course_removed' | 'section_changed' | 'selection_cleared' | 'data_loaded';
+    course?: Course;
+    section?: string | null;
+    selectedCourses: SelectedCourse[];
+    timestamp: number;
+}
+
+export type SelectionChangeListener = (event: SelectionChangeEvent) => void;
+
 export class CourseSelectionService {
-    private courseManager: CourseManager;
-    private storageManager: StorageManager;
+    private profileStateManager: ProfileStateManager;
+    private dataValidator: DataValidator;
+    private retryManager: RetryManager;
+    private migrationService: ProfileMigrationService;
+    private selectionListeners = new Set<SelectionChangeListener>();
+    private isInitialized = false;
+    private initializationPromise: Promise<boolean> | null = null;
 
-    constructor(courseManager?: CourseManager, storageManager?: StorageManager) {
-        this.courseManager = courseManager || new CourseManager();
-        this.storageManager = storageManager || new StorageManager();
-        
-        this.loadPersistedSelections();
-        this.setupPersistenceListener();
+    constructor(
+        profileStateManager?: ProfileStateManager,
+        dataValidator?: DataValidator,
+        retryManager?: RetryManager,
+        migrationService?: ProfileMigrationService
+    ) {
+        this.profileStateManager = profileStateManager || new ProfileStateManager();
+        this.dataValidator = dataValidator || new DataValidator();
+        this.retryManager = retryManager || RetryManager.createStorageRetryManager();
+        this.migrationService = migrationService || new ProfileMigrationService(
+            this.dataValidator,
+            this.profileStateManager['storageManager'],
+            this.retryManager
+        );
+
+        this.setupStateManagerListeners();
     }
 
-    selectCourse(course: Course, isRequired: boolean = false): void {
-        if (!Validators.isValidCourse(course)) {
-            throw new Error('Invalid course object provided');
+    // Initialization
+    async initialize(): Promise<boolean> {
+        if (this.isInitialized) return true;
+        if (this.initializationPromise) return this.initializationPromise;
+
+        this.initializationPromise = this.performInitialization();
+        return this.initializationPromise;
+    }
+
+    private async performInitialization(): Promise<boolean> {
+        try {
+            console.log('🚀 Initializing CourseSelectionService...');
+
+            // Check and perform migrations if needed
+            const migrationResult = await this.checkAndPerformMigrations();
+            if (!migrationResult) {
+                console.warn('⚠️ Migration check failed, proceeding with existing data');
+            }
+
+            // Load data from storage
+            await this.profileStateManager.loadFromStorage();
+
+            // Validate loaded data
+            const healthCheck = await this.performHealthCheck();
+            if (!healthCheck.healthy) {
+                console.warn('⚠️ Health check found issues:', healthCheck.issues);
+                // Attempt repairs
+                await this.attemptDataRepair();
+            }
+
+            this.isInitialized = true;
+            console.log('✅ CourseSelectionService initialized successfully');
+            return true;
+
+        } catch (error) {
+            console.error('❌ Failed to initialize CourseSelectionService:', error);
+            this.isInitialized = false;
+            return false;
+        } finally {
+            this.initializationPromise = null;
         }
-        this.courseManager.addCourse(course, isRequired);
     }
 
-    unselectCourse(course: Course): void {
-        if (!Validators.isValidCourse(course)) {
-            throw new Error('Invalid course object provided');
+    // Core course selection methods
+    async selectCourse(course: Course, options: CourseSelectionOptions = {}): Promise<CourseSelectionResult> {
+        await this.ensureInitialized();
+
+        const {
+            isRequired = false,
+            autoSave = true,
+            validateBeforeAdd = true
+        } = options;
+
+        try {
+            // Validate course if requested
+            if (validateBeforeAdd) {
+                const validation = this.dataValidator.validateCourse(course);
+                if (!validation.valid) {
+                    return {
+                        success: false,
+                        error: `Invalid course: ${validation.errors.map(e => e.message).join(', ')}`,
+                        warnings: validation.warnings.map(w => w.message)
+                    };
+                }
+            }
+
+            // Execute with retry
+            const result = await this.retryManager.executeWithRetry(
+                () => {
+                    this.profileStateManager.selectCourse(course, isRequired, 'api');
+                    return this.profileStateManager.getSelectedCourse(course);
+                },
+                {
+                    operationName: `select course ${course.department.abbreviation}${course.number}`,
+                    onRetry: (attempt, error) => {
+                        console.warn(`Course selection failed, retrying (attempt ${attempt}):`, error.message);
+                    }
+                }
+            );
+
+            if (!result.success) {
+                return {
+                    success: false,
+                    error: `Failed to select course: ${result.error?.message || 'Unknown error'}`
+                };
+            }
+
+            const selectedCourse = result.result;
+            if (!selectedCourse) {
+                return {
+                    success: false,
+                    error: 'Course selection succeeded but course not found in state'
+                };
+            }
+
+            // Notify listeners
+            this.notifySelectionListeners({
+                type: 'course_added',
+                course,
+                selectedCourses: this.profileStateManager.getSelectedCourses(),
+                timestamp: Date.now()
+            });
+
+            // Auto-save if requested
+            if (autoSave) {
+                const saveResult = await this.profileStateManager.save();
+                if (!saveResult.success) {
+                    console.warn('Failed to auto-save after course selection:', saveResult.error);
+                }
+            }
+
+            return {
+                success: true,
+                course: selectedCourse
+            };
+
+        } catch (error) {
+            console.error('Error selecting course:', error);
+            return {
+                success: false,
+                error: `Error selecting course: ${error}`
+            };
         }
-        this.courseManager.removeCourse(course);
     }
 
-    toggleCourseSelection(course: Course, isRequired: boolean = false): boolean {
+    async unselectCourse(course: Course, options: { autoSave?: boolean } = {}): Promise<CourseSelectionResult> {
+        await this.ensureInitialized();
+        const { autoSave = true } = options;
+
+        try {
+            if (!this.isCourseSelected(course)) {
+                return {
+                    success: false,
+                    error: 'Course is not currently selected'
+                };
+            }
+
+            const result = await this.retryManager.executeWithRetry(
+                () => {
+                    this.profileStateManager.unselectCourse(course, 'api');
+                },
+                {
+                    operationName: `unselect course ${course.department.abbreviation}${course.number}`,
+                }
+            );
+
+            if (!result.success) {
+                return {
+                    success: false,
+                    error: `Failed to unselect course: ${result.error?.message || 'Unknown error'}`
+                };
+            }
+
+            // Notify listeners
+            this.notifySelectionListeners({
+                type: 'course_removed',
+                course,
+                selectedCourses: this.profileStateManager.getSelectedCourses(),
+                timestamp: Date.now()
+            });
+
+            // Auto-save if requested
+            if (autoSave) {
+                const saveResult = await this.profileStateManager.save();
+                if (!saveResult.success) {
+                    console.warn('Failed to auto-save after course removal:', saveResult.error);
+                }
+            }
+
+            return { success: true };
+
+        } catch (error) {
+            console.error('Error unselecting course:', error);
+            return {
+                success: false,
+                error: `Error unselecting course: ${error}`
+            };
+        }
+    }
+
+    async toggleCourseSelection(course: Course, options: CourseSelectionOptions = {}): Promise<CourseSelectionResult> {
         const isSelected = this.isCourseSelected(course);
         
         if (isSelected) {
-            this.unselectCourse(course);
-            return false;
+            return this.unselectCourse(course, { autoSave: options.autoSave });
         } else {
-            this.selectCourse(course, isRequired);
-            return true;
+            return this.selectCourse(course, options);
         }
     }
 
-    setSelectedSection(course: Course, sectionNumber: string | null): void {
-        if (!Validators.isValidCourse(course)) {
-            throw new Error('Invalid course object provided');
+    async setSelectedSection(course: Course, sectionNumber: string | null, options: { autoSave?: boolean } = {}): Promise<CourseSelectionResult> {
+        await this.ensureInitialized();
+        const { autoSave = true } = options;
+
+        try {
+            if (!this.isCourseSelected(course)) {
+                return {
+                    success: false,
+                    error: 'Course must be selected before setting a section'
+                };
+            }
+
+            // Validate section number if provided
+            if (sectionNumber !== null && !Validators.validateSectionNumber(sectionNumber)) {
+                return {
+                    success: false,
+                    error: 'Invalid section number format'
+                };
+            }
+
+            // Check if section exists in course
+            if (sectionNumber !== null) {
+                const sectionExists = course.sections.some(s => s.number === sectionNumber);
+                if (!sectionExists) {
+                    return {
+                        success: false,
+                        error: `Section ${sectionNumber} not found in course ${course.department.abbreviation}${course.number}`
+                    };
+                }
+            }
+
+            const result = await this.retryManager.executeWithRetry(
+                () => {
+                    this.profileStateManager.setSelectedSection(course, sectionNumber, 'api');
+                },
+                {
+                    operationName: `set section for ${course.department.abbreviation}${course.number}`,
+                }
+            );
+
+            if (!result.success) {
+                return {
+                    success: false,
+                    error: `Failed to set section: ${result.error?.message || 'Unknown error'}`
+                };
+            }
+
+            // Notify listeners
+            this.notifySelectionListeners({
+                type: 'section_changed',
+                course,
+                section: sectionNumber,
+                selectedCourses: this.profileStateManager.getSelectedCourses(),
+                timestamp: Date.now()
+            });
+
+            // Auto-save if requested
+            if (autoSave) {
+                const saveResult = await this.profileStateManager.save();
+                if (!saveResult.success) {
+                    console.warn('Failed to auto-save after section selection:', saveResult.error);
+                }
+            }
+
+            const updatedCourse = this.profileStateManager.getSelectedCourse(course);
+            return {
+                success: true,
+                course: updatedCourse
+            };
+
+        } catch (error) {
+            console.error('Error setting selected section:', error);
+            return {
+                success: false,
+                error: `Error setting selected section: ${error}`
+            };
         }
-        if (sectionNumber !== null && !Validators.validateSectionNumber(sectionNumber)) {
-            throw new Error('Invalid sectionNumber provided');
-        }
-        this.courseManager.setSelectedSection(course, sectionNumber);
     }
 
-    getSelectedSection(course: Course): string | null {
-        if (!Validators.isValidCourse(course)) {
-            throw new Error('Invalid course object provided');
+    async clearAllSelections(options: { autoSave?: boolean } = {}): Promise<{ success: boolean; error?: string }> {
+        await this.ensureInitialized();
+        const { autoSave = true } = options;
+
+        try {
+            const result = await this.retryManager.executeWithRetry(
+                () => {
+                    this.profileStateManager.clearAllSelections('api');
+                },
+                {
+                    operationName: 'clear all course selections',
+                }
+            );
+
+            if (!result.success) {
+                return {
+                    success: false,
+                    error: `Failed to clear selections: ${result.error?.message || 'Unknown error'}`
+                };
+            }
+
+            // Notify listeners
+            this.notifySelectionListeners({
+                type: 'selection_cleared',
+                selectedCourses: [],
+                timestamp: Date.now()
+            });
+
+            // Auto-save if requested
+            if (autoSave) {
+                const saveResult = await this.profileStateManager.save();
+                if (!saveResult.success) {
+                    console.warn('Failed to auto-save after clearing selections:', saveResult.error);
+                }
+            }
+
+            return { success: true };
+
+        } catch (error) {
+            console.error('Error clearing selections:', error);
+            return {
+                success: false,
+                error: `Error clearing selections: ${error}`
+            };
         }
-        return this.courseManager.getSelectedSection(course);
     }
 
-    getSelectedSectionObject(course: Course): Section | null {
-        if (!Validators.isValidCourse(course)) {
-            throw new Error('Invalid course object provided');
-        }
-        return this.courseManager.getSelectedSectionObject(course);
-    }
-
-
+    // Query methods
     isCourseSelected(course: Course): boolean {
-        if (!Validators.isValidCourse(course)) {
-            return false;
-        }
-        return this.courseManager.isSelected(course);
-    }
-
-    getSelectedCourses(): SelectedCourse[] {
-        return this.courseManager.getSelectedCourses();
+        if (!this.isInitialized) return false;
+        return this.profileStateManager.getSelectedCourse(course) !== undefined;
     }
 
     getSelectedCourse(course: Course): SelectedCourse | undefined {
-        if (!Validators.isValidCourse(course)) {
-            return undefined;
-        }
-        return this.courseManager.getSelectedCourse(course);
+        if (!this.isInitialized) return undefined;
+        return this.profileStateManager.getSelectedCourse(course);
     }
 
-    clearAllSelections(): void {
-        this.courseManager.clearAll();
-        this.storageManager.clearSelectedCourses();
+    getSelectedCourses(): SelectedCourse[] {
+        if (!this.isInitialized) return [];
+        return this.profileStateManager.getSelectedCourses();
+    }
+
+    getSelectedSection(course: Course): string | null {
+        const selectedCourse = this.getSelectedCourse(course);
+        return selectedCourse?.selectedSectionNumber || null;
+    }
+
+    getSelectedSectionObject(course: Course): Section | null {
+        const selectedCourse = this.getSelectedCourse(course);
+        return selectedCourse?.selectedSection || null;
     }
 
     getSelectedCoursesCount(): number {
@@ -98,116 +406,262 @@ export class CourseSelectionService {
         return this.getSelectedCourses().map(sc => sc.course.id);
     }
 
-    onSelectionChange(listener: (courses: SelectedCourse[]) => void): void {
-        this.courseManager.onSelectionChange(listener);
+    // Event handling
+    addSelectionListener(listener: SelectionChangeListener): void {
+        this.selectionListeners.add(listener);
     }
 
-    offSelectionChange(listener: (courses: SelectedCourse[]) => void): void {
-        this.courseManager.offSelectionChange(listener);
+    removeSelectionListener(listener: SelectionChangeListener): void {
+        this.selectionListeners.delete(listener);
     }
 
-    private loadPersistedSelections(): void {
-        const persistedCourses = this.storageManager.loadSelectedCourses();
-        if (persistedCourses.length > 0) {
-            this.courseManager.loadSelectedCourses(persistedCourses);
-        }
-    }
-
-    private setupPersistenceListener(): void {
-        // Automatic persistence removed - now handled by manual save
-    }
-
-    private persistSelections(): void {
-        const selectedCourses = this.getSelectedCourses();
-        this.storageManager.saveSelectedCourses(selectedCourses);
-    }
-
-    exportSelections(): string {
-        const selectedCourses = this.getSelectedCourses();
-        return JSON.stringify({
-            version: '1.0',
-            timestamp: new Date().toISOString(),
-            selectedCourses
-        }, null, 2);
-    }
-
-    importSelections(jsonData: string): boolean {
-        try {
-            const data = JSON.parse(jsonData);
-            if (data.selectedCourses && Array.isArray(data.selectedCourses)) {
-                this.courseManager.loadSelectedCourses(data.selectedCourses);
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error('Failed to import selections:', error);
-            return false;
-        }
+    removeAllSelectionListeners(): void {
+        this.selectionListeners.clear();
     }
 
     // Department and section management
     setAllDepartments(departments: Department[]): void {
-        this.courseManager.setAllDepartments(departments);
+        // This would typically be handled by a separate service
+        // For now, we'll store it in the profile state manager if needed
+        console.log(`📚 Loaded ${departments.length} departments`);
     }
 
     getAllSections(): Section[] {
-        return this.courseManager.getAllSections();
+        // This would be retrieved from the course data service
+        return [];
     }
 
     getAllSectionsForCourse(course: Course): Section[] {
-        return this.courseManager.getAllSectionsForCourse(course);
+        return course.sections || [];
     }
 
-    getAllSectionsForDepartment(deptAbbreviation: string): Section[] {
-        return this.courseManager.getAllSectionsForDepartment(deptAbbreviation);
-    }
+    // Data management
+    async exportSelections(): Promise<{ success: boolean; data?: string; error?: string }> {
+        try {
+            await this.ensureInitialized();
+            const exportData = this.profileStateManager.exportData();
+            
+            if (exportData === null) {
+                return {
+                    success: false,
+                    error: 'Failed to export data'
+                };
+            }
 
-    // Helper methods for backward compatibility
-    findCourseById(courseId: string): Course | undefined {
-        for (const dept of this.courseManager.getAllDepartments()) {
-            const course = dept.courses.find(c => c.id === courseId);
-            if (course) return course;
+            return {
+                success: true,
+                data: exportData
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: `Export failed: ${error}`
+            };
         }
+    }
+
+    async importSelections(jsonData: string): Promise<{ success: boolean; error?: string }> {
+        try {
+            await this.ensureInitialized();
+            
+            const result = await this.profileStateManager.importData(jsonData);
+            
+            if (result.success) {
+                // Notify listeners about the data change
+                this.notifySelectionListeners({
+                    type: 'data_loaded',
+                    selectedCourses: this.profileStateManager.getSelectedCourses(),
+                    timestamp: Date.now()
+                });
+            }
+
+            return {
+                success: result.success,
+                error: result.error?.message
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: `Import failed: ${error}`
+            };
+        }
+    }
+
+    // Health and diagnostics
+    async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
+        const issues: string[] = [];
+
+        try {
+            // Check if initialized
+            if (!this.isInitialized) {
+                issues.push('Service not initialized');
+            }
+
+            // Check profile state manager health
+            const stateHealth = this.profileStateManager.isHealthy();
+            if (!stateHealth.healthy) {
+                issues.push(...stateHealth.issues.map(issue => `State: ${issue}`));
+            }
+
+            // Validate current data
+            const selectedCourses = this.getSelectedCourses();
+            const validation = this.dataValidator.validateBatch(
+                selectedCourses,
+                (course) => this.dataValidator.validateSelectedCourse(course)
+            );
+
+            if (!validation.valid) {
+                issues.push(`Data validation: ${validation.errors.length} errors found`);
+            }
+
+        } catch (error) {
+            issues.push(`Health check error: ${error}`);
+        }
+
+        return {
+            healthy: issues.length === 0,
+            issues
+        };
+    }
+
+    async save(): Promise<{ success: boolean; error?: string }> {
+        try {
+            await this.ensureInitialized();
+            const result = await this.profileStateManager.save();
+            return {
+                success: result.success,
+                error: result.error?.message
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: `Save failed: ${error}`
+            };
+        }
+    }
+
+    hasUnsavedChanges(): boolean {
+        if (!this.isInitialized) return false;
+        return this.profileStateManager.hasUnsavedChanges();
+    }
+
+    // Backward compatibility methods
+    findCourseById(courseId: string): Course | undefined {
+        // This would need to be implemented with access to course data
+        console.warn('findCourseById: Course data access not implemented in this service');
         return undefined;
     }
 
-    // Legacy methods using courseId (for backward compatibility)
+    // Legacy methods for compatibility
     unselectCourseById(courseId: string): void {
-        const course = this.findCourseById(courseId);
-        if (course) {
-            this.unselectCourse(course);
-        }
+        console.warn('unselectCourseById: Use unselectCourse with course object instead');
     }
 
     isCourseSelectedById(courseId: string): boolean {
-        const course = this.findCourseById(courseId);
-        return course ? this.isCourseSelected(course) : false;
+        console.warn('isCourseSelectedById: Use isCourseSelected with course object instead');
+        return false;
     }
 
-    setSelectedSectionById(courseId: string, sectionNumber: string | null): void {
-        const course = this.findCourseById(courseId);
-        if (course) {
-            this.setSelectedSection(course, sectionNumber);
+    // Private helper methods
+    private async ensureInitialized(): Promise<void> {
+        if (!this.isInitialized) {
+            await this.initialize();
         }
     }
 
-    getSelectedSectionById(courseId: string): string | null {
-        const course = this.findCourseById(courseId);
-        return course ? this.getSelectedSection(course) : null;
+    private setupStateManagerListeners(): void {
+        const stateListener: StateChangeListener = (event: StateChangeEvent) => {
+            // Convert state manager events to selection events
+            switch (event.type) {
+                case 'courses_changed':
+                    // Already handled in our methods where we emit events
+                    break;
+                case 'active_schedule_changed':
+                    this.notifySelectionListeners({
+                        type: 'data_loaded',
+                        selectedCourses: this.profileStateManager.getSelectedCourses(),
+                        timestamp: event.timestamp
+                    });
+                    break;
+            }
+        };
+
+        this.profileStateManager.addListener(stateListener);
     }
 
-    // Testing support method
-    getCourseManager(): CourseManager {
-        return this.courseManager;
+    private notifySelectionListeners(event: SelectionChangeEvent): void {
+        this.selectionListeners.forEach(listener => {
+            try {
+                listener(event);
+            } catch (error) {
+                console.error('Error in selection change listener:', error);
+            }
+        });
     }
 
-    getSelectedCourseById(courseId: string): SelectedCourse | undefined {
-        const course = this.findCourseById(courseId);
-        return course ? this.getSelectedCourse(course) : undefined;
+    private async checkAndPerformMigrations(): Promise<boolean> {
+        try {
+            // Export current data
+            const currentData = this.profileStateManager.exportData();
+            if (!currentData) {
+                return true; // No data to migrate
+            }
+
+            const parsedData = JSON.parse(currentData);
+            
+            // Check if migration is needed
+            const migrationResult = await this.migrationService.migrateToLatest(parsedData);
+            
+            if (migrationResult.success && migrationResult.itemsChanged > 0) {
+                console.log(`✅ Migration completed: ${migrationResult.itemsChanged} items updated from ${migrationResult.fromVersion} to ${migrationResult.toVersion}`);
+                
+                // Import migrated data
+                if (migrationResult.migratedData) {
+                    await this.profileStateManager.importData(JSON.stringify(migrationResult.migratedData));
+                }
+            }
+
+            return migrationResult.success;
+        } catch (error) {
+            console.error('Migration check failed:', error);
+            return false;
+        }
     }
 
-    // Reconstruct Section objects after course data is loaded
-    reconstructSectionObjects(): void {
-        this.courseManager.reconstructSectionObjects();
+    private async attemptDataRepair(): Promise<boolean> {
+        try {
+            const selectedCourses = this.getSelectedCourses();
+            let repairedCount = 0;
+
+            selectedCourses.forEach(selectedCourse => {
+                // Repair each selected course
+                this.dataValidator.repairSelectedCourse(selectedCourse);
+                repairedCount++;
+            });
+
+            if (repairedCount > 0) {
+                console.log(`🔧 Repaired ${repairedCount} selected courses`);
+                await this.profileStateManager.save();
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Data repair failed:', error);
+            return false;
+        }
+    }
+
+    // Debug methods
+    debugState(): void {
+        console.log('=== COURSE SELECTION SERVICE DEBUG ===');
+        console.log('Initialized:', this.isInitialized);
+        console.log('Selected Courses:', this.getSelectedCoursesCount());
+        console.log('Listeners:', this.selectionListeners.size);
+        console.log('Has Unsaved Changes:', this.hasUnsavedChanges());
+        
+        this.profileStateManager.debugState();
+        
+        console.log('Health Check:', this.performHealthCheck());
+        console.log('=============================================');
     }
 }

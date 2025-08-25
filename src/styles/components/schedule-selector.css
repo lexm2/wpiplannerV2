@@ -85,6 +85,7 @@
     z-index: 1000;
     max-height: 400px;
     overflow-y: auto;
+    overflow-x: visible; /* Allow menus to extend outside dropdown */
 }
 
 .schedule-dropdown-header {
@@ -115,6 +116,7 @@
 .schedule-list {
     max-height: 250px;
     overflow-y: auto;
+    overflow-x: visible; /* Allow menu to extend outside horizontally */
 }
 
 .schedule-list-empty {
@@ -132,6 +134,7 @@
     border-bottom: 1px solid var(--color-border);
     transition: background 0.15s ease;
     position: relative;
+    overflow: visible; /* Allow menu to extend outside */
 }
 
 .schedule-item:last-child {
@@ -207,6 +210,12 @@
 .menu-btn {
     font-size: 1rem;
     padding: 0.25rem;
+    position: relative;
+}
+
+.menu-btn:active {
+    background: var(--color-primary-light);
+    transform: scale(0.95);
 }
 
 /* Schedule Item Menu */
@@ -221,6 +230,20 @@
     z-index: 1001;
     min-width: 120px;
     padding: 0.25rem 0;
+    /* Ensure menu is visible when shown */
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Menu visibility states */
+.schedule-item-menu[style*="display: none"] {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.schedule-item-menu[style*="display: block"] {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .menu-action {

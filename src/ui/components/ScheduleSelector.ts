@@ -79,6 +79,7 @@ export class ScheduleSelector {
         document.addEventListener('click', (e) => {
             if (!this.container.contains(e.target as Node)) {
                 this.closeDropdown();
+                this.closeAllScheduleMenus();
             }
         });
 
@@ -99,6 +100,7 @@ export class ScheduleSelector {
 
         dropdown?.addEventListener('click', (e) => {
             e.stopPropagation();
+            console.log('Dropdown click event:', e.target);
         });
     }
 
@@ -144,6 +146,12 @@ export class ScheduleSelector {
             this.isDropdownOpen = false;
             this.container.classList.remove('dropdown-open');
         }
+    }
+
+    private closeAllScheduleMenus(): void {
+        document.querySelectorAll('.schedule-item-menu').forEach(menu => {
+            (menu as HTMLElement).style.display = 'none';
+        });
     }
 
     private updateDisplay(): void {
@@ -209,7 +217,15 @@ export class ScheduleSelector {
         if (this.lastScheduleListHTML !== newHTML) {
             this.lastScheduleListHTML = newHTML;
             scheduleList.innerHTML = newHTML;
+            console.log('Schedule list HTML updated, setting up listeners...');
             this.setupScheduleItemListeners();
+            
+            // Debug: verify menu buttons exist
+            const menuButtons = scheduleList.querySelectorAll('.menu-btn');
+            console.log(`Found ${menuButtons.length} menu buttons after DOM update`);
+            menuButtons.forEach((btn, index) => {
+                console.log(`Menu button ${index}:`, btn);
+            });
         }
     }
 
@@ -223,6 +239,7 @@ export class ScheduleSelector {
         // Create and store new handlers
         this.scheduleListClickHandler = (e) => {
             const target = e.target as HTMLElement;
+            console.log('Schedule list click:', target.className, target.tagName);
 
             if (target.classList.contains('switch-btn')) {
                 const scheduleId = target.closest('.schedule-item')?.getAttribute('data-schedule-id');
@@ -232,6 +249,7 @@ export class ScheduleSelector {
             }
 
             if (target.classList.contains('menu-btn')) {
+                console.log('Menu button clicked:', target);
                 e.stopPropagation();
                 this.toggleScheduleMenu(target);
             }
@@ -239,6 +257,7 @@ export class ScheduleSelector {
             if (target.classList.contains('menu-action')) {
                 const action = target.getAttribute('data-action');
                 const scheduleId = target.closest('.schedule-item')?.getAttribute('data-schedule-id');
+                console.log('Menu action clicked:', action, scheduleId);
                 if (action && scheduleId) {
                     this.handleScheduleAction(action, scheduleId);
                 }
@@ -270,34 +289,65 @@ export class ScheduleSelector {
     }
 
     private toggleScheduleMenu(menuBtn: HTMLElement): void {
+        console.log('toggleScheduleMenu called with:', menuBtn);
+        
+        // Close all other menus first
         document.querySelectorAll('.schedule-item-menu').forEach(menu => {
-            if (menu !== menuBtn.parentElement?.querySelector('.schedule-item-menu')) {
+            const currentMenu = menuBtn.closest('.schedule-item')?.querySelector('.schedule-item-menu');
+            if (menu !== currentMenu) {
                 (menu as HTMLElement).style.display = 'none';
+                console.log('Closed other menu:', menu);
             }
         });
 
-        const menu = menuBtn.parentElement?.querySelector('.schedule-item-menu') as HTMLElement;
+        // Find the menu for this button using closest parent approach
+        const scheduleItem = menuBtn.closest('.schedule-item');
+        console.log('Found schedule item:', scheduleItem);
+        
+        if (!scheduleItem) {
+            console.error('Could not find schedule item parent for menu button');
+            return;
+        }
+
+        const menu = scheduleItem.querySelector('.schedule-item-menu') as HTMLElement;
+        console.log('Found menu element:', menu);
+        
         if (menu) {
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            const isCurrentlyHidden = menu.style.display === 'none' || menu.style.display === '';
+            menu.style.display = isCurrentlyHidden ? 'block' : 'none';
+            console.log('Menu display set to:', menu.style.display);
+        } else {
+            console.error('Could not find menu element in schedule item');
         }
     }
 
     private handleScheduleAction(action: string, scheduleId: string): void {
-        switch (action) {
-            case 'rename':
-                this.renameSchedule(scheduleId);
-                break;
-            case 'duplicate':
-                this.duplicateSchedule(scheduleId);
-                break;
-            case 'export':
-                this.exportSchedule(scheduleId);
-                break;
-            case 'delete':
-                this.deleteSchedule(scheduleId);
-                break;
+        console.log(`Handling schedule action: ${action} for schedule: ${scheduleId}`);
+        
+        try {
+            switch (action) {
+                case 'rename':
+                    this.renameSchedule(scheduleId);
+                    break;
+                case 'duplicate':
+                    this.duplicateSchedule(scheduleId);
+                    break;
+                case 'export':
+                    this.exportSchedule(scheduleId);
+                    break;
+                case 'delete':
+                    this.deleteSchedule(scheduleId);
+                    break;
+                default:
+                    console.warn(`Unknown schedule action: ${action}`);
+                    return;
+            }
+        } catch (error) {
+            console.error(`Error handling schedule action ${action}:`, error);
+            alert(`Failed to ${action} schedule. Please try again.`);
         }
 
+        // Close all menus after action
         document.querySelectorAll('.schedule-item-menu').forEach(menu => {
             (menu as HTMLElement).style.display = 'none';
         });
