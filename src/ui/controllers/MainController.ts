@@ -1,4 +1,5 @@
 import { Course, Department } from '../../types/types'
+import { SelectedCourse } from '../../types/schedule'
 import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { ScheduleSelector } from '../components/ScheduleSelector'
@@ -809,21 +810,38 @@ export class MainController {
                 return;
             }
             
+            // Handle explicit course removal events immediately to ensure UI sync
+            if (event.type === 'course_removed' && event.course) {
+                // Directly update UI for the removed course to ensure immediate feedback
+                this.courseController.updateCourseUIById(event.course.id, false);
+            }
+            
+            // Handle explicit course addition events immediately to ensure UI sync  
+            if (event.type === 'course_added' && event.course) {
+                // Directly update UI for the added course to ensure immediate feedback
+                this.courseController.updateCourseUIById(event.course.id, true);
+            }
+            
             // Create current state map for comparison
             const currentCoursesMap = new Map<string, string | null>();
             selectedCourses.forEach(sc => {
                 currentCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
             });
             
+            // Handle explicit course addition/removal events to ensure UI sync
+            const requiresUIRefresh = isCoursesAddedOrRemoved || 
+                event.type === 'course_added' || 
+                event.type === 'course_removed';
+            
             // Use targeted updates instead of global refresh for better performance
-            if (isCoursesAddedOrRemoved) {
+            if (requiresUIRefresh) {
                 this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
             }
             
             // Always update the selected courses sidebar
             this.courseController.displaySelectedCourses();
             
-            if (isCoursesAddedOrRemoved) {
+            if (requiresUIRefresh) {
                 // Full refresh needed when courses are added/removed
                 this.scheduleController.displayScheduleSelectedCourses();
                 
