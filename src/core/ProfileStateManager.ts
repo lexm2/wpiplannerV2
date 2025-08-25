@@ -1,5 +1,5 @@
 import { Schedule, SchedulePreferences, SelectedCourse } from '../types/schedule'
-import { Course } from '../types/types'
+import { Course, Section } from '../types/types'
 import { TransactionalStorageManager, TransactionResult } from './TransactionalStorageManager'
 
 export interface StateChangeEvent {
@@ -252,12 +252,28 @@ export class ProfileStateManager {
         this.withStateUpdate(() => {
             const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
             if (selectedCourse) {
-                const sectionObject = sectionNumber ? 
-                    course.sections.find(s => s.number === sectionNumber) || null : 
-                    null;
+                let sectionObject: Section | null = null;
+                
+                if (sectionNumber) {
+                    // Find the section in the course
+                    sectionObject = course.sections.find(s => s.number === sectionNumber) || null;
+                    
+                    // Validate section object has required properties
+                    if (sectionObject && !sectionObject.computedTerm) {
+                        console.warn(`Section ${sectionNumber} for course ${course.department.abbreviation}${course.number} is missing computedTerm property`);
+                        // Don't set the section if it's missing required data
+                        sectionObject = null;
+                    }
+                    
+                    if (!sectionObject && sectionNumber) {
+                        console.warn(`Section ${sectionNumber} not found in course ${course.department.abbreviation}${course.number} sections:`, 
+                            course.sections.map(s => s.number));
+                    }
+                }
 
+                // Ensure we never set undefined - always use null
                 selectedCourse.selectedSection = sectionObject;
-                selectedCourse.selectedSectionNumber = sectionNumber;
+                selectedCourse.selectedSectionNumber = sectionObject ? sectionNumber : null;
 
                 this.updateActiveScheduleWithCurrentCourses();
                 this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);

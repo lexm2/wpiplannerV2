@@ -6,6 +6,7 @@ import { SectionInfoModalController } from './SectionInfoModalController'
 import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/ConflictDetector'
+import { getComputedTerm, validateSelectedCourses } from '../../utils/typeGuards'
 
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
@@ -517,7 +518,8 @@ export class ScheduleController {
     }
 
     renderScheduleGrids(): void {
-        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        const rawSelectedCourses = this.courseSelectionService.getSelectedCourses();
+        const selectedCourses = validateSelectedCourses(rawSelectedCourses);
         const grids = ['A', 'B', 'C', 'D'];
         
         
@@ -527,15 +529,16 @@ export class ScheduleController {
             
             // Filter courses for this term - use direct Section object access
             const termCourses = selectedCourses.filter(sc => {
-                const hasSelectedSection = sc.selectedSection !== null;
+                const computedTerm = getComputedTerm(sc);
                 
-                if (!hasSelectedSection) return false;
+                if (!computedTerm) {
+                    if (sc.selectedSection) {
+                        console.warn(`Course ${sc.course.department.abbreviation}${sc.course.number} has invalid section data:`, sc.selectedSection);
+                    }
+                    return false;
+                }
                 
-                // Use the pre-computed term letter from Java backend
-                const sectionTermLetter = sc.selectedSection!.computedTerm;
-                const matchesTerm = sectionTermLetter === term;
-                
-                return matchesTerm;
+                return computedTerm === term;
             });
             
             if (termCourses.length === 0) {
