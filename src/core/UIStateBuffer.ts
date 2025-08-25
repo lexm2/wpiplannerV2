@@ -307,6 +307,18 @@ export class UIStateBuffer {
         return this.uiState.pendingOperations.length;
     }
 
+    // Force refresh from backend (for schedule changes)
+    refreshFromBackend(): void {
+        const backendCourses = this.profileStateManager.getSelectedCourses();
+        this.uiState.selectedCourses = backendCourses.map(sc => ({ ...sc }));
+        this.uiState.lastSyncTimestamp = Date.now();
+        
+        // Clear any pending operations since we're starting fresh from backend
+        this.uiState.pendingOperations = [];
+        
+        this.notifyListeners();
+    }
+
     // Backend synchronization
     async syncWithBackend(): Promise<SyncResult> {
         try {

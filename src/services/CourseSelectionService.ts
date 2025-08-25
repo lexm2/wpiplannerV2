@@ -705,6 +705,9 @@ export class CourseSelectionService {
                     // Already handled in our methods where we emit events
                     break;
                 case 'active_schedule_changed':
+                    // Refresh optimistic UI cache with new schedule's data
+                    this.uiStateBuffer.refreshFromBackend();
+                    
                     this.notifySelectionListeners({
                         type: 'data_loaded',
                         selectedCourses: this.profileStateManager.getSelectedCourses(),
