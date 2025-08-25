@@ -15,6 +15,7 @@ export class ScheduleController {
     private sectionInfoModalController: SectionInfoModalController | null = null;
     private conflictDetector: ConflictDetector | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
+    private containerEventListeners = new Map<HTMLElement, EventListener>();
     private statePreserver?: { 
         preserve: () => Map<string, boolean>, 
         restore: (states: Map<string, boolean>) => void 
@@ -564,6 +565,13 @@ export class ScheduleController {
     private renderPopulatedGrid(container: HTMLElement, courses: any[], term: string): void {
         container.classList.remove('empty');
         
+        // Clean up existing event listeners before replacing DOM content
+        const existingListener = this.containerEventListeners.get(container);
+        if (existingListener) {
+            container.removeEventListener('click', existingListener);
+            this.containerEventListeners.delete(container);
+        }
+        
         // Create 5-day (Mon-Fri) × 24 time slot grid (7 AM - 7 PM, 30-min intervals)
         const weekdays = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
         const timeSlots = TimeUtils.TOTAL_TIME_SLOTS;
@@ -816,8 +824,14 @@ export class ScheduleController {
     }
 
     private addSectionBlockEventListeners(container: HTMLElement): void {
-        // Use event delegation to handle clicks on section blocks
-        container.addEventListener('click', (event) => {
+        // Remove existing listener for this container if it exists
+        const existingListener = this.containerEventListeners.get(container);
+        if (existingListener) {
+            container.removeEventListener('click', existingListener);
+        }
+        
+        // Create new listener
+        const clickListener = (event: Event) => {
             const target = event.target as HTMLElement;
             
             // Find the section block element (might be the target or a parent)
@@ -832,7 +846,11 @@ export class ScheduleController {
                 event.stopPropagation(); // Prevent event bubbling
                 this.showSectionInfoModal(courseId, sectionNumber);
             }
-        });
+        };
+        
+        // Add new listener and track it
+        container.addEventListener('click', clickListener);
+        this.containerEventListeners.set(container, clickListener);
     }
 
     showSectionInfoModal(courseId: string, sectionNumber: string): void {
