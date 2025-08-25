@@ -316,7 +316,40 @@ export class ScheduleSelector {
         const menu = scheduleItem.querySelector('.schedule-item-menu') as HTMLElement;
         if (menu) {
             const isCurrentlyHidden = menu.style.display === 'none' || menu.style.display === '';
-            menu.style.display = isCurrentlyHidden ? 'block' : 'none';
+            
+            if (isCurrentlyHidden) {
+                // Calculate position relative to viewport
+                const btnRect = menuBtn.getBoundingClientRect();
+                const menuWidth = 120; // min-width from CSS
+                const menuHeight = 160; // estimated height
+                
+                // Position menu below and to the right of button
+                let left = btnRect.right - menuWidth;
+                let top = btnRect.bottom + 4; // small gap
+                
+                // Ensure menu stays within viewport
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                
+                // Adjust horizontal position if menu would go off-screen
+                if (left < 8) {
+                    left = 8; // minimum padding from left edge
+                } else if (left + menuWidth > viewportWidth - 8) {
+                    left = viewportWidth - menuWidth - 8; // minimum padding from right edge
+                }
+                
+                // Adjust vertical position if menu would go off-screen
+                if (top + menuHeight > viewportHeight - 8) {
+                    top = btnRect.top - menuHeight - 4; // position above button
+                }
+                
+                // Apply positioning
+                menu.style.left = `${left}px`;
+                menu.style.top = `${top}px`;
+                menu.style.display = 'block';
+            } else {
+                menu.style.display = 'none';
+            }
         }
     }
 

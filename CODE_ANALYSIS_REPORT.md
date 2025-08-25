@@ -341,7 +341,119 @@ UI Controllers → Services → Core Business Logic
 - **Accessibility**: Consistent modal management and keyboard navigation
 - **Testability**: Controllers can be unit tested with mocked services
 
+## Utilities & Helper Functions (`src/utils/`)
+
+The utilities layer provides cross-cutting concerns and specialized helper functions that are used throughout the application. These utilities focus on performance, data validation, and domain-specific operations.
+
+### Performance & Monitoring Utilities
+
+**PerformanceMetrics.ts**
+- **Purpose**: Real-time performance monitoring and metrics collection
+- **Key Features**:
+  - Operation timing with start/end tracking
+  - Performance reports with averages, min/max durations
+  - Specialized filtering/rendering performance metrics
+  - Configurable metrics retention (default: last 100 operations)
+- **Used By**: CourseController, ProgressiveRenderer, FilterService
+- **Benefits**: Performance bottleneck identification, optimization validation
+
+**RequestCancellation.ts**
+- **Purpose**: Cooperative cancellation system for long-running operations
+- **Components**:
+  - `CancellationToken`: Represents a cancellable operation state
+  - `CancellationError`: Specialized error for cancelled operations  
+  - `CancellationTokenSource`: Factory for creating cancellation tokens
+  - `OperationManager`: High-level debouncing and operation coordination
+- **Used By**: ProgressiveRenderer, search operations, data loading
+- **Pattern**: Prevents outdated operations from completing and wasting resources
+
+### Data Validation & Quality
+
+**validators.ts**
+- **Purpose**: Comprehensive type-safe validation for all data structures
+- **Validation Coverage**:
+  - Course, Section, Period, Department validation
+  - Schedule and SelectedCourse validation  
+  - SchedulePreferences validation
+  - Nested object validation with full type checking
+- **Used By**: CourseSelectionService, data loading, import/export operations
+- **Benefits**: Runtime type safety, data integrity assurance, graceful error handling
+
+### Domain-Specific Utilities
+
+**dateUtils.ts**
+- **Purpose**: Academic calendar and date operations
+- **Key Features**:
+  - Academic year calculation (starts in August)
+  - Semester determination based on current date
+  - Academic date range calculations
+  - WPI-specific academic calendar logic
+- **Used By**: Course filtering, schedule planning, data organization
+- **Domain Knowledge**: Encapsulates WPI's academic calendar specifics
+
+**departmentUtils.ts** 
+- **Purpose**: Department organization and categorization
+- **Key Features**:
+  - Department-to-category mapping (Science, Engineering, Business, etc.)
+  - Category-based department filtering
+  - WPI-specific department abbreviations
+- **Data**: Comprehensive mapping of 40+ WPI departments to logical categories
+- **Used By**: DepartmentController, search filtering, UI organization
+
+**termUtils.ts** (Legacy Support)
+- **Purpose**: Academic term extraction and formatting 
+- **Status**: Marked deprecated but kept for testing and legacy support
+- **Functions**: `extractTermLetter()`, `formatTermName()`, `isValidTermLetter()`
+- **Usage**: Primarily in tests and Java converter integration
+
+### Utility Architecture Patterns
+
+#### Cross-Cutting Concerns Pattern
+```
+Performance Monitoring:
+Any Operation → PerformanceMetrics → Metrics Collection → Optimization Insights
+
+Cancellation Pattern:  
+User Action → CancellationTokenSource → CancellationToken → Operation Cancellation
+
+Validation Pipeline:
+Data Input → Validators → Type-Safe Data → Application Processing
+```
+
+#### Domain Knowledge Encapsulation
+```
+WPI-Specific Logic:
+Academic Calendar → dateUtils → Standard Date Operations
+Department Structure → departmentUtils → UI Organization  
+Term System → termUtils → Legacy/Test Support
+```
+
+### Integration with Application Layers
+
+**Core Layer Integration:**
+- Validators ensure data integrity for ProfileStateManager
+- Performance metrics monitor ConflictDetector operations
+- Date utilities support academic term processing
+
+**Services Layer Integration:**  
+- Cancellation tokens prevent resource waste in SearchService
+- Performance metrics track CourseSelectionService operations
+- Validators ensure data quality in all service operations
+
+**UI Layer Integration:**
+- Performance metrics optimize ProgressiveRenderer batch sizes
+- Cancellation tokens prevent outdated UI updates
+- Department utilities organize DepartmentController displays
+
+### Key Utility Benefits
+
+- **Performance Optimization**: Real-time metrics enable continuous performance improvement
+- **Resource Management**: Cancellation system prevents wasted computation
+- **Data Integrity**: Comprehensive validation ensures application stability
+- **Domain Expertise**: WPI-specific logic centralized and maintainable
+- **Cross-Layer Support**: Utilities serve all application layers consistently
+- **Testing Support**: Validation and metrics enable robust testing strategies
+
 ## Next Sections
 
-- Utilities & Helper Functions
 - Type System & Data Models

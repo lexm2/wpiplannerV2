@@ -220,9 +220,7 @@
 
 /* Schedule Item Menu */
 .schedule-item-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
+    position: fixed;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: 6px;
