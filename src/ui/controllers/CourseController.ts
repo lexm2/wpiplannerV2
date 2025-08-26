@@ -168,7 +168,6 @@ export class CourseController {
     private allCoursesToDisplay: Course[] = [];
     private displayedCourses: Course[] = [];
     private readonly INITIAL_PAGE_SIZE = 100;
-    private currentPageSize: number = this.INITIAL_PAGE_SIZE;
     private hasMore: boolean = false;
 
     constructor(courseSelectionService: CourseSelectionService) {
@@ -218,7 +217,6 @@ export class CourseController {
     // Pagination management methods
     private resetPagination(): void {
         this.displayedCourses = [];
-        this.currentPageSize = this.INITIAL_PAGE_SIZE;
         this.hasMore = false;
     }
 
@@ -226,7 +224,6 @@ export class CourseController {
         this.allCoursesToDisplay = courses;
         this.displayedCourses = courses.slice(0, this.INITIAL_PAGE_SIZE);
         this.hasMore = courses.length > this.INITIAL_PAGE_SIZE;
-        this.currentPageSize = Math.min(this.INITIAL_PAGE_SIZE, courses.length);
     }
 
     loadMoreCourses(): void {
@@ -349,11 +346,6 @@ export class CourseController {
         this.addLoadMoreButton();
     }
 
-    private courseHasWarning(course: Course): boolean {
-        // Check if ALL sections are fully enrolled (no available options)
-        return course.sections.every(section => section.seatsAvailable <= 0);
-    }
-
     handleSearch(query: string, selectedDepartment: Department | null): Course[] {
         const baseCourses = selectedDepartment ? selectedDepartment.courses : this.getAllCourses();
         
@@ -454,25 +446,25 @@ export class CourseController {
 
         try {
             // Show immediate optimistic feedback
-            this.updateCourseUIById(course.id, !wasSelected, true);
+            this.updateCourseUIById(course.id, !wasSelected);
             
             const result = await this.courseSelectionService.toggleCourseSelection(course);
             const newSelection = result.success && result.course !== undefined;
             
             // Update to final state (removes optimistic feedback)
-            this.updateCourseUIById(course.id, newSelection, false);
+            this.updateCourseUIById(course.id, newSelection);
             
             return newSelection;
         } catch (error) {
             console.error('Error toggling course selection:', error);
             // Rollback optimistic change on error
-            this.updateCourseUIById(course.id, wasSelected, false);
+            this.updateCourseUIById(course.id, wasSelected);
             return false;
         }
     }
 
 
-    private updateCourseSelectionUI(element: HTMLElement, isSelected: boolean, showOptimisticFeedback: boolean = false): void {
+    private updateCourseSelectionUI(element: HTMLElement, isSelected: boolean): void {
         const selectBtn = element.querySelector('.course-select-btn');
         
         if (selectBtn) {
@@ -517,14 +509,13 @@ export class CourseController {
      * Enhanced: Provides instant visual feedback for optimistic UI
      * @param courseId The course ID to update
      * @param isSelected Whether the course is selected
-     * @param showOptimisticFeedback Show pending state indicators
      */
-    updateCourseUIById(courseId: string, isSelected: boolean, showOptimisticFeedback: boolean = false): void {
+    updateCourseUIById(courseId: string, isSelected: boolean): void {
         // Find all elements with this course ID using direct attribute selector
         const courseElements = document.querySelectorAll(`[data-course-id="${courseId}"]`);
         
         courseElements.forEach(element => {
-            this.updateCourseSelectionUI(element as HTMLElement, isSelected, showOptimisticFeedback);
+            this.updateCourseSelectionUI(element as HTMLElement, isSelected);
         });
     }
 
@@ -535,8 +526,8 @@ export class CourseController {
      * @param isSelected Whether the course is selected
      * @param showOptimisticFeedback Show pending state indicators
      */
-    updateCourseUIByCourse(course: Course, isSelected: boolean, showOptimisticFeedback: boolean = false): void {
-        this.updateCourseUIById(course.id, isSelected, showOptimisticFeedback);
+    updateCourseUIByCourse(course: Course, isSelected: boolean): void {
+        this.updateCourseUIById(course.id, isSelected);
     }
 
     private displayCourseDescription(course: Course): void {
