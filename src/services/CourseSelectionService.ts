@@ -304,6 +304,7 @@ export class CourseSelectionService {
             console.log('🚀 Initializing CourseSelectionService...');
 
             // Clear old course selections with legacy ID format
+            // TODO: Remove this call along with clearLegacyCourseSelections() method in future version
             this.clearLegacyCourseSelections();
 
             // Check and perform migrations if needed
@@ -950,6 +951,13 @@ export class CourseSelectionService {
         }
     }
 
+    /**
+     * @deprecated This method was added for migration from old course ID format (without department prefix)
+     * to new format (with department prefix like "CS-1101"). Once all users have migrated (after a few 
+     * releases), this method and its call in performInitialization() can be safely removed.
+     * 
+     * TODO: Remove this method in a future version (estimated: 2-3 releases after course ID format change)
+     */
     private clearLegacyCourseSelections(): void {
         try {
             // Check if there are any existing course selections

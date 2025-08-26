@@ -151,9 +151,7 @@ import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek } from
 
 export class CourseDataService {
     private static readonly WPI_COURSE_DATA_URL = './course-data-constructed.json';
-    private static readonly LOCAL_STORAGE_KEY = 'wpi-course-data';
-    private static readonly CACHE_EXPIRY_HOURS = 1;
-
+    
     private scheduleDB: ScheduleDB | null = null;
 
     constructor() {}
@@ -193,16 +191,11 @@ export class CourseDataService {
             console.error('Invalid JSON data structure:', jsonData);
             throw new Error('Invalid JSON data structure - missing departments array');
         }
-
         
         const scheduleDB: ScheduleDB = {
             departments: this.parseConstructedDepartments(jsonData.departments),
             generated: jsonData.generated || new Date().toISOString()
         };
-        
-        
-        // Log sections for MA1024 specifically
-        this.logMA1024Sections(scheduleDB);
         
         return scheduleDB;
     }
@@ -321,57 +314,10 @@ export class CourseDataService {
         return daySet;
     }
 
-    private logMA1024Sections(scheduleDB: ScheduleDB): void {
-        // Debug logging method - keeping for development purposes but not logging on boot
-    }
-
-
-
     private stripHtml(html: string): string {
         return html.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim();
     }
 
-
-
-    private getCachedData(): ScheduleDB | null {
-        try {
-            const cached = localStorage.getItem(CourseDataService.LOCAL_STORAGE_KEY);
-            if (!cached) return null;
-
-            const parsedData = JSON.parse(cached);
-            return parsedData.scheduleDB;
-        } catch (error) {
-            console.warn('Failed to parse cached course data:', error);
-            return null;
-        }
-    }
-
-    private cacheData(scheduleDB: ScheduleDB): void {
-        try {
-            const cacheData = {
-                scheduleDB,
-                timestamp: Date.now()
-            };
-            localStorage.setItem(CourseDataService.LOCAL_STORAGE_KEY, JSON.stringify(cacheData));
-        } catch (error) {
-            console.warn('Failed to cache course data:', error);
-        }
-    }
-
-    private isCacheExpired(): boolean {
-        try {
-            const cached = localStorage.getItem(CourseDataService.LOCAL_STORAGE_KEY);
-            if (!cached) return true;
-
-            const parsedData = JSON.parse(cached);
-            const cacheAge = Date.now() - parsedData.timestamp;
-            const maxAge = CourseDataService.CACHE_EXPIRY_HOURS * 60 * 60 * 1000;
-            
-            return cacheAge > maxAge;
-        } catch (error) {
-            return true;
-        }
-    }
 
     getScheduleDB(): ScheduleDB | null {
         return this.scheduleDB;
