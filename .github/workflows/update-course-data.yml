@@ -40,7 +40,7 @@ jobs:
       - name: Run course data converter
         run: |
           cd WorkdayToPlannerConverter-master
-          java -cp "lib/json-simple-1.1.1.jar:src" jsonToXml.Converter
+          java -cp "lib/json-simple-1.1.1.jar:bin" jsonToXml.Converter
       
       - name: Check for changes
         id: changes
