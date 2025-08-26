@@ -145,7 +145,7 @@ import { ThemeManager } from '../../themes/ThemeManager'
  */
 export class MainController {
     private courseDataService: CourseDataService;
-    private themeSelector: ThemeSelector;
+    private themeSelector: ThemeSelector; // This needs to be constructed dont remove
     private scheduleSelector: ScheduleSelector | null = null;
     private profileStateManager: ProfileStateManager;
     private courseSelectionService: CourseSelectionService;
