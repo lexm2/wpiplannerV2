@@ -303,6 +303,9 @@ export class CourseSelectionService {
         try {
             console.log('🚀 Initializing CourseSelectionService...');
 
+            // Clear old course selections with legacy ID format
+            this.clearLegacyCourseSelections();
+
             // Check and perform migrations if needed
             const migrationResult = await this.checkAndPerformMigrations();
             if (!migrationResult) {
@@ -947,8 +950,33 @@ export class CourseSelectionService {
         }
     }
 
-
-
+    private clearLegacyCourseSelections(): void {
+        try {
+            // Check if there are any existing course selections
+            const existingSelections = localStorage.getItem('wpi-planner-selected-courses');
+            if (existingSelections) {
+                // Parse to check if they use the old ID format (no department prefix)
+                const selections = JSON.parse(existingSelections);
+                if (Array.isArray(selections) && selections.length > 0) {
+                    const hasLegacyIds = selections.some((sc: any) => 
+                        sc.course && sc.course.id && !sc.course.id.includes('-')
+                    );
+                    
+                    if (hasLegacyIds) {
+                        console.log('🧹 Clearing legacy course selections with old ID format...');
+                        localStorage.removeItem('wpi-planner-selected-courses');
+                        localStorage.removeItem('wpi-planner-user-state');
+                        localStorage.removeItem('wpi-planner-schedules');
+                        console.log('✅ Legacy course selections cleared');
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ Error clearing legacy course selections:', error);
+            // If there's any error parsing, just clear it to be safe
+            localStorage.removeItem('wpi-planner-selected-courses');
+        }
+    }
 
     // Debug methods
     debugState(): void {

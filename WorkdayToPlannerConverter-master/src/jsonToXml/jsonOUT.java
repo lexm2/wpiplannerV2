@@ -32,7 +32,7 @@ public class jsonOUT {
 				// Process each course in the department
 				for (course thisCourse : department.getCourses()) {
 					JSONObject courseObj = new JSONObject();
-					courseObj.put("id", thisCourse.getNumber());
+					courseObj.put("id", department.getAbbrev() + "-" + thisCourse.getNumber());
 					courseObj.put("number", thisCourse.getNumber());
 					courseObj.put("name", thisCourse.getName());
 					courseObj.put("description", thisCourse.getCourseDesc());

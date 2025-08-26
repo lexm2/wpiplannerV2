@@ -56,7 +56,6 @@
  * - parseConstructedPeriods() creates period objects with time/location data
  * 
  * Data Quality Management:
- * - Duplicate course ID detection and automatic resolution with fallback strategies
  * - HTML stripping from descriptions ensuring clean text presentation
  * - Time parsing with multiple format support (24-hour to 12-hour conversion)
  * - Day-of-week normalization for consistent scheduling representation
@@ -93,7 +92,6 @@
  * Data Quality Assurance:
  * - JSON structure validation preventing application crashes
  * - Missing field handling with sensible defaults
- * - Duplicate course ID resolution with automatic fallback generation
  * - HTML content sanitization for security and presentation
  * 
  * SEARCH & DISCOVERY CAPABILITIES:
@@ -114,10 +112,8 @@
  * - Consistent day representation across scheduling components
  * 
  * Course ID Management:
- * - Automatic duplicate detection using Set-based tracking
- * - Fallback ID generation (Department-Number format)
- * - Counter-based uniqueness ensuring no data loss
- * - Comprehensive logging for duplicate resolution audit trails
+ * - Department-prefixed unique course IDs (generated at source)
+ * - Consistent ID format: "DEPARTMENT-NUMBER" (e.g., "CS-1101")
  * 
  * CACHE MANAGEMENT STRATEGY:
  * - Strategic 1-hour expiry balancing freshness and performance
@@ -140,7 +136,7 @@
  * - Clean data transformation ensuring consistent application behavior
  * - Search capabilities enabling effective course discovery
  * - Offline support through strategic cache utilization
- * - Data quality assurance preventing duplicate and malformed data issues
+ * - Data quality assurance preventing malformed data issues
  * 
  * INTEGRATION NOTES:
  * - Designed as foundational data service for entire application
@@ -212,12 +208,7 @@ export class CourseDataService {
     }
 
     private parseConstructedDepartments(departments: any[]): Department[] {
-        const seenIds = new Set<string>();
-        const duplicateIds = new Set<string>();
-        let totalCoursesProcessed = 0;
-        let duplicatesFixed = 0;
-        
-        const result = departments.map(deptData => {
+        return departments.map(deptData => {
             const department: Department = {
                 abbreviation: deptData.abbreviation,
                 name: deptData.name,
@@ -225,30 +216,8 @@ export class CourseDataService {
             };
             
             department.courses = deptData.courses.map((courseData: any) => {
-                totalCoursesProcessed++;
-                let courseId = courseData.id;
-                
-                // Check for duplicate ID
-                if (seenIds.has(courseId)) {
-                    duplicateIds.add(courseId);
-                    const fallbackId = `${department.abbreviation}-${courseData.number}`;
-                    console.warn(`🔍 Duplicate course ID detected: "${courseId}" for ${department.abbreviation}${courseData.number}`);
-                    console.warn(`   Using fallback ID: "${fallbackId}"`);
-                    courseId = fallbackId;
-                    duplicatesFixed++;
-                    
-                    // If fallback is also duplicate, add a counter
-                    let counter = 2;
-                    while (seenIds.has(courseId)) {
-                        courseId = `${fallbackId}-${counter}`;
-                        counter++;
-                    }
-                }
-                
-                seenIds.add(courseId);
-                
                 const course: Course = {
-                    id: courseId,
+                    id: courseData.id,
                     number: courseData.number,
                     name: courseData.name,
                     description: this.stripHtml(courseData.description || ''),
@@ -262,18 +231,6 @@ export class CourseDataService {
             
             return department;
         });
-        
-        // Log summary of duplicate ID fixes
-        if (duplicatesFixed > 0) {
-            console.log(`📋 Course ID Deduplication Summary:`);
-            console.log(`   Total courses processed: ${totalCoursesProcessed}`);
-            console.log(`   Duplicate IDs fixed: ${duplicatesFixed}`);
-            console.log(`   Affected original IDs: [${Array.from(duplicateIds).join(', ')}]`);
-        } else {
-            console.log(`✅ Course ID validation complete: ${totalCoursesProcessed} courses, no duplicates found`);
-        }
-        
-        return result;
     }
 
     private parseConstructedSections(sections: any[]): Section[] {
