@@ -9,7 +9,7 @@ import { ActiveFilter, FilterChangeEvent, FilterEventListener, FilterCriteria } 
  * - Core state management foundation for the comprehensive filtering system
  * - Event-driven filter coordination hub with real-time notifications
  * - Selective serialization engine preventing transient filter persistence
- * - Foundation layer supporting FilterService and UI filter interactions
+ * - Foundation layer supporting CourseFilterService and UI filter interactions
  * - Centralized filter lifecycle management (add, update, remove, clear)
  * 
  * KEY DEPENDENCIES:
@@ -26,8 +26,8 @@ import { ActiveFilter, FilterChangeEvent, FilterEventListener, FilterCriteria } 
  * - Memory efficient → Map-based storage with proper cleanup
  * 
  * USED BY:
- * - FilterService → Primary state coordinator and service layer bridge
- * - UI Controllers → Indirect access through FilterService events
+ * - CourseFilterService → Primary state coordinator and service layer bridge
+ * - UI Controllers → Indirect access through CourseFilterService events
  * - FilterModalController → Real-time filter state updates and display
  * - ScheduleFilterService → Specialized schedule filter state management
  * - Persistence System → Selective serialization for localStorage operations
@@ -79,7 +79,7 @@ import { ActiveFilter, FilterChangeEvent, FilterEventListener, FilterCriteria } 
  * - 'clear': All filters removed
  * 
  * Cross-Component Updates:
- * FilterState Event → FilterService → UI Controllers → DOM Updates
+ * FilterState Event → CourseFilterService → UI Controllers → DOM Updates
  * ```
  * 
  * DESERIALIZATION WITH EXCLUSION:
@@ -120,7 +120,7 @@ import { ActiveFilter, FilterChangeEvent, FilterEventListener, FilterCriteria } 
  * ```
  * 
  * INTEGRATION POINTS:
- * - FilterService coordination through event system
+ * - CourseFilterService coordination through event system
  * - localStorage integration via selective serialization
  * - UI component updates through event notifications
  * - State validation through type-safe interfaces

@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'vitest'
-import { FilterService } from '../../src/services/FilterService'
+import { CourseFilterService } from '../../src/services/CourseFilterService'
 import { SearchService } from '../../src/services/searchService'
 import { CourseSelectionService } from '../../src/services/CourseSelectionService'
 import { ConflictDetector } from '../../src/core/ConflictDetector'
@@ -18,7 +18,7 @@ import {
 } from '../helpers/mockData'
 
 describe('AvailabilityFilter Integration', () => {
-  let filterService: FilterService
+  let filterService: CourseFilterService
   let searchService: SearchService
   let courseSelectionService: CourseSelectionService
   let conflictDetector: ConflictDetector
@@ -28,7 +28,7 @@ describe('AvailabilityFilter Integration', () => {
     searchService = new SearchService()
     courseSelectionService = new CourseSelectionService()
     conflictDetector = new ConflictDetector()
-    filterService = new FilterService(searchService, courseSelectionService)
+    filterService = new CourseFilterService(searchService, courseSelectionService)
 
     // Initialize course selection service
     await courseSelectionService.initialize()

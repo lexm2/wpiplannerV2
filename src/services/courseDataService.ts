@@ -21,7 +21,7 @@
  * USED BY:
  * - MainController → Application initialization and primary data loading coordination
  * - SearchService → Course search indexing and search result preparation
- * - FilterService → Course filtering and discovery operations
+ * - CourseFilterService → Course filtering and discovery operations
  * - Data refresh systems → Periodic updates and cache invalidation management
  * - Application startup → Initial course database loading and availability verification
  * 
@@ -69,7 +69,7 @@
  * INTEGRATION PATTERNS:
  * Service Layer Coordination:
  * - Provides foundation data for SearchService indexing operations
- * - Supplies course catalog for FilterService filtering operations
+ * - Supplies course catalog for CourseFilterService filtering operations
  * - Integrates with application initialization via MainController
  * - Supports data refresh workflows with cache invalidation
  * 

@@ -6,7 +6,7 @@ import { CourseSelectionService } from './CourseSelectionService';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * FilterService - Central Filtering Coordination & Selective Persistence Manager
+ * CourseFilterService - Central Filtering Coordination & Selective Persistence Manager
  * ═══════════════════════════════════════════════════════════════════════════════
  * 
  * ARCHITECTURE ROLE:
@@ -70,9 +70,9 @@ import { CourseSelectionService } from './CourseSelectionService';
  *    - Combined filtering through filterCourses() optimizes performance
  * 
  * 3. Search Integration:
- *    - searchAndFilter() combines text search with active filters
+ *    - SearchTextFilter handles text-based course filtering
  *    - SearchService provides full-text indexing and ranking
- *    - Search text automatically managed as transient 'searchText' filter
+ *    - Search text managed as standard filter through normal pipeline
  * 
  * 4. Persistence Coordination:
  *    - Selective saveFiltersToStorage() excludes search/department
@@ -82,10 +82,10 @@ import { CourseSelectionService } from './CourseSelectionService';
  * DATA FLOW ARCHITECTURE:
  * ```
  * User Interaction:
- * UI Component → FilterService.addFilter() → FilterState → Event → UI Updates
+ * UI Component → CourseFilterService.addFilter() → FilterState → Event → UI Updates
  * 
  * Search Flow:
- * Search Input → searchAndFilter() → addFilter('searchText') → filterCourses() → Results
+ * Search Input → addFilter('searchText') → filterCourses() → Results
  * 
  * Persistence Flow:
  * Filter Changes → saveFiltersToStorage() → serialize(excludeList) → localStorage
@@ -124,7 +124,7 @@ import { CourseSelectionService } from './CourseSelectionService';
  * 
  * ═══════════════════════════════════════════════════════════════════════════════
  */
-export class FilterService {
+export class CourseFilterService {
     private filterState: FilterState;
     private registeredFilters: Map<string, CourseFilter> = new Map();
     private searchService: SearchService;
@@ -231,40 +231,17 @@ export class FilterService {
         let filteredCourses = courses;
         const activeFilters = this.getActiveFilters();
         
-        // Apply search text filter first if it exists (for better performance)
-        const searchTextFilter = activeFilters.find(f => f.id === 'searchText');
-        if (searchTextFilter) {
-            const filter = this.registeredFilters.get(searchTextFilter.id);
-            if (filter) {
-                filteredCourses = filter.apply(filteredCourses, searchTextFilter.criteria);
-            }
-        }
-        
-        // Apply remaining filters sequentially
+        // Apply all filters sequentially
         for (const activeFilter of activeFilters) {
-            if (activeFilter.id !== 'searchText') { // Skip searchText as it's already applied
-                const filter = this.registeredFilters.get(activeFilter.id);
-                if (filter) {
-                    filteredCourses = filter.apply(filteredCourses, activeFilter.criteria);
-                }
+            const filter = this.registeredFilters.get(activeFilter.id);
+            if (filter) {
+                filteredCourses = filter.apply(filteredCourses, activeFilter.criteria);
             }
         }
         
         return filteredCourses;
     }
     
-    // Combined Search and Filter
-    searchAndFilter(query: string, courses: Course[]): Course[] {
-        // If there's a query, add/update the search text filter
-        if (query.trim()) {
-            this.addFilter('searchText', { query: query.trim() });
-        } else {
-            this.removeFilter('searchText');
-        }
-        
-        // Apply all filters (including search text if present)
-        return this.filterCourses(courses);
-    }
     
     // Event Handling
     addEventListener(listener: FilterEventListener): void {

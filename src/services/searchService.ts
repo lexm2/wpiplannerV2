@@ -18,7 +18,7 @@
  * - Course database from CourseDataService → Foundation data for indexing
  * 
  * USED BY:
- * - FilterService → Core filtering operations and search integration
+ * - CourseFilterService → Core filtering operations and search integration
  * - SearchTextFilter → Text-based course filtering implementation
  * - UI search components → Real-time search functionality
  * - FilterModalController → Advanced search and filtering interface
@@ -114,7 +114,7 @@
  * - Course popularity and enrollment data integration
  * 
  * INTEGRATION PATTERNS:
- * FilterService Integration:
+ * CourseFilterService Integration:
  * - Provides foundation search capabilities for filtering system
  * - Integrates with SearchTextFilter for text-based filtering
  * - Supports FilterModalController advanced search interface
@@ -154,7 +154,7 @@
  * - Extensible search architecture supporting future enhancements
  * 
  * INTEGRATION NOTES:
- * - Designed for integration with FilterService and UI components
+ * - Designed for integration with CourseFilterService and UI components
  * - Supports CourseDataService data format and update patterns
  * - Provides foundation for advanced filtering and discovery features
  * - Enables real-time search experiences with performance optimization

@@ -1,20 +1,20 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { PeriodConflictFilter } from '../../../src/core/filters/PeriodConflictFilter';
 import { ConflictDetector } from '../../../src/core/ConflictDetector';
-import { FilterService } from '../../../src/services/FilterService';
+import { CourseFilterService } from '../../../src/services/CourseFilterService';
 import { SearchService } from '../../../src/services/searchService';
 
 describe('PeriodConflictFilter Registration', () => {
     let conflictDetector: ConflictDetector;
     let periodConflictFilter: PeriodConflictFilter;
-    let filterService: FilterService;
+    let filterService: CourseFilterService;
     let searchService: SearchService;
 
     beforeEach(() => {
         conflictDetector = new ConflictDetector();
         periodConflictFilter = new PeriodConflictFilter(conflictDetector);
         searchService = new SearchService();
-        filterService = new FilterService(searchService);
+        filterService = new CourseFilterService(searchService);
     });
 
     test('should implement CourseFilter interface correctly', () => {

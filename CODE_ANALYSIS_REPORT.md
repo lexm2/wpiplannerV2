@@ -157,9 +157,9 @@ The services layer provides high-level business logic coordination and external 
 - **Purpose**: Full-text search across courses, professors, and course content
 - **Key Features**: Search indexing, ranking algorithms, caching
 - **Performance**: Pre-built indexes for fast search on large datasets
-- **Used By**: FilterService, SearchTextFilter, UI search components
+- **Used By**: CourseFilterService, SearchTextFilter, UI search components
 
-**FilterService.ts**
+**CourseFilterService.ts**
 - **Purpose**: Coordinating service for the filtering system
 - **Dependencies**: SearchService, FilterState (core)
 - **Connections**: Used by ScheduleFilterService and FilterModalController
@@ -168,13 +168,13 @@ The services layer provides high-level business logic coordination and external 
 
 **ScheduleFilterService.ts**
 - **Purpose**: Specialized filtering for schedule generation and conflict detection
-- **Dependencies**: FilterService, SearchService, ConflictDetector
+- **Dependencies**: CourseFilterService, SearchService, ConflictDetector
 - **Filter Types**: PeriodConflictFilter, PeriodDaysFilter, PeriodTypeFilter
 - **Used By**: ScheduleController for generating valid schedules
 
 **DepartmentSyncService.ts**
 - **Purpose**: Synchronizes department selection between UI components
-- **Connections**: FilterService ↔ DepartmentController ↔ FilterModalController
+- **Connections**: CourseFilterService ↔ DepartmentController ↔ FilterModalController
 - **Key Features**: Prevents circular updates, maintains UI consistency
 - **Architecture Role**: Coordination layer preventing tight coupling between UI components
 
@@ -190,7 +190,7 @@ The services layer provides high-level business logic coordination and external 
 
 ```
 Data Flow:
-courseDataService → SearchService → FilterService → UI Controllers
+courseDataService → SearchService → CourseFilterService → UI Controllers
                  → CourseSelectionService → ScheduleManagementService
 
 Storage Flow:
@@ -232,7 +232,7 @@ The UI layer implements the Model-View-Controller (MVC) pattern with specialized
   - Performance monitoring and metrics collection
   - Pagination with dynamic page sizing
   - WeakMap-based element-to-course mapping for memory efficiency
-- **Service Integration**: CourseSelectionService, FilterService
+- **Service Integration**: CourseSelectionService, CourseFilterService
 - **Performance**: Optimized for datasets of 1000+ courses
 
 **ScheduleController.ts** - Schedule Visualization & Management  
@@ -254,7 +254,7 @@ The UI layer implements the Model-View-Controller (MVC) pattern with specialized
 
 **FilterModalController.ts** - Advanced Filtering Interface  
 - **Purpose**: Provides comprehensive filtering UI for course discovery
-- **Integration**: FilterService, SearchService coordination
+- **Integration**: CourseFilterService, SearchService coordination
 - **Features**: Multi-criteria filtering, real-time filter application
 
 **ScheduleFilterModalController.ts** - Schedule-Specific Filtering
@@ -312,8 +312,8 @@ The UI layer implements the Model-View-Controller (MVC) pattern with specialized
 #### Controller Coordination Pattern
 ```
 MainController (Orchestrator)
-    ├── DepartmentController ←→ DepartmentSyncService ←→ FilterService  
-    ├── CourseController ←→ FilterService ←→ SearchService
+    ├── DepartmentController ←→ DepartmentSyncService ←→ CourseFilterService  
+    ├── CourseController ←→ CourseFilterService ←→ SearchService
     ├── ScheduleController ←→ ScheduleFilterService ←→ ConflictDetector
     └── Modal Controllers ←→ ModalService (z-index management)
 ```
@@ -354,7 +354,7 @@ The utilities layer provides cross-cutting concerns and specialized helper funct
   - Performance reports with averages, min/max durations
   - Specialized filtering/rendering performance metrics
   - Configurable metrics retention (default: last 100 operations)
-- **Used By**: CourseController, ProgressiveRenderer, FilterService
+- **Used By**: CourseController, ProgressiveRenderer, CourseFilterService
 - **Benefits**: Performance bottleneck identification, optimization validation
 
 **RequestCancellation.ts**

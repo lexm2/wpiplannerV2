@@ -1,6 +1,6 @@
 import { Period, Section } from '../types/types';
 import { SelectedCourse } from '../types/schedule';
-import { FilterService } from './FilterService';
+import { CourseFilterService } from './CourseFilterService';
 import { SearchService } from './searchService';
 import { CourseSelectionFilter } from '../core/filters/CourseSelectionFilter';
 import { PeriodDaysFilter } from '../core/filters/PeriodDaysFilter';
@@ -107,7 +107,7 @@ import { SectionStatusFilter } from '../core/filters/SectionStatusFilter';
  */
 
 export class ScheduleFilterService {
-    private filterService: FilterService;
+    private filterService: CourseFilterService;
     private registeredSectionFilters: Map<string, SectionFilter> = new Map();
     private registeredSelectedCourseFilters: Map<string, SelectedCourseFilter> = new Map();
     private courseSelectionFilter: CourseSelectionFilter;
@@ -122,7 +122,7 @@ export class ScheduleFilterService {
     private sectionStatusFilter: SectionStatusFilter;
     
     constructor(searchService: SearchService) {
-        this.filterService = new FilterService(searchService);
+        this.filterService = new CourseFilterService(searchService);
         this.courseSelectionFilter = new CourseSelectionFilter();
         this.periodDaysFilter = new PeriodDaysFilter();
         this.periodProfessorFilter = new PeriodProfessorFilter();
@@ -250,15 +250,37 @@ export class ScheduleFilterService {
         // Get all periods from selected courses  
         let allPeriods = this.getAllPeriodsWithContext(coursesToSearch);
         
-        // Apply search text filter to periods (search course name, professor, etc.)
-        const searchTextFilter = activeFilters.find(f => f.id === 'searchText');
-        if (searchTextFilter) {
-            allPeriods = this.applySearchTextToPeriods(allPeriods, searchTextFilter.criteria.query);
-        }
-        
         // Apply period-based filters
         for (const activeFilter of activeFilters) {
             switch (activeFilter.id) {
+                case 'searchText':
+                    // Handle search text by filtering periods based on course/period content
+                    const query = activeFilter.criteria.query?.toLowerCase().trim();
+                    if (query) {
+                        allPeriods = allPeriods.filter(item => {
+                            const course = item.course.course;
+                            const period = item.period;
+                            
+                            // Search in course info
+                            if (course.name.toLowerCase().includes(query) ||
+                                course.number.toLowerCase().includes(query) ||
+                                course.department.abbreviation.toLowerCase().includes(query)) {
+                                return true;
+                            }
+                            
+                            // Search in period info  
+                            if (period.professor.toLowerCase().includes(query) ||
+                                period.type.toLowerCase().includes(query) ||
+                                period.building.toLowerCase().includes(query) ||
+                                period.room.toLowerCase().includes(query) ||
+                                period.location.toLowerCase().includes(query)) {
+                                return true;
+                            }
+                            
+                            return false;
+                        });
+                    }
+                    break;
                 case 'periodDays':
                     // Exclude periods that are on excluded days
                     const excludedDaysForPeriods = new Set(activeFilter.criteria.days.map((day: string) => day.toLowerCase()));
@@ -379,37 +401,6 @@ export class ScheduleFilterService {
         return periodsWithContext;
     }
     
-    // Apply search text to periods
-    private applySearchTextToPeriods(periodsWithContext: Array<{course: SelectedCourse, period: Period}>, query: string): Array<{course: SelectedCourse, period: Period}> {
-        if (!query || !query.trim()) {
-            return periodsWithContext;
-        }
-        
-        const searchQuery = query.toLowerCase().trim();
-        
-        return periodsWithContext.filter(item => {
-            const course = item.course.course;
-            const period = item.period;
-            
-            // Search in course info
-            if (course.name.toLowerCase().includes(searchQuery) ||
-                course.number.toLowerCase().includes(searchQuery) ||
-                course.department.abbreviation.toLowerCase().includes(searchQuery)) {
-                return true;
-            }
-            
-            // Search in period info  
-            if (period.professor.toLowerCase().includes(searchQuery) ||
-                period.type.toLowerCase().includes(searchQuery) ||
-                period.building.toLowerCase().includes(searchQuery) ||
-                period.room.toLowerCase().includes(searchQuery) ||
-                period.location.toLowerCase().includes(searchQuery)) {
-                return true;
-            }
-            
-            return false;
-        });
-    }
     
     // Section-based filtering method - returns filtered sections with course context
     filterSections(selectedCourses: SelectedCourse[]): Array<{course: SelectedCourse, section: Section}> {
@@ -438,15 +429,40 @@ export class ScheduleFilterService {
             allSections = this.applySectionCodeFilter(allSections, sectionCodeFilter.criteria.codes);
         }
         
-        // Apply search text filter to sections (search course name, professor, etc.)
-        const searchTextFilter = activeFilters.find(f => f.id === 'searchText');
-        if (searchTextFilter) {
-            allSections = this.applySearchTextToSections(allSections, searchTextFilter.criteria.query);
-        }
         
         // Apply section-based filters using the registered SectionFilter implementations
         for (const activeFilter of activeFilters) {
-            if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
+            if (activeFilter.id === 'searchText') {
+                // Handle search text by filtering sections based on course/section content
+                const query = activeFilter.criteria.query?.toLowerCase().trim();
+                if (query) {
+                    allSections = allSections.filter(item => {
+                        const course = item.course.course;
+                        const section = item.section;
+                        
+                        // Search in course info
+                        if (course.name.toLowerCase().includes(query) ||
+                            course.number.toLowerCase().includes(query) ||
+                            course.department.abbreviation.toLowerCase().includes(query)) {
+                            return true;
+                        }
+                        
+                        // Search in section number
+                        if (section.number.toLowerCase().includes(query)) {
+                            return true;
+                        }
+                        
+                        // Search in any period info within the section
+                        return section.periods.some(period =>
+                            period.professor.toLowerCase().includes(query) ||
+                            period.type.toLowerCase().includes(query) ||
+                            period.building.toLowerCase().includes(query) ||
+                            period.room.toLowerCase().includes(query) ||
+                            period.location.toLowerCase().includes(query)
+                        );
+                    });
+                }
+            } else if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
                 // Special handling for conflict filter which needs additional context
                 allSections = this.periodConflictFilter.applyToSectionsWithContext(allSections, {
                     ...activeFilter.criteria,
@@ -571,40 +587,6 @@ export class ScheduleFilterService {
         });
     }
     
-    // Apply search text to sections
-    private applySearchTextToSections(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, query: string): Array<{course: SelectedCourse, section: Section}> {
-        if (!query || !query.trim()) {
-            return sectionsWithContext;
-        }
-        
-        const searchQuery = query.toLowerCase().trim();
-        
-        return sectionsWithContext.filter(item => {
-            const course = item.course.course;
-            const section = item.section;
-            
-            // Search in course info
-            if (course.name.toLowerCase().includes(searchQuery) ||
-                course.number.toLowerCase().includes(searchQuery) ||
-                course.department.abbreviation.toLowerCase().includes(searchQuery)) {
-                return true;
-            }
-            
-            // Search in section number
-            if (section.number.toLowerCase().includes(searchQuery)) {
-                return true;
-            }
-            
-            // Search in any period info within the section
-            return section.periods.some(period =>
-                period.professor.toLowerCase().includes(searchQuery) ||
-                period.type.toLowerCase().includes(searchQuery) ||
-                period.building.toLowerCase().includes(searchQuery) ||
-                period.room.toLowerCase().includes(searchQuery) ||
-                period.location.toLowerCase().includes(searchQuery)
-            );
-        });
-    }
     
     private getAvailableProfessors(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
         const professors = new Set<string>();

@@ -148,7 +148,7 @@
  * 
  * ═══════════════════════════════════════════════════════════════════════════════
  */
-import { FilterService } from './FilterService';
+import { CourseFilterService } from './CourseFilterService';
 import { DepartmentController } from '../ui/controllers/DepartmentController';
 import { FilterModalController } from '../ui/controllers/FilterModalController';
 
@@ -157,13 +157,13 @@ export interface DepartmentSyncEventListener {
 }
 
 export class DepartmentSyncService {
-    private filterService: FilterService;
+    private filterService: CourseFilterService;
     private departmentController: DepartmentController;
     private filterModalController: FilterModalController | null = null;
     private listeners: DepartmentSyncEventListener[] = [];
     private isUpdating: boolean = false; // Prevent circular updates
 
-    constructor(filterService: FilterService, departmentController: DepartmentController) {
+    constructor(filterService: CourseFilterService, departmentController: DepartmentController) {
         this.filterService = filterService;
         this.departmentController = departmentController;
         

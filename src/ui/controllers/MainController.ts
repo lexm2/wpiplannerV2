@@ -13,7 +13,7 @@ import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { ScheduleFilterModalController } from './ScheduleFilterModalController'
-import { FilterService } from '../../services/FilterService'
+import { CourseFilterService } from '../../services/CourseFilterService'
 import { ScheduleFilterService } from '../../services/ScheduleFilterService'
 import { SearchService } from '../../services/searchService'
 import { createDefaultFilters, SearchTextFilter } from '../../core/filters'
@@ -159,7 +159,7 @@ export class MainController {
     private filterModalController: FilterModalController;
     private scheduleFilterModalController: ScheduleFilterModalController;
     private searchService: SearchService;
-    private filterService: FilterService;
+    private filterService: CourseFilterService;
     private scheduleFilterService: ScheduleFilterService;
     private uiStateManager: UIStateManager;
     private timestampManager: TimestampManager;
@@ -188,7 +188,7 @@ export class MainController {
         
         // Initialize search and filter services
         this.searchService = new SearchService();
-        this.filterService = new FilterService(this.searchService, this.courseSelectionService);
+        this.filterService = new CourseFilterService(this.searchService, this.courseSelectionService);
         this.scheduleFilterService = new ScheduleFilterService(this.searchService);
         
         // Initialize schedule management service with shared ProfileStateManager and CourseSelectionService
@@ -901,7 +901,7 @@ export class MainController {
         return this.courseSelectionService;
     }
 
-    public getFilterService(): FilterService {
+    public getFilterService(): CourseFilterService {
         return this.filterService;
     }
 

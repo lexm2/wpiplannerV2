@@ -1,6 +1,6 @@
 import { Course, Department } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
-import { FilterService } from '../../services/FilterService'
+import { CourseFilterService } from '../../services/CourseFilterService'
 import { ProgressiveRenderer, ProgressiveRenderOptions } from '../utils/ProgressiveRenderer'
 import { CancellationToken } from '../../utils/RequestCancellation'
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
@@ -159,7 +159,7 @@ export class CourseController {
     private allDepartments: Department[] = [];
     private selectedCourse: Course | null = null;
     private courseSelectionService: CourseSelectionService;
-    private filterService: FilterService | null = null;
+    private filterService: CourseFilterService | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private progressiveRenderer: ProgressiveRenderer;
     private performanceMetrics: PerformanceMetrics;
@@ -206,7 +206,7 @@ export class CourseController {
         this.progressiveRenderer = new ProgressiveRenderer(renderOptions);
     }
 
-    setFilterService(filterService: FilterService): void {
+    setFilterService(filterService: CourseFilterService): void {
         this.filterService = filterService;
     }
 
@@ -351,7 +351,14 @@ export class CourseController {
         
         // If we have a FilterService, use it for search and filtering
         if (this.filterService) {
-            const results = this.filterService.searchAndFilter(query, baseCourses);
+            // Handle search text filter
+            if (query.trim()) {
+                this.filterService.addFilter('searchText', { query: query.trim() });
+            } else {
+                this.filterService.removeFilter('searchText');
+            }
+            
+            const results = this.filterService.filterCourses(baseCourses);
             this.updateSearchHeader(query, results.length, selectedDepartment);
             return results;
         }

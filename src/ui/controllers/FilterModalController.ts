@@ -1,11 +1,11 @@
 import { ModalService } from '../../services/ModalService';
-import { FilterService } from '../../services/FilterService';
+import { CourseFilterService } from '../../services/CourseFilterService';
 import { Course, Department } from '../../types/types';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 
 export class FilterModalController {
     private modalService: ModalService;
-    private filterService: FilterService | null = null;
+    private filterService: CourseFilterService | null = null;
     private allCourses: Course[] = [];
     private allDepartments: Department[] = [];
     private currentModalId: string | null = null;
@@ -16,7 +16,7 @@ export class FilterModalController {
         this.modalService = modalService;
     }
 
-    setFilterService(filterService: FilterService): void {
+    setFilterService(filterService: CourseFilterService): void {
         this.filterService = filterService;
     }
 
