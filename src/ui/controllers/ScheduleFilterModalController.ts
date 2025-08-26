@@ -142,9 +142,10 @@ export class ScheduleFilterModalController {
                     <div class="filter-group">
                         <h4>Availability</h4>
                         <div class="filter-option">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="available-only-filter">
-                                <span class="checkbox-text">Available Seats Only</span>
+                            <label class="filter-toggle-label">
+                                <input type="checkbox" class="filter-toggle" id="available-only-filter">
+                                <span class="filter-toggle-slider"></span>
+                                <span class="filter-toggle-text">Available Seats Only</span>
                             </label>
                             <div class="min-seats-input" style="margin-top: 0.5rem;">
                                 <label>Minimum Available Seats:</label>
@@ -155,9 +156,10 @@ export class ScheduleFilterModalController {
                     <div class="filter-group">
                         <h4>Schedule Conflicts</h4>
                         <div class="filter-option">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="avoid-conflicts-filter">
-                                <span class="checkbox-text">Hide periods that conflict with selected sections</span>
+                            <label class="filter-toggle-label">
+                                <input type="checkbox" class="filter-toggle" id="avoid-conflicts-filter">
+                                <span class="filter-toggle-slider"></span>
+                                <span class="filter-toggle-text">Hide periods that conflict with selected sections</span>
                             </label>
                         </div>
                     </div>
@@ -197,10 +199,11 @@ export class ScheduleFilterModalController {
         const activeDays = this.getActiveDays();
 
         return dayOptions.map((option: any) => `
-            <label class="checkbox-label">
-                <input type="checkbox" name="periodDays" value="${option.value}" 
+            <label class="filter-toggle-label">
+                <input type="checkbox" class="filter-toggle" name="periodDays" value="${option.value}" 
                        ${activeDays.includes(option.value) ? 'checked' : ''}>
-                <span class="checkbox-text">${option.label}</span>
+                <span class="filter-toggle-slider"></span>
+                <span class="filter-toggle-text">${option.label}</span>
             </label>
         `).join('');
     }
@@ -241,10 +244,11 @@ export class ScheduleFilterModalController {
         }
 
         return typeOptions.map((option: any) => `
-            <label class="checkbox-label">
-                <input type="checkbox" name="periodType" value="${option.value}" 
+            <label class="filter-toggle-label">
+                <input type="checkbox" class="filter-toggle" name="periodType" value="${option.value}" 
                        ${activeTypes.includes(option.value) ? 'checked' : ''}>
-                <span class="checkbox-text">${option.label}</span>
+                <span class="filter-toggle-slider"></span>
+                <span class="filter-toggle-text">${option.label}</span>
             </label>
         `).join('');
     }
@@ -258,10 +262,11 @@ export class ScheduleFilterModalController {
         }
 
         return termOptions.map((option: any) => `
-            <label class="checkbox-label">
-                <input type="checkbox" name="periodTerm" value="${option.value}" 
+            <label class="filter-toggle-label">
+                <input type="checkbox" class="filter-toggle" name="periodTerm" value="${option.value}" 
                        ${activeTerms.includes(option.value) ? 'checked' : ''}>
-                <span class="checkbox-text">${option.label}</span>
+                <span class="filter-toggle-slider"></span>
+                <span class="filter-toggle-text">${option.label}</span>
             </label>
         `).join('');
     }

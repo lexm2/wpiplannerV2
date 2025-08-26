@@ -216,14 +216,12 @@ export class FilterModalController {
                     </div>
                 </div>
                 <div class="filter-section-content">
-                    <div class="filter-toggle-container">
-                        <label class="filter-toggle-label">
-                            <input type="checkbox" class="filter-toggle" ${this.isCategoryMode ? 'checked' : ''} 
-                                   id="category-mode-toggle">
-                            <span class="filter-toggle-slider"></span>
-                            <span class="filter-toggle-text">Search by Credit Requirements</span>
-                        </label>
-                    </div>
+                    <label class="filter-toggle-label">
+                        <input type="checkbox" class="filter-toggle" ${this.isCategoryMode ? 'checked' : ''} 
+                               id="category-mode-toggle">
+                        <span class="filter-toggle-slider"></span>
+                        <span class="filter-toggle-text">Search by Credit Requirements</span>
+                    </label>
                     <div class="filter-search-container">
                         <input type="text" class="filter-search" placeholder="${searchPlaceholder}" data-filter="department">
                     </div>
@@ -243,10 +241,11 @@ export class FilterModalController {
         const activeDepartments = activeFilter?.criteria?.departments || [];
 
         return departments.map(dept => `
-            <label class="filter-checkbox-label">
-                <input type="checkbox" value="${dept}" ${activeDepartments.includes(dept) ? 'checked' : ''} 
+            <label class="filter-toggle-label">
+                <input type="checkbox" class="filter-toggle" value="${dept}" ${activeDepartments.includes(dept) ? 'checked' : ''} 
                        data-filter="department">
-                <span class="filter-checkbox-text">${dept}</span>
+                <span class="filter-toggle-slider"></span>
+                <span class="filter-toggle-text">${dept}</span>
             </label>
         `).join('');
     }
@@ -353,10 +352,11 @@ export class FilterModalController {
         const activeTerms = activeFilter?.criteria?.terms || [];
 
         const termCheckboxes = terms.map(term => `
-            <label class="filter-checkbox-label term-checkbox">
-                <input type="checkbox" value="${term}" ${activeTerms.includes(term) ? 'checked' : ''} 
+            <label class="filter-toggle-label term-checkbox">
+                <input type="checkbox" class="filter-toggle" value="${term}" ${activeTerms.includes(term) ? 'checked' : ''} 
                        data-filter="term">
-                <span class="filter-checkbox-text">${term} Term</span>
+                <span class="filter-toggle-slider"></span>
+                <span class="filter-toggle-text">${term} Term</span>
             </label>
         `).join('');
 
@@ -384,10 +384,11 @@ export class FilterModalController {
         const activeBuildings = activeFilter?.criteria?.buildings || [];
 
         const buildingCheckboxes = buildings.map(building => `
-            <label class="filter-checkbox-label">
-                <input type="checkbox" value="${building}" ${activeBuildings.includes(building) ? 'checked' : ''} 
+            <label class="filter-toggle-label">
+                <input type="checkbox" class="filter-toggle" value="${building}" ${activeBuildings.includes(building) ? 'checked' : ''} 
                        data-filter="location">
-                <span class="filter-checkbox-text">${building}</span>
+                <span class="filter-toggle-slider"></span>
+                <span class="filter-toggle-text">${building}</span>
             </label>
         `).join('');
 
@@ -708,29 +709,52 @@ export class FilterModalController {
     private toggleDepartmentMode(modalElement: HTMLElement): void {
         this.isCategoryMode = !this.isCategoryMode;
         
-        // Refresh the department filter section
-        const allFilterSections = modalElement.querySelectorAll('.filter-section');
-        let departmentSection: Element | null = null;
+        // Update only the specific elements that need to change
+        this.updateSearchPlaceholder(modalElement);
+        this.updateCheckboxGrid(modalElement);
+        this.setupDepartmentCheckboxes(modalElement);
+    }
+
+    private updateSearchPlaceholder(modalElement: HTMLElement): void {
+        const searchInput = modalElement.querySelector('.filter-search[data-filter="department"]') as HTMLInputElement;
+        if (searchInput) {
+            const searchPlaceholder = this.isCategoryMode ? 
+                'Search categories...' : 
+                'Search departments...';
+            searchInput.placeholder = searchPlaceholder;
+        }
+    }
+
+    private updateCheckboxGrid(modalElement: HTMLElement): void {
+        const checkboxGrid = modalElement.querySelector('#department-checkboxes');
+        if (checkboxGrid) {
+            const checkboxesHtml = this.isCategoryMode ? 
+                this.createCategoryCheckboxes() : 
+                this.createIndividualDepartmentCheckboxes();
+            checkboxGrid.innerHTML = checkboxesHtml;
+        }
+    }
+
+    private setupDepartmentCheckboxes(modalElement: HTMLElement): void {
+        const checkboxes = modalElement.querySelectorAll('input[data-filter="department"]');
         
-        for (const section of allFilterSections) {
-            const titleElement = section.querySelector('.filter-section-title');
-            if (titleElement?.textContent === 'Departments') {
-                departmentSection = section;
-                break;
-            }
+        // Set up indeterminate states for category mode checkboxes
+        if (this.isCategoryMode) {
+            checkboxes.forEach((checkbox) => {
+                const cb = checkbox as HTMLInputElement;
+                if (cb.dataset.indeterminate === 'true') {
+                    cb.indeterminate = true;
+                }
+            });
         }
         
-        if (departmentSection) {
-            const newDepartmentFilter = this.createDepartmentFilter();
-            departmentSection.outerHTML = newDepartmentFilter;
-            
-            // Re-query the modal element to ensure we have fresh DOM references
-            const freshModalElement = document.getElementById(this.currentModalId || '') as HTMLElement;
-            if (freshModalElement) {
-                this.setupDepartmentFilter(freshModalElement);
-                this.setupFilterSearch(freshModalElement);
-            }
-        }
+        // Set up event listeners for new checkboxes
+        checkboxes.forEach((checkbox) => {
+            const cb = checkbox as HTMLInputElement;
+            cb.addEventListener('change', () => {
+                this.updateDepartmentFilter(modalElement);
+            });
+        });
     }
 
     private createCategoryCheckboxes(): string {
@@ -763,11 +787,12 @@ export class FilterModalController {
             const isChecked = allSelected || someSelected;
             
             return `
-                <label class="filter-checkbox-label">
-                    <input type="checkbox" value="${category}" ${isChecked ? 'checked' : ''} 
+                <label class="filter-toggle-label">
+                    <input type="checkbox" class="filter-toggle" value="${category}" ${isChecked ? 'checked' : ''} 
                            ${isIndeterminate ? 'data-indeterminate="true"' : ''}
                            data-filter="department" data-category="true">
-                    <span class="filter-checkbox-text">${category}</span>
+                    <span class="filter-toggle-slider"></span>
+                    <span class="filter-toggle-text">${category}</span>
                 </label>
             `;
         }).join('');
