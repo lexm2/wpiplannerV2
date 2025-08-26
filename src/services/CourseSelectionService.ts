@@ -1,7 +1,7 @@
 import { Course, Department, Section } from '../types/types'
 import { SelectedCourse } from '../types/schedule'
 import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../core/ProfileStateManager'
-import { DataValidator, ValidationResult } from '../core/DataValidator'
+import { DataValidator } from '../core/DataValidator'
 import { RetryManager } from '../core/RetryManager'
 import { ProfileMigrationService } from '../core/ProfileMigrationService'
 import { Validators } from '../utils/validators'
@@ -524,21 +524,6 @@ export class CourseSelectionService {
         this.addSelectionListener(callback);
     }
 
-    // Department and section management
-    setAllDepartments(departments: Department[]): void {
-        // This would typically be handled by a separate service
-        // For now, we'll store it in the profile state manager if needed
-        console.log(`📚 Loaded ${departments.length} departments`);
-    }
-
-    getAllSections(): Section[] {
-        // This would be retrieved from the course data service
-        return [];
-    }
-
-    getAllSectionsForCourse(course: Course): Section[] {
-        return course.sections || [];
-    }
 
     // Data management
     async exportSelections(): Promise<{ success: boolean; data?: string; error?: string }> {
@@ -650,22 +635,6 @@ export class CourseSelectionService {
         return this.profileStateManager.hasUnsavedChanges();
     }
 
-    // Backward compatibility methods
-    findCourseById(courseId: string): Course | undefined {
-        // This would need to be implemented with access to course data
-        console.warn('findCourseById: Course data access not implemented in this service');
-        return undefined;
-    }
-
-    // Utility methods
-    unselectCourseById(courseId: string): void {
-        console.warn('unselectCourseById: Use unselectCourse with course object instead');
-    }
-
-    isCourseSelectedById(courseId: string): boolean {
-        console.warn('isCourseSelectedById: Use isCourseSelected with course object instead');
-        return false;
-    }
 
     reconstructSectionObjects(): void {
         try {

@@ -334,7 +334,6 @@ export class MainController {
             this.allDepartments = scheduleDB.departments;
             this.departmentController.setAllDepartments(this.allDepartments);
             this.courseController.setAllDepartments(this.allDepartments);
-            this.courseSelectionService.setAllDepartments(this.allDepartments);
             
             // Initialize search service with course data
             this.searchService.setCourseData(this.allDepartments);

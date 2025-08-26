@@ -445,21 +445,6 @@ export class CourseController {
         return course;
     }
 
-    // Legacy method for backward compatibility
-    selectCourseById(courseId: string): Course | null {
-        const course = this.courseSelectionService.findCourseById(courseId);
-        if (!course) return null;
-
-        // Find the associated element and call selectCourse
-        const allElements = document.querySelectorAll('.course-item, .course-card');
-        for (const element of allElements) {
-            const elementCourse = this.elementToCourseMap.get(element as HTMLElement);
-            if (elementCourse?.id === courseId) {
-                return this.selectCourse(element as HTMLElement);
-            }
-        }
-        return null;
-    }
 
     async toggleCourseSelection(element: HTMLElement): Promise<boolean> {
         const course = this.elementToCourseMap.get(element);
@@ -486,21 +471,6 @@ export class CourseController {
         }
     }
 
-    // Legacy method for backward compatibility
-    async toggleCourseSelectionById(courseId: string): Promise<boolean> {
-        const course = this.courseSelectionService.findCourseById(courseId);
-        if (!course) return false;
-
-        // Find the associated element and call toggleCourseSelection
-        const allElements = document.querySelectorAll('.course-item, .course-card');
-        for (const element of allElements) {
-            const elementCourse = this.elementToCourseMap.get(element as HTMLElement);
-            if (elementCourse?.id === courseId) {
-                return await this.toggleCourseSelection(element as HTMLElement);
-            }
-        }
-        return false;
-    }
 
     private updateCourseSelectionUI(element: HTMLElement, isSelected: boolean, showOptimisticFeedback: boolean = false): void {
         const selectBtn = element.querySelector('.course-select-btn');
