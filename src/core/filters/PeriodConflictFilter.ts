@@ -11,7 +11,7 @@ export class PeriodConflictFilter implements SectionFilter {
     readonly id = 'periodConflict';
     readonly name = 'Schedule Conflicts';
     readonly description = 'Hide periods that conflict with selected sections';
-    readonly priority = 75; // Low priority - applied after other reductions
+    readonly priority = 65;
     private conflictDetector: ConflictDetector;
 
     constructor(conflictDetector: ConflictDetector) {

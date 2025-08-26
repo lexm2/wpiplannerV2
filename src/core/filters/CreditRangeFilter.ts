@@ -5,7 +5,7 @@ export class CreditRangeFilter implements CourseFilter {
     readonly id = 'creditRange';
     readonly name = 'Credit Range';
     readonly description = 'Filter courses by credit hours';
-    readonly priority = 45; // Medium priority - often eliminates some courses
+    readonly priority = 99;
     
     apply(courses: Course[], criteria: CreditRangeFilterCriteria): Course[] {
         return courses.filter(course => {

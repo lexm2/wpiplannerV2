@@ -6,7 +6,7 @@ export class PeriodProfessorFilter implements SectionFilter {
     readonly id = 'periodProfessor';
     readonly name = 'Period Professor';
     readonly description = 'Filter periods by professor';
-    readonly priority = 40; // Medium priority - moderately selective
+    readonly priority = 7;
     
     applyToSections(sections: Section[], criteria: PeriodProfessorFilterCriteria): Section[] {
         if (!criteria.professors || criteria.professors.length === 0) {

@@ -5,7 +5,7 @@ export class SearchTextFilter implements CourseFilter {
     readonly id = 'searchText';
     readonly name = 'Search Text';
     readonly description = 'Filter courses by search text';
-    readonly priority = 20; // High priority - often very selective
+    readonly priority = 1;
     
     apply(courses: Course[], criteria: SearchTextFilterCriteria): Course[] {
         if (!criteria.query || !criteria.query.trim()) {

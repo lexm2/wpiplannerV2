@@ -5,7 +5,7 @@ export class TermFilter implements CourseFilter {
     readonly id = 'term';
     readonly name = 'Term';
     readonly description = 'Filter courses by academic term';
-    readonly priority = 15; // High priority - eliminates ~75% of sections per term
+    readonly priority = 25;
     
     apply(courses: Course[], criteria: TermFilterCriteria): Course[] {
         if (!criteria.terms || criteria.terms.length === 0) {

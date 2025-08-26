@@ -9,7 +9,7 @@ export class RequiredStatusFilter implements SelectedCourseFilter {
     readonly id = 'requiredStatus';
     readonly name = 'Required Status';
     readonly description = 'Filter courses by required/optional status';
-    readonly priority = 85; // Low priority - final status-based filtering
+    readonly priority = 85;
     
     
     applyToSelectedCourses(selectedCourses: SelectedCourse[], criteria: RequiredStatusFilterCriteria): SelectedCourse[] {

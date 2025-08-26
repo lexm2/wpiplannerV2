@@ -5,7 +5,7 @@ export class ProfessorFilter implements CourseFilter {
     readonly id = 'professor';
     readonly name = 'Professor';
     readonly description = 'Filter courses by instructor';
-    readonly priority = 40; // Medium priority - moderately selective
+    readonly priority = 7;
     
     apply(courses: Course[], criteria: ProfessorFilterCriteria): Course[] {
         if (!criteria.professors || criteria.professors.length === 0) {
