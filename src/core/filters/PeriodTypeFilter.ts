@@ -1,14 +1,46 @@
-import { Course, Period } from '../../types/types';
-import { CourseFilter, PeriodTypeFilterCriteria } from '../../types/filters';
+import { Period, Section } from '../../types/types';
+import { SectionFilter, PeriodTypeFilterCriteria } from '../../types/filters';
+import { SelectedCourse } from '../../types/schedule';
 
-export class PeriodTypeFilter implements CourseFilter {
+export class PeriodTypeFilter implements SectionFilter {
     readonly id = 'periodType';
     readonly name = 'Period Type';
     readonly description = 'Exclude sections with selected period types';
     
-    apply(courses: Course[], criteria: PeriodTypeFilterCriteria): Course[] {
-        // This filter works on periods, so it's handled by the service layer
-        return courses;
+    applyToSections(sections: Section[], criteria: PeriodTypeFilterCriteria): Section[] {
+        if (!criteria.types || criteria.types.length === 0) {
+            return sections;
+        }
+        
+        const excludedTypes = new Set(
+            criteria.types.map(type => this.normalizeType(type))
+        );
+        
+        return sections.filter(section => {
+            // Exclude section if ANY period is of any of the excluded types
+            return !section.periods.some(period => {
+                const normalizedPeriodType = this.normalizeType(period.type);
+                return excludedTypes.has(normalizedPeriodType);
+            });
+        });
+    }
+
+    applyToSectionsWithContext(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, criteria: PeriodTypeFilterCriteria): Array<{course: SelectedCourse, section: Section}> {
+        if (!criteria.types || criteria.types.length === 0) {
+            return sectionsWithContext;
+        }
+        
+        const excludedTypes = new Set(
+            criteria.types.map(type => this.normalizeType(type))
+        );
+        
+        return sectionsWithContext.filter(item => {
+            // Exclude section if ANY period is of any of the excluded types
+            return !item.section.periods.some(period => {
+                const normalizedPeriodType = this.normalizeType(period.type);
+                return excludedTypes.has(normalizedPeriodType);
+            });
+        });
     }
     
     applyToPeriods(periods: Period[], criteria: PeriodTypeFilterCriteria): Period[] {

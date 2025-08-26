@@ -245,27 +245,7 @@ export class FilterService {
             if (activeFilter.id !== 'searchText') { // Skip searchText as it's already applied
                 const filter = this.registeredFilters.get(activeFilter.id);
                 if (filter) {
-                    // Special handling for availability filter to pass other active filters
-                    if (activeFilter.id === 'availability') {
-                        const termFilter = activeFilters.find(f => f.id === 'term');
-                        const activeTerms = termFilter?.criteria?.terms || [];
-                        
-                        // Get all other active filters (excluding availability and search)
-                        const otherActiveFilters = activeFilters.filter(f => 
-                            f.id !== 'availability' && f.id !== 'searchText'
-                        );
-                        
-                        // Get selected courses for conflict detection
-                        const selectedCourses = this.courseSelectionService?.getSelectedCourses() || [];
-                        
-                        filteredCourses = filter.apply(filteredCourses, activeFilter.criteria, {
-                            activeTerms,
-                            otherActiveFilters,
-                            selectedCourses
-                        });
-                    } else {
-                        filteredCourses = filter.apply(filteredCourses, activeFilter.criteria);
-                    }
+                    filteredCourses = filter.apply(filteredCourses, activeFilter.criteria);
                 }
             }
         }

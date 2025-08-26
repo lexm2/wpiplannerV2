@@ -19,9 +19,7 @@ export class SearchTextFilter implements CourseFilter {
                 course.id,
                 course.name,
                 course.description,
-                course.department.abbreviation,
                 course.department.name,
-                course.number,
                 courseCode
             ].join(' ').toLowerCase();
 

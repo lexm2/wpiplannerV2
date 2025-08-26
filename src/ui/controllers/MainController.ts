@@ -254,7 +254,7 @@ export class MainController {
     }
 
     private initializeFilters(): void {
-        const filters = createDefaultFilters(this.conflictDetector);
+        const filters = createDefaultFilters();
         filters.forEach(filter => {
             this.filterService.registerFilter(filter);
         });

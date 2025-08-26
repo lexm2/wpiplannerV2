@@ -1,13 +1,25 @@
-import { Course } from './types';
+import { Course, Section } from './types';
+import { SelectedCourse } from './schedule';
 
-export interface CourseFilter {
+export interface BaseFilter {
     readonly id: string;
     readonly name: string;
     readonly description: string;
-    
-    apply(courses: Course[], criteria: any, additionalData?: any): Course[];
     isValidCriteria(criteria: any): boolean;
     getDisplayValue(criteria: any): string;
+}
+
+export interface CourseFilter extends BaseFilter {
+    apply(courses: Course[], criteria: any, additionalData?: any): Course[];
+}
+
+export interface SectionFilter extends BaseFilter {
+    applyToSections(sections: Section[], criteria: any): Section[];
+    applyToSectionsWithContext?(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, criteria: any): Array<{course: SelectedCourse, section: Section}>;
+}
+
+export interface SelectedCourseFilter extends BaseFilter {
+    applyToSelectedCourses(selectedCourses: SelectedCourse[], criteria: any): SelectedCourse[];
 }
 
 export interface FilterCriteria {

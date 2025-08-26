@@ -1,13 +1,13 @@
-import { Period, Section, Course } from '../../types/types';
+import { Period, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
 import { ConflictDetector } from '../ConflictDetector';
-import { CourseFilter, PeriodConflictFilterCriteria } from '../../types/filters';
+import { SectionFilter, PeriodConflictFilterCriteria } from '../../types/filters';
 
 export interface PeriodConflictCriteria extends PeriodConflictFilterCriteria {
     selectedCourses?: SelectedCourse[];
 }
 
-export class PeriodConflictFilter implements CourseFilter {
+export class PeriodConflictFilter implements SectionFilter {
     readonly id = 'periodConflict';
     readonly name = 'Schedule Conflicts';
     readonly description = 'Hide periods that conflict with selected sections';
@@ -130,6 +130,64 @@ export class PeriodConflictFilter implements CourseFilter {
     }
 
     // Section-based conflict detection - if ANY period in a section conflicts, filter out the ENTIRE section
+    applyToSections(
+        sections: Section[], 
+        criteria: PeriodConflictCriteria
+    ): Section[] {
+        if (!criteria.avoidConflicts || !criteria.selectedCourses) {
+            return sections;
+        }
+
+        // Get currently selected sections (where selectedSectionNumber is not null)
+        const selectedSections: Section[] = [];
+        for (const selectedCourse of criteria.selectedCourses) {
+            if (selectedCourse.selectedSectionNumber) {
+                const section = selectedCourse.course.sections.find(s => s.number === selectedCourse.selectedSectionNumber);
+                if (section) {
+                    selectedSections.push(section);
+                }
+            }
+        }
+
+        // If no sections are selected, show all sections
+        if (selectedSections.length === 0) {
+            return sections;
+        }
+
+        // Filter out sections that have ANY period conflicting with selected sections
+        return sections.filter(currentSection => {
+            // Check if ANY period in the current section conflicts with selected sections
+            for (const currentPeriod of currentSection.periods) {
+                // Create a temporary section containing just this period
+                const tempSection: Section = {
+                    crn: Math.floor(Math.random() * 99999),
+                    number: 'TEMP',
+                    periods: [currentPeriod],
+                    seats: 999,
+                    seatsAvailable: 999,
+                    actualWaitlist: 0,
+                    maxWaitlist: 0,
+                    description: 'Temporary section for conflict detection',
+                    term: 'TEMP',
+                    computedTerm: 'TEMP'
+                };
+
+                // Test if this period conflicts with any selected sections
+                const testSections = [...selectedSections, tempSection];
+                const conflicts = this.conflictDetector.detectConflicts(testSections);
+                
+                // If ANY period in this section conflicts, filter out the ENTIRE section
+                if (conflicts.length > 0) {
+                    return false;
+                }
+            }
+
+            // No conflicts found for any period in this section
+            return true;
+        });
+    }
+
+    // Keep the context-aware version for backward compatibility
     applyToSectionsWithContext(
         sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, 
         criteria: PeriodConflictCriteria
@@ -203,18 +261,6 @@ export class PeriodConflictFilter implements CourseFilter {
         });
     }
 
-    applyCriteriaToSelectedCourses(selectedCourses: SelectedCourse[], criteria: PeriodConflictCriteria): SelectedCourse[] {
-        // This filter works at the period level, not course level
-        return selectedCourses;
-    }
-
-    // CourseFilter interface implementation
-    apply(courses: Course[], criteria: PeriodConflictFilterCriteria): Course[] {
-        // This filter doesn't work at the course level, it works at the period level
-        // For course-level filtering, we just return all courses since conflict detection
-        // happens at the period level in the ScheduleFilterService
-        return courses;
-    }
 
     isValidCriteria(criteria: any): boolean {
         if (!criteria || typeof criteria !== 'object') {

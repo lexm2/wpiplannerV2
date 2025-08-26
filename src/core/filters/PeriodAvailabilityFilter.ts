@@ -1,14 +1,48 @@
-import { Course, Period } from '../../types/types';
-import { CourseFilter, PeriodAvailabilityFilterCriteria } from '../../types/filters';
+import { Period, Section } from '../../types/types';
+import { SectionFilter, PeriodAvailabilityFilterCriteria } from '../../types/filters';
+import { SelectedCourse } from '../../types/schedule';
 
-export class PeriodAvailabilityFilter implements CourseFilter {
+export class PeriodAvailabilityFilter implements SectionFilter {
     readonly id = 'periodAvailability';
     readonly name = 'Period Availability';
     readonly description = 'Filter periods by seat availability';
     
-    apply(courses: Course[], criteria: PeriodAvailabilityFilterCriteria): Course[] {
-        // This filter works on periods, so it's handled by the service layer
-        return courses;
+    applyToSections(sections: Section[], criteria: PeriodAvailabilityFilterCriteria): Section[] {
+        return sections.filter(section => {
+            // Include section if ANY period meets the availability criteria
+            return section.periods.some(period => {
+                // Filter by availability
+                if (criteria.availableOnly && period.seatsAvailable <= 0) {
+                    return false;
+                }
+                
+                // Filter by minimum available seats
+                if (criteria.minAvailable && period.seatsAvailable < criteria.minAvailable) {
+                    return false;
+                }
+                
+                return true;
+            });
+        });
+    }
+
+    applyToSectionsWithContext(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, criteria: PeriodAvailabilityFilterCriteria): Array<{course: SelectedCourse, section: Section}> {
+        return sectionsWithContext.filter(item => {
+            // Include section if ANY period meets the availability criteria
+            return item.section.periods.some(period => {
+                // Filter by availability
+                if (criteria.availableOnly && period.seatsAvailable <= 0) {
+                    return false;
+                }
+                
+                // Filter by minimum available seats
+                if (criteria.minAvailable && period.seatsAvailable < criteria.minAvailable) {
+                    return false;
+                }
+                
+                return true;
+            });
+        });
     }
     
     applyToPeriods(periods: Period[], criteria: PeriodAvailabilityFilterCriteria): Period[] {

@@ -1,14 +1,44 @@
-import { Course, Period, DayOfWeek } from '../../types/types';
-import { CourseFilter, PeriodDaysFilterCriteria } from '../../types/filters';
+import { Period, Section, DayOfWeek } from '../../types/types';
+import { SectionFilter, PeriodDaysFilterCriteria } from '../../types/filters';
+import { SelectedCourse } from '../../types/schedule';
 
-export class PeriodDaysFilter implements CourseFilter {
+export class PeriodDaysFilter implements SectionFilter {
     readonly id = 'periodDays';
     readonly name = 'Period Days';
     readonly description = 'Exclude sections with classes on selected days';
     
-    apply(courses: Course[], criteria: PeriodDaysFilterCriteria): Course[] {
-        // This filter works on periods, so it's handled by the service layer
-        return courses;
+    applyToSections(sections: Section[], criteria: PeriodDaysFilterCriteria): Section[] {
+        if (!criteria.days || criteria.days.length === 0) {
+            return sections;
+        }
+        
+        const excludedDays = new Set(criteria.days.map(day => day.toLowerCase()));
+        
+        return sections.filter(section => {
+            // Exclude entire section if ANY period has any of the excluded days
+            return !section.periods.some(period => 
+                Array.from(period.days).some(day => 
+                    excludedDays.has(day.toLowerCase())
+                )
+            );
+        });
+    }
+
+    applyToSectionsWithContext(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, criteria: PeriodDaysFilterCriteria): Array<{course: SelectedCourse, section: Section}> {
+        if (!criteria.days || criteria.days.length === 0) {
+            return sectionsWithContext;
+        }
+        
+        const excludedDays = new Set(criteria.days.map(day => day.toLowerCase()));
+        
+        return sectionsWithContext.filter(item => {
+            // Exclude entire section if ANY period has any of the excluded days
+            return !item.section.periods.some(period => 
+                Array.from(period.days).some(day => 
+                    excludedDays.has(day.toLowerCase())
+                )
+            );
+        });
     }
     
     applyToPeriods(periods: Period[], criteria: PeriodDaysFilterCriteria): Period[] {

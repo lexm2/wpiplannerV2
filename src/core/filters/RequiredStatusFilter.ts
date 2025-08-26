@@ -1,21 +1,15 @@
-import { Course } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
-import { CourseFilter } from '../../types/filters';
+import { SelectedCourseFilter } from '../../types/filters';
 
 export interface RequiredStatusFilterCriteria {
     status: 'required' | 'optional' | 'all';
 }
 
-export class RequiredStatusFilter implements CourseFilter {
+export class RequiredStatusFilter implements SelectedCourseFilter {
     readonly id = 'requiredStatus';
     readonly name = 'Required Status';
     readonly description = 'Filter courses by required/optional status';
     
-    apply(courses: Course[], criteria: RequiredStatusFilterCriteria): Course[] {
-        // This filter requires access to SelectedCourse data, so it will be handled
-        // by the ScheduleFilterService rather than working on Course[] directly
-        return courses;
-    }
     
     applyToSelectedCourses(selectedCourses: SelectedCourse[], criteria: RequiredStatusFilterCriteria): SelectedCourse[] {
         if (criteria.status === 'all') {

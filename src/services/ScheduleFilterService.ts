@@ -1,4 +1,4 @@
-import { Course, Period, Section } from '../types/types';
+import { Period, Section } from '../types/types';
 import { SelectedCourse } from '../types/schedule';
 import { FilterService } from './FilterService';
 import { SearchService } from './searchService';
@@ -12,6 +12,9 @@ import { PeriodConflictFilter } from '../core/filters/PeriodConflictFilter';
 import { SectionCodeFilter } from '../core/filters/SectionCodeFilter';
 import { SearchTextFilter } from '../core/filters';
 import { ConflictDetector } from '../core/ConflictDetector';
+import { SectionFilter, SelectedCourseFilter } from '../types/filters';
+import { RequiredStatusFilter } from '../core/filters/RequiredStatusFilter';
+import { SectionStatusFilter } from '../core/filters/SectionStatusFilter';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -105,6 +108,8 @@ import { ConflictDetector } from '../core/ConflictDetector';
 
 export class ScheduleFilterService {
     private filterService: FilterService;
+    private registeredSectionFilters: Map<string, SectionFilter> = new Map();
+    private registeredSelectedCourseFilters: Map<string, SelectedCourseFilter> = new Map();
     private courseSelectionFilter: CourseSelectionFilter;
     private periodDaysFilter: PeriodDaysFilter;
     private periodProfessorFilter: PeriodProfessorFilter;
@@ -113,6 +118,8 @@ export class ScheduleFilterService {
     private periodAvailabilityFilter: PeriodAvailabilityFilter;
     private periodConflictFilter: PeriodConflictFilter | null = null;
     private sectionCodeFilter: SectionCodeFilter;
+    private requiredStatusFilter: RequiredStatusFilter;
+    private sectionStatusFilter: SectionStatusFilter;
     
     constructor(searchService: SearchService) {
         this.filterService = new FilterService(searchService);
@@ -123,13 +130,15 @@ export class ScheduleFilterService {
         this.periodTermFilter = new PeriodTermFilter();
         this.periodAvailabilityFilter = new PeriodAvailabilityFilter();
         this.sectionCodeFilter = new SectionCodeFilter();
+        this.requiredStatusFilter = new RequiredStatusFilter();
+        this.sectionStatusFilter = new SectionStatusFilter();
         
         this.initializeFilters();
     }
     
     setConflictDetector(conflictDetector: ConflictDetector): void {
         this.periodConflictFilter = new PeriodConflictFilter(conflictDetector);
-        this.filterService.registerFilter(this.periodConflictFilter);
+        this.registeredSectionFilters.set(this.periodConflictFilter.id, this.periodConflictFilter);
     }
     
     private initializeFilters(): void {
@@ -137,14 +146,20 @@ export class ScheduleFilterService {
         const searchTextFilter = new SearchTextFilter();
         this.filterService.registerFilter(searchTextFilter);
         
-        // Register period-based filters
+        // Register CourseFilter implementations with FilterService
         this.filterService.registerFilter(this.courseSelectionFilter);
-        this.filterService.registerFilter(this.periodDaysFilter);
-        this.filterService.registerFilter(this.periodProfessorFilter);
-        this.filterService.registerFilter(this.periodTypeFilter);
-        this.filterService.registerFilter(this.periodTermFilter);
-        this.filterService.registerFilter(this.periodAvailabilityFilter);
-        this.filterService.registerFilter(this.sectionCodeFilter);
+        
+        // Register SectionFilter implementations with our own registry
+        this.registeredSectionFilters.set(this.periodDaysFilter.id, this.periodDaysFilter);
+        this.registeredSectionFilters.set(this.periodProfessorFilter.id, this.periodProfessorFilter);
+        this.registeredSectionFilters.set(this.periodTypeFilter.id, this.periodTypeFilter);
+        this.registeredSectionFilters.set(this.periodTermFilter.id, this.periodTermFilter);
+        this.registeredSectionFilters.set(this.periodAvailabilityFilter.id, this.periodAvailabilityFilter);
+        this.registeredSectionFilters.set(this.sectionCodeFilter.id, this.sectionCodeFilter);
+        
+        // Register SelectedCourseFilter implementations with our own registry
+        this.registeredSelectedCourseFilters.set(this.requiredStatusFilter.id, this.requiredStatusFilter);
+        this.registeredSelectedCourseFilters.set(this.sectionStatusFilter.id, this.sectionStatusFilter);
     }
     
     // Delegate basic filter management to FilterService
@@ -429,54 +444,19 @@ export class ScheduleFilterService {
             allSections = this.applySearchTextToSections(allSections, searchTextFilter.criteria.query);
         }
         
-        // Apply section-based filters
+        // Apply section-based filters using the registered SectionFilter implementations
         for (const activeFilter of activeFilters) {
-            switch (activeFilter.id) {
-                case 'periodDays':
-                    // Exclude entire sections if ANY period is on excluded days
-                    const excludedDaysForSections = new Set(activeFilter.criteria.days.map((day: string) => day.toLowerCase()));
-                    allSections = allSections.filter(item => {
-                        // Exclude section if ANY period is on any of the excluded days
-                        return !item.section.periods.some(period => 
-                            Array.from(period.days).some(day => 
-                                excludedDaysForSections.has(day.toLowerCase())
-                            )
-                        );
-                    });
-                    break;
-                case 'periodProfessor':
-                    allSections = allSections.filter(item => 
-                        this.periodProfessorFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
-                    );
-                    break;
-                case 'periodType':
-                    // Exclude entire sections if ANY period is of excluded types
-                    const excludedTypesForSections = new Set(activeFilter.criteria.types.map((type: string) => this.periodTypeFilter.normalizeType(type)));
-                    allSections = allSections.filter(item => {
-                        // Exclude section if ANY period is of any of the excluded types
-                        return !item.section.periods.some(period => {
-                            const normalizedPeriodType = this.periodTypeFilter.normalizeType(period.type);
-                            return excludedTypesForSections.has(normalizedPeriodType);
-                        });
-                    });
-                    break;
-                case 'periodTerm':
-                    // Include only sections from selected terms
-                    allSections = this.periodTermFilter.applyToSections(allSections, activeFilter.criteria);
-                    break;
-                case 'periodAvailability':
-                    allSections = allSections.filter(item => 
-                        this.periodAvailabilityFilter.applyToPeriods(item.section.periods, activeFilter.criteria).length > 0
-                    );
-                    break;
-                case 'periodConflict':
-                    if (this.periodConflictFilter) {
-                        allSections = this.periodConflictFilter.applyToSectionsWithContext(allSections, {
-                            ...activeFilter.criteria,
-                            selectedCourses: selectedCourses
-                        });
-                    }
-                    break;
+            if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
+                // Special handling for conflict filter which needs additional context
+                allSections = this.periodConflictFilter.applyToSectionsWithContext(allSections, {
+                    ...activeFilter.criteria,
+                    selectedCourses: selectedCourses
+                });
+            } else {
+                const sectionFilter = this.registeredSectionFilters.get(activeFilter.id);
+                if (sectionFilter && sectionFilter.applyToSectionsWithContext) {
+                    allSections = sectionFilter.applyToSectionsWithContext(allSections, activeFilter.criteria);
+                }
             }
         }
         
@@ -490,6 +470,29 @@ export class ScheduleFilterService {
         // Get unique courses from filtered periods
         const uniqueCourseIds = new Set(filteredPeriods.map(item => item.course.course.id));
         return selectedCourses.filter(sc => uniqueCourseIds.has(sc.course.id));
+    }
+
+    // Apply SelectedCourseFilter implementations to filter selected courses
+    applySelectedCourseFilters(selectedCourses: SelectedCourse[]): SelectedCourse[] {
+        if (this.isEmpty()) {
+            return selectedCourses;
+        }
+
+        const activeFilters = this.getActiveFilters();
+        let filteredSelectedCourses = selectedCourses;
+
+        // Apply SelectedCourseFilter implementations
+        for (const activeFilter of activeFilters) {
+            const selectedCourseFilter = this.registeredSelectedCourseFilters.get(activeFilter.id);
+            if (selectedCourseFilter) {
+                filteredSelectedCourses = selectedCourseFilter.applyToSelectedCourses(
+                    filteredSelectedCourses, 
+                    activeFilter.criteria
+                );
+            }
+        }
+
+        return filteredSelectedCourses;
     }
     
     // Get available filter options specific to selected courses
@@ -516,6 +519,18 @@ export class ScheduleFilterService {
                 return this.getAvailableTerms(selectedCourses);
             case 'sectionCode':
                 return this.getAvailableSectionCodes(selectedCourses);
+            case 'requiredStatus':
+                return [
+                    { value: 'all', label: 'All Courses' },
+                    { value: 'required', label: 'Required Courses' },
+                    { value: 'optional', label: 'Optional Courses' }
+                ];
+            case 'sectionStatus':
+                return [
+                    { value: 'all', label: 'All Courses' },
+                    { value: 'selected', label: 'With Selected Section' },
+                    { value: 'unselected', label: 'Without Selected Section' }
+                ];
             default:
                 return null;
         }

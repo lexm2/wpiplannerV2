@@ -8,8 +8,12 @@ export class CourseSelectionFilter implements CourseFilter {
     readonly description = 'Select which courses to search periods within';
     
     apply(courses: Course[], criteria: CourseSelectionFilterCriteria): Course[] {
-        // This filter is handled specially by the ScheduleFilterService
-        return courses;
+        if (!criteria.selectedCourseIds || criteria.selectedCourseIds.length === 0) {
+            return courses;
+        }
+        
+        const selectedIds = new Set(criteria.selectedCourseIds);
+        return courses.filter(course => selectedIds.has(course.id));
     }
     
     applyToSelectedCourses(selectedCourses: SelectedCourse[], criteria: CourseSelectionFilterCriteria): SelectedCourse[] {

@@ -34,7 +34,7 @@ describe('AvailabilityFilter Integration', () => {
     await courseSelectionService.initialize()
 
     // Register filters with proper dependencies
-    const availabilityFilter = new AvailabilityFilter(conflictDetector)
+    const availabilityFilter = new AvailabilityFilter()
     filterService.registerFilter(availabilityFilter)
     filterService.registerFilter(new DepartmentFilter())
     filterService.registerFilter(new ProfessorFilter())

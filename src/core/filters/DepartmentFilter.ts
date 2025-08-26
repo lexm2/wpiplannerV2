@@ -5,7 +5,7 @@ export class DepartmentFilter implements CourseFilter {
     readonly id = 'department';
     readonly name = 'Department';
     readonly description = 'Filter courses by department(s)';
-    
+
     apply(courses: Course[], criteria: DepartmentFilterCriteria): Course[] {
         if (!criteria.departments || criteria.departments.length === 0) {
             return courses;

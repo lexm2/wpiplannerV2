@@ -18,21 +18,21 @@ describe('AvailabilityFilter', () => {
 
   beforeEach(() => {
     mockConflictDetector = new ConflictDetector()
-    availabilityFilter = new AvailabilityFilter(mockConflictDetector)
+    availabilityFilter = new AvailabilityFilter()
   })
 
   describe('constructor', () => {
     test('should create filter with correct properties', () => {
       expect(availabilityFilter.id).toBe('availability')
       expect(availabilityFilter.name).toBe('Availability')
-      expect(availabilityFilter.description).toBe('Show only courses with at least one available section that matches other filters')
+      expect(availabilityFilter.description).toBe('Show only courses with at least one available section')
     })
 
     test('should require ConflictDetector dependency', () => {
       // The AvailabilityFilter constructor doesn't currently validate the ConflictDetector
       // This is a design choice - it accepts null and will fail at runtime
       // Let's test that it creates the filter instance
-      const filter = new AvailabilityFilter(null as any)
+      const filter = new AvailabilityFilter()
       expect(filter).toBeDefined()
       expect(filter.id).toBe('availability')
     })

@@ -1,16 +1,13 @@
-import { Course, Period } from '../../types/types';
-import { CourseFilter, PeriodTermFilterCriteria } from '../../types/filters';
+import { Section } from '../../types/types';
+import { SectionFilter, PeriodTermFilterCriteria } from '../../types/filters';
+import { SelectedCourse } from '../../types/schedule';
 
-export class PeriodTermFilter implements CourseFilter {
+export class PeriodTermFilter implements SectionFilter {
     readonly id = 'periodTerm';
     readonly name = 'Term';
     readonly description = 'Show sections from selected academic terms';
     
-    apply(courses: Course[], criteria: PeriodTermFilterCriteria): Course[] {
-        return courses;
-    }
-    
-    applyToSections(sections: any[], criteria: PeriodTermFilterCriteria): any[] {
+    applyToSections(sections: Section[], criteria: PeriodTermFilterCriteria): Section[] {
         if (!criteria.terms || criteria.terms.length === 0) {
             return sections;
         }
@@ -19,7 +16,22 @@ export class PeriodTermFilter implements CourseFilter {
             criteria.terms.map(term => this.normalizeTerm(term))
         );
         
-        return sections.filter(item => {
+        return sections.filter(section => {
+            const normalizedTerm = this.normalizeTerm(section.computedTerm);
+            return selectedTerms.has(normalizedTerm);
+        });
+    }
+    
+    applyToSectionsWithContext(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, criteria: PeriodTermFilterCriteria): Array<{course: SelectedCourse, section: Section}> {
+        if (!criteria.terms || criteria.terms.length === 0) {
+            return sectionsWithContext;
+        }
+        
+        const selectedTerms = new Set(
+            criteria.terms.map(term => this.normalizeTerm(term))
+        );
+        
+        return sectionsWithContext.filter(item => {
             const normalizedTerm = this.normalizeTerm(item.section.computedTerm);
             return selectedTerms.has(normalizedTerm);
         });
