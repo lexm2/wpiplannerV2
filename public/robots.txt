@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lexm2.github.io/wpiplannerV2/sitemap.xml

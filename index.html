@@ -3,14 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WPI Course Planner</title>
+    <title>WPI Course Planner - Plan Your WPI Academic Schedule</title>
+    <meta name="description" content="Plan your WPI academic schedule with our interactive course planner. Browse courses, check schedules, and create your perfect academic plan for Worcester Polytechnic Institute.">
+    <meta name="keywords" content="WPI, Worcester Polytechnic Institute, course planner, academic planning, schedule, courses, registration">
+    <meta name="author" content="WPI Course Planner">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lexm2.github.io/wpiplannerV2/">
+    <meta property="og:title" content="WPI Course Planner - Plan Your WPI Academic Schedule">
+    <meta property="og:description" content="Plan your WPI academic schedule with our interactive course planner. Browse courses, check schedules, and create your perfect academic plan.">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://lexm2.github.io/wpiplannerV2/">
+    <meta property="twitter:title" content="WPI Course Planner - Plan Your WPI Academic Schedule">
+    <meta property="twitter:description" content="Plan your WPI academic schedule with our interactive course planner. Browse courses, check schedules, and create your perfect academic plan."
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://lexm2.github.io/wpiplannerV2/">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "WPI Course Planner",
+      "description": "Interactive course planning tool for Worcester Polytechnic Institute students",
+      "url": "https://lexm2.github.io/wpiplannerV2/",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Person",
+        "name": "WPI Student"
+      }
+    }
+    </script>
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
     <link rel="shortcut icon" href="./favicon.ico">
 </head>
 <body>
     <div id="app">
-        <header class="app-header">
+        <header class="app-header" role="banner">
             <div class="header-content">
                 <div class="header-left">
                     <h1>WPI Course Planner</h1>
@@ -21,9 +62,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="header-navigation">
+                <nav class="header-navigation" role="navigation" aria-label="Main navigation">
                     <button id="schedule-btn" class="btn btn-primary btn-schedule">Schedule</button>
-                </div>
+                </nav>
                 <div class="header-controls">
                     <div class="status-indicator-container">
                         <div id="optimistic-ui-status" class="optimistic-status idle"></div>
@@ -44,7 +85,7 @@
         </header>
         
         <div class="app-body" id="planner-page">
-            <aside class="sidebar">
+            <aside class="sidebar" role="complementary" aria-label="Department navigation">
                 <div class="sidebar-header">
                     <h2>Departments</h2>
                 </div>
@@ -53,12 +94,12 @@
                 </div>
             </aside>
             
-            <main class="main-content">
+            <main class="main-content" role="main">
                 <div class="content-header">
                     <h2>Course Listings</h2>
                     <div class="search-controls">
-                        <input type="text" id="search-input" placeholder="Search courses..." class="search-input">
-                        <button id="filter-btn" class="btn btn-secondary filter-btn" title="Filter courses">⧩</button>
+                        <input type="text" id="search-input" placeholder="Search courses..." class="search-input" aria-label="Search courses">
+                        <button id="filter-btn" class="btn btn-secondary filter-btn" title="Filter courses" aria-label="Filter courses">⧩</button>
                     </div>
                     <div class="view-controls">
                         <button id="view-list" class="btn btn-primary active">List View</button>
@@ -70,23 +111,23 @@
                 </div>
             </main>
             
-            <aside class="right-panel">
-                <div class="course-description-section">
+            <aside class="right-panel" role="complementary" aria-label="Course details and selection">
+                <section class="course-description-section">
                     <div class="panel-header">
                         <h2>Course Details</h2>
                     </div>
                     <div class="course-description-content" id="course-description">
                         <div class="empty-state">Select a course to view description</div>
                     </div>
-                </div>
-                <div class="selected-courses-section">
+                </section>
+                <section class="selected-courses-section">
                     <div class="panel-header">
                         <h2>Selected Courses <span id="selected-count" class="course-count">(0)</span></h2>
                     </div>
                     <div class="selected-courses-content" id="selected-courses-list">
                         <div class="empty-state">No courses selected yet</div>
                     </div>
-                </div>
+                </section>
             </aside>
         </div>
         
