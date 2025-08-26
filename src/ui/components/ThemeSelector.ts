@@ -67,9 +67,9 @@ export class ThemeSelector {
     private currentThemeNameElement: HTMLElement | null = null;
     private isOpen: boolean = false;
 
-    constructor() {
+    constructor(profileStateManager?: ProfileStateManager) {
         this.themeManager = ThemeManager.getInstance();
-        this.profileStateManager = new ProfileStateManager();
+        this.profileStateManager = profileStateManager || new ProfileStateManager();
         this.init();
     }
 

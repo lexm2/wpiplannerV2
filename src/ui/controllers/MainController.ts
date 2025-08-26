@@ -145,6 +145,7 @@ import { ThemeManager } from '../../themes/ThemeManager'
  */
 export class MainController {
     private courseDataService: CourseDataService;
+    private themeSelector: ThemeSelector;
     private scheduleSelector: ScheduleSelector | null = null;
     private profileStateManager: ProfileStateManager;
     private courseSelectionService: CourseSelectionService;
@@ -179,6 +180,7 @@ export class MainController {
         
         // Initialize services with shared ProfileStateManager
         this.courseDataService = new CourseDataService();
+        this.themeSelector = new ThemeSelector(this.profileStateManager);
         this.courseSelectionService = new CourseSelectionService(this.profileStateManager);
         this.conflictDetector = new ConflictDetector();
         this.modalService = new ModalService();
@@ -186,7 +188,7 @@ export class MainController {
         
         // Initialize search and filter services
         this.searchService = new SearchService();
-        this.filterService = new CourseFilterService(this.searchService, this.courseSelectionService);
+        this.filterService = new CourseFilterService(this.searchService);
         this.scheduleFilterService = new ScheduleFilterService();
         
         // Initialize schedule management service with shared ProfileStateManager and CourseSelectionService
@@ -243,7 +245,7 @@ export class MainController {
         
         // Setup optimistic UI event handlers
         this.setupOptimisticUIEventHandlers();
-        this.enableOptimisticUIDebug();
+        // this.enableOptimisticUIDebug();
         
         // IMPORTANT: Initialize filters LAST (triggers events that use operationManager)
         this.initializeFilters();
@@ -685,7 +687,7 @@ export class MainController {
             // Handle all filters (including search text)
             const baseCourses = selectedDepartment ? selectedDepartment.courses : this.getAllCourses();
             coursesToDisplay = this.filterService.filterCourses(baseCourses);
-            this.updateFilteredHeader(coursesToDisplay.length, selectedDepartment);
+            this.updateFilteredHeader(coursesToDisplay.length);
         } else if (selectedDepartment) {
             // Show department courses without filters
             coursesToDisplay = selectedDepartment.courses;
@@ -988,7 +990,7 @@ export class MainController {
         }
     }
 
-    private updateFilteredHeader(resultCount: number, selectedDepartment: Department | null): void {
+    private updateFilteredHeader(resultCount: number): void {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
             const filters = this.filterService.getActiveFilters();

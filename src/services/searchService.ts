@@ -162,7 +162,7 @@
  * 
  * ═══════════════════════════════════════════════════════════════════════════════
  */
-import { Course, Department, Section, Period, DayOfWeek } from '../types/types'
+import { Course, Department, Period, DayOfWeek } from '../types/types'
 import { SearchFilter, TimeSlot } from '../types/ui'
 
 export class SearchService {

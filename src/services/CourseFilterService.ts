@@ -1,8 +1,7 @@
-import { Course, Department } from '../types/types';
+import { Course } from '../types/types';
 import { CourseFilter, FilterEventListener, ActiveFilter } from '../types/filters';
 import { FilterState } from '../core/FilterState';
 import { SearchService } from './searchService';
-import { CourseSelectionService } from './CourseSelectionService';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -128,12 +127,10 @@ export class CourseFilterService {
     private filterState: FilterState;
     private registeredFilters: Map<string, CourseFilter> = new Map();
     private searchService: SearchService;
-    private courseSelectionService?: CourseSelectionService;
     
-    constructor(searchService: SearchService, courseSelectionService?: CourseSelectionService) {
+    constructor(searchService: SearchService) {
         this.filterState = new FilterState();
         this.searchService = searchService;
-        this.courseSelectionService = courseSelectionService;
     }
     
     // Filter Registration
@@ -293,21 +290,6 @@ export class CourseFilterService {
         return `${activeFilters.length} filters active`;
     }
     
-    // Convert internal filter state to SearchService format
-    private convertToSearchFilter(): any {
-        const criteria = this.filterState.getFilterCriteria();
-        
-        return {
-            departments: criteria.department?.departments || [],
-            timeSlots: criteria.timeSlot?.timeSlots || [],
-            professors: criteria.professor?.professors || [],
-            availabilityOnly: criteria.availability?.availableOnly || false,
-            creditRange: criteria.creditRange ? {
-                min: criteria.creditRange.min,
-                max: criteria.creditRange.max
-            } : undefined
-        };
-    }
     
     // Utility for getting filter options
     getFilterOptions(filterId: string, allCourses: Course[]): any {
@@ -331,7 +313,7 @@ export class CourseFilterService {
         return Array.from(departments).sort();
     }
     
-    private getProfessorOptions(courses: Course[]): string[] {
+    private getProfessorOptions(_courses: Course[]): string[] {
         return this.searchService.getAvailableProfessors();
     }
     
@@ -348,7 +330,7 @@ export class CourseFilterService {
         return Array.from(terms).sort();
     }
     
-    private getLocationOptions(courses: Course[]): { buildings: string[] } {
+    private getLocationOptions(_courses: Course[]): { buildings: string[] } {
         const buildings = this.searchService.getAvailableBuildings();
         return { buildings };
     }
