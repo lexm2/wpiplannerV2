@@ -20,9 +20,15 @@
   --color-error: #d32f2f;
   --color-info: #007aff;
 
-  /* Typography */
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Typography - WPI Official */
+  --font-family: 'Myriad Pro', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  
+  /* Font weights for WPI typography hierarchy - Lighter */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 400;
+  --font-weight-bold: 600;
 
   /* Spacing */
   --spacing-base-unit: 1rem;
@@ -48,4 +54,5 @@ body {
   background-color: var(--color-background);
   color: var(--color-text);
   font-family: var(--font-family);
+  font-weight: var(--font-weight-regular);
 }

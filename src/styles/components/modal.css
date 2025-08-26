@@ -74,7 +74,7 @@
 .modal-title {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text);
 }
 
@@ -160,7 +160,7 @@
 .modal-btn {
   padding: 0.5rem 1rem;
   border-radius: var(--effect-border-radius);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   font-size: 0.875rem;
   cursor: pointer;
   transition: var(--effect-transition);
@@ -297,7 +297,7 @@
 }
 
 .enrollment-status {
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   margin-bottom: 0.25rem;
 }
 
@@ -336,7 +336,7 @@
   padding: 0.25rem 0.5rem;
   border-radius: calc(var(--effect-border-radius) / 2);
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   height: fit-content;
   min-width: 45px;
   text-align: center;
@@ -358,7 +358,7 @@
 .period-details strong {
   min-width: 70px;
   color: var(--color-text-secondary);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .section-notes h4 {
@@ -436,7 +436,7 @@
 .filter-section-title {
   margin: 0;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text);
 }
 
@@ -775,7 +775,7 @@
 
 .filter-count {
   color: var(--color-primary);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   font-size: 0.9rem;
 }
 
@@ -853,7 +853,7 @@
 .schedule-filter-modal .available-filters-section h3 {
   margin: 0 0 1rem 0;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text);
 }
 
@@ -911,7 +911,7 @@
 .schedule-filter-modal .filter-group h4 {
   margin: 0 0 0.75rem 0;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text);
 }
 
@@ -984,7 +984,7 @@
 
 .schedule-filter-modal .time-input-group label {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text);
 }
 
@@ -1012,7 +1012,7 @@
 
 .schedule-filter-modal .location-subgroup label {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text);
 }
 

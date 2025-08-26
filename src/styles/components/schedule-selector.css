@@ -49,7 +49,7 @@
 
 .schedule-name {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: var(--font-weight-medium);
     color: var(--color-text);
     line-height: 1.2;
 }
@@ -100,7 +100,7 @@
 .schedule-dropdown-header h3 {
     margin: 0;
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: var(--font-weight-medium);
     color: var(--color-text);
 }
 
@@ -160,7 +160,7 @@
 
 .schedule-item-name {
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--color-text);
     margin-bottom: 0.25rem;
     line-height: 1.2;
@@ -169,7 +169,7 @@
 
 .schedule-item.active .schedule-item-name {
     color: var(--color-primary);
-    font-weight: 600;
+    font-weight: var(--font-weight-medium);
 }
 
 .schedule-item-details {
@@ -283,7 +283,7 @@
     border-radius: 4px;
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--color-text);
     min-width: 120px;
 }

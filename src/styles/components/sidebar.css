@@ -16,7 +16,7 @@
 
 .sidebar-header h2 {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text);
   margin: 0;
 }
@@ -30,7 +30,7 @@
 }
 
 .category-header {
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-primary);
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
@@ -67,7 +67,7 @@
 
 /* All Departments special styling */
 .department-item.all-departments {
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 0.5rem;
   padding-bottom: 0.75rem;
@@ -102,7 +102,7 @@
 .department-item[data-dept-id].active {
   background: var(--color-primary) !important;
   color: var(--color-text-inverse) !important;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 /* Enhanced visual feedback for multiple selections */

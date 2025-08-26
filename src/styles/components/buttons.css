@@ -4,7 +4,7 @@
   border: none;
   border-radius: var(--effect-border-radius);
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: var(--effect-transition);
 }

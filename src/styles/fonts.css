@@ -1,0 +1,55 @@
+/* Myriad Pro Font Faces - WPI Official Typography */
+
+/* Myriad Pro Light */
+@font-face {
+  font-family: 'Myriad Pro';
+  src: url('/fonts/MyriadPro-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Myriad Pro Regular */
+@font-face {
+  font-family: 'Myriad Pro';
+  src: url('/fonts/MYRIADPRO-REGULAR.OTF') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Myriad Pro Semi Bold */
+@font-face {
+  font-family: 'Myriad Pro';
+  src: url('/fonts/MYRIADPRO-SEMIBOLD.OTF') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Myriad Pro Bold */
+@font-face {
+  font-family: 'Myriad Pro';
+  src: url('/fonts/MYRIADPRO-BOLD.OTF') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Myriad Pro Condensed (Alternative for space-constrained areas) */
+@font-face {
+  font-family: 'Myriad Pro Condensed';
+  src: url('/fonts/MYRIADPRO-COND.OTF') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Myriad Pro Bold Condensed */
+@font-face {
+  font-family: 'Myriad Pro Condensed';
+  src: url('/fonts/MYRIADPRO-BOLDCOND.OTF') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

@@ -1,3 +1,6 @@
+/* Import fonts */
+@import url('./styles/fonts.css');
+
 /* Import theme base styles */
 @import url('./themes/styles/base.css');
 

@@ -36,7 +36,7 @@
 
 .schedule-sidebar-header h2 {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text);
   margin: 0;
 }
@@ -72,13 +72,13 @@
 }
 
 .highlighted-period .period-type-label {
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-primary);
 }
 
 .highlighted-period .period-schedule {
   color: var(--color-text);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .schedule-selected-courses {
@@ -127,7 +127,7 @@
 }
 
 .schedule-course-code {
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-primary);
   font-size: 0.9rem;
   margin-bottom: 0.25rem;
@@ -199,7 +199,7 @@
 
 .term-label {
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
@@ -235,7 +235,7 @@
 }
 
 .section-number {
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-primary);
   font-size: 0.8rem;
   margin-bottom: 0.5rem;
@@ -281,7 +281,7 @@
 
 .period-type-label {
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-inverse);
   background: var(--color-text-secondary);
   padding: 0.1rem 0.3rem;
@@ -309,7 +309,7 @@
   font-size: 0.75rem;
   color: var(--color-text);
   font-family: var(--font-family-mono);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .period-details {
@@ -402,7 +402,7 @@
 .term-header h3 {
   margin: 0;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text);
   text-align: center;
 }
@@ -428,7 +428,7 @@
   justify-content: center;
   font-size: 0.6rem;
   color: var(--color-text-secondary);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   padding: 0 0.25rem;
   border-right: 2px solid var(--color-border);
 }
@@ -441,7 +441,7 @@
   justify-content: center;
   font-size: 0.65rem;
   color: var(--color-text);
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   border-bottom: 2px solid var(--color-border);
 }
 
@@ -478,7 +478,7 @@
   border-radius: 3px;
   padding: 3px 6px;
   font-size: 0.65rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -513,7 +513,7 @@
 
 .section-number {
   font-size: 0.6rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   background: rgba(255, 255, 255, 0.25);
   padding: 2px 4px;
   border-radius: 3px;
@@ -536,7 +536,7 @@
 
 .period-type-info .period-type {
   font-size: 0.55rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   background: rgba(255, 255, 255, 0.2);
   padding: 1px 3px;
   border-radius: 2px;
@@ -582,14 +582,14 @@
 }
 
 .course-title {
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   font-size: 0.7rem;
   line-height: 1;
 }
 
 .period-type-badge {
   font-size: 0.55rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   background: rgba(255, 255, 255, 0.2);
   padding: 1px 3px;
   border-radius: 2px;
