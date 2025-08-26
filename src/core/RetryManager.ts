@@ -1,3 +1,175 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * RetryManager - Resilient Operation Execution with Exponential Backoff
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Provides retry logic for network operations with exponential backoff strategies
+ * - Handles transient failures gracefully across all application operations
+ * - Implements circuit breaker patterns for frequently failing operations
+ * - Foundation for reliable data loading, storage, and external API interactions
+ * - Performance optimization through intelligent retry strategies and failure handling
+ * 
+ * DEPENDENCIES:
+ * - RetryConfig, RetryResult interfaces → Configuration and result reporting structures
+ * - RetryOptions interface → Operation-specific retry customization options
+ * - Promise-based operations → Async operation execution and timeout management
+ * - Error handling patterns → Intelligent error classification and retry decisions
+ * 
+ * USED BY:
+ * - CourseSelectionService → Reliable course data operations with retry on failures
+ * - TransactionalStorageManager → Storage operations with retry for transient errors
+ * - Network data fetching → WPI course data loading with retry for network issues
+ * - Health checking systems → Resilient health verification with automatic retry
+ * - Import/Export operations → Data portability with retry on file system errors
+ * - ProfileMigrationService → Data migration with retry for consistency
+ * 
+ * RETRY ARCHITECTURE:
+ * ```
+ * Operation Execution Request
+ *         ↓
+ * RetryManager Configuration
+ *         ↓
+ * Attempt Operation (with timeout)
+ *         ↓
+ * Success? → Return Result
+ *         ↓ No
+ * Error Analysis & Retry Decision
+ *         ↓
+ * Calculate Backoff Delay (exponential + jitter)
+ *         ↓
+ * Wait Period → Retry Operation
+ *         ↓
+ * Max Attempts Reached? → Final Failure Result
+ * ```
+ * 
+ * KEY FEATURES:
+ * Core Retry System:
+ * - executeWithRetry() orchestrates retry logic with configurable parameters
+ * - Exponential backoff with jitter to prevent thundering herd problems
+ * - Configurable retry conditions based on error types and patterns
+ * - Timeout support with automatic cancellation for long-running operations
+ * - Comprehensive result reporting with attempt counts and timing data
+ * 
+ * Specialized Retry Patterns:
+ * - retryStorageOperation() optimized for localStorage and IndexedDB operations
+ * - retryNetworkOperation() configured for network requests and API calls
+ * - retryTransactionOperation() fast retry for database transaction conflicts
+ * - Circuit breaker pattern for preventing cascade failures
+ * 
+ * Batch Operation Support:
+ * - retryBatch() processes arrays with configurable concurrency limits
+ * - Individual item retry with optional stop-on-first-failure behavior
+ * - Progress tracking and partial success reporting
+ * - Memory-efficient processing for large datasets
+ * 
+ * Health Checking Integration:
+ * - healthCheck() validates system components with retry
+ * - Multi-component health verification with individual result tracking
+ * - Configurable health check retry parameters
+ * - Overall system health determination with detailed reporting
+ * 
+ * RETRY STRATEGIES:
+ * Exponential Backoff:
+ * - Base delay (default 1000ms) with exponential growth (2^attempt)
+ * - Maximum delay cap (default 10000ms) to prevent excessive waits
+ * - Jitter (±25%) to distribute retry attempts and prevent synchronization
+ * - Configurable backoff behavior for different operation types
+ * 
+ * Error Classification:
+ * - Storage errors: QuotaExceededError, SecurityError, localStorage issues
+ * - Network errors: NetworkError, TimeoutError, fetch failures
+ * - Transaction errors: Integrity conflicts, transaction failures
+ * - Custom retry conditions via configurable predicates
+ * 
+ * Circuit Breaker Pattern:
+ * - createCircuitBreaker() prevents cascade failures from repeated attempts
+ * - Configurable failure threshold before opening circuit
+ * - Recovery timeout with automatic circuit reset attempts
+ * - Fail-fast behavior when circuit is open to prevent resource waste
+ * 
+ * OPERATION-SPECIFIC CONFIGURATIONS:
+ * Storage Operations:
+ * - 3 max attempts with 500ms base delay
+ * - Specialized retry conditions for storage-specific errors
+ * - Quick retry suitable for localStorage/IndexedDB transient issues
+ * 
+ * Network Operations:
+ * - 5 max attempts with 1000ms base delay, 30s timeout
+ * - Extended retry suitable for network latency and connectivity issues
+ * - Longer maximum delay (30s) for network recovery scenarios
+ * 
+ * Transaction Operations:
+ * - 2 max attempts with 100ms base delay
+ * - Fast retry for database transaction conflicts
+ * - No exponential backoff for quick conflict resolution
+ * 
+ * PERFORMANCE FEATURES:
+ * Timeout Management:
+ * - withTimeout() prevents operations from hanging indefinitely
+ * - Configurable timeout per operation type
+ * - Automatic cleanup of timed-out operations
+ * 
+ * Memory Efficiency:
+ * - Minimal object allocation during retry cycles
+ * - Efficient delay calculation without object creation
+ * - Optional callback cleanup with error handling
+ * 
+ * Concurrency Control:
+ * - Batch processing with configurable concurrency limits
+ * - Prevention of overwhelming system resources
+ * - Balanced throughput and resource utilization
+ * 
+ * INTEGRATION PATTERNS:
+ * Service Layer Integration:
+ * ```typescript
+ * const retryManager = RetryManager.createNetworkRetryManager();
+ * const result = await retryManager.executeWithRetry(
+ *   () => fetchCourseData(),
+ *   { operationName: 'course data fetch' }
+ * );
+ * ```
+ * 
+ * Circuit Breaker Pattern:
+ * ```typescript
+ * const circuitBreaker = retryManager.createCircuitBreaker(
+ *   () => unreliableOperation(),
+ *   { failureThreshold: 5, recoveryTimeout: 60000 }
+ * );
+ * const result = await circuitBreaker();
+ * ```
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Strategy: Configurable retry strategies for different operation types
+ * - Template Method: Consistent retry workflow across all operation patterns
+ * - Circuit Breaker: Failure detection and automatic recovery mechanisms
+ * - Observer: Callback system for retry events and status monitoring
+ * - Factory: Static factory methods for common retry manager configurations
+ * 
+ * BENEFITS ACHIEVED:
+ * - Graceful handling of transient failures across all system operations
+ * - Reduced user-visible errors through automatic retry mechanisms
+ * - Optimal retry timing with exponential backoff and jitter
+ * - Prevention of cascade failures through circuit breaker patterns
+ * - Comprehensive monitoring and reporting of retry operations
+ * - Memory and resource efficient retry implementation
+ * - Configurable retry behavior for different operation characteristics
+ * 
+ * ERROR HANDLING & MONITORING:
+ * - Detailed logging of retry attempts with timing and error information
+ * - Structured error reporting with attempt counts and total execution time
+ * - Callback system for custom retry monitoring and alerting
+ * - Graceful degradation when max attempts are reached
+ * - Health check integration for proactive failure detection
+ * 
+ * STATIC UTILITY METHODS:
+ * - withRetry() provides one-shot retry execution without manager instance
+ * - createStorageRetryManager() / createNetworkRetryManager() factory methods
+ * - Pre-configured retry managers for common use cases
+ * - Simplified API for basic retry scenarios
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 export interface RetryConfig {
     maxAttempts: number;
     baseDelay: number;

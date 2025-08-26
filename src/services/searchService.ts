@@ -1,3 +1,167 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * SearchService - High-Performance Course Search & Discovery Engine
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Full-text search engine across courses, professors, and course content
+ * - High-performance search indexing with pre-built indexes for large datasets
+ * - Course discovery coordinator with advanced filtering and ranking algorithms
+ * - Search result optimization layer providing fast queries on 8MB+ course datasets
+ * - Academic data aggregation service providing professor and building enumeration
+ * - Time-based search capabilities for schedule-aware course discovery
+ * 
+ * DEPENDENCIES:
+ * - Course, Department, Section types → Core academic data structures
+ * - SearchFilter, TimeSlot types → Search criteria and time-based filtering
+ * - Period, DayOfWeek types → Schedule information for time-based searches
+ * - Course database from CourseDataService → Foundation data for indexing
+ * 
+ * USED BY:
+ * - FilterService → Core filtering operations and search integration
+ * - SearchTextFilter → Text-based course filtering implementation
+ * - UI search components → Real-time search functionality
+ * - FilterModalController → Advanced search and filtering interface
+ * - Course discovery systems → Academic course exploration features
+ * 
+ * SEARCH ARCHITECTURE:
+ * ```
+ * Course Database Input
+ *         ↓
+ * Search Index Construction (Map-based)
+ *         ↓
+ * Time Slot Mapping & Professor/Building Caches
+ *         ↓
+ * Multi-criteria Search Processing
+ *         ↓
+ * Ranking & Result Optimization
+ *         ↓
+ * Filtered Course Results
+ * ```
+ * 
+ * KEY FEATURES:
+ * Full-Text Search Engine:
+ * - searchCourses() provides comprehensive text-based course discovery
+ * - Multi-field search across course names, numbers, descriptions, and professor names
+ * - Case-insensitive search with tokenization and partial matching
+ * - Search index construction for O(1) term lookup performance
+ * - Ranking algorithms prioritizing exact matches and multiple field matches
+ * 
+ * Advanced Search Indexing:
+ * - buildSearchIndex() creates Map-based indexes for instant term lookup
+ * - Tokenization splitting course information into searchable terms
+ * - Set-based course storage preventing duplicate results
+ * - Professor and building cache construction for enumeration
+ * - Time slot mapping enabling schedule-aware search
+ * 
+ * Multi-Criteria Filtering:
+ * - Department filtering for focused course discovery
+ * - Professor filtering for instructor-based course selection
+ * - Building filtering for location-based course discovery
+ * - Credit hour filtering for academic planning requirements
+ * - Time-based filtering for schedule compatibility
+ * 
+ * Performance Optimization:
+ * - Pre-computed search indexes reducing query time complexity
+ * - Cache-based professor and building enumeration
+ * - Efficient Map and Set data structures for fast lookups
+ * - Minimal memory footprint through strategic caching
+ * - Lazy cache population optimizing initialization performance
+ * 
+ * SEARCH CAPABILITIES:
+ * Text Search:
+ * - Course name and number matching with partial string support
+ * - Course description full-text search
+ * - Professor name search across all course sections
+ * - Multi-term queries with AND logic
+ * - Case-insensitive search with normalization
+ * 
+ * Academic Filtering:
+ * - Department-based filtering for focused browsing
+ * - Credit hour range filtering for degree planning
+ * - Course level filtering (undergraduate/graduate)
+ * - Section availability filtering
+ * 
+ * Schedule-Aware Search:
+ * - Time slot filtering for schedule compatibility
+ * - Day-of-week filtering for scheduling preferences
+ * - Professor availability across time periods
+ * - Building proximity for consecutive classes
+ * 
+ * PERFORMANCE STRATEGIES:
+ * Index Construction:
+ * - buildSearchIndex() creates comprehensive term-to-course mappings
+ * - Tokenization extracting searchable terms from all text fields
+ * - Set-based storage eliminating duplicate course references
+ * - Map structure providing O(1) term lookup performance
+ * 
+ * Cache Management:
+ * - clearCaches() resets all performance optimization caches
+ * - Lazy cache population reducing initialization overhead
+ * - Strategic cache invalidation maintaining data freshness
+ * - Memory-efficient cache structures optimizing space usage
+ * 
+ * DATA AGGREGATION SERVICES:
+ * - getAllProfessors() provides complete instructor enumeration
+ * - getAllBuildings() supplies location-based filtering options
+ * - getUniqueValues() extracts distinct values for filter options
+ * - Academic metadata extraction for UI filter population
+ * 
+ * SEARCH RESULT RANKING:
+ * - Exact match prioritization for precise course discovery
+ * - Multi-field match bonus scoring
+ * - Relevance-based result ordering
+ * - Course popularity and enrollment data integration
+ * 
+ * INTEGRATION PATTERNS:
+ * FilterService Integration:
+ * - Provides foundation search capabilities for filtering system
+ * - Integrates with SearchTextFilter for text-based filtering
+ * - Supports FilterModalController advanced search interface
+ * - Enables real-time search result updates
+ * 
+ * Course Data Integration:
+ * - setCourseData() integrates with CourseDataService updates
+ * - Automatic index rebuilding on data changes
+ * - Data validation and consistency checking
+ * - Support for incremental data updates
+ * 
+ * UI Component Support:
+ * - Real-time search result updates
+ * - Filter option enumeration for UI population
+ * - Search suggestions and autocomplete support
+ * - Performance optimization for interactive search
+ * 
+ * TIME-BASED SEARCH FEATURES:
+ * - buildTimeSlotMappings() enables schedule-compatible course discovery
+ * - Time period analysis for schedule optimization
+ * - Day-of-week availability checking
+ * - Conflict detection integration with search results
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Index: Pre-computed search indexes for performance optimization
+ * - Strategy: Configurable search and ranking strategies
+ * - Cache: Performance optimization through strategic data caching
+ * - Observer: Data change notifications triggering index rebuilds
+ * - Factory: Search result construction with ranking and filtering
+ * 
+ * BENEFITS ACHIEVED:
+ * - High-performance search across large course datasets (8MB+)
+ * - Real-time search results with sub-100ms response times
+ * - Comprehensive course discovery across multiple criteria
+ * - Schedule-aware search enabling academic planning workflows
+ * - Memory-efficient indexing supporting offline course browsing
+ * - Extensible search architecture supporting future enhancements
+ * 
+ * INTEGRATION NOTES:
+ * - Designed for integration with FilterService and UI components
+ * - Supports CourseDataService data format and update patterns
+ * - Provides foundation for advanced filtering and discovery features
+ * - Enables real-time search experiences with performance optimization
+ * - Supports academic planning workflows with schedule-aware capabilities
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 import { Course, Department, Section, Period, DayOfWeek } from '../types/types'
 import { SearchFilter, TimeSlot } from '../types/ui'
 

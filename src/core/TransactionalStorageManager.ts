@@ -1,3 +1,124 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * TransactionalStorageManager - Atomic localStorage Operations Foundation
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Low-level localStorage operations with transaction support and data consistency
+ * - Foundation layer providing atomic operations for ProfileStateManager
+ * - Handles serialization/deserialization of complex data types (Sets, nested objects)
+ * - Prevents data corruption through transactional operations and rollback support
+ * - Bridge between application state and browser localStorage persistence
+ * 
+ * DEPENDENCIES:
+ * - Schedule, SchedulePreferences, SelectedCourse types → Data models for storage operations
+ * - UserScheduleState interface → Legacy state model for backward compatibility
+ * - Browser localStorage API → Underlying persistence mechanism
+ * - JSON serialization/deserialization → Data transformation for storage
+ * 
+ * USED BY:
+ * - ProfileStateManager → Primary consumer for all state persistence operations
+ * - StorageService → Singleton bridge for legacy components and theme management
+ * - Import/Export functionality → Data portability operations
+ * - Health checking systems → Storage integrity verification
+ * 
+ * STORAGE ARCHITECTURE INTEGRATION:
+ * ```
+ * ProfileStateManager (Single Source of Truth)
+ *           ↓
+ * TransactionalStorageManager (This Component)
+ *           ↓
+ *      localStorage
+ * ```
+ * 
+ * KEY FEATURES:
+ * Transaction Management:
+ * - executeTransaction() with atomic operations and automatic rollback
+ * - Backup creation before operations to enable rollback
+ * - Data integrity verification after each transaction
+ * - Transaction logging for debugging and audit trails
+ * 
+ * Data Operations:
+ * - saveSchedule() / loadSchedule() / deleteSchedule() for schedule management
+ * - savePreferences() / loadPreferences() for user settings persistence
+ * - saveSelectedCourses() / loadSelectedCourses() for course selection state
+ * - saveThemePreference() / loadThemePreference() for UI theme persistence
+ * - saveActiveScheduleId() / loadActiveScheduleId() for active schedule tracking
+ * 
+ * Serialization System:
+ * - Custom replacer/reviver for JSON serialization handling
+ * - Set serialization/deserialization support (converted to/from arrays)
+ * - Department reference optimization (removes circular references)
+ * - Section object filtering to prevent duplicate storage
+ * - Safe error handling for malformed data
+ * 
+ * Data Integrity & Safety:
+ * - verifyDataIntegrity() checks after every operation
+ * - Atomic transactions prevent partial data corruption
+ * - Rollback capability restores previous state on failures
+ * - Health checking with localStorage availability testing
+ * - Checksum generation/verification for import/export operations
+ * 
+ * Import/Export Functionality:
+ * - exportData() generates JSON with version and checksum information
+ * - importData() with integrity verification and checksum validation
+ * - Cross-version compatibility support for future migrations
+ * - Comprehensive data portability for user backups
+ * 
+ * STORAGE KEY ARCHITECTURE:
+ * - USER_STATE: Legacy user state for backward compatibility
+ * - PREFERENCES: Schedule generation preferences and user settings
+ * - SCHEDULES: All saved schedules with course selections
+ * - SELECTED_COURSES: Standalone course selections (fallback)
+ * - THEME: Active theme selection for UI appearance
+ * - ACTIVE_SCHEDULE_ID: Currently active schedule identifier
+ * - TRANSACTION_LOG: Operation logging for debugging (reserved)
+ * 
+ * TRANSACTION FLOW:
+ * 1. Begin transaction with unique ID generation
+ * 2. Create backup of all affected localStorage keys
+ * 3. Execute all operations in sequence
+ * 4. Verify data integrity after operations
+ * 5. Commit transaction on success OR rollback on failure
+ * 6. Clean up transaction records and return result
+ * 
+ * ERROR HANDLING & RECOVERY:
+ * - Try/catch blocks around all localStorage operations
+ * - Graceful degradation with default values for missing data
+ * - Automatic rollback on transaction failures
+ * - Health checking detects and reports storage issues
+ * - Safe loading with fallback to default values
+ * 
+ * PERFORMANCE OPTIMIZATIONS:
+ * - Lazy loading patterns for large data structures
+ * - Efficient serialization avoiding unnecessary data
+ * - Batch operations within single transactions
+ * - Integrity verification only on critical operations
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Repository: Centralized data access layer
+ * - Transaction: Atomic operations with rollback capability
+ * - Template Method: Consistent operation patterns for all data types  
+ * - Strategy: Pluggable serialization/deserialization strategies
+ * - Singleton: Shared storage manager instance across components
+ * 
+ * BENEFITS ACHIEVED:
+ * - Eliminated data corruption through atomic operations
+ * - Consistent serialization/deserialization across all data types
+ * - Reliable rollback capability for failed operations
+ * - Health monitoring and integrity verification
+ * - Data portability through export/import functionality
+ * - Foundation for unified storage architecture
+ * 
+ * INTEGRATION NOTES:
+ * - Designed specifically as foundation for ProfileStateManager
+ * - Handles complex data types (Sets, circular references) transparently
+ * - Provides transaction abstraction over localStorage limitations
+ * - Enables event-driven architecture through reliable persistence
+ * - Supports multi-schedule functionality through efficient storage patterns
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
 
 export interface StorageTransaction {

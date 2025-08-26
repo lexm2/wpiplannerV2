@@ -1,3 +1,153 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * DepartmentSyncService - UI Component Synchronization & Coordination Hub
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Department selection synchronization coordinator preventing circular updates
+ * - UI consistency guardian maintaining state synchronization across components
+ * - Filter integration bridge connecting FilterService with UI controllers
+ * - Multi-component state manager coordinating sidebar and modal interactions
+ * - Event-driven synchronization hub preventing tight coupling between UI components
+ * - Visual state management layer ensuring UI reflects filter state accurately
+ * 
+ * DEPENDENCIES:
+ * - FilterService → Core filtering infrastructure for department filter management
+ * - DepartmentController → Sidebar department selection UI controller
+ * - FilterModalController → Modal-based advanced filtering interface
+ * - DOM Element Management → Direct DOM manipulation for visual state updates
+ * 
+ * USED BY:
+ * - DepartmentController → Sidebar department selection event coordination
+ * - FilterModalController → Modal department filter synchronization
+ * - MainController → Application-level department coordination setup
+ * - FilterService event handlers → Automatic UI synchronization on filter changes
+ * 
+ * SYNCHRONIZATION ARCHITECTURE:
+ * ```
+ * User Interaction (Sidebar/Modal)
+ *         ↓
+ * DepartmentSyncService Coordination
+ *         ↓
+ * FilterService Update (Central State)
+ *         ↓
+ * Event-Driven UI Synchronization
+ *         ↓
+ * Visual State Update Across All Components
+ * ```
+ * 
+ * KEY FEATURES:
+ * Circular Update Prevention:
+ * - isUpdating flag preventing infinite loops between UI components
+ * - Controlled update sequences ensuring state consistency
+ * - Event handler coordination preventing duplicate operations
+ * - Transaction-like update patterns with try/finally blocks
+ * 
+ * Multi-Component Synchronization:
+ * - syncSidebarToFilter() handles sidebar → filter state updates
+ * - syncFilterToSidebar() handles filter → sidebar state updates
+ * - syncFilterToModal() coordinates modal interface synchronization
+ * - Bidirectional synchronization maintaining consistency across interfaces
+ * 
+ * Visual State Management:
+ * - updateSidebarVisualState() with comprehensive DOM manipulation
+ * - CSS class management for active/inactive department states
+ * - Multi-selection indicators with count display
+ * - Error-resilient visual updates with fallback strategies
+ * 
+ * Advanced Selection Modes:
+ * - Single selection with toggle behavior
+ * - Multi-selection with cumulative department addition
+ * - "All Departments" special case handling
+ * - Smart selection clearing and state reset
+ * 
+ * INTEGRATION PATTERNS:
+ * FilterService Integration:
+ * - Delegates department filtering to FilterService core infrastructure
+ * - Leverages FilterService event system for change notifications
+ * - Maintains separation between UI coordination and core filtering logic
+ * - Provides FilterService with UI-specific department filter operations
+ * 
+ * UI Controller Coordination:
+ * - DepartmentController event handling with sync service mediation
+ * - FilterModalController state synchronization during modal operations
+ * - Cross-controller communication through centralized sync service
+ * - Event listener management preventing memory leaks
+ * 
+ * DOM Integration:
+ * - Direct DOM element manipulation for performance optimization
+ * - CSS class management for visual state indication
+ * - Element finding strategies with fallback mechanisms
+ * - Debug tooling for DOM state inspection and troubleshooting
+ * 
+ * SELECTION MANAGEMENT FEATURES:
+ * Selection Operations:
+ * - toggleDepartment() for interactive department selection
+ * - selectDepartments() for programmatic multi-department selection
+ * - clearAllDepartmentSelections() for state reset functionality
+ * - getActiveDepartments() for current selection state access
+ * 
+ * Selection State Queries:
+ * - isDepartmentSelected() for individual department status checking
+ * - getSelectedDepartmentCount() for selection quantity tracking
+ * - getSelectionDescription() for human-readable selection summaries
+ * 
+ * VISUAL STATE SYNCHRONIZATION:
+ * DOM Element Management:
+ * - updateSidebarVisualState() with comprehensive visual updates
+ * - findDepartmentElement() with multiple search strategies
+ * - normalizeDepartmentId() for consistent element matching
+ * - updateMultiSelectionIndicators() for selection count display
+ * 
+ * Error Handling & Debugging:
+ * - debugDepartmentElementSearch() for troubleshooting element issues
+ * - debugVisualSync() for state consistency verification
+ * - enableDebugMode() / disableDebugMode() for visual debugging
+ * - Comprehensive logging for synchronization operation tracking
+ * 
+ * ELEMENT FINDING STRATEGIES:
+ * - Exact case match for data-dept-id attributes
+ * - Uppercase normalization for case-insensitive matching
+ * - Lowercase fallback for alternative case patterns
+ * - DOM traversal-based search for complex element structures
+ * 
+ * EVENT SYSTEM ARCHITECTURE:
+ * - DepartmentSyncEventListener interface for external coordination
+ * - addEventListener() / removeEventListener() for lifecycle management
+ * - notifyListeners() for event propagation to registered components
+ * - Event-driven architecture reducing tight coupling
+ * 
+ * INITIALIZATION & LIFECYCLE:
+ * - initialize() method for service startup coordination
+ * - setFilterModalController() for late controller binding
+ * - forceVisualRefresh() for manual state synchronization
+ * - Component lifecycle integration with proper cleanup
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Coordinator: Multi-component state synchronization
+ * - Observer: Event-driven updates between components
+ * - Strategy: Multiple element finding and update strategies
+ * - State Machine: Selection state management with transitions
+ * - Facade: Simplified interface hiding complex synchronization logic
+ * 
+ * BENEFITS ACHIEVED:
+ * - Eliminated circular updates between sidebar and modal interfaces
+ * - Consistent department selection state across all UI components
+ * - Clean separation between UI coordination and core filtering logic
+ * - Robust visual state management with error recovery
+ * - Event-driven architecture enabling loose coupling between components
+ * - Comprehensive debugging and troubleshooting capabilities
+ * - Flexible selection modes supporting different user interaction patterns
+ * 
+ * INTEGRATION NOTES:
+ * - Designed as coordination layer between FilterService and UI controllers
+ * - Prevents tight coupling between sidebar and modal department interfaces
+ * - Provides debugging capabilities for complex UI synchronization issues
+ * - Supports both programmatic and user-driven department selection workflows
+ * - Enables clean separation of concerns in multi-component filtering systems
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 import { FilterService } from './FilterService';
 import { DepartmentController } from '../ui/controllers/DepartmentController';
 import { FilterModalController } from '../ui/controllers/FilterModalController';

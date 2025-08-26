@@ -1,3 +1,171 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * ProfileMigrationService - Data Schema Migration & Version Compatibility System
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Handles migration between different storage formats for application updates
+ * - Ensures data compatibility during application version transitions
+ * - Safely transitions users from old to new storage systems with data preservation
+ * - Provides rollback capabilities for failed migrations with automatic recovery
+ * - Foundation for schema evolution and backward compatibility support
+ * 
+ * DEPENDENCIES:
+ * - DataValidator → Schema validation and data integrity verification
+ * - TransactionalStorageManager → Atomic storage operations during migration
+ * - RetryManager → Resilient migration operations with automatic retry
+ * - Schedule, SelectedCourse, SchedulePreferences types → Data model validation
+ * - ValidationResult interface → Migration validation result reporting
+ * 
+ * USED BY:
+ * - ProfileStateManager → Data loading with automatic migration for legacy data
+ * - TransactionalStorageManager → Storage loading with version compatibility
+ * - Application initialization → Automatic data migration on startup
+ * - Import/Export systems → Cross-version data compatibility
+ * - Data recovery operations → Safe restoration from backups
+ * 
+ * MIGRATION ARCHITECTURE:
+ * ```
+ * Legacy Data Detection
+ *         ↓
+ * Version Analysis & Migration Path Planning
+ *         ↓
+ * Backup Creation (with integrity verification)
+ *         ↓
+ * Sequential Migration Steps (with validation)
+ *         ↓
+ * Final Data Validation
+ *         ↓
+ * Rollback on Failure OR Commit on Success
+ * ```
+ * 
+ * KEY FEATURES:
+ * Automatic Migration System:
+ * - migrateToLatest() automatically upgrades data to current schema version
+ * - migrateFromTo() provides custom version migration paths
+ * - Version detection through DataValidator.detectSchemaVersion()
+ * - Sequential migration steps with individual validation
+ * - Comprehensive error handling with automatic rollback
+ * 
+ * Migration Step Architecture:
+ * - MigrationStep interface defines structured migration operations
+ * - Each step includes migrate(), validate(), and rollback() methods
+ * - Linear migration path with version progression tracking
+ * - Individual step validation with DataValidator integration
+ * - Automatic rollback capabilities for failed migration steps
+ * 
+ * Data Safety & Integrity:
+ * - createBackup() generates integrity-verified backups before migration
+ * - Checksum verification for backup data integrity
+ * - restoreFromBackup() provides automatic recovery on migration failure
+ * - TransactionalStorageManager integration for atomic operations
+ * - RetryManager integration for resilient migration operations
+ * 
+ * Schema Migration Examples:
+ * - migrate1_0To2_0() adds selectedSectionNumber field and structure improvements
+ * - migrate2_0To2_1() adds new preference fields and metadata optimization
+ * - Structured migration with item change tracking
+ * - Deep cloning for safe data transformation
+ * 
+ * SPECIFIC MIGRATION IMPLEMENTATIONS:
+ * Version 1.0 → 2.0 Migration:
+ * - Add selectedSectionNumber field alongside selectedSection object
+ * - Ensure isRequired boolean field exists for all selected courses
+ * - Handle selectedSection string-to-object migration
+ * - Add default theme preference if missing
+ * - Convert preferredDays arrays to Sets for consistency
+ * - Process both standalone and schedule-embedded course selections
+ * 
+ * Version 2.0 → 2.1 Migration (Future):
+ * - Add preferredBuildings array for location preferences
+ * - Add maxWalkingTime preference for schedule optimization
+ * - Add metadata fields to schedules (created/modified timestamps)
+ * - Example of extensible migration architecture
+ * 
+ * BACKUP & RECOVERY SYSTEM:
+ * Backup Creation:
+ * - Automatic backup before any migration attempt
+ * - Integrity checksums for backup verification
+ * - Timestamped backup identification
+ * - Storage-retry integration for reliable backup creation
+ * 
+ * Recovery Operations:
+ * - restoreFromBackup() with integrity verification
+ * - Automatic recovery on migration failure
+ * - Backup cleanup with configurable age limits
+ * - Migration history logging for audit trails
+ * 
+ * MIGRATION PATH PLANNING:
+ * - findMigrationPath() determines sequential upgrade steps
+ * - Linear path planning from source to target version
+ * - Circular dependency detection and prevention
+ * - Support for complex multi-step migration sequences
+ * - Version compatibility checking with supported version list
+ * 
+ * VALIDATION INTEGRATION:
+ * - Step-by-step validation during migration process
+ * - Final validation of migrated data against target schema
+ * - DataValidator integration for consistent validation rules
+ * - Warning collection and error reporting
+ * - Repair-in-place option for minor data inconsistencies
+ * 
+ * ERROR HANDLING & MONITORING:
+ * - Comprehensive error collection with detailed messages
+ * - Migration result reporting with success/failure status
+ * - Item change counting for migration impact assessment
+ * - Migration history logging with success/failure tracking
+ * - Automatic rollback with error preservation
+ * 
+ * UTILITY FEATURES:
+ * Migration History:
+ * - getMigrationHistory() provides audit trail of all migrations
+ * - Timestamped migration log with success/failure status
+ * - Item change tracking for migration impact analysis
+ * - Limited log retention (50 entries) for memory efficiency
+ * 
+ * Backup Management:
+ * - cleanupOldBackups() removes expired backup data
+ * - Configurable retention period (default 30 days)
+ * - Storage space optimization through automatic cleanup
+ * - Error-resilient cleanup with invalid backup removal
+ * 
+ * Version Compatibility:
+ * - isVersionSupported() validates version compatibility
+ * - getCurrentVersion() provides current schema version
+ * - Supported version list for compatibility checking
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Strategy: Configurable migration strategies per version transition
+ * - Template Method: Consistent migration workflow across all versions
+ * - Command: Migration steps as discrete, reversible operations
+ * - State: Version-aware data transformation with state preservation
+ * - Observer: Result reporting with detailed success/failure information
+ * 
+ * BENEFITS ACHIEVED:
+ * - Seamless data migration during application updates
+ * - Data preservation across schema changes and format updates
+ * - Automatic rollback prevents data corruption during failed migrations
+ * - Comprehensive validation ensures data integrity after migration
+ * - Audit trail provides migration history for troubleshooting
+ * - Extensible architecture supports future schema evolution
+ * - User-transparent migration with minimal disruption
+ * 
+ * INTEGRATION NOTES:
+ * - Designed for ProfileStateManager initialization workflow
+ * - Integrates with TransactionalStorageManager for atomic operations
+ * - Uses DataValidator for consistent validation rules
+ * - RetryManager provides resilient migration operations
+ * - Supports import/export workflows with version compatibility
+ * 
+ * FUTURE EXTENSIBILITY:
+ * - Additional migration steps easily added to migrationSteps array
+ * - Complex migration path planning for non-linear version jumps
+ * - Enhanced rollback strategies with partial migration support
+ * - Migration performance optimization for large datasets
+ * - Advanced backup strategies with compression and encryption
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
 import { Course, Section, Department } from '../types/types'
 import { DataValidator, ValidationResult } from './DataValidator'

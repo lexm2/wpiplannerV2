@@ -33,6 +33,157 @@ export interface ScheduleUpdateOptions {
     autoSave?: boolean;
 }
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * ScheduleManagementService - Multi-Schedule Coordination & Lifecycle Management
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECTURE ROLE:
+ * - Multi-schedule management coordinator handling multiple saved schedules
+ * - Schedule lifecycle manager with CRUD operations and validation
+ * - Active schedule coordination integrating with CourseSelectionService
+ * - Event-driven schedule state notifications for UI synchronization
+ * - Data validation and integrity guardian for schedule operations
+ * - Schedule activation coordinator managing transitions between saved schedules
+ * 
+ * DEPENDENCIES:
+ * - ProfileStateManager → Backend persistence and authoritative schedule storage
+ * - CourseSelectionService → Course selection coordination and state synchronization
+ * - DataValidator → Schedule validation and data integrity verification
+ * - RetryManager → Resilient operations with automatic retry capabilities
+ * - Schedule, SelectedCourse types → Core data structures for schedule management
+ * 
+ * USED BY:
+ * - ScheduleController → UI schedule management and visualization
+ * - ScheduleSelector component → Schedule switching and management interface
+ * - MainController → Application-level schedule coordination
+ * - UI components requiring multi-schedule functionality
+ * - Schedule import/export systems → Schedule portability operations
+ * 
+ * SCHEDULE MANAGEMENT ARCHITECTURE:
+ * ```
+ * UI Schedule Operations
+ *         ↓
+ * ScheduleManagementService Coordination
+ *         ↓
+ * ProfileStateManager Integration
+ *         ↓
+ * CourseSelectionService Synchronization
+ *         ↓
+ * Event-Driven UI Updates
+ * ```
+ * 
+ * KEY FEATURES:
+ * Schedule Lifecycle Management:
+ * - createSchedule() with flexible creation options and validation
+ * - updateSchedule() with partial updates and automatic validation
+ * - deleteSchedule() with safety checks and cascade handling
+ * - duplicateSchedule() for schedule templating and experimentation
+ * - renameSchedule() with validation and event notifications
+ * 
+ * Active Schedule Coordination:
+ * - setActiveSchedule() with course selection synchronization
+ * - getActiveSchedule() providing current schedule access
+ * - Active schedule change management with CourseSelectionService integration
+ * - Automatic course loading when switching between schedules
+ * 
+ * Schedule Operations & Validation:
+ * - Schedule validation using DataValidator integration
+ * - Data integrity checks for schedule consistency
+ * - Retry mechanisms for failed operations
+ * - Error handling with detailed operation results
+ * 
+ * Event-Driven Architecture:
+ * - Schedule change events (created, updated, deleted, activated)
+ * - Real-time listener notifications for UI synchronization
+ * - Event aggregation reducing notification overhead
+ * - Type-safe event handling with timestamp tracking
+ * 
+ * INTEGRATION PATTERNS:
+ * ProfileStateManager Coordination:
+ * - Delegates schedule persistence to ProfileStateManager
+ * - Leverages ProfileStateManager's event system for state changes
+ * - Integrates with unified storage architecture
+ * - Maintains consistency with core data management patterns
+ * 
+ * CourseSelectionService Integration:
+ * - Coordinates course selections with active schedule changes
+ * - Synchronizes course state when switching schedules
+ * - Maintains course selection consistency across schedule operations
+ * - Leverages CourseSelectionService events for UI coordination
+ * 
+ * UI Component Integration:
+ * - Event-driven updates reducing tight coupling
+ * - Comprehensive operation results with success/error reporting
+ * - Flexible operation options supporting different UI workflows
+ * - Listener management for component lifecycle integration
+ * 
+ * SCHEDULE CREATION OPTIONS:
+ * - includeCurrentCourses: Copy current course selections to new schedule
+ * - copyFromSchedule: Duplicate existing schedule as template
+ * - autoActivate: Automatically set new schedule as active
+ * - autoSave: Immediately persist schedule after creation
+ * 
+ * SCHEDULE UPDATE CAPABILITIES:
+ * - Partial schedule updates without full replacement
+ * - Name updates with validation
+ * - Course list synchronization options
+ * - Automatic save coordination
+ * - Event notifications for all update types
+ * 
+ * ERROR HANDLING & RESILIENCE:
+ * - Comprehensive validation before all operations
+ * - RetryManager integration for transient failures
+ * - Detailed error reporting with operation context
+ * - Graceful degradation for partial operation failures
+ * - State consistency preservation during error conditions
+ * 
+ * EVENT SYSTEM ARCHITECTURE:
+ * Event Types:
+ * - schedule_created: New schedule added to collection
+ * - schedule_updated: Existing schedule modified
+ * - schedule_deleted: Schedule removed from collection
+ * - schedule_activated: Active schedule changed
+ * - schedules_loaded: Complete schedule collection loaded
+ * 
+ * Event Properties:
+ * - Type-safe event enumeration
+ * - Schedule objects included for immediate UI updates
+ * - Timestamp tracking for chronological event ordering
+ * - Complete schedule collection for state synchronization
+ * 
+ * INITIALIZATION & LIFECYCLE:
+ * - Lazy initialization with promise caching
+ * - ProfileStateManager listener setup
+ * - Event system integration
+ * - State synchronization on service startup
+ * - Graceful error handling during initialization
+ * 
+ * ARCHITECTURAL PATTERNS:
+ * - Facade: Simplified interface to complex schedule operations
+ * - Observer: Event-driven notifications for state changes
+ * - Strategy: Configurable operation options and behaviors
+ * - Coordinator: Multi-service integration and orchestration
+ * - Template Method: Consistent operation workflow across all schedule operations
+ * 
+ * BENEFITS ACHIEVED:
+ * - Multi-schedule workflow support for complex academic planning
+ * - Event-driven architecture enabling responsive UI updates
+ * - Data integrity through comprehensive validation
+ * - Resilient operations with automatic retry capabilities
+ * - Clean separation between schedule management and course selection
+ * - Flexible operation options supporting diverse UI requirements
+ * - Consistent error handling and reporting across all operations
+ * 
+ * INTEGRATION NOTES:
+ * - Designed to work alongside CourseSelectionService
+ * - Integrates with ProfileStateManager unified storage architecture
+ * - Supports ScheduleController UI management requirements
+ * - Enables ScheduleSelector component functionality
+ * - Provides foundation for schedule import/export features
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 export class ScheduleManagementService {
     private profileStateManager: ProfileStateManager;
     private courseSelectionService: CourseSelectionService;
