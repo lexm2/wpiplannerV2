@@ -72,8 +72,7 @@ describe('ScheduleController Expansion State', () => {
             <div id="schedule-selected-count"></div>
         `;
 
-        searchService = new SearchService();
-        scheduleFilterService = new ScheduleFilterService(searchService);
+        scheduleFilterService = new ScheduleFilterService();
         conflictDetector = new ConflictDetector();
         scheduleFilterService.setConflictDetector(conflictDetector);
         

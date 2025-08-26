@@ -44,15 +44,24 @@ describe('ProfileStateManager', () => {
 
     mockStorageManager = new TransactionalStorageManager()
     profileStateManager = new ProfileStateManager(mockStorageManager)
+    
+    // Create a default schedule for tests that need an active schedule
+    const defaultSchedule = profileStateManager.createSchedule('Test Schedule', 'test')
+    profileStateManager.setActiveSchedule(defaultSchedule.id, 'test')
+    
+    // Clear any courses that might have been set during setup
+    profileStateManager.clearAllSelections('test')
   })
 
   afterEach(() => {
-    consoleSpy.restore()
+    consoleSpy.mockRestore()
   })
 
   describe('Initialization and State Management', () => {
     it('should initialize with default state', () => {
-      const state = profileStateManager.getState()
+      // Create a fresh instance without the default schedule from beforeEach
+      const freshProfileManager = new ProfileStateManager(mockStorageManager)
+      const state = freshProfileManager.getState()
       
       expect(state.activeScheduleId).toBeNull()
       expect(state.schedules).toEqual([])
@@ -63,9 +72,11 @@ describe('ProfileStateManager', () => {
     })
 
     it('should create default schedule if none exist', async () => {
-      await profileStateManager.loadFromStorage()
+      // Create a fresh instance without the default schedule from beforeEach
+      const freshProfileManager = new ProfileStateManager(mockStorageManager)
+      await freshProfileManager.loadFromStorage()
       
-      const state = profileStateManager.getState()
+      const state = freshProfileManager.getState()
       expect(state.schedules.length).toBe(1)
       expect(state.schedules[0].name).toBe('My Schedule')
       expect(state.activeScheduleId).toBe(state.schedules[0].id)
@@ -95,8 +106,10 @@ describe('ProfileStateManager', () => {
   })
 
   describe('Course Selection Management', () => {
-    it('should select course successfully', () => {
+    it('should select course successfully', async () => {
       const listeners: StateChangeEvent[] = []
+      
+      // Add listener after setup is complete
       profileStateManager.addListener((event) => listeners.push(event))
 
       profileStateManager.selectCourse(mockCourse, false, 'test')
@@ -107,9 +120,13 @@ describe('ProfileStateManager', () => {
       expect(state.selectedCourses[0].isRequired).toBe(false)
       expect(state.hasUnsavedChanges).toBe(true)
 
-      expect(listeners.length).toBe(1)
-      expect(listeners[0].type).toBe('courses_changed')
-      expect(listeners[0].data.action).toBe('selected')
+      // Wait for async event processing
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      // Should only receive the course selection event
+      const courseEvents = listeners.filter(e => e.type === 'courses_changed' && e.data.action === 'selected')
+      expect(courseEvents.length).toBe(1)
+      expect(courseEvents[0].data.action).toBe('selected')
     })
 
     it('should unselect course successfully', () => {

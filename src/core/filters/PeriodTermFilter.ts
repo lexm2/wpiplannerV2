@@ -6,6 +6,7 @@ export class PeriodTermFilter implements SectionFilter {
     readonly id = 'periodTerm';
     readonly name = 'Term';
     readonly description = 'Show sections from selected academic terms';
+    readonly priority = 15; // High priority - eliminates ~75% of sections per term
     
     applyToSections(sections: Section[], criteria: PeriodTermFilterCriteria): Section[] {
         if (!criteria.terms || criteria.terms.length === 0) {

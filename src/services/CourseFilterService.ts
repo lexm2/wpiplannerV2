@@ -27,7 +27,7 @@ import { CourseSelectionService } from './CourseSelectionService';
  * - DepartmentFilter, AvailabilityFilter, CreditRangeFilter → Course-level filtering
  * - SearchTextFilter, ProfessorFilter, LocationFilter → Content-based filtering  
  * - PeriodConflictFilter, TermFilter → Advanced scheduling filters
- * - CourseSelectionFilter, RequiredStatusFilter → State-based filtering
+ * - RequiredStatusFilter → State-based filtering
  * 
  * USED BY:
  * - MainController → Central application coordination and filter setup
@@ -231,8 +231,17 @@ export class CourseFilterService {
         let filteredCourses = courses;
         const activeFilters = this.getActiveFilters();
         
-        // Apply all filters sequentially
-        for (const activeFilter of activeFilters) {
+        // Sort filters by priority (lower number = higher priority = applied first)
+        const sortedFilters = activeFilters.sort((a, b) => {
+            const filterA = this.registeredFilters.get(a.id);
+            const filterB = this.registeredFilters.get(b.id);
+            const priorityA = filterA?.priority ?? 100; // Default priority for missing filters
+            const priorityB = filterB?.priority ?? 100;
+            return priorityA - priorityB;
+        });
+
+        // Apply all filters sequentially in priority order
+        for (const activeFilter of sortedFilters) {
             const filter = this.registeredFilters.get(activeFilter.id);
             if (filter) {
                 filteredCourses = filter.apply(filteredCourses, activeFilter.criteria);

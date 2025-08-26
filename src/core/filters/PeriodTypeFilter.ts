@@ -6,6 +6,7 @@ export class PeriodTypeFilter implements SectionFilter {
     readonly id = 'periodType';
     readonly name = 'Period Type';
     readonly description = 'Exclude sections with selected period types';
+    readonly priority = 50; // Medium priority - Lab vs Lecture distinction
     
     applyToSections(sections: Section[], criteria: PeriodTypeFilterCriteria): Section[] {
         if (!criteria.types || criteria.types.length === 0) {

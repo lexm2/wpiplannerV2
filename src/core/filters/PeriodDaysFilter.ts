@@ -6,6 +6,7 @@ export class PeriodDaysFilter implements SectionFilter {
     readonly id = 'periodDays';
     readonly name = 'Period Days';
     readonly description = 'Exclude sections with classes on selected days';
+    readonly priority = 55; // Medium priority - day-based filtering
     
     applyToSections(sections: Section[], criteria: PeriodDaysFilterCriteria): Section[] {
         if (!criteria.days || criteria.days.length === 0) {

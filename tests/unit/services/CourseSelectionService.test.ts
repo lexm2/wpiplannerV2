@@ -90,7 +90,7 @@ describe('CourseSelectionService', () => {
   })
 
   afterEach(() => {
-    consoleSpy.restore()
+    consoleSpy.mockRestore()
   })
 
   describe('Initialization', () => {

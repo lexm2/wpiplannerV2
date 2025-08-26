@@ -5,6 +5,7 @@ export class AvailabilityFilter implements CourseFilter {
     readonly id = 'availability';
     readonly name = 'Availability';
     readonly description = 'Show only courses with at least one available section';
+    readonly priority = 25; // High priority - can eliminate many courses with no seats
     
     apply(courses: Course[], criteria: AvailabilityFilterCriteria): Course[] {
         if (!criteria.availableOnly) {

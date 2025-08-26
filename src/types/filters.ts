@@ -1,10 +1,11 @@
-import { Course, Section } from './types';
+import { Course, Section, Period } from './types';
 import { SelectedCourse } from './schedule';
 
 export interface BaseFilter {
     readonly id: string;
     readonly name: string;
     readonly description: string;
+    readonly priority: number; // Lower numbers = higher priority (applied first)
     isValidCriteria(criteria: any): boolean;
     getDisplayValue(criteria: any): string;
 }
@@ -16,6 +17,7 @@ export interface CourseFilter extends BaseFilter {
 export interface SectionFilter extends BaseFilter {
     applyToSections(sections: Section[], criteria: any): Section[];
     applyToSectionsWithContext?(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, criteria: any): Array<{course: SelectedCourse, section: Section}>;
+    applyToPeriods?(periods: Period[], criteria: any): Period[];
 }
 
 export interface SelectedCourseFilter extends BaseFilter {
@@ -86,9 +88,6 @@ export interface RequiredStatusFilterCriteria {
 }
 
 // Period-based filter criteria
-export interface CourseSelectionFilterCriteria {
-    selectedCourseIds: string[];
-}
 
 
 export interface PeriodDaysFilterCriteria {

@@ -188,8 +188,7 @@ describe('Term Data Flow Integration Tests', () => {
         const profileStateManager = new ProfileStateManager();
         courseSelectionService = new CourseSelectionService(profileStateManager);
         
-        const searchService = new SearchService();
-        scheduleFilterService = new ScheduleFilterService(searchService);
+        scheduleFilterService = new ScheduleFilterService();
         
         scheduleController = new ScheduleController(courseSelectionService);
         

@@ -172,7 +172,6 @@ export class ProfileStateManager {
     constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
         this.state = this.createInitialState();
-        this.initializeFromStorage();
     }
 
     // Public API for state access
@@ -304,9 +303,6 @@ export class ProfileStateManager {
         });
     }
 
-    saveCurrentAsSchedule(name: string, source: string = 'user'): Schedule {
-        return this.createSchedule(name, source);
-    }
 
     setActiveSchedule(scheduleId: string, source: string = 'user'): boolean {
         return this.withStateUpdateSync(() => {

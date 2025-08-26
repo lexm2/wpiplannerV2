@@ -145,7 +145,6 @@ import { ThemeManager } from '../../themes/ThemeManager'
  */
 export class MainController {
     private courseDataService: CourseDataService;
-    private themeSelector: ThemeSelector;
     private scheduleSelector: ScheduleSelector | null = null;
     private profileStateManager: ProfileStateManager;
     private courseSelectionService: CourseSelectionService;
@@ -180,7 +179,6 @@ export class MainController {
         
         // Initialize services with shared ProfileStateManager
         this.courseDataService = new CourseDataService();
-        this.themeSelector = new ThemeSelector();
         this.courseSelectionService = new CourseSelectionService(this.profileStateManager);
         this.conflictDetector = new ConflictDetector();
         this.modalService = new ModalService();
@@ -189,7 +187,7 @@ export class MainController {
         // Initialize search and filter services
         this.searchService = new SearchService();
         this.filterService = new CourseFilterService(this.searchService, this.courseSelectionService);
-        this.scheduleFilterService = new ScheduleFilterService(this.searchService);
+        this.scheduleFilterService = new ScheduleFilterService();
         
         // Initialize schedule management service with shared ProfileStateManager and CourseSelectionService
         this.scheduleManagementService = new ScheduleManagementService(this.profileStateManager, this.courseSelectionService);
@@ -264,7 +262,7 @@ export class MainController {
         this.filterService.registerFilter(searchTextFilter);
 
         // Set up filter change listener to refresh UI
-        this.filterService.addEventListener((event) => {
+        this.filterService.addEventListener((_event) => {
             this.refreshCurrentView();
         });
         
@@ -724,7 +722,7 @@ export class MainController {
             this.operationManager.completeOperation('render');
             
         } catch (error) {
-            if (error.name === 'CancellationError') {
+            if ((error as any).name === 'CancellationError') {
                 // Render was cancelled, not an error
                 return;
             }
@@ -1017,13 +1015,6 @@ export class MainController {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
             contentHeader.textContent = `${department.name} (${department.abbreviation})`;
-        }
-    }
-
-    private updateDefaultHeader(): void {
-        const contentHeader = document.querySelector('.content-header h2');
-        if (contentHeader) {
-            contentHeader.textContent = 'Course Listings';
         }
     }
 

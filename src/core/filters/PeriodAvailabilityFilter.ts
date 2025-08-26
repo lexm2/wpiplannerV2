@@ -6,6 +6,7 @@ export class PeriodAvailabilityFilter implements SectionFilter {
     readonly id = 'periodAvailability';
     readonly name = 'Period Availability';
     readonly description = 'Filter periods by seat availability';
+    readonly priority = 25; // High priority - can eliminate many sections with no seats
     
     applyToSections(sections: Section[], criteria: PeriodAvailabilityFilterCriteria): Section[] {
         return sections.filter(section => {

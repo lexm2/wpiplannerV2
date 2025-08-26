@@ -20,7 +20,7 @@ describe('TransactionalStorageManager', () => {
   })
 
   afterEach(() => {
-    consoleSpy.restore()
+    consoleSpy.mockRestore()
   })
 
   describe('Transaction Operations', () => {

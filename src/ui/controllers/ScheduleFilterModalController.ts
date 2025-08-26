@@ -186,20 +186,9 @@ export class ScheduleFilterModalController {
     }
 
     private renderCourseSelectionCheckboxes(): string {
-        const courseOptions = this.scheduleFilterService!.getFilterOptions('courseSelection', this.selectedCourses) || [];
-        const activeCourses = this.getActiveCourseSelection();
-
-        if (courseOptions.length === 0) {
-            return '<div class="no-options">No courses available</div>';
-        }
-
-        return courseOptions.map((option: any) => `
-            <label class="checkbox-label">
-                <input type="checkbox" name="courseSelection" value="${option.value}" 
-                       ${activeCourses.includes(option.value) ? 'checked' : ''}>
-                <span class="checkbox-text">${option.label}</span>
-            </label>
-        `).join('');
+        // Course selection is now handled by ProfileStateManager directly
+        // This filter is no longer needed as selectedCourses are already filtered
+        return '<div class="info-message">Course selection is managed through the main interface. Use other filters below to refine your schedule.</div>';
     }
 
 
@@ -282,10 +271,6 @@ export class ScheduleFilterModalController {
         return searchFilter?.criteria?.query || '';
     }
 
-    private getActiveCourseSelection(): string[] {
-        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'courseSelection');
-        return filter?.criteria?.selectedCourseIds || [];
-    }
 
     private getActiveDays(): string[] {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodDays');
@@ -307,10 +292,6 @@ export class ScheduleFilterModalController {
         return filter?.criteria?.terms || [];
     }
 
-    private getActiveTimeRange(): { startTime?: { hours: number; minutes: number }; endTime?: { hours: number; minutes: number } } {
-        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodTime');
-        return filter?.criteria || {};
-    }
 
     private getActiveAvailability(): { availableOnly: boolean; minAvailable?: number } {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodAvailability');
@@ -367,13 +348,8 @@ export class ScheduleFilterModalController {
         }
 
 
-        // Course selection checkboxes
-        modalElement.querySelectorAll('input[name="courseSelection"]').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                this.updateCourseSelectionFilter();
-                this.refreshActiveFilters();
-            });
-        });
+        // Course selection is now handled by ProfileStateManager directly
+        // No event listeners needed for course selection checkboxes
 
         // Days checkboxes
         modalElement.querySelectorAll('input[name="periodDays"]').forEach(checkbox => {
@@ -432,21 +408,6 @@ export class ScheduleFilterModalController {
     }
 
 
-    private updateCourseSelectionFilter(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
-        if (modalElement) {
-            const checkedCourses = Array.from(modalElement.querySelectorAll('input[name="courseSelection"]:checked'))
-                .map(cb => (cb as HTMLInputElement).value);
-
-            if (checkedCourses.length > 0) {
-                this.scheduleFilterService!.addFilter('courseSelection', { selectedCourseIds: checkedCourses });
-            } else {
-                this.scheduleFilterService!.removeFilter('courseSelection');
-            }
-        }
-    }
 
     private updateDaysFilter(): void {
         if (!this.currentModalId) return;

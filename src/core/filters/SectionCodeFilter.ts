@@ -6,6 +6,7 @@ export class SectionCodeFilter implements SectionFilter {
     readonly id = 'sectionCode';
     readonly name = 'Section Code';
     readonly description = 'Filter by section codes (AL01, AX01, A01, etc.)';
+    readonly priority = 80; // Low priority - very specific filtering
 
     applyToSections(sections: Section[], criteria: SectionCodeFilterCriteria): Section[] {
         if (!criteria.codes || criteria.codes.length === 0) {

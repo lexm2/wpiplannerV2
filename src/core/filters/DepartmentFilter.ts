@@ -5,6 +5,7 @@ export class DepartmentFilter implements CourseFilter {
     readonly id = 'department';
     readonly name = 'Department';
     readonly description = 'Filter courses by department(s)';
+    readonly priority = 10; // High priority - often eliminates 80-90% of courses
 
     apply(courses: Course[], criteria: DepartmentFilterCriteria): Course[] {
         if (!criteria.departments || criteria.departments.length === 0) {

@@ -1,4 +1,4 @@
-import { beforeEach, vi } from 'vitest'
+import { beforeEach, afterEach, vi } from 'vitest'
 
 // Setup DOM environment
 beforeEach(() => {

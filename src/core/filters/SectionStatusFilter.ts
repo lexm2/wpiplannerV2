@@ -9,6 +9,7 @@ export class SectionStatusFilter implements SelectedCourseFilter {
     readonly id = 'sectionStatus';
     readonly name = 'Section Status';
     readonly description = 'Filter courses by section selection status';
+    readonly priority = 90; // Low priority - final selection state filtering
     
     
     applyToSelectedCourses(selectedCourses: SelectedCourse[], criteria: SectionStatusFilterCriteria): SelectedCourse[] {

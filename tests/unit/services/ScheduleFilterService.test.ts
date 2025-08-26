@@ -99,8 +99,7 @@ describe('ScheduleFilterService', () => {
     };
 
     beforeEach(() => {
-        searchService = new SearchService();
-        scheduleFilterService = new ScheduleFilterService(searchService);
+        scheduleFilterService = new ScheduleFilterService();
         conflictDetector = new ConflictDetector();
         scheduleFilterService.setConflictDetector(conflictDetector);
     });
