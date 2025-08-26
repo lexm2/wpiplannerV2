@@ -1,4 +1,5 @@
 import { ThemeDefinition, ThemeId, ThemeChangeEvent, ThemeChangeListener } from './types'
+import { ProfileStateManager } from '../core/ProfileStateManager'
 
 // Import theme definitions
 import wpiClassic from './definitions/wpi-classic.json'
@@ -19,22 +20,22 @@ import highContrast from './definitions/high-contrast.json'
  * - Event broadcasting system for theme change notifications
  * 
  * DEPENDENCIES:
- * - ThemeStorage interface → Pluggable storage strategy (StorageService or DefaultThemeStorage)
+ * - ThemeStorage interface → Pluggable storage strategy (ProfileStateManagerThemeStorage or DefaultThemeStorage)
  * - Theme JSON definitions → wpi-classic.json, wpi-dark.json, wpi-light.json, high-contrast.json
  * - ThemeDefinition types → Type safety for theme structure validation
  * - DOM CSS Custom Properties → :root CSS variable manipulation
  * 
  * USED BY:
  * - ThemeSelector → UI component for theme selection interface
- * - MainController → Initialization and StorageService integration
- * - StorageService → Implements ThemeStorage interface for unified persistence
+ * - MainController → Initialization and ProfileStateManager integration
+ * - ProfileStateManagerThemeStorage → Implements ThemeStorage interface for unified persistence
  * - Application CSS → Consumes CSS custom properties set by theme system
  * 
  * STORAGE STRATEGY PATTERN:
  * 1. Default: Uses DefaultThemeStorage with direct localStorage access
- * 2. Injected: MainController injects StorageService via setStorage()
+ * 2. Injected: MainController injects ProfileStateManagerThemeStorage via setStorage()
  * 3. Strategy allows swapping between storage implementations
- * 4. Unified storage integration through StorageService ThemeStorage implementation
+ * 4. Unified storage integration through ProfileStateManagerThemeStorage implementation
  * 
  * DATA FLOW:
  * Theme Loading:
@@ -52,7 +53,7 @@ import highContrast from './definitions/high-contrast.json'
  * 
  * KEY FEATURES:
  * - Singleton pattern ensuring single theme management instance
- * - Strategy pattern for pluggable storage (DefaultThemeStorage ↔ StorageService)
+ * - Strategy pattern for pluggable storage (DefaultThemeStorage ↔ ProfileStateManagerThemeStorage)
  * - Observer pattern for theme change event broadcasting
  * - JSON-based theme definition system with validation
  * - CSS custom property management for dynamic styling
@@ -62,7 +63,7 @@ import highContrast from './definitions/high-contrast.json'
  * INTEGRATION POINTS:
  * - Implements dependency injection for storage strategy
  * - Coordinates with MainController for unified storage setup
- * - Provides ThemeStorage interface for StorageService implementation
+ * - Provides ThemeStorage interface for ProfileStateManagerThemeStorage implementation
  * - Integrates with CSS system via custom property manipulation
  * - Event system integration for UI component notifications
  * 
@@ -103,6 +104,19 @@ class DefaultThemeStorage implements ThemeStorage {
     }
 }
 
+class ProfileStateManagerThemeStorage implements ThemeStorage {
+    constructor(private profileStateManager: ProfileStateManager) {}
+
+    loadThemePreference(): string {
+        const preferences = this.profileStateManager.getPreferences();
+        return preferences.theme || 'wpi-classic';
+    }
+
+    saveThemePreference(themeId: string): void {
+        this.profileStateManager.updatePreferences({ theme: themeId }, 'theme-manager');
+    }
+}
+
 export class ThemeManager {
     private static instance: ThemeManager;
     private currentTheme: ThemeId = 'wpi-classic';
@@ -128,6 +142,11 @@ export class ThemeManager {
 
     setStorage(storage: ThemeStorage): void {
         this.storage = storage;
+        this.loadSavedTheme();
+    }
+
+    setProfileStateManager(profileStateManager: ProfileStateManager): void {
+        this.storage = new ProfileStateManagerThemeStorage(profileStateManager);
         this.loadSavedTheme();
     }
 

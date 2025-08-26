@@ -23,7 +23,6 @@ import { OperationManager, DebouncedOperation } from '../../utils/RequestCancell
 import { DepartmentSyncService } from '../../services/DepartmentSyncService'
 import { ScheduleManagementService } from '../../services/ScheduleManagementService'
 import { ProfileStateManager } from '../../core/ProfileStateManager'
-import { StorageService } from '../../services/StorageService'
 import { ThemeManager } from '../../themes/ThemeManager'
 
 /**
@@ -41,7 +40,6 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * MAJOR DEPENDENCIES (27+ services including optimistic UI):
  * Core Systems:
  * - ProfileStateManager → Backend state management and persistent storage coordination
- * - StorageService → Unified storage interface (wraps ProfileStateManager)
  * - ThemeManager → Theme system coordination via storage injection
  * 
  * Optimistic UI Layer:
@@ -80,8 +78,7 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * INITIALIZATION FLOW (Critical Order):
  * 1. Core Storage Setup:
  *    - Create ProfileStateManager instance
- *    - Initialize StorageService with shared ProfileStateManager
- *    - Configure ThemeManager to use StorageService (unified storage)
+ *    - Configure ThemeManager to use ProfileStateManager (unified storage)
  * 
  * 2. Service Layer Initialization:
  *    - CourseSelectionService with shared ProfileStateManager + Optimistic UI integration
@@ -103,7 +100,6 @@ import { ThemeManager } from '../../themes/ThemeManager'
  *    - Debug instrumentation setup for optimistic UI monitoring
  * 
  * 5. Application Startup:
- *    - StorageService initialization
  *    - CourseSelectionService data loading with UIStateBuffer sync
  *    - BatchOperationManager timer activation for background processing
  *    - Course data fetching
@@ -112,7 +108,7 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * 
  * DATA FLOW COORDINATION:
  * Storage Unification:
- * ProfileStateManager → StorageService → ThemeManager (via ThemeStorage interface)
+ * ProfileStateManager → ThemeManager (via ProfileStateManagerThemeStorage)
  * All services share the same ProfileStateManager instance for consistency
  * 
  * UI Update Flow (Optimistic):
@@ -152,7 +148,6 @@ export class MainController {
     private themeSelector: ThemeSelector;
     private scheduleSelector: ScheduleSelector | null = null;
     private profileStateManager: ProfileStateManager;
-    private storageService: StorageService;
     private courseSelectionService: CourseSelectionService;
     private conflictDetector: ConflictDetector;
     private modalService: ModalService;
@@ -178,11 +173,10 @@ export class MainController {
     constructor() {
         // Initialize core storage and state management first
         this.profileStateManager = new ProfileStateManager();
-        this.storageService = StorageService.getInstance(this.profileStateManager);
         
         // Connect ThemeManager to use our unified storage
         const themeManager = ThemeManager.getInstance();
-        themeManager.setStorage(this.storageService);
+        themeManager.setProfileStateManager(this.profileStateManager);
         
         // Initialize services with shared ProfileStateManager
         this.courseDataService = new CourseDataService();
@@ -282,10 +276,6 @@ export class MainController {
         this.uiStateManager.showLoadingState();
         
         try {
-            // Initialize StorageService FIRST
-            console.log('🔄 MainController: Initializing StorageService...');
-            const storageInitResult = await this.storageService.initialize();
-            console.log('📊 StorageService initialized:', storageInitResult);
 
             // Initialize CourseSelectionService SECOND to load persisted data
             console.log('🔄 MainController: Initializing CourseSelectionService...');

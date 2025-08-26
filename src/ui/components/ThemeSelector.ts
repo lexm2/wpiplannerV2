@@ -1,5 +1,5 @@
 import { ThemeManager } from '../../themes/ThemeManager'
-import { StorageService } from '../../services/StorageService'
+import { ProfileStateManager } from '../../core/ProfileStateManager'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -14,7 +14,7 @@ import { StorageService } from '../../services/StorageService'
  * 
  * DEPENDENCIES:
  * - ThemeManager → Theme application, available theme registry, current theme state
- * - StorageService → Unified storage interface for theme preference persistence
+ * - ProfileStateManager → Core state management for theme preference persistence
  * - DOM Elements → #theme-dropdown, #theme-options, #current-theme-name
  * 
  * USED BY:
@@ -26,12 +26,12 @@ import { StorageService } from '../../services/StorageService'
  * 1. User clicks theme dropdown → toggleDropdown()
  * 2. User selects theme option → selectTheme(themeId)
  * 3. ThemeManager.setTheme() applies theme to DOM
- * 4. StorageService.saveThemePreference() persists selection
+ * 4. ProfileStateManager.updatePreferences() persists selection
  * 5. UI updates: current theme display, dropdown state, active option
  * 6. Dropdown closes and state resets
  * 
  * Initialization Flow:
- * 1. Constructor gets ThemeManager + StorageService singletons
+ * 1. Constructor gets ThemeManager + ProfileStateManager instances
  * 2. setupElements() binds DOM references
  * 3. loadSavedTheme() restores persisted preference
  * 4. setupEventListeners() binds UI interactions
@@ -46,7 +46,7 @@ import { StorageService } from '../../services/StorageService'
  * - Public API for programmatic theme changes
  * 
  * INTEGRATION POINTS:
- * - Connected to unified storage system via StorageService
+ * - Connected to unified storage system via ProfileStateManager
  * - Integrates with ThemeManager singleton for theme operations
  * - Coordinated by MainController during application initialization
  * - DOM-dependent component requiring specific HTML structure
@@ -54,14 +54,14 @@ import { StorageService } from '../../services/StorageService'
  * ARCHITECTURAL PATTERNS:
  * - MVC: Model (ThemeManager), View (DOM), Controller (ThemeSelector)
  * - Observer: Responds to theme system changes and user interactions
- * - Singleton Integration: Uses ThemeManager and StorageService singletons
+ * - Singleton Integration: Uses ThemeManager singleton and ProfileStateManager
  * - Event Delegation: Dynamic theme option handling
  * 
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 export class ThemeSelector {
     private themeManager: ThemeManager;
-    private storageService: StorageService;
+    private profileStateManager: ProfileStateManager;
     private dropdownElement: HTMLElement | null = null;
     private optionsElement: HTMLElement | null = null;
     private currentThemeNameElement: HTMLElement | null = null;
@@ -69,7 +69,7 @@ export class ThemeSelector {
 
     constructor() {
         this.themeManager = ThemeManager.getInstance();
-        this.storageService = StorageService.getInstance();
+        this.profileStateManager = new ProfileStateManager();
         this.init();
     }
 
@@ -87,7 +87,7 @@ export class ThemeSelector {
     }
 
     private loadSavedTheme(): void {
-        const savedTheme = this.storageService.loadThemePreference();
+        const savedTheme = this.profileStateManager.getPreferences().theme || 'wpi-classic';
         this.themeManager.setTheme(savedTheme);
         this.updateCurrentThemeDisplay();
     }
@@ -172,7 +172,7 @@ export class ThemeSelector {
         if (!success) return;
 
         // Save to storage
-        this.storageService.saveThemePreference(themeId);
+        this.profileStateManager.updatePreferences({ theme: themeId }, 'theme-selector');
 
         // Update UI
         this.updateCurrentThemeDisplay();

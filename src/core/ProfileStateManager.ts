@@ -43,7 +43,6 @@ export type StateChangeListener = (event: StateChangeEvent, state: ProfileState)
  * USED BY:
  * - CourseSelectionService → High-level course selection API with ProfileStateManager coordination
  * - ScheduleManagementService → Schedule operations and multi-schedule management
- * - StorageService → Singleton bridge to ProfileStateManager for legacy components
  * - MainController → Application initialization and core functionality coordination  
  * - ThemeManager → User preferences and theme persistence
  * - ALL UI Controllers → State access and event-driven updates
@@ -68,7 +67,7 @@ export type StateChangeListener = (event: StateChangeEvent, state: ProfileState)
  *                            ↑
  *      ┌─────────────────────────────────────────────────────┐
  *      │                                                     │
- * StorageService ←→ ThemeManager    CourseSelectionService    MainController
+ * ThemeManager    CourseSelectionService    MainController
  *      ↑
  * ThemeSelector
  * ```
@@ -358,6 +357,12 @@ export class ProfileStateManager {
 
             const deletedSchedule = this.state.schedules[scheduleIndex];
             this.state.schedules.splice(scheduleIndex, 1);
+
+            // Remove from localStorage storage
+            const deleteResult = this.storageManager.deleteSchedule(scheduleId);
+            if (!deleteResult.success) {
+                console.warn('Failed to delete schedule from storage:', deleteResult.error);
+            }
 
             // If we deleted the active schedule, switch to another one
             if (this.state.activeScheduleId === scheduleId) {

@@ -18,7 +18,6 @@
  * 
  * USED BY:
  * - ProfileStateManager → Primary consumer for all state persistence operations
- * - StorageService → Singleton bridge for legacy components and theme management
  * - Import/Export functionality → Data portability operations
  * - Health checking systems → Storage integrity verification
  * 

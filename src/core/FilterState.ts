@@ -265,7 +265,7 @@ export class FilterState {
     serialize(excludeFilters: string[] = []): string {
         const data = {
             filters: Array.from(this.activeFilters.entries())
-                .filter(([id, filter]) => !excludeFilters.includes(id))
+                .filter(([id]) => !excludeFilters.includes(id))
                 .map(([id, filter]) => ({
                     id: filter.id,
                     name: filter.name,

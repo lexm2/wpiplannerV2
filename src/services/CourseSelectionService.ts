@@ -1,4 +1,4 @@
-import { Course, Department, Section } from '../types/types'
+import { Course, Section } from '../types/types'
 import { SelectedCourse } from '../types/schedule'
 import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../core/ProfileStateManager'
 import { DataValidator } from '../core/DataValidator'
