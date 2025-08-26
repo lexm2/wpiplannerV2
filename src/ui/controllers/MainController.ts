@@ -144,35 +144,42 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 export class MainController {
-    private courseDataService: CourseDataService;
-    private themeSelector: ThemeSelector; // This needs to be constructed dont remove
+    private courseDataService!: CourseDataService;
+    private themeSelector!: ThemeSelector; // This needs to be constructed dont remove
     private scheduleSelector: ScheduleSelector | null = null;
-    private profileStateManager: ProfileStateManager;
-    private courseSelectionService: CourseSelectionService;
-    private conflictDetector: ConflictDetector;
-    private modalService: ModalService;
-    private departmentController: DepartmentController;
-    private courseController: CourseController;
-    private scheduleController: ScheduleController;
-    private sectionInfoModalController: SectionInfoModalController;
-    private infoModalController: InfoModalController;
-    private filterModalController: FilterModalController;
-    private scheduleFilterModalController: ScheduleFilterModalController;
-    private searchService: SearchService;
-    private filterService: CourseFilterService;
-    private scheduleFilterService: ScheduleFilterService;
-    private uiStateManager: UIStateManager;
-    private timestampManager: TimestampManager;
-    private operationManager: OperationManager;
-    private debouncedSearch: DebouncedOperation;
-    private departmentSyncService: DepartmentSyncService;
-    private scheduleManagementService: ScheduleManagementService;
+    private profileStateManager!: ProfileStateManager;
+    private courseSelectionService!: CourseSelectionService;
+    private conflictDetector!: ConflictDetector;
+    private modalService!: ModalService;
+    private departmentController!: DepartmentController;
+    private courseController!: CourseController;
+    private scheduleController!: ScheduleController;
+    private sectionInfoModalController!: SectionInfoModalController;
+    private infoModalController!: InfoModalController;
+    private filterModalController!: FilterModalController;
+    private scheduleFilterModalController!: ScheduleFilterModalController;
+    private searchService!: SearchService;
+    private filterService!: CourseFilterService;
+    private scheduleFilterService!: ScheduleFilterService;
+    private uiStateManager!: UIStateManager;
+    private timestampManager!: TimestampManager;
+    private operationManager!: OperationManager;
+    private debouncedSearch!: DebouncedOperation;
+    private departmentSyncService!: DepartmentSyncService;
+    private scheduleManagementService!: ScheduleManagementService;
     private allDepartments: Department[] = [];
 
 
     constructor() {
+        this.setupServices();
+    }
+
+    private async setupServices(): Promise<void> {
         // Initialize core storage and state management first
         this.profileStateManager = new ProfileStateManager();
+        
+        // Load saved data before initializing UI components
+        await this.profileStateManager.loadFromStorage();
         
         // Connect ThemeManager to use our unified storage
         const themeManager = ThemeManager.getInstance();
@@ -250,7 +257,7 @@ export class MainController {
         // IMPORTANT: Initialize filters LAST (triggers events that use operationManager)
         this.initializeFilters();
         
-        this.init();
+        this.loadDataAndInitializeUI();
     }
 
     private initializeFilters(): void {
@@ -272,7 +279,7 @@ export class MainController {
         setTimeout(() => this.updateFilterButtonState(), 100);
     }
 
-    private async init(): Promise<void> {
+    private async loadDataAndInitializeUI(): Promise<void> {
         this.uiStateManager.showLoadingState();
         
         try {
