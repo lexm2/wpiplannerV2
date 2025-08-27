@@ -161,12 +161,11 @@ export class FilterModalController {
         return `
             <div class="filter-sections">
                 ${this.createSearchTextFilter()}
+                ${this.createProfessorFilter()}
                 ${this.createDepartmentFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createCreditRangeFilter()}
-                ${this.createProfessorFilter()}
                 ${this.createTermFilter()}
-                ${this.createLocationFilter()}
             </div>
         `;
     }
@@ -241,11 +240,10 @@ export class FilterModalController {
         const activeDepartments = activeFilter?.criteria?.departments || [];
 
         return departments.map(dept => `
-            <label class="filter-toggle-label">
-                <input type="checkbox" class="filter-toggle" value="${dept}" ${activeDepartments.includes(dept) ? 'checked' : ''} 
+            <label class="department-checkbox-label">
+                <input type="checkbox" class="department-checkbox" value="${dept}" ${activeDepartments.includes(dept) ? 'checked' : ''} 
                        data-filter="department">
-                <span class="filter-toggle-slider"></span>
-                <span class="filter-toggle-text">${dept}</span>
+                <span class="department-checkbox-text">${dept}</span>
             </label>
         `).join('');
     }
@@ -375,54 +373,16 @@ export class FilterModalController {
         `;
     }
 
-    private createLocationFilter(): string {
-        if (!this.filterService) return '';
-        
-        const locationOptions = this.filterService.getFilterOptions('location', this.allCourses) as { buildings: string[] };
-        const buildings = locationOptions.buildings || [];
-        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'location');
-        const activeBuildings = activeFilter?.criteria?.buildings || [];
-
-        const buildingCheckboxes = buildings.map(building => `
-            <label class="filter-toggle-label">
-                <input type="checkbox" class="filter-toggle" value="${building}" ${activeBuildings.includes(building) ? 'checked' : ''} 
-                       data-filter="location">
-                <span class="filter-toggle-slider"></span>
-                <span class="filter-toggle-text">${building}</span>
-            </label>
-        `).join('');
-
-        return `
-            <div class="filter-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Buildings</h4>
-                    <div class="filter-section-actions">
-                        <button class="filter-select-all" data-filter="location">All</button>
-                        <button class="filter-select-none" data-filter="location">None</button>
-                    </div>
-                </div>
-                <div class="filter-section-content">
-                    <div class="filter-search-container">
-                        <input type="text" class="filter-search" placeholder="Search buildings..." data-filter="location">
-                    </div>
-                    <div class="filter-checkbox-grid" id="location-checkboxes">
-                        ${buildingCheckboxes}
-                    </div>
-                </div>
-            </div>
-        `;
-    }
 
     private initializeFilterUI(modalElement: HTMLElement): void {
         if (!this.filterService) return;
 
         this.setupSearchTextFilter(modalElement);
+        this.setupProfessorFilter(modalElement);
         this.setupDepartmentFilter(modalElement);
         this.setupAvailabilityFilter(modalElement);
         this.setupCreditRangeFilter(modalElement);
-        this.setupProfessorFilter(modalElement);
         this.setupTermFilter(modalElement);
-        this.setupLocationFilter(modalElement);
         this.setupClearAllButton(modalElement);
         this.setupFilterSearch(modalElement);
     }
@@ -589,25 +549,6 @@ export class FilterModalController {
         });
     }
 
-    private setupLocationFilter(modalElement: HTMLElement): void {
-        const checkboxes = modalElement.querySelectorAll('input[data-filter="location"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', () => this.updateLocationFilter(modalElement));
-        });
-
-        const selectAll = modalElement.querySelector('.filter-select-all[data-filter="location"]');
-        const selectNone = modalElement.querySelector('.filter-select-none[data-filter="location"]');
-
-        selectAll?.addEventListener('click', () => {
-            checkboxes.forEach((cb: any) => cb.checked = true);
-            this.updateLocationFilter(modalElement);
-        });
-
-        selectNone?.addEventListener('click', () => {
-            checkboxes.forEach((cb: any) => cb.checked = false);
-            this.updateLocationFilter(modalElement);
-        });
-    }
 
     private setupClearAllButton(modalElement: HTMLElement): void {
         const clearButton = modalElement.querySelector('#clear-all-filters');
@@ -638,7 +579,7 @@ export class FilterModalController {
                 if (filterType === 'department') {
                     const checkboxes = modalElement.querySelector('#department-checkboxes');
                     if (checkboxes) {
-                        const labels = checkboxes.querySelectorAll('.filter-checkbox-label');
+                        const labels = checkboxes.querySelectorAll('.department-checkbox-label');
                         labels.forEach((label: any) => {
                             const checkbox = label.querySelector('input[type="checkbox"]') as HTMLInputElement;
                             const value = checkbox ? checkbox.value : '';
@@ -787,12 +728,11 @@ export class FilterModalController {
             const isChecked = allSelected || someSelected;
             
             return `
-                <label class="filter-toggle-label">
-                    <input type="checkbox" class="filter-toggle" value="${category}" ${isChecked ? 'checked' : ''} 
+                <label class="department-checkbox-label">
+                    <input type="checkbox" class="department-checkbox" value="${category}" ${isChecked ? 'checked' : ''} 
                            ${isIndeterminate ? 'data-indeterminate="true"' : ''}
                            data-filter="department" data-category="true">
-                    <span class="filter-toggle-slider"></span>
-                    <span class="filter-toggle-text">${category}</span>
+                    <span class="department-checkbox-text">${category}</span>
                 </label>
             `;
         }).join('');
@@ -929,17 +869,6 @@ export class FilterModalController {
         this.updatePreview(modalElement);
     }
 
-    private updateLocationFilter(modalElement: HTMLElement): void {
-        const checkboxes = modalElement.querySelectorAll('input[data-filter="location"]:checked') as NodeListOf<HTMLInputElement>;
-        const buildings = Array.from(checkboxes).map(cb => cb.value);
-        
-        if (buildings.length > 0) {
-            this.filterService?.addFilter('location', { buildings });
-        } else {
-            this.filterService?.removeFilter('location');
-        }
-        this.updatePreview(modalElement);
-    }
 
     private updatePreview(modalElement: HTMLElement): void {
         if (!this.filterService) return;

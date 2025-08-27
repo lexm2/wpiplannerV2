@@ -170,7 +170,6 @@ export class SearchService {
     private departments: Department[] = [];
     private searchIndex: Map<string, Set<Course>> = new Map();
     private professorCache: string[] | null = null;
-    private buildingCache: string[] | null = null;
     private timeSlotMappings: Map<string, Course[]> = new Map();
 
     setCourseData(departments: Department[]): void {
@@ -376,30 +375,9 @@ export class SearchService {
         return this.professorCache;
     }
 
-    getAvailableBuildings(): string[] {
-        if (this.buildingCache) {
-            return this.buildingCache;
-        }
-        
-        const buildings = new Set<string>();
-        
-        this.courses.forEach(course => {
-            course.sections.forEach(section => {
-                section.periods.forEach(period => {
-                    if (period.building) {
-                        buildings.add(period.building);
-                    }
-                });
-            });
-        });
-
-        this.buildingCache = Array.from(buildings).sort();
-        return this.buildingCache;
-    }
 
     private clearCaches(): void {
         this.professorCache = null;
-        this.buildingCache = null;
         this.searchIndex.clear();
         this.timeSlotMappings.clear();
     }

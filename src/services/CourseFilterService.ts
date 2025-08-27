@@ -300,8 +300,6 @@ export class CourseFilterService {
                 return this.getProfessorOptions(allCourses);
             case 'term':
                 return this.getTermOptions(allCourses);
-            case 'location':
-                return this.getLocationOptions(allCourses);
             default:
                 return null;
         }
@@ -330,8 +328,4 @@ export class CourseFilterService {
         return Array.from(terms).sort();
     }
     
-    private getLocationOptions(_courses: Course[]): { buildings: string[] } {
-        const buildings = this.searchService.getAvailableBuildings();
-        return { buildings };
-    }
 }

@@ -93,33 +93,38 @@ export class ScheduleFilterModalController {
                     <h3>Period Search Filters</h3>
                     
                     <div class="filter-group">
-                        <h4>Search Periods</h4>
+                        <h4>Search Section IDs</h4>
                         <div class="filter-option">
-                            <input type="text" id="modal-search-input" placeholder="Search professors, buildings, courses..." 
-                                   value="${this.getSearchValue()}" class="search-input">
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <h4>Select Courses to Search</h4>
-                        <div class="filter-option">
-                            ${this.renderCourseSelectionCheckboxes()}
-                        </div>
-                    </div>
-
-
-                    <div class="filter-group">
-                        <h4>Exclude Days</h4>
-                        <div class="filter-option">
-                            <div class="filter-help-text">Hide sections with classes on selected days</div>
-                            ${this.renderDaysCheckboxes()}
+                            <div class="filter-help-text">Search section numbers (A01, B02, GPS A01, etc.)</div>
+                            <div class="filter-search-container section-search-container">
+                                <input type="text" id="modal-search-input" placeholder="Search section IDs..." 
+                                       value="${this.getSearchValue()}" class="search-input section-search">
+                                <div class="section-dropdown" id="section-dropdown" style="display: none;"></div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="filter-group">
                         <h4>Professor</h4>
                         <div class="filter-option">
+                            <div class="filter-help-text">Search and select specific professors</div>
                             ${this.renderProfessorCheckboxes()}
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4>Selected Courses</h4>
+                        <div class="filter-option">
+                            <div class="filter-help-text">Currently selected courses from main interface</div>
+                            ${this.renderCourseSelectionCheckboxes()}
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4>Exclude Days</h4>
+                        <div class="filter-option">
+                            <div class="filter-help-text">Hide sections with classes on selected days</div>
+                            ${this.renderDaysCheckboxes()}
                         </div>
                     </div>
 
@@ -188,9 +193,21 @@ export class ScheduleFilterModalController {
     }
 
     private renderCourseSelectionCheckboxes(): string {
-        // Course selection is now handled by ProfileStateManager directly
-        // This filter is no longer needed as selectedCourses are already filtered
-        return '<div class="info-message">Course selection is managed through the main interface. Use other filters below to refine your schedule.</div>';
+        if (this.selectedCourses.length === 0) {
+            return '<div class="no-options">No courses selected</div>';
+        }
+
+        return this.selectedCourses.map(selectedCourse => {
+            const course = selectedCourse.course;
+            const courseCode = `${course.department.abbreviation}${course.number}`;
+            
+            return `
+                <div class="course-display-item">
+                    <span class="course-code">${courseCode}</span>: 
+                    <span class="course-name">${course.name}</span>
+                </div>
+            `;
+        }).join('');
     }
 
 
@@ -272,8 +289,8 @@ export class ScheduleFilterModalController {
     }
 
     private getSearchValue(): string {
-        const searchFilter = this.scheduleFilterService.getActiveFilters().find(f => f.id === 'searchText');
-        return searchFilter?.criteria?.query || '';
+        const searchFilter = this.scheduleFilterService.getActiveFilters().find(f => f.id === 'sectionCode');
+        return searchFilter?.criteria?.codes?.[0] || '';
     }
 
 
@@ -338,19 +355,9 @@ export class ScheduleFilterModalController {
             this.hide();
         });
 
-        // Real-time search input
-        const searchInput = modalElement.querySelector('#modal-search-input') as HTMLInputElement;
-        if (searchInput) {
-            searchInput.addEventListener('input', () => {
-                const query = searchInput.value.trim();
-                if (query) {
-                    this.scheduleFilterService!.addFilter('searchText', { query });
-                } else {
-                    this.scheduleFilterService!.removeFilter('searchText');
-                }
-                this.refreshActiveFilters();
-            });
-        }
+        // Setup simple section ID search
+        this.setupSectionIdSearch(modalElement);
+        
 
 
         // Course selection is now handled by ProfileStateManager directly
@@ -688,6 +695,76 @@ export class ScheduleFilterModalController {
             }
         }
     }
+
+    private getSectionCodeOptions(): string[] {
+        const sectionCodes = new Set<string>();
+        
+        for (const selectedCourse of this.selectedCourses) {
+            for (const section of selectedCourse.course.sections) {
+                if (section.number && section.number.trim() !== '') {
+                    sectionCodes.add(section.number.trim());
+                }
+            }
+        }
+        
+        return Array.from(sectionCodes).sort();
+    }
+
+    private setupSectionIdSearch(modalElement: HTMLElement): void {
+        const searchInput = modalElement.querySelector('#modal-search-input') as HTMLInputElement;
+        const dropdown = modalElement.querySelector('#section-dropdown') as HTMLElement;
+        
+        if (searchInput && dropdown) {
+            const sectionCodeOptions = this.getSectionCodeOptions();
+            
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.trim();
+                
+                // Apply section filter
+                if (query) {
+                    this.scheduleFilterService!.addFilter('sectionCode', { codes: [query] });
+                } else {
+                    this.scheduleFilterService!.removeFilter('sectionCode');
+                }
+                this.refreshActiveFilters();
+                
+                // Show dropdown with matching section codes
+                const queryLower = query.toLowerCase();
+                if (queryLower.length > 0) {
+                    const matches = sectionCodeOptions.filter(sectionCode => 
+                        sectionCode.toLowerCase().includes(queryLower)
+                    ).slice(0, 10);
+                    
+                    dropdown.innerHTML = matches.map(sectionCode => 
+                        `<div class="section-option" data-section="${sectionCode}">${sectionCode}</div>`
+                    ).join('');
+                    dropdown.style.display = matches.length > 0 ? 'block' : 'none';
+                } else {
+                    dropdown.style.display = 'none';
+                }
+            });
+
+            dropdown.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                if (target.classList.contains('section-option')) {
+                    const sectionCode = target.dataset.section;
+                    if (sectionCode) {
+                        searchInput.value = sectionCode;
+                        this.scheduleFilterService!.addFilter('sectionCode', { codes: [sectionCode] });
+                        this.refreshActiveFilters();
+                        dropdown.style.display = 'none';
+                    }
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target as Node) && !dropdown.contains(e.target as Node)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        }
+    }
+
 
     syncSearchInputFromMain(query: string): void {
         if (this.currentModalId) {
