@@ -926,8 +926,8 @@
 
 /* Schedule Filter Modal Styles */
 .schedule-filter-modal .modal-dialog {
-  max-width: 600px;
-  width: 90%;
+  max-width: 800px;
+  width: 95%;
 }
 
 .schedule-filter-modal .filter-modal-content {
@@ -1014,6 +1014,12 @@
 .schedule-filter-modal .filter-option {
   margin-bottom: 0.5rem;
   width: 100%;
+}
+
+.schedule-filter-modal .filter-help-text {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
 }
 
 .schedule-filter-modal .filter-select {
