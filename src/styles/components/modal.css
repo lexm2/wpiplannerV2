@@ -849,6 +849,29 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* Schedule Filter Modal Chip Remove Button */
+.schedule-filter-modal .chip-remove {
+  background: none;
+  border: none;
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--effect-transition);
+  margin-left: 0.25rem;
+}
+
+.schedule-filter-modal .chip-remove:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 /* Filter Modal Footer */
 .filter-modal .modal-footer {
   display: flex;
