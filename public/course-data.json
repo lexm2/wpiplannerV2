@@ -6001,7 +6001,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "1/25",
+      "Waitlist_Waitlist_Capacity": "2/25",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335196"
     },
     {
@@ -13930,7 +13930,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Civil Engineering",
-      "Waitlist_Waitlist_Capacity": "2/15",
+      "Waitlist_Waitlist_Capacity": "1/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335320"
     },
     {
@@ -30236,7 +30236,7 @@
       "Course_Title": "CS 509 - Design Of Software Systems",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "26/30",
+      "Enrolled_Capacity": "25/30",
       "Instructional_Format": "Lecture",
       "Instructors": "George Heineman",
       "Locations": "Online-asynchronous",
