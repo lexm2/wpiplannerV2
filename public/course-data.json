@@ -5917,7 +5917,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "5/20",
+      "Waitlist_Waitlist_Capacity": "6/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336860"
     },
     {
@@ -112714,6 +112714,34 @@
       "Subject": "Wellness and Physical Education",
       "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335166"
+    },
+    {
+      "Academic_Level": "Undergraduate",
+      "Academic_Units": "Physical Education and Athletics Department",
+      "Academic_Year": "2025 - 2026 Academic Year",
+      "Course_Description": "<p>Cat. I (1/12 unit)</p><p>In each term, specific PE courses are offered to provide a variety of wellness, dance and healthy alternatives to traditional PE sport-based classes . The specific courses are subject to change on a yearly basis in order to provide flexibility in the PE offerings based upon the latest trends in wellness and dance . The focus of these classes is more on individual fitness, wellness and education, with instruction provided to all students in the classes.</p>",
+      "Course_Section": "WPE 1099-C01 - Healthy Alternative",
+      "Course_Section_Description": "<p>Cat. I (1/12 unit)</p><p>In each term, specific PE courses are offered to provide a variety of wellness, dance and healthy alternatives to traditional PE sport-based classes . The specific courses are subject to change on a yearly basis in order to provide flexibility in the PE offerings based upon the latest trends in wellness and dance . The focus of these classes is more on individual fitness, wellness and education, with instruction provided to all students in the classes.</p>",
+      "Course_Section_End_Date": "2026-03-06",
+      "Course_Section_Owner": "Physical Education and Athletics Department",
+      "Course_Section_Start_Date": "2026-01-14",
+      "Course_Tags": "Offering Pattern :: Category I",
+      "Course_Title": "WPE 1099 - Healthy Alternative",
+      "Credits": "0.75",
+      "Delivery_Mode": "In-Person",
+      "Enrolled_Capacity": "0/30",
+      "Instructional_Format": "Workshop",
+      "Instructors": "Linda Bullock",
+      "Locations": "Other",
+      "Meeting_Day_Patterns": "T-R",
+      "Meeting_Patterns": "T-R | 9:00 AM - 9:50 AM",
+      "Offering_Period": "2026 Spring C Term",
+      "Section_Details": "Other | T-R | 9:00 AM - 9:50 AM",
+      "Section_Status": "Open",
+      "Starting_Academic_Period_Type": "C Term",
+      "Subject": "Wellness and Physical Education",
+      "Waitlist_Waitlist_Capacity": "0/10",
+      "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-353499"
     },
     {
       "Academic_Level": "Undergraduate",
