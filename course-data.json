@@ -80800,7 +80800,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ME 4320 - Advanced Engineering Design (a)",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336717"
     },
     {
@@ -80818,7 +80818,7 @@
       "Course_Title": "ME 4320 - Advanced Engineering Design",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "39/40",
+      "Enrolled_Capacity": "40/40",
       "Instructional_Format": "Laboratory",
       "Instructors": "Joe Stabile",
       "Locations": "Higgins Labs 230 Geom Modeling Computer Lab",
@@ -80826,7 +80826,7 @@
       "Meeting_Patterns": "R | 10:00 AM - 11:50 AM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Higgins Labs 230 Geom Modeling Computer Lab | R | 10:00 AM - 11:50 AM",
-      "Section_Status": "Open",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ME 4320 - Advanced Engineering Design (a)",
       "Subject": "Mechanical Engineering",
