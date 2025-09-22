@@ -2829,7 +2829,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "9/12",
+      "Waitlist_Waitlist_Capacity": "8/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335261"
     },
     {
@@ -3132,7 +3132,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "6/12",
+      "Waitlist_Waitlist_Capacity": "5/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335173"
     },
     {
@@ -5838,7 +5838,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "19/20",
+      "Waitlist_Waitlist_Capacity": "18/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339594"
     },
     {
@@ -6001,7 +6001,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "2/25",
+      "Waitlist_Waitlist_Capacity": "1/25",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335196"
     },
     {
@@ -6859,10 +6859,10 @@
       "Meeting_Patterns": "M-R | 1:00 PM - 2:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Goddard Hall 206 BB Lab | M-R | 1:00 PM - 2:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "3/3",
+      "Waitlist_Waitlist_Capacity": "2/3",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337053"
     },
     {
@@ -9373,7 +9373,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: BME 1004 - Introduction To Programming In Matlab ()",
       "Subject": "Biomedical Engineering",
-      "Waitlist_Waitlist_Capacity": "11/20",
+      "Waitlist_Waitlist_Capacity": "10/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335394"
     },
     {
@@ -29326,7 +29326,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "3/20",
+      "Waitlist_Waitlist_Capacity": "1/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335149"
     },
     {
@@ -29522,7 +29522,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "9/15",
+      "Waitlist_Waitlist_Capacity": "8/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337602"
     },
     {
@@ -48567,7 +48567,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "History",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335273"
     },
     {
@@ -80324,10 +80324,10 @@
       "Meeting_Patterns": "T-R | 1:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Higgins Labs 031 ME Computer Lab | T-R | 1:00 PM - 3:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336823"
     },
     {
@@ -80800,7 +80800,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ME 4320 - Advanced Engineering Design (a)",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336717"
     },
     {
@@ -103488,7 +103488,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337251"
     },
     {
@@ -107437,7 +107437,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337251"
     },
     {
@@ -111552,7 +111552,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "7/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334714"
     },
     {
@@ -112275,7 +112275,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335160"
     },
     {
@@ -116356,7 +116356,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-340286"
     },
     {
