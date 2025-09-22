@@ -2829,7 +2829,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "8/12",
+      "Waitlist_Waitlist_Capacity": "7/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335261"
     },
     {
@@ -57286,7 +57286,7 @@
       "Course_Title": "IMGD 5010 - IMGD Fundamentals",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "14/20",
+      "Enrolled_Capacity": "15/20",
       "Instructional_Format": "Lecture",
       "Instructors": "Gillian Smith",
       "Locations": "Olin Hall 126; Higgins Labs 154",
@@ -69018,7 +69018,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: MA 2051 - Ordinary Differential Equations ()",
       "Subject": "Mathematical Sciences",
-      "Waitlist_Waitlist_Capacity": "0/999",
+      "Waitlist_Waitlist_Capacity": "1/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335095"
     },
     {
@@ -69283,7 +69283,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: MA 2051 - Ordinary Differential Equations ()",
       "Subject": "Mathematical Sciences",
-      "Waitlist_Waitlist_Capacity": "0/999",
+      "Waitlist_Waitlist_Capacity": "1/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334695"
     },
     {
@@ -83122,7 +83122,7 @@
       "Course_Title": "ME 591 - Graduate Seminar",
       "Credits": "0",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "96/90",
+      "Enrolled_Capacity": "95/90",
       "Instructional_Format": "Seminar",
       "Instructors": "Kedar Prashant Shete",
       "Locations": "Unity Hall 500",
@@ -83149,7 +83149,7 @@
       "Course_Title": "ME 591 - Graduate Seminar",
       "Credits": "0",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "89/90",
+      "Enrolled_Capacity": "88/90",
       "Instructional_Format": "Seminar",
       "Instructors": "Kedar Prashant Shete",
       "Locations": "Salisbury Labs 115 Kinnicutt Hall",
