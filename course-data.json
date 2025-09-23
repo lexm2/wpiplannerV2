@@ -25197,7 +25197,7 @@
       "Course_Title": "CS 2022 - Discrete Mathematics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "7/30",
+      "Enrolled_Capacity": "8/30",
       "Instructional_Format": "Discussion",
       "Instructors": "Jane Coons",
       "Locations": "Stratton Hall 311",
@@ -25253,7 +25253,7 @@
       "Course_Title": "CS 2022 - Discrete Mathematics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "45/90",
+      "Enrolled_Capacity": "46/90",
       "Instructional_Format": "Lecture",
       "Instructors": "Jane Coons",
       "Locations": "Unity Hall 500",
@@ -72127,7 +72127,7 @@
       "Course_Title": "MA 2201 - Discrete Mathematics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "7/30",
+      "Enrolled_Capacity": "8/30",
       "Instructional_Format": "Discussion",
       "Instructors": "Jane Coons",
       "Locations": "Stratton Hall 311",
@@ -72183,7 +72183,7 @@
       "Course_Title": "MA 2201 - Discrete Mathematics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "45/90",
+      "Enrolled_Capacity": "46/90",
       "Instructional_Format": "Lecture",
       "Instructors": "Jane Coons",
       "Locations": "Unity Hall 500",
@@ -110742,10 +110742,10 @@
       "Meeting_Patterns": "M-W | 10:00 AM - 10:50 AM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Recreation Center Track | M-W | 10:00 AM - 10:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "10/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334707"
     },
     {
@@ -110798,10 +110798,10 @@
       "Meeting_Patterns": "W-F | 2:00 PM - 2:50 PM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Recreation Center Track | W-F | 2:00 PM - 2:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "10/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334711"
     },
     {
@@ -111160,7 +111160,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334712"
     },
     {
@@ -111188,7 +111188,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335164"
     },
     {
@@ -116497,7 +116497,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335021"
     },
     {
@@ -116525,7 +116525,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335385"
     },
     {
@@ -116553,7 +116553,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-340228"
     },
     {
