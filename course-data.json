@@ -2438,7 +2438,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Aerospace Engineering",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336168"
     },
     {
@@ -38028,7 +38028,7 @@
       "Course_Title": "ECE 559 - Selected Topics In Energy Systems",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "5/20",
+      "Enrolled_Capacity": "6/20",
       "Instructional_Format": "Lecture",
       "Instructors": "Umair Zia",
       "Locations": "Online-asynchronous",
@@ -87400,7 +87400,7 @@
       "Course_Title": "MTE 575 - Introduction To Nanomaterials And Nanotechnology",
       "Credits": "2",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "6/30",
+      "Enrolled_Capacity": "7/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Pratap Rao",
       "Locations": "Online-asynchronous",
