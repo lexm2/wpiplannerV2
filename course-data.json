@@ -3404,10 +3404,10 @@
       "Meeting_Patterns": "T-F | 10:00 AM - 11:50 AM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Salisbury Labs 123 Computer Lab | T-F | 10:00 AM - 11:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "11/12",
+      "Waitlist_Waitlist_Capacity": "12/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338783"
     },
     {
@@ -87977,7 +87977,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334903"
     },
     {
@@ -113352,7 +113352,7 @@
       "Course_Title": "WPE 1212 - Club Sport - Men's Lacrosse Team",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "3/50",
+      "Enrolled_Capacity": "4/50",
       "Instructional_Format": "Workshop",
       "Instructors": "Ann McCarron",
       "Offering_Period": "2026 Spring C Term",
@@ -113375,7 +113375,7 @@
       "Course_Title": "WPE 1212 - Club Sport - Men's Lacrosse Team",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "0/100",
+      "Enrolled_Capacity": "1/100",
       "Instructional_Format": "Workshop",
       "Instructors": "Ann McCarron",
       "Offering_Period": "2026 Spring D Term",
@@ -116373,7 +116373,7 @@
       "Course_Title": "WPE 1611 - Introduction to Mindfulness",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "4/18",
+      "Enrolled_Capacity": "5/18",
       "Instructional_Format": "Workshop",
       "Instructors": "Paula Fitzpatrick",
       "Locations": "Daniels Hall 102E",
