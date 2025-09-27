@@ -22513,7 +22513,7 @@
       "Course_Title": "CN 1541 - Elementary Chinese I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "18/18",
+      "Enrolled_Capacity": "17/18",
       "Instructional_Format": "Lecture",
       "Instructors": "Huili Zheng",
       "Locations": "Salisbury Labs 011",
@@ -22521,10 +22521,10 @@
       "Meeting_Patterns": "M-T-R-F | 12:00 PM - 12:50 PM",
       "Offering_Period": "2025 Fall A Term",
       "Section_Details": "Salisbury Labs 011 | M-T-R-F | 12:00 PM - 12:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "A Term",
       "Subject": "Chinese",
-      "Waitlist_Waitlist_Capacity": "2/9",
+      "Waitlist_Waitlist_Capacity": "1/9",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-333899"
     },
     {
@@ -22737,7 +22737,7 @@
       "Course_Title": "CN 2541 - Intermediate Chinese I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "3/18",
+      "Enrolled_Capacity": "4/18",
       "Instructional_Format": "Lecture",
       "Instructors": "Huili Zheng",
       "Locations": "Kaven Hall 115",
@@ -30272,7 +30272,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "Fall",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "3/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335741"
     },
     {
@@ -31358,7 +31358,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "Fall",
       "Subject": "Computer Science; Data Science",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335870"
     },
     {
@@ -31899,7 +31899,7 @@
       "Course_Title": "CS 585 - Big Data Management",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "26/40",
+      "Enrolled_Capacity": "27/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Roee Shraga",
       "Locations": "Unity Hall 520",
@@ -33064,7 +33064,7 @@
       "Course_Title": "DS 503 - Big Data Management",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "26/40",
+      "Enrolled_Capacity": "27/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Roee Shraga",
       "Locations": "Unity Hall 520",
@@ -33320,7 +33320,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "Fall",
       "Subject": "Computer Science; Data Science",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335870"
     },
     {
@@ -84807,7 +84807,7 @@
       "Course_Title": "MIS 587 - Business Applications In Machine Learning",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "8/60",
+      "Enrolled_Capacity": "9/60",
       "Instructional_Format": "Lecture",
       "Instructors": "ZQ Cheng",
       "Locations": "Kaven Hall 116",
