@@ -28428,7 +28428,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "2/20",
+      "Waitlist_Waitlist_Capacity": "1/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335077"
     },
     {
@@ -118395,7 +118395,7 @@
       "Course_Title": "WR 2300 - Intercultural Communication",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/20",
+      "Enrolled_Capacity": "19/20",
       "Instructional_Format": "Lecture",
       "Instructors": "Esther Boucher-Yip",
       "Locations": "Salisbury Labs 406",
@@ -118403,7 +118403,7 @@
       "Meeting_Patterns": "T-F | 2:00 PM - 3:50 PM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Salisbury Labs 406 | T-F | 2:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Writing",
       "Waitlist_Waitlist_Capacity": "0/5",
