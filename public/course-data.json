@@ -6018,7 +6018,7 @@
       "Course_Title": "BB 1004 - Human Biology",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "83/85",
+      "Enrolled_Capacity": "82/85",
       "Instructional_Format": "Lecture",
       "Instructors": "Jill Rulfs",
       "Locations": "Unity Hall 400",
@@ -6102,7 +6102,7 @@
       "Course_Title": "BB 1102 - Foundations of Ecology and Environmental Biology",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "43/50",
+      "Enrolled_Capacity": "44/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Chris Collins",
       "Locations": "Unity Hall 520",
@@ -27902,7 +27902,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science; Social Science",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335228"
     },
     {
@@ -28428,7 +28428,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "2/20",
+      "Waitlist_Waitlist_Capacity": "3/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335077"
     },
     {
@@ -29104,10 +29104,10 @@
       "Meeting_Patterns": "T-F | 2:00 PM - 3:50 PM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Unity Hall 420 | T-F | 2:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "19/20",
+      "Waitlist_Waitlist_Capacity": "20/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335510"
     },
     {
@@ -32657,7 +32657,7 @@
       "Course_Title": "DS 3010 - Data Science III: Computational Methods",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "41/50",
+      "Enrolled_Capacity": "42/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Torumoy Ghoshal",
       "Locations": "Unity Hall 520",
@@ -40077,7 +40077,7 @@
       "Course_Title": "EN 2252 - Science And Scientists In Modern Literature",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "31/35",
+      "Enrolled_Capacity": "32/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Lance Schachterle",
       "Locations": "Salisbury Labs 406",
@@ -88191,7 +88191,7 @@
       "Course_Title": "MU 2010 - Jazz History",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "21/35",
+      "Enrolled_Capacity": "22/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Douglas Olsen",
       "Locations": "Alden Hall B06 Janet Earle Room",
@@ -109049,7 +109049,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science; Social Science",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335228"
     },
     {
@@ -109472,7 +109472,7 @@
       "Course_Title": "SYS 502 - Business Practices",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "4/30",
+      "Enrolled_Capacity": "5/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Jamie Monat",
       "Locations": "Online-asynchronous",
