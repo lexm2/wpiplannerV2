@@ -44171,7 +44171,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338973"
     },
     {
@@ -80141,7 +80141,7 @@
       "Course_Title": "ME 3820 - Computer-Aided Manufacturing",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "24/36",
+      "Enrolled_Capacity": "25/36",
       "Instructional_Format": "Lecture",
       "Instructors": "Mustapha Fofana",
       "Locations": "Higgins Labs 230 Geom Modeling Computer Lab",
@@ -80201,7 +80201,7 @@
       "Course_Title": "ME 3820 - Computer-Aided Manufacturing",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "9/12",
+      "Enrolled_Capacity": "10/12",
       "Instructional_Format": "Laboratory",
       "Instructors": "Mustapha Fofana",
       "Locations": "Washburn 107 Machine Shop",
