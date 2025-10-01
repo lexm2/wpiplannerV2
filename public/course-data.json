@@ -10413,7 +10413,7 @@
       "Starting_Academic_Period_Type": "A Term",
       "Student_Course_Section_Cluster": "2025 Fall A Term: BME 311X - Clinical Devices Laboratory: Techniques (a)",
       "Subject": "Biomedical Engineering",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-341927"
     },
     {
@@ -29068,7 +29068,7 @@
       "Course_Title": "CS 411X - Multiplayer Network Games",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "29/60",
+      "Enrolled_Capacity": "30/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Mark Claypool",
       "Locations": "Salisbury Labs 104",
@@ -29645,7 +29645,7 @@
       "Course_Title": "CS 4433 - Big Data Management and Analytics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "41/60",
+      "Enrolled_Capacity": "42/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Elke Rundensteiner",
       "Locations": "Salisbury Labs 402",
@@ -29977,7 +29977,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "11/15",
+      "Waitlist_Waitlist_Capacity": "12/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336750"
     },
     {
@@ -32770,7 +32770,7 @@
       "Course_Title": "DS 4433 - Big Data Management and Analytics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "41/60",
+      "Enrolled_Capacity": "42/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Elke Rundensteiner",
       "Locations": "Salisbury Labs 402",
@@ -56908,7 +56908,7 @@
       "Course_Title": "IMGD 411X - Multiplayer Network Games",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "29/60",
+      "Enrolled_Capacity": "30/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Mark Claypool",
       "Locations": "Salisbury Labs 104",
