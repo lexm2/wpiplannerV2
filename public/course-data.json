@@ -79392,7 +79392,7 @@
       "Course_Title": "ME 2300 - Introduction To Engineering Design",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "33/40",
+      "Enrolled_Capacity": "32/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Joyce Hyde",
       "Locations": "Higgins Labs 230 Geom Modeling Computer Lab",
@@ -79422,7 +79422,7 @@
       "Course_Title": "ME 2300 - Introduction To Engineering Design",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "33/40",
+      "Enrolled_Capacity": "32/40",
       "Instructional_Format": "Laboratory",
       "Instructors": "Joyce Hyde",
       "Locations": "Higgins Labs 230 Geom Modeling Computer Lab",
@@ -80597,7 +80597,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335366"
     },
     {
