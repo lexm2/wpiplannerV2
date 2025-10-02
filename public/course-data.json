@@ -4643,7 +4643,7 @@
       "Course_Title": "AREN 3003 - Principles Of Hvac Design For Buildings",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "23/40",
+      "Enrolled_Capacity": "22/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Nan Ma",
       "Locations": "Unity Hall 420",
@@ -4654,7 +4654,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Architectural Engineering",
-      "Waitlist_Waitlist_Capacity": "5/5",
+      "Waitlist_Waitlist_Capacity": "4/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337028"
     },
     {
@@ -4671,18 +4671,18 @@
       "Course_Title": "AREN 3006 - Advanced Hvac System Design",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "21/21",
+      "Enrolled_Capacity": "26/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Nan Ma",
-      "Locations": "Kaven Hall 204",
+      "Locations": "Fuller Labs 320",
       "Meeting_Day_Patterns": "M-R",
       "Meeting_Patterns": "M-R | 9:00 AM - 10:50 AM",
       "Offering_Period": "2025 Fall B Term",
-      "Section_Details": "Kaven Hall 204 | M-R | 9:00 AM - 10:50 AM",
-      "Section_Status": "Closed",
+      "Section_Details": "Fuller Labs 320 | M-R | 9:00 AM - 10:50 AM",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Architectural Engineering",
-      "Waitlist_Waitlist_Capacity": "5/5",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335526"
     },
     {
@@ -4727,7 +4727,7 @@
       "Course_Title": "AREN 3022 - Architectural Design V - Building Envelope Design",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "21/21",
+      "Enrolled_Capacity": "26/33",
       "Instructional_Format": "Lecture",
       "Instructors": "Steven Van Dessel; Siena Mamayek",
       "Locations": "Kaven Hall 207",
@@ -4735,10 +4735,10 @@
       "Meeting_Patterns": "M-W-R | 2:00 PM - 5:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Kaven Hall 207 | M-W-R | 2:00 PM - 5:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Architectural Engineering",
-      "Waitlist_Waitlist_Capacity": "5/5",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336090"
     },
     {
@@ -5973,7 +5973,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Bioinformatics and Computational Biology; Biology",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334840"
     },
     {
@@ -9082,7 +9082,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Bioinformatics and Computational Biology; Biology",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334840"
     },
     {
@@ -29605,7 +29605,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "14/20",
+      "Waitlist_Waitlist_Capacity": "13/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337603"
     },
     {
