@@ -2885,7 +2885,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "3/5",
+      "Waitlist_Waitlist_Capacity": "4/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-340753"
     },
     {
@@ -88250,7 +88250,7 @@
       "Course_Title": "MU 2002 - History of Western Art Music After 1750",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "35/35",
+      "Enrolled_Capacity": "34/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Brent Wetters",
       "Locations": "Alden Hall B06 Janet Earle Room",
@@ -88258,7 +88258,7 @@
       "Meeting_Patterns": "T-F | 2:00 PM - 3:50 PM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Alden Hall B06 Janet Earle Room | T-F | 2:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Music",
       "Waitlist_Waitlist_Capacity": "0/10",
