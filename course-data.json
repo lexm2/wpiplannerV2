@@ -1554,7 +1554,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Aerospace Engineering",
-      "Waitlist_Waitlist_Capacity": "3/15",
+      "Waitlist_Waitlist_Capacity": "2/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336513"
     },
     {
@@ -4587,7 +4587,7 @@
       "Course_Title": "AREN 2025 - Building Electrical Systems",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "28/40",
+      "Enrolled_Capacity": "25/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Matthew Robinson",
       "Locations": "Atwater Kent 233",
@@ -4598,7 +4598,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Architectural Engineering",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337033"
     },
     {
@@ -4643,7 +4643,7 @@
       "Course_Title": "AREN 3003 - Principles Of Hvac Design For Buildings",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "22/40",
+      "Enrolled_Capacity": "21/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Nan Ma",
       "Locations": "Unity Hall 420",
@@ -4654,7 +4654,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Architectural Engineering",
-      "Waitlist_Waitlist_Capacity": "1/5",
+      "Waitlist_Waitlist_Capacity": "0/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337028"
     },
     {
@@ -4671,7 +4671,7 @@
       "Course_Title": "AREN 3006 - Advanced Hvac System Design",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "26/40",
+      "Enrolled_Capacity": "25/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Nan Ma",
       "Locations": "Fuller Labs 320",
@@ -4682,7 +4682,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Architectural Engineering",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335526"
     },
     {
@@ -4727,7 +4727,7 @@
       "Course_Title": "AREN 3022 - Architectural Design V - Building Envelope Design",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "26/33",
+      "Enrolled_Capacity": "23/33",
       "Instructional_Format": "Lecture",
       "Instructors": "Steven Van Dessel; Siena Mamayek",
       "Locations": "Kaven Hall 207",
@@ -4738,7 +4738,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Architectural Engineering",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336090"
     },
     {
@@ -5866,7 +5866,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "19/20",
+      "Waitlist_Waitlist_Capacity": "18/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339594"
     },
     {
@@ -23060,7 +23060,7 @@
       "Course_Title": "CS 1004 - Introduction To Programming For Non-Majors",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "71/72",
+      "Enrolled_Capacity": "69/72",
       "Instructional_Format": "Lecture",
       "Instructors": "Jennifer Mortensen",
       "Locations": "Unity Hall 420",
@@ -23072,7 +23072,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: CS 1004 - Introduction To Programming For Non-Majors (a)",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "2/15",
+      "Waitlist_Waitlist_Capacity": "0/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338675"
     },
     {
@@ -27947,17 +27947,17 @@
       "Course_Title": "CS 3043 - Social Implications Of Information Processing",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "30/30",
+      "Enrolled_Capacity": "29/30",
       "Instructional_Format": "Lecture",
       "Locations": "Olin Hall 109",
       "Meeting_Day_Patterns": "T-F",
       "Meeting_Patterns": "T-F | 2:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Olin Hall 109 | T-F | 2:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Computer Science; Social Science",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336385"
     },
     {
@@ -29493,7 +29493,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "4/5",
+      "Waitlist_Waitlist_Capacity": "3/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337228"
     },
     {
@@ -29521,7 +29521,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "6/15",
+      "Waitlist_Waitlist_Capacity": "5/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337602"
     },
     {
@@ -40536,7 +40536,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Environmental Studies",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335089"
     },
     {
@@ -40986,7 +40986,7 @@
       "Course_Title": "ES 1310 - Introduction To Computer Aided Design",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "64/64",
+      "Enrolled_Capacity": "63/64",
       "Instructional_Format": "Lecture",
       "Instructors": "Reza Ebadi",
       "Locations": "Goddard Hall 227 Classroom",
@@ -40994,11 +40994,11 @@
       "Meeting_Patterns": "F | 9:00 AM - 9:50 AM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Goddard Hall 227 Classroom | F | 9:00 AM - 9:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: ES 1310 - Introduction To Computer Aided Design ()",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "3/20",
+      "Waitlist_Waitlist_Capacity": "1/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335018"
     },
     {
@@ -43112,7 +43112,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "2/20",
+      "Waitlist_Waitlist_Capacity": "1/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335395"
     },
     {
@@ -79006,7 +79006,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ME 1800 - Manufacturing Science, Prototyping, And Computer-Controlled Machining ()",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "8/15",
+      "Waitlist_Waitlist_Capacity": "7/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336705"
     },
     {
@@ -80614,7 +80614,7 @@
       "Course_Title": "ME 3902 - Project-Based Engineering Experimentation",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "30/30",
+      "Enrolled_Capacity": "29/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Mehul Bhatia",
       "Locations": "Higgins Labs 031 ME Computer Lab",
@@ -80623,10 +80623,10 @@
       "Offering_Period": "2025 Fall B Term",
       "Public_Notes": "<p>This section includes a <b>LAB </b>portion</p>",
       "Section_Details": "Higgins Labs 031 ME Computer Lab | T-R | 2:00 PM - 4:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334826"
     },
     {
@@ -102169,7 +102169,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Psychology",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335194"
     },
     {
@@ -103924,7 +103924,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335043"
     },
     {
@@ -107621,7 +107621,7 @@
       "Course_Title": "RE 2721 - Religion And Culture",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "34/35",
+      "Enrolled_Capacity": "32/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Rebecca Moody",
       "Locations": "Higgins Labs 114",
@@ -107632,7 +107632,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Religion",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339252"
     },
     {
@@ -107734,7 +107734,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335043"
     },
     {
@@ -109183,17 +109183,17 @@
       "Course_Title": "SS 3043 - Social Implications Of Information Processing",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "30/30",
+      "Enrolled_Capacity": "29/30",
       "Instructional_Format": "Lecture",
       "Locations": "Olin Hall 109",
       "Meeting_Day_Patterns": "T-F",
       "Meeting_Patterns": "T-F | 2:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Olin Hall 109 | T-F | 2:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Computer Science; Social Science",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336385"
     },
     {
@@ -111807,10 +111807,10 @@
       "Meeting_Patterns": "T-R | 11:00 AM - 11:50 AM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Recreation Center All Courts 1-2 | T-R | 11:00 AM - 11:50 AM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335561"
     },
     {
@@ -112393,7 +112393,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "4/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336743"
     },
     {
