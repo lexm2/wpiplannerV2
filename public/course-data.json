@@ -2882,10 +2882,10 @@
       "Meeting_Patterns": "T-F | 10:00 AM - 11:50 AM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Riley Commons | T-F | 10:00 AM - 11:50 AM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "5/5",
+      "Waitlist_Waitlist_Capacity": "4/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-340753"
     },
     {
@@ -5866,7 +5866,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "19/20",
+      "Waitlist_Waitlist_Capacity": "18/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339594"
     },
     {
@@ -27708,10 +27708,10 @@
       "Meeting_Patterns": "M-R | 2:00 PM - 3:50 PM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Innovation Studio 205 Active Learning Classroom North | M-R | 2:00 PM - 3:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "5/5",
+      "Waitlist_Waitlist_Capacity": "4/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335073"
     },
     {
@@ -29470,7 +29470,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "4/5",
+      "Waitlist_Waitlist_Capacity": "3/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337228"
     },
     {
@@ -80284,7 +80284,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336823"
     },
     {
@@ -103822,7 +103822,7 @@
       "Course_Title": "PY 2731 - Ethics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "34/35",
+      "Enrolled_Capacity": "33/35",
       "Instructional_Format": "Lecture",
       "Instructors": "John Sanbonmatsu",
       "Locations": "Higgins Labs 116",
@@ -103833,7 +103833,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335043"
     },
     {
@@ -107632,7 +107632,7 @@
       "Course_Title": "RE 2731 - Ethics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "34/35",
+      "Enrolled_Capacity": "33/35",
       "Instructional_Format": "Lecture",
       "Instructors": "John Sanbonmatsu",
       "Locations": "Higgins Labs 116",
@@ -107643,7 +107643,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335043"
     },
     {
@@ -112302,7 +112302,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336743"
     },
     {
