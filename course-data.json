@@ -1014,7 +1014,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: AE 3010 - Experimentation and Data Science with Aerospace Engineering Applications (a)",
       "Subject": "Aerospace Engineering",
-      "Waitlist_Waitlist_Capacity": "1/4",
+      "Waitlist_Waitlist_Capacity": "0/4",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-341325"
     },
     {
@@ -1092,7 +1092,7 @@
       "Course_Title": "AE 3010 - Experimentation and Data Science with Aerospace Engineering Applications",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "3/4",
+      "Enrolled_Capacity": "4/4",
       "Instructional_Format": "Laboratory",
       "Instructors": "Zachary Taillefer",
       "Locations": "Higgins Labs 216 AE Undergraduate Lab",
@@ -1100,7 +1100,7 @@
       "Meeting_Patterns": "T-R | 8:00 AM - 9:50 AM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Higgins Labs 216 AE Undergraduate Lab | T-R | 8:00 AM - 9:50 AM",
-      "Section_Status": "Open",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: AE 3010 - Experimentation and Data Science with Aerospace Engineering Applications (a)",
       "Subject": "Aerospace Engineering",
