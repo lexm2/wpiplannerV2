@@ -3160,7 +3160,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "7/12",
+      "Waitlist_Waitlist_Capacity": "8/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335173"
     },
     {
@@ -3961,7 +3961,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335325"
     },
     {
@@ -56467,7 +56467,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335325"
     },
     {
@@ -112629,7 +112629,7 @@
       "Course_Title": "WPE 1054 - Plyometrics",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "25/25",
+      "Enrolled_Capacity": "24/25",
       "Instructional_Format": "Workshop",
       "Instructors": "Brian Chabot",
       "Locations": "Recreation Center All Courts 3-4",
@@ -112637,7 +112637,7 @@
       "Meeting_Patterns": "T-R | 11:00 AM - 11:50 AM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Recreation Center All Courts 3-4 | T-R | 11:00 AM - 11:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
       "Waitlist_Waitlist_Capacity": "0/10",
