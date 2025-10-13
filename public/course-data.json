@@ -5867,7 +5867,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "18/20",
+      "Waitlist_Waitlist_Capacity": "17/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339594"
     },
     {
@@ -5946,7 +5946,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "9/20",
+      "Waitlist_Waitlist_Capacity": "8/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336860"
     },
     {
@@ -9425,7 +9425,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: BME 1004 - Introduction To Programming In Matlab ()",
       "Subject": "Biomedical Engineering",
-      "Waitlist_Waitlist_Capacity": "10/20",
+      "Waitlist_Waitlist_Capacity": "9/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335394"
     },
     {
@@ -21078,7 +21078,7 @@
       "Course_Title": "CH 542 - Drugs In The Brain",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "20/30",
+      "Enrolled_Capacity": "19/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Carissa Olsen",
       "Locations": "Online-asynchronous",
@@ -21087,7 +21087,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335258"
     },
     {
@@ -21126,7 +21126,7 @@
       "Course_Title": "CH 544 - Elucidation Of Organic Reaction Mechanisms",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "12/30",
+      "Enrolled_Capacity": "11/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Anita Mattson",
       "Locations": "Online-asynchronous",
@@ -21135,7 +21135,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "1/5",
+      "Waitlist_Waitlist_Capacity": "0/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338201"
     },
     {
@@ -22293,7 +22293,7 @@
       "Course_Title": "CHE 4402 - Unit Operations Of Chemical Engineering II",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "16/16",
+      "Enrolled_Capacity": "15/16",
       "Instructional_Format": "Laboratory",
       "Instructors": "Susan Zhou; Laila Abu-Lail",
       "Locations": "Goddard Hall 116 Chem Lab",
@@ -22301,10 +22301,10 @@
       "Meeting_Patterns": "T | 8:00 AM - 11:50 AM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Goddard Hall 116 Chem Lab | T | 8:00 AM - 11:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Chemical Engineering",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335034"
     },
     {
@@ -30013,7 +30013,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "8/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335283"
     },
     {
@@ -30069,7 +30069,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "3/5",
+      "Waitlist_Waitlist_Capacity": "2/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337228"
     },
     {
@@ -30153,7 +30153,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "14/15",
+      "Waitlist_Waitlist_Capacity": "13/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-341473"
     },
     {
@@ -30288,7 +30288,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "3/5",
+      "Waitlist_Waitlist_Capacity": "2/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-342704"
     },
     {
@@ -34303,7 +34303,7 @@
       "Course_Title": "DS 598 - Graduate Qualifying Project",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "30/40",
+      "Enrolled_Capacity": "28/40",
       "Instructional_Format": "Experiential",
       "Instructors": "Fatemeh Emdad; Chun-Kit Ngan",
       "Locations": "Unity Hall 520",
@@ -34314,7 +34314,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Data Science",
-      "Waitlist_Waitlist_Capacity": "4/15",
+      "Waitlist_Waitlist_Capacity": "2/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337612"
     },
     {
@@ -39121,7 +39121,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Economics",
-      "Waitlist_Waitlist_Capacity": "4/20",
+      "Waitlist_Waitlist_Capacity": "3/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335057"
     },
     {
@@ -44960,7 +44960,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Entrepreneurship",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335064"
     },
     {
@@ -44988,7 +44988,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Entrepreneurship",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336496"
     },
     {
@@ -50074,7 +50074,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Humanities",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339388"
     },
     {
@@ -57195,7 +57195,7 @@
       "Course_Title": "IMGD 4000 - Technical Game Development II",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "44/48",
+      "Enrolled_Capacity": "36/48",
       "Instructional_Format": "Laboratory",
       "Instructors": "Lena Dias",
       "Locations": "Kaven Hall 116",
@@ -57207,7 +57207,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: IMGD 4000 - Technical Game Development II (a)",
       "Subject": "Interactive Media and Game Development",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339173"
     },
     {
@@ -57649,7 +57649,7 @@
       "Course_Title": "IMGD 4500 - Artistic Game Development II",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "12/24",
+      "Enrolled_Capacity": "11/24",
       "Instructional_Format": "Lecture",
       "Instructors": "Ralph Sutter",
       "Locations": "Fuller Labs 222 IMGD Computer Lab",
@@ -57661,7 +57661,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: IMGD 4500 - Artistic Game Development II (a)",
       "Subject": "Interactive Media and Game Development",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339101"
     },
     {
@@ -57680,7 +57680,7 @@
       "Course_Title": "IMGD 4500 - Artistic Game Development II",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "37/48",
+      "Enrolled_Capacity": "36/48",
       "Instructional_Format": "Laboratory",
       "Instructors": "Ralph Sutter",
       "Locations": "Kaven Hall 116",
@@ -57692,7 +57692,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: IMGD 4500 - Artistic Game Development II (a)",
       "Subject": "Interactive Media and Game Development",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339191"
     },
     {
@@ -79738,7 +79738,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ME 1800 - Manufacturing Science, Prototyping, And Computer-Controlled Machining ()",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "12/15",
+      "Waitlist_Waitlist_Capacity": "11/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337340"
     },
     {
@@ -81638,7 +81638,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "7/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334730"
     },
     {
@@ -105485,7 +105485,7 @@
       "Course_Title": "RBE 2002 - Unified Robotics II: Sensing and Perception in Robotics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "101/102",
+      "Enrolled_Capacity": "100/102",
       "Instructional_Format": "Lecture",
       "Instructors": "Greg Lewin",
       "Locations": "Olin Hall 107",
@@ -105497,7 +105497,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: RBE 2002 - Unified Robotics II: Sensing and Perception in Robotics ()",
       "Subject": "Robotics Engineering",
-      "Waitlist_Waitlist_Capacity": "2/20",
+      "Waitlist_Waitlist_Capacity": "1/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336943"
     },
     {
@@ -111418,7 +111418,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "7/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334711"
     },
     {
@@ -111586,7 +111586,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "13/15",
+      "Waitlist_Waitlist_Capacity": "12/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337280"
     },
     {
