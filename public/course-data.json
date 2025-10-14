@@ -350,7 +350,7 @@
       "Course_Title": "AE 2310 - Introduction to Aerospace Control Systems",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "42/50",
+      "Enrolled_Capacity": "41/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Raghvendra Cowlagi",
       "Locations": "Salisbury Labs 105",
@@ -378,7 +378,7 @@
       "Course_Title": "AE 2310 - Introduction to Aerospace Control Systems",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "71/100",
+      "Enrolled_Capacity": "72/100",
       "Instructional_Format": "Lecture",
       "Instructors": "Raghvendra Cowlagi",
       "Locations": "Salisbury Labs 115 Kinnicutt Hall",
@@ -5974,7 +5974,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Bioinformatics and Computational Biology; Biology",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334840"
     },
     {
@@ -7904,7 +7904,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Bioinformatics and Computational Biology; Biology",
-      "Waitlist_Waitlist_Capacity": "4/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338772"
     },
     {
@@ -9106,7 +9106,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Bioinformatics and Computational Biology; Biology",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334840"
     },
     {
@@ -9134,7 +9134,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Bioinformatics and Computational Biology; Biology",
-      "Waitlist_Waitlist_Capacity": "4/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338772"
     },
     {
@@ -13527,7 +13527,7 @@
       "Course_Title": "BUS 2080 - Data Analysis For Decision Making",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "29/50",
+      "Enrolled_Capacity": "30/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Sara Saberi",
       "Locations": "Salisbury Labs 411",
@@ -13583,7 +13583,7 @@
       "Course_Title": "BUS 2080 - Data Analysis For Decision Making",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "49/50",
+      "Enrolled_Capacity": "48/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Michael Ahern",
       "Locations": "Unity Hall 500",
@@ -73136,7 +73136,7 @@
       "Course_Title": "MA 2212 - Theory Of Interest II",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "8/25",
+      "Enrolled_Capacity": "7/25",
       "Instructional_Format": "Discussion",
       "Instructors": "Barry Posterro",
       "Locations": "Stratton Hall 202 (new)",
@@ -73166,7 +73166,7 @@
       "Course_Title": "MA 2212 - Theory Of Interest II",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "8/25",
+      "Enrolled_Capacity": "7/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Barry Posterro",
       "Locations": "Stratton Hall 301",
