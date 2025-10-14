@@ -19472,7 +19472,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "0/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335461"
     },
     {
@@ -85656,7 +85656,7 @@
       "Course_Title": "MKT 500 - Marketing Strategy",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "30/50",
+      "Enrolled_Capacity": "31/50",
       "Instructional_Format": "Lecture",
       "Locations": "Online-asynchronous",
       "Offering_Period": "2026 Spring Semester",
@@ -112713,7 +112713,7 @@
       "Course_Title": "WPE 1054 - Plyometrics",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/25",
+      "Enrolled_Capacity": "21/25",
       "Instructional_Format": "Workshop",
       "Instructors": "Brian Chabot",
       "Locations": "Recreation Center All Courts 3-4",
