@@ -210,7 +210,7 @@
       "Course_Title": "ACC 2060 - Financial Statements For Decision Making",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "32/50",
+      "Enrolled_Capacity": "31/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Nii Ollenu",
       "Locations": "Innovation Studio 105 Active Learning Classroom",
@@ -30502,7 +30502,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science; Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "11/20",
+      "Waitlist_Waitlist_Capacity": "12/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336907"
     },
     {
@@ -33065,7 +33065,7 @@
       "Course_Title": "DS 1010 - Data Science I: Introduction To Data Science",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "38/50",
+      "Enrolled_Capacity": "39/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Xiangnan Kong",
       "Locations": "Salisbury Labs 402",
@@ -33374,7 +33374,7 @@
       "Course_Title": "DS 4635 - Data Analytics And Statistical Learning",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "37/60",
+      "Enrolled_Capacity": "38/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Oren Mangoubi",
       "Locations": "Fuller Labs 320",
@@ -37714,7 +37714,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science; Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "11/20",
+      "Waitlist_Waitlist_Capacity": "12/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336907"
     },
     {
@@ -77998,7 +77998,7 @@
       "Course_Title": "MA 4635 - Data Analytics And Statistical Learning",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "37/60",
+      "Enrolled_Capacity": "38/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Oren Mangoubi",
       "Locations": "Fuller Labs 320",
