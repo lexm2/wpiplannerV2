@@ -3160,7 +3160,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "8/12",
+      "Waitlist_Waitlist_Capacity": "9/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335173"
     },
     {
@@ -3407,7 +3407,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335232"
     },
     {
@@ -3933,7 +3933,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335556"
     },
     {
@@ -3961,7 +3961,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335325"
     },
     {
@@ -4254,7 +4254,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339124"
     },
     {
@@ -56439,7 +56439,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335556"
     },
     {
@@ -56467,7 +56467,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335325"
     },
     {
@@ -56809,7 +56809,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339124"
     },
     {
@@ -57514,7 +57514,7 @@
       "Course_Title": "IMGD 4200 - History And Future Of Immersive And Interactive Media",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/24",
+      "Enrolled_Capacity": "19/24",
       "Instructional_Format": "Lecture",
       "Instructors": "Karen Stewart",
       "Locations": "Stratton Hall 202 (new)",
@@ -58012,7 +58012,7 @@
       "Course_Title": "IMGD 5200 - History And Future Of Immersive And Interactive Media",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/24",
+      "Enrolled_Capacity": "19/24",
       "Instructional_Format": "Lecture",
       "Instructors": "Karen Stewart",
       "Locations": "Stratton Hall 202 (new)",
@@ -60343,7 +60343,7 @@
       "Course_Title": "MA 1021 - Calculus I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "14/35",
+      "Enrolled_Capacity": "15/35",
       "Instructional_Format": "Discussion",
       "Instructors": "Marcel Blais",
       "Locations": "Stratton Hall 301",
@@ -60396,7 +60396,7 @@
       "Course_Title": "MA 1021 - Calculus I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "14/35",
+      "Enrolled_Capacity": "15/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Marcel Blais",
       "Locations": "Salisbury Labs 104",
@@ -60449,7 +60449,7 @@
       "Course_Title": "MA 1021 - Calculus I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "14/35",
+      "Enrolled_Capacity": "15/35",
       "Instructional_Format": "Laboratory",
       "Locations": "Stratton Hall 116 Computer Lab",
       "Meeting_Day_Patterns": "T",
@@ -74018,7 +74018,7 @@
       "Course_Title": "MA 2611 - Applied Statistics I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "54/54",
+      "Enrolled_Capacity": "53/54",
       "Instructional_Format": "Lecture",
       "Instructors": "Adam Sales",
       "Locations": "Salisbury Labs 305",
@@ -74026,7 +74026,7 @@
       "Meeting_Patterns": "M-T-R-F | 2:00 PM - 2:50 PM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Salisbury Labs 305 | M-T-R-F | 2:00 PM - 2:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: MA 2611 - Applied Statistics I ()",
       "Subject": "Mathematical Sciences",
@@ -74133,7 +74133,7 @@
       "Course_Title": "MA 2611 - Applied Statistics I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "27/27",
+      "Enrolled_Capacity": "26/27",
       "Instructional_Format": "Laboratory",
       "Instructors": "Adam Sales",
       "Locations": "Kaven Hall 202 Stats Computer Lab",
@@ -74141,7 +74141,7 @@
       "Meeting_Patterns": "W | 2:00 PM - 2:50 PM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Kaven Hall 202 Stats Computer Lab | W | 2:00 PM - 2:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: MA 2611 - Applied Statistics I ()",
       "Subject": "Mathematical Sciences",
