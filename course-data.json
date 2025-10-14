@@ -44033,7 +44033,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: ES 3003 - Heat Transfer ()",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "0/40",
+      "Waitlist_Waitlist_Capacity": "1/40",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335033"
     },
     {
@@ -82431,7 +82431,7 @@
       "Course_Title": "ME 4821 - Plastics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "15/40",
+      "Enrolled_Capacity": "16/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Jericho Moll; Jianyu Liang; Brian Jing; Michael Kreder",
       "Locations": "Goddard Hall 227 Classroom",
@@ -104209,7 +104209,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Philosophy",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-353580"
     },
     {
@@ -112740,7 +112740,7 @@
       "Course_Title": "WPE 1054 - Plyometrics",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "21/25",
+      "Enrolled_Capacity": "20/25",
       "Instructional_Format": "Workshop",
       "Instructors": "Brian Chabot",
       "Locations": "Recreation Center All Courts 3-4",
@@ -112880,7 +112880,7 @@
       "Course_Title": "WPE 1055 - Physical Conditioning",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "11/25",
+      "Enrolled_Capacity": "12/25",
       "Instructional_Format": "Workshop",
       "Instructors": "Taylor Browning",
       "Locations": "Recreation Center All Courts 4",
