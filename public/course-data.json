@@ -378,7 +378,7 @@
       "Course_Title": "AE 2310 - Introduction to Aerospace Control Systems",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "72/100",
+      "Enrolled_Capacity": "71/100",
       "Instructional_Format": "Lecture",
       "Instructors": "Raghvendra Cowlagi",
       "Locations": "Salisbury Labs 115 Kinnicutt Hall",
@@ -389,7 +389,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Aerospace Engineering",
-      "Waitlist_Waitlist_Capacity": "1/25",
+      "Waitlist_Waitlist_Capacity": "0/25",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337374"
     },
     {
@@ -5867,7 +5867,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "18/20",
+      "Waitlist_Waitlist_Capacity": "17/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339594"
     },
     {
@@ -5946,7 +5946,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "7/20",
+      "Waitlist_Waitlist_Capacity": "6/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336860"
     },
     {
@@ -9425,7 +9425,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: BME 1004 - Introduction To Programming In Matlab ()",
       "Subject": "Biomedical Engineering",
-      "Waitlist_Waitlist_Capacity": "7/20",
+      "Waitlist_Waitlist_Capacity": "6/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335394"
     },
     {
@@ -12913,7 +12913,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Biomedical Engineering",
-      "Waitlist_Waitlist_Capacity": "4/5",
+      "Waitlist_Waitlist_Capacity": "3/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337787"
     },
     {
@@ -30125,7 +30125,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "11/15",
+      "Waitlist_Waitlist_Capacity": "10/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-341473"
     },
     {
@@ -44949,7 +44949,7 @@
       "Course_Title": "ETR 1100 - Engineering Innovation And Entrepreneurship",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "38/50",
+      "Enrolled_Capacity": "37/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Sandhya Balasubramanian",
       "Locations": "Washburn 229",
@@ -44960,7 +44960,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Entrepreneurship",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336496"
     },
     {
@@ -50035,7 +50035,7 @@
       "Course_Title": "HU 1222 - Introduction To Medical Humanities",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "25/25",
+      "Enrolled_Capacity": "24/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Shana Lessing",
       "Locations": "Salisbury Labs 407",
@@ -50043,10 +50043,10 @@
       "Meeting_Patterns": "M-T-R-F | 11:00 AM - 11:50 AM",
       "Offering_Period": "2025 Fall B Term",
       "Section_Details": "Salisbury Labs 407 | M-T-R-F | 11:00 AM - 11:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Humanities",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339388"
     },
     {
@@ -76415,7 +76415,7 @@
       "Course_Title": "MA 2621 - Probability For Applications",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "34/35",
+      "Enrolled_Capacity": "33/35",
       "Instructional_Format": "Discussion",
       "Instructors": "Michael Smith",
       "Locations": "Stratton Hall 301",
@@ -76588,7 +76588,7 @@
       "Course_Title": "MA 2621 - Probability For Applications",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "46/70",
+      "Enrolled_Capacity": "45/70",
       "Instructional_Format": "Lecture",
       "Instructors": "Michael Smith",
       "Locations": "Kaven Hall 116",
@@ -81636,7 +81636,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334730"
     },
     {
