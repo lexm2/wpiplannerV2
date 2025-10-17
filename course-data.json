@@ -3396,7 +3396,7 @@
       "Course_Title": "AR 1111 - Introduction To Art History",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "26/25",
+      "Enrolled_Capacity": "25/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Michelle Borowski",
       "Locations": "Salisbury Labs 011",
@@ -10054,7 +10054,7 @@
       "Course_Title": "BME 3012 - Biomedical Sensors Laboratory: Techniques",
       "Credits": "1.5",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "26/36",
+      "Enrolled_Capacity": "25/36",
       "Instructional_Format": "Lecture",
       "Instructors": "Taimoor Afzal",
       "Locations": "Atwater Kent 233",
@@ -10082,7 +10082,7 @@
       "Course_Title": "BME 3012 - Biomedical Sensors Laboratory: Techniques",
       "Credits": "1.5",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "6/12",
+      "Enrolled_Capacity": "5/12",
       "Instructional_Format": "Laboratory",
       "Instructors": "Taimoor Afzal",
       "Locations": "Atwater Kent 014 BME Lab",
@@ -28282,7 +28282,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "2/5",
+      "Waitlist_Waitlist_Capacity": "1/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335073"
     },
     {
@@ -57149,7 +57149,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: IMGD 4000 - Technical Game Development II (a)",
       "Subject": "Interactive Media and Game Development",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "7/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339100"
     },
     {
@@ -57168,7 +57168,7 @@
       "Course_Title": "IMGD 4000 - Technical Game Development II",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "37/48",
+      "Enrolled_Capacity": "36/48",
       "Instructional_Format": "Laboratory",
       "Instructors": "Lena Dias",
       "Locations": "Kaven Hall 116",
@@ -57180,7 +57180,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2025 Fall B Term: IMGD 4000 - Technical Game Development II (a)",
       "Subject": "Interactive Media and Game Development",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339173"
     },
     {
@@ -83137,7 +83137,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335397"
     },
     {
@@ -87600,7 +87600,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335397"
     },
     {
@@ -103993,7 +103993,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "2/12",
+      "Waitlist_Waitlist_Capacity": "1/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335036"
     },
     {
@@ -107943,7 +107943,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "2/12",
+      "Waitlist_Waitlist_Capacity": "1/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335036"
     },
     {
