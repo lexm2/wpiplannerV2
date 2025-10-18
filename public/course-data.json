@@ -6562,7 +6562,7 @@
       "Course_Title": "BB 2550 - Cell Biology",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "50/100",
+      "Enrolled_Capacity": "51/100",
       "Instructional_Format": "Lecture",
       "Instructors": "Shane McInally",
       "Locations": "Unity Hall 400",
@@ -49912,7 +49912,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "History",
-      "Waitlist_Waitlist_Capacity": "0/5",
+      "Waitlist_Waitlist_Capacity": "1/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335371"
     },
     {
