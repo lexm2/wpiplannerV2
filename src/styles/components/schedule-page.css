@@ -380,6 +380,22 @@
   gap: 1rem;
   padding: 1rem;
   overflow: hidden;
+  position: relative;
+}
+
+.terms-grid.focused .term-graph {
+  display: none;
+}
+
+.terms-grid.focused .term-graph.focused-term {
+  display: flex;
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
 }
 
 .term-graph {
@@ -390,6 +406,22 @@
   flex-direction: column;
   overflow: hidden;
   min-height: 200px;
+  cursor: pointer;
+  transition: var(--effect-transition);
+}
+
+.term-graph:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--effect-shadow-hover);
+}
+
+.term-graph.focused-term {
+  cursor: default;
+}
+
+.term-graph.focused-term:hover {
+  border-color: var(--color-border);
+  box-shadow: none;
 }
 
 .term-header {
@@ -397,6 +429,10 @@
   border-bottom: 1px solid var(--color-border);
   background: var(--color-background-alt);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .term-header h3 {
@@ -405,6 +441,35 @@
   font-weight: var(--font-weight-medium);
   color: var(--color-text);
   text-align: center;
+}
+
+.term-back-btn {
+  position: absolute;
+  left: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  padding: 0.25rem 0.5rem;
+  font-size: 1.5rem;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: var(--effect-transition);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  line-height: 1;
+}
+
+.term-graph.focused-term .term-back-btn {
+  display: flex;
+}
+
+.term-back-btn:hover {
+  background: var(--color-background-alt);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* Schedule grid for each term */
@@ -418,6 +483,12 @@
   font-size: 0.7rem;
   overflow: auto;
   min-height: 200px;
+}
+
+.term-graph.focused-term .schedule-grid {
+  grid-template-rows: auto repeat(24, 1fr);
+  overflow: hidden;
+  min-height: 0;
 }
 
 /* Time labels column */
@@ -494,6 +565,11 @@
   bottom: 0;
   z-index: 10;
   overflow: hidden;
+  height: var(--pixel-height);
+}
+
+.term-graph.focused-term .section-block {
+  height: calc(var(--row-span) * 100%);
 }
 
 .section-block:hover {

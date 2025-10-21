@@ -17,13 +17,15 @@ export class ScheduleController {
     private conflictDetector: ConflictDetector | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private containerEventListeners = new Map<HTMLElement, EventListener>();
-    private statePreserver?: { 
-        preserve: () => Map<string, boolean>, 
-        restore: (states: Map<string, boolean>) => void 
+    private statePreserver?: {
+        preserve: () => Map<string, boolean>,
+        restore: (states: Map<string, boolean>) => void
     };
+    private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
+        this.setupTermFocusHandlers();
     }
 
     setSectionInfoModalController(sectionInfoModalController: SectionInfoModalController): void {
@@ -699,13 +701,15 @@ export class ScheduleController {
         
         // Build content for the first section in the slot - simplified to show only course name
         const content = primarySection.isFirstSlot ? `
-            <div class="section-block ${hasConflict ? 'conflict' : ''}" 
+            <div class="section-block ${hasConflict ? 'conflict' : ''}"
                  data-course-id="${primarySection.course.course.id}"
                  data-section-number="${primarySection.course.selectedSectionNumber || ''}"
                  data-selected-course-index="${primarySection.courseIndex || 0}"
+                 data-row-span="${rowSpan}"
                  style="
-                background-color: ${courseColor}; 
-                height: ${heightInPixels}px;
+                background-color: ${courseColor};
+                --row-span: ${rowSpan};
+                --pixel-height: ${heightInPixels}px;
                 width: 100%;
                 position: absolute;
                 top: 0;
@@ -889,7 +893,7 @@ export class ScheduleController {
         // Find the selected course and section
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
         const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
-        
+
         if (!selectedCourse || !selectedCourse.selectedSection) {
             console.warn('Course or section not found:', courseId, sectionNumber);
             return;
@@ -908,6 +912,75 @@ export class ScheduleController {
 
         // Show modal using the dedicated controller
         this.sectionInfoModalController.show(sectionData);
+    }
+
+    private setupTermFocusHandlers(): void {
+        document.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+
+            // Check if back button was clicked
+            if (target.classList.contains('term-back-btn')) {
+                e.stopPropagation();
+                this.unfocusTerm();
+                return;
+            }
+
+            // Check if term-graph or its header was clicked (but not the schedule grid)
+            const termGraph = target.closest('.term-graph');
+            if (termGraph && !target.closest('.schedule-grid')) {
+                const termsGrid = document.querySelector('.terms-grid');
+                // Only focus if not already focused
+                if (termsGrid && !termsGrid.classList.contains('focused')) {
+                    const term = (termGraph as HTMLElement).dataset.term;
+                    if (term) {
+                        this.focusTerm(term);
+                    }
+                }
+            }
+        });
+
+        // Setup escape key handler
+        this.escapeKeyHandler = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                const termsGrid = document.querySelector('.terms-grid');
+                if (termsGrid && termsGrid.classList.contains('focused')) {
+                    e.preventDefault();
+                    this.unfocusTerm();
+                }
+            }
+        };
+        document.addEventListener('keydown', this.escapeKeyHandler);
+    }
+
+    private focusTerm(term: string): void {
+        const termsGrid = document.querySelector('.terms-grid');
+        const termGraphs = document.querySelectorAll('.term-graph');
+
+        if (!termsGrid) return;
+
+        termsGrid.classList.add('focused');
+
+        termGraphs.forEach(graph => {
+            const graphElement = graph as HTMLElement;
+            if (graphElement.dataset.term === term) {
+                graphElement.classList.add('focused-term');
+            } else {
+                graphElement.classList.remove('focused-term');
+            }
+        });
+    }
+
+    private unfocusTerm(): void {
+        const termsGrid = document.querySelector('.terms-grid');
+        const termGraphs = document.querySelectorAll('.term-graph');
+
+        if (!termsGrid) return;
+
+        termsGrid.classList.remove('focused');
+
+        termGraphs.forEach(graph => {
+            graph.classList.remove('focused-term');
+        });
     }
 
 }
