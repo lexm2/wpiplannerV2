@@ -86,22 +86,25 @@ export class SectionInfoModalController {
     }
 
     private generateModalBody(data: SectionData): string {
-        const enrollmentStatus = data.section.seatsAvailable > 0 
-            ? `${data.section.seatsAvailable} seats available` 
+        const enrollmentStatus = data.section.seatsAvailable > 0
+            ? `${data.section.seatsAvailable} seats available`
             : 'Full';
-        
-        const waitlistInfo = data.section.maxWaitlist > 0 
-            ? `Waitlist: ${data.section.actualWaitlist}/${data.section.maxWaitlist}` 
+
+        const waitlistInfo = data.section.maxWaitlist > 0
+            ? `Waitlist: ${data.section.actualWaitlist}/${data.section.maxWaitlist}`
             : '';
+
+        const professors = [...new Set(data.section.periods.map(p => p.professor).filter(p => p && p.trim()))];
+        const professorDisplay = professors.length > 0 ? professors.join(', ') : 'TBA';
 
         const meetingTimes = data.section.periods.map(period => {
             const daysArray = Array.from(period.days).sort();
             const daysStr = daysArray.join(', ').toUpperCase();
             const timeStr = `${period.startTime.displayTime} - ${period.endTime.displayTime}`;
-            const location = period.building && period.room 
-                ? `${period.building} ${period.room}` 
+            const location = period.building && period.room
+                ? `${period.building} ${period.room}`
                 : period.location || 'TBA';
-            
+
             return `
                 <div class="period-info">
                     <div class="period-type">${this.getPeriodTypeLabel(period.type)}</div>
@@ -116,6 +119,7 @@ export class SectionInfoModalController {
         return `
             <div class="section-modal-content">
                 <div class="section-basic-info">
+                    <div class="section-detail"><strong>Professor:</strong> ${professorDisplay}</div>
                     <div class="section-detail"><strong>Section:</strong> ${data.section.number}</div>
                     <div class="section-detail"><strong>CRN:</strong> ${data.section.crn}</div>
                     <div class="section-detail"><strong>Term:</strong> ${data.section.term}</div>
