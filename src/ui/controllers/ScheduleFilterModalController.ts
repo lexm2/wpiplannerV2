@@ -51,241 +51,246 @@ export class ScheduleFilterModalController {
 
     private createModalElement(id: string): HTMLElement {
         const backdrop = document.createElement('div');
-        backdrop.className = 'modal-backdrop schedule-filter-modal';
+        backdrop.className = 'modal-backdrop filter-modal';
         backdrop.id = id;
 
+        const activeFiltersCount = this.scheduleFilterService?.getFilterCount() || 0;
+
         backdrop.innerHTML = `
-            <div class="modal-dialog">
+            <div class="modal-dialog filter-modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3 class="modal-title">Filter Selected Courses</h3>
-                        <button class="modal-close" type="button">×</button>
+                        <h3 class="modal-title">
+                            Filter Sections
+                            <span id="filter-count" class="filter-count">${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}</span>
+                        </h3>
+                        <button class="modal-close" onclick="document.getElementById('${id}').click()">×</button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body filter-modal-body">
                         ${this.createFilterModalContent()}
                     </div>
                 </div>
             </div>
         `;
 
-        // Add close button event listener
-        const closeBtn = backdrop.querySelector('.modal-close');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.hide());
+        const dialog = backdrop.querySelector('.modal-dialog') as HTMLElement;
+        if (dialog) {
+            dialog.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
         }
 
         return backdrop;
     }
 
     private createFilterModalContent(): string {
-        const activeFilters = this.scheduleFilterService.getActiveFilters();
+        const activeFiltersCount = this.scheduleFilterService.getFilterCount();
+        const sectionCount = this.scheduleFilterService ? this.scheduleFilterService.filterSections(this.selectedCourses).length : 0;
 
         return `
-            <div class="filter-modal-content">
-                <div class="active-filters-section">
-                    <h3>Active Filters</h3>
-                    <div id="active-filters-list" class="active-filters-list">
-                        ${this.renderActiveFilters(activeFilters)}
-                    </div>
+            <div class="filter-sections">
+                ${this.createSearchTextFilter()}
+                ${this.createProfessorFilter()}
+                ${this.createPeriodTypeFilter()}
+                ${this.createTermFilter()}
+                ${this.createAvailabilityFilter()}
+                ${this.createConflictFilter()}
+            </div>
+            <div class="modal-footer">
+                <div class="filter-preview">
+                    <span id="section-count-preview">${sectionCount} sections match current filters</span>
                 </div>
-
-                <div class="available-filters-section">
-                    <h3>Period Search Filters</h3>
-                    
-                    <div class="filter-group">
-                        <h4>Search Section IDs</h4>
-                        <div class="filter-option">
-                            <div class="filter-help-text">Search section numbers (A01, B02, GPS A01, etc.)</div>
-                            <div class="filter-search-container section-search-container">
-                                <input type="text" id="modal-search-input" placeholder="Search section IDs..." 
-                                       value="${this.getSearchValue()}" class="search-input section-search">
-                                <div class="section-dropdown" id="section-dropdown" style="display: none;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <h4>Professor</h4>
-                        <div class="filter-option">
-                            <div class="filter-help-text">Search and select specific professors</div>
-                            ${this.renderProfessorCheckboxes()}
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <h4>Selected Courses</h4>
-                        <div class="filter-option">
-                            <div class="filter-help-text">Currently selected courses from main interface</div>
-                            ${this.renderCourseSelectionCheckboxes()}
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <h4>Exclude Days</h4>
-                        <div class="filter-option">
-                            <div class="filter-help-text">Hide sections with classes on selected days</div>
-                            ${this.renderDaysCheckboxes()}
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <h4>Exclude Period Types</h4>
-                        <div class="filter-option">
-                            <div class="filter-help-text">Hide sections with selected period types</div>
-                            ${this.renderPeriodTypeCheckboxes()}
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <h4>Academic Terms</h4>
-                        <div class="filter-option">
-                            <div class="filter-help-text">Show sections from selected academic terms</div>
-                            ${this.renderTermCheckboxes()}
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <h4>Availability</h4>
-                        <div class="filter-option">
-                            <label class="filter-toggle-label">
-                                <input type="checkbox" class="filter-toggle" id="available-only-filter">
-                                <span class="filter-toggle-slider"></span>
-                                <span class="filter-toggle-text">Available Seats Only</span>
-                            </label>
-                            <div class="min-seats-input" style="margin-top: 0.5rem;">
-                                <label>Minimum Available Seats:</label>
-                                <input type="number" id="min-seats-filter" min="0" max="999" placeholder="Any">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="filter-group">
-                        <h4>Schedule Conflicts</h4>
-                        <div class="filter-option">
-                            <label class="filter-toggle-label">
-                                <input type="checkbox" class="filter-toggle" id="avoid-conflicts-filter">
-                                <span class="filter-toggle-slider"></span>
-                                <span class="filter-toggle-text">Hide periods that conflict with selected sections</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="filter-modal-actions">
-                    <button id="clear-all-filters" class="btn btn-secondary">Clear All</button>
-                    <button id="apply-filters" class="btn btn-primary">Apply Filters</button>
+                <div class="filter-actions">
+                    <button class="modal-btn btn-secondary" id="clear-all-filters">Clear All</button>
+                    <button class="modal-btn btn-primary" id="apply-filters">Apply</button>
                 </div>
             </div>
         `;
     }
 
-    private renderActiveFilters(activeFilters: any[]): string {
-        if (activeFilters.length === 0) {
-            return '<div class="no-filters">No active filters</div>';
-        }
+    private createSearchTextFilter(): string {
+        if (!this.scheduleFilterService) return '';
 
-        return activeFilters.map(filter => `
-            <div class="active-filter-tag" data-filter-id="${filter.id}">
-                <span class="filter-name">${filter.name}:</span>
-                <span class="filter-value">${filter.displayValue}</span>
-                <button class="remove-filter-btn" data-filter-id="${filter.id}">×</button>
-            </div>
-        `).join('');
-    }
+        const searchFilter = this.scheduleFilterService.getActiveFilters().find(f => f.id === 'sectionCode');
+        const currentQuery = searchFilter?.criteria?.codes?.[0] || '';
 
-    private renderCourseSelectionCheckboxes(): string {
-        if (this.selectedCourses.length === 0) {
-            return '<div class="no-options">No courses selected</div>';
-        }
-
-        return this.selectedCourses.map(selectedCourse => {
-            const course = selectedCourse.course;
-            const courseCode = `${course.department.abbreviation}${course.number}`;
-            
-            return `
-                <div class="course-display-item">
-                    <span class="course-code">${courseCode}</span>: 
-                    <span class="course-name">${course.name}</span>
+        return `
+            <div class="filter-section search-text-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Search Section IDs</h4>
+                    <button class="filter-clear-search" ${currentQuery ? '' : 'style="display: none;"'}>Clear</button>
                 </div>
-            `;
-        }).join('');
+                <div class="filter-section-content">
+                    <div class="filter-search-container">
+                        <input type="text" class="filter-search search-text-input"
+                               placeholder="Search section numbers (A01, B02, etc.)..."
+                               value="${this.escapeHtml(currentQuery)}"
+                               id="modal-search-input">
+                        <div class="section-dropdown" id="section-dropdown" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
+    private createProfessorFilter(): string {
+        if (!this.scheduleFilterService) return '';
 
-    private renderDaysCheckboxes(): string {
-        const dayOptions = this.scheduleFilterService!.getFilterOptions('periodDays', this.selectedCourses) || [];
-        const activeDays = this.getActiveDays();
-
-        return dayOptions.map((option: any) => `
-            <label class="filter-toggle-label">
-                <input type="checkbox" class="filter-toggle" name="periodDays" value="${option.value}" 
-                       ${activeDays.includes(option.value) ? 'checked' : ''}>
-                <span class="filter-toggle-slider"></span>
-                <span class="filter-toggle-text">${option.label}</span>
-            </label>
-        `).join('');
-    }
-
-    private renderProfessorCheckboxes(): string {
-        const professorOptions = this.scheduleFilterService!.getFilterOptions('periodProfessor', this.selectedCourses) || [];
         const activeProfessors = this.getActiveProfessors();
-        
-        if (professorOptions.length === 0) {
-            return '<div class="no-options">No professors available</div>';
-        }
 
         const selectedProfessorsChips = activeProfessors.map(prof => `
-            <div class="filter-chip" data-professor="${prof}">
-                <span>${prof}</span>
-                <button type="button" class="chip-remove" data-professor="${prof}">×</button>
-            </div>
+            <span class="filter-chip">
+                ${this.escapeHtml(prof)}
+                <button class="filter-chip-remove" data-professor="${this.escapeHtml(prof)}">×</button>
+            </span>
         `).join('');
 
         return `
-            <div class="filter-search-container">
-                <input type="text" class="filter-search professor-search" 
-                       placeholder="Search professors..." data-filter="professor">
-                <div class="professor-dropdown" id="professor-dropdown" style="display: none;"></div>
-            </div>
-            <div class="filter-selected-chips">
-                ${selectedProfessorsChips}
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Professors</h4>
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-search-container">
+                        <input type="text" class="filter-search professor-search"
+                               placeholder="Search professors..." data-filter="professor">
+                        <div class="professor-dropdown" id="professor-dropdown" style="display: none;"></div>
+                    </div>
+                    <div class="filter-selected-chips">
+                        ${selectedProfessorsChips}
+                    </div>
+                </div>
             </div>
         `;
     }
 
-    private renderPeriodTypeCheckboxes(): string {
-        const typeOptions = this.scheduleFilterService!.getFilterOptions('periodType', this.selectedCourses) || [];
+    private createPeriodTypeFilter(): string {
+        if (!this.scheduleFilterService) return '';
+
+        const typeOptions = this.scheduleFilterService.getFilterOptions('periodType', this.selectedCourses) || [];
         const activeTypes = this.getActivePeriodTypes();
 
         if (typeOptions.length === 0) {
-            return '<div class="no-options">No period types available</div>';
+            return '';
         }
 
-        return typeOptions.map((option: any) => `
+        const typeCheckboxes = typeOptions.map((option: any) => `
             <label class="filter-toggle-label">
-                <input type="checkbox" class="filter-toggle" name="periodType" value="${option.value}" 
+                <input type="checkbox" class="filter-toggle" name="periodType" value="${option.value}"
                        ${activeTypes.includes(option.value) ? 'checked' : ''}>
                 <span class="filter-toggle-slider"></span>
                 <span class="filter-toggle-text">${option.label}</span>
             </label>
         `).join('');
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Exclude Period Types</h4>
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-checkbox-row">
+                        ${typeCheckboxes}
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
-    private renderTermCheckboxes(): string {
-        const termOptions = this.scheduleFilterService!.getFilterOptions('periodTerm', this.selectedCourses) || [];
+    private createTermFilter(): string {
+        if (!this.scheduleFilterService) return '';
+
+        const termOptions = this.scheduleFilterService.getFilterOptions('periodTerm', this.selectedCourses) || [];
         const activeTerms = this.getActiveTerms();
 
         if (termOptions.length === 0) {
-            return '<div class="no-options">No academic terms available</div>';
+            return '';
         }
 
-        return termOptions.map((option: any) => `
-            <label class="filter-toggle-label">
-                <input type="checkbox" class="filter-toggle" name="periodTerm" value="${option.value}" 
+        const termCheckboxes = termOptions.map((option: any) => `
+            <label class="filter-toggle-label term-checkbox">
+                <input type="checkbox" class="filter-toggle" name="periodTerm" value="${option.value}"
                        ${activeTerms.includes(option.value) ? 'checked' : ''}>
                 <span class="filter-toggle-slider"></span>
                 <span class="filter-toggle-text">${option.label}</span>
             </label>
         `).join('');
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Terms</h4>
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-checkbox-row">
+                        ${termCheckboxes}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    private createAvailabilityFilter(): string {
+        if (!this.scheduleFilterService) return '';
+
+        const activeAvailability = this.getActiveAvailability();
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Availability</h4>
+                </div>
+                <div class="filter-section-content">
+                    <label class="filter-toggle-label">
+                        <input type="checkbox" class="filter-toggle" id="available-only-filter"
+                               ${activeAvailability.availableOnly ? 'checked' : ''}>
+                        <span class="filter-toggle-slider"></span>
+                        <span class="filter-toggle-text">Show only sections with available seats</span>
+                    </label>
+                    <div class="filter-range-container" style="margin-top: 0.75rem;">
+                        <div class="filter-range-input">
+                            <label>Minimum Available Seats</label>
+                            <input type="number" id="min-seats-filter" min="0" max="999"
+                                   placeholder="Any" value="${activeAvailability.minAvailable || ''}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    private createConflictFilter(): string {
+        if (!this.scheduleFilterService) return '';
+
+        const activeConflictDetection = this.getActiveConflictDetection();
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Schedule Conflicts</h4>
+                </div>
+                <div class="filter-section-content">
+                    <label class="filter-toggle-label">
+                        <input type="checkbox" class="filter-toggle" id="avoid-conflicts-filter"
+                               ${activeConflictDetection.avoidConflicts ? 'checked' : ''}>
+                        <span class="filter-toggle-slider"></span>
+                        <span class="filter-toggle-text">Hide periods that conflict with selected sections</span>
+                    </label>
+                </div>
+            </div>
+        `;
+    }
+
+    private escapeHtml(text: string): string {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    private unescapeHtml(text: string): string {
+        const div = document.createElement('div');
+        div.innerHTML = text;
+        return div.textContent || div.innerText || '';
     }
 
     private getSearchValue(): string {
@@ -293,11 +298,6 @@ export class ScheduleFilterModalController {
         return searchFilter?.criteria?.codes?.[0] || '';
     }
 
-
-    private getActiveDays(): string[] {
-        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodDays');
-        return filter?.criteria?.days || [];
-    }
 
     private getActiveProfessors(): string[] {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodProfessor');
@@ -330,53 +330,18 @@ export class ScheduleFilterModalController {
         
         const modalElement = document.getElementById(this.currentModalId);
         if (!modalElement) return;
-        
-        // Remove filter buttons
-        modalElement.querySelectorAll('.remove-filter-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const filterId = (e.target as HTMLElement).dataset.filterId;
-                if (filterId) {
-                    this.scheduleFilterService.removeFilter(filterId);
-                    this.refreshActiveFilters();
-                }
-            });
-        });
 
-        // Clear all filters
-        modalElement.querySelector('#clear-all-filters')?.addEventListener('click', () => {
-            this.scheduleFilterService!.clearFilters();
-            this.refreshActiveFilters();
-            this.resetFilterInputs();
-        });
+        // Search text filter
+        this.setupSearchTextFilter(modalElement);
 
-        // Apply filters button
-        modalElement.querySelector('#apply-filters')?.addEventListener('click', () => {
-            this.applyFilters();
-            this.hide();
-        });
-
-        // Setup simple section ID search
-        this.setupSectionIdSearch(modalElement);
-        
-
-
-        // Course selection is now handled by ProfileStateManager directly
-        // No event listeners needed for course selection checkboxes
-
-        // Days checkboxes
-        modalElement.querySelectorAll('input[name="periodDays"]').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                this.updateDaysFilter();
-                this.refreshActiveFilters();
-            });
-        });
-
+        // Professor filter
+        this.setupProfessorFilter(modalElement);
 
         // Period type checkboxes
         modalElement.querySelectorAll('input[name="periodType"]').forEach(checkbox => {
             checkbox.addEventListener('change', () => {
                 this.updatePeriodTypeFilter();
-                this.refreshActiveFilters();
+                this.updatePreview(modalElement);
             });
         });
 
@@ -384,7 +349,7 @@ export class ScheduleFilterModalController {
         modalElement.querySelectorAll('input[name="periodTerm"]').forEach(checkbox => {
             checkbox.addEventListener('change', () => {
                 this.updateTermFilter();
-                this.refreshActiveFilters();
+                this.updatePreview(modalElement);
             });
         });
 
@@ -395,14 +360,14 @@ export class ScheduleFilterModalController {
         if (availableOnlyCheckbox) {
             availableOnlyCheckbox.addEventListener('change', () => {
                 this.updateAvailabilityFilter();
-                this.refreshActiveFilters();
+                this.updatePreview(modalElement);
             });
         }
 
         if (minSeatsInput) {
             minSeatsInput.addEventListener('input', () => {
                 this.updateAvailabilityFilter();
-                this.refreshActiveFilters();
+                this.updatePreview(modalElement);
             });
         }
 
@@ -411,31 +376,29 @@ export class ScheduleFilterModalController {
         if (avoidConflictsCheckbox) {
             avoidConflictsCheckbox.addEventListener('change', () => {
                 this.updateConflictFilter();
-                this.refreshActiveFilters();
+                this.updatePreview(modalElement);
             });
         }
 
-        // Setup professor filter
-        this.setupProfessorFilter(modalElement);
-    }
-
-
-
-    private updateDaysFilter(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
-        if (modalElement) {
-            const checkedDays = Array.from(modalElement.querySelectorAll('input[name="periodDays"]:checked'))
-                .map(cb => (cb as HTMLInputElement).value);
-
-            if (checkedDays.length > 0) {
-                this.scheduleFilterService!.addFilter('periodDays', { days: checkedDays });
-            } else {
-                this.scheduleFilterService!.removeFilter('periodDays');
+        // Clear all filters
+        modalElement.querySelector('#clear-all-filters')?.addEventListener('click', () => {
+            this.scheduleFilterService!.clearFilters();
+            this.updatePreview(modalElement);
+            // Refresh the modal content
+            const modalBody = modalElement.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.innerHTML = this.createFilterModalContent();
+                this.setupFilterModalEventListeners();
             }
-        }
+        });
+
+        // Apply filters button
+        modalElement.querySelector('#apply-filters')?.addEventListener('click', () => {
+            this.applyFilters();
+            this.hide();
+        });
     }
+
 
 
     private updatePeriodTypeFilter(): void {
@@ -533,81 +496,88 @@ export class ScheduleFilterModalController {
         }
     }
 
+    private setupSearchTextFilter(modalElement: HTMLElement): void {
+        const searchInput = modalElement.querySelector('.search-text-input') as HTMLInputElement;
+        const clearButton = modalElement.querySelector('.filter-clear-search');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.trim();
+                this.updateSearchTextFilter(query, modalElement);
+            });
+        }
+
+        if (clearButton) {
+            clearButton.addEventListener('click', () => {
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+                this.updateSearchTextFilter('', modalElement);
+            });
+        }
+
+        // Setup section dropdown
+        this.setupSectionIdSearch(modalElement);
+    }
+
+    private updateSearchTextFilter(query: string, modalElement: HTMLElement): void {
+        if (query.length > 0) {
+            this.scheduleFilterService?.addFilter('sectionCode', { codes: [query] });
+        } else {
+            this.scheduleFilterService?.removeFilter('sectionCode');
+        }
+        this.updatePreview(modalElement);
+        this.updateClearSearchButton(modalElement, query);
+    }
+
+    private updateClearSearchButton(modalElement: HTMLElement, query: string): void {
+        const clearButton = modalElement.querySelector('.filter-clear-search') as HTMLElement;
+        if (clearButton) {
+            clearButton.style.display = query.length > 0 ? 'inline-block' : 'none';
+        }
+    }
+
+    private updatePreview(modalElement: HTMLElement): void {
+        if (!this.scheduleFilterService) return;
+
+        const filteredSections = this.scheduleFilterService.filterSections(this.selectedCourses);
+        const sectionCount = filteredSections.length;
+        const filterCount = this.scheduleFilterService.getFilterCount();
+
+        const countElement = modalElement.querySelector('#section-count-preview');
+        const filterCountElement = modalElement.querySelector('#filter-count');
+
+        if (countElement) {
+            countElement.textContent = `${sectionCount} sections match current filters`;
+        }
+
+        if (filterCountElement) {
+            filterCountElement.textContent = filterCount > 0 ? `(${filterCount})` : '';
+        }
+    }
+
     private applyFilters(): void {
         // Save filter state
         this.scheduleFilterService.saveFiltersToStorage();
     }
 
-    private refreshActiveFilters(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
-        if (modalElement) {
-            const activeFiltersList = modalElement.querySelector('#active-filters-list');
-            if (activeFiltersList) {
-                const activeFilters = this.scheduleFilterService!.getActiveFilters();
-                activeFiltersList.innerHTML = this.renderActiveFilters(activeFilters);
-                
-                // Re-bind remove button event listeners
-                activeFiltersList.querySelectorAll('.remove-filter-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const filterId = (e.target as HTMLElement).dataset.filterId;
-                        if (filterId) {
-                            this.scheduleFilterService!.removeFilter(filterId);
-                            this.refreshActiveFilters();
-                        }
-                    });
-                });
-            }
-        }
-    }
-
-    private resetFilterInputs(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
-        if (modalElement) {
-            // Clear search input
-            const searchInput = modalElement.querySelector('#modal-search-input') as HTMLInputElement;
-            if (searchInput) {
-                searchInput.value = '';
-            }
-
-            // Reset selects
-            const sectionStatusSelect = modalElement.querySelector('#section-status-filter') as HTMLSelectElement;
-            if (sectionStatusSelect) {
-                sectionStatusSelect.value = '';
-            }
-
-            const requiredStatusSelect = modalElement.querySelector('#required-status-filter') as HTMLSelectElement;
-            if (requiredStatusSelect) {
-                requiredStatusSelect.value = '';
-            }
-
-            // Uncheck all checkboxes
-            modalElement.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                (cb as HTMLInputElement).checked = false;
-            });
-        }
-    }
-
     private setupProfessorFilter(modalElement: HTMLElement): void {
         const searchInput = modalElement.querySelector('.professor-search') as HTMLInputElement;
         const dropdown = modalElement.querySelector('#professor-dropdown') as HTMLElement;
-        
+
         if (searchInput && this.scheduleFilterService) {
             const professorOptions = this.scheduleFilterService.getFilterOptions('periodProfessor', this.selectedCourses) || [];
             const professors = professorOptions.map((option: any) => option.value).filter((prof: string) => prof && prof.trim() !== 'TBA');
-            
+
             searchInput.addEventListener('input', () => {
                 const query = searchInput.value.toLowerCase();
                 if (query.length > 0) {
-                    const matches = professors.filter((prof: string) => 
+                    const matches = professors.filter((prof: string) =>
                         prof.toLowerCase().includes(query)
                     ).slice(0, 10);
-                    
-                    dropdown.innerHTML = matches.map((prof: string) => 
-                        `<div class="professor-option" data-professor="${prof}">${prof}</div>`
+
+                    dropdown.innerHTML = matches.map((prof: string) =>
+                        `<div class="professor-option" data-professor="${this.escapeHtml(prof)}">${this.escapeHtml(prof)}</div>`
                     ).join('');
                     dropdown.style.display = matches.length > 0 ? 'block' : 'none';
                 } else {
@@ -618,9 +588,9 @@ export class ScheduleFilterModalController {
             dropdown.addEventListener('click', (e) => {
                 const target = e.target as HTMLElement;
                 if (target.classList.contains('professor-option')) {
-                    const professor = target.dataset.professor;
+                    const professor = this.unescapeHtml(target.dataset.professor!);
                     if (professor) {
-                        this.addProfessorToSelection(professor);
+                        this.addProfessorToSelection(professor, modalElement);
                         searchInput.value = '';
                         dropdown.style.display = 'none';
                     }
@@ -634,65 +604,57 @@ export class ScheduleFilterModalController {
             });
         }
 
-        modalElement.querySelectorAll('.chip-remove').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const professor = (e.target as HTMLElement).dataset.professor;
-                if (professor) {
-                    this.removeProfessorFromSelection(professor);
+        // Handle chip removal - use delegation on the chips container
+        const chipsContainer = modalElement.querySelector('.filter-selected-chips');
+        if (chipsContainer) {
+            chipsContainer.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                if (target.classList.contains('filter-chip-remove')) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    const professor = this.unescapeHtml(target.dataset.professor!);
+                    this.removeProfessorFromSelection(professor, modalElement);
                 }
             });
-        });
+        }
     }
 
-    private addProfessorToSelection(professor: string): void {
+    private addProfessorToSelection(professor: string, modalElement: HTMLElement): void {
         const activeProfessors = this.getActiveProfessors();
         if (!activeProfessors.includes(professor)) {
             activeProfessors.push(professor);
             this.scheduleFilterService!.addFilter('periodProfessor', { professors: activeProfessors });
-            this.refreshActiveFilters();
-            this.refreshProfessorChips();
+            this.refreshProfessorChips(modalElement);
+            this.updatePreview(modalElement);
         }
     }
 
-    private removeProfessorFromSelection(professor: string): void {
+    private removeProfessorFromSelection(professor: string, modalElement: HTMLElement): void {
         const activeProfessors = this.getActiveProfessors();
         const updatedProfessors = activeProfessors.filter(prof => prof !== professor);
-        
+
         if (updatedProfessors.length > 0) {
             this.scheduleFilterService!.addFilter('periodProfessor', { professors: updatedProfessors });
         } else {
             this.scheduleFilterService!.removeFilter('periodProfessor');
         }
-        this.refreshActiveFilters();
-        this.refreshProfessorChips();
+        this.refreshProfessorChips(modalElement);
+        this.updatePreview(modalElement);
     }
 
-    private refreshProfessorChips(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
-        if (modalElement) {
-            const chipsContainer = modalElement.querySelector('.filter-selected-chips');
-            if (chipsContainer) {
-                const activeProfessors = this.getActiveProfessors();
-                const selectedProfessorsChips = activeProfessors.map(prof => `
-                    <div class="filter-chip" data-professor="${prof}">
-                        <span>${prof}</span>
-                        <button type="button" class="chip-remove" data-professor="${prof}">×</button>
-                    </div>
-                `).join('');
-                chipsContainer.innerHTML = selectedProfessorsChips;
+    private refreshProfessorChips(modalElement: HTMLElement): void {
+        if (!this.scheduleFilterService) return;
 
-                // Re-bind chip remove event listeners
-                chipsContainer.querySelectorAll('.chip-remove').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const professor = (e.target as HTMLElement).dataset.professor;
-                        if (professor) {
-                            this.removeProfessorFromSelection(professor);
-                        }
-                    });
-                });
-            }
+        const activeProfessors = this.getActiveProfessors();
+        const chipsContainer = modalElement.querySelector('.filter-selected-chips');
+
+        if (chipsContainer) {
+            chipsContainer.innerHTML = activeProfessors.map(prof => `
+                <span class="filter-chip">
+                    ${this.escapeHtml(prof)}
+                    <button class="filter-chip-remove" data-professor="${this.escapeHtml(prof)}">×</button>
+                </span>
+            `).join('');
         }
     }
 
