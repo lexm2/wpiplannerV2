@@ -191,7 +191,7 @@ export class ProgressiveRenderer {
                             <div class="course-details">
                                 <div class="course-name">
                                     ${course.name}
-                                    ${hasWarning ? '<span class="warning-icon">⚠</span>' : ''}
+                                    ${hasWarning ? '<span class="warning-icon" title="All sections full">⚠</span>' : ''}
                                 </div>
                                 <div class="course-sections">
                                     ${course.sections.map(section => {
@@ -310,7 +310,7 @@ export class ProgressiveRenderer {
                         </div>
                         <div class="course-title">
                             ${course.name}
-                            ${hasWarning ? '<span class="warning-icon">⚠</span>' : ''}
+                            ${hasWarning ? '<span class="warning-icon" title="All sections full">⚠</span>' : ''}
                         </div>
                         <div class="course-info">
                             <span class="course-credits">${credits} credits</span>

@@ -70,7 +70,9 @@
   font-weight: var(--font-weight-medium);
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 0.5rem;
-  padding-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
 }
 
 .department-item.all-departments.active {
