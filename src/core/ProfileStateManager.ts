@@ -172,6 +172,21 @@ export class ProfileStateManager {
     constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
         this.state = this.createInitialState();
+
+        // Save any pending changes before page unload
+        if (typeof window !== 'undefined') {
+            window.addEventListener('beforeunload', () => {
+                if (this.state.hasUnsavedChanges) {
+                    // Cancel any pending debounced save
+                    if (this.saveTimeout) {
+                        clearTimeout(this.saveTimeout);
+                        this.saveTimeout = null;
+                    }
+                    // Perform immediate synchronous save
+                    this.saveSync();
+                }
+            });
+        }
     }
 
     // Public API for state access
@@ -458,6 +473,23 @@ export class ProfileStateManager {
         }
 
         return result;
+    }
+
+    private saveSync(): void {
+        // Synchronous version of save for beforeunload handler
+        // Note: This bypasses the transaction system for immediate persistence
+        try {
+            this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
+            this.state.schedules.forEach(schedule => {
+                this.storageManager.saveSchedule(schedule);
+            });
+            this.storageManager.saveSelectedCourses(this.state.selectedCourses);
+            this.storageManager.savePreferences(this.state.preferences);
+            this.state.hasUnsavedChanges = false;
+            this.state.lastSaved = Date.now();
+        } catch (error) {
+            console.error('Synchronous save failed:', error);
+        }
     }
 
     async loadFromStorage(): Promise<boolean> {
