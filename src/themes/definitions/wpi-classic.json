@@ -12,6 +12,7 @@
     "backgroundAlt": "#ffffff",
     "surface": "#ffffff",
     "surfaceHover": "#fbfbfd",
+    "surfaceElevated": "#f8f8f8",
     "text": "#1d1d1f",
     "textSecondary": "#86868b",
     "textInverse": "#ffffff",

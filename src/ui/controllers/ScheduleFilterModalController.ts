@@ -56,6 +56,8 @@ export class ScheduleFilterModalController {
 
         const activeFiltersCount = this.scheduleFilterService?.getFilterCount() || 0;
 
+        const sectionCount = this.scheduleFilterService ? this.scheduleFilterService.filterSections(this.selectedCourses).length : 0;
+
         backdrop.innerHTML = `
             <div class="modal-dialog filter-modal-dialog">
                 <div class="modal-content">
@@ -68,6 +70,15 @@ export class ScheduleFilterModalController {
                     </div>
                     <div class="modal-body filter-modal-body">
                         ${this.createFilterModalContent()}
+                    </div>
+                    <div class="modal-footer">
+                        <div class="filter-preview">
+                            <span id="section-count-preview">${sectionCount} sections match current filters</span>
+                        </div>
+                        <div class="filter-actions">
+                            <button class="modal-btn btn-secondary" id="clear-all-filters">Clear All</button>
+                            <button class="modal-btn btn-primary" id="apply-filters">Apply</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,9 +95,6 @@ export class ScheduleFilterModalController {
     }
 
     private createFilterModalContent(): string {
-        const activeFiltersCount = this.scheduleFilterService.getFilterCount();
-        const sectionCount = this.scheduleFilterService ? this.scheduleFilterService.filterSections(this.selectedCourses).length : 0;
-
         return `
             <div class="filter-sections">
                 ${this.createSearchTextFilter()}
@@ -95,15 +103,6 @@ export class ScheduleFilterModalController {
                 ${this.createTermFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createConflictFilter()}
-            </div>
-            <div class="modal-footer">
-                <div class="filter-preview">
-                    <span id="section-count-preview">${sectionCount} sections match current filters</span>
-                </div>
-                <div class="filter-actions">
-                    <button class="modal-btn btn-secondary" id="clear-all-filters">Clear All</button>
-                    <button class="modal-btn btn-primary" id="apply-filters">Apply</button>
-                </div>
             </div>
         `;
     }

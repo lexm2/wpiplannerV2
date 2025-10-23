@@ -8,6 +8,7 @@ export interface ThemeColors {
     backgroundAlt: string;
     surface: string;
     surfaceHover: string;
+    surfaceElevated: string;
     text: string;
     textSecondary: string;
     textInverse: string;
