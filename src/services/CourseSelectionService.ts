@@ -1,7 +1,7 @@
-import { Course, Section } from '../types/types'
+import { Course, Department, Section } from '../types/types'
 import { SelectedCourse } from '../types/schedule'
 import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../core/ProfileStateManager'
-import { DataValidator } from '../core/DataValidator'
+import { DataValidator, ValidationResult } from '../core/DataValidator'
 import { RetryManager } from '../core/RetryManager'
 import { ProfileMigrationService } from '../core/ProfileMigrationService'
 import { Validators } from '../utils/validators'
@@ -266,6 +266,7 @@ export class CourseSelectionService {
     // Optimistic UI Components
     private uiStateBuffer: UIStateBuffer;
     private batchOperationManager: BatchOperationManager;
+    private isEmittingEvent: boolean = false;
 
     constructor(
         profileStateManager?: ProfileStateManager,
@@ -301,16 +302,12 @@ export class CourseSelectionService {
 
     private async performInitialization(): Promise<boolean> {
         try {
-            console.log('🚀 Initializing CourseSelectionService...');
-
-            // Clear old course selections with legacy ID format
-            // TODO: Remove this call along with clearLegacyCourseSelections() method in future version
-            this.clearLegacyCourseSelections();
+            console.log('Initializing CourseSelectionService...');
 
             // Check and perform migrations if needed
             const migrationResult = await this.checkAndPerformMigrations();
             if (!migrationResult) {
-                console.warn('⚠️ Migration check failed, proceeding with existing data');
+                console.warn('Migration check failed, proceeding with existing data');
             }
 
             // Load data from storage
@@ -319,17 +316,17 @@ export class CourseSelectionService {
             // Validate loaded data
             const healthCheck = await this.performHealthCheck();
             if (!healthCheck.healthy) {
-                console.warn('⚠️ Health check found issues:', healthCheck.issues);
+                console.warn('Health check found issues:', healthCheck.issues);
                 // Attempt repairs
                 await this.attemptDataRepair();
             }
 
             this.isInitialized = true;
-            console.log('✅ CourseSelectionService initialized successfully');
+            console.log('CourseSelectionService initialized successfully');
             return true;
 
         } catch (error) {
-            console.error('❌ Failed to initialize CourseSelectionService:', error);
+            console.error('Failed to initialize CourseSelectionService:', error);
             this.isInitialized = false;
             return false;
         } finally {
@@ -528,6 +525,21 @@ export class CourseSelectionService {
         this.addSelectionListener(callback);
     }
 
+    // Department and section management
+    setAllDepartments(departments: Department[]): void {
+        // This would typically be handled by a separate service
+        // For now, we'll store it in the profile state manager if needed
+        console.log(`Loaded ${departments.length} departments`);
+    }
+
+    getAllSections(): Section[] {
+        // This would be retrieved from the course data service
+        return [];
+    }
+
+    getAllSectionsForCourse(course: Course): Section[] {
+        return course.sections || [];
+    }
 
     // Data management
     async exportSelections(): Promise<{ success: boolean; data?: string; error?: string }> {
@@ -639,6 +651,22 @@ export class CourseSelectionService {
         return this.profileStateManager.hasUnsavedChanges();
     }
 
+    // Backward compatibility methods
+    findCourseById(courseId: string): Course | undefined {
+        // This would need to be implemented with access to course data
+        console.warn('findCourseById: Course data access not implemented in this service');
+        return undefined;
+    }
+
+    // Utility methods
+    unselectCourseById(courseId: string): void {
+        console.warn('unselectCourseById: Use unselectCourse with course object instead');
+    }
+
+    isCourseSelectedById(courseId: string): boolean {
+        console.warn('isCourseSelectedById: Use isCourseSelected with course object instead');
+        return false;
+    }
 
     reconstructSectionObjects(): void {
         try {
@@ -659,7 +687,7 @@ export class CourseSelectionService {
             });
             
             if (reconstructedCount > 0) {
-                console.log(`🔗 Reconstructed ${reconstructedCount} section objects`);
+                console.log(`Reconstructed ${reconstructedCount} section objects`);
                 // Save changes and notify listeners
                 this.profileStateManager.save();
             }
@@ -719,20 +747,25 @@ export class CourseSelectionService {
     private setupOptimisticUIListeners(): void {
         // Listen to UIStateBuffer changes for instant UI updates
         this.uiStateBuffer.addListener((uiState) => {
-            const selectionEvent: SelectionChangeEvent = {
-                type: 'data_loaded', // Generic type, will be refined by specific methods
-                selectedCourses: uiState.selectedCourses,
-                timestamp: Date.now()
-            };
-            this.notifySelectionListeners(selectionEvent);
+            // Skip event emission if we're already emitting from a specific method
+            // This prevents duplicate events when selectCourseOptimistic/unselectCourseOptimistic
+            // are already emitting their own specific events
+            if (!this.isEmittingEvent) {
+                const selectionEvent: SelectionChangeEvent = {
+                    type: 'data_loaded', // Generic type for non-specific updates
+                    selectedCourses: uiState.selectedCourses,
+                    timestamp: Date.now()
+                };
+                this.notifySelectionListeners(selectionEvent);
+            }
         });
 
         // Listen to batch operation results for user feedback
         this.batchOperationManager.addListener((result) => {
             if (result.success) {
-                console.log(`✅ Batch operation completed: ${result.operationsProcessed} operations in ${result.duration}ms`);
+                console.log(`Batch operation completed: ${result.operationsProcessed} operations in ${result.duration}ms`);
             } else {
-                console.warn(`❌ Batch operation failed: ${result.error}`);
+                console.warn(`Batch operation failed: ${result.error}`);
             }
         });
     }
@@ -759,10 +792,10 @@ export class CourseSelectionService {
             
             // Check if migration is needed
             const migrationResult = await this.migrationService.migrateToLatest(parsedData);
-            
+
             if (migrationResult.success && migrationResult.itemsChanged > 0) {
-                console.log(`✅ Migration completed: ${migrationResult.itemsChanged} items updated from ${migrationResult.fromVersion} to ${migrationResult.toVersion}`);
-                
+                console.log(`Migration completed: ${migrationResult.itemsChanged} items updated from ${migrationResult.fromVersion} to ${migrationResult.toVersion}`);
+
                 // Import migrated data
                 if (migrationResult.migratedData) {
                     await this.profileStateManager.importData(JSON.stringify(migrationResult.migratedData));
@@ -788,7 +821,7 @@ export class CourseSelectionService {
             });
 
             if (repairedCount > 0) {
-                console.log(`🔧 Repaired ${repairedCount} selected courses`);
+                console.log(`Repaired ${repairedCount} selected courses`);
                 await this.profileStateManager.save();
             }
 
@@ -828,13 +861,16 @@ export class CourseSelectionService {
     // Optimistic UI Implementation Methods
     private selectCourseOptimistic(course: Course, isRequired: boolean): CourseSelectionResult {
         try {
+            // Set flag to prevent duplicate event emission from UIStateBuffer listener
+            this.isEmittingEvent = true;
+            
             // Instant UI update via UIStateBuffer (0ms response)
             this.uiStateBuffer.selectCourse(course, isRequired);
             
             // Get updated course from UI state buffer
             const selectedCourse = this.uiStateBuffer.getSelectedCourse(course);
             
-            // Emit event for immediate UI updates
+            // Emit event for immediate UI updates with specific type
             this.notifySelectionListeners({
                 type: 'course_added',
                 course,
@@ -842,12 +878,16 @@ export class CourseSelectionService {
                 timestamp: Date.now()
             });
             
+            // Reset flag
+            this.isEmittingEvent = false;
+            
             return {
                 success: true,
                 course: selectedCourse
             };
         } catch (error) {
             console.error('Error in optimistic course selection:', error);
+            this.isEmittingEvent = false;
             return {
                 success: false,
                 error: `Optimistic selection failed: ${error}`
@@ -857,10 +897,13 @@ export class CourseSelectionService {
 
     private unselectCourseOptimistic(course: Course): CourseSelectionResult {
         try {
+            // Set flag to prevent duplicate event emission from UIStateBuffer listener
+            this.isEmittingEvent = true;
+            
             // Instant UI update via UIStateBuffer (0ms response)
             this.uiStateBuffer.unselectCourse(course);
             
-            // Emit event for immediate UI updates
+            // Emit event for immediate UI updates with specific type
             this.notifySelectionListeners({
                 type: 'course_removed',
                 course,
@@ -868,11 +911,15 @@ export class CourseSelectionService {
                 timestamp: Date.now()
             });
             
+            // Reset flag
+            this.isEmittingEvent = false;
+            
             return {
                 success: true
             };
         } catch (error) {
             console.error('Error in optimistic course unselection:', error);
+            this.isEmittingEvent = false;
             return {
                 success: false,
                 error: `Optimistic unselection failed: ${error}`
@@ -901,13 +948,16 @@ export class CourseSelectionService {
                 }
             }
 
+            // Set flag to prevent duplicate event emission from UIStateBuffer listener
+            this.isEmittingEvent = true;
+            
             // Instant UI update via UIStateBuffer (0ms response)
             this.uiStateBuffer.setSelectedSection(course, sectionNumber);
             
             // Get updated course from UI state buffer
             const selectedCourse = this.uiStateBuffer.getSelectedCourse(course);
             
-            // Emit event for immediate UI updates
+            // Emit event for immediate UI updates with specific type
             this.notifySelectionListeners({
                 type: 'section_changed',
                 course,
@@ -916,12 +966,16 @@ export class CourseSelectionService {
                 timestamp: Date.now()
             });
             
+            // Reset flag
+            this.isEmittingEvent = false;
+            
             return {
                 success: true,
                 course: selectedCourse
             };
         } catch (error) {
             console.error('Error in optimistic section selection:', error);
+            this.isEmittingEvent = false;
             return {
                 success: false,
                 error: `Optimistic section selection failed: ${error}`
@@ -931,19 +985,26 @@ export class CourseSelectionService {
 
     private clearAllSelectionsOptimistic(): { success: boolean; error?: string } {
         try {
+            // Set flag to prevent duplicate event emission from UIStateBuffer listener
+            this.isEmittingEvent = true;
+            
             // Instant UI update via UIStateBuffer (0ms response)
             this.uiStateBuffer.clearAllSelections();
             
-            // Emit event for immediate UI updates
+            // Emit event for immediate UI updates with specific type
             this.notifySelectionListeners({
                 type: 'selection_cleared',
                 selectedCourses: [],
                 timestamp: Date.now()
             });
             
+            // Reset flag
+            this.isEmittingEvent = false;
+            
             return { success: true };
         } catch (error) {
             console.error('Error in optimistic clear all selections:', error);
+            this.isEmittingEvent = false;
             return {
                 success: false,
                 error: `Optimistic clear all failed: ${error}`
@@ -951,40 +1012,8 @@ export class CourseSelectionService {
         }
     }
 
-    /**
-     * @deprecated This method was added for migration from old course ID format (without department prefix)
-     * to new format (with department prefix like "CS-1101"). Once all users have migrated (after a few 
-     * releases), this method and its call in performInitialization() can be safely removed.
-     * 
-     * TODO: Remove this method in a future version (estimated: 2-3 releases after course ID format change)
-     */
-    private clearLegacyCourseSelections(): void {
-        try {
-            // Check if there are any existing course selections
-            const existingSelections = localStorage.getItem('wpi-planner-selected-courses');
-            if (existingSelections) {
-                // Parse to check if they use the old ID format (no department prefix)
-                const selections = JSON.parse(existingSelections);
-                if (Array.isArray(selections) && selections.length > 0) {
-                    const hasLegacyIds = selections.some((sc: any) => 
-                        sc.course && sc.course.id && !sc.course.id.includes('-')
-                    );
-                    
-                    if (hasLegacyIds) {
-                        console.log('🧹 Clearing legacy course selections with old ID format...');
-                        localStorage.removeItem('wpi-planner-selected-courses');
-                        localStorage.removeItem('wpi-planner-user-state');
-                        localStorage.removeItem('wpi-planner-schedules');
-                        console.log('✅ Legacy course selections cleared');
-                    }
-                }
-            }
-        } catch (error) {
-            console.warn('⚠️ Error clearing legacy course selections:', error);
-            // If there's any error parsing, just clear it to be safe
-            localStorage.removeItem('wpi-planner-selected-courses');
-        }
-    }
+
+
 
     // Debug methods
     debugState(): void {

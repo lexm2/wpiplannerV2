@@ -1,5 +1,4 @@
 import { Course, Department } from '../../types/types'
-import { SelectedCourse } from '../../types/schedule'
 import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { ScheduleSelector } from '../components/ScheduleSelector'
@@ -23,6 +22,7 @@ import { OperationManager, DebouncedOperation } from '../../utils/RequestCancell
 import { DepartmentSyncService } from '../../services/DepartmentSyncService'
 import { ScheduleManagementService } from '../../services/ScheduleManagementService'
 import { ProfileStateManager } from '../../core/ProfileStateManager'
+import { StorageService } from '../../services/StorageService'
 import { ThemeManager } from '../../themes/ThemeManager'
 
 /**
@@ -40,6 +40,7 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * MAJOR DEPENDENCIES (27+ services including optimistic UI):
  * Core Systems:
  * - ProfileStateManager → Backend state management and persistent storage coordination
+ * - StorageService → Unified storage interface (wraps ProfileStateManager)
  * - ThemeManager → Theme system coordination via storage injection
  * 
  * Optimistic UI Layer:
@@ -78,7 +79,8 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * INITIALIZATION FLOW (Critical Order):
  * 1. Core Storage Setup:
  *    - Create ProfileStateManager instance
- *    - Configure ThemeManager to use ProfileStateManager (unified storage)
+ *    - Initialize StorageService with shared ProfileStateManager
+ *    - Configure ThemeManager to use StorageService (unified storage)
  * 
  * 2. Service Layer Initialization:
  *    - CourseSelectionService with shared ProfileStateManager + Optimistic UI integration
@@ -100,6 +102,7 @@ import { ThemeManager } from '../../themes/ThemeManager'
  *    - Debug instrumentation setup for optimistic UI monitoring
  * 
  * 5. Application Startup:
+ *    - StorageService initialization
  *    - CourseSelectionService data loading with UIStateBuffer sync
  *    - BatchOperationManager timer activation for background processing
  *    - Course data fetching
@@ -108,7 +111,7 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * 
  * DATA FLOW COORDINATION:
  * Storage Unification:
- * ProfileStateManager → ThemeManager (via ProfileStateManagerThemeStorage)
+ * ProfileStateManager → StorageService → ThemeManager (via ThemeStorage interface)
  * All services share the same ProfileStateManager instance for consistency
  * 
  * UI Update Flow (Optimistic):
@@ -144,50 +147,45 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 export class MainController {
-    private courseDataService!: CourseDataService;
-    private themeSelector!: ThemeSelector; // This needs to be constructed dont remove
+    private courseDataService: CourseDataService;
+    private themeSelector: ThemeSelector;
     private scheduleSelector: ScheduleSelector | null = null;
-    private profileStateManager!: ProfileStateManager;
-    private courseSelectionService!: CourseSelectionService;
-    private conflictDetector!: ConflictDetector;
-    private modalService!: ModalService;
-    private departmentController!: DepartmentController;
-    private courseController!: CourseController;
-    private scheduleController!: ScheduleController;
-    private sectionInfoModalController!: SectionInfoModalController;
-    private infoModalController!: InfoModalController;
-    private filterModalController!: FilterModalController;
-    private scheduleFilterModalController!: ScheduleFilterModalController;
-    private searchService!: SearchService;
-    private filterService!: CourseFilterService;
-    private scheduleFilterService!: ScheduleFilterService;
-    private uiStateManager!: UIStateManager;
-    private timestampManager!: TimestampManager;
-    private operationManager!: OperationManager;
-    private debouncedSearch!: DebouncedOperation;
-    private departmentSyncService!: DepartmentSyncService;
-    private scheduleManagementService!: ScheduleManagementService;
+    private profileStateManager: ProfileStateManager;
+    private storageService: StorageService;
+    private courseSelectionService: CourseSelectionService;
+    private conflictDetector: ConflictDetector;
+    private modalService: ModalService;
+    private departmentController: DepartmentController;
+    private courseController: CourseController;
+    private scheduleController: ScheduleController;
+    private sectionInfoModalController: SectionInfoModalController;
+    private infoModalController: InfoModalController;
+    private filterModalController: FilterModalController;
+    private scheduleFilterModalController: ScheduleFilterModalController;
+    private searchService: SearchService;
+    private filterService: CourseFilterService;
+    private scheduleFilterService: ScheduleFilterService;
+    private uiStateManager: UIStateManager;
+    private timestampManager: TimestampManager;
+    private operationManager: OperationManager;
+    private debouncedSearch: DebouncedOperation;
+    private departmentSyncService: DepartmentSyncService;
+    private scheduleManagementService: ScheduleManagementService;
     private allDepartments: Department[] = [];
 
 
     constructor() {
-        this.setupServices();
-    }
-
-    private async setupServices(): Promise<void> {
         // Initialize core storage and state management first
         this.profileStateManager = new ProfileStateManager();
-        
-        // Load saved data before initializing UI components
-        await this.profileStateManager.loadFromStorage();
+        this.storageService = StorageService.getInstance(this.profileStateManager);
         
         // Connect ThemeManager to use our unified storage
         const themeManager = ThemeManager.getInstance();
-        themeManager.setProfileStateManager(this.profileStateManager);
+        themeManager.setStorage(this.storageService);
         
         // Initialize services with shared ProfileStateManager
         this.courseDataService = new CourseDataService();
-        this.themeSelector = new ThemeSelector(this.profileStateManager);
+        this.themeSelector = new ThemeSelector();
         this.courseSelectionService = new CourseSelectionService(this.profileStateManager);
         this.conflictDetector = new ConflictDetector();
         this.modalService = new ModalService();
@@ -196,7 +194,7 @@ export class MainController {
         // Initialize search and filter services
         this.searchService = new SearchService();
         this.filterService = new CourseFilterService(this.searchService);
-        this.scheduleFilterService = new ScheduleFilterService();
+        this.scheduleFilterService = new ScheduleFilterService(this.searchService);
         
         // Initialize schedule management service with shared ProfileStateManager and CourseSelectionService
         this.scheduleManagementService = new ScheduleManagementService(this.profileStateManager, this.courseSelectionService);
@@ -252,12 +250,12 @@ export class MainController {
         
         // Setup optimistic UI event handlers
         this.setupOptimisticUIEventHandlers();
-        // this.enableOptimisticUIDebug();
+        this.enableOptimisticUIDebug();
         
         // IMPORTANT: Initialize filters LAST (triggers events that use operationManager)
         this.initializeFilters();
         
-        this.loadDataAndInitializeUI();
+        this.init();
     }
 
     private initializeFilters(): void {
@@ -271,7 +269,7 @@ export class MainController {
         this.filterService.registerFilter(searchTextFilter);
 
         // Set up filter change listener to refresh UI
-        this.filterService.addEventListener((_event) => {
+        this.filterService.addEventListener((event) => {
             this.refreshCurrentView();
         });
         
@@ -279,19 +277,23 @@ export class MainController {
         setTimeout(() => this.updateFilterButtonState(), 100);
     }
 
-    private async loadDataAndInitializeUI(): Promise<void> {
+    private async init(): Promise<void> {
         this.uiStateManager.showLoadingState();
         
         try {
+            // Initialize StorageService FIRST
+            console.log('MainController: Initializing StorageService...');
+            const storageInitResult = await this.storageService.initialize();
+            console.log('StorageService initialized:', storageInitResult);
 
             // Initialize CourseSelectionService SECOND to load persisted data
-            console.log('🔄 MainController: Initializing CourseSelectionService...');
+            console.log('MainController: Initializing CourseSelectionService...');
             const initResult = await this.courseSelectionService.initialize();
-            console.log('📊 CourseSelectionService initialized:', initResult);
+            console.log('CourseSelectionService initialized:', initResult);
             
             // Check what was loaded from storage
             const loadedCourses = this.courseSelectionService.getSelectedCourses();
-            console.log(`📦 Loaded ${loadedCourses.length} selected courses from storage:`, loadedCourses.map(sc => ({
+            console.log(`Loaded ${loadedCourses.length} selected courses from storage:`, loadedCourses.map(sc => ({
                 course: `${sc.course.department.abbreviation}${sc.course.number}`,
                 selectedSection: sc.selectedSectionNumber,
                 hasSection: sc.selectedSection !== null
@@ -331,6 +333,7 @@ export class MainController {
             this.allDepartments = scheduleDB.departments;
             this.departmentController.setAllDepartments(this.allDepartments);
             this.courseController.setAllDepartments(this.allDepartments);
+            this.courseSelectionService.setAllDepartments(this.allDepartments);
             
             // Initialize search service with course data
             this.searchService.setCourseData(this.allDepartments);
@@ -517,24 +520,25 @@ export class MainController {
         const searchInput = document.getElementById('search-input') as HTMLInputElement;
         if (searchInput) {
             searchInput.addEventListener('input', () => {
-                const query = searchInput.value.trim();
-                
+                const query = searchInput.value;
+
                 // Use debounced operation for search to prevent excessive filtering
                 this.debouncedSearch.execute(async (cancellationToken) => {
                     cancellationToken.throwIfCancelled();
-                    
+
                     // Update search text filter in FilterService
-                    if (query.length > 0) {
+                    // Only trim for the check, but pass the original query with spaces
+                    if (query.trim().length > 0) {
                         this.filterService.addFilter('searchText', { query });
                     } else {
                         this.filterService.removeFilter('searchText');
                     }
-                    
+
                     cancellationToken.throwIfCancelled();
-                    
+
                     // Sync modal search input
                     this.syncModalSearchInput(query);
-                    
+
                     return Promise.resolve();
                 }).catch(error => {
                     // Ignore cancellation errors, log others
@@ -578,7 +582,7 @@ export class MainController {
                     
                     selectedCourses.forEach(sc => {
                         const hasSection = sc.selectedSection !== null;
-                        console.log(`${sc.course.department.abbreviation}${sc.course.number}: section ${sc.selectedSectionNumber} ${hasSection ? '✓' : '✗'}`);
+                        console.log(`${sc.course.department.abbreviation}${sc.course.number}: section ${sc.selectedSectionNumber} ${hasSection ? 'OK' : 'MISSING'}`);
                         if (hasSection && sc.selectedSection) {
                             console.log(`  Term: ${sc.selectedSection.term}, Periods: ${sc.selectedSection.periods.length}`);
                             console.log(`  Full section object:`, sc.selectedSection);
@@ -606,15 +610,8 @@ export class MainController {
                     });
                     console.log('=== END SCHEDULE SECTION DATA ===\n');
                     
-                    // Force refresh of schedule content to ensure optimistic UI data is current
-                    // This is critical for first course selection after reload to appear immediately
                     this.scheduleController.displayScheduleSelectedCourses();
                     this.scheduleController.renderScheduleGrids();
-                    
-                    // Additional safety refresh after a brief delay to catch any async updates
-                    setTimeout(() => {
-                        this.scheduleController.displayScheduleSelectedCourses();
-                    }, 50);
                 }
             });
         }
@@ -659,14 +656,14 @@ export class MainController {
         const scheduleSearchInput = document.getElementById('schedule-search-input') as HTMLInputElement;
         if (scheduleSearchInput) {
             scheduleSearchInput.addEventListener('input', () => {
-                const query = scheduleSearchInput.value.trim();
-                
-                if (query.length > 0) {
+                const query = scheduleSearchInput.value;
+
+                if (query.trim().length > 0) {
                     this.scheduleFilterService.addFilter('searchText', { query });
                 } else {
                     this.scheduleFilterService.removeFilter('searchText');
                 }
-                
+
                 // Refresh the schedule page display
                 this.scheduleController.applyFiltersAndRefresh();
             });
@@ -694,7 +691,7 @@ export class MainController {
             // Handle all filters (including search text)
             const baseCourses = selectedDepartment ? selectedDepartment.courses : this.getAllCourses();
             coursesToDisplay = this.filterService.filterCourses(baseCourses);
-            this.updateFilteredHeader(coursesToDisplay.length);
+            this.updateFilteredHeader(coursesToDisplay.length, selectedDepartment);
         } else if (selectedDepartment) {
             // Show department courses without filters
             coursesToDisplay = selectedDepartment.courses;
@@ -731,7 +728,7 @@ export class MainController {
             this.operationManager.completeOperation('render');
             
         } catch (error) {
-            if ((error as any).name === 'CancellationError') {
+            if (error.name === 'CancellationError') {
                 // Render was cancelled, not an error
                 return;
             }
@@ -806,38 +803,21 @@ export class MainController {
                 return;
             }
             
-            // Handle explicit course removal events immediately to ensure UI sync
-            if (event.type === 'course_removed' && event.course) {
-                // Directly update UI for the removed course to ensure immediate feedback
-                this.courseController.updateCourseUIById(event.course.id, false);
-            }
-            
-            // Handle explicit course addition events immediately to ensure UI sync  
-            if (event.type === 'course_added' && event.course) {
-                // Directly update UI for the added course to ensure immediate feedback
-                this.courseController.updateCourseUIById(event.course.id, true);
-            }
-            
             // Create current state map for comparison
             const currentCoursesMap = new Map<string, string | null>();
             selectedCourses.forEach(sc => {
                 currentCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
             });
             
-            // Handle explicit course addition/removal events to ensure UI sync
-            const requiresUIRefresh = isCoursesAddedOrRemoved || 
-                event.type === 'course_added' || 
-                event.type === 'course_removed';
-            
             // Use targeted updates instead of global refresh for better performance
-            if (requiresUIRefresh) {
+            if (isCoursesAddedOrRemoved) {
                 this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
             }
             
             // Always update the selected courses sidebar
             this.courseController.displaySelectedCourses();
             
-            if (requiresUIRefresh) {
+            if (isCoursesAddedOrRemoved) {
                 // Full refresh needed when courses are added/removed
                 this.scheduleController.displayScheduleSelectedCourses();
                 
@@ -891,7 +871,7 @@ export class MainController {
             this.courseController.updateCourseUIById(selectedCourse.course.id, true);
         });
         
-        console.log(`✅ Initial UI sync complete: Updated ${selectedCourses.length} selected courses`);
+        console.log(`Initial UI sync complete: Updated ${selectedCourses.length} selected courses`);
     }
 
 
@@ -997,7 +977,7 @@ export class MainController {
         }
     }
 
-    private updateFilteredHeader(resultCount: number): void {
+    private updateFilteredHeader(resultCount: number, selectedDepartment: Department | null): void {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
             const filters = this.filterService.getActiveFilters();
@@ -1024,6 +1004,13 @@ export class MainController {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
             contentHeader.textContent = `${department.name} (${department.abbreviation})`;
+        }
+    }
+
+    private updateDefaultHeader(): void {
+        const contentHeader = document.querySelector('.content-header h2');
+        if (contentHeader) {
+            contentHeader.textContent = 'Course Listings';
         }
     }
 
@@ -1183,7 +1170,7 @@ export class MainController {
 
     // Debug methods for optimistic UI testing
     enableOptimisticUIDebug(): void {
-        console.log('🔧 Enabling optimistic UI debug mode');
+        console.log('Enabling optimistic UI debug mode');
         
         // Add debug info to window for testing
         if (typeof window !== 'undefined') {
