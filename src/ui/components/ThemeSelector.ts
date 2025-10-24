@@ -86,6 +86,8 @@ export class ThemeSelector {
      */
     public initializeTheme(): void {
         this.loadSavedTheme();
+        // Re-render theme options to reflect the correct active theme
+        this.renderThemeOptions();
     }
 
     private setupElements(): void {
