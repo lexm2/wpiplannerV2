@@ -3435,7 +3435,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "10/12",
+      "Waitlist_Waitlist_Capacity": "9/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338783"
     },
     {
@@ -29708,7 +29708,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "14/20",
+      "Waitlist_Waitlist_Capacity": "13/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335510"
     },
     {
@@ -30055,7 +30055,7 @@
       "Course_Title": "CS 4342 - Machine Learning",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "65/70",
+      "Enrolled_Capacity": "66/70",
       "Instructional_Format": "Lecture",
       "Instructors": "Walter Gerych",
       "Locations": "Washburn 229",
@@ -33260,7 +33260,7 @@
       "Course_Title": "DS 3010 - Data Science III: Computational Methods",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "18/48",
+      "Enrolled_Capacity": "17/48",
       "Instructional_Format": "Lecture",
       "Instructors": "Xiangnan Kong",
       "Locations": "Unity Hall 405",
@@ -88594,7 +88594,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-334907"
     },
     {
@@ -102659,7 +102659,7 @@
       "Course_Title": "PSY 1400 - Introduction To Psychological Science",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "56/55",
+      "Enrolled_Capacity": "55/55",
       "Instructional_Format": "Lecture",
       "Instructors": "Richard Lopez",
       "Locations": "Salisbury Labs 305",
