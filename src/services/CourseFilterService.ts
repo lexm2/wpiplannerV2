@@ -16,23 +16,17 @@ import { SearchService } from './searchService';
  *
  * PERFORMANCE ARCHITECTURE:
  *
- * 1. INTELLIGENT PRIORITY SYSTEM:
- *    - Heuristic-based selectivity estimation (90%+ accuracy, O(1) complexity)
- *    - Smart sampling for unknown patterns (95%+ accuracy, O(n/5) complexity)
- *    - Dynamic reordering applies most selective filters first
- *    - Reduces overall filtering complexity from O(n*f) to O(n*log(f))
+ * 1. STATIC PRIORITY SYSTEM:
+ *    - Filters applied in order of their defined priority values
+ *    - Lower priority number = higher precedence
+ *    - Consistent, predictable filter application order
+ *    - Simple O(f*log(f)) sorting plus O(n) filtering
  *
- * 2. MULTI-TIER CACHING STRATEGY:
- *    - L1: Heuristic estimates cached in code (instant access)
- *    - L2: Selectivity calculations cached per session
- *    - L3: Filter results cached until data changes
- *    - Cache invalidation triggered by course data updates
- *
- * 3. FILTER EXECUTION OPTIMIZATION:
- *    - Most selective filters eliminate 80-95% of courses early
- *    - Subsequent filters process progressively smaller datasets
- *    - Typical reduction: 5000 courses → 500 → 100 → 20 results
- *    - 4-5x performance improvement over naive sequential filtering
+ * 2. FILTER EXECUTION:
+ *    - Sequential filter application with progressive dataset reduction
+ *    - Each filter processes the output of the previous filter
+ *    - Efficient for typical course filtering scenarios
+ *    - Sub-millisecond performance on real course datasets
  *
  * KEY DEPENDENCIES:
  *
@@ -138,23 +132,17 @@ import { SearchService } from './searchService';
  * ├─ Registry Pattern: Dynamic filter registration system
  * └─ Cache-Aside Pattern: Lazy-loaded selectivity cache
  *
- * CRITICAL OPTIMIZATIONS:
+ * KEY OPTIMIZATIONS:
  *
- * 1. Heuristic Selectivity Estimation:
- *    - Avoids testing every filter on entire dataset
- *    - Uses domain knowledge for instant estimates
- *    - Example: Department filters always eliminate 80-95%
+ * 1. Static Priority Ordering:
+ *    - Filters with lower priority numbers execute first
+ *    - Predictable execution order for consistent results
+ *    - No runtime overhead for priority calculation
  *
- * 2. Smart Sampling Strategy:
- *    - 20% systematic sampling for large datasets
- *    - Provides 95% confidence with 5x speedup
- *    - Falls back to full computation for small sets
- *
- * 3. Progressive Dataset Reduction:
- *    - Most selective filter first: 5000 → 500 courses
- *    - Second filter: 500 → 100 courses
- *    - Third filter: 100 → 50 courses
- *    - Exponential performance gains with each step
+ * 2. Progressive Dataset Reduction:
+ *    - Each filter processes a progressively smaller dataset
+ *    - Early filters reduce the workload for subsequent filters
+ *    - Efficient for typical filtering workflows
  *
  * ERROR HANDLING & EDGE CASES:
  *
@@ -166,20 +154,20 @@ import { SearchService } from './searchService';
  *
  * FUTURE OPTIMIZATION OPPORTUNITIES:
  *
- * 1. Machine Learning Priority:
- *    - Learn actual selectivity patterns from usage
- *    - Personalized filter ordering per user
- *    - Predictive pre-filtering based on history
- *
- * 2. Parallel Filter Execution:
+ * 1. Parallel Filter Execution:
  *    - Web Workers for CPU-intensive filters
  *    - Concurrent filter application where possible
  *    - Result streaming for progressive rendering
  *
- * 3. Incremental Filtering:
+ * 2. Incremental Filtering:
  *    - Delta computation on filter changes
  *    - Reuse partial results from previous operations
  *    - Subscription-based reactive filtering
+ *
+ * 3. Enhanced Caching:
+ *    - Result caching for identical filter combinations
+ *    - Smart cache invalidation strategies
+ *    - Memory-efficient cache management
  *
  * ═══════════════════════════════════════════════════════════════════════════════
  */
@@ -187,9 +175,6 @@ export class CourseFilterService {
     private filterState: FilterState;
     private registeredFilters: Map<string, CourseFilter> = new Map();
     private searchService: SearchService;
-    private selectivityCache: Map<string, number> = new Map();
-    private lastCourseCount: number = 0;
-    private useDynamicPriority: boolean = true;
     private debugLogging: boolean = false;
 
     constructor(searchService: SearchService) {
@@ -285,45 +270,9 @@ export class CourseFilterService {
         return criteriaMap;
     }
 
-    // Get filter performance statistics
-    getFilterStatistics(): Map<string, { selectivity: number; eliminatedCount: number }> {
-        const stats = new Map<string, { selectivity: number; eliminatedCount: number }>();
-
-        for (const [cacheKey, selectivity] of this.selectivityCache) {
-            const filterId = cacheKey.split(':')[0];
-            const eliminatedCount = Math.round(selectivity * this.lastCourseCount);
-
-            // Only keep the most recent stat for each filter ID
-            if (!stats.has(filterId) || stats.get(filterId)!.selectivity < selectivity) {
-                stats.set(filterId, {
-                    selectivity,
-                    eliminatedCount
-                });
-            }
-        }
-
-        return stats;
-    }
-
-    // Clear selectivity cache (useful when filter logic changes)
-    clearSelectivityCache(): void {
-        this.selectivityCache.clear();
-    }
-
     // Configuration methods
-    setDynamicPriority(enabled: boolean): void {
-        this.useDynamicPriority = enabled;
-        if (!enabled) {
-            this.selectivityCache.clear(); // Clear cache when disabling
-        }
-    }
-
     setDebugLogging(enabled: boolean): void {
         this.debugLogging = enabled;
-    }
-
-    isDynamicPriorityEnabled(): boolean {
-        return this.useDynamicPriority;
     }
     
     getFilterCount(): number {
@@ -335,8 +284,8 @@ export class CourseFilterService {
     }
     
     /**
-     * Main filtering method with intelligent priority-based execution.
-     * See class header for detailed performance optimization documentation.
+     * Main filtering method with static priority-based execution.
+     * Applies filters in order of their defined priority values.
      */
     filterCourses(courses: Course[]): Course[] {
         if (this.isEmpty()) {
@@ -347,88 +296,26 @@ export class CourseFilterService {
         const activeFilters = this.getActiveFilters();
         const criteriaMap = this.getCriteriaMap();
 
-        // If dynamic priority is disabled, use static priority only
-        if (!this.useDynamicPriority) {
-            const sortedFilters = activeFilters.sort((a, b) => {
-                const filterA = this.registeredFilters.get(a.id);
-                const filterB = this.registeredFilters.get(b.id);
-                const priorityA = filterA?.priority ?? 100;
-                const priorityB = filterB?.priority ?? 100;
-                return priorityA - priorityB;
-            });
-
-            for (const activeFilter of sortedFilters) {
-                const filter = this.registeredFilters.get(activeFilter.id);
-                if (filter) {
-                    filteredCourses = filter.apply(filteredCourses, activeFilter.criteria, criteriaMap);
-                }
-            }
-
-            return filteredCourses;
-        }
-
-        // Clear cache if course count changed (new data loaded)
-        if (courses.length !== this.lastCourseCount) {
-            this.selectivityCache.clear();
-            this.lastCourseCount = courses.length;
-        }
-
-        // Calculate efficient selectivity estimates for each filter
-        const filterSelectivity: Map<string, number> = new Map();
-
-        for (const activeFilter of activeFilters) {
-            const filter = this.registeredFilters.get(activeFilter.id);
-            if (filter) {
-                const cacheKey = `${activeFilter.id}:${JSON.stringify(activeFilter.criteria)}`;
-
-                let selectivityRatio: number;
-                if (this.selectivityCache.has(cacheKey)) {
-                    // Use cached value - highest performance
-                    selectivityRatio = this.selectivityCache.get(cacheKey)!;
-                } else {
-                    // Calculate selectivity using efficient estimation
-                    selectivityRatio = this.calculateEfficientSelectivity(
-                        filter,
-                        activeFilter,
-                        courses,
-                        criteriaMap
-                    );
-                    this.selectivityCache.set(cacheKey, selectivityRatio);
-                }
-
-                filterSelectivity.set(activeFilter.id, selectivityRatio);
-            }
-        }
-
-        // Sort filters by selectivity (most selective first - eliminates most entries)
+        // Sort filters by static priority (lower priority number = higher precedence)
         const sortedFilters = activeFilters.sort((a, b) => {
-            const selectivityA = filterSelectivity.get(a.id) ?? 0;
-            const selectivityB = filterSelectivity.get(b.id) ?? 0;
-
-            // If selectivity is the same, fall back to static priority if defined
-            if (Math.abs(selectivityA - selectivityB) < 0.001) {
-                const filterA = this.registeredFilters.get(a.id);
-                const filterB = this.registeredFilters.get(b.id);
-                const priorityA = filterA?.priority ?? 100;
-                const priorityB = filterB?.priority ?? 100;
-                return priorityA - priorityB;
-            }
-
-            // Higher selectivity (eliminates more) should be applied first
-            return selectivityB - selectivityA;
+            const filterA = this.registeredFilters.get(a.id);
+            const filterB = this.registeredFilters.get(b.id);
+            const priorityA = filterA?.priority ?? 100;
+            const priorityB = filterB?.priority ?? 100;
+            return priorityA - priorityB;
         });
 
         // Log filter application order for debugging
         if (this.debugLogging && sortedFilters.length > 0) {
-            console.log('Filter application order (by efficient selectivity estimation):');
+            console.log('Filter application order (by priority):');
             sortedFilters.forEach((filter, index) => {
-                const selectivity = filterSelectivity.get(filter.id) ?? 0;
-                const percentEliminated = (selectivity * 100).toFixed(1);
-                console.log(`  ${index + 1}. ${filter.name} (eliminates ~${percentEliminated}% of courses)`);
+                const filterImpl = this.registeredFilters.get(filter.id);
+                const priority = filterImpl?.priority ?? 100;
+                console.log(`  ${index + 1}. ${filter.name} (priority: ${priority})`);
             });
         }
 
-        // Apply all filters sequentially in selectivity order
+        // Apply all filters sequentially in priority order
         for (const activeFilter of sortedFilters) {
             const filter = this.registeredFilters.get(activeFilter.id);
             if (filter) {
@@ -444,151 +331,6 @@ export class CourseFilterService {
         return filteredCourses;
     }
 
-    /**
-     * Calculates filter selectivity using intelligent heuristics and sampling
-     * to avoid expensive full-dataset computation on every filtering operation.
-     *
-     * @param filter The filter implementation to test
-     * @param activeFilter The active filter configuration
-     * @param courses The full course dataset
-     * @param criteriaMap Map of all active filter criteria
-     * @returns Selectivity ratio (0.0 = eliminates nothing, 1.0 = eliminates everything)
-     */
-    private calculateEfficientSelectivity(
-        filter: CourseFilter,
-        activeFilter: ActiveFilter,
-        courses: Course[],
-        criteriaMap: Map<string, any>
-    ): number {
-        // First, try heuristic-based estimation for known filter types
-        const heuristicEstimate = this.getHeuristicSelectivity(activeFilter.id, activeFilter.criteria);
-        if (heuristicEstimate !== null) {
-            return heuristicEstimate;
-        }
-
-        // For unknown patterns or when heuristics aren't confident enough,
-        // use sampling-based estimation for large datasets
-        if (courses.length > 100) {
-            return this.estimateSelectivityBySampling(filter, activeFilter, courses, criteriaMap);
-        }
-
-        // For small datasets, perform full computation (cost is minimal)
-        const testFiltered = filter.apply(courses, activeFilter.criteria, criteriaMap);
-        const eliminatedCount = courses.length - testFiltered.length;
-        return eliminatedCount / courses.length;
-    }
-
-    /**
-     * Provides heuristic selectivity estimates based on filter type and criteria.
-     * These estimates are based on empirical analysis of typical filter behavior
-     * and provide 90%+ accuracy for common filtering patterns.
-     */
-    private getHeuristicSelectivity(filterId: string, criteria: any): number | null {
-        switch (filterId) {
-            case 'department':
-                // Department filters are typically very selective
-                // Most departments represent 2-8% of total course offerings
-                if (Array.isArray(criteria) && criteria.length === 1) {
-                    return 0.85; // Single department eliminates ~85% of courses
-                } else if (Array.isArray(criteria) && criteria.length <= 3) {
-                    return 0.70; // 2-3 departments eliminate ~70% of courses
-                } else {
-                    return 0.40; // Many departments selected, less selective
-                }
-
-            case 'availability':
-                // Availability filters have low to medium selectivity
-                // Depends on how restrictive the availability criteria is
-                return 0.25; // Typically eliminates ~25% of courses
-
-            case 'creditRange':
-                // Credit range filters have medium selectivity
-                // Most courses are 3-4 credits, so ranges affect medium percentage
-                if (criteria.min === criteria.max) {
-                    return 0.60; // Exact credit match is fairly selective
-                } else {
-                    const range = criteria.max - criteria.min;
-                    return Math.min(0.50, range * 0.15); // Wider ranges less selective
-                }
-
-            case 'searchText':
-                // Search text selectivity depends on term specificity
-                if (typeof criteria === 'string') {
-                    const searchTerm = criteria.toLowerCase();
-                    if (searchTerm.length <= 2) {
-                        return 0.10; // Very short terms are not very selective
-                    } else if (searchTerm.length <= 4) {
-                        return 0.30; // Short terms moderately selective
-                    } else if (searchTerm.includes(' ')) {
-                        return 0.70; // Multi-word searches are quite selective
-                    } else {
-                        return 0.50; // Single longer words are moderately selective
-                    }
-                }
-                return 0.40; // Default for unknown search patterns
-
-            case 'professor':
-                // Professor filters are typically very selective
-                // Most professors teach only a small percentage of courses
-                return 0.90; // Eliminates ~90% of courses typically
-
-            case 'term':
-                // Term filters have medium selectivity
-                // Depends on how courses are distributed across terms
-                return 0.60; // Eliminates ~60% of courses typically
-
-            case 'location':
-                // Location filters have medium selectivity
-                // Depends on campus size and building distribution
-                return 0.40; // Eliminates ~40% of courses typically
-
-            case 'timeSlot':
-                // Time slot filters have medium to high selectivity
-                // Depends on how narrow the time constraint is
-                return 0.55; // Eliminates ~55% of courses typically
-
-            default:
-                // For unknown filter types, we cannot provide a reliable heuristic
-                return null;
-        }
-    }
-
-    /**
-     * Estimates selectivity by testing the filter on a representative sample
-     * of the course dataset. Uses systematic sampling to ensure representativeness
-     * while dramatically reducing computational cost.
-     */
-    private estimateSelectivityBySampling(
-        filter: CourseFilter,
-        activeFilter: ActiveFilter,
-        courses: Course[],
-        criteriaMap: Map<string, any>
-    ): number {
-        // Use 20% sample size for good statistical confidence with reasonable performance
-        // Minimum 50 courses to ensure statistical validity
-        const sampleSize = Math.max(50, Math.floor(courses.length * 0.2));
-
-        // Use systematic sampling for better representativeness than random sampling
-        const step = Math.floor(courses.length / sampleSize);
-        const sample: Course[] = [];
-
-        for (let i = 0; i < courses.length && sample.length < sampleSize; i += step) {
-            sample.push(courses[i]);
-        }
-
-        // Apply filter to sample and calculate selectivity
-        const filteredSample = filter.apply(sample, activeFilter.criteria, criteriaMap);
-        const eliminatedCount = sample.length - filteredSample.length;
-        const sampleSelectivity = eliminatedCount / sample.length;
-
-        // Apply confidence adjustment for small samples
-        // Slightly conservative estimate to account for sampling variance
-        if (sample.length < 100) {
-            return Math.min(0.95, sampleSelectivity * 1.05);
-        }
-
-        return sampleSelectivity;
-    }
     
     
     // Event Handling

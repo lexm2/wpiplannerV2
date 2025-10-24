@@ -537,7 +537,7 @@ export class ProfileStateManager {
             }
 
             this.state.selectedCourses = loadedCourses;
-            console.log(`📊 ProfileStateManager: Final loaded course count: ${loadedCourses.length}`);
+            console.log(`ProfileStateManager: Final loaded course count: ${loadedCourses.length}`);
 
             // If no schedules exist, create a default one
             if (this.state.schedules.length === 0) {

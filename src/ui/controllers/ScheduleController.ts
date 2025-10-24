@@ -96,14 +96,14 @@ export class ScheduleController {
         }
         
         if (selectedCourses.length === 0) {
-            console.log('⚠️ Early return: 0 selected courses - displaying empty state');
+            console.log('Early return: 0 selected courses - displaying empty state');
             countElement.textContent = '(0)';
             selectedCoursesContainer.innerHTML = '<div class="empty-state">No courses selected yet</div>';
             return;
         }
 
         if (hasActiveFilters && filteredSections.length === 0) {
-            console.log('⚠️ Early return: 0 sections match active filters - displaying empty state');
+            console.log('Early return: 0 sections match active filters - displaying empty state');
             countElement.textContent = '(0 sections match filters)';
             selectedCoursesContainer.innerHTML = '<div class="empty-state">No sections match the current filters</div>';
             return;

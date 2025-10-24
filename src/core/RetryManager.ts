@@ -411,7 +411,7 @@ export class RetryManager {
 
             // If circuit is open, fail fast
             if (isCircuitOpen) {
-                console.warn(`⚡ Circuit breaker for ${operationName} is OPEN - failing fast`);
+                console.warn(`Circuit breaker for ${operationName} is OPEN - failing fast`);
                 return {
                     success: false,
                     error: new Error(`Circuit breaker is open for ${operationName}`),
@@ -430,7 +430,7 @@ export class RetryManager {
                     
                     if (failureCount >= failureThreshold) {
                         isCircuitOpen = true;
-                        console.warn(`⚡ Circuit breaker for ${operationName} is now OPEN after ${failureCount} failures`);
+                        console.warn(`Circuit breaker for ${operationName} is now OPEN after ${failureCount} failures`);
                     }
                 },
                 onSuccess: () => {

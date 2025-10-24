@@ -88,24 +88,24 @@ async function fetchCourseData() {
     writeFileSync(timestampPath, JSON.stringify(timestamp, null, 2));
     console.log(`✅ Timestamp saved to ${timestampPath}`);
     
-    console.log('🎉 Course data fetch completed successfully!');
+    console.log('Course data fetch completed successfully!');
     
   } catch (error) {
     console.error('❌ Failed to fetch course data:', error.message);
     
     // Provide helpful debugging information
     if (error.message.includes('terminated') || error.message.includes('ECONNRESET')) {
-      console.error('🔍 Network connection was terminated. This could be due to:');
+      console.error('Network connection was terminated. This could be due to:');
       console.error('   - WPI server temporarily unavailable');
       console.error('   - Network timeout (large file download)');
       console.error('   - GitHub Actions network limitations');
     }
     
     if (error.message.includes('timeout') || error.message.includes('AbortError')) {
-      console.error('🔍 Request timed out. The WPI server may be slow or overloaded.');
+      console.error('Request timed out. The WPI server may be slow or overloaded.');
     }
     
-    console.error('💡 This error is typically temporary. The GitHub Actions workflow will retry in 15 minutes.');
+    console.error('This error is typically temporary. The GitHub Actions workflow will retry in 15 minutes.');
     process.exit(1);
   }
 }
