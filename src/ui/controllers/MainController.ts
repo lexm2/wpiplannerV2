@@ -1,4 +1,5 @@
 import { Course, Department } from '../../types/types'
+import { SelectedCourse } from '../../types/schedule'
 import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { ScheduleSelector } from '../components/ScheduleSelector'
@@ -148,8 +149,8 @@ import { ThemeManager } from '../../themes/ThemeManager'
  */
 export class MainController {
     private courseDataService: CourseDataService;
-    private themeSelector: ThemeSelector;
     private scheduleSelector: ScheduleSelector | null = null;
+    private _themeSelector: ThemeSelector;
     private profileStateManager: ProfileStateManager;
     private storageService: StorageService;
     private courseSelectionService: CourseSelectionService;
@@ -185,7 +186,7 @@ export class MainController {
         
         // Initialize services with shared ProfileStateManager
         this.courseDataService = new CourseDataService();
-        this.themeSelector = new ThemeSelector();
+        this._themeSelector = new ThemeSelector(this.profileStateManager);
         this.courseSelectionService = new CourseSelectionService(this.profileStateManager);
         this.conflictDetector = new ConflictDetector();
         this.modalService = new ModalService();
@@ -194,7 +195,7 @@ export class MainController {
         // Initialize search and filter services
         this.searchService = new SearchService();
         this.filterService = new CourseFilterService(this.searchService);
-        this.scheduleFilterService = new ScheduleFilterService(this.searchService);
+        this.scheduleFilterService = new ScheduleFilterService();
         
         // Initialize schedule management service with shared ProfileStateManager and CourseSelectionService
         this.scheduleManagementService = new ScheduleManagementService(this.profileStateManager, this.courseSelectionService);
@@ -269,7 +270,7 @@ export class MainController {
         this.filterService.registerFilter(searchTextFilter);
 
         // Set up filter change listener to refresh UI
-        this.filterService.addEventListener((event) => {
+        this.filterService.addEventListener((_event) => {
             this.refreshCurrentView();
         });
         
@@ -285,6 +286,11 @@ export class MainController {
             console.log('MainController: Initializing StorageService...');
             const storageInitResult = await this.storageService.initialize();
             console.log('StorageService initialized:', storageInitResult);
+
+            // Initialize theme after storage is loaded
+            console.log('MainController: Initializing theme from storage...');
+            this._themeSelector.initializeTheme();
+            console.log('Theme initialized');
 
             // Initialize CourseSelectionService SECOND to load persisted data
             console.log('MainController: Initializing CourseSelectionService...');
@@ -378,7 +384,7 @@ export class MainController {
                     testCompleteSwitch: (scheduleId?: string) => {
                         const schedules = this.scheduleManagementService.getAllSchedules();
                         if (schedules.length < 2 && !scheduleId) {
-                            const { schedule1, schedule2 } = (window as any).debugScheduleManagement.createTestSchedules();
+                            const { schedule1 } = (window as any).debugScheduleManagement.createTestSchedules();
                             scheduleId = schedule1.id;
                         }
                         const targetId = scheduleId || schedules[0].id;
@@ -728,7 +734,7 @@ export class MainController {
             this.operationManager.completeOperation('render');
             
         } catch (error) {
-            if (error.name === 'CancellationError') {
+            if ((error as Error).name === 'CancellationError') {
                 // Render was cancelled, not an error
                 return;
             }
@@ -977,7 +983,7 @@ export class MainController {
         }
     }
 
-    private updateFilteredHeader(resultCount: number, selectedDepartment: Department | null): void {
+    private updateFilteredHeader(resultCount: number, _selectedDepartment: Department | null): void {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
             const filters = this.filterService.getActiveFilters();
@@ -1004,13 +1010,6 @@ export class MainController {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
             contentHeader.textContent = `${department.name} (${department.abbreviation})`;
-        }
-    }
-
-    private updateDefaultHeader(): void {
-        const contentHeader = document.querySelector('.content-header h2');
-        if (contentHeader) {
-            contentHeader.textContent = 'Course Listings';
         }
     }
 
@@ -1107,7 +1106,7 @@ export class MainController {
         });
     }
 
-    private updateOptimisticUIFeedback(state: string, pendingOperations: number, isProcessing: boolean): void {
+    private updateOptimisticUIFeedback(state: string, pendingOperations: number, _isProcessing: boolean): void {
         // Update UI to show optimistic operation status
         const statusIndicator = this.findOrCreateStatusIndicator();
         

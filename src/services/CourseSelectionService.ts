@@ -1,7 +1,7 @@
 import { Course, Department, Section } from '../types/types'
 import { SelectedCourse } from '../types/schedule'
 import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../core/ProfileStateManager'
-import { DataValidator, ValidationResult } from '../core/DataValidator'
+import { DataValidator } from '../core/DataValidator'
 import { RetryManager } from '../core/RetryManager'
 import { ProfileMigrationService } from '../core/ProfileMigrationService'
 import { Validators } from '../utils/validators'
@@ -652,18 +652,18 @@ export class CourseSelectionService {
     }
 
     // Backward compatibility methods
-    findCourseById(courseId: string): Course | undefined {
+    findCourseById(_courseId: string): Course | undefined {
         // This would need to be implemented with access to course data
         console.warn('findCourseById: Course data access not implemented in this service');
         return undefined;
     }
 
     // Utility methods
-    unselectCourseById(courseId: string): void {
+    unselectCourseById(_courseId: string): void {
         console.warn('unselectCourseById: Use unselectCourse with course object instead');
     }
 
-    isCourseSelectedById(courseId: string): boolean {
+    isCourseSelectedById(_courseId: string): boolean {
         console.warn('isCourseSelectedById: Use isCourseSelected with course object instead');
         return false;
     }

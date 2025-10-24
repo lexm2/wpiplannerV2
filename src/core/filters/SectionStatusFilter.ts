@@ -10,8 +10,11 @@ export class SectionStatusFilter implements SelectedCourseFilter {
     readonly name = 'Section Status';
     readonly description = 'Filter courses by section selection status';
     readonly priority = 90;
-    
-    
+
+    apply(selectedCourses: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+        return this.applyToSelectedCourses(selectedCourses, criteria);
+    }
+
     applyToSelectedCourses(selectedCourses: SelectedCourse[], criteria: SectionStatusFilterCriteria): SelectedCourse[] {
         if (criteria.status === 'all') {
             return selectedCourses;

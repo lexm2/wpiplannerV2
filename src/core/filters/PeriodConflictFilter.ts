@@ -18,6 +18,10 @@ export class PeriodConflictFilter implements SectionFilter {
         this.conflictDetector = conflictDetector;
     }
 
+    apply(sections: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+        return this.applyToSections(sections, criteria);
+    }
+
     applyToPeriods(periods: Period[], criteria: PeriodConflictCriteria): Period[] {
         if (!criteria.avoidConflicts || !criteria.selectedCourses) {
             return periods;

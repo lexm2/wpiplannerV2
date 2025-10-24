@@ -166,10 +166,8 @@
  * 
  * ═══════════════════════════════════════════════════════════════════════════════
  */
-import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
-import { Course, Section, Department } from '../types/types'
 import { DataValidator, ValidationResult } from './DataValidator'
-import { TransactionalStorageManager, TransactionResult } from './TransactionalStorageManager'
+import { TransactionalStorageManager } from './TransactionalStorageManager'
 import { RetryManager } from './RetryManager'
 
 export interface MigrationResult {

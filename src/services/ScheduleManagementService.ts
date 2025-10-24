@@ -1,6 +1,6 @@
-import { Schedule, SelectedCourse, SchedulePreferences } from '../types/schedule'
+import { Schedule, SelectedCourse } from '../types/schedule'
 import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../core/ProfileStateManager'
-import { DataValidator, ValidationResult } from '../core/DataValidator'
+import { DataValidator } from '../core/DataValidator'
 import { RetryManager } from '../core/RetryManager'
 import { CourseSelectionService } from './CourseSelectionService'
 

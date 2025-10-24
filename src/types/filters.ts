@@ -11,6 +11,38 @@ export interface CourseFilter {
     getDisplayValue(criteria: any): string;
 }
 
+export interface SectionFilter {
+    readonly id: string;
+    readonly name: string;
+    readonly description: string;
+    readonly priority?: number;
+
+    apply(sections: any[], criteria: any, activeFilters?: Map<string, any>): any[];
+    isValidCriteria(criteria: any): boolean;
+    getDisplayValue(criteria: any): string;
+}
+
+export interface SelectedCourseFilter {
+    readonly id: string;
+    readonly name: string;
+    readonly description: string;
+    readonly priority?: number;
+
+    apply(selectedCourses: any[], criteria: any, activeFilters?: Map<string, any>): any[];
+    isValidCriteria(criteria: any): boolean;
+    getDisplayValue(criteria: any): string;
+}
+
+export interface BaseFilter {
+    readonly id: string;
+    readonly name: string;
+    readonly description: string;
+    readonly priority?: number;
+
+    isValidCriteria(criteria: any): boolean;
+    getDisplayValue(criteria: any): string;
+}
+
 export interface FilterCriteria {
     [filterId: string]: any;
 }

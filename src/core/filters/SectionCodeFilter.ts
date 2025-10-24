@@ -8,6 +8,10 @@ export class SectionCodeFilter implements SectionFilter {
     readonly description = 'Filter by section codes (AL01, AX01, A01, etc.)';
     readonly priority = 2;
 
+    apply(sections: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+        return this.applyToSections(sections, criteria);
+    }
+
     applyToSections(sections: Section[], criteria: SectionCodeFilterCriteria): Section[] {
         if (!criteria.codes || criteria.codes.length === 0) {
             return sections;

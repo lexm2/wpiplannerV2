@@ -519,7 +519,7 @@ export class TransactionalStorageManager {
         return value;
     };
 
-    private readonly reviver = (key: string, value: any): any => {
+    private readonly reviver = (_key: string, value: any): any => {
         if (typeof value === 'object' && value !== null && value.__type === 'Set') {
             return new Set(value.value);
         }
@@ -542,7 +542,7 @@ export class TransactionalStorageManager {
         return `tx_${Date.now()}_${++this.transactionCounter}_${Math.random().toString(36).substr(2, 9)}`;
     }
 
-    private extractKeysFromOperations(operations: (() => void)[]): string[] {
+    private extractKeysFromOperations(_operations: (() => void)[]): string[] {
         return Object.values(TransactionalStorageManager.STORAGE_KEYS);
     }
 

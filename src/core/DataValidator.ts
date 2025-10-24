@@ -157,8 +157,7 @@
  * 
  * ═══════════════════════════════════════════════════════════════════════════════
  */
-import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
-import { Course, Section, Department } from '../types/types'
+import { Schedule, SelectedCourse } from '../types/schedule'
 
 export interface ValidationResult {
     valid: boolean;
@@ -186,8 +185,6 @@ export interface SchemaValidationOptions {
 }
 
 export class DataValidator {
-    private static readonly CURRENT_SCHEMA_VERSION = '2.0';
-    
     // Schema validation for core data types
     validateSchedule(schedule: any, options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
@@ -405,7 +402,7 @@ export class DataValidator {
         return result;
     }
 
-    validateDepartment(department: any, options: SchemaValidationOptions = {}): ValidationResult {
+    validateDepartment(department: any, _options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
         if (!department || typeof department !== 'object') {

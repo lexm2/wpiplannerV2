@@ -36,7 +36,7 @@ export class ProgressiveRenderer {
     async renderCoursesBatched(
         courses: Course[], 
         renderFunction: (courses: Course[], isFirstBatch: boolean, isComplete: boolean) => void,
-        container: HTMLElement,
+        _container: HTMLElement,
         cancellationToken?: CancellationToken
     ): Promise<void> {
         // Cancel any existing render operation

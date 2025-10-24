@@ -70,7 +70,7 @@ export class OperationManager {
     
     // Cancel all active operations
     cancelAllOperations(reason?: string): void {
-        for (const [id, tokenSource] of this.activeOperations) {
+        for (const [_id, tokenSource] of this.activeOperations) {
             tokenSource.cancel(reason || 'All operations cancelled');
         }
         this.activeOperations.clear();

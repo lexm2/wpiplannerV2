@@ -7,7 +7,11 @@ export class PeriodTermFilter implements SectionFilter {
     readonly name = 'Term';
     readonly description = 'Show sections from selected academic terms';
     readonly priority = 24;
-    
+
+    apply(sections: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+        return this.applyToSections(sections, criteria);
+    }
+
     applyToSections(sections: Section[], criteria: PeriodTermFilterCriteria): Section[] {
         if (!criteria.terms || criteria.terms.length === 0) {
             return sections;

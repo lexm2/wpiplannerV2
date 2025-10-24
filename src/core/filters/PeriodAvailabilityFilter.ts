@@ -7,6 +7,10 @@ export class PeriodAvailabilityFilter implements SectionFilter {
     readonly name = 'Period Availability';
     readonly description = 'Filter periods by seat availability';
     readonly priority = 50;
+
+    apply(sections: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+        return this.applyToSections(sections, criteria);
+    }
     
     applyToSections(sections: Section[], criteria: PeriodAvailabilityFilterCriteria): Section[] {
         return sections.filter(section => {

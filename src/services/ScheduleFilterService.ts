@@ -377,9 +377,9 @@ export class ScheduleFilterService {
             } else {
                 // Use registered filters with applyToPeriods method
                 const sectionFilter = this.registeredSectionFilters.get(activeFilter.id);
-                if (sectionFilter && sectionFilter.applyToPeriods) {
+                if (sectionFilter && (sectionFilter as any).applyToPeriods) {
                     const periods = allPeriods.map(item => item.period);
-                    const filteredPeriods = sectionFilter.applyToPeriods(periods, activeFilter.criteria);
+                    const filteredPeriods = (sectionFilter as any).applyToPeriods(periods, activeFilter.criteria);
                     const filteredPeriodSet = new Set(filteredPeriods);
                     allPeriods = allPeriods.filter(item => filteredPeriodSet.has(item.period));
                 }
@@ -524,8 +524,8 @@ export class ScheduleFilterService {
                 });
             } else {
                 const sectionFilter = this.registeredSectionFilters.get(activeFilter.id);
-                if (sectionFilter && sectionFilter.applyToSectionsWithContext) {
-                    allSections = sectionFilter.applyToSectionsWithContext(allSections, activeFilter.criteria);
+                if (sectionFilter && (sectionFilter as any).applyToSectionsWithContext) {
+                    allSections = (sectionFilter as any).applyToSectionsWithContext(allSections, activeFilter.criteria);
                 }
             }
         }
@@ -564,7 +564,7 @@ export class ScheduleFilterService {
         for (const activeFilter of sortedSelectedCourseFilters) {
             const selectedCourseFilter = this.registeredSelectedCourseFilters.get(activeFilter.id);
             if (selectedCourseFilter) {
-                filteredSelectedCourses = selectedCourseFilter.applyToSelectedCourses(
+                filteredSelectedCourses = (selectedCourseFilter as any).applyToSelectedCourses(
                     filteredSelectedCourses, 
                     activeFilter.criteria
                 );

@@ -484,7 +484,7 @@ export class UIStateBuffer {
                     let sectionObject: Section | null = null;
                     
                     if (sectionNumber) {
-                        sectionObject = sectionCourse.sections.find(s => s.number === sectionNumber) || null;
+                        sectionObject = sectionCourse.sections.find((s: any) => s.number === sectionNumber) || null;
                         if (sectionObject && !sectionObject.computedTerm) {
                             console.warn(`Section ${sectionNumber} missing computedTerm property`);
                             sectionObject = null;

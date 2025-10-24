@@ -178,9 +178,9 @@ export class ProfileStateManager {
             window.addEventListener('beforeunload', () => {
                 if (this.state.hasUnsavedChanges) {
                     // Cancel any pending debounced save
-                    if (this.saveTimeout) {
-                        clearTimeout(this.saveTimeout);
-                        this.saveTimeout = null;
+                    if (this.saveDebounceTimer) {
+                        clearTimeout(this.saveDebounceTimer);
+                        this.saveDebounceTimer = null;
                     }
                     // Perform immediate synchronous save
                     this.saveSync();
@@ -616,9 +616,6 @@ export class ProfileStateManager {
         };
     }
 
-    private async initializeFromStorage(): Promise<void> {
-        await this.loadFromStorage();
-    }
 
     private withStateUpdate<T>(updateFn: () => T): T {
         const previousUnsavedState = this.state.hasUnsavedChanges;

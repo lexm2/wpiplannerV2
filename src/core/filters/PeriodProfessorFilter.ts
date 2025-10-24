@@ -7,6 +7,10 @@ export class PeriodProfessorFilter implements SectionFilter {
     readonly name = 'Period Professor';
     readonly description = 'Filter periods by professor';
     readonly priority = 7;
+
+    apply(sections: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+        return this.applyToSections(sections, criteria);
+    }
     
     applyToSections(sections: Section[], criteria: PeriodProfessorFilterCriteria): Section[] {
         if (!criteria.professors || criteria.professors.length === 0) {

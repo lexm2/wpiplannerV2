@@ -29,7 +29,7 @@ export class PerformanceMetrics {
     private activeOperations = new Map<string, number>();
 
     // Start timing an operation
-    startOperation(operation: string, metadata?: Record<string, any>): string {
+    startOperation(operation: string, _metadata?: Record<string, any>): string {
         const operationId = `${operation}_${Date.now()}_${Math.random()}`;
         this.activeOperations.set(operationId, performance.now());
         return operationId;

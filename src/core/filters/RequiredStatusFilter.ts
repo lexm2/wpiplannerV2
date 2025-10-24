@@ -10,8 +10,11 @@ export class RequiredStatusFilter implements SelectedCourseFilter {
     readonly name = 'Required Status';
     readonly description = 'Filter courses by required/optional status';
     readonly priority = 85;
-    
-    
+
+    apply(selectedCourses: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+        return this.applyToSelectedCourses(selectedCourses, criteria);
+    }
+
     applyToSelectedCourses(selectedCourses: SelectedCourse[], criteria: RequiredStatusFilterCriteria): SelectedCourse[] {
         if (criteria.status === 'all') {
             return selectedCourses;

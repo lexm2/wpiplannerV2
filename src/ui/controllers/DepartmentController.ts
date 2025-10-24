@@ -130,7 +130,7 @@ export class DepartmentController {
             this.departmentSyncService.syncSidebarToFilter(deptId, multiSelect);
         } else {
             // Fallback to old behavior for backward compatibility
-            const selectedDept = this.selectDepartment(deptId);
+            this.selectDepartment(deptId);
             
             // Update active state manually if no sync service
             document.querySelectorAll('.department-item').forEach(item => {

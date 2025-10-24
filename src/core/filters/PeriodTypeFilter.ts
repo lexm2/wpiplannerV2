@@ -7,7 +7,11 @@ export class PeriodTypeFilter implements SectionFilter {
     readonly name = 'Period Type';
     readonly description = 'Exclude sections with selected period types';
     readonly priority = 50;
-    
+
+    apply(sections: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+        return this.applyToSections(sections, criteria);
+    }
+
     applyToSections(sections: Section[], criteria: PeriodTypeFilterCriteria): Section[] {
         if (!criteria.types || criteria.types.length === 0) {
             return sections;

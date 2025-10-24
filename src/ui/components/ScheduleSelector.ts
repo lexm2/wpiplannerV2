@@ -117,7 +117,7 @@ export class ScheduleSelector {
         });
         
         // Listen for schedule list changes (creation, deletion, etc.)
-        this.scheduleManagementService.addScheduleListener((event) => {
+        this.scheduleManagementService.addScheduleListener((_event) => {
             // Always refresh the schedule list when schedules are created/deleted/updated
             this.refreshScheduleList();
         });

@@ -7,6 +7,10 @@ export class PeriodDaysFilter implements SectionFilter {
     readonly name = 'Period Days';
     readonly description = 'Exclude sections with classes on selected days';
     readonly priority = 20;
+
+    apply(sections: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+        return this.applyToSections(sections, criteria);
+    }
     
     applyToSections(sections: Section[], criteria: PeriodDaysFilterCriteria): Section[] {
         if (!criteria.days || criteria.days.length === 0) {

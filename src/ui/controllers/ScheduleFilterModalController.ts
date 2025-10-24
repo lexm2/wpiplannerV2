@@ -292,12 +292,6 @@ export class ScheduleFilterModalController {
         return div.textContent || div.innerText || '';
     }
 
-    private getSearchValue(): string {
-        const searchFilter = this.scheduleFilterService.getActiveFilters().find(f => f.id === 'sectionCode');
-        return searchFilter?.criteria?.codes?.[0] || '';
-    }
-
-
     private getActiveProfessors(): string[] {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodProfessor');
         return filter?.criteria?.professors || [];
@@ -557,7 +551,7 @@ export class ScheduleFilterModalController {
 
     private applyFilters(): void {
         // Save filter state
-        this.scheduleFilterService.saveFiltersToStorage();
+        this.scheduleFilterService?.saveFiltersToStorage();
     }
 
     private setupProfessorFilter(modalElement: HTMLElement): void {
@@ -687,7 +681,6 @@ export class ScheduleFilterModalController {
                 } else {
                     this.scheduleFilterService!.removeFilter('sectionCode');
                 }
-                this.refreshActiveFilters();
                 
                 // Show dropdown with matching section codes
                 const queryLower = query.toLowerCase();
@@ -712,8 +705,7 @@ export class ScheduleFilterModalController {
                     if (sectionCode) {
                         searchInput.value = sectionCode;
                         this.scheduleFilterService!.addFilter('sectionCode', { codes: [sectionCode] });
-                        this.refreshActiveFilters();
-                        dropdown.style.display = 'none';
+                                dropdown.style.display = 'none';
                     }
                 }
             });

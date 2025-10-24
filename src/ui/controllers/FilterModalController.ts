@@ -7,7 +7,7 @@ export class FilterModalController {
     private modalService: ModalService;
     private filterService: CourseFilterService | null = null;
     private allCourses: Course[] = [];
-    private allDepartments: Department[] = [];
+    private _allDepartments: Department[] = [];
     private currentModalId: string | null = null;
     private isCategoryMode: boolean = false;
     private isUpdatingFilter: boolean = false;
@@ -21,7 +21,7 @@ export class FilterModalController {
     }
 
     setCourseData(departments: Department[]): void {
-        this.allDepartments = departments;
+        this._allDepartments = departments;
         this.allCourses = [];
         departments.forEach(dept => {
             this.allCourses.push(...dept.courses);
@@ -311,8 +311,8 @@ export class FilterModalController {
 
     private createProfessorFilter(): string {
         if (!this.filterService) return '';
-        
-        const professors = this.filterService.getFilterOptions('professor', this.allCourses) as string[];
+
+        this.filterService.getFilterOptions('professor', this.allCourses) as string[];
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'professor');
         const activeProfessors = activeFilter?.criteria?.professors || [];
 

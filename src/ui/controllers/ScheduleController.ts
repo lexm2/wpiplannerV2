@@ -11,8 +11,8 @@ import { getComputedTerm, validateSelectedCourses } from '../../utils/typeGuards
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
     private scheduleFilterService: ScheduleFilterService | null = null;
-    private scheduleManagementService: ScheduleManagementService | null = null;
-    private scheduleFilterModalController: ScheduleFilterModalController | null = null;
+    private _scheduleManagementService: ScheduleManagementService | null = null;
+    private _scheduleFilterModalController: ScheduleFilterModalController | null = null;
     private sectionInfoModalController: SectionInfoModalController | null = null;
     private conflictDetector: ConflictDetector | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
@@ -56,11 +56,11 @@ export class ScheduleController {
     }
 
     setScheduleFilterModalController(scheduleFilterModalController: ScheduleFilterModalController): void {
-        this.scheduleFilterModalController = scheduleFilterModalController;
+        this._scheduleFilterModalController = scheduleFilterModalController;
     }
 
     setScheduleManagementService(scheduleManagementService: ScheduleManagementService): void {
-        this.scheduleManagementService = scheduleManagementService;
+        this._scheduleManagementService = scheduleManagementService;
     }
 
     setStatePreserver(statePreserver: { 
@@ -149,12 +149,9 @@ export class ScheduleController {
         if (dropdownStates) {
             this.statePreserver?.restore(dropdownStates);
         }
-
-        // Log how many schedule-course-items were created
-        const courseItemCount = selectedCoursesContainer.querySelectorAll('.schedule-course-item').length;
     }
     
-    private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, selectedCourses: any[], dropdownStates?: Map<string, boolean>): string {
+    private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, _selectedCourses: any[], dropdownStates?: Map<string, boolean>): string {
         // Group filtered sections by course
         const sectionsByCourse = new Map();
         
@@ -180,7 +177,7 @@ export class ScheduleController {
             return courseA.number.localeCompare(courseB.number);
         });
         
-        sortedEntries.forEach(([courseId, data]) => {
+        sortedEntries.forEach(([_courseId, data]) => {
             const selectedCourse = data.selectedCourse;
             const matchingSections = data.sections;
             const course = selectedCourse.course;
@@ -270,7 +267,7 @@ export class ScheduleController {
         return html;
     }
     
-    private buildCourseHeaderHTML(course: any, selectedCourse: any, isExpanded: boolean = false): string {
+    private buildCourseHeaderHTML(course: any, _selectedCourse: any, isExpanded: boolean = false): string {
         const credits = course.minCredits === course.maxCredits 
             ? `${course.minCredits} credits` 
             : `${course.minCredits}-${course.maxCredits} credits`;
@@ -343,7 +340,7 @@ export class ScheduleController {
                                 <div class="section-periods">`;
                     
                     // Display all periods for this section
-                    sortedPeriods.forEach((period, index) => {
+                    sortedPeriods.forEach((period, _index) => {
                         const timeRange = TimeUtils.formatTimeRange(period.startTime, period.endTime);
                         const days = TimeUtils.formatDays(period.days);
                         const periodTypeLabel = this.getPeriodTypeLabel(period.type);
@@ -591,7 +588,7 @@ export class ScheduleController {
         container.classList.add('empty');
     }
 
-    private renderPopulatedGrid(container: HTMLElement, courses: any[], term: string): void {
+    private renderPopulatedGrid(container: HTMLElement, courses: any[], _term: string): void {
         container.classList.remove('empty');
         
         // Clean up existing event listeners before replacing DOM content
@@ -740,48 +737,6 @@ export class ScheduleController {
         return { content, classes };
     }
 
-    private formatSectionPeriods(periods: any[]): string {
-        if (periods.length === 0) return '';
-        
-        // Group periods by type and format them
-        const periodsByType: { [type: string]: any[] } = {};
-        
-        for (const period of periods) {
-            const periodType = this.getPeriodTypeLabel(period.type);
-            if (!periodsByType[periodType]) {
-                periodsByType[periodType] = [];
-            }
-            periodsByType[periodType].push(period);
-        }
-        
-        // Create formatted list of periods
-        const periodStrings: string[] = [];
-        
-        // Sort by priority: Lecture, Lab, Discussion, etc.
-        const typeOrder = ['LEC', 'LAB', 'DIS', 'REC', 'SEM', 'STU', 'CONF'];
-        const sortedTypes = Object.keys(periodsByType).sort((a, b) => {
-            const indexA = typeOrder.indexOf(a);
-            const indexB = typeOrder.indexOf(b);
-            const priorityA = indexA === -1 ? 999 : indexA;
-            const priorityB = indexB === -1 ? 999 : indexB;
-            return priorityA - priorityB;
-        });
-        
-        for (const type of sortedTypes) {
-            const periodsOfType = periodsByType[type];
-            const timeRanges = periodsOfType.map(p => 
-                TimeUtils.formatTimeRange(p.startTime, p.endTime)
-            ).join(', ');
-            
-            periodStrings.push(`<div class="period-type-info">
-                <span class="period-type">${type}</span>
-                <span class="period-times">${timeRanges}</span>
-            </div>`);
-        }
-        
-        return periodStrings.join('');
-    }
-
     private getCourseColor(courseId: string): string {
         // Generate consistent colors for courses
         const colors = [
@@ -810,20 +765,6 @@ export class ScheduleController {
         
         // Return abbreviated version for unknown types (first 3-4 chars)
         return type.substring(0, Math.min(4, type.length)).toUpperCase();
-    }
-
-    private getPeriodTypeClass(type: string): string {
-        const lower = type.toLowerCase();
-        
-        if (lower.includes('lec') || lower.includes('lecture')) return 'period-lecture';
-        if (lower.includes('lab')) return 'period-lab';
-        if (lower.includes('dis') || lower.includes('discussion')) return 'period-discussion';
-        if (lower.includes('rec') || lower.includes('recitation')) return 'period-recitation';
-        if (lower.includes('sem') || lower.includes('seminar')) return 'period-seminar';
-        if (lower.includes('studio')) return 'period-studio';
-        if (lower.includes('conference') || lower.includes('conf')) return 'period-conference';
-        
-        return 'period-other';
     }
 
     getCourseFromElement(element: HTMLElement): Course | undefined {

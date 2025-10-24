@@ -75,9 +75,17 @@ export class ThemeSelector {
 
     private init(): void {
         this.setupElements();
-        this.loadSavedTheme();
         this.setupEventListeners();
         this.renderThemeOptions();
+        // Note: loadSavedTheme() is deferred until initializeTheme() is called
+    }
+
+    /**
+     * Initialize theme after ProfileStateManager has loaded data from storage
+     * This should be called by MainController after storage initialization is complete
+     */
+    public initializeTheme(): void {
+        this.loadSavedTheme();
     }
 
     private setupElements(): void {
@@ -167,12 +175,9 @@ export class ThemeSelector {
     }
 
     private selectTheme(themeId: string): void {
-        // Apply theme
+        // Apply theme (ThemeManager handles storage automatically via StorageService)
         const success = this.themeManager.setTheme(themeId);
         if (!success) return;
-
-        // Save to storage
-        this.profileStateManager.updatePreferences({ theme: themeId }, 'theme-selector');
 
         // Update UI
         this.updateCurrentThemeDisplay();

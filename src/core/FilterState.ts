@@ -266,7 +266,7 @@ export class FilterState {
         const data = {
             filters: Array.from(this.activeFilters.entries())
                 .filter(([id]) => !excludeFilters.includes(id))
-                .map(([id, filter]) => ({
+                .map(([_id, filter]) => ({
                     id: filter.id,
                     name: filter.name,
                     criteria: filter.criteria,
