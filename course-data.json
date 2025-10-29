@@ -2627,7 +2627,7 @@
       "Course_Title": "AE 5531 - Applied Computational Methods for Partial Differential Equations",
       "Credits": "2",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "36/40",
+      "Enrolled_Capacity": "35/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Zhangxian Yuan",
       "Locations": "Higgins Labs 154",
@@ -2655,7 +2655,7 @@
       "Course_Title": "AE 5531 - Applied Computational Methods for Partial Differential Equations",
       "Credits": "2",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "20/50",
+      "Enrolled_Capacity": "21/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Nikolaos Gatsonis; Zhangxian Yuan",
       "Locations": "Online-asynchronous",
@@ -30570,7 +30570,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science; Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "7/20",
+      "Waitlist_Waitlist_Capacity": "8/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336907"
     },
     {
@@ -37756,7 +37756,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science; Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "7/20",
+      "Waitlist_Waitlist_Capacity": "8/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336907"
     },
     {
@@ -47459,7 +47459,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Geology",
-      "Waitlist_Waitlist_Capacity": "9/20",
+      "Waitlist_Waitlist_Capacity": "10/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336372"
     },
     {
@@ -83746,7 +83746,7 @@
       "Course_Title": "ME 591 - Graduate Seminar",
       "Credits": "0",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "102/120",
+      "Enrolled_Capacity": "103/120",
       "Instructional_Format": "Seminar",
       "Instructors": "Kedar Prashant Shete",
       "Locations": "Salisbury Labs 115 Kinnicutt Hall",
@@ -113887,7 +113887,7 @@
       "Course_Title": "WPE 1210 - Club Sport - Men's Ultimate Frisbee Team",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "8/999",
+      "Enrolled_Capacity": "9/999",
       "Instructional_Format": "Workshop",
       "Instructors": "Ann McCarron",
       "Offering_Period": "2026 Spring Semester",
