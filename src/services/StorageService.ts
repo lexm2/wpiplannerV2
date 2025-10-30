@@ -119,7 +119,7 @@ export class StorageService implements ThemeStorage {
         return this.profileStateManager.getAllSchedules();
     }
 
-    deleteSchedule(scheduleId: string): boolean {
+    async deleteSchedule(scheduleId: string): Promise<boolean> {
         return this.profileStateManager.deleteSchedule(scheduleId, 'storage-service');
     }
 

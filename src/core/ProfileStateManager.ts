@@ -358,8 +358,8 @@ export class ProfileStateManager {
         });
     }
 
-    deleteSchedule(scheduleId: string, source: string = 'user'): boolean {
-        return this.withStateUpdateSync(() => {
+    async deleteSchedule(scheduleId: string, source: string = 'user'): Promise<boolean> {
+        return this.withStateUpdateAsync(async () => {
             const scheduleIndex = this.state.schedules.findIndex(s => s.id === scheduleId);
             if (scheduleIndex < 0) return false;
 
@@ -369,8 +369,8 @@ export class ProfileStateManager {
             const deletedSchedule = this.state.schedules[scheduleIndex];
             this.state.schedules.splice(scheduleIndex, 1);
 
-            // Remove from localStorage storage
-            const deleteResult = this.storageManager.deleteSchedule(scheduleId);
+            // Remove from storage
+            const deleteResult = await this.storageManager.deleteSchedule(scheduleId);
             if (!deleteResult.success) {
                 console.warn('Failed to delete schedule from storage:', deleteResult.error);
             }
@@ -438,41 +438,36 @@ export class ProfileStateManager {
             this.saveDebounceTimer = null;
         }
 
-        const operations = [
-            () => {
-                // Save active schedule ID
-                this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
-            },
-            () => {
-                // Save all schedules
-                this.state.schedules.forEach(schedule => {
-                    this.storageManager.saveSchedule(schedule);
-                });
-            },
-            () => {
-                // Save selected courses
-                this.storageManager.saveSelectedCourses(this.state.selectedCourses);
-            },
-            () => {
-                // Save preferences
-                this.storageManager.savePreferences(this.state.preferences);
-            }
-        ];
+        try {
+            this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
 
-        const result = await this.storageManager.executeTransaction(operations);
-        
-        if (result.success) {
+            for (const schedule of this.state.schedules) {
+                await this.storageManager.saveSchedule(schedule);
+            }
+
+            this.storageManager.saveSelectedCourses(this.state.selectedCourses);
+            this.storageManager.savePreferences(this.state.preferences);
+
             const previousUnsavedState = this.state.hasUnsavedChanges;
             this.state.hasUnsavedChanges = false;
             this.state.lastSaved = Date.now();
-            
-            // Emit save state change event if state actually changed
+
             if (previousUnsavedState) {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
             }
-        }
 
-        return result;
+            return {
+                success: true,
+                transactionId: `save-${Date.now()}`
+            };
+        } catch (error) {
+            console.error('Failed to save:', error);
+            return {
+                success: false,
+                transactionId: `save-${Date.now()}`,
+                error: error as Error
+            };
+        }
     }
 
     private saveSync(): void {
@@ -504,7 +499,7 @@ export class ProfileStateManager {
             }
 
             // Load all schedules
-            const schedulesResult = this.storageManager.loadAllSchedules();
+            const schedulesResult = await this.storageManager.loadAllSchedules();
             if (schedulesResult.valid && schedulesResult.data) {
                 this.state.schedules = schedulesResult.data;
             }
@@ -545,9 +540,9 @@ export class ProfileStateManager {
                 this.state.activeScheduleId = defaultSchedule.id;
             }
 
-            // If no active schedule but schedules exist, set the first one as active
+            // If no active schedule but schedules exist, set the last one as active
             if (!this.state.activeScheduleId && this.state.schedules.length > 0) {
-                this.state.activeScheduleId = this.state.schedules[0].id;
+                this.state.activeScheduleId = this.state.schedules[this.state.schedules.length - 1].id;
             }
 
             this.state.hasUnsavedChanges = false;
@@ -621,12 +616,26 @@ export class ProfileStateManager {
         const previousUnsavedState = this.state.hasUnsavedChanges;
         const result = updateFn();
         this.state.hasUnsavedChanges = true;
-        
+
         // Emit save state change event if state actually changed
         if (!previousUnsavedState) {
             this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
         }
-        
+
+        this.debouncedSave();
+        return result;
+    }
+
+    private async withStateUpdateAsync<T>(updateFn: () => Promise<T>): Promise<T> {
+        const previousUnsavedState = this.state.hasUnsavedChanges;
+        const result = await updateFn();
+        this.state.hasUnsavedChanges = true;
+
+        // Emit save state change event if state actually changed
+        if (!previousUnsavedState) {
+            this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
+        }
+
         this.debouncedSave();
         return result;
     }
@@ -635,12 +644,12 @@ export class ProfileStateManager {
         const previousUnsavedState = this.state.hasUnsavedChanges;
         const result = updateFn();
         this.state.hasUnsavedChanges = true;
-        
+
         // Emit save state change event if state actually changed
         if (!previousUnsavedState) {
             this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
         }
-        
+
         this.debouncedSave();
         return result;
     }
@@ -743,5 +752,9 @@ export class ProfileStateManager {
         console.log('Listeners:', this.listeners.size);
         console.log('Health Check:', this.isHealthy());
         console.log('===============================');
+    }
+
+    async getStorageStats() {
+        return this.storageManager.getStorageStats();
     }
 }

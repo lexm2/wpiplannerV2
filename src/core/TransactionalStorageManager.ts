@@ -119,6 +119,8 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
+import { IndexedDBStorageManager } from './IndexedDBStorageManager'
+import { StorageMigration } from '../utils/storageMigration'
 
 export interface StorageTransaction {
     id: string;
@@ -149,11 +151,45 @@ export class TransactionalStorageManager {
         SELECTED_COURSES: 'wpi-planner-selected-courses',
         THEME: 'wpi-planner-theme',
         ACTIVE_SCHEDULE_ID: 'wpi-planner-active-schedule-id',
-        TRANSACTION_LOG: 'wpi-planner-transaction-log'
+        TRANSACTION_LOG: 'wpi-planner-transaction-log',
+        MIGRATION_FLAG: 'wpi-planner-indexeddb-migrated'
     };
 
     private activeTransactions = new Map<string, StorageTransaction>();
     private transactionCounter = 0;
+    private indexedDBStorage: IndexedDBStorageManager;
+    private useIndexedDB = false;
+
+    constructor() {
+        this.indexedDBStorage = new IndexedDBStorageManager();
+        this.initializeIndexedDB();
+    }
+
+    private async initializeIndexedDB(): Promise<void> {
+        try {
+            const isCompatible = await this.indexedDBStorage.checkCompatibility();
+            if (isCompatible) {
+                this.useIndexedDB = true;
+                console.log('✅ IndexedDB initialized successfully');
+
+                const migrationResult = await StorageMigration.performMigration(this.indexedDBStorage);
+                if (migrationResult.success) {
+                    if (!migrationResult.skipped) {
+                        console.log(`✅ Migrated ${migrationResult.migratedCount} schedules to IndexedDB`);
+                    }
+                } else {
+                    console.error('⚠️ Migration failed:', migrationResult.errors);
+                    console.warn('⚠️ Falling back to localStorage');
+                    this.useIndexedDB = false;
+                }
+            } else {
+                console.warn('⚠️ IndexedDB not available, using localStorage fallback');
+            }
+        } catch (error) {
+            console.error('Failed to initialize IndexedDB:', error);
+            this.useIndexedDB = false;
+        }
+    }
 
     async executeTransaction(operations: (() => void)[]): Promise<TransactionResult> {
         const transactionId = this.generateTransactionId();
@@ -220,24 +256,76 @@ export class TransactionalStorageManager {
         );
     }
 
-    saveSchedule(schedule: Schedule): TransactionResult {
+    async saveSchedule(schedule: Schedule): Promise<TransactionResult> {
+        if (this.useIndexedDB) {
+            const result = await this.indexedDBStorage.saveSchedule(schedule);
+            return {
+                success: result.success,
+                transactionId: `indexeddb-${Date.now()}`,
+                error: result.error ? new Error(result.error) : undefined
+            };
+        } else {
+            return this.saveScheduleToLocalStorage(schedule);
+        }
+    }
+
+    async loadSchedule(scheduleId: string): Promise<{ data: Schedule | null; valid: boolean; error?: string }> {
+        if (this.useIndexedDB) {
+            const result = await this.indexedDBStorage.loadSchedule(scheduleId);
+            return {
+                data: result.data || null,
+                valid: result.success,
+                error: result.error
+            };
+        } else {
+            return this.loadScheduleFromLocalStorage(scheduleId);
+        }
+    }
+
+    async loadAllSchedules(): Promise<{ data: Schedule[] | null; valid: boolean; error?: string }> {
+        if (this.useIndexedDB) {
+            const result = await this.indexedDBStorage.loadAllSchedules();
+            return {
+                data: result.data || [],
+                valid: result.success,
+                error: result.error
+            };
+        } else {
+            return this.loadAllSchedulesFromLocalStorage();
+        }
+    }
+
+    async deleteSchedule(scheduleId: string): Promise<TransactionResult> {
+        if (this.useIndexedDB) {
+            const result = await this.indexedDBStorage.deleteSchedule(scheduleId);
+            return {
+                success: result.success,
+                transactionId: `indexeddb-${Date.now()}`,
+                error: result.error ? new Error(result.error) : undefined
+            };
+        } else {
+            return this.deleteScheduleFromLocalStorage(scheduleId);
+        }
+    }
+
+    private saveScheduleToLocalStorage(schedule: Schedule): TransactionResult {
         return this.executeSyncTransaction(() => {
-            const schedules = this.loadAllSchedules().data || [];
+            const schedules = this.loadAllSchedulesFromLocalStorage().data || [];
             const existingIndex = schedules.findIndex(s => s.id === schedule.id);
-            
+
             if (existingIndex >= 0) {
                 schedules[existingIndex] = schedule;
             } else {
                 schedules.push(schedule);
             }
-            
+
             const serializedSchedules = this.safeStringify(schedules);
             localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.SCHEDULES, serializedSchedules);
         });
     }
 
-    loadSchedule(scheduleId: string): { data: Schedule | null; valid: boolean; error?: string } {
-        const schedulesResult = this.loadAllSchedules();
+    private loadScheduleFromLocalStorage(scheduleId: string): { data: Schedule | null; valid: boolean; error?: string } {
+        const schedulesResult = this.loadAllSchedulesFromLocalStorage();
         if (!schedulesResult.valid || !schedulesResult.data) {
             return { data: null, valid: false, error: schedulesResult.error };
         }
@@ -246,7 +334,7 @@ export class TransactionalStorageManager {
         return { data: schedule, valid: true };
     }
 
-    loadAllSchedules(): { data: Schedule[] | null; valid: boolean; error?: string } {
+    private loadAllSchedulesFromLocalStorage(): { data: Schedule[] | null; valid: boolean; error?: string } {
         return this.safeLoad<Schedule[]>(
             TransactionalStorageManager.STORAGE_KEYS.SCHEDULES,
             [],
@@ -254,9 +342,9 @@ export class TransactionalStorageManager {
         );
     }
 
-    deleteSchedule(scheduleId: string): TransactionResult {
+    private deleteScheduleFromLocalStorage(scheduleId: string): TransactionResult {
         return this.executeSyncTransaction(() => {
-            const schedules = this.loadAllSchedules().data || [];
+            const schedules = this.loadAllSchedulesFromLocalStorage().data || [];
             const filtered = schedules.filter(s => s.id !== scheduleId);
             const serializedSchedules = this.safeStringify(filtered);
             localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.SCHEDULES, serializedSchedules);
@@ -368,7 +456,7 @@ export class TransactionalStorageManager {
     exportData(): { data: string | null; valid: boolean; error?: string } {
         try {
             const state = this.loadUserState().data;
-            const schedules = this.loadAllSchedules().data || [];
+            const schedules = this.loadAllSchedulesFromLocalStorage().data || [];
             const preferences = this.loadPreferences().data;
             const selectedCourses = this.loadSelectedCourses().data || [];
 
@@ -597,7 +685,7 @@ export class TransactionalStorageManager {
             }
 
             // Verify key data structures can be parsed
-            const schedules = this.loadAllSchedules();
+            const schedules = this.loadAllSchedulesFromLocalStorage();
             if (!schedules.valid) {
                 return { valid: false, error: `Schedule data invalid: ${schedules.error}` };
             }
@@ -663,5 +751,33 @@ export class TransactionalStorageManager {
             healthy: issues.length === 0,
             issues
         };
+    }
+
+    async getStorageStats(): Promise<{
+        totalSchedules: number;
+        estimatedSize: number;
+        isUsingIndexedDB: boolean;
+        schedulesSizes?: Map<string, number>;
+    }> {
+        if (this.useIndexedDB) {
+            const stats = await this.indexedDBStorage.getStorageStats();
+            return {
+                totalSchedules: stats.data?.totalSchedules || 0,
+                estimatedSize: stats.data?.estimatedSize || 0,
+                isUsingIndexedDB: true,
+                schedulesSizes: stats.data?.schedulesSizes
+            };
+        } else {
+            const schedulesResult = this.loadAllSchedulesFromLocalStorage();
+            const schedules = schedulesResult.data || [];
+            const serialized = this.safeStringify(schedules);
+            const size = new Blob([serialized]).size;
+
+            return {
+                totalSchedules: schedules.length,
+                estimatedSize: size,
+                isUsingIndexedDB: false
+            };
+        }
     }
 }

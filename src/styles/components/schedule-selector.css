@@ -348,3 +348,39 @@
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
 }
+
+/* Storage Usage Indicator */
+.storage-usage-container {
+    padding: 0.75rem;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-background);
+}
+
+.storage-usage-text {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.storage-usage-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--color-border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.storage-usage-fill {
+    height: 100%;
+    background: var(--color-primary);
+    transition: width 0.3s ease, background 0.3s ease;
+    border-radius: 3px;
+}
+
+.storage-usage-fill.storage-warning {
+    background: #ff9800;
+}
+
+.storage-usage-fill.storage-critical {
+    background: var(--color-error);
+}

@@ -1004,8 +1004,8 @@ export class ScheduleManagementService {
                 console.warn('Failed to save default schedule:', error);
             }
         } else if (!this.getActiveScheduleId()) {
-            // Activate first schedule if no active one
-            this.profileStateManager.setActiveSchedule(existingSchedules[0].id, 'system');
+            // Activate last schedule if no active one
+            this.profileStateManager.setActiveSchedule(existingSchedules[existingSchedules.length - 1].id, 'system');
         }
     }
 
@@ -1047,5 +1047,9 @@ export class ScheduleManagementService {
         
         console.log('Health Check:', this.performHealthCheck());
         console.log('===============================================');
+    }
+
+    async getStorageStats() {
+        return this.profileStateManager.getStorageStats();
     }
 }

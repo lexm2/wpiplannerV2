@@ -59,7 +59,14 @@ export class ScheduleSelector {
                     <div class="schedule-list" id="schedule-list">
                         <!-- Schedule items will be populated here -->
                     </div>
-                    
+
+                    <div class="storage-usage-container" id="storage-usage-container">
+                        <div class="storage-usage-text">Storage: Loading...</div>
+                        <div class="storage-usage-bar">
+                            <div class="storage-usage-fill" id="storage-usage-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+
                     <div class="schedule-dropdown-footer">
                         <button class="btn btn-secondary btn-small" id="import-schedule-btn">Import</button>
                         <button class="btn btn-secondary btn-small" id="export-schedule-btn">Export</button>
@@ -148,6 +155,7 @@ export class ScheduleSelector {
             this.isDropdownOpen = true;
             this.container.classList.add('dropdown-open');
             this.updateScheduleList();
+            this.updateStorageUsage();
         }
     }
 
@@ -241,6 +249,42 @@ export class ScheduleSelector {
             this.lastScheduleListHTML = newHTML;
             scheduleList.innerHTML = newHTML;
             this.setupScheduleItemListeners();
+        }
+    }
+
+    private async updateStorageUsage(): Promise<void> {
+        try {
+            const stats = await this.scheduleManagementService.getStorageStats();
+            const storageText = this.container.querySelector('.storage-usage-text') as HTMLElement;
+            const storageFill = this.container.querySelector('#storage-usage-fill') as HTMLElement;
+
+            if (!storageText || !storageFill) return;
+
+            const sizeMB = (stats.estimatedSize / 1024 / 1024).toFixed(2);
+            const storageType = stats.isUsingIndexedDB ? 'IndexedDB' : 'localStorage';
+
+            let percentUsed = 0;
+            let warningClass = '';
+
+            if (!stats.isUsingIndexedDB) {
+                const maxSizeMB = 5;
+                percentUsed = (stats.estimatedSize / (maxSizeMB * 1024 * 1024)) * 100;
+
+                if (percentUsed >= 90) {
+                    warningClass = 'storage-critical';
+                } else if (percentUsed >= 70) {
+                    warningClass = 'storage-warning';
+                }
+
+                storageText.textContent = `Storage: ${sizeMB} MB / ~${maxSizeMB} MB (${storageType})`;
+            } else {
+                storageText.textContent = `Storage: ${sizeMB} MB (${storageType})`;
+            }
+
+            storageFill.style.width = `${Math.min(percentUsed, 100)}%`;
+            storageFill.className = `storage-usage-fill ${warningClass}`;
+        } catch (error) {
+            console.error('Failed to update storage usage:', error);
         }
     }
 
@@ -353,7 +397,7 @@ export class ScheduleSelector {
         }
     }
 
-    private handleScheduleAction(action: string, scheduleId: string): void {
+    private async handleScheduleAction(action: string, scheduleId: string): Promise<void> {
         try {
             switch (action) {
                 case 'rename':
@@ -363,10 +407,10 @@ export class ScheduleSelector {
                     this.duplicateSchedule(scheduleId);
                     break;
                 case 'export':
-                    this.exportSchedule(scheduleId);
+                    await this.exportSchedule(scheduleId);
                     break;
                 case 'delete':
-                    this.deleteSchedule(scheduleId);
+                    await this.deleteSchedule(scheduleId);
                     break;
             }
         } catch (error) {
