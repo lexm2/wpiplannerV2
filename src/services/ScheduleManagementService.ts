@@ -3,6 +3,7 @@ import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../c
 import { DataValidator } from '../core/DataValidator'
 import { RetryManager } from '../core/RetryManager'
 import { CourseSelectionService } from './CourseSelectionService'
+import { ICSGenerator, ICSExportOptions, ICSExportResult } from '../utils/icsGenerator'
 
 export interface ScheduleOperationResult {
     success: boolean;
@@ -777,6 +778,35 @@ export class ScheduleManagementService {
             return {
                 success: false,
                 error: `Export failed: ${error}`
+            };
+        }
+    }
+
+    async exportScheduleICS(scheduleId: string, options: ICSExportOptions = {}): Promise<ICSExportResult & { error?: string }> {
+        try {
+            const schedule = this.getScheduleById(scheduleId);
+            if (!schedule) {
+                return {
+                    success: false,
+                    skippedCourses: 0,
+                    totalCourses: 0,
+                    error: `Schedule with ID "${scheduleId}" not found`
+                };
+            }
+
+            const result = ICSGenerator.generateICS(schedule, options);
+
+            if (!result.success) {
+                return result;
+            }
+
+            return result;
+        } catch (error) {
+            return {
+                success: false,
+                skippedCourses: 0,
+                totalCourses: 0,
+                error: `ICS export failed: ${error}`
             };
         }
     }

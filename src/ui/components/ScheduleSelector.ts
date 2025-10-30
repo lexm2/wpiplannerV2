@@ -70,6 +70,7 @@ export class ScheduleSelector {
                     <div class="schedule-dropdown-footer">
                         <button class="btn btn-secondary btn-small" id="import-schedule-btn">Import</button>
                         <button class="btn btn-secondary btn-small" id="export-schedule-btn">Export</button>
+                        <button class="btn btn-secondary btn-small" id="export-ics-btn">Export ICS</button>
                     </div>
                 </div>
             </div>
@@ -82,6 +83,7 @@ export class ScheduleSelector {
         const newScheduleBtn = this.container.querySelector('#new-schedule-btn') as HTMLElement;
         const importBtn = this.container.querySelector('#import-schedule-btn') as HTMLElement;
         const exportBtn = this.container.querySelector('#export-schedule-btn') as HTMLElement;
+        const exportIcsBtn = this.container.querySelector('#export-ics-btn') as HTMLElement;
 
         trigger?.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -108,6 +110,11 @@ export class ScheduleSelector {
         exportBtn?.addEventListener('click', (e) => {
             e.stopPropagation();
             this.exportActiveSchedule();
+        });
+
+        exportIcsBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.exportActiveScheduleICS();
         });
 
         dropdown?.addEventListener('click', (e) => {
@@ -238,6 +245,7 @@ export class ScheduleSelector {
                         <button class="menu-action" data-action="rename">Rename</button>
                         <button class="menu-action" data-action="duplicate">Duplicate</button>
                         <button class="menu-action" data-action="export">Export</button>
+                        <button class="menu-action" data-action="export-ics">Export ICS</button>
                         ${schedules.length > 1 ? '<button class="menu-action danger" data-action="delete">Delete</button>' : ''}
                     </div>
                 </div>
@@ -409,6 +417,9 @@ export class ScheduleSelector {
                 case 'export':
                     await this.exportSchedule(scheduleId);
                     break;
+                case 'export-ics':
+                    await this.exportScheduleICS(scheduleId);
+                    break;
                 case 'delete':
                     await this.deleteSchedule(scheduleId);
                     break;
@@ -523,6 +534,30 @@ export class ScheduleSelector {
         }
     }
 
+    private async exportScheduleICS(scheduleId: string): Promise<void> {
+        const exportResult = await this.scheduleManagementService.exportScheduleICS(scheduleId);
+        if (exportResult.success && exportResult.data) {
+            const schedule = this.scheduleManagementService.loadSchedule(scheduleId);
+            const filename = `${schedule?.name || 'schedule'}.ics`;
+            this.downloadICS(exportResult.data, filename);
+
+            if (exportResult.skippedCourses > 0) {
+                const message = `ICS export successful!\n\n${exportResult.skippedCourses} of ${exportResult.totalCourses} courses were skipped (no section selected).`;
+                alert(message);
+            }
+        } else {
+            alert(exportResult.error || 'Failed to export ICS file');
+        }
+    }
+
+    private async exportActiveScheduleICS(): Promise<void> {
+        const activeScheduleId = this.scheduleManagementService.getActiveScheduleId();
+        if (activeScheduleId) {
+            await this.exportScheduleICS(activeScheduleId);
+            this.closeDropdown();
+        }
+    }
+
     private importSchedule(): void {
         const input = document.createElement('input');
         input.type = 'file';
@@ -553,6 +588,18 @@ export class ScheduleSelector {
 
     private downloadJSON(data: string, filename: string): void {
         const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    private downloadICS(data: string, filename: string): void {
+        const blob = new Blob([data], { type: 'text/calendar' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
