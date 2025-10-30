@@ -488,6 +488,18 @@ export class ProfileStateManager {
     }
 
     async loadFromStorage(): Promise<boolean> {
+        // Prevent concurrent calls - if already loading, skip this call
+        if (this.isLoadingFlag) {
+            console.log('ProfileStateManager: Already loading from storage, skipping duplicate call');
+            return false;
+        }
+
+        // Skip if already loaded with schedules (redundant call prevention)
+        if (this.state.schedules.length > 0 && !this.state.isLoading) {
+            console.log('ProfileStateManager: Already loaded with schedules, skipping redundant call');
+            return true;
+        }
+
         try {
             this.state.isLoading = true;
             this.isLoadingFlag = true;
@@ -516,7 +528,7 @@ export class ProfileStateManager {
                 const activeSchedule = this.state.schedules.find(s => s.id === this.state.activeScheduleId);
                 if (activeSchedule) {
                     loadedCourses = activeSchedule.selectedCourses;
-                    console.log(`📂 ProfileStateManager: Loaded ${loadedCourses.length} courses from active schedule "${activeSchedule.name}"`);
+                    console.log(`ProfileStateManager: Loaded ${loadedCourses.length} courses from active schedule "${activeSchedule.name}"`);
                 }
             }
 
@@ -525,9 +537,9 @@ export class ProfileStateManager {
                 const coursesResult = this.storageManager.loadSelectedCourses();
                 if (coursesResult.valid && coursesResult.data) {
                     loadedCourses = coursesResult.data;
-                    console.log(`📂 ProfileStateManager: Loaded ${loadedCourses.length} standalone courses from storage`);
+                    console.log(`ProfileStateManager: Loaded ${loadedCourses.length} standalone courses from storage`);
                 } else {
-                    console.log('📂 ProfileStateManager: No standalone courses found in storage');
+                    console.log('ProfileStateManager: No standalone courses found in storage');
                 }
             }
 

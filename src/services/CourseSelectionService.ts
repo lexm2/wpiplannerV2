@@ -310,8 +310,8 @@ export class CourseSelectionService {
                 console.warn('Migration check failed, proceeding with existing data');
             }
 
-            // Load data from storage
-            await this.profileStateManager.loadFromStorage();
+            // NOTE: ProfileStateManager is already initialized by StorageService before this service
+            // Redundant loadFromStorage() call removed to prevent duplicate schedule creation race condition
 
             // Validate loaded data
             const healthCheck = await this.performHealthCheck();

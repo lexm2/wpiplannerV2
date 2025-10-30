@@ -40,7 +40,7 @@ export class StorageMigration {
         try {
             const alreadyMigrated = await StorageMigration.checkMigrationStatus();
             if (alreadyMigrated) {
-                console.log('📦 Migration already completed, skipping...');
+                console.log('Migration already completed, skipping...');
                 result.skipped = true;
                 result.success = true;
                 return result;
@@ -48,7 +48,7 @@ export class StorageMigration {
 
             const schedulesData = localStorage.getItem(StorageMigration.SCHEDULES_KEY);
             if (!schedulesData) {
-                console.log('📦 No schedules to migrate, marking as complete');
+                console.log('No schedules to migrate, marking as complete');
                 localStorage.setItem(StorageMigration.MIGRATION_FLAG_KEY, 'true');
                 result.success = true;
                 result.skipped = true;
@@ -66,17 +66,17 @@ export class StorageMigration {
                 return result;
             }
 
-            console.log(`📦 Starting migration of ${schedules.length} schedules to IndexedDB...`);
+            console.log(`Starting migration of ${schedules.length} schedules to IndexedDB...`);
 
             localStorage.setItem(StorageMigration.BACKUP_KEY, schedulesData);
-            console.log('📦 Backup created in localStorage');
+            console.log('Backup created in localStorage');
 
             for (const schedule of schedules) {
                 try {
                     const saveResult = await indexedDBStorage.saveSchedule(schedule);
                     if (saveResult.success) {
                         result.migratedCount++;
-                        console.log(`✅ Migrated schedule: ${schedule.name} (${schedule.id})`);
+                        console.log(`Migrated schedule: ${schedule.name} (${schedule.id})`);
                     } else {
                         result.errors.push(`Failed to migrate schedule ${schedule.id}: ${saveResult.error}`);
                     }
@@ -91,8 +91,8 @@ export class StorageMigration {
                     localStorage.removeItem(StorageMigration.SCHEDULES_KEY);
                     localStorage.setItem(StorageMigration.MIGRATION_FLAG_KEY, 'true');
                     result.success = true;
-                    console.log(`✅ Migration completed successfully! ${result.migratedCount} schedules migrated.`);
-                    console.log('📦 localStorage schedules cleared (backup retained)');
+                    console.log(`Migration completed successfully! ${result.migratedCount} schedules migrated.`);
+                    console.log('localStorage schedules cleared (backup retained)');
                 } else {
                     result.errors.push('Verification failed: schedule count mismatch');
                     result.success = false;
@@ -116,10 +116,10 @@ export class StorageMigration {
             if (backup) {
                 localStorage.setItem(StorageMigration.SCHEDULES_KEY, backup);
                 localStorage.removeItem(StorageMigration.MIGRATION_FLAG_KEY);
-                console.log('↩️ Migration rolled back successfully');
+                console.log('Migration rolled back successfully');
                 return true;
             } else {
-                console.warn('⚠️ No backup found for rollback');
+                console.warn('No backup found for rollback');
                 return false;
             }
         } catch (error) {
@@ -130,7 +130,7 @@ export class StorageMigration {
 
     static clearBackup(): void {
         localStorage.removeItem(StorageMigration.BACKUP_KEY);
-        console.log('🗑️ Migration backup cleared');
+        console.log('Migration backup cleared');
     }
 
     static async exportSchedulesToFile(): Promise<void> {
@@ -151,7 +151,7 @@ export class StorageMigration {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            console.log('💾 Schedules exported to file');
+            console.log('Schedules exported to file');
         } catch (error) {
             console.error('Failed to export schedules:', error);
         }

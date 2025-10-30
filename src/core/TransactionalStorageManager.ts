@@ -170,20 +170,20 @@ export class TransactionalStorageManager {
             const isCompatible = await this.indexedDBStorage.checkCompatibility();
             if (isCompatible) {
                 this.useIndexedDB = true;
-                console.log('✅ IndexedDB initialized successfully');
+                console.log('IndexedDB initialized successfully');
 
                 const migrationResult = await StorageMigration.performMigration(this.indexedDBStorage);
                 if (migrationResult.success) {
                     if (!migrationResult.skipped) {
-                        console.log(`✅ Migrated ${migrationResult.migratedCount} schedules to IndexedDB`);
+                        console.log(`Migrated ${migrationResult.migratedCount} schedules to IndexedDB`);
                     }
                 } else {
-                    console.error('⚠️ Migration failed:', migrationResult.errors);
-                    console.warn('⚠️ Falling back to localStorage');
+                    console.error('Migration failed:', migrationResult.errors);
+                    console.warn('Falling back to localStorage');
                     this.useIndexedDB = false;
                 }
             } else {
-                console.warn('⚠️ IndexedDB not available, using localStorage fallback');
+                console.warn('IndexedDB not available, using localStorage fallback');
             }
         } catch (error) {
             console.error('Failed to initialize IndexedDB:', error);
