@@ -22,7 +22,6 @@
   align-items: center;
   gap: 0.5rem;
   flex: 1;
-  max-width: 400px;
 }
 
 .content-header .search-input {
@@ -40,10 +39,16 @@
 }
 
 .content-header h2 {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: var(--font-weight-medium);
   color: var(--color-text);
   margin: 0;
+  min-width: 280px;
+  max-width: 400px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .view-controls {
@@ -63,7 +68,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
   font-size: 14px;
-  width: 300px;
+  min-width: 200px;
   transition: var(--effect-transition);
   background: var(--color-surface);
   color: var(--color-text);
