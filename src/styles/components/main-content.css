@@ -38,6 +38,12 @@
   height: 40px;
 }
 
+.filter-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .content-header h2 {
   font-size: 1rem;
   font-weight: var(--font-weight-medium);

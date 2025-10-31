@@ -130,7 +130,11 @@
 .warning-icon {
   color: var(--color-warning);
   margin-left: 0.5rem;
-  font-size: 1.1rem;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: text-bottom;
+  transform: translateY(-1px);
 }
 
 .course-professors {

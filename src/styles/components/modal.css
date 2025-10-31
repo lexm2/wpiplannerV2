@@ -137,6 +137,12 @@
   color: var(--color-warning);
 }
 
+.modal-warning-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-block;
+}
+
 .modal-error .modal-icon {
   background: var(--color-error-background, #f8d7da);
   color: var(--color-error, #dc3545);
