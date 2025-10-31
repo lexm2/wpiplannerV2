@@ -1,5 +1,5 @@
 {
-  "generated": "Oct 31, 2025, 9:13 PM",
+  "generated": "Oct 31, 2025, 9:26 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -19216,7 +19216,7 @@
                 "crn": 336919,
                 "number": "D01",
                 "seats": 25,
-                "seats_available": 1,
+                "seats_available": 2,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -19235,7 +19235,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 25,
-                    "seats_available": 1,
+                    "seats_available": 2,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "D01",
@@ -61769,7 +61769,7 @@
                 "crn": 335061,
                 "number": "B01",
                 "seats": 100,
-                "seats_available": 19,
+                "seats_available": 20,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -61788,7 +61788,7 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 100,
-                    "seats_available": 19,
+                    "seats_available": 20,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "B01",
@@ -61953,7 +61953,7 @@
                 "crn": 337581,
                 "number": "D01",
                 "seats": 85,
-                "seats_available": 10,
+                "seats_available": 9,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -61972,7 +61972,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 85,
-                    "seats_available": 10,
+                    "seats_available": 9,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "D01",
@@ -71712,43 +71712,6 @@
                     "specific_section": "C20 - INQ SEM: Music and Society",
                     "days": [
                       "tue"
-                    ]
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 339232,
-                "number": "C23 - INQ SEM IN HUA: Mic Check: The Rhetoric of Hip-Hop",
-                "seats": 12,
-                "seats_available": 12,
-                "actual_waitlist": 0,
-                "max_waitlist": 0,
-                "note": null,
-                "description": "Cat. I This seminar serves as the culmination for a student's Humanities and Arts Requirement. The seminar provides opportunities for sustained critical inquiry into a focused thematic area. The seminar seeks to help students learn to communicate effectively, to think critically, and to appreciate diverse perspectives in a spirit of openness and cooperation through research, creativity, and investigation. The specific theme of each seminar will vary and will be defined by the instructor. Prior to enrolling in the seminar, a student must have completed five courses in Humanities and Arts, at least two of which must be thematically related and at least one of which must be at the 2000-level or above.",
-                "term": "202201",
-                "computedTerm": "C",
-                "is_gps": true,
-                "is_interest_list": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "Lerie M. Gabriel",
-                    "start_time": "12:00",
-                    "end_time": "13:50",
-                    "location": "Salisbury Labs 226 HUA Seminar Room",
-                    "building": "",
-                    "room": "Salisbury Labs 226 HUA Seminar Room",
-                    "seats": 12,
-                    "seats_available": 12,
-                    "actual_waitlist": 0,
-                    "max_waitlist": 0,
-                    "specific_section": "C23 - INQ SEM IN HUA: Mic Check: The Rhetoric of Hip-Hop",
-                    "days": [
-                      "wed"
                     ]
                   }
                 ]
