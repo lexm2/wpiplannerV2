@@ -120,7 +120,6 @@
  */
 import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
-import { StorageMigration } from '../utils/storageMigration'
 
 export interface StorageTransaction {
     id: string;
@@ -151,8 +150,7 @@ export class TransactionalStorageManager {
         SELECTED_COURSES: 'wpi-planner-selected-courses',
         THEME: 'wpi-planner-theme',
         ACTIVE_SCHEDULE_ID: 'wpi-planner-active-schedule-id',
-        TRANSACTION_LOG: 'wpi-planner-transaction-log',
-        MIGRATION_FLAG: 'wpi-planner-indexeddb-migrated'
+        TRANSACTION_LOG: 'wpi-planner-transaction-log'
     };
 
     private activeTransactions = new Map<string, StorageTransaction>();
@@ -171,17 +169,6 @@ export class TransactionalStorageManager {
             if (isCompatible) {
                 this.useIndexedDB = true;
                 console.log('IndexedDB initialized successfully');
-
-                const migrationResult = await StorageMigration.performMigration(this.indexedDBStorage);
-                if (migrationResult.success) {
-                    if (!migrationResult.skipped) {
-                        console.log(`Migrated ${migrationResult.migratedCount} schedules to IndexedDB`);
-                    }
-                } else {
-                    console.error('Migration failed:', migrationResult.errors);
-                    console.warn('Falling back to localStorage');
-                    this.useIndexedDB = false;
-                }
             } else {
                 console.warn('IndexedDB not available, using localStorage fallback');
             }
