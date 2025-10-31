@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run build:converter && vite build",
+    "build:converter": "tsc -p tsconfig.converter.json",
+    "convert": "node dist/scripts/convert-course-data.js",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",

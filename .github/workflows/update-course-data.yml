@@ -25,22 +25,19 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-      
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-      
+
       - name: Fetch latest course data
         run: |
           mkdir -p public
           node scripts/fetch-course-data.js
-      
-      - name: Run course data converter
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and run TypeScript converter
         run: |
-          cd WorkdayToPlannerConverter-master
-          java -cp "lib/json-simple-1.1.1.jar:bin" jsonToXml.Converter
+          npm run build:converter
+          npm run convert
       
       - name: Check for changes
         id: changes
@@ -62,10 +59,7 @@ jobs:
           git add public/course-data.json public/course-data-constructed.json public/last-updated.json
           git commit -m "Update course data $(date -u +%Y-%m-%d\ %H:%M\ UTC)"
           git push
-      
-      - name: Install dependencies
-        run: npm install
-      
+
       - name: Build TypeScript application
         run: npm run build
       

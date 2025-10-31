@@ -1,10 +1,24 @@
+/**
+ * NEW HIERARCHICAL STRUCTURE
+ * Courses now use lecture groups instead of flat combined sections
+ */
+export interface LectureGroup {
+    section: Section;                 // The lecture section itself
+    compatibleDiscussions: Section[]; // Discussions that work with this lecture
+    compatibleLabs: Section[];        // Labs that work with this lecture
+}
+
 export interface Course {
     id: string;
     number: string;
     name: string;
     description: string;
     department: Department;
-    sections: Section[];
+    // NEW: Hierarchical structure
+    lectures?: LectureGroup[];          // Main structure for most courses
+    standaloneLabs?: Section[];         // For lab-only courses
+    // DEPRECATED: Old flat structure (may be removed in future)
+    sections?: Section[];
     minCredits: number;
     maxCredits: number;
 }
