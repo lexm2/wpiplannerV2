@@ -68,9 +68,11 @@ export class ScheduleSelector {
                     </div>
 
                     <div class="schedule-dropdown-footer">
-                        <button class="btn btn-secondary btn-small" id="import-schedule-btn">Import</button>
-                        <button class="btn btn-secondary btn-small" id="export-schedule-btn">Export</button>
-                        <button class="btn btn-secondary btn-small" id="export-ics-btn">Export ICS</button>
+                        <div class="schedule-footer-buttons">
+                            <button class="btn btn-secondary btn-small" id="import-schedule-btn">Import</button>
+                            <button class="btn btn-secondary btn-small" id="export-schedule-btn">Export</button>
+                            <button class="btn btn-secondary btn-small" id="export-ics-btn">ICS</button>
+                        </div>
                     </div>
                 </div>
             </div>
