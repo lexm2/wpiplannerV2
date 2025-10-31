@@ -36,14 +36,18 @@ export class UIStateManager {
 
         this.currentPage = page;
 
-        // Update button text based on current page
-        const scheduleButton = document.getElementById('schedule-btn');
-        if (scheduleButton) {
+        // Update tab active states
+        const plannerTab = document.getElementById('planner-tab');
+        const scheduleTab = document.getElementById('schedule-tab');
+
+        if (plannerTab && scheduleTab) {
             if (page === 'schedule') {
-                scheduleButton.textContent = 'Back to Classes';
+                plannerTab.classList.remove('active');
+                scheduleTab.classList.add('active');
                 this.showSchedulePage();
             } else {
-                scheduleButton.textContent = 'Schedule';
+                plannerTab.classList.add('active');
+                scheduleTab.classList.remove('active');
                 this.showPlannerPage();
             }
         }

@@ -563,62 +563,69 @@ export class MainController {
             });
         }
 
-        // Schedule navigation
-        const scheduleButton = document.getElementById('schedule-btn');
-        if (scheduleButton) {
-            scheduleButton.addEventListener('click', async () => {
-                this.uiStateManager.togglePage();
-                if (this.uiStateManager.currentPage === 'schedule') {
-                    // Initialize schedule selector if not already created
-                    if (!this.scheduleSelector) {
-                        try {
-                            // Ensure the schedule management service is initialized before creating selector
-                            await this.scheduleManagementService.initialize();
-                            
-                            this.scheduleSelector = new ScheduleSelector(this.scheduleManagementService, 'schedule-selector-container');
-                        } catch (error) {
-                            console.error('Failed to initialize schedule selector:', error);
-                        }
+        // Tab navigation
+        const plannerTab = document.getElementById('planner-tab');
+        const scheduleTab = document.getElementById('schedule-tab');
+
+        if (plannerTab) {
+            plannerTab.addEventListener('click', () => {
+                this.uiStateManager.switchToPage('planner');
+            });
+        }
+
+        if (scheduleTab) {
+            scheduleTab.addEventListener('click', async () => {
+                this.uiStateManager.switchToPage('schedule');
+
+                // Initialize schedule selector if not already created
+                if (!this.scheduleSelector) {
+                    try {
+                        // Ensure the schedule management service is initialized before creating selector
+                        await this.scheduleManagementService.initialize();
+
+                        this.scheduleSelector = new ScheduleSelector(this.scheduleManagementService, 'schedule-selector-container');
+                    } catch (error) {
+                        console.error('Failed to initialize schedule selector:', error);
                     }
-                    
-                    // Log selected section data for debugging  
-                    const selectedCourses = this.courseSelectionService.getSelectedCourses();
-                    console.log('=== SCHEDULE PAGE LOADED ===');
-                    console.log(`Found ${selectedCourses.length} selected courses with sections:`);
-                    
-                    selectedCourses.forEach(sc => {
-                        const hasSection = sc.selectedSection !== null;
-                        console.log(`${sc.course.department.abbreviation}${sc.course.number}: section ${sc.selectedSectionNumber} ${hasSection ? 'OK' : 'MISSING'}`);
-                        if (hasSection && sc.selectedSection) {
-                            console.log(`  Term: ${sc.selectedSection.term}, Periods: ${sc.selectedSection.periods.length}`);
-                            console.log(`  Full section object:`, sc.selectedSection);
-                            
-                            // Log each period in detail
-                            sc.selectedSection.periods.forEach((period, idx) => {
-                                console.log(`    Period ${idx + 1}:`, {
-                                    type: period.type,
-                                    professor: period.professor,
-                                    startTime: period.startTime,
-                                    endTime: period.endTime,
-                                    days: Array.from(period.days),
-                                    location: period.location,
-                                    building: period.building,
-                                    room: period.room
-                                });
-                                
-                                // Calculate and log time slots for debugging
-                                const startSlot = Math.floor(((period.startTime.hours * 60 + period.startTime.minutes) - (7 * 60)) / 10);
-                                const endSlot = Math.floor(((period.endTime.hours * 60 + period.endTime.minutes) - (7 * 60)) / 10);
-                                const duration = endSlot - startSlot;
-                                console.log(`      Time slots: ${startSlot} to ${endSlot} (span ${duration} rows)`);
-                            });
-                        }
-                    });
-                    console.log('=== END SCHEDULE SECTION DATA ===\n');
-                    
-                    this.scheduleController.displayScheduleSelectedCourses();
-                    this.scheduleController.renderScheduleGrids();
                 }
+
+                // Log selected section data for debugging
+                const selectedCourses = this.courseSelectionService.getSelectedCourses();
+                console.log('=== SCHEDULE PAGE LOADED ===');
+                console.log(`Found ${selectedCourses.length} selected courses with sections:`);
+
+                selectedCourses.forEach(sc => {
+                    const hasSection = sc.selectedSection !== null;
+                    console.log(`${sc.course.department.abbreviation}${sc.course.number}: section ${sc.selectedSectionNumber} ${hasSection ? 'OK' : 'MISSING'}`);
+                    if (hasSection && sc.selectedSection) {
+                        console.log(`  Term: ${sc.selectedSection.term}, Periods: ${sc.selectedSection.periods.length}`);
+                        console.log(`  Full section object:`, sc.selectedSection);
+
+                        // Log each period in detail
+                        sc.selectedSection.periods.forEach((period, idx) => {
+                            console.log(`    Period ${idx + 1}:`, {
+                                type: period.type,
+                                professor: period.professor,
+                                startTime: period.startTime,
+                                endTime: period.endTime,
+                                days: Array.from(period.days),
+                                location: period.location,
+                                building: period.building,
+                                room: period.room
+                            });
+
+                            // Calculate and log time slots for debugging
+                            const startSlot = Math.floor(((period.startTime.hours * 60 + period.startTime.minutes) - (7 * 60)) / 10);
+                            const endSlot = Math.floor(((period.endTime.hours * 60 + period.endTime.minutes) - (7 * 60)) / 10);
+                            const duration = endSlot - startSlot;
+                            console.log(`      Time slots: ${startSlot} to ${endSlot} (span ${duration} rows)`);
+                        });
+                    }
+                });
+                console.log('=== END SCHEDULE SECTION DATA ===\n');
+
+                this.scheduleController.displayScheduleSelectedCourses();
+                this.scheduleController.renderScheduleGrids();
             });
         }
 
