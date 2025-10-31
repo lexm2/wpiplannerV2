@@ -237,12 +237,13 @@ export class ScheduleController {
                         const timeRange = TimeUtils.formatTimeRange(period.startTime, period.endTime);
                         const days = TimeUtils.formatDays(period.days);
                         const periodTypeLabel = this.getPeriodTypeLabel(period.type);
-                        
+                        const professor = period.professor && period.professor !== 'TBA' && period.professor !== 'Not Assigned' && period.professor.trim() !== '' ? period.professor : 'TBA';
+
                         html += `
                             <div class="period-info highlighted-period" data-period-type="${period.type.toLowerCase()}">
                                 <div class="period-header">
                                     <span class="period-type-label">${periodTypeLabel}</span>
-                                    <span class="period-schedule">${days} ${timeRange}</span>
+                                    <span class="period-schedule">${days} ${timeRange} - ${professor}</span>
                                 </div>
                             </div>
                         `;
@@ -344,12 +345,13 @@ export class ScheduleController {
                         const timeRange = TimeUtils.formatTimeRange(period.startTime, period.endTime);
                         const days = TimeUtils.formatDays(period.days);
                         const periodTypeLabel = this.getPeriodTypeLabel(period.type);
-                        
+                        const professor = period.professor && period.professor !== 'TBA' && period.professor !== 'Not Assigned' && period.professor.trim() !== '' ? period.professor : 'TBA';
+
                         html += `
                             <div class="period-info" data-period-type="${period.type.toLowerCase()}">
                                 <div class="period-header">
                                     <span class="period-type-label">${periodTypeLabel}</span>
-                                    <span class="period-schedule">${days} ${timeRange}</span>
+                                    <span class="period-schedule">${days} ${timeRange} - ${professor}</span>
                                 </div>
                             </div>
                         `;

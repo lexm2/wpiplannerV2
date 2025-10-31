@@ -1,6 +1,7 @@
 import { Course } from '../../types/types';
 import { CancellationToken, CancellationError } from '../../utils/RequestCancellation';
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics';
+import { getProfessorsByTerm } from '../../utils/courseUtils';
 
 export interface RenderBatchCallback {
     (batchIndex: number, batchCount: number, totalCount: number): void;
@@ -196,7 +197,17 @@ export class ProgressiveRenderer {
                                 <div class="course-sections">
                                     ${course.sections.map(section => {
                                         const isFull = section.seatsAvailable <= 0;
-                                        return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${section.number}">${section.number}</span>`;
+                                        const professors = new Set<string>();
+                                        section.periods.forEach(period => {
+                                            if (period.professor &&
+                                                period.professor !== 'TBA' &&
+                                                period.professor !== 'Not Assigned' &&
+                                                period.professor.trim() !== '') {
+                                                professors.add(period.professor);
+                                            }
+                                        });
+                                        const profList = Array.from(professors).join(', ') || 'TBA';
+                                        return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${section.number}" title="${profList}: ${section.number}">${profList}: ${section.number}</span>`;
                                     }).join('')}
                                 </div>
                             </div>
@@ -313,8 +324,11 @@ export class ProgressiveRenderer {
                             ${hasWarning ? '<span class="warning-icon" title="All sections full">⚠</span>' : ''}
                         </div>
                         <div class="course-info">
-                            <span class="course-credits">${credits} credits</span>
-                            <span class="course-sections-count">${course.sections.length} section${course.sections.length !== 1 ? 's' : ''}</span>
+                            <div class="course-info-top">
+                                <span class="course-credits">${credits} credits</span>
+                                <span class="course-sections-count">${course.sections.length} section${course.sections.length !== 1 ? 's' : ''}</span>
+                            </div>
+                            <div class="course-professors-compact">${getProfessorsByTerm(course)}</div>
                         </div>
                     </div>
                 `;
