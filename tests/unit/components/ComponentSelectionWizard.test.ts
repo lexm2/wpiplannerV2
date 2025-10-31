@@ -138,6 +138,18 @@ describe('ComponentSelectionWizard', () => {
     describe('Step Determination', () => {
         test('should determine lecture step for hierarchical course', () => {
             const course = createHierarchicalCourse();
+
+            // Mock CourseDataService methods
+            vi.spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
+            vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
+            vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
+                {
+                    section: createSection(12345, 'A01', 'Lecture'),
+                    compatibleDiscussions: [],
+                    compatibleLabs: []
+                }
+            ]);
+
             const wizard = new ComponentSelectionWizard(
                 course,
                 courseDataService,
@@ -151,6 +163,18 @@ describe('ComponentSelectionWizard', () => {
 
         test('should determine all steps for full hierarchical course', () => {
             const course = createHierarchicalCourse();
+
+            // Mock CourseDataService to return hierarchical structure
+            vi.spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
+            vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
+            vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
+                {
+                    section: createSection(12345, 'A01', 'Lecture'),
+                    compatibleDiscussions: [createSection(12347, 'A11', 'Discussion')],
+                    compatibleLabs: [createSection(12349, 'A21', 'Lab')]
+                }
+            ]);
+
             const wizard = new ComponentSelectionWizard(
                 course,
                 courseDataService,
@@ -159,12 +183,24 @@ describe('ComponentSelectionWizard', () => {
             );
 
             const steps = wizard.determineAvailableSteps();
-            // Note: Actual steps depend on CourseDataService implementation
             expect(steps.length).toBeGreaterThan(0);
+            expect(steps).toContain('lecture');
         });
 
         test('should determine start step as first available step', () => {
             const course = createHierarchicalCourse();
+
+            // Mock CourseDataService
+            vi.spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
+            vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
+            vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
+                {
+                    section: createSection(12345, 'A01', 'Lecture'),
+                    compatibleDiscussions: [],
+                    compatibleLabs: []
+                }
+            ]);
+
             const wizard = new ComponentSelectionWizard(
                 course,
                 courseDataService,
@@ -174,6 +210,7 @@ describe('ComponentSelectionWizard', () => {
 
             const startStep = wizard.determineStartStep();
             const availableSteps = wizard.determineAvailableSteps();
+            expect(availableSteps.length).toBeGreaterThan(0);
             expect(startStep).toBe(availableSteps[0]);
         });
 
@@ -542,7 +579,7 @@ describe('ComponentSelectionWizard', () => {
             }, 350); // Wait for animation
         });
 
-        test('should add active class to panel when opened', () => {
+        test('should add active class to panel when opened', (done) => {
             const course = createHierarchicalCourse();
             const wizard = new ComponentSelectionWizard(
                 course,
@@ -553,9 +590,16 @@ describe('ComponentSelectionWizard', () => {
 
             wizard.open();
 
+            // Wait for requestAnimationFrame to execute (double RAF needed)
             requestAnimationFrame(() => {
-                const panel = document.querySelector('.wizard-inline-panel');
-                expect(panel?.classList.contains('active')).toBe(true);
+                requestAnimationFrame(() => {
+                    const panel = document.querySelector('.wizard-inline-panel');
+                    expect(panel).toBeTruthy();
+                    if (panel) {
+                        expect(panel.classList.contains('active')).toBe(true);
+                    }
+                    done();
+                });
             });
         });
     });

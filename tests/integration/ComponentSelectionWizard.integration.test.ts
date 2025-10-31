@@ -100,6 +100,17 @@ describe('ComponentSelectionWizard Integration', () => {
             const mockOnComplete = vi.fn();
             const mockOnCancel = vi.fn();
 
+            // Mock CourseDataService to indicate hierarchical course
+            vi.spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
+            vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
+            vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
+                {
+                    section: createSection(12345, 'A01', 'Lecture'),
+                    compatibleDiscussions: [createSection(12347, 'A11', 'Discussion')],
+                    compatibleLabs: [createSection(12348, 'A21', 'Lab')]
+                }
+            ]);
+
             const wizard = new ComponentSelectionWizard(
                 course,
                 courseDataService,
@@ -110,6 +121,7 @@ describe('ComponentSelectionWizard Integration', () => {
             const steps = wizard.determineAvailableSteps();
             // Should have lecture step for hierarchical course
             expect(steps.length).toBeGreaterThan(0);
+            expect(steps).toContain('lecture');
         });
     });
 

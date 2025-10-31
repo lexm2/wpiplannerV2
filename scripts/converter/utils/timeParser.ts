@@ -67,15 +67,45 @@ export function parseSectionDetails(sectionDetails: string): ParsedMeetingPatter
 /**
  * Parses day codes from Workday format
  * M = Monday, T = Tuesday, W = Wednesday, R = Thursday, F = Friday
+ *
+ * Handles various formats:
+ * - Single letters: "M-T-R-F" -> mon, tue, thu, fri
+ * - Multiple patterns: "M-T-R-F; W" -> mon, tue, thu, fri, wed
+ * - Abbreviations: "Mon", "Tue", etc.
+ * - Full names: "Monday", "Tuesday", etc.
  */
 function parseDays(dayString: string): string[] {
     const days: string[] = [];
+    const normalized = dayString.toUpperCase();
 
-    if (dayString.includes('M')) days.push('mon');
-    if (dayString.includes('T')) days.push('tue');
-    if (dayString.includes('W')) days.push('wed');
-    if (dayString.includes('R')) days.push('thu');
-    if (dayString.includes('F')) days.push('fri');
+    // Split by common delimiters (dash, space, comma, semicolon)
+    // This prevents false matches like 'M' in 'TERM' or 'T' in 'WINTER'
+    const dayParts = normalized.split(/[-\s,;]+/);
+
+    for (const part of dayParts) {
+        const trimmed = part.trim();
+        if (!trimmed) continue; // Skip empty parts
+
+        // Match single letter codes (most common in Workday data)
+        if (trimmed === 'M') {
+            if (!days.includes('mon')) days.push('mon');
+        } else if (trimmed === 'T' || trimmed === 'TU' || trimmed === 'TUE' || trimmed === 'TUESDAY') {
+            if (!days.includes('tue')) days.push('tue');
+        } else if (trimmed === 'W' || trimmed === 'WED' || trimmed === 'WEDNESDAY') {
+            if (!days.includes('wed')) days.push('wed');
+        } else if (trimmed === 'R' || trimmed === 'TH' || trimmed === 'THU' || trimmed === 'THURSDAY') {
+            if (!days.includes('thu')) days.push('thu');
+        } else if (trimmed === 'F' || trimmed === 'FRI' || trimmed === 'FRIDAY') {
+            if (!days.includes('fri')) days.push('fri');
+        } else if (trimmed === 'S' || trimmed === 'SA' || trimmed === 'SAT' || trimmed === 'SATURDAY') {
+            if (!days.includes('sat')) days.push('sat');
+        } else if (trimmed === 'U' || trimmed === 'SU' || trimmed === 'SUN' || trimmed === 'SUNDAY') {
+            if (!days.includes('sun')) days.push('sun');
+        } else if (trimmed === 'MON' || trimmed === 'MONDAY') {
+            if (!days.includes('mon')) days.push('mon');
+        }
+        // Ignore unrecognized parts (could be numbers, location names, etc.)
+    }
 
     return days;
 }
