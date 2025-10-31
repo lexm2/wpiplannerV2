@@ -1,5 +1,5 @@
 {
-  "generated": "Oct 31, 2025, 8:49 PM",
+  "generated": "Oct 31, 2025, 9:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -175396,7 +175396,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Yunus Telliel",
+                    "professor": "Lerie M. Gabriel",
                     "start_time": "10:00",
                     "end_time": "11:50",
                     "location": "Kaven Hall 204",
@@ -186355,7 +186355,7 @@
                 "periods": [
                   {
                     "type": "Workshop",
-                    "professor": "Not Assigned",
+                    "professor": "Caitlin Ferrarini",
                     "start_time": "11:00",
                     "end_time": "11:50",
                     "location": "Unknown",
