@@ -148,6 +148,12 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 export class MainController {
+    // Status indicator text constants
+    private static readonly STATUS_TEXT_IDLE = 'No changes';
+    private static readonly STATUS_TEXT_SAVING = 'Saving';
+    private static readonly STATUS_TEXT_SAVED = 'All changes saved';
+    private static readonly STATUS_TEXT_ERROR = 'Save failed - will retry';
+
     private courseDataService: CourseDataService;
     private scheduleSelector: ScheduleSelector | null = null;
     private _themeSelector: ThemeSelector;
@@ -316,7 +322,6 @@ export class MainController {
             
             this.setupEventListeners();
             this.setupCourseSelectionListener();
-            this.setupSaveStateListener();
             this.courseController.displaySelectedCourses();
             
             // Initial UI sync for selected courses (use efficient targeted updates)
@@ -681,14 +686,6 @@ export class MainController {
                 this.scheduleController.applyFiltersAndRefresh();
             });
         }
-
-        // Save profile button
-        const saveProfileButton = document.getElementById('save-profile-btn');
-        if (saveProfileButton) {
-            saveProfileButton.addEventListener('click', () => {
-                this.handleSaveProfile();
-            });
-        }
     }
 
     private refreshCurrentView(): void {
@@ -1038,11 +1035,11 @@ export class MainController {
         // Show loading state on the button
         const loadMoreButton = document.querySelector('.load-more-button') as HTMLButtonElement;
         if (!loadMoreButton) return;
-        
+
         const originalText = loadMoreButton.textContent;
         loadMoreButton.textContent = 'Loading...';
         loadMoreButton.disabled = true;
-        
+
         try {
             // Load more courses using the current view
             const currentView = this.uiStateManager.currentView;
@@ -1053,54 +1050,6 @@ export class MainController {
             loadMoreButton.textContent = originalText;
             loadMoreButton.disabled = false;
             throw error; // Re-throw so the caller can handle it
-        }
-    }
-
-    private async handleSaveProfile(): Promise<void> {
-        const saveButton = document.getElementById('save-profile-btn') as HTMLButtonElement;
-        if (!saveButton) return;
-
-        // Visual feedback
-        const originalText = saveButton.innerHTML;
-        saveButton.innerHTML = 'Saving...';
-        saveButton.disabled = true;
-
-        const result = await this.scheduleManagementService.manualSaveCurrentProfile();
-        const success = result.success;
-        
-        setTimeout(() => {
-            if (success) {
-                saveButton.innerHTML = 'Saved!';
-                setTimeout(() => {
-                    saveButton.innerHTML = originalText;
-                    saveButton.disabled = false;
-                }, 1500);
-            } else {
-                saveButton.innerHTML = 'Error';
-                setTimeout(() => {
-                    saveButton.innerHTML = originalText;
-                    saveButton.disabled = false;
-                }, 2000);
-            }
-        }, 300);
-    }
-
-    private setupSaveStateListener(): void {
-        this.scheduleManagementService.onSaveStateChange((hasUnsavedChanges) => {
-            this.updateSaveButtonState(hasUnsavedChanges);
-        });
-    }
-
-    private updateSaveButtonState(hasUnsavedChanges: boolean): void {
-        const saveButton = document.getElementById('save-profile-btn') as HTMLButtonElement;
-        if (!saveButton) return;
-
-        if (hasUnsavedChanges) {
-            saveButton.classList.add('unsaved-changes');
-            saveButton.title = 'You have unsaved changes - Click to save';
-        } else {
-            saveButton.classList.remove('unsaved-changes');
-            saveButton.title = 'Save current profile';
         }
     }
 
@@ -1116,31 +1065,31 @@ export class MainController {
     private updateOptimisticUIFeedback(state: string, pendingOperations: number, _isProcessing: boolean): void {
         // Update UI to show optimistic operation status
         const statusIndicator = this.findOrCreateStatusIndicator();
-        
+
         switch (state) {
             case 'saving':
-                statusIndicator.textContent = `Saving ${pendingOperations} change${pendingOperations === 1 ? '' : 's'}...`;
+                statusIndicator.textContent = `${MainController.STATUS_TEXT_SAVING} ${pendingOperations} change${pendingOperations === 1 ? '' : 's'}...`;
                 statusIndicator.className = 'optimistic-status saving';
                 break;
             case 'saved':
-                statusIndicator.textContent = 'All changes saved';
+                statusIndicator.textContent = MainController.STATUS_TEXT_SAVED;
                 statusIndicator.className = 'optimistic-status saved';
                 break;
             case 'error':
-                statusIndicator.textContent = 'Save failed - will retry';
+                statusIndicator.textContent = MainController.STATUS_TEXT_ERROR;
                 statusIndicator.className = 'optimistic-status error';
                 break;
             case 'idle':
             default:
-                statusIndicator.textContent = '';
+                statusIndicator.textContent = MainController.STATUS_TEXT_IDLE;
                 statusIndicator.className = 'optimistic-status idle';
                 break;
         }
-        
-        // Auto-hide saved/error messages
+
+        // Auto-hide saved/error messages and return to idle state
         if (state === 'saved' || state === 'error') {
             setTimeout(() => {
-                statusIndicator.textContent = '';
+                statusIndicator.textContent = MainController.STATUS_TEXT_IDLE;
                 statusIndicator.className = 'optimistic-status idle';
             }, state === 'saved' ? 2000 : 4000);
         }
@@ -1153,21 +1102,17 @@ export class MainController {
             indicator = document.createElement('div');
             indicator.id = 'optimistic-ui-status';
             indicator.className = 'optimistic-status idle';
-            
-            // Try to insert in dedicated container first, fallback to old behavior
+            indicator.textContent = MainController.STATUS_TEXT_IDLE;
+
+            // Try to insert in dedicated container
             const statusContainer = document.querySelector('.status-indicator-container');
             if (statusContainer) {
                 statusContainer.appendChild(indicator);
             } else {
-                // Fallback: insert before save button (old behavior)
-                const saveButton = document.getElementById('save-profile-btn');
-                if (saveButton && saveButton.parentNode) {
-                    saveButton.parentNode.insertBefore(indicator, saveButton);
-                } else {
-                    const header = document.querySelector('.controls, .header-controls, .content-header');
-                    if (header) {
-                        header.appendChild(indicator);
-                    }
+                // Fallback: insert in header
+                const header = document.querySelector('.header-controls');
+                if (header) {
+                    header.appendChild(indicator);
                 }
             }
         }

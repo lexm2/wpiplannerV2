@@ -233,7 +233,7 @@ export class BatchOperationManager {
     constructor(uiStateBuffer: UIStateBuffer, options?: Partial<BatchOperationOptions>) {
         this.uiStateBuffer = uiStateBuffer;
         this.options = {
-            batchInterval: 2500, // 2.5 seconds
+            batchInterval: 500, // 0.5 seconds for responsive feedback
             maxBatchSize: 10,
             maxRetries: 3,
             enableVisualFeedback: true,
