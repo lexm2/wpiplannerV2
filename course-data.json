@@ -378,7 +378,7 @@
       "Course_Title": "AE 2310 - Introduction to Aerospace Control Systems",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "72/100",
+      "Enrolled_Capacity": "71/100",
       "Instructional_Format": "Lecture",
       "Instructors": "Raghvendra Cowlagi",
       "Locations": "Salisbury Labs 115 Kinnicutt Hall",
@@ -389,7 +389,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Aerospace Engineering",
-      "Waitlist_Waitlist_Capacity": "1/25",
+      "Waitlist_Waitlist_Capacity": "0/25",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337374"
     },
     {
@@ -1442,7 +1442,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Aerospace Engineering",
-      "Waitlist_Waitlist_Capacity": "2/15",
+      "Waitlist_Waitlist_Capacity": "1/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336505"
     },
     {
@@ -3244,7 +3244,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "4/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336316"
     },
     {
@@ -5867,7 +5867,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "11/20",
+      "Waitlist_Waitlist_Capacity": "10/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339594"
     },
     {
@@ -30114,7 +30114,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "2/5",
+      "Waitlist_Waitlist_Capacity": "1/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337228"
     },
     {
