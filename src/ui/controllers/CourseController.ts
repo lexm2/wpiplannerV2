@@ -1,6 +1,7 @@
-import { Course, Department } from '../../types/types'
+import { Course, Department, Section, LectureGroup } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { CourseFilterService } from '../../services/CourseFilterService'
+import { CourseDataService } from '../../services/courseDataService'
 import { ProgressiveRenderer, ProgressiveRenderOptions } from '../utils/ProgressiveRenderer'
 import { CancellationToken } from '../../utils/RequestCancellation'
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
@@ -159,19 +160,21 @@ export class CourseController {
     private allDepartments: Department[] = [];
     private selectedCourse: Course | null = null;
     private courseSelectionService: CourseSelectionService;
+    private courseDataService: CourseDataService;
     private filterService: CourseFilterService | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private progressiveRenderer: ProgressiveRenderer;
     private performanceMetrics: PerformanceMetrics;
-    
+
     // Pagination state
     private allCoursesToDisplay: Course[] = [];
     private displayedCourses: Course[] = [];
     private readonly INITIAL_PAGE_SIZE = 100;
     private hasMore: boolean = false;
 
-    constructor(courseSelectionService: CourseSelectionService) {
+    constructor(courseSelectionService: CourseSelectionService, courseDataService: CourseDataService) {
         this.courseSelectionService = courseSelectionService;
+        this.courseDataService = courseDataService;
         
         // Initialize performance metrics
         this.performanceMetrics = new PerformanceMetrics();
@@ -541,15 +544,211 @@ export class CourseController {
         const descriptionContainer = document.getElementById('course-description');
         if (!descriptionContainer) return;
 
-        const html = `
+        const isHierarchical = this.courseDataService.isHierarchicalCourse(course);
+        const isLabOnly = this.courseDataService.isLabOnlyCourse(course);
+
+        const credits = course.minCredits === course.maxCredits
+            ? `${course.minCredits} credits`
+            : `${course.minCredits}-${course.maxCredits} credits`;
+
+        let html = `
             <div class="course-info">
                 <div class="course-title">${course.name}</div>
-                <div class="course-code">${course.department.abbreviation}${course.number} (${course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits}-${course.maxCredits}`} credits)</div>
+                <div class="course-code">${course.department.abbreviation}${course.number} (${credits})</div>
             </div>
             <div class="course-description-text">${course.description}</div>
         `;
 
+        // Add tabs for hierarchical courses
+        if (isHierarchical || isLabOnly) {
+            html += this.renderComponentTabs(course, isHierarchical, isLabOnly);
+        }
+
         descriptionContainer.innerHTML = html;
+
+        // Attach tab event listeners if hierarchical
+        if (isHierarchical || isLabOnly) {
+            this.attachTabEventListeners();
+        }
+    }
+
+    private renderComponentTabs(course: Course, isHierarchical: boolean, isLabOnly: boolean): string {
+        let html = '<div class="course-components-section">';
+        html += '<div class="component-tabs">';
+
+        // Determine which tabs to show
+        const showLectures = isHierarchical;
+        const showDiscussions = isHierarchical && this.hasAnyDiscussions(course);
+        const showLabs = isHierarchical ? this.hasAnyLabs(course) : isLabOnly;
+
+        // Render tab buttons
+        if (showLectures) {
+            html += '<button class="component-tab active" data-tab="lectures">Lectures</button>';
+        }
+        if (showDiscussions) {
+            html += '<button class="component-tab" data-tab="discussions">Discussions</button>';
+        }
+        if (showLabs) {
+            html += `<button class="component-tab" data-tab="labs">${isLabOnly ? 'Lab Sections' : 'Labs'}</button>`;
+        }
+
+        html += '</div>'; // end component-tabs
+
+        // Render tab content
+        html += '<div class="component-tab-content">';
+
+        if (showLectures) {
+            html += this.renderLecturesTab(course);
+        }
+        if (showDiscussions) {
+            html += this.renderDiscussionsTab(course);
+        }
+        if (showLabs) {
+            html += this.renderLabsTab(course, isLabOnly);
+        }
+
+        html += '</div>'; // end component-tab-content
+        html += '</div>'; // end course-components-section
+
+        return html;
+    }
+
+    private renderLecturesTab(course: Course): string {
+        const lectures = this.courseDataService.getLecturesForCourse(course);
+
+        let html = '<div class="tab-panel active" data-panel="lectures">';
+        html += `<h3>Available Lectures (${lectures.length})</h3>`;
+        html += '<div class="sections-list">';
+
+        for (const lectureGroup of lectures) {
+            html += this.renderSectionCard(lectureGroup.section, 'Lecture');
+        }
+
+        html += '</div></div>';
+        return html;
+    }
+
+    private renderDiscussionsTab(course: Course): string {
+        const lectures = this.courseDataService.getLecturesForCourse(course);
+
+        let html = '<div class="tab-panel" data-panel="discussions">';
+        html += '<h3>Available Discussions by Lecture</h3>';
+
+        for (const lectureGroup of lectures) {
+            const discussions = lectureGroup.compatibleDiscussions;
+            if (discussions.length === 0) continue;
+
+            html += `<div class="lecture-group">`;
+            html += `<h4>Lecture ${lectureGroup.section.number} - ${discussions.length} Discussion(s)</h4>`;
+            html += '<div class="sections-list">';
+
+            for (const discussion of discussions) {
+                html += this.renderSectionCard(discussion, 'Discussion');
+            }
+
+            html += '</div></div>';
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    private renderLabsTab(course: Course, isLabOnly: boolean): string {
+        let html = '<div class="tab-panel" data-panel="labs">';
+
+        if (isLabOnly) {
+            const labs = this.courseDataService.getStandaloneLabs(course);
+            html += `<h3>Available Lab Sections (${labs.length})</h3>`;
+            html += '<div class="sections-list">';
+
+            for (const lab of labs) {
+                html += this.renderSectionCard(lab, 'Lab');
+            }
+        } else {
+            const lectures = this.courseDataService.getLecturesForCourse(course);
+            html += '<h3>Available Labs by Lecture</h3>';
+
+            for (const lectureGroup of lectures) {
+                const labs = lectureGroup.compatibleLabs;
+                if (labs.length === 0) continue;
+
+                html += `<div class="lecture-group">`;
+                html += `<h4>Lecture ${lectureGroup.section.number} - ${labs.length} Lab(s)</h4>`;
+                html += '<div class="sections-list">';
+
+                for (const lab of labs) {
+                    html += this.renderSectionCard(lab, 'Lab');
+                }
+
+                html += '</div></div>';
+            }
+        }
+
+        html += '</div></div>';
+        return html;
+    }
+
+    private renderSectionCard(section: Section, type: string): string {
+        const period = section.periods[0];
+        const days = period ? Array.from(period.days).join(', ').toUpperCase() : 'TBA';
+        const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
+        const location = period?.location || 'TBA';
+        const professor = period?.professor || 'Not Assigned';
+
+        return `
+            <div class="section-card">
+                <div class="section-header">
+                    <span class="section-number">${section.number}</span>
+                    <span class="section-type">${type}</span>
+                    <span class="section-crn">CRN: ${section.crn}</span>
+                </div>
+                <div class="section-details">
+                    <div class="section-time">
+                        <strong>${days}</strong> ${time}
+                    </div>
+                    <div class="section-location">${location}</div>
+                    <div class="section-professor">${professor}</div>
+                    <div class="section-seats">
+                        Seats: ${section.seatsAvailable}/${section.seats}
+                        ${section.actualWaitlist > 0 ? `(Waitlist: ${section.actualWaitlist}/${section.maxWaitlist})` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    private hasAnyDiscussions(course: Course): boolean {
+        const lectures = this.courseDataService.getLecturesForCourse(course);
+        return lectures.some(lg => lg.compatibleDiscussions.length > 0);
+    }
+
+    private hasAnyLabs(course: Course): boolean {
+        const lectures = this.courseDataService.getLecturesForCourse(course);
+        return lectures.some(lg => lg.compatibleLabs.length > 0);
+    }
+
+    private attachTabEventListeners(): void {
+        const tabs = document.querySelectorAll('.component-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                const tabName = target.dataset.tab;
+                if (!tabName) return;
+
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                target.classList.add('active');
+
+                // Update active panel
+                const panels = document.querySelectorAll('.tab-panel');
+                panels.forEach(p => p.classList.remove('active'));
+
+                const activePanel = document.querySelector(`.tab-panel[data-panel="${tabName}"]`);
+                if (activePanel) {
+                    activePanel.classList.add('active');
+                }
+            });
+        });
     }
 
     clearCourseDescription(): void {

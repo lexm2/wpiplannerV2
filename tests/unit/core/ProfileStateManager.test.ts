@@ -252,7 +252,7 @@ describe('ProfileStateManager', () => {
       expect(listeners[0].data.action).toBe('updated')
     })
 
-    it('should delete schedule and switch to another', () => {
+    it('should delete schedule and switch to another', async () => {
       const schedule1 = profileStateManager.createSchedule('Schedule 1', 'test')
       const schedule2 = profileStateManager.createSchedule('Schedule 2', 'test')
 
@@ -263,7 +263,7 @@ describe('ProfileStateManager', () => {
       profileStateManager.addListener((event) => listeners.push(event))
 
       // Delete active schedule
-      const success = profileStateManager.deleteSchedule(schedule1.id, 'test')
+      const success = await profileStateManager.deleteSchedule(schedule1.id, 'test')
       expect(success).toBe(true)
 
       const state = profileStateManager.getState()
@@ -275,10 +275,10 @@ describe('ProfileStateManager', () => {
       expect(listeners.some(e => e.type === 'active_schedule_changed')).toBe(true)
     })
 
-    it('should not allow deleting last schedule', () => {
+    it('should not allow deleting last schedule', async () => {
       const schedule = profileStateManager.createSchedule('Only Schedule', 'test')
 
-      const success = profileStateManager.deleteSchedule(schedule.id, 'test')
+      const success = await profileStateManager.deleteSchedule(schedule.id, 'test')
       expect(success).toBe(false)
 
       const state = profileStateManager.getState()

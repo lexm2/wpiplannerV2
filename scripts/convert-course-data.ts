@@ -13,7 +13,8 @@ import { dirname, join } from 'path';
 // Get script directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const projectRoot = join(__dirname, '..');
+// After compilation, __dirname will be dist/scripts/, so go up 2 levels to get project root
+const projectRoot = join(__dirname, '..', '..');
 
 // File paths
 const INPUT_PATH = join(projectRoot, 'public', 'course-data.json');

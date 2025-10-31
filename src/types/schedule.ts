@@ -2,8 +2,16 @@ import { Course, Section } from './types'
 
 export interface SelectedCourse {
     course: Course;
+
+    // NEW: Component-based selections for hierarchical courses
+    selectedLecture: Section | null;      // Selected lecture section
+    selectedDiscussion: Section | null;   // Selected discussion section (if exists)
+    selectedLab: Section | null;          // Selected lab section (if exists)
+
+    // DEPRECATED: Legacy single-section selection for backward compatibility
     selectedSection: Section | null;  // Store the full Section object for direct access
     selectedSectionNumber: string | null;  // Keep for backward compatibility and serialization
+
     isRequired: boolean;
 }
 

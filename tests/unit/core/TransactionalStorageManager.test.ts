@@ -89,10 +89,10 @@ describe('TransactionalStorageManager', () => {
       expect(result.issues[0]).toContain('localStorage unavailable')
     })
 
-    it('should detect data corruption', () => {
+    it('should detect data corruption', async () => {
       mockStorage.getItem.mockReturnValue('invalid json{')
 
-      const result = storageManager.loadAllSchedules()
+      const result = await storageManager.loadAllSchedules()
       expect(result.valid).toBe(false)
       expect(result.data).toEqual([])
       expect(result.error).toContain('Failed to load schedules')
@@ -145,7 +145,7 @@ describe('TransactionalStorageManager', () => {
   })
 
   describe('Schedule Management', () => {
-    it('should save and load schedules with conflict resolution', () => {
+    it('should save and load schedules with conflict resolution', async () => {
       const schedule1: Schedule = {
         id: 'schedule-1',
         name: 'Test Schedule',
@@ -161,18 +161,18 @@ describe('TransactionalStorageManager', () => {
       }
 
       // Save both schedules
-      expect(storageManager.saveSchedule(schedule1).success).toBe(true)
-      expect(storageManager.saveSchedule(schedule2).success).toBe(true)
+      expect((await storageManager.saveSchedule(schedule1)).success).toBe(true)
+      expect((await storageManager.saveSchedule(schedule2)).success).toBe(true)
 
       // Load all schedules
-      const loaded = storageManager.loadAllSchedules()
+      const loaded = await storageManager.loadAllSchedules()
       expect(loaded.valid).toBe(true)
       expect(loaded.data).toHaveLength(2)
       expect(loaded.data?.find(s => s.id === 'schedule-1')).toEqual(schedule1)
       expect(loaded.data?.find(s => s.id === 'schedule-2')).toEqual(schedule2)
     })
 
-    it('should update existing schedule atomically', () => {
+    it('should update existing schedule atomically', async () => {
       const originalSchedule: Schedule = {
         id: 'schedule-1',
         name: 'Original Name',
@@ -186,19 +186,19 @@ describe('TransactionalStorageManager', () => {
       }
 
       // Save original
-      expect(storageManager.saveSchedule(originalSchedule).success).toBe(true)
+      expect((await storageManager.saveSchedule(originalSchedule)).success).toBe(true)
 
       // Update
-      expect(storageManager.saveSchedule(updatedSchedule).success).toBe(true)
+      expect((await storageManager.saveSchedule(updatedSchedule)).success).toBe(true)
 
       // Verify only one schedule exists with updated data
-      const loaded = storageManager.loadAllSchedules()
+      const loaded = await storageManager.loadAllSchedules()
       expect(loaded.valid).toBe(true)
       expect(loaded.data).toHaveLength(1)
       expect(loaded.data?.[0].name).toBe('Updated Name')
     })
 
-    it('should delete schedule atomically', () => {
+    it('should delete schedule atomically', async () => {
       const schedule: Schedule = {
         id: 'schedule-1',
         name: 'Test Schedule',
@@ -207,22 +207,22 @@ describe('TransactionalStorageManager', () => {
       }
 
       // Save schedule
-      expect(storageManager.saveSchedule(schedule).success).toBe(true)
+      expect((await storageManager.saveSchedule(schedule)).success).toBe(true)
 
       // Verify it exists
-      expect(storageManager.loadSchedule('schedule-1').data).toEqual(schedule)
+      expect((await storageManager.loadSchedule('schedule-1')).data).toEqual(schedule)
 
       // Delete schedule
-      expect(storageManager.deleteSchedule('schedule-1').success).toBe(true)
+      expect((await storageManager.deleteSchedule('schedule-1')).success).toBe(true)
 
       // Verify it's gone
-      expect(storageManager.loadSchedule('schedule-1').data).toBeNull()
-      expect(storageManager.loadAllSchedules().data).toEqual([])
+      expect((await storageManager.loadSchedule('schedule-1')).data).toBeNull()
+      expect((await storageManager.loadAllSchedules()).data).toEqual([])
     })
   })
 
   describe('Export/Import with Integrity Checks', () => {
-    it('should export and import data with checksum validation', () => {
+    it('should export and import data with checksum validation', async () => {
       const schedule: Schedule = {
         id: 'test-schedule',
         name: 'Test Schedule',
@@ -241,7 +241,7 @@ describe('TransactionalStorageManager', () => {
       }
 
       // Save test data
-      storageManager.saveSchedule(schedule)
+      await storageManager.saveSchedule(schedule)
       storageManager.savePreferences(preferences)
 
       // Export
@@ -261,7 +261,7 @@ describe('TransactionalStorageManager', () => {
       expect(importResult.success).toBe(true)
 
       // Verify imported data
-      const loadedSchedules = storageManager.loadAllSchedules()
+      const loadedSchedules = await storageManager.loadAllSchedules()
       const loadedPreferences = storageManager.loadPreferences()
       expect(loadedSchedules.data?.[0]).toEqual(schedule)
       expect(loadedPreferences.data).toEqual(preferences)
@@ -297,7 +297,7 @@ describe('TransactionalStorageManager', () => {
         throw new Error('localStorage not available')
       })
 
-      const result = storageManager.loadSchedulePreferences()
+      const result = storageManager.loadThemePreference()
       expect(result.valid).toBe(false)
       expect(result.data).toBe('wpi-classic') // Default theme
     })
@@ -316,7 +316,7 @@ describe('TransactionalStorageManager', () => {
   })
 
   describe('Performance and Memory Management', () => {
-    it('should handle large data sets without memory leaks', () => {
+    it('should handle large data sets without memory leaks', async () => {
       // Create a large schedule with many courses
       const largeSchedule: Schedule = {
         id: 'large-schedule',
@@ -338,10 +338,10 @@ describe('TransactionalStorageManager', () => {
         generatedSchedules: []
       }
 
-      const result = storageManager.saveSchedule(largeSchedule)
+      const result = await storageManager.saveSchedule(largeSchedule)
       expect(result.success).toBe(true)
 
-      const loaded = storageManager.loadSchedule('large-schedule')
+      const loaded = await storageManager.loadSchedule('large-schedule')
       expect(loaded.valid).toBe(true)
       expect(loaded.data?.selectedCourses.length).toBe(1000)
     })
@@ -381,7 +381,7 @@ describe('TransactionalStorageManager', () => {
         expect(result.success).toBe(true)
       })
 
-      const allSchedules = storageManager.loadAllSchedules()
+      const allSchedules = await storageManager.loadAllSchedules()
       expect(allSchedules.valid).toBe(true)
       expect(allSchedules.data?.length).toBe(10)
     })

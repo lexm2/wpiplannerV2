@@ -213,7 +213,7 @@ export class MainController {
         this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
         
         // Initialize controllers
-        this.courseController = new CourseController(this.courseSelectionService);
+        this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
         this.scheduleController = new ScheduleController(this.courseSelectionService);
         this.sectionInfoModalController = new SectionInfoModalController(this.modalService);
         this.infoModalController = new InfoModalController(this.modalService);
@@ -228,11 +228,12 @@ export class MainController {
         
         // Connect schedule filter service to controllers
         this.scheduleFilterModalController.setScheduleFilterService(this.scheduleFilterService);
+        this.scheduleController.setCourseDataService(this.courseDataService);
         this.scheduleController.setConflictDetector(this.conflictDetector);
         this.scheduleController.setScheduleFilterService(this.scheduleFilterService);
         this.scheduleController.setScheduleFilterModalController(this.scheduleFilterModalController);
         this.scheduleController.setScheduleManagementService(this.scheduleManagementService);
-        
+
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
         
@@ -457,7 +458,7 @@ export class MainController {
                 } else {
                     course = this.courseController.getCourseFromElement(target as HTMLElement);
                 }
-                
+
                 if (course) {
                     // Directly remove course (remove button means always unselect)
                     this.courseSelectionService.unselectCourse(course).catch(error => {
@@ -465,6 +466,23 @@ export class MainController {
                         this.uiStateManager.showErrorMessage('Failed to remove course. Please try again.');
                     });
                 }
+            }
+
+            if (target.classList.contains('course-edit-btn')) {
+                e.stopPropagation();
+
+                if (this.uiStateManager.currentPage === 'schedule') {
+                    const course = this.scheduleController.getCourseFromElement(target as HTMLElement);
+                    if (course) {
+                        // Get existing selections for this course
+                        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+                        const existingSelections = selectedCourses.find(sc => sc.course.id === course.id);
+
+                        // Open wizard with existing selections if any
+                        this.scheduleController.openComponentWizard(course, existingSelections);
+                    }
+                }
+                return;
             }
 
             // Handle section-related clicks FIRST (before dropdown logic)
@@ -503,10 +521,11 @@ export class MainController {
                     
                 if (triggerElement) {
                     // Only trigger dropdown if clicking on course header area (not section-related elements)
-                    const shouldToggle = !target.classList.contains('course-remove-btn') && 
+                    const shouldToggle = !target.classList.contains('course-remove-btn') &&
+                        !target.classList.contains('course-edit-btn') &&
                         !target.classList.contains('section-select-btn') &&
-                        !target.classList.contains('section-number') && 
-                        !target.classList.contains('section-schedule') && 
+                        !target.classList.contains('section-number') &&
+                        !target.classList.contains('section-schedule') &&
                         !target.classList.contains('section-professor') &&
                         !target.closest('.section-option') &&
                         !target.closest('.section-info') &&

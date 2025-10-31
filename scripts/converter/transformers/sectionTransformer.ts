@@ -72,15 +72,6 @@ export function transformSection(
     // Normalize type (Laboratory → Lab)
     const type = instructionalFormat === 'Laboratory' ? 'Lab' : instructionalFormat;
 
-    // Determine part of term
-    const term = workdaySection.Starting_Academic_Period_Type;
-    let partOfTerm = term;
-    if (term === 'Fall') {
-        partOfTerm = 'A Term, B Term';
-    } else if (term === 'Spring') {
-        partOfTerm = 'C Term, D Term';
-    }
-
     // Create periods from meeting patterns
     const periods: PlannerPeriod[] = meetingPatterns.map(pattern => ({
         type: type,

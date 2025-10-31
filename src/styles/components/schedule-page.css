@@ -9,7 +9,7 @@
 
 .schedule-page-layout {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 37.5rem 1fr; /* 600px equivalent - wider for wizard integration */
   height: 100%;
   gap: 0;
   overflow: hidden;
@@ -86,6 +86,7 @@
   padding: 1rem 1.5rem;
   overflow-y: auto;
   background: var(--color-surface);
+  position: relative; /* Allow wizard to position absolutely inside */
 }
 
 .schedule-selected-courses .empty-state {

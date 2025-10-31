@@ -237,7 +237,7 @@ export class UIStateBuffer {
         const selectedCourse = this.uiState.selectedCourses.find(sc => sc.course.id === course.id);
         if (selectedCourse) {
             let sectionObject: Section | null = null;
-            
+
             if (sectionNumber) {
                 sectionObject = course.sections.find(s => s.number === sectionNumber) || null;
                 if (sectionObject && !sectionObject.computedTerm) {
@@ -255,6 +255,40 @@ export class UIStateBuffer {
                 type: 'set_section',
                 courseId: course.id,
                 data: { course, sectionNumber },
+                timestamp: Date.now(),
+                retryCount: 0
+            });
+
+            this.notifyListeners();
+        }
+    }
+
+    /**
+     * Set selected components (lecture, discussion, lab) for hierarchical courses
+     */
+    setSelectedComponents(
+        course: Course,
+        lecture: Section | null,
+        discussion: Section | null,
+        lab: Section | null
+    ): void {
+        const selectedCourse = this.uiState.selectedCourses.find(sc => sc.course.id === course.id);
+        if (selectedCourse) {
+            // Update component selections
+            selectedCourse.selectedLecture = lecture;
+            selectedCourse.selectedDiscussion = discussion;
+            selectedCourse.selectedLab = lab;
+
+            // For backward compatibility, set selectedSection to lecture (primary component)
+            selectedCourse.selectedSection = lecture;
+            selectedCourse.selectedSectionNumber = lecture?.number || null;
+
+            // Queue backend operation
+            this.queueOperation({
+                id: this.generateOperationId(),
+                type: 'set_section', // Reuse set_section type for now
+                courseId: course.id,
+                data: { course, lecture, discussion, lab },
                 timestamp: Date.now(),
                 retryCount: 0
             });

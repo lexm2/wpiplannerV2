@@ -276,13 +276,28 @@ export class CourseDataService {
                 
                 seenIds.add(courseId);
                 
+                // Parse NEW hierarchical structure (lectures + standaloneLabs)
+                const lectures = this.parseLectureGroups(courseData.lectures || [], department);
+                const standaloneLabs = courseData.standaloneLabs
+                    ? this.parseConstructedSections(courseData.standaloneLabs)
+                    : undefined;
+
+                // Parse OLD flat structure for backward compatibility
+                const sections = courseData.sections
+                    ? this.parseConstructedSections(courseData.sections)
+                    : this.flattenLectureGroups(lectures, standaloneLabs);
+
                 const course: Course = {
                     id: courseId,
                     number: courseData.number,
                     name: courseData.name,
                     description: this.stripHtml(courseData.description || ''),
                     department: department,
-                    sections: this.parseConstructedSections(courseData.sections || []),
+                    // NEW hierarchical structure
+                    lectures: lectures.length > 0 ? lectures : undefined,
+                    standaloneLabs: standaloneLabs,
+                    // DEPRECATED: Maintain for backward compatibility
+                    sections: sections,
                     minCredits: courseData.min_credits || 0,
                     maxCredits: courseData.max_credits || 0
                 };
@@ -309,10 +324,10 @@ export class CourseDataService {
         return sections.map(sectionData => {
             const rawTerm = sectionData.term || '';
             const sectionNumber = sectionData.number || '';
-            
+
             // Use pre-computed term from Java backend
             const computedTerm: string = sectionData.computedTerm;
-            
+
             const section: Section = {
                 crn: sectionData.crn || 0,
                 number: sectionNumber,
@@ -326,9 +341,52 @@ export class CourseDataService {
                 computedTerm: computedTerm,
                 periods: this.parseConstructedPeriods(sectionData.periods || [])
             };
-            
+
             return section;
         });
+    }
+
+    /**
+     * Parses lecture groups from the NEW hierarchical structure
+     * Each lecture group contains a lecture section with compatible discussions and labs
+     */
+    private parseLectureGroups(lectureGroups: any[], department: Department): import('../types/types').LectureGroup[] {
+        return lectureGroups.map(groupData => {
+            const lectureSection = this.parseConstructedSections([groupData.section])[0];
+            const compatibleDiscussions = this.parseConstructedSections(groupData.compatibleDiscussions || []);
+            const compatibleLabs = this.parseConstructedSections(groupData.compatibleLabs || []);
+
+            return {
+                section: lectureSection,
+                compatibleDiscussions: compatibleDiscussions,
+                compatibleLabs: compatibleLabs
+            };
+        });
+    }
+
+    /**
+     * Flattens lecture groups into a flat sections array for backward compatibility
+     * Combines all sections from lectures, discussions, and labs into one array
+     */
+    private flattenLectureGroups(
+        lectures: import('../types/types').LectureGroup[],
+        standaloneLabs: Section[] | undefined
+    ): Section[] {
+        const sections: Section[] = [];
+
+        // Add all lecture sections and their compatible components
+        for (const lectureGroup of lectures) {
+            sections.push(lectureGroup.section);
+            sections.push(...lectureGroup.compatibleDiscussions);
+            sections.push(...lectureGroup.compatibleLabs);
+        }
+
+        // Add standalone labs
+        if (standaloneLabs) {
+            sections.push(...standaloneLabs);
+        }
+
+        return sections;
     }
     
     private parseConstructedPeriods(periods: any[]): Period[] {
@@ -439,6 +497,80 @@ export class CourseDataService {
 
     getAllDepartments(): Department[] {
         return this.scheduleDB?.departments || [];
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════════
+     * NEW HIERARCHICAL STRUCTURE HELPER METHODS
+     * ═══════════════════════════════════════════════════════════════════════════════
+     * These methods provide access to the NEW hierarchical course structure with
+     * lectures, compatible discussions, and compatible labs.
+     */
+
+    /**
+     * Gets all lecture groups for a course
+     * Returns empty array if course uses old flat structure or is lab-only
+     */
+    getLecturesForCourse(course: Course): import('../types/types').LectureGroup[] {
+        return course.lectures || [];
+    }
+
+    /**
+     * Gets compatible discussions for a specific lecture section
+     * @param course The course containing the lecture
+     * @param lectureSection The lecture section to get discussions for
+     * @returns Array of compatible discussion sections
+     */
+    getDiscussionsForLecture(course: Course, lectureSection: Section): Section[] {
+        if (!course.lectures) return [];
+
+        const lectureGroup = course.lectures.find(lg => lg.section.crn === lectureSection.crn);
+        return lectureGroup?.compatibleDiscussions || [];
+    }
+
+    /**
+     * Gets compatible labs for a specific lecture section
+     * @param course The course containing the lecture
+     * @param lectureSection The lecture section to get labs for
+     * @returns Array of compatible lab sections
+     */
+    getLabsForLecture(course: Course, lectureSection: Section): Section[] {
+        if (!course.lectures) return [];
+
+        const lectureGroup = course.lectures.find(lg => lg.section.crn === lectureSection.crn);
+        return lectureGroup?.compatibleLabs || [];
+    }
+
+    /**
+     * Gets standalone labs for lab-only courses
+     * Returns empty array if course has lectures or no standalone labs
+     */
+    getStandaloneLabs(course: Course): Section[] {
+        return course.standaloneLabs || [];
+    }
+
+    /**
+     * Checks if a course uses the new hierarchical structure
+     * @returns true if course has lecture groups, false if flat/standalone labs
+     */
+    isHierarchicalCourse(course: Course): boolean {
+        return (course.lectures && course.lectures.length > 0) || false;
+    }
+
+    /**
+     * Checks if a course is lab-only (no lectures, only standalone labs)
+     */
+    isLabOnlyCourse(course: Course): boolean {
+        return (!course.lectures || course.lectures.length === 0) &&
+               (course.standaloneLabs && course.standaloneLabs.length > 0) || false;
+    }
+
+    /**
+     * Gets all sections for a course regardless of structure (hierarchical or flat)
+     * Useful for backward compatibility and general section iteration
+     */
+    getAllSectionsForCourse(course: Course): Section[] {
+        return course.sections || [];
     }
 
 }

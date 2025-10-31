@@ -3,7 +3,7 @@
  * Implements the NEW hierarchical structure with lecture groups
  */
 
-import fs from 'fs/promises';
+import { readFile, writeFile, stat } from 'fs/promises';
 import { WorkdayFeed, WorkdaySection } from './types/workdayTypes.js';
 import { PlannerOutput } from './types/outputTypes.js';
 import { ConverterConfig, isValidAcademicPeriod } from './ConverterConfig.js';
@@ -86,7 +86,7 @@ export class WorkdayConverter {
      * Reads and parses Workday JSON file
      */
     private async readWorkdayData(inputPath: string): Promise<WorkdayFeed> {
-        const content = await fs.readFile(inputPath, 'utf-8');
+        const content = await readFile(inputPath, 'utf-8');
         return JSON.parse(content) as WorkdayFeed;
     }
 
@@ -164,11 +164,11 @@ export class WorkdayConverter {
      */
     private async writePlannerData(data: PlannerOutput, outputPath: string): Promise<void> {
         const json = JSON.stringify(data, null, 2);
-        await fs.writeFile(outputPath, json, 'utf-8');
+        await writeFile(outputPath, json, 'utf-8');
         console.log(`Wrote output to ${outputPath}`);
 
         // Calculate file size
-        const stats = await fs.stat(outputPath);
+        const stats = await stat(outputPath);
         const sizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
         console.log(`Output file size: ${sizeInMB} MB`);
     }

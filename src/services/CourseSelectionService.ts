@@ -440,10 +440,108 @@ export class CourseSelectionService {
         }
     }
 
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════════
+     * COMPONENT-BASED SELECTION METHODS (NEW HIERARCHICAL STRUCTURE)
+     * ═══════════════════════════════════════════════════════════════════════════════
+     * These methods support the new hierarchical course structure with separate
+     * selections for lectures, discussions, and labs.
+     */
+
+    /**
+     * Set selected components (lecture, discussion, lab) for a hierarchical course
+     */
+    async setSelectedComponents(
+        course: Course,
+        lecture: Section | null,
+        discussion: Section | null,
+        lab: Section | null
+    ): Promise<CourseSelectionResult> {
+        await this.ensureInitialized();
+
+        try {
+            if (!this.isCourseSelected(course)) {
+                return {
+                    success: false,
+                    error: 'Course must be selected before setting components'
+                };
+            }
+
+            // Use optimistic UI approach
+            return this.setSelectedComponentsOptimistic(course, lecture, discussion, lab);
+
+        } catch (error) {
+            console.error('Error setting selected components:', error);
+            return {
+                success: false,
+                error: `Error setting selected components: ${error}`
+            };
+        }
+    }
+
+    /**
+     * Get the currently selected components for a course
+     */
+    getSelectedComponents(course: Course): {
+        lecture: Section | null;
+        discussion: Section | null;
+        lab: Section | null;
+    } {
+        if (!this.isInitialized) {
+            return { lecture: null, discussion: null, lab: null };
+        }
+
+        const selectedCourse = this.uiStateBuffer.getSelectedCourses().find(
+            sc => sc.course.id === course.id
+        );
+
+        return {
+            lecture: selectedCourse?.selectedLecture || null,
+            discussion: selectedCourse?.selectedDiscussion || null,
+            lab: selectedCourse?.selectedLab || null
+        };
+    }
+
+    /**
+     * Check if a course has incomplete component selections
+     * (i.e., course is selected but doesn't have all required components)
+     */
+    hasIncompleteSelections(course: Course): boolean {
+        if (!this.isCourseSelected(course)) return false;
+
+        const components = this.getSelectedComponents(course);
+
+        // For hierarchical courses, lecture is always required
+        if (!components.lecture) return true;
+
+        // TODO: Add logic to check if discussion/lab are required based on course structure
+        // For now, we'll consider it complete if lecture is selected
+        return false;
+    }
+
+    /**
+     * Get all courses with incomplete component selections
+     */
+    getIncompleteCourses(): SelectedCourse[] {
+        if (!this.isInitialized) return [];
+
+        const selectedCourses = this.uiStateBuffer.getSelectedCourses();
+        return selectedCourses.filter(sc => {
+            // Check if it's a hierarchical course without complete selections
+            const hasLecture = sc.selectedLecture !== null;
+            const hasSection = sc.selectedSection !== null;
+
+            // If it has neither lecture nor section, it's incomplete
+            if (!hasLecture && !hasSection) return true;
+
+            return false;
+        });
+    }
+
     // Query methods
     isCourseSelected(course: Course): boolean {
         if (!this.isInitialized) return false;
-        
+
         // Use optimistic UI state for instant response
         return this.uiStateBuffer.isCourseSelected(course);
     }
@@ -1015,6 +1113,50 @@ export class CourseSelectionService {
 
 
 
+    /**
+     * Optimistic UI implementation for setting component selections
+     */
+    private setSelectedComponentsOptimistic(
+        course: Course,
+        lecture: Section | null,
+        discussion: Section | null,
+        lab: Section | null
+    ): CourseSelectionResult {
+        try {
+            // Set flag to prevent duplicate event emission
+            this.isEmittingEvent = true;
+
+            // Update component selections in UI state buffer
+            this.uiStateBuffer.setSelectedComponents(course, lecture, discussion, lab);
+
+            // Get updated course from UI state buffer
+            const selectedCourse = this.uiStateBuffer.getSelectedCourse(course);
+
+            // Emit event for immediate UI updates
+            this.notifySelectionListeners({
+                type: 'components_changed',
+                course,
+                selectedCourses: this.uiStateBuffer.getSelectedCourses(),
+                timestamp: Date.now()
+            });
+
+            // Reset flag
+            this.isEmittingEvent = false;
+
+            return {
+                success: true,
+                course: selectedCourse
+            };
+        } catch (error) {
+            console.error('Error in optimistic component selection:', error);
+            this.isEmittingEvent = false;
+            return {
+                success: false,
+                error: `Error setting components: ${error}`
+            };
+        }
+    }
+
     // Debug methods
     debugState(): void {
         console.log('=== COURSE SELECTION SERVICE DEBUG ===');
@@ -1024,11 +1166,11 @@ export class CourseSelectionService {
         console.log('Has Unsaved Changes:', this.hasUnsavedChanges());
         console.log('Optimistic UI: Always Enabled');
         console.log('Pending Operations:', this.uiStateBuffer.getPendingOperationsCount());
-        
+
         this.profileStateManager.debugState();
         this.uiStateBuffer.debugState();
         this.batchOperationManager.debugState();
-        
+
         console.log('Health Check:', this.performHealthCheck());
         console.log('=============================================');
     }

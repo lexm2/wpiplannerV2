@@ -117,7 +117,7 @@ describe('PeriodTermFilter', () => {
                 createSectionItem('C')
             ];
 
-            const result = periodTermFilter.applyToSections(sections, { terms: [] });
+            const result = periodTermFilter.applyToSectionsWithContext(sections, { terms: [] });
             expect(result).toHaveLength(3);
             expect(result).toEqual(sections);
         });
@@ -129,7 +129,7 @@ describe('PeriodTermFilter', () => {
 
             const sections = [aTermSection, bTermSection, cTermSection];
 
-            const result = periodTermFilter.applyToSections(sections, { terms: ['A'] });
+            const result = periodTermFilter.applyToSectionsWithContext(sections, { terms: ['A'] });
 
             // Should include only A term section
             expect(result).toHaveLength(1);
@@ -146,7 +146,7 @@ describe('PeriodTermFilter', () => {
 
             const sections = [aTermSection, bTermSection, cTermSection, dTermSection];
 
-            const result = periodTermFilter.applyToSections(sections, { terms: ['A', 'C'] });
+            const result = periodTermFilter.applyToSectionsWithContext(sections, { terms: ['A', 'C'] });
 
             // Should include A and C term sections
             expect(result).toHaveLength(2);
@@ -163,7 +163,7 @@ describe('PeriodTermFilter', () => {
                 createSectionItem('C')
             ];
 
-            const result = periodTermFilter.applyToSections(sections, { terms: ['a', 'B'] });
+            const result = periodTermFilter.applyToSectionsWithContext(sections, { terms: ['a', 'B'] });
 
             // Should match regardless of case
             expect(result).toHaveLength(2);
@@ -177,7 +177,7 @@ describe('PeriodTermFilter', () => {
                 createSectionItem('C')
             ];
 
-            const result = periodTermFilter.applyToSections(sections, { terms: ['A', 'B'] });
+            const result = periodTermFilter.applyToSectionsWithContext(sections, { terms: ['A', 'B'] });
 
             // Should match after normalization
             expect(result).toHaveLength(2);
@@ -191,7 +191,7 @@ describe('PeriodTermFilter', () => {
                 createSectionItem('C')
             ];
 
-            const result = periodTermFilter.applyToSections(sections, { terms: ['X', 'Y'] });
+            const result = periodTermFilter.applyToSectionsWithContext(sections, { terms: ['X', 'Y'] });
 
             // Should return empty array for non-matching terms
             expect(result).toHaveLength(0);
@@ -202,7 +202,7 @@ describe('PeriodTermFilter', () => {
             const emptyTermSection = createSectionItem('');
             const sections = [validSection, emptyTermSection];
 
-            const result = periodTermFilter.applyToSections(sections, { terms: ['A'] });
+            const result = periodTermFilter.applyToSectionsWithContext(sections, { terms: ['A'] });
 
             // Should include only section with matching term
             expect(result).toHaveLength(1);
@@ -212,12 +212,12 @@ describe('PeriodTermFilter', () => {
         test('should handle all terms being selected', () => {
             const sections = [
                 createSectionItem('A'),
-                createSectionItem('B'), 
+                createSectionItem('B'),
                 createSectionItem('C'),
                 createSectionItem('D')
             ];
 
-            const result = periodTermFilter.applyToSections(sections, { terms: ['A', 'B', 'C', 'D'] });
+            const result = periodTermFilter.applyToSectionsWithContext(sections, { terms: ['A', 'B', 'C', 'D'] });
 
             // Should include all sections
             expect(result).toHaveLength(4);
@@ -228,22 +228,22 @@ describe('PeriodTermFilter', () => {
     describe('Section-Level Integration', () => {
         test('should provide correct inclusion behavior for section filtering', () => {
             const aTermSections = [
-                { section: { term: 'A', computedTerm: 'A' } },
-                { section: { term: 'A', computedTerm: 'A' } }
+                { course: { id: 'TEST' }, section: { term: 'A', computedTerm: 'A' } },
+                { course: { id: 'TEST' }, section: { term: 'A', computedTerm: 'A' } }
             ];
 
             const bTermSections = [
-                { section: { term: 'B', computedTerm: 'B' } },
-                { section: { term: 'B', computedTerm: 'B' } }
+                { course: { id: 'TEST' }, section: { term: 'B', computedTerm: 'B' } },
+                { course: { id: 'TEST' }, section: { term: 'B', computedTerm: 'B' } }
             ];
 
             // When filtering sections, only sections matching selected terms should be included
-            const aTermResult = periodTermFilter.applyToSections(aTermSections, { terms: ['A'] });
-            const bTermResult = periodTermFilter.applyToSections(bTermSections, { terms: ['A'] });
+            const aTermResult = periodTermFilter.applyToSectionsWithContext(aTermSections as any, { terms: ['A'] });
+            const bTermResult = periodTermFilter.applyToSectionsWithContext(bTermSections as any, { terms: ['A'] });
 
             // A term sections should all be included
             expect(aTermResult.length).toBe(aTermSections.length);
-            
+
             // B term sections should be excluded when filtering for A term
             expect(bTermResult.length).toBe(0);
         });

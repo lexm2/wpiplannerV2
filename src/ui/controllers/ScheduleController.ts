@@ -1,15 +1,18 @@
 import { DayOfWeek, Course, Section } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
+import { CourseDataService } from '../../services/courseDataService'
 import { ScheduleFilterService } from '../../services/ScheduleFilterService'
 import { ScheduleManagementService } from '../../services/ScheduleManagementService'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { ScheduleFilterModalController } from './ScheduleFilterModalController'
+import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
 import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/ConflictDetector'
 import { getComputedTerm, validateSelectedCourses } from '../../utils/typeGuards'
 
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
+    private courseDataService: CourseDataService | null = null;
     private scheduleFilterService: ScheduleFilterService | null = null;
     private _scheduleManagementService: ScheduleManagementService | null = null;
     private _scheduleFilterModalController: ScheduleFilterModalController | null = null;
@@ -22,10 +25,15 @@ export class ScheduleController {
         restore: (states: Map<string, boolean>) => void
     };
     private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+    private componentWizard: ComponentSelectionWizard | null = null;
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
         this.setupTermFocusHandlers();
+    }
+
+    setCourseDataService(courseDataService: CourseDataService): void {
+        this.courseDataService = courseDataService;
     }
 
     setSectionInfoModalController(sectionInfoModalController: SectionInfoModalController): void {
@@ -63,11 +71,74 @@ export class ScheduleController {
         this._scheduleManagementService = scheduleManagementService;
     }
 
-    setStatePreserver(statePreserver: { 
-        preserve: () => Map<string, boolean>, 
-        restore: (states: Map<string, boolean>) => void 
+    setStatePreserver(statePreserver: {
+        preserve: () => Map<string, boolean>,
+        restore: (states: Map<string, boolean>) => void
     }): void {
         this.statePreserver = statePreserver;
+    }
+
+    /**
+     * Open the component selection wizard for a course
+     */
+    openComponentWizard(course: Course, existingSelections?: any): void {
+        if (!this.courseDataService) {
+            console.error('CourseDataService not available');
+            return;
+        }
+
+        // Close any existing wizard
+        if (this.componentWizard) {
+            this.componentWizard.close();
+        }
+
+        // Create new wizard
+        this.componentWizard = new ComponentSelectionWizard(
+            course,
+            this.courseDataService,
+            (selections) => this.onWizardComplete(course, selections),
+            () => this.closeComponentWizard(),
+            existingSelections
+        );
+
+        this.componentWizard.open();
+    }
+
+    /**
+     * Close the component selection wizard
+     */
+    closeComponentWizard(): void {
+        if (this.componentWizard) {
+            this.componentWizard.close();
+            this.componentWizard = null;
+        }
+    }
+
+    /**
+     * Handle wizard completion - save component selections
+     */
+    private async onWizardComplete(course: Course, selections: any): Promise<void> {
+        try {
+            const result = await this.courseSelectionService.setSelectedComponents(
+                course,
+                selections.lecture,
+                selections.discussion,
+                selections.lab
+            );
+
+            if (result.success) {
+                // Refresh the display to show updated selections
+                this.displayScheduleSelectedCourses();
+            } else {
+                console.error('Failed to save component selections:', result.error);
+                alert('Failed to save selections. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error saving component selections:', error);
+            alert('An error occurred while saving selections.');
+        }
+
+        this.closeComponentWizard();
     }
 
     displayScheduleSelectedCourses(): void {
@@ -284,6 +355,9 @@ export class ScheduleController {
                         <div class="schedule-course-credits">${credits}</div>
                     </div>
                     <div class="header-controls">
+                        <button class="course-edit-btn" data-course-id="${course.id}" title="Edit section selections">
+                            ✏️
+                        </button>
                         <span class="dropdown-arrow">▼</span>
                         <button class="course-remove-btn" title="Remove from selection">
                             ×
@@ -391,6 +465,13 @@ export class ScheduleController {
             this.elementToCourseMap.set(button as HTMLElement, course);
         });
 
+        // Associate edit buttons with their Course objects
+        const editButtons = selectedCoursesContainer.querySelectorAll('.course-edit-btn');
+        editButtons.forEach((button, index) => {
+            const course = sortedCourses[index]?.course;
+            this.elementToCourseMap.set(button as HTMLElement, course);
+        });
+
         // IMPORTANT: Associate section buttons with their Course objects
         const sectionButtons = selectedCoursesContainer.querySelectorAll('.section-select-btn');
         sectionButtons.forEach(button => {
@@ -435,6 +516,13 @@ export class ScheduleController {
         });
         
         removeButtons.forEach((button, index) => {
+            const course = uniqueCourses[index]?.course;
+            this.elementToCourseMap.set(button as HTMLElement, course);
+        });
+
+        // Associate edit buttons with their Course objects
+        const editButtons = selectedCoursesContainer.querySelectorAll('.course-edit-btn');
+        editButtons.forEach((button, index) => {
             const course = uniqueCourses[index]?.course;
             this.elementToCourseMap.set(button as HTMLElement, course);
         });
