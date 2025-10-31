@@ -457,8 +457,8 @@ export class TransactionalStorageManager {
                 selectedCourses
             };
 
-            // Generate checksum for integrity verification
-            const dataString = JSON.stringify({
+            // Generate checksum for integrity verification (use custom replacer for Sets)
+            const dataString = this.safeStringify({
                 state: exportData.state,
                 schedules: exportData.schedules,
                 preferences: exportData.preferences,
@@ -467,7 +467,7 @@ export class TransactionalStorageManager {
             exportData.checksum = this.generateChecksum(dataString);
 
             return {
-                data: JSON.stringify(exportData, null, 2),
+                data: JSON.stringify(exportData, this.replacer, 2),
                 valid: true
             };
         } catch (error) {
@@ -481,9 +481,9 @@ export class TransactionalStorageManager {
 
     importData(jsonData: string): TransactionResult {
         return this.executeSyncTransaction(() => {
-            const data = JSON.parse(jsonData);
-            
-            // Verify checksum if available
+            const data = JSON.parse(jsonData, this.reviver);
+
+            // Verify checksum if available (use custom replacer for Sets)
             if (data.checksum) {
                 const verifyData = {
                     state: data.state,
@@ -491,7 +491,7 @@ export class TransactionalStorageManager {
                     preferences: data.preferences,
                     selectedCourses: data.selectedCourses
                 };
-                const calculatedChecksum = this.generateChecksum(JSON.stringify(verifyData));
+                const calculatedChecksum = this.generateChecksum(this.safeStringify(verifyData));
                 if (calculatedChecksum !== data.checksum) {
                     throw new Error('Data integrity check failed - checksum mismatch');
                 }

@@ -37,11 +37,12 @@ describe('TransactionalStorageManager', () => {
     })
 
     it('should rollback on transaction failure', async () => {
-      // Set initial value
-      localStorage.setItem('test-key', 'initial-value')
+      // Set initial value using a predefined storage key
+      const testKey = 'wpi-planner-theme'
+      localStorage.setItem(testKey, 'initial-value')
 
       const operations = [
-        () => localStorage.setItem('test-key', 'new-value'),
+        () => localStorage.setItem(testKey, 'new-value'),
         () => { throw new Error('Simulated failure') }
       ]
 
@@ -50,7 +51,7 @@ describe('TransactionalStorageManager', () => {
       expect(result.success).toBe(false)
       expect(result.error).toBeTruthy()
       expect(result.rolledBack).toBe(true)
-      expect(localStorage.getItem('test-key')).toBe('initial-value')
+      expect(localStorage.getItem(testKey)).toBe('initial-value')
     })
 
     it('should handle localStorage quota exceeded error', async () => {
