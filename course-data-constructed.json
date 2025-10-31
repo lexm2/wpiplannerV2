@@ -1,5 +1,5 @@
 {
-  "generated": "Oct 31, 2025, 8:38 PM",
+  "generated": "Oct 31, 2025, 8:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -118800,7 +118800,7 @@
                 "crn": 337863,
                 "number": "S02",
                 "seats": 30,
-                "seats_available": 16,
+                "seats_available": 17,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -118819,7 +118819,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seats_available": 16,
+                    "seats_available": 17,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S02",
