@@ -48,8 +48,8 @@
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
     <link rel="shortcut icon" href="./favicon.ico">
-  <script type="module" crossorigin src="/wpiplannerV2/assets/index-D4pI1M6u.js"></script>
-  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-Cn9_Q_YX.css">
+  <script type="module" crossorigin src="/wpiplannerV2/assets/index-D8x6d1SH.js"></script>
+  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-kLu-xjjv.css">
 </head>
 <body>
     <div id="app">
@@ -65,13 +65,15 @@
                     </div>
                 </div>
                 <nav class="header-navigation" role="navigation" aria-label="Main navigation">
-                    <button id="schedule-btn" class="btn btn-primary btn-schedule">Schedule</button>
+                    <div class="nav-tabs-pill">
+                        <button id="planner-tab" class="nav-tab active" aria-label="Classes view">Classes</button>
+                        <button id="schedule-tab" class="nav-tab" aria-label="Schedule view">Schedule</button>
+                    </div>
                 </nav>
                 <div class="header-controls">
                     <div class="status-indicator-container">
-                        <div id="optimistic-ui-status" class="optimistic-status idle"></div>
+                        <div id="optimistic-ui-status" class="optimistic-status idle">No changes</div>
                     </div>
-                    <button id="save-profile-btn" class="btn btn-primary" title="Save current profile">Save</button>
                     <div class="theme-selector">
                         <div class="theme-dropdown" id="theme-dropdown">
                             <span id="current-theme-name">WPI Classic</span>
