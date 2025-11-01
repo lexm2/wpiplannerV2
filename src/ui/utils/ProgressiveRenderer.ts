@@ -195,7 +195,7 @@ export class ProgressiveRenderer {
                                     ${hasWarning ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="warning-icon" title="All sections full"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" /></svg>' : ''}
                                 </div>
                                 <div class="course-sections">
-                                    ${course.sections.map(section => {
+                                    ${(course.sections ?? []).map(section => {
                                         const isFull = section.seatsAvailable <= 0;
                                         const professors = new Set<string>();
                                         section.periods.forEach(period => {
@@ -326,7 +326,7 @@ export class ProgressiveRenderer {
                         <div class="course-info">
                             <div class="course-info-top">
                                 <span class="course-credits">${credits} credits</span>
-                                <span class="course-sections-count">${course.sections.length} section${course.sections.length !== 1 ? 's' : ''}</span>
+                                <span class="course-sections-count">${course.sections?.length ?? 0} section${(course.sections?.length ?? 0) !== 1 ? 's' : ''}</span>
                             </div>
                             <div class="course-professors-compact">${getProfessorsByTerm(course)}</div>
                         </div>
@@ -445,7 +445,7 @@ export class ProgressiveRenderer {
     }
 
     private courseHasWarning(course: Course): boolean {
-        return course.sections.every(section => section.seatsAvailable <= 0);
+        return course.sections?.every(section => section.seatsAvailable <= 0) ?? false;
     }
 
     private completeRender(totalRendered: number): void {

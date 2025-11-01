@@ -103,7 +103,7 @@ export class Validators {
                 ...course,
                 name: this.sanitizeString(course.name),
                 description: this.sanitizeString(course.description),
-                sections: course.sections.map((section: Section) => ({
+                sections: course.sections?.map((section: Section) => ({
                     ...section,
                     description: this.sanitizeString(section.description),
                     periods: section.periods.map((period: Period) => ({

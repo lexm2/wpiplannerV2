@@ -235,7 +235,7 @@ END:VTIMEZONE`;
                 continue;
             }
 
-            const section = selectedCourse.course.sections.find(
+            const section = selectedCourse.course.sections?.find(
                 s => s.number === selectedCourse.selectedSectionNumber
             );
 

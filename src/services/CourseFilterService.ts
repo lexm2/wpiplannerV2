@@ -403,7 +403,7 @@ export class CourseFilterService {
     private getTermOptions(courses: Course[]): string[] {
         const terms = new Set<string>();
         courses.forEach(course => {
-            course.sections.forEach(section => {
+            course.sections?.forEach(section => {
                 if (section.computedTerm) {
                     terms.add(section.computedTerm);
                 }

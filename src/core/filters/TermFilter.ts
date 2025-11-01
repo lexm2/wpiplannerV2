@@ -17,9 +17,9 @@ export class TermFilter implements CourseFilter {
         );
         
         return courses.filter(course =>
-            course.sections.some(section => {
+            course.sections?.some(section => {
                 return termSet.has(section.computedTerm);
-            })
+            }) ?? false
         );
     }
     

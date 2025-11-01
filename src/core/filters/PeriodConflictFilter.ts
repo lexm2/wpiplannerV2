@@ -31,7 +31,7 @@ export class PeriodConflictFilter implements SectionFilter {
         const selectedSections: Section[] = [];
         for (const selectedCourse of criteria.selectedCourses) {
             if (selectedCourse.selectedSectionNumber) {
-                const section = selectedCourse.course.sections.find(s => s.number === selectedCourse.selectedSectionNumber);
+                const section = selectedCourse.course.sections?.find(s => s.number === selectedCourse.selectedSectionNumber);
                 if (section) {
                     selectedSections.push(section);
                 }
@@ -81,7 +81,7 @@ export class PeriodConflictFilter implements SectionFilter {
         const selectedSectionsByCourse = new Map<string, Section>();
         for (const selectedCourse of criteria.selectedCourses) {
             if (selectedCourse.selectedSectionNumber) {
-                const section = selectedCourse.course.sections.find(s => s.number === selectedCourse.selectedSectionNumber);
+                const section = selectedCourse.course.sections?.find(s => s.number === selectedCourse.selectedSectionNumber);
                 if (section) {
                     selectedSectionsByCourse.set(selectedCourse.course.id, section);
                 }
@@ -147,7 +147,7 @@ export class PeriodConflictFilter implements SectionFilter {
         const selectedSections: Section[] = [];
         for (const selectedCourse of criteria.selectedCourses) {
             if (selectedCourse.selectedSectionNumber) {
-                const section = selectedCourse.course.sections.find(s => s.number === selectedCourse.selectedSectionNumber);
+                const section = selectedCourse.course.sections?.find(s => s.number === selectedCourse.selectedSectionNumber);
                 if (section) {
                     selectedSections.push(section);
                 }
@@ -205,7 +205,7 @@ export class PeriodConflictFilter implements SectionFilter {
         const selectedSectionsByCourse = new Map<string, Section>();
         for (const selectedCourse of criteria.selectedCourses) {
             if (selectedCourse.selectedSectionNumber) {
-                const section = selectedCourse.course.sections.find(s => s.number === selectedCourse.selectedSectionNumber);
+                const section = selectedCourse.course.sections?.find(s => s.number === selectedCourse.selectedSectionNumber);
                 if (section) {
                     selectedSectionsByCourse.set(selectedCourse.course.id, section);
                 }

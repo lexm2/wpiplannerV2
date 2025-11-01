@@ -277,7 +277,7 @@ export class CourseDataService {
                 seenIds.add(courseId);
                 
                 // Parse NEW hierarchical structure (lectures + standaloneLabs)
-                const lectures = this.parseLectureGroups(courseData.lectures || [], department);
+                const lectures = this.parseLectureGroups(courseData.lectures || []);
                 const standaloneLabs = courseData.standaloneLabs
                     ? this.parseConstructedSections(courseData.standaloneLabs)
                     : undefined;
@@ -350,7 +350,7 @@ export class CourseDataService {
      * Parses lecture groups from the NEW hierarchical structure
      * Each lecture group contains a lecture section with compatible discussions and labs
      */
-    private parseLectureGroups(lectureGroups: any[], department: Department): import('../types/types').LectureGroup[] {
+    private parseLectureGroups(lectureGroups: any[]): import('../types/types').LectureGroup[] {
         return lectureGroups.map(groupData => {
             const lectureSection = this.parseConstructedSections([groupData.section])[0];
             const compatibleDiscussions = this.parseConstructedSections(groupData.compatibleDiscussions || []);

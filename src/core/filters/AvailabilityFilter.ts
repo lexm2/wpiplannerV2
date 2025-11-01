@@ -18,13 +18,13 @@ export class AvailabilityFilter implements CourseFilter {
             : null;
 
         return courses.filter(course =>
-            course.sections.some(section => {
+            course.sections?.some(section => {
                 // If term filter is active, only check availability in those specific terms
                 if (activeTerms && !activeTerms.has(section.computedTerm)) {
                     return false;
                 }
                 return section.seatsAvailable > 0;
-            })
+            }) ?? false
         );
     }
     

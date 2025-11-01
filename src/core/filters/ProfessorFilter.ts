@@ -17,11 +17,11 @@ export class ProfessorFilter implements CourseFilter {
         );
         
         return courses.filter(course =>
-            course.sections.some(section =>
+            course.sections?.some(section =>
                 section.periods.some(period =>
                     professorSet.has(period.professor.toLowerCase())
                 )
-            )
+            ) ?? false
         );
     }
     

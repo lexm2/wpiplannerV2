@@ -7,7 +7,6 @@ export class FilterModalController {
     private modalService: ModalService;
     private filterService: CourseFilterService | null = null;
     private allCourses: Course[] = [];
-    private _allDepartments: Department[] = [];
     private currentModalId: string | null = null;
     private isCategoryMode: boolean = false;
     private isUpdatingFilter: boolean = false;
@@ -21,7 +20,6 @@ export class FilterModalController {
     }
 
     setCourseData(departments: Department[]): void {
-        this._allDepartments = departments;
         this.allCourses = [];
         departments.forEach(dept => {
             this.allCourses.push(...dept.courses);

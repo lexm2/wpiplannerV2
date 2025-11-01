@@ -655,7 +655,7 @@ export class ScheduleFilterModalController {
         const sectionCodes = new Set<string>();
         
         for (const selectedCourse of this.selectedCourses) {
-            for (const section of selectedCourse.course.sections) {
+            for (const section of selectedCourse.course.sections ?? []) {
                 if (section.number && section.number.trim() !== '') {
                     sectionCodes.add(section.number.trim());
                 }

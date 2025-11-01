@@ -272,18 +272,18 @@ export class ProfileStateManager {
                 
                 if (sectionNumber) {
                     // Find the section in the course
-                    sectionObject = course.sections.find(s => s.number === sectionNumber) || null;
-                    
+                    sectionObject = course.sections?.find(s => s.number === sectionNumber) || null;
+
                     // Validate section object has required properties
                     if (sectionObject && !sectionObject.computedTerm) {
                         console.warn(`Section ${sectionNumber} for course ${course.department.abbreviation}${course.number} is missing computedTerm property`);
                         // Don't set the section if it's missing required data
                         sectionObject = null;
                     }
-                    
+
                     if (!sectionObject && sectionNumber) {
-                        console.warn(`Section ${sectionNumber} not found in course ${course.department.abbreviation}${course.number} sections:`, 
-                            course.sections.map(s => s.number));
+                        console.warn(`Section ${sectionNumber} not found in course ${course.department.abbreviation}${course.number} sections:`,
+                            course.sections?.map(s => s.number));
                     }
                 }
 

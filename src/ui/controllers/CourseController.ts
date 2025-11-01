@@ -1,4 +1,4 @@
-import { Course, Department, Section, LectureGroup } from '../../types/types'
+import { Course, Department, Section } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { CourseFilterService } from '../../services/CourseFilterService'
 import { CourseDataService } from '../../services/courseDataService'

@@ -21,8 +21,6 @@ export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
     private courseDataService: CourseDataService | null = null;
     private scheduleFilterService: ScheduleFilterService | null = null;
-    private _scheduleManagementService: ScheduleManagementService | null = null;
-    private _scheduleFilterModalController: ScheduleFilterModalController | null = null;
     private sectionInfoModalController: SectionInfoModalController | null = null;
     private conflictDetector: ConflictDetector | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
@@ -68,12 +66,12 @@ export class ScheduleController {
         });
     }
 
-    setScheduleFilterModalController(scheduleFilterModalController: ScheduleFilterModalController): void {
-        this._scheduleFilterModalController = scheduleFilterModalController;
+    setScheduleFilterModalController(_scheduleFilterModalController: ScheduleFilterModalController): void {
+        // Intentionally empty - kept for backward compatibility
     }
 
-    setScheduleManagementService(scheduleManagementService: ScheduleManagementService): void {
-        this._scheduleManagementService = scheduleManagementService;
+    setScheduleManagementService(_scheduleManagementService: ScheduleManagementService): void {
+        // Intentionally empty - kept for backward compatibility
     }
 
     /**

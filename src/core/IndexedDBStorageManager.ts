@@ -23,7 +23,7 @@
  * - Fallback to localStorage for compatibility
  */
 
-import { Schedule, SchedulePreferences, SelectedCourse } from '../types/schedule';
+import { Schedule } from '../types/schedule';
 
 interface StorageResult<T> {
     success: boolean;

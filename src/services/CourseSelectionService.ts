@@ -773,10 +773,10 @@ export class CourseSelectionService {
             
             selectedCourses.forEach(selectedCourse => {
                 if (selectedCourse.selectedSectionNumber && !selectedCourse.selectedSection) {
-                    const sectionObject = selectedCourse.course.sections.find(s => 
+                    const sectionObject = selectedCourse.course.sections?.find(s =>
                         s.number === selectedCourse.selectedSectionNumber
                     ) || null;
-                    
+
                     if (sectionObject) {
                         selectedCourse.selectedSection = sectionObject;
                         reconstructedCount++;
@@ -1037,7 +1037,7 @@ export class CourseSelectionService {
 
             // Check if section exists in course
             if (sectionNumber !== null) {
-                const sectionExists = course.sections.some(s => s.number === sectionNumber);
+                const sectionExists = course.sections?.some(s => s.number === sectionNumber) ?? false;
                 if (!sectionExists) {
                     return {
                         success: false,

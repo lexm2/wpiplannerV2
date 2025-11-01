@@ -14,7 +14,7 @@ export function getProfessorsByTerm(course: Course): string {
     const termProfessors = new Map<string, Set<string>>();
 
     // Aggregate professors by term across all sections
-    course.sections.forEach(section => {
+    course.sections?.forEach(section => {
         const term = section.computedTerm;
 
         // Initialize set for this term if not exists

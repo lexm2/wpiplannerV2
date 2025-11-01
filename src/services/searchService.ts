@@ -247,7 +247,7 @@ export class SearchService {
 
             // Availability filter
             if (filters.availabilityOnly) {
-                const hasAvailableSeats = course.sections.some(section => section.seatsAvailable > 0);
+                const hasAvailableSeats = course.sections?.some(section => section.seatsAvailable > 0) ?? false;
                 if (!hasAvailableSeats) {
                     return false;
                 }
@@ -255,7 +255,7 @@ export class SearchService {
 
             // Time slot filter
             if (filters.timeSlots.length > 0) {
-                const matchesTimeSlot = course.sections.some(section =>
+                const matchesTimeSlot = course.sections?.some(section =>
                     section.periods.some(period =>
                         filters.timeSlots.some(timeSlot =>
                             this.periodsOverlap(period, timeSlot)
@@ -269,7 +269,7 @@ export class SearchService {
 
             // Professor filter
             if (filters.professors.length > 0) {
-                const hasProfessor = course.sections.some(section =>
+                const hasProfessor = course.sections?.some(section =>
                     section.periods.some(period =>
                         filters.professors.some(prof =>
                             period.professor.toLowerCase().includes(prof.toLowerCase())
@@ -334,9 +334,9 @@ export class SearchService {
         if (course.description.toLowerCase().includes(query)) score += 10;
 
         // Boost popular/available courses
-        const totalSeats = course.sections.reduce((sum, section) => sum + section.seats, 0);
-        const availableSeats = course.sections.reduce((sum, section) => sum + section.seatsAvailable, 0);
-        
+        const totalSeats = course.sections?.reduce((sum, section) => sum + section.seats, 0) ?? 0;
+        const availableSeats = course.sections?.reduce((sum, section) => sum + section.seatsAvailable, 0) ?? 0;
+
         if (availableSeats > 0) score += 5;
         if (totalSeats > 100) score += 2; // Large courses might be more popular
 
@@ -360,9 +360,9 @@ export class SearchService {
         }
         
         const professors = new Set<string>();
-        
+
         this.courses.forEach(course => {
-            course.sections.forEach(section => {
+            course.sections?.forEach(section => {
                 section.periods.forEach(period => {
                     if (period.professor && period.professor !== 'TBA') {
                         professors.add(period.professor);
@@ -460,7 +460,7 @@ export class SearchService {
 
     private buildTimeSlotMappings(): void {
         this.courses.forEach(course => {
-            course.sections.forEach(section => {
+            course.sections?.forEach(section => {
                 section.periods.forEach(period => {
                     const timeKey = this.getTimeSlotKey(period);
                     if (!this.timeSlotMappings.has(timeKey)) {

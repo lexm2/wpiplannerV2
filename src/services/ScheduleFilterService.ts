@@ -395,7 +395,7 @@ export class ScheduleFilterService {
         
         for (const selectedCourse of selectedCourses) {
             // Get all sections for this course
-            for (const section of selectedCourse.course.sections) {
+            for (const section of selectedCourse.course.sections ?? []) {
                 sectionsWithContext.push({
                     course: selectedCourse,
                     section: section
@@ -428,7 +428,7 @@ export class ScheduleFilterService {
         
         for (const item of periodsWithContext) {
             // Find the section that contains this period
-            const section = item.course.course.sections.find(s => s.periods.includes(item.period));
+            const section = item.course.course.sections?.find(s => s.periods.includes(item.period));
             if (section) {
                 const sectionKey = `${item.course.course.id}-${section.number}`;
                 if (!sectionMap.has(sectionKey)) {
@@ -449,7 +449,7 @@ export class ScheduleFilterService {
         
         for (const selectedCourse of selectedCourses) {
             // Get all sections for this course (not just selected one for search purposes)
-            for (const section of selectedCourse.course.sections) {
+            for (const section of selectedCourse.course.sections ?? []) {
                 for (const period of section.periods) {
                     periodsWithContext.push({
                         course: selectedCourse,
@@ -613,9 +613,9 @@ export class ScheduleFilterService {
     
     private getAvailableProfessors(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
         const professors = new Set<string>();
-        
+
         selectedCourses.forEach(sc => {
-            sc.course.sections.forEach(section => {
+            sc.course.sections?.forEach(section => {
                 section.periods.forEach(period => {
                     if (period.professor && period.professor.trim()) {
                         professors.add(period.professor.trim());
@@ -633,9 +633,9 @@ export class ScheduleFilterService {
     
     private getAvailablePeriodTypes(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
         const types = new Set<string>();
-        
+
         selectedCourses.forEach(sc => {
-            sc.course.sections.forEach(section => {
+            sc.course.sections?.forEach(section => {
                 section.periods.forEach(period => {
                     if (period.type && period.type.trim()) {
                         types.add(period.type.trim());
@@ -668,9 +668,9 @@ export class ScheduleFilterService {
     
     private getAvailableSectionCodes(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
         const sectionCodes = new Set<string>();
-        
+
         selectedCourses.forEach(sc => {
-            sc.course.sections.forEach(section => {
+            sc.course.sections?.forEach(section => {
                 if (section.number && section.number.trim()) {
                     sectionCodes.add(section.number.trim());
                 }
@@ -689,10 +689,10 @@ export class ScheduleFilterService {
         const terms = new Set<string>();
         
         selectedCourses.forEach(sc => {
-            console.log(`[DEBUG] Processing course ${sc.course.id} with ${sc.course.sections.length} sections`);
-            sc.course.sections.forEach(section => {
+            console.log(`[DEBUG] Processing course ${sc.course.id} with ${sc.course.sections?.length ?? 0} sections`);
+            sc.course.sections?.forEach(section => {
                 console.log(`[DEBUG] Section ${section.number}: computedTerm = "${section.computedTerm}"`);
-                
+
                 // Filter out invalid computed terms
                 if (section.computedTerm && 
                     section.computedTerm.trim() && 
