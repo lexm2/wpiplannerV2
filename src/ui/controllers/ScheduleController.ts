@@ -345,6 +345,8 @@ export class ScheduleController {
 
         // Build selected components display
         let selectedComponentsHTML = '';
+        let warningIconHTML = '';
+
         if (selectedCourse) {
             const components: string[] = [];
             if (selectedCourse.selectedLecture) {
@@ -356,6 +358,14 @@ export class ScheduleController {
             if (selectedCourse.selectedLab) {
                 components.push(`<span class="selected-component lab">Lab ${selectedCourse.selectedLab.number}</span>`);
             }
+
+            // Check for incomplete selections
+            const incompleteInfo = this.getIncompleteSelectionInfo(selectedCourse);
+            if (incompleteInfo.isIncomplete) {
+                warningIconHTML = `<span class="incomplete-warning" title="${incompleteInfo.message}"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="warning-icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" /></svg></span>`;
+                components.push(warningIconHTML);
+            }
+
             if (components.length > 0) {
                 selectedComponentsHTML = `<div class="schedule-course-components">${components.join('')}</div>`;
             }
@@ -377,6 +387,85 @@ export class ScheduleController {
                     </div>
                 </div>
         `;
+    }
+
+    /**
+     * Check if a section has at least one period with a valid time slot
+     * Placeholder sections have start_time === end_time (e.g., "12:00" to "12:00")
+     * This matches the wizard's hasValidTimeSlot logic
+     */
+    private hasValidTimeSlot(section: any): boolean {
+        return section.periods.some((period: any) => {
+            // Compare actual time values, not object references
+            // A valid time slot has different start and end times
+            return period.startTime.hours !== period.endTime.hours ||
+                   period.startTime.minutes !== period.endTime.minutes;
+        });
+    }
+
+    /**
+     * Check if a selected course has incomplete component selections
+     * Returns information about what's missing
+     * This logic matches the wizard's determineAvailableSteps() to ensure consistency
+     */
+    private getIncompleteSelectionInfo(selectedCourse: any): { isIncomplete: boolean; message: string } {
+        const course = selectedCourse.course;
+
+        // Skip check for lab-only courses
+        if (this.courseDataService && this.courseDataService.isLabOnlyCourse(course)) {
+            // For lab-only courses, check if a lab section is selected
+            if (!selectedCourse.selectedLab) {
+                const labs = this.courseDataService.getStandaloneLabs(course);
+                const hasValidLabs = labs.some(lab => this.hasValidTimeSlot(lab));
+                if (hasValidLabs) {
+                    return { isIncomplete: true, message: 'Incomplete: Missing lab selection' };
+                }
+            }
+            return { isIncomplete: false, message: '' };
+        }
+
+        // For hierarchical courses, check if lecture groups exist
+        if (!course.lectures || course.lectures.length === 0) {
+            return { isIncomplete: false, message: '' };
+        }
+
+        const missingComponents: string[] = [];
+
+        // Check if lectures with valid time slots exist
+        const validLectures = course.lectures.filter((lg: any) => this.hasValidTimeSlot(lg.section));
+        if (validLectures.length === 0) {
+            // No valid lectures available, nothing to warn about
+            return { isIncomplete: false, message: '' };
+        }
+
+        // Check lecture selection (only warn if valid lectures exist)
+        if (!selectedCourse.selectedLecture) {
+            missingComponents.push('lecture');
+        }
+
+        // Check if ANY lecture has discussions/labs with valid time slots
+        // This matches the wizard's logic for determining available steps
+        const hasValidDiscussions = course.lectures.some((lg: any) =>
+            lg.compatibleDiscussions && lg.compatibleDiscussions.some((d: any) => this.hasValidTimeSlot(d))
+        );
+        const hasValidLabs = course.lectures.some((lg: any) =>
+            lg.compatibleLabs && lg.compatibleLabs.some((l: any) => this.hasValidTimeSlot(l))
+        );
+
+        // Only warn about missing components if they would appear in the wizard
+        if (hasValidDiscussions && !selectedCourse.selectedDiscussion) {
+            missingComponents.push('discussion');
+        }
+        if (hasValidLabs && !selectedCourse.selectedLab) {
+            missingComponents.push('lab');
+        }
+
+        if (missingComponents.length === 0) {
+            return { isIncomplete: false, message: '' };
+        }
+
+        const message = `Incomplete: Missing ${missingComponents.join(', ')} selection`;
+        return { isIncomplete: true, message };
     }
     
     private buildAllCoursesHTML(sortedCourses: any[]): string {

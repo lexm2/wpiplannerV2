@@ -169,6 +169,19 @@
   background: #10b981;
 }
 
+.incomplete-warning {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.25rem;
+}
+
+.incomplete-warning .warning-icon {
+  color: #f59e0b;
+  vertical-align: middle;
+  cursor: help;
+}
+
 .header-controls {
   display: flex;
   align-items: center;

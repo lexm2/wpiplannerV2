@@ -182,20 +182,32 @@ export class ComponentSelectionWizard {
                 console.log(`[Wizard] After filtering placeholders: ${validLectures.length} lectures with valid time slots`);
 
                 sections = validLectures.map(lg => lg.section);
+
+                // Apply reverse filtering if discussion or lab is selected
+                if (this.selections.discussion || this.selections.lab) {
+                    console.log(`[Wizard] Applying reverse filter based on selected child components`);
+                    sections = this.filterLecturesByChildSelections(sections);
+                    console.log(`[Wizard] After reverse filtering: ${sections.length} compatible lectures`);
+                }
+
                 console.log(`[Wizard] Before filters: ${sections.length} lecture sections`);
             }
         } else if (step === 'discussion') {
             if (!this.selections.lecture) {
-                console.log(`[Wizard] No lecture selected, returning empty discussions`);
-                return [];
-            }
-            console.log(`[Wizard] Getting discussions for lecture ${this.selections.lecture.number} (CRN: ${this.selections.lecture.crn})`);
-            const discussions = this.courseDataService.getDiscussionsForLecture(this.course, this.selections.lecture);
+                // No lecture selected - show ALL discussions from all lecture groups
+                console.log(`[Wizard] No lecture selected, showing all discussions from all lecture groups`);
+                sections = this.getAllDiscussionsForCourse();
+                console.log(`[Wizard] Found ${sections.length} total discussions across all lecture groups`);
+            } else {
+                // Lecture selected - show only compatible discussions
+                console.log(`[Wizard] Getting discussions for lecture ${this.selections.lecture.number} (CRN: ${this.selections.lecture.crn})`);
+                const discussions = this.courseDataService.getDiscussionsForLecture(this.course, this.selections.lecture);
 
-            // Filter out placeholder discussions
-            const validDiscussions = discussions.filter(d => this.hasValidTimeSlot(d));
-            console.log(`[Wizard] Before filters: ${discussions.length} discussions, ${validDiscussions.length} with valid time slots`);
-            sections = validDiscussions;
+                // Filter out placeholder discussions
+                const validDiscussions = discussions.filter(d => this.hasValidTimeSlot(d));
+                console.log(`[Wizard] Before filters: ${discussions.length} discussions, ${validDiscussions.length} with valid time slots`);
+                sections = validDiscussions;
+            }
         } else if (step === 'lab') {
             // Lab-only course
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
@@ -204,18 +216,22 @@ export class ComponentSelectionWizard {
                 console.log(`[Wizard] Lab-only course: ${labs.length} total, ${validLabs.length} with valid time slots`);
                 sections = validLabs;
             } else {
-                // Regular course with selected lecture
+                // Regular course
                 if (!this.selections.lecture) {
-                    console.log(`[Wizard] No lecture selected, returning empty labs`);
-                    return [];
-                }
-                console.log(`[Wizard] Getting labs for lecture ${this.selections.lecture.number} (CRN: ${this.selections.lecture.crn})`);
-                const labs = this.courseDataService.getLabsForLecture(this.course, this.selections.lecture);
+                    // No lecture selected - show ALL labs from all lecture groups
+                    console.log(`[Wizard] No lecture selected, showing all labs from all lecture groups`);
+                    sections = this.getAllLabsForCourse();
+                    console.log(`[Wizard] Found ${sections.length} total labs across all lecture groups`);
+                } else {
+                    // Lecture selected - show only compatible labs
+                    console.log(`[Wizard] Getting labs for lecture ${this.selections.lecture.number} (CRN: ${this.selections.lecture.crn})`);
+                    const labs = this.courseDataService.getLabsForLecture(this.course, this.selections.lecture);
 
-                // Filter out placeholder labs
-                const validLabs = labs.filter(l => this.hasValidTimeSlot(l));
-                console.log(`[Wizard] Before filters: ${labs.length} labs, ${validLabs.length} with valid time slots`);
-                sections = validLabs;
+                    // Filter out placeholder labs
+                    const validLabs = labs.filter(l => this.hasValidTimeSlot(l));
+                    console.log(`[Wizard] Before filters: ${labs.length} labs, ${validLabs.length} with valid time slots`);
+                    sections = validLabs;
+                }
             }
         }
 
@@ -274,6 +290,69 @@ export class ComponentSelectionWizard {
 
         console.log(`[Wizard Filter] Result: ${filteredSections.length}/${sections.length} sections passed filters`);
         return filteredSections;
+    }
+
+    /**
+     * Get all discussions across all lecture groups
+     */
+    private getAllDiscussionsForCourse(): Section[] {
+        const lectureGroups = this.courseDataService.getLecturesForCourse(this.course);
+        const allDiscussions = new Map<number, Section>(); // Use Map to deduplicate by CRN
+
+        for (const lectureGroup of lectureGroups) {
+            for (const discussion of lectureGroup.compatibleDiscussions) {
+                if (this.hasValidTimeSlot(discussion)) {
+                    allDiscussions.set(discussion.crn, discussion);
+                }
+            }
+        }
+
+        return Array.from(allDiscussions.values());
+    }
+
+    /**
+     * Get all labs across all lecture groups
+     */
+    private getAllLabsForCourse(): Section[] {
+        const lectureGroups = this.courseDataService.getLecturesForCourse(this.course);
+        const allLabs = new Map<number, Section>(); // Use Map to deduplicate by CRN
+
+        for (const lectureGroup of lectureGroups) {
+            for (const lab of lectureGroup.compatibleLabs) {
+                if (this.hasValidTimeSlot(lab)) {
+                    allLabs.set(lab.crn, lab);
+                }
+            }
+        }
+
+        return Array.from(allLabs.values());
+    }
+
+    /**
+     * Filter lectures to show only those compatible with selected discussion/lab
+     */
+    private filterLecturesByChildSelections(lectures: Section[]): Section[] {
+        const lectureGroups = this.courseDataService.getLecturesForCourse(this.course);
+
+        // If a discussion is selected, filter to lectures that have this discussion
+        if (this.selections.discussion) {
+            const compatibleLectureGroups = lectureGroups.filter(lg =>
+                lg.compatibleDiscussions.some(d => d.crn === this.selections.discussion!.crn)
+            );
+            const compatibleCRNs = new Set(compatibleLectureGroups.map(lg => lg.section.crn));
+            lectures = lectures.filter(lecture => compatibleCRNs.has(lecture.crn));
+        }
+
+        // If a lab is selected, filter to lectures that have this lab
+        if (this.selections.lab) {
+            const compatibleLectureGroups = lectureGroups.filter(lg =>
+                lg.compatibleLabs.some(l => l.crn === this.selections.lab!.crn)
+            );
+            const compatibleCRNs = new Set(compatibleLectureGroups.map(lg => lg.section.crn));
+            lectures = lectures.filter(lecture => compatibleCRNs.has(lecture.crn));
+        }
+
+        return lectures;
     }
 
     /**
@@ -412,17 +491,33 @@ export class ComponentSelectionWizard {
 
             // Update footer button visibility
             const hasSelection = this.selections[this.currentStep] !== null;
+            const currentIndex = this.availableSteps.indexOf(this.currentStep);
+            const isLastStep = currentIndex === this.availableSteps.length - 1;
             const nextBtn = this.wizardPanel.querySelector('#wizard-next-btn');
+            const skipBtn = this.wizardPanel.querySelector('#wizard-skip-btn');
 
             if (!hasSelection && nextBtn) {
-                // Hide Next button if no selection
+                // Remove Next button and add Skip button (if not last step)
                 nextBtn.remove();
+                if (!isLastStep && !skipBtn) {
+                    const footer = this.wizardPanel.querySelector('.wizard-footer');
+                    if (footer) {
+                        const skipBtnHTML = `
+                            <button class="wizard-btn wizard-btn-secondary" id="wizard-skip-btn">
+                                Skip
+                            </button>
+                        `;
+                        footer.insertAdjacentHTML('beforeend', skipBtnHTML);
+
+                        const newSkipBtn = footer.querySelector('#wizard-skip-btn');
+                        newSkipBtn?.addEventListener('click', () => this.nextStep());
+                    }
+                }
             } else if (hasSelection && !nextBtn) {
-                // Show Next button if selection made but button doesn't exist
+                // Remove Skip button and add Next button
+                skipBtn?.remove();
                 const footer = this.wizardPanel.querySelector('.wizard-footer');
                 if (footer) {
-                    const currentIndex = this.availableSteps.indexOf(this.currentStep);
-                    const isLastStep = currentIndex === this.availableSteps.length - 1;
                     const nextBtnHTML = `
                         <button class="wizard-btn wizard-btn-primary" id="wizard-next-btn">
                             ${isLastStep ? 'Finish' : 'Next'}
@@ -770,6 +865,10 @@ export class ComponentSelectionWizard {
                 <button class="wizard-btn wizard-btn-primary" id="wizard-next-btn">
                     ${isLastStep ? 'Finish' : 'Next'}
                 </button>
+            ` : !isLastStep ? `
+                <button class="wizard-btn wizard-btn-secondary" id="wizard-skip-btn">
+                    Skip
+                </button>
             ` : ''}
         `;
     }
@@ -802,6 +901,12 @@ export class ComponentSelectionWizard {
             } else {
                 this.nextStep();
             }
+        });
+
+        // Skip button (shown when no selection is made on non-last steps)
+        const skipBtn = this.wizardPanel.querySelector('#wizard-skip-btn');
+        skipBtn?.addEventListener('click', () => {
+            this.nextStep();
         });
 
         // Breadcrumb navigation
