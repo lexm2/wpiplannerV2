@@ -1,0 +1,2 @@
+# Auto-merge course data file - always accept the newer version
+public/course-data-constructed.json merge=union
