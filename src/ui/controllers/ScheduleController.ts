@@ -124,7 +124,8 @@ export class ScheduleController {
             (selections) => this.onWizardComplete(freshCourse, selections),
             () => this.closeComponentWizard(),
             existingSelections,
-            (selections) => this.onWizardSelectionChange(freshCourse, selections)
+            (selections) => this.onWizardSelectionChange(freshCourse, selections),
+            this.scheduleFilterService || undefined
         );
 
         this.componentWizard.open();
@@ -232,19 +233,31 @@ export class ScheduleController {
         if (selectedCourses.length === 0) {
             console.log('Early return: 0 selected courses - displaying empty state');
             countElement.textContent = '(0)';
+
+            // Preserve wizard if open
+            const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
             selectedCoursesContainer.innerHTML = '<div class="empty-state">No courses selected yet</div>';
+            if (wizardPanel) {
+                selectedCoursesContainer.appendChild(wizardPanel);
+            }
             return;
         }
 
         if (hasActiveFilters && filteredSections.length === 0) {
             console.log('Early return: 0 sections match active filters - displaying empty state');
             countElement.textContent = '(0 sections match filters)';
+
+            // Preserve wizard if open
+            const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
             selectedCoursesContainer.innerHTML = '<div class="empty-state">No sections match the current filters</div>';
+            if (wizardPanel) {
+                selectedCoursesContainer.appendChild(wizardPanel);
+            }
             return;
         }
 
         let html = '';
-        
+
         if (hasActiveFilters) {
             // Display filtered sections
             html = this.buildFilteredSectionsHTML(filteredSections, selectedCourses);
@@ -264,7 +277,15 @@ export class ScheduleController {
             countElement.textContent = `(${selectedCourses.length})`;
         }
 
+        // Check if wizard is open before wiping innerHTML
+        const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
+
         selectedCoursesContainer.innerHTML = html;
+
+        // Restore wizard panel if it was open
+        if (wizardPanel) {
+            selectedCoursesContainer.appendChild(wizardPanel);
+        }
 
         // Set up DOM element mapping for course association
         if (!hasActiveFilters) {

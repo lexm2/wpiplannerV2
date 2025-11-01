@@ -15,6 +15,7 @@
 import { Course, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
 import { CourseDataService } from '../../services/courseDataService';
+import { ScheduleFilterService } from '../../services/ScheduleFilterService';
 
 type WizardStep = 'lecture' | 'discussion' | 'lab';
 
@@ -27,6 +28,7 @@ interface WizardSelections {
 export class ComponentSelectionWizard {
     private course: Course;
     private courseDataService: CourseDataService;
+    private scheduleFilterService: ScheduleFilterService | null;
     private currentStep: WizardStep;
     private selections: WizardSelections;
     private onComplete: (selections: WizardSelections) => void;
@@ -35,6 +37,7 @@ export class ComponentSelectionWizard {
     private container: HTMLElement | null = null;
     private availableSteps: WizardStep[] = [];
     private wizardPanel: HTMLElement | null = null;
+    private filterChangeHandler: (() => void) | null = null;
 
     constructor(
         course: Course,
@@ -42,16 +45,19 @@ export class ComponentSelectionWizard {
         onComplete: (selections: WizardSelections) => void,
         onCancel: () => void,
         existingSelections?: SelectedCourse,
-        onSelectionChange?: (selections: WizardSelections) => void
+        onSelectionChange?: (selections: WizardSelections) => void,
+        scheduleFilterService?: ScheduleFilterService
     ) {
         this.course = course;
         this.courseDataService = courseDataService;
         this.onComplete = onComplete;
         this.onCancel = onCancel;
         this.onSelectionChange = onSelectionChange;
+        this.scheduleFilterService = scheduleFilterService || null;
 
         console.log('[Wizard] Constructor called');
         console.log('[Wizard] Has onSelectionChange callback:', !!this.onSelectionChange);
+        console.log('[Wizard] Has scheduleFilterService:', !!this.scheduleFilterService);
         console.log('[Wizard] Course:', course.department.abbreviation + course.number);
 
         // Initialize selections from existing if editing
@@ -64,6 +70,12 @@ export class ComponentSelectionWizard {
         // Determine available steps based on course structure
         this.availableSteps = this.determineAvailableSteps();
         this.currentStep = this.determineStartStep();
+
+        // Set up filter change listener if filter service is available
+        if (this.scheduleFilterService) {
+            this.filterChangeHandler = () => this.onFilterChange();
+            this.scheduleFilterService.addEventListener(this.filterChangeHandler);
+        }
     }
 
     /**
@@ -151,29 +163,28 @@ export class ComponentSelectionWizard {
         });
         console.log(`[Wizard] Course has ${this.course.lectures?.length || 0} lecture groups`);
 
+        let sections: Section[] = [];
+
         if (step === 'lecture') {
             // Lab-only course
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
                 const labs = this.courseDataService.getStandaloneLabs(this.course);
                 const validLabs = labs.filter(lab => this.hasValidTimeSlot(lab));
                 console.log(`[Wizard] Lab-only course: ${labs.length} total, ${validLabs.length} with valid time slots`);
-                return validLabs;
+                sections = validLabs;
+            } else {
+                // Regular hierarchical course
+                const lectureGroups = this.courseDataService.getLecturesForCourse(this.course);
+                console.log(`[Wizard] Found ${lectureGroups.length} lecture groups`);
+
+                // Filter out placeholder sections (those with start_time === end_time like 12:00-12:00)
+                const validLectures = lectureGroups.filter(lg => this.hasValidTimeSlot(lg.section));
+                console.log(`[Wizard] After filtering placeholders: ${validLectures.length} lectures with valid time slots`);
+
+                sections = validLectures.map(lg => lg.section);
+                console.log(`[Wizard] Before filters: ${sections.length} lecture sections`);
             }
-
-            // Regular hierarchical course
-            const lectureGroups = this.courseDataService.getLecturesForCourse(this.course);
-            console.log(`[Wizard] Found ${lectureGroups.length} lecture groups`);
-
-            // Filter out placeholder sections (those with start_time === end_time like 12:00-12:00)
-            const validLectures = lectureGroups.filter(lg => this.hasValidTimeSlot(lg.section));
-            console.log(`[Wizard] After filtering placeholders: ${validLectures.length} lectures with valid time slots`);
-
-            const sections = validLectures.map(lg => lg.section);
-            console.log(`[Wizard] Returning ${sections.length} lecture sections`);
-            return sections;
-        }
-
-        if (step === 'discussion') {
+        } else if (step === 'discussion') {
             if (!this.selections.lecture) {
                 console.log(`[Wizard] No lecture selected, returning empty discussions`);
                 return [];
@@ -183,34 +194,86 @@ export class ComponentSelectionWizard {
 
             // Filter out placeholder discussions
             const validDiscussions = discussions.filter(d => this.hasValidTimeSlot(d));
-            console.log(`[Wizard] Found ${discussions.length} discussions, ${validDiscussions.length} with valid time slots`);
-            return validDiscussions;
-        }
-
-        if (step === 'lab') {
+            console.log(`[Wizard] Before filters: ${discussions.length} discussions, ${validDiscussions.length} with valid time slots`);
+            sections = validDiscussions;
+        } else if (step === 'lab') {
             // Lab-only course
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
                 const labs = this.courseDataService.getStandaloneLabs(this.course);
                 const validLabs = labs.filter(lab => this.hasValidTimeSlot(lab));
                 console.log(`[Wizard] Lab-only course: ${labs.length} total, ${validLabs.length} with valid time slots`);
-                return validLabs;
-            }
+                sections = validLabs;
+            } else {
+                // Regular course with selected lecture
+                if (!this.selections.lecture) {
+                    console.log(`[Wizard] No lecture selected, returning empty labs`);
+                    return [];
+                }
+                console.log(`[Wizard] Getting labs for lecture ${this.selections.lecture.number} (CRN: ${this.selections.lecture.crn})`);
+                const labs = this.courseDataService.getLabsForLecture(this.course, this.selections.lecture);
 
-            // Regular course with selected lecture
-            if (!this.selections.lecture) {
-                console.log(`[Wizard] No lecture selected, returning empty labs`);
-                return [];
+                // Filter out placeholder labs
+                const validLabs = labs.filter(l => this.hasValidTimeSlot(l));
+                console.log(`[Wizard] Before filters: ${labs.length} labs, ${validLabs.length} with valid time slots`);
+                sections = validLabs;
             }
-            console.log(`[Wizard] Getting labs for lecture ${this.selections.lecture.number} (CRN: ${this.selections.lecture.crn})`);
-            const labs = this.courseDataService.getLabsForLecture(this.course, this.selections.lecture);
-
-            // Filter out placeholder labs
-            const validLabs = labs.filter(l => this.hasValidTimeSlot(l));
-            console.log(`[Wizard] Found ${labs.length} labs, ${validLabs.length} with valid time slots`);
-            return validLabs;
         }
 
-        return [];
+        // Apply schedule filters if available
+        if (this.scheduleFilterService && sections.length > 0) {
+            const filteredSections = this.applyScheduleFilters(sections, step);
+            console.log(`[Wizard] After filters: ${filteredSections.length} sections`);
+            return filteredSections;
+        }
+
+        return sections;
+    }
+
+    /**
+     * Apply schedule filters to sections
+     */
+    private applyScheduleFilters(sections: Section[], step: WizardStep): Section[] {
+        if (!this.scheduleFilterService) return sections;
+
+        console.log(`[Wizard Filter] Filtering ${sections.length} ${step} sections`);
+        console.log(`[Wizard Filter] Active filters:`, this.scheduleFilterService.getActiveFilters());
+
+        // Filter sections individually through the schedule filter service
+        const filteredSections = sections.filter(section => {
+            // Create a temporary course object with ONLY the section being tested
+            // This ensures filterSections only evaluates this single section
+            const tempCourse: Course = {
+                ...this.course,
+                sections: [section]
+            };
+
+            // Create a temporary SelectedCourse with this section in the appropriate slot
+            const tempSelectedCourse: SelectedCourse = {
+                course: tempCourse,
+                selectedLecture: step === 'lecture' ? section : (this.selections.lecture || null),
+                selectedDiscussion: step === 'discussion' ? section : (this.selections.discussion || null),
+                selectedLab: step === 'lab' ? section : (this.selections.lab || null),
+                isRequired: false
+            };
+
+            console.log(`[Wizard Filter] Testing section ${section.number} (CRN: ${section.crn}, Term: ${section.computedTerm})`);
+            console.log(`[Wizard Filter] Temp course structure:`, {
+                lecture: tempSelectedCourse.selectedLecture?.number,
+                discussion: tempSelectedCourse.selectedDiscussion?.number,
+                lab: tempSelectedCourse.selectedLab?.number
+            });
+
+            // Test if this section passes the filters
+            const filtered = this.scheduleFilterService.filterSections([tempSelectedCourse]);
+            const passes = filtered.length > 0;
+
+            console.log(`[Wizard Filter] Section ${section.number} ${passes ? 'PASSES' : 'FAILS'} filters`);
+
+            return passes;
+        });
+
+        console.log(`[Wizard Filter] Result: ${filteredSections.length}/${sections.length} sections passed filters`);
+        return filteredSections;
     }
 
     /**
@@ -251,30 +314,44 @@ export class ComponentSelectionWizard {
     close(): void {
         if (!this.wizardPanel) return;
 
-        // Get the active step and add slide-down animation
+        // Get the active step and add slide-out-left animation
         const activeStep = this.wizardPanel.querySelector('.wizard-step.active');
         if (activeStep) {
-            activeStep.classList.add('slide-out-down');
+            activeStep.classList.add('slide-out-left');
             activeStep.classList.remove('slide-in-right', 'slide-in-left');
         }
 
-        // Wait for slide-down animation, then fade out background
-        setTimeout(() => {
-            if (this.wizardPanel) {
-                this.wizardPanel.classList.remove('active');
+        // Immediately start fading out the background
+        this.wizardPanel.classList.remove('active');
 
-                // Wait for background fade, then remove from DOM
-                setTimeout(() => {
-                    if (this.wizardPanel && this.container && this.container.contains(this.wizardPanel)) {
-                        this.container.removeChild(this.wizardPanel);
-                        this.wizardPanel = null;
-                        this.container = null;
-                    }
-                }, 200); // Match background fade duration
+        // Wait for slide-out-left animation, then remove from DOM
+        setTimeout(() => {
+            if (this.wizardPanel && this.container && this.container.contains(this.wizardPanel)) {
+                this.container.removeChild(this.wizardPanel);
+                this.wizardPanel = null;
+                this.container = null;
             }
-        }, 300); // Match slide-down animation duration
+        }, 250); // Match animation duration
 
         document.removeEventListener('keydown', this.handleEscapeKey);
+
+        // Remove filter change listener
+        if (this.scheduleFilterService && this.filterChangeHandler) {
+            this.scheduleFilterService.removeEventListener(this.filterChangeHandler);
+            this.filterChangeHandler = null;
+        }
+    }
+
+    /**
+     * Handle filter changes - refresh current step
+     */
+    private onFilterChange(): void {
+        console.log('[Wizard] Filter changed, refreshing current step');
+        if (!this.wizardPanel) return;
+
+        // Re-render the current step with filtered sections
+        this.wizardPanel.innerHTML = this.renderWizardContent();
+        this.attachEventListeners();
     }
 
     /**
@@ -444,7 +521,7 @@ export class ComponentSelectionWizard {
             currentStepElement.classList.add(exitClass);
             currentStepElement.classList.remove('slide-in-right', 'slide-in-left');
 
-            // Wait for exit animation to complete
+            // Wait for exit animation to complete (250ms base + 250ms max stagger = 500ms)
             setTimeout(() => {
                 // Re-render with new step (which includes slide-in-right by default)
                 this.wizardPanel!.innerHTML = this.renderWizardContent();
@@ -459,7 +536,7 @@ export class ComponentSelectionWizard {
                 }
 
                 this.attachEventListeners();
-            }, 300); // Match animation duration
+            }, 250); // Match base animation duration (stagger will happen automatically via CSS)
         } else {
             // No current step element, just render
             this.wizardPanel.innerHTML = this.renderWizardContent();
@@ -570,12 +647,13 @@ export class ComponentSelectionWizard {
 
         // Render sections grouped by term
         let sectionsHTML = '';
+        let cardIndex = 0; // Global card index for stagger animation
         for (const [term, sections] of sectionsByTerm) {
             const termName = this.getTermName(term);
             sectionsHTML += `
                 <div class="wizard-term-separator">${termName}</div>
                 <div class="wizard-sections-grid">
-                    ${sections.map(section => this.renderSectionCard(section)).join('')}
+                    ${sections.map(section => this.renderSectionCard(section, cardIndex++)).join('')}
                 </div>
             `;
         }
@@ -631,7 +709,7 @@ export class ComponentSelectionWizard {
     /**
      * Render a single section card
      */
-    private renderSectionCard(section: Section): string {
+    private renderSectionCard(section: Section, cardIndex: number): string {
         const period = section.periods[0];
         const days = period ? Array.from(period.days).join('') : 'TBA';
         const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
@@ -647,6 +725,7 @@ export class ComponentSelectionWizard {
             <div
                 class="wizard-section-card ${isSelected ? 'selected' : ''}"
                 data-crn="${section.crn}"
+                style="--card-index: ${cardIndex}"
             >
                 <div class="section-card-header">
                     <span class="section-card-number">${section.number}</span>

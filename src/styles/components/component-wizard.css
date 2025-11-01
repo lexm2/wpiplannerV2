@@ -151,6 +151,7 @@
 .wizard-content {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 1.5rem;
     background-color: var(--color-background);
 }
@@ -239,36 +240,44 @@
     }
 }
 
-@keyframes slideOutDown {
-    from {
-        transform: translateY(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-}
-
 /* Animation Classes */
 .wizard-step.slide-in-right {
-    animation: slideInRight 0.3s ease-out forwards;
+    animation: slideInRight 0.25s ease-out forwards;
 }
 
 .wizard-step.slide-in-left {
-    animation: slideInLeft 0.3s ease-out forwards;
+    animation: slideInLeft 0.25s ease-out forwards;
 }
 
 .wizard-step.slide-out-left {
-    animation: slideOutLeft 0.3s ease-out forwards;
+    animation: slideOutLeft 0.25s ease-out forwards;
 }
 
 .wizard-step.slide-out-right {
-    animation: slideOutRight 0.3s ease-out forwards;
+    animation: slideOutRight 0.25s ease-out forwards;
 }
 
-.wizard-step.slide-out-down {
-    animation: slideOutDown 0.3s ease-out forwards;
+/* Stagger animations using CSS variables */
+.wizard-step.slide-in-right .wizard-section-card {
+    animation: slideInRight 0.25s ease-out forwards;
+    animation-delay: calc(var(--card-index) * 40ms);
+    opacity: 0;
+}
+
+.wizard-step.slide-in-left .wizard-section-card {
+    animation: slideInLeft 0.25s ease-out forwards;
+    animation-delay: calc(var(--card-index) * 40ms);
+    opacity: 0;
+}
+
+.wizard-step.slide-out-left .wizard-section-card {
+    animation: slideOutLeft 0.25s ease-out forwards;
+    animation-delay: calc(var(--card-index) * 40ms);
+}
+
+.wizard-step.slide-out-right .wizard-section-card {
+    animation: slideOutRight 0.25s ease-out forwards;
+    animation-delay: calc(var(--card-index) * 40ms);
 }
 
 .wizard-section-card {
