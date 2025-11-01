@@ -430,6 +430,43 @@
     overflow: hidden;
 }
 
+/* Rate My Professor Badge */
+.rmp-badge {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: var(--color-surface-hover);
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.rmp-rating {
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.rmp-rating.excellent {
+    color: #4caf50; /* Green */
+}
+
+.rmp-rating.good {
+    color: #ff9800; /* Orange */
+}
+
+.rmp-rating.poor {
+    color: #f44336; /* Red */
+}
+
+.rmp-details {
+    color: var(--color-text-secondary);
+    font-size: 0.7rem;
+    line-height: 1.3;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .wizard-breadcrumbs {

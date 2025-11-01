@@ -16,6 +16,7 @@ import { Course, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
 import { CourseDataService } from '../../services/courseDataService';
 import { ScheduleFilterService } from '../../services/ScheduleFilterService';
+import { rateMyProfessorService } from '../../services/RateMyProfessorService';
 
 type WizardStep = 'lecture' | 'discussion' | 'lab';
 
@@ -76,6 +77,17 @@ export class ComponentSelectionWizard {
             this.filterChangeHandler = () => this.onFilterChange();
             this.scheduleFilterService.addEventListener(this.filterChangeHandler);
         }
+
+        // Load Rate My Professor data asynchronously
+        console.log('[Wizard] Initiating RMP data load...');
+        rateMyProfessorService.loadData()
+            .then(() => {
+                console.log('[Wizard] ✓ RMP data loaded successfully');
+                console.log('[Wizard] RMP service state - isLoaded:', rateMyProfessorService.isLoaded());
+            })
+            .catch(err => {
+                console.error('[Wizard] ✗ Failed to load RMP data:', err);
+            });
     }
 
     /**
@@ -816,6 +828,11 @@ export class ComponentSelectionWizard {
             ? `${section.seatsAvailable}/${section.seats} seats`
             : `Full (${section.actualWaitlist}/${section.maxWaitlist} waitlist)`;
 
+        // Get Rate My Professor data for this professor
+        console.log('[Wizard] Rendering card - Professor:', professor, '| RMP loaded:', rateMyProfessorService.isLoaded());
+        const rmpData = professor !== 'Not Assigned' ? rateMyProfessorService.getRatingDisplay(professor) : null;
+        console.log('[Wizard] RMP data result:', rmpData ? `Rating: ${rmpData.rating}` : 'null');
+
         return `
             <div
                 class="wizard-section-card ${isSelected ? 'selected' : ''}"
@@ -829,7 +846,10 @@ export class ComponentSelectionWizard {
                     <strong>${days}</strong> ${time}
                 </div>
                 <div class="section-card-location">${location}</div>
-                <div class="section-card-professor">${professor}</div>
+                <div class="section-card-professor">
+                    ${professor}
+                    ${rmpData ? this.renderRMPBadge(rmpData) : ''}
+                </div>
                 <div class="section-card-footer">
                     <span class="section-card-seats ${section.seatsAvailable === 0 ? 'full' : ''}">
                         ${seatsInfo}
@@ -837,6 +857,30 @@ export class ComponentSelectionWizard {
                     <span class="section-card-crn">CRN: ${section.crn}</span>
                 </div>
                 ${isSelected ? '<div class="section-card-selected-badge">✓ Selected</div>' : ''}
+            </div>
+        `;
+    }
+
+    /**
+     * Render Rate My Professor badge with rating info
+     */
+    private renderRMPBadge(rmpData: {
+        rating: string;
+        difficulty: string;
+        numRatings: number;
+        wouldTakeAgain: string | null;
+        hasData: boolean;
+    }): string {
+        const ratingNum = parseFloat(rmpData.rating);
+        const ratingClass = ratingNum >= 4.0 ? 'excellent' : ratingNum >= 3.0 ? 'good' : 'poor';
+
+        return `
+            <div class="rmp-badge" title="Rate My Professor: ${rmpData.rating}/5.0 (${rmpData.numRatings} ratings)">
+                <span class="rmp-rating ${ratingClass}">★ ${rmpData.rating}</span>
+                <span class="rmp-details">
+                    ${rmpData.difficulty}/5 difficulty
+                    ${rmpData.wouldTakeAgain ? ` • ${rmpData.wouldTakeAgain} would take again` : ''}
+                </span>
             </div>
         `;
     }

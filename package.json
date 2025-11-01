@@ -12,13 +12,15 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "fetch-rmp-data": "tsx scripts/rateMyProfessor/fetchRateMyProfessor.ts"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
     "@types/jest": "^30.0.0",
     "@vitejs/plugin-legacy": "^5.0.0",
     "jsdom": "^26.1.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.0.0",
     "vite": "^5.0.0",
     "vitest": "^3.2.4"

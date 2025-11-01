@@ -1,0 +1,59 @@
+name: Update Rate My Professor Data
+
+on:
+  # Run quarterly (4 times per year, once per term)
+  # A term: Early September
+  # B term: Early November
+  # C term: Early February
+  # D term: Late March
+  schedule:
+    - cron: '0 6 1 9 *'   # September 1st at 6:00 AM UTC (A term)
+    - cron: '0 6 1 11 *'  # November 1st at 6:00 AM UTC (B term)
+    - cron: '0 6 1 2 *'   # February 1st at 6:00 AM UTC (C term)
+    - cron: '0 6 25 3 *'  # March 25th at 6:00 AM UTC (D term)
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  update-rmp-data:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch Rate My Professor data
+        run: npm run fetch-rmp-data
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code public/rateMyProfessor.json || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push changes
+        if: steps.git-check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/rateMyProfessor.json
+          git commit -m "Update Rate My Professor data $(date +'%Y-%m-%d')"
+          git push
+
+      - name: No changes detected
+        if: steps.git-check.outputs.changed != 'true'
+        run: echo "No changes to Rate My Professor data"
