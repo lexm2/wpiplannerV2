@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 1, 2025, 6:20 PM",
+  "generated": "Nov 1, 2025, 6:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -167256,7 +167256,7 @@
                 "crn": 336139,
                 "number": "CL01",
                 "seats": 84,
-                "seats_available": 13,
+                "seats_available": 14,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4410",
@@ -167275,7 +167275,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 84,
-                    "seats_available": 13,
+                    "seats_available": 14,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "CL01",
@@ -167327,7 +167327,7 @@
                   "crn": 336146,
                   "number": "CX02",
                   "seats": 28,
-                  "seats_available": 2,
+                  "seats_available": 3,
                   "actual_waitlist": 0,
                   "max_waitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4410",
@@ -167346,7 +167346,7 @@
                       "building": "",
                       "room": "Atwater Kent 120D Robotics Lab",
                       "seats": 28,
-                      "seats_available": 2,
+                      "seats_available": 3,
                       "actual_waitlist": 0,
                       "max_waitlist": 0,
                       "specific_section": "CX02",
