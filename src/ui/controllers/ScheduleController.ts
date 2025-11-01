@@ -29,10 +29,28 @@ export class ScheduleController {
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
     private wizardPreviewSelections: WizardSelections | null = null;
+    private courseColorMap: Map<string, string> = new Map();
+    private usedColors: Set<string> = new Set();
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
         this.setupTermFocusHandlers();
+        this.setupColorManagement();
+    }
+
+    /**
+     * Set up listener to clean up colors when courses are removed
+     */
+    private setupColorManagement(): void {
+        this.courseSelectionService.addSelectionListener((event) => {
+            if (event.type === 'course_removed' && event.course) {
+                this.releaseCourseColor(event.course.id);
+            } else if (event.type === 'selection_cleared') {
+                // Clear all color assignments
+                this.courseColorMap.clear();
+                this.usedColors.clear();
+            }
+        });
     }
 
     setCourseDataService(courseDataService: CourseDataService): void {
@@ -798,18 +816,52 @@ export class ScheduleController {
     }
 
     private getCourseColor(courseId: string): string {
-        // Generate consistent colors for courses
+        // If this course already has a color assigned, return it
+        if (this.courseColorMap.has(courseId)) {
+            return this.courseColorMap.get(courseId)!;
+        }
+
+        // Color palette
         const colors = [
             '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336',
             '#00BCD4', '#795548', '#607D8B', '#3F51B5', '#E91E63'
         ];
-        
-        let hash = 0;
-        for (let i = 0; i < courseId.length; i++) {
-            hash = courseId.charCodeAt(i) + ((hash << 5) - hash);
+
+        // Shuffle the colors array to get random distribution
+        const shuffledColors = [...colors].sort(() => Math.random() - 0.5);
+
+        // Find first unused color from shuffled array
+        let assignedColor: string;
+        const unusedColor = shuffledColors.find(color => !this.usedColors.has(color));
+
+        if (unusedColor) {
+            // Assign first available unused color from shuffled array
+            assignedColor = unusedColor;
+        } else {
+            // All colors in use, fall back to hash-based selection
+            let hash = 0;
+            for (let i = 0; i < courseId.length; i++) {
+                hash = courseId.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            assignedColor = colors[Math.abs(hash) % colors.length];
         }
-        
-        return colors[Math.abs(hash) % colors.length];
+
+        // Track the assignment
+        this.courseColorMap.set(courseId, assignedColor);
+        this.usedColors.add(assignedColor);
+
+        return assignedColor;
+    }
+
+    /**
+     * Release a course's color assignment when it's removed from the schedule
+     */
+    releaseCourseColor(courseId: string): void {
+        const color = this.courseColorMap.get(courseId);
+        if (color) {
+            this.usedColors.delete(color);
+            this.courseColorMap.delete(courseId);
+        }
     }
 
     getCourseFromElement(element: HTMLElement): Course | undefined {
