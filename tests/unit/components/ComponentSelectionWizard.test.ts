@@ -287,7 +287,7 @@ describe('ComponentSelectionWizard', () => {
             }
         });
 
-        test('should call complete when advancing from last step', () => {
+        test('should not auto-complete when selecting last step (requires manual next)', () => {
             const course = createLabOnlyCourse();
             const wizard = new ComponentSelectionWizard(
                 course,
@@ -296,14 +296,17 @@ describe('ComponentSelectionWizard', () => {
                 mockOnCancel
             );
 
-            // Select a lab section first
+            // Select a lab section
             const labSection = createSection(12351, 'L01', 'Lab');
+            wizard['currentStep'] = 'lab';
             wizard.selectSection(labSection);
 
-            // Wait for timeout
-            setTimeout(() => {
-                expect(mockOnComplete).toHaveBeenCalled();
-            }, 300);
+            // Should not auto-complete (user must click Next/Finish)
+            expect(mockOnComplete).not.toHaveBeenCalled();
+
+            // Manual completion should work
+            wizard.nextStep();
+            expect(mockOnComplete).toHaveBeenCalled();
         });
 
         test('should go back to previous step', () => {
@@ -680,7 +683,8 @@ describe('ComponentSelectionWizard', () => {
             wizard['selections'].lecture = section;
 
             const card = wizard['renderSectionCard'](section);
-            expect(card).toContain('Selected');
+            expect(card).toContain('selected'); // Check for 'selected' CSS class
+            expect(card).toContain('✓'); // Check for checkmark icon
         });
     });
 });

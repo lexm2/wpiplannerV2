@@ -162,11 +162,20 @@ export class ScheduleController {
      * Handle wizard selection changes - update calendar preview
      */
     private onWizardSelectionChange(course: Course, selections: WizardSelections): void {
+        console.log('[Preview] onWizardSelectionChange called');
+        console.log('[Preview] Course:', course.department.abbreviation + course.number);
+        console.log('[Preview] Selections:', {
+            lecture: selections.lecture?.number || null,
+            discussion: selections.discussion?.number || null,
+            lab: selections.lab?.number || null
+        });
+
         // Store preview data
         this.wizardPreviewCourse = course;
         this.wizardPreviewSelections = selections;
 
         // Re-render calendar with preview
+        console.log('[Preview] Calling renderScheduleGrids()');
         this.renderScheduleGrids();
     }
 
@@ -513,7 +522,12 @@ export class ScheduleController {
      * Apply wizard preview overlay to selected courses
      */
     private applyPreviewOverlay(courses: SelectedCourse[]): SelectedCourse[] {
+        console.log('[Preview] applyPreviewOverlay called');
+        console.log('[Preview] wizardPreviewCourse:', this.wizardPreviewCourse?.id || 'null');
+        console.log('[Preview] wizardPreviewSelections:', this.wizardPreviewSelections);
+
         if (!this.wizardPreviewCourse || !this.wizardPreviewSelections) {
+            console.log('[Preview] No preview data, returning original courses');
             return courses;
         }
 
@@ -525,25 +539,48 @@ export class ScheduleController {
             sc => sc.course.id === this.wizardPreviewCourse!.id
         );
 
+        console.log('[Preview] Preview index:', previewIndex);
+        console.log('[Preview] Total courses:', previewCourses.length);
+
         if (previewIndex >= 0) {
-            // Update with preview selections
+            console.log('[Preview] Updating existing course at index', previewIndex);
+            // Update existing course with preview selections
             previewCourses[previewIndex] = {
                 ...previewCourses[previewIndex],
                 selectedLecture: this.wizardPreviewSelections.lecture,
                 selectedDiscussion: this.wizardPreviewSelections.discussion,
                 selectedLab: this.wizardPreviewSelections.lab
             };
+        } else {
+            console.log('[Preview] Adding new preview course');
+            // Course not yet selected - add temporary preview entry
+            previewCourses.push({
+                course: this.wizardPreviewCourse,
+                selectedLecture: this.wizardPreviewSelections.lecture,
+                selectedDiscussion: this.wizardPreviewSelections.discussion,
+                selectedLab: this.wizardPreviewSelections.lab,
+                selectedSection: null,
+                selectedSectionNumber: null,
+                isRequired: false
+            });
         }
 
+        console.log('[Preview] Returning', previewCourses.length, 'courses');
         return previewCourses;
     }
 
     renderScheduleGrids(): void {
+        console.log('[Preview] renderScheduleGrids() called');
         let rawSelectedCourses = this.courseSelectionService.getSelectedCourses();
+        console.log('[Preview] Raw selected courses:', rawSelectedCourses.length);
 
         // Apply preview overlay if wizard is open
         if (this.wizardPreviewCourse && this.wizardPreviewSelections) {
+            console.log('[Preview] Applying preview overlay');
             rawSelectedCourses = this.applyPreviewOverlay(rawSelectedCourses);
+            console.log('[Preview] After overlay:', rawSelectedCourses.length, 'courses');
+        } else {
+            console.log('[Preview] No preview to apply');
         }
 
         // Sync section objects with section numbers before validation

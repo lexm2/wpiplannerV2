@@ -273,7 +273,7 @@ export class ComponentSelectionWizard {
      * Select a section for the current step
      */
     selectSection(section: Section): void {
-        // Check if there was a previous selection for this step
+        // Get previous selection to check if we need to clear dependent selections
         const previousSelection = this.selections[this.currentStep];
         console.log(`[Wizard] selectSection() - step: ${this.currentStep}, section: ${section.number}, previousSelection: ${previousSelection?.number || 'none'}`);
 
@@ -292,28 +292,68 @@ export class ComponentSelectionWizard {
             this.selections.lab = section;
         }
 
-        // Re-render to show updated selection
+        // Update visual selection state without re-rendering
         if (this.wizardPanel) {
-            this.wizardPanel.innerHTML = this.renderWizardContent();
-            this.attachEventListeners();
+            // Remove 'selected' class from all section options
+            const allSections = this.wizardPanel.querySelectorAll('.section-option');
+            allSections.forEach(el => {
+                el.classList.remove('selected');
+                const btn = el.querySelector('.section-select-btn');
+                if (btn) {
+                    btn.classList.remove('selected');
+                    btn.textContent = '+';
+                }
+            });
+
+            // Add 'selected' class to the newly selected section
+            const selectedSection = this.wizardPanel.querySelector(`.section-option[data-crn="${section.crn}"]`);
+            if (selectedSection) {
+                selectedSection.classList.add('selected');
+                const btn = selectedSection.querySelector('.section-select-btn');
+                if (btn) {
+                    btn.classList.add('selected');
+                    btn.textContent = '✓';
+                }
+            }
+
+            // Update footer button visibility
+            const hasSelection = this.selections[this.currentStep] !== null;
+            const nextBtn = this.wizardPanel.querySelector('#wizard-next-btn');
+
+            if (!hasSelection && nextBtn) {
+                // Hide Next button if no selection
+                nextBtn.remove();
+            } else if (hasSelection && !nextBtn) {
+                // Show Next button if selection made but button doesn't exist
+                const footer = this.wizardPanel.querySelector('.wizard-footer');
+                if (footer) {
+                    const currentIndex = this.availableSteps.indexOf(this.currentStep);
+                    const isLastStep = currentIndex === this.availableSteps.length - 1;
+                    const nextBtnHTML = `
+                        <button class="wizard-btn wizard-btn-primary" id="wizard-next-btn">
+                            ${isLastStep ? 'Finish' : 'Next'}
+                        </button>
+                    `;
+                    footer.insertAdjacentHTML('beforeend', nextBtnHTML);
+
+                    // Attach event listener to new button
+                    const newNextBtn = footer.querySelector('#wizard-next-btn');
+                    newNextBtn?.addEventListener('click', () => {
+                        const currentIndex = this.availableSteps.indexOf(this.currentStep);
+                        const isLastStep = currentIndex === this.availableSteps.length - 1;
+                        if (isLastStep) {
+                            this.complete();
+                        } else {
+                            this.nextStep();
+                        }
+                    });
+                }
+            }
         }
 
         // Trigger live preview callback
         if (this.onSelectionChange) {
             this.onSelectionChange(this.selections);
-        }
-
-        // Auto-advance if this is a new selection OR user is selecting a different section
-        const isNewSelection = !previousSelection;
-        const isDifferentSelection = previousSelection && previousSelection.crn !== section.crn;
-        console.log(`[Wizard] Auto-advance check - isNew: ${isNewSelection}, isDifferent: ${isDifferentSelection}`);
-        if (isNewSelection || isDifferentSelection) {
-            console.log(`[Wizard] Auto-advancing in 200ms...`);
-            setTimeout(() => {
-                this.nextStep();
-            }, 200); // Brief delay to show selection feedback
-        } else {
-            console.log(`[Wizard] Not auto-advancing (same section clicked again)`);
         }
     }
 

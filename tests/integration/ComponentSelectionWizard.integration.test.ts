@@ -175,7 +175,7 @@ describe('ComponentSelectionWizard Integration', () => {
     });
 
     describe('End-to-End Component Flow', () => {
-        test('should complete full selection flow for multi-step course', (done) => {
+        test('should complete full selection flow for multi-step course with manual navigation', () => {
             const course = createTestCourse();
             let completed = false;
 
@@ -193,14 +193,18 @@ describe('ComponentSelectionWizard Integration', () => {
             wizard['currentStep'] = 'lecture';
             wizard.selectSection(createSection(12345, 'A01', 'Lecture'));
 
-            // Auto-advance should occur
-            setTimeout(() => {
-                // If this was the last step, should be completed
-                if (wizard['availableSteps'].length === 1) {
-                    expect(completed).toBe(true);
-                }
-                done();
-            }, 300);
+            // Should not auto-advance (requires manual navigation)
+            expect(completed).toBe(false);
+
+            // Manual next step
+            if (wizard['availableSteps'].length > 1) {
+                wizard.nextStep();
+                expect(completed).toBe(false); // Still not completed
+            } else {
+                // If only one step, manually complete
+                wizard.nextStep();
+                expect(completed).toBe(true);
+            }
         });
 
         test('should handle cancel during selection', () => {

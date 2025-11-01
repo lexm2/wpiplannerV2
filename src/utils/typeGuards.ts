@@ -133,10 +133,30 @@ export function getValidSelectedSection(sc: SelectedCourse): Section | null {
 
 /**
  * Safe getter for computed term from selected course
+ * Supports both flat structure (selectedSection) and hierarchical structure (selectedLecture/Discussion/Lab)
  */
 export function getComputedTerm(sc: SelectedCourse): string | null {
+    // First try selectedSection (flat structure)
     const section = getValidSelectedSection(sc);
-    return section?.computedTerm || null;
+    if (section?.computedTerm) {
+        return section.computedTerm;
+    }
+
+    // Fallback to hierarchical structure: check lecture/discussion/lab
+    // Use lecture as primary source since it's always required
+    if (sc.selectedLecture?.computedTerm) {
+        return sc.selectedLecture.computedTerm;
+    }
+
+    if (sc.selectedDiscussion?.computedTerm) {
+        return sc.selectedDiscussion.computedTerm;
+    }
+
+    if (sc.selectedLab?.computedTerm) {
+        return sc.selectedLab.computedTerm;
+    }
+
+    return null;
 }
 
 /**
