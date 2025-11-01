@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 1, 2025, 3:40 AM",
+  "generated": "Nov 1, 2025, 3:57 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -163655,7 +163655,7 @@
                 "crn": 338520,
                 "number": "B01",
                 "seats": 55,
-                "seats_available": 11,
+                "seats_available": 12,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -163674,7 +163674,7 @@
                     "building": "",
                     "room": "Atwater Kent 233",
                     "seats": 55,
-                    "seats_available": 11,
+                    "seats_available": 12,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "B01",
