@@ -170,11 +170,28 @@
     font-weight: 600;
 }
 
+/* Term Separator */
+.wizard-term-separator {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    padding: 0.75rem 0 0.5rem 0;
+    margin-top: 1rem;
+    border-bottom: 2px solid var(--color-border);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.wizard-term-separator:first-child {
+    margin-top: 0;
+}
+
 /* Sections Grid */
 .wizard-sections-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .wizard-section-card {
@@ -199,9 +216,6 @@
 }
 
 .section-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 0.75rem;
 }
 
@@ -209,6 +223,13 @@
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--color-text);
+}
+
+.section-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
 }
 
 .section-card-crn {
@@ -237,7 +258,6 @@
     font-size: 0.85rem;
     color: var(--color-success);
     font-weight: 500;
-    margin-top: 0.5rem;
 }
 
 .section-card-seats.full {

@@ -294,26 +294,26 @@ export class ComponentSelectionWizard {
 
         // Update visual selection state without re-rendering
         if (this.wizardPanel) {
-            // Remove 'selected' class from all section options
-            const allSections = this.wizardPanel.querySelectorAll('.section-option');
+            // Remove 'selected' class and badges from all section cards
+            const allSections = this.wizardPanel.querySelectorAll('.wizard-section-card');
             allSections.forEach(el => {
                 el.classList.remove('selected');
-                const btn = el.querySelector('.section-select-btn');
-                if (btn) {
-                    btn.classList.remove('selected');
-                    btn.textContent = '+';
+                // Remove any existing selected badge
+                const badge = el.querySelector('.section-card-selected-badge');
+                if (badge) {
+                    badge.remove();
                 }
             });
 
-            // Add 'selected' class to the newly selected section
-            const selectedSection = this.wizardPanel.querySelector(`.section-option[data-crn="${section.crn}"]`);
+            // Add 'selected' class to the newly selected section and add badge
+            const selectedSection = this.wizardPanel.querySelector(`.wizard-section-card[data-crn="${section.crn}"]`);
             if (selectedSection) {
                 selectedSection.classList.add('selected');
-                const btn = selectedSection.querySelector('.section-select-btn');
-                if (btn) {
-                    btn.classList.add('selected');
-                    btn.textContent = '✓';
-                }
+                // Add selected badge
+                const badge = document.createElement('div');
+                badge.className = 'section-card-selected-badge';
+                badge.textContent = '✓ Selected';
+                selectedSection.appendChild(badge);
             }
 
             // Update footer button visibility
@@ -517,83 +517,106 @@ export class ComponentSelectionWizard {
             lab: 'Select Lab'
         };
 
+        // Group sections by academic term
+        const sectionsByTerm = this.groupSectionsByTerm(options);
+
+        // Render sections grouped by term
+        let sectionsHTML = '';
+        for (const [term, sections] of sectionsByTerm) {
+            const termName = this.getTermName(term);
+            sectionsHTML += `
+                <div class="wizard-term-separator">${termName}</div>
+                <div class="wizard-sections-grid">
+                    ${sections.map(section => this.renderSectionCard(section)).join('')}
+                </div>
+            `;
+        }
+
         return `
             <div class="wizard-step active" data-step="${this.currentStep}">
                 <h3 class="wizard-step-title">${stepTitles[this.currentStep]}</h3>
-                <div class="wizard-sections-grid">
-                    ${options.map(section => this.renderSectionCard(section)).join('')}
-                </div>
+                ${sectionsHTML}
             </div>
         `;
     }
 
     /**
-     * Render a single section card using section-option styling
+     * Group sections by their academic term (computedTerm)
+     * Returns a Map with term as key and sections array as value
+     */
+    private groupSectionsByTerm(sections: Section[]): Map<string, Section[]> {
+        const grouped = new Map<string, Section[]>();
+
+        for (const section of sections) {
+            const term = section.computedTerm || 'Unknown';
+            if (!grouped.has(term)) {
+                grouped.set(term, []);
+            }
+            grouped.get(term)!.push(section);
+        }
+
+        // Sort by term order (A, B, C, D, E)
+        const sortedMap = new Map(
+            Array.from(grouped.entries()).sort((a, b) => {
+                const termOrder = ['A', 'B', 'C', 'D', 'E'];
+                return termOrder.indexOf(a[0]) - termOrder.indexOf(b[0]);
+            })
+        );
+
+        return sortedMap;
+    }
+
+    /**
+     * Get display name for academic term
+     */
+    private getTermName(term: string): string {
+        const termNames: Record<string, string> = {
+            'A': 'A Term (Fall 1)',
+            'B': 'B Term (Fall 2)',
+            'C': 'C Term (Spring 1)',
+            'D': 'D Term (Spring 2)',
+            'E': 'E Term (Summer)'
+        };
+        return termNames[term] || `${term} Term`;
+    }
+
+    /**
+     * Render a single section card
      */
     private renderSectionCard(section: Section): string {
+        const period = section.periods[0];
+        const days = period ? Array.from(period.days).join('').toUpperCase() : 'TBA';
+        const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
+        const location = period?.location || 'TBA';
+        const professor = period?.professor || 'Not Assigned';
+
         const isSelected = this.selections[this.currentStep]?.crn === section.crn;
-        const selectedClass = isSelected ? 'selected' : '';
-
-        // Sort periods by type priority (lecture first, then lab, then discussion)
-        const sortedPeriods = [...section.periods].sort((a, b) => {
-            const typePriority = (type: string) => {
-                const lower = type.toLowerCase();
-                if (lower.includes('lec') || lower.includes('lecture')) return 1;
-                if (lower.includes('lab')) return 2;
-                if (lower.includes('dis') || lower.includes('discussion') || lower.includes('rec')) return 3;
-                return 4;
-            };
-            return typePriority(a.type) - typePriority(b.type);
-        });
-
-        let periodsHTML = '';
-        sortedPeriods.forEach(period => {
-            const days = period ? Array.from(period.days).join('').toUpperCase() : 'TBA';
-            const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
-            const professor = period.professor && period.professor !== 'TBA' && period.professor !== 'Not Assigned' && period.professor.trim() !== '' ? period.professor : 'TBA';
-            const periodTypeLabel = this.getPeriodTypeLabel(period.type);
-
-            periodsHTML += `
-                <div class="period-info" data-period-type="${period.type.toLowerCase()}">
-                    <div class="period-header">
-                        <span class="period-type-label">${periodTypeLabel}</span>
-                        <span class="period-schedule">${days} ${time} - ${professor}</span>
-                    </div>
-                </div>
-            `;
-        });
+        const seatsInfo = section.seatsAvailable > 0
+            ? `${section.seatsAvailable}/${section.seats} seats`
+            : `Full (${section.actualWaitlist}/${section.maxWaitlist} waitlist)`;
 
         return `
-            <div class="section-option ${selectedClass}" data-crn="${section.crn}">
-                <div class="section-info">
-                    <div class="section-number">${section.number}</div>
-                    <div class="section-periods">
-                        ${periodsHTML}
-                    </div>
+            <div
+                class="wizard-section-card ${isSelected ? 'selected' : ''}"
+                data-crn="${section.crn}"
+            >
+                <div class="section-card-header">
+                    <span class="section-card-number">${section.number}</span>
                 </div>
-                <button class="section-select-btn ${selectedClass}">
-                    ${isSelected ? '✓' : '+'}
-                </button>
+                <div class="section-card-time">
+                    <strong>${days}</strong> ${time}
+                </div>
+                <div class="section-card-location">${location}</div>
+                <div class="section-card-professor">${professor}</div>
+                <div class="section-card-footer">
+                    <span class="section-card-seats ${section.seatsAvailable === 0 ? 'full' : ''}">
+                        ${seatsInfo}
+                    </span>
+                    <span class="section-card-crn">CRN: ${section.crn}</span>
+                </div>
+                ${isSelected ? '<div class="section-card-selected-badge">✓ Selected</div>' : ''}
             </div>
         `;
-    }
-
-    /**
-     * Get period type label (helper method)
-     */
-    private getPeriodTypeLabel(type: string): string {
-        const lower = type.toLowerCase();
-
-        if (lower.includes('lec') || lower.includes('lecture')) return 'LEC';
-        if (lower.includes('lab')) return 'LAB';
-        if (lower.includes('dis') || lower.includes('discussion')) return 'DIS';
-        if (lower.includes('rec') || lower.includes('recitation')) return 'REC';
-        if (lower.includes('sem') || lower.includes('seminar')) return 'SEM';
-        if (lower.includes('studio')) return 'STU';
-        if (lower.includes('conference') || lower.includes('conf')) return 'CONF';
-
-        // Return abbreviated version for unknown types (first 3-4 chars)
-        return type.substring(0, Math.min(4, type.length)).toUpperCase();
     }
 
     /**
@@ -663,10 +686,10 @@ export class ComponentSelectionWizard {
             });
         });
 
-        // Section option cards
-        const sectionOptions = this.wizardPanel.querySelectorAll('.section-option');
-        sectionOptions.forEach(option => {
-            option.addEventListener('click', (e) => {
+        // Section cards
+        const sectionCards = this.wizardPanel.querySelectorAll('.wizard-section-card');
+        sectionCards.forEach(card => {
+            card.addEventListener('click', (e) => {
                 const crn = parseInt((e.currentTarget as HTMLElement).dataset.crn || '0');
                 const options = this.getOptionsForStep(this.currentStep);
                 const section = options.find(s => s.crn === crn);
