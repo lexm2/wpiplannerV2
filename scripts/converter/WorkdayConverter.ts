@@ -30,9 +30,9 @@ export class WorkdayConverter {
         const validSections = this.preFilterSections(workdayData.Report_Entry);
         console.log(`${validSections.length} sections after filtering canceled courses`);
 
-        // Group sections by course and term
+        // Group sections by course (all terms combined)
         const courseGroups = this.groupSectionsByCourse(validSections);
-        console.log(`Grouped into ${courseGroups.length} course-term combinations`);
+        console.log(`Grouped into ${courseGroups.length} unique courses`);
 
         // Initialize departments
         const departments = initializeDepartments();
@@ -115,7 +115,7 @@ export class WorkdayConverter {
     }
 
     /**
-     * Groups sections by course and term
+     * Groups sections by course only (all terms combined)
      * Assumes sections are pre-sorted by course (as they are in Workday data)
      */
     private groupSectionsByCourse(sections: WorkdaySection[]): WorkdaySection[][] {
@@ -126,7 +126,6 @@ export class WorkdayConverter {
             const courseSection = section.Course_Section;
             const dashIndex = courseSection.indexOf('-');
             const courseId = courseSection.substring(0, dashIndex); // e.g., "CS 1101"
-            const term = section.Starting_Academic_Period_Type;
 
             // Check if this section belongs to current group
             if (currentGroup.length > 0) {
@@ -134,15 +133,14 @@ export class WorkdayConverter {
                 const prevCourseSection = prevSection.Course_Section;
                 const prevDashIndex = prevCourseSection.indexOf('-');
                 const prevCourseId = prevCourseSection.substring(0, prevDashIndex);
-                const prevTerm = prevSection.Starting_Academic_Period_Type;
 
-                // Same course and term?
-                if (courseId === prevCourseId && term === prevTerm) {
+                // Same course? (ignore term - all terms go in same course)
+                if (courseId === prevCourseId) {
                     currentGroup.push(section);
                     continue;
                 }
 
-                // Different course/term - start new group
+                // Different course - start new group
                 groups.push(currentGroup);
                 currentGroup = [section];
             } else {

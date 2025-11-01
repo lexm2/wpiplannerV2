@@ -120,6 +120,7 @@
  */
 import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
+import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
 
 export interface StorageTransaction {
     id: string;
@@ -572,34 +573,11 @@ export class TransactionalStorageManager {
     }
 
     private safeStringify(data: any): string {
-        return JSON.stringify(data, this.replacer);
+        return JSON.stringify(data, createJSONReplacer());
     }
 
-    private readonly replacer = (key: string, value: any): any => {
-        if (value instanceof Set) {
-            return { __type: 'Set', value: [...value] };
-        }
-
-        if (key === 'department' && value && value.courses) {
-            return {
-                abbreviation: value.abbreviation,
-                name: value.name
-            };
-        }
-
-        if (key === 'selectedSection' && value && typeof value === 'object' && value.number) {
-            return undefined;
-        }
-
-        return value;
-    };
-
-    private readonly reviver = (_key: string, value: any): any => {
-        if (typeof value === 'object' && value !== null && value.__type === 'Set') {
-            return new Set(value.value);
-        }
-        return value;
-    };
+    private readonly replacer = createJSONReplacer();
+    private readonly reviver = createJSONReviver();
 
     private getDefaultPreferences(): SchedulePreferences {
         return {

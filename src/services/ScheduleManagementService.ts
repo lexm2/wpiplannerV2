@@ -4,6 +4,7 @@ import { DataValidator } from '../core/DataValidator'
 import { RetryManager } from '../core/RetryManager'
 import { CourseSelectionService } from './CourseSelectionService'
 import { ICSGenerator, ICSExportOptions, ICSExportResult } from '../utils/icsGenerator'
+import { safeStringify } from '../utils/jsonSerializer'
 
 export interface ScheduleOperationResult {
     success: boolean;
@@ -772,7 +773,7 @@ export class ScheduleManagementService {
 
             return {
                 success: true,
-                data: JSON.stringify(exportData, null, 2)
+                data: safeStringify(exportData, 2)
             };
         } catch (error) {
             return {

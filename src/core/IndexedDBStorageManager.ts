@@ -24,6 +24,7 @@
  */
 
 import { Schedule } from '../types/schedule';
+import { safeStringify } from '../utils/jsonSerializer';
 
 interface StorageResult<T> {
     success: boolean;
@@ -266,7 +267,7 @@ export class IndexedDBStorageManager {
             let totalSize = 0;
 
             schedules.forEach(schedule => {
-                const serialized = JSON.stringify(schedule);
+                const serialized = safeStringify(schedule);
                 const size = new Blob([serialized]).size;
                 schedulesSizes.set(schedule.id, size);
                 totalSize += size;
