@@ -64,6 +64,7 @@ export class ComponentSelectionWizard {
 
     /**
      * Determine which steps are available based on course structure
+     * Only includes steps that have at least one option with a valid time slot
      */
     determineAvailableSteps(): WizardStep[] {
         const steps: WizardStep[] = [];
@@ -71,24 +72,38 @@ export class ComponentSelectionWizard {
         const isLabOnly = this.courseDataService.isLabOnlyCourse(this.course);
 
         if (isLabOnly) {
-            // Lab-only course
-            steps.push('lab');
+            // Lab-only course - check if any labs have valid time slots
+            const labs = this.courseDataService.getStandaloneLabs(this.course);
+            const hasValidLabs = labs.some(lab => this.hasValidTimeSlot(lab));
+            if (hasValidLabs) {
+                steps.push('lab');
+            }
         } else if (isHierarchical) {
-            // Hierarchical course - check what's available
+            // Hierarchical course - check what's available with valid time slots
             const lectures = this.courseDataService.getLecturesForCourse(this.course);
 
-            if (lectures.length > 0) {
+            // Check if any lectures have valid time slots
+            const validLectures = lectures.filter(lg => this.hasValidTimeSlot(lg.section));
+
+            if (validLectures.length > 0) {
                 steps.push('lecture');
 
-                // Check if any lecture has discussions or labs
-                const hasDiscussions = lectures.some(lg => lg.compatibleDiscussions.length > 0);
-                const hasLabs = lectures.some(lg => lg.compatibleLabs.length > 0);
+                // Check if any lecture has discussions with valid time slots
+                const hasValidDiscussions = lectures.some(lg =>
+                    lg.compatibleDiscussions.some(d => this.hasValidTimeSlot(d))
+                );
 
-                if (hasDiscussions) steps.push('discussion');
-                if (hasLabs) steps.push('lab');
+                // Check if any lecture has labs with valid time slots
+                const hasValidLabs = lectures.some(lg =>
+                    lg.compatibleLabs.some(l => this.hasValidTimeSlot(l))
+                );
+
+                if (hasValidDiscussions) steps.push('discussion');
+                if (hasValidLabs) steps.push('lab');
             }
         }
 
+        console.log(`[Wizard] Available steps with valid options: ${steps.join(', ')}`);
         return steps;
     }
 
