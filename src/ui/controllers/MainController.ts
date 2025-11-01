@@ -241,13 +241,7 @@ export class MainController {
         this.departmentSyncService = new DepartmentSyncService(this.filterService, this.departmentController);
         this.departmentController.setDepartmentSyncService(this.departmentSyncService);
         this.departmentSyncService.setFilterModalController(this.filterModalController);
-        
-        // Wire up state preservation for dropdown states
-        this.scheduleController.setStatePreserver({
-            preserve: () => this.preserveDropdownStates(),
-            restore: (states) => this.restoreDropdownStates(states)
-        });
-        
+
         // Initialize tracking for course changes
         const initialSelectedCourses = this.courseSelectionService.getSelectedCourses();
         this.previousSelectedCoursesCount = initialSelectedCourses.length;
@@ -468,73 +462,58 @@ export class MainController {
                 }
             }
 
-            if (target.classList.contains('course-edit-btn')) {
+            // Handle clicking on schedule course header to open wizard
+            if (target.classList.contains('schedule-course-header') || target.closest('.schedule-course-header')) {
                 e.stopPropagation();
 
                 if (this.uiStateManager.currentPage === 'schedule') {
-                    const course = this.scheduleController.getCourseFromElement(target as HTMLElement);
-                    if (course) {
-                        // Get existing selections for this course
-                        const selectedCourses = this.courseSelectionService.getSelectedCourses();
-                        const existingSelections = selectedCourses.find(sc => sc.course.id === course.id);
+                    // Don't trigger if clicking remove button
+                    if (target.classList.contains('course-remove-btn')) {
+                        return;
+                    }
 
-                        // Open wizard with existing selections if any
-                        this.scheduleController.openComponentWizard(course, existingSelections);
+                    const headerElement = target.classList.contains('schedule-course-header')
+                        ? target
+                        : target.closest('.schedule-course-header') as HTMLElement;
+
+                    if (headerElement) {
+                        const courseElement = headerElement.closest('.schedule-course-item') as HTMLElement;
+                        if (courseElement) {
+                            const course = this.scheduleController.getCourseFromElement(courseElement);
+                            if (course) {
+                                // Get existing selections for this course
+                                const selectedCourses = this.courseSelectionService.getSelectedCourses();
+                                const existingSelections = selectedCourses.find(sc => sc.course.id === course.id);
+
+                                // Log without circular reference
+                                if (existingSelections) {
+                                    console.log('Selected Course Data:', {
+                                        isRequired: existingSelections.isRequired,
+                                        selectedSectionNumber: existingSelections.selectedSectionNumber,
+                                        selectedLecture: existingSelections.selectedLecture?.number || null,
+                                        selectedDiscussion: existingSelections.selectedDiscussion?.number || null,
+                                        selectedLab: existingSelections.selectedLab?.number || null,
+                                        course: {
+                                            id: course.id,
+                                            number: course.number,
+                                            name: course.name,
+                                            department: course.department?.abbreviation,
+                                            hasLectures: !!course.lectures && course.lectures.length > 0,
+                                            lecturesCount: course.lectures?.length || 0,
+                                            hasStandaloneLabs: !!course.standaloneLabs && course.standaloneLabs.length > 0,
+                                            standaloneLabs: course.standaloneLabs?.length || 0,
+                                            sectionsCount: course.sections?.length || 0
+                                        }
+                                    });
+                                }
+
+                                // Open wizard with existing selections if any
+                                this.scheduleController.openComponentWizard(course, existingSelections);
+                            }
+                        }
                     }
                 }
                 return;
-            }
-
-            // Handle section-related clicks FIRST (before dropdown logic)
-            if (target.classList.contains('section-select-btn')) {
-                e.stopPropagation();
-                const courseElement = target.closest('.schedule-course-item') as HTMLElement;
-                const sectionNumber = target.dataset.section;
-                
-                if (courseElement && sectionNumber) {
-                    const course = this.scheduleController.getCourseFromElement(courseElement);
-                    if (course) {
-                        this.scheduleController.handleSectionSelection(course, sectionNumber).catch(error => {
-                            console.error('Failed to handle section selection:', error);
-                            this.uiStateManager.showErrorMessage('Failed to update section selection. Please try again.');
-                        });
-                    }
-                }
-                return;
-            }
-
-            // Prevent dropdown closing for any other section-related clicks
-            if (target.classList.contains('section-option') || target.closest('.section-option') ||
-                target.classList.contains('section-info') || target.closest('.section-info') ||
-                target.classList.contains('section-number') || 
-                target.classList.contains('section-schedule') || 
-                target.classList.contains('section-professor')) {
-                e.stopPropagation();
-                e.preventDefault();
-                return;
-            }
-
-            if (target.classList.contains('dropdown-trigger') || target.closest('.dropdown-trigger')) {
-                const triggerElement = target.classList.contains('dropdown-trigger') 
-                    ? target 
-                    : target.closest('.dropdown-trigger') as HTMLElement;
-                    
-                if (triggerElement) {
-                    // Only trigger dropdown if clicking on course header area (not section-related elements)
-                    const shouldToggle = !target.classList.contains('course-remove-btn') &&
-                        !target.classList.contains('course-edit-btn') &&
-                        !target.classList.contains('section-select-btn') &&
-                        !target.classList.contains('section-number') &&
-                        !target.classList.contains('section-schedule') &&
-                        !target.classList.contains('section-professor') &&
-                        !target.closest('.section-option') &&
-                        !target.closest('.section-info') &&
-                        !target.closest('.schedule-sections-container');
-                        
-                    if (shouldToggle) {
-                        this.toggleCourseDropdown(triggerElement);
-                    }
-                }
             }
 
 
@@ -935,51 +914,6 @@ export class MainController {
 
     public getScheduleManagementService(): ScheduleManagementService {
         return this.scheduleManagementService;
-    }
-
-    private toggleCourseDropdown(triggerElement: HTMLElement): void {
-        const courseItem = triggerElement.closest('.schedule-course-item');
-        if (!courseItem) return;
-
-        const isCollapsed = courseItem.classList.contains('collapsed');
-        
-        if (isCollapsed) {
-            // Expand
-            courseItem.classList.remove('collapsed');
-            courseItem.classList.add('expanded');
-        } else {
-            // Collapse
-            courseItem.classList.remove('expanded');
-            courseItem.classList.add('collapsed');
-        }
-    }
-
-    private preserveDropdownStates(): Map<string, boolean> {
-        const states = new Map<string, boolean>();
-        document.querySelectorAll('.schedule-course-item').forEach(item => {
-            const course = this.scheduleController.getCourseFromElement(item as HTMLElement);
-            if (course) {
-                const isExpanded = item.classList.contains('expanded');
-                states.set(course.id, isExpanded);
-            }
-        });
-        return states;
-    }
-
-    private restoreDropdownStates(states: Map<string, boolean>): void {
-        document.querySelectorAll('.schedule-course-item').forEach(item => {
-            const course = this.scheduleController.getCourseFromElement(item as HTMLElement);
-            if (course && states.has(course.id)) {
-                const wasExpanded = states.get(course.id);
-                if (wasExpanded) {
-                    item.classList.remove('collapsed');
-                    item.classList.add('expanded');
-                } else {
-                    item.classList.remove('expanded');
-                    item.classList.add('collapsed');
-                }
-            }
-        });
     }
 
     private getAllCourses(): Course[] {

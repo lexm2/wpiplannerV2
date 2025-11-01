@@ -40,6 +40,7 @@ export interface Section {
     description: string;
     term: string;
     computedTerm: string; // Computed academic term letter (A, B, C, D)
+    is_interest_list?: boolean; // True for interest list placeholder sections
     periods: Period[];
 }
 

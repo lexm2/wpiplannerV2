@@ -318,23 +318,6 @@
     background-color: var(--color-surface-hover);
 }
 
-/* Edit Button in Course Header */
-.course-edit-btn {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    padding: 0.25rem 0.5rem;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: all 0.2s ease;
-    border-radius: 4px;
-}
-
-.course-edit-btn:hover {
-    opacity: 1;
-    background-color: var(--color-surface-hover);
-}
-
 /* Ensure sidebar container can hold wizard */
 .schedule-selected-courses {
     position: relative;

@@ -89,12 +89,15 @@ export function validateSelectedCourses(selectedCourses: any[]): SelectedCourse[
  */
 export function repairSelectedCourse(sc: any): SelectedCourse | null {
     if (!sc || typeof sc !== 'object' || !sc.course) return null;
-    
+
     // Create a repaired version
     const repaired: SelectedCourse = {
         course: sc.course,
         selectedSection: null,
         selectedSectionNumber: null,
+        selectedLecture: null,
+        selectedDiscussion: null,
+        selectedLab: null,
         isRequired: Boolean(sc.isRequired)
     };
     

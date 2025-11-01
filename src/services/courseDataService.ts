@@ -522,10 +522,29 @@ export class CourseDataService {
      * @returns Array of compatible discussion sections
      */
     getDiscussionsForLecture(course: Course, lectureSection: Section): Section[] {
-        if (!course.lectures) return [];
+        if (!course.lectures) {
+            console.log('[CourseDataService] No lectures array on course');
+            return [];
+        }
+
+        console.log(`[CourseDataService] Searching for CRN:`, lectureSection.crn, `(type: ${typeof lectureSection.crn})`);
+        console.log(`[CourseDataService] Available lectures:`, course.lectures.map(lg => ({
+            crn: lg.section.crn,
+            type: typeof lg.section.crn,
+            number: lg.section.number,
+            discussions: lg.compatibleDiscussions.length,
+            labs: lg.compatibleLabs.length
+        })));
 
         const lectureGroup = course.lectures.find(lg => lg.section.crn === lectureSection.crn);
-        return lectureGroup?.compatibleDiscussions || [];
+
+        if (!lectureGroup) {
+            console.log('[CourseDataService] Lecture group NOT FOUND - CRN mismatch!');
+            return [];
+        }
+
+        console.log(`[CourseDataService] ✓ Found lecture group "${lectureGroup.section.number}", has ${lectureGroup.compatibleDiscussions.length} discussions`);
+        return lectureGroup.compatibleDiscussions || [];
     }
 
     /**
@@ -535,10 +554,29 @@ export class CourseDataService {
      * @returns Array of compatible lab sections
      */
     getLabsForLecture(course: Course, lectureSection: Section): Section[] {
-        if (!course.lectures) return [];
+        if (!course.lectures) {
+            console.log('[CourseDataService] No lectures array on course');
+            return [];
+        }
+
+        console.log(`[CourseDataService] Searching for CRN:`, lectureSection.crn, `(type: ${typeof lectureSection.crn})`);
+        console.log(`[CourseDataService] Available lectures:`, course.lectures.map(lg => ({
+            crn: lg.section.crn,
+            type: typeof lg.section.crn,
+            number: lg.section.number,
+            discussions: lg.compatibleDiscussions.length,
+            labs: lg.compatibleLabs.length
+        })));
 
         const lectureGroup = course.lectures.find(lg => lg.section.crn === lectureSection.crn);
-        return lectureGroup?.compatibleLabs || [];
+
+        if (!lectureGroup) {
+            console.log('[CourseDataService] Lecture group NOT FOUND - CRN mismatch!');
+            return [];
+        }
+
+        console.log(`[CourseDataService] ✓ Found lecture group "${lectureGroup.section.number}", has ${lectureGroup.compatibleLabs.length} labs`);
+        return lectureGroup.compatibleLabs || [];
     }
 
     /**

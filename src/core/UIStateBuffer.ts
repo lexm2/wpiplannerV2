@@ -196,6 +196,9 @@ export class UIStateBuffer {
                 course,
                 selectedSection: null,
                 selectedSectionNumber: null,
+                selectedLecture: null,
+                selectedDiscussion: null,
+                selectedLab: null,
                 isRequired
             };
             this.uiState.selectedCourses.push(selectedCourse);
@@ -492,6 +495,9 @@ export class UIStateBuffer {
                         course,
                         selectedSection: null,
                         selectedSectionNumber: null,
+                        selectedLecture: null,
+                        selectedDiscussion: null,
+                        selectedLab: null,
                         isRequired
                     };
                     this.uiState.selectedCourses.push(selectedCourse);

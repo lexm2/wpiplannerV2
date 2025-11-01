@@ -240,6 +240,9 @@ export class ProfileStateManager {
                     course,
                     selectedSection: null,
                     selectedSectionNumber: null,
+                    selectedLecture: null,
+                    selectedDiscussion: null,
+                    selectedLab: null,
                     isRequired
                 };
                 this.state.selectedCourses.push(selectedCourse);

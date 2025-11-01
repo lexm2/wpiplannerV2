@@ -1,4 +1,5 @@
 import { DayOfWeek, Course, Section } from '../../types/types'
+import { SelectedCourse } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { CourseDataService } from '../../services/courseDataService'
 import { ScheduleFilterService } from '../../services/ScheduleFilterService'
@@ -10,6 +11,12 @@ import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/ConflictDetector'
 import { getComputedTerm, validateSelectedCourses } from '../../utils/typeGuards'
 
+interface WizardSelections {
+    lecture: Section | null;
+    discussion: Section | null;
+    lab: Section | null;
+}
+
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
     private courseDataService: CourseDataService | null = null;
@@ -20,12 +27,10 @@ export class ScheduleController {
     private conflictDetector: ConflictDetector | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private containerEventListeners = new Map<HTMLElement, EventListener>();
-    private statePreserver?: {
-        preserve: () => Map<string, boolean>,
-        restore: (states: Map<string, boolean>) => void
-    };
     private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
     private componentWizard: ComponentSelectionWizard | null = null;
+    private wizardPreviewCourse: Course | null = null;
+    private wizardPreviewSelections: WizardSelections | null = null;
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
@@ -71,13 +76,6 @@ export class ScheduleController {
         this._scheduleManagementService = scheduleManagementService;
     }
 
-    setStatePreserver(statePreserver: {
-        preserve: () => Map<string, boolean>,
-        restore: (states: Map<string, boolean>) => void
-    }): void {
-        this.statePreserver = statePreserver;
-    }
-
     /**
      * Open the component selection wizard for a course
      */
@@ -92,13 +90,25 @@ export class ScheduleController {
             this.componentWizard.close();
         }
 
-        // Create new wizard
+        // Look up fresh course data from courseDataService to ensure we have the latest structure
+        // (the passed course may be from cached localStorage with old structure)
+        const freshCourse = this.courseDataService.getAllDepartments()
+            .flatMap(d => d.courses)
+            .find(c => c.id === course.id);
+
+        if (!freshCourse) {
+            console.error('Could not find fresh course data for:', course.id);
+            return;
+        }
+
+        // Create new wizard with fresh course data
         this.componentWizard = new ComponentSelectionWizard(
-            course,
+            freshCourse,
             this.courseDataService,
-            (selections) => this.onWizardComplete(course, selections),
+            (selections) => this.onWizardComplete(freshCourse, selections),
             () => this.closeComponentWizard(),
-            existingSelections
+            existingSelections,
+            (selections) => this.onWizardSelectionChange(freshCourse, selections)
         );
 
         this.componentWizard.open();
@@ -112,12 +122,21 @@ export class ScheduleController {
             this.componentWizard.close();
             this.componentWizard = null;
         }
+
+        // Clear preview and re-render calendar
+        this.wizardPreviewCourse = null;
+        this.wizardPreviewSelections = null;
+        this.renderScheduleGrids();
     }
 
     /**
      * Handle wizard completion - save component selections
      */
     private async onWizardComplete(course: Course, selections: any): Promise<void> {
+        // Clear preview first
+        this.wizardPreviewCourse = null;
+        this.wizardPreviewSelections = null;
+
         try {
             const result = await this.courseSelectionService.setSelectedComponents(
                 course,
@@ -141,18 +160,27 @@ export class ScheduleController {
         this.closeComponentWizard();
     }
 
+    /**
+     * Handle wizard selection changes - update calendar preview
+     */
+    private onWizardSelectionChange(course: Course, selections: WizardSelections): void {
+        // Store preview data
+        this.wizardPreviewCourse = course;
+        this.wizardPreviewSelections = selections;
+
+        // Re-render calendar with preview
+        this.renderScheduleGrids();
+    }
+
     displayScheduleSelectedCourses(): void {
-        
+
         const selectedCoursesContainer = document.getElementById('schedule-selected-courses');
         const countElement = document.getElementById('schedule-selected-count');
-        
+
         if (!selectedCoursesContainer || !countElement) {
             console.log('❌ Missing DOM elements - selectedCoursesContainer or countElement not found');
             return;
         }
-
-        // Preserve dropdown states before refresh
-        const dropdownStates = this.statePreserver?.preserve();
 
         let selectedCourses = this.courseSelectionService.getSelectedCourses();
         
@@ -184,8 +212,8 @@ export class ScheduleController {
         
         if (hasActiveFilters) {
             // Display filtered sections
-            html = this.buildFilteredSectionsHTML(filteredSections, selectedCourses, dropdownStates);
-            
+            html = this.buildFilteredSectionsHTML(filteredSections, selectedCourses);
+
             // Update count to show section matches
             const uniqueCourses = new Set(filteredSections.map(fs => fs.course.course.id)).size;
             countElement.textContent = `(${filteredSections.length} sections in ${uniqueCourses} courses)`;
@@ -196,7 +224,7 @@ export class ScheduleController {
                 if (deptCompare !== 0) return deptCompare;
                 return a.course.number.localeCompare(b.course.number);
             });
-            
+
             html = this.buildAllCoursesHTML(sortedCourses);
             countElement.textContent = `(${selectedCourses.length})`;
         }
@@ -215,14 +243,9 @@ export class ScheduleController {
             // For filtered view, we need to set up mapping differently
             this.setupFilteredDOMElementMapping(selectedCoursesContainer, filteredSections);
         }
-
-        // Restore dropdown states after refresh
-        if (dropdownStates) {
-            this.statePreserver?.restore(dropdownStates);
-        }
     }
     
-    private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, _selectedCourses: any[], dropdownStates?: Map<string, boolean>): string {
+    private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, _selectedCourses: any[]): string {
         // Group filtered sections by course
         const sectionsByCourse = new Map();
         
@@ -250,115 +273,48 @@ export class ScheduleController {
         
         sortedEntries.forEach(([_courseId, data]) => {
             const selectedCourse = data.selectedCourse;
-            const matchingSections = data.sections;
             const course = selectedCourse.course;
-            
-            // Determine if this course should be expanded
-            // Default to expanded when filtering (so users can see the results)
-            // But preserve any explicit state from previous interactions
-            const isExpanded = dropdownStates?.has(course.id) ? dropdownStates.get(course.id)! : true;
-            
-            html += this.buildCourseHeaderHTML(course, selectedCourse, isExpanded);
-            
-            html += '<div class="schedule-sections-container">';
-            
-            // Group sections by term
-            const sectionsByTerm: any = {};
-            matchingSections.forEach((section: any) => {
-                if (!sectionsByTerm[section.computedTerm]) {
-                    sectionsByTerm[section.computedTerm] = [];
-                }
-                sectionsByTerm[section.computedTerm].push({
-                    section: section,
-                    filteredPeriods: section.periods // Show all periods in the section
-                });
-            });
-            
-            const terms = Object.keys(sectionsByTerm).sort();
-            terms.forEach((term: string) => {
-                html += `<div class="term-sections" data-term="${term}">`;
-                html += `<div class="term-label">${term} Term</div>`;
-                
-                sectionsByTerm[term].forEach((sectionData: any) => {
-                    const section = sectionData.section;
-                    const filteredPeriods = sectionData.filteredPeriods;
-                    const isSelected = selectedCourse.selectedSectionNumber === section.number;
-                    const selectedClass = isSelected ? 'selected' : '';
-                    
-                    html += `
-                        <div class="section-option ${selectedClass} filtered-section" data-section="${section.number}">
-                            <div class="section-info">
-                                <div class="section-number">${section.number}</div>
-                                <div class="section-periods">`;
-                    
-                    // Sort filtered periods by type priority
-                    const sortedPeriods = [...filteredPeriods].sort((a: any, b: any) => {
-                        const typePriority = (type: string) => {
-                            const lower = type.toLowerCase();
-                            if (lower.includes('lec') || lower.includes('lecture')) return 1;
-                            if (lower.includes('lab')) return 2;
-                            if (lower.includes('dis') || lower.includes('discussion') || lower.includes('rec')) return 3;
-                            return 4;
-                        };
-                        return typePriority(a.type) - typePriority(b.type);
-                    });
-                    
-                    // Display only the filtered periods (highlighted)
-                    sortedPeriods.forEach((period: any) => {
-                        const timeRange = TimeUtils.formatTimeRange(period.startTime, period.endTime);
-                        const days = TimeUtils.formatDays(period.days);
-                        const periodTypeLabel = this.getPeriodTypeLabel(period.type);
-                        const professor = period.professor && period.professor !== 'TBA' && period.professor !== 'Not Assigned' && period.professor.trim() !== '' ? period.professor : 'TBA';
 
-                        html += `
-                            <div class="period-info highlighted-period" data-period-type="${period.type.toLowerCase()}">
-                                <div class="period-header">
-                                    <span class="period-type-label">${periodTypeLabel}</span>
-                                    <span class="period-schedule">${days} ${timeRange} - ${professor}</span>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    html += `
-                                </div>
-                            </div>
-                            <button class="section-select-btn ${selectedClass}" data-section="${section.number}">
-                                ${isSelected ? '✓' : '+'}
-                            </button>
-                        </div>
-                    `;
-                });
-                
-                html += '</div>';
-            });
-            
-            html += '</div></div>';
+            html += this.buildCourseHeaderHTML(course, selectedCourse);
+            html += '</div>'; // Close schedule-course-item
         });
         
         return html;
     }
     
-    private buildCourseHeaderHTML(course: any, _selectedCourse: any, isExpanded: boolean = false): string {
-        const credits = course.minCredits === course.maxCredits 
-            ? `${course.minCredits} credits` 
+    private buildCourseHeaderHTML(course: any, selectedCourse: any): string {
+        const credits = course.minCredits === course.maxCredits
+            ? `${course.minCredits} credits`
             : `${course.minCredits}-${course.maxCredits} credits`;
-        
-        const expansionClass = isExpanded ? 'expanded' : 'collapsed';
-            
+
+        // Build selected components display
+        let selectedComponentsHTML = '';
+        if (selectedCourse) {
+            const components: string[] = [];
+            if (selectedCourse.selectedLecture) {
+                components.push(`<span class="selected-component lec">Lec ${selectedCourse.selectedLecture.number}</span>`);
+            }
+            if (selectedCourse.selectedDiscussion) {
+                components.push(`<span class="selected-component dis">Dis ${selectedCourse.selectedDiscussion.number}</span>`);
+            }
+            if (selectedCourse.selectedLab) {
+                components.push(`<span class="selected-component lab">Lab ${selectedCourse.selectedLab.number}</span>`);
+            }
+            if (components.length > 0) {
+                selectedComponentsHTML = `<div class="schedule-course-components">${components.join('')}</div>`;
+            }
+        }
+
         return `
-            <div class="schedule-course-item ${expansionClass}">
-                <div class="schedule-course-header dropdown-trigger">
+            <div class="schedule-course-item">
+                <div class="schedule-course-header">
                     <div class="schedule-course-info">
                         <div class="schedule-course-code">${course.department.abbreviation}${course.number}</div>
                         <div class="schedule-course-name">${course.name}</div>
+                        ${selectedComponentsHTML}
                         <div class="schedule-course-credits">${credits}</div>
                     </div>
                     <div class="header-controls">
-                        <button class="course-edit-btn" data-course-id="${course.id}" title="Edit section selections">
-                            ✏️
-                        </button>
-                        <span class="dropdown-arrow">▼</span>
                         <button class="course-remove-btn" title="Remove from selection">
                             ×
                         </button>
@@ -369,84 +325,14 @@ export class ScheduleController {
     
     private buildAllCoursesHTML(sortedCourses: any[]): string {
         let html = '';
-        
+
         sortedCourses.forEach(selectedCourse => {
             const course = selectedCourse.course;
-            
+
             html += this.buildCourseHeaderHTML(course, selectedCourse);
-            
-            // Group sections by term
-            const sectionsByTerm: { [term: string]: typeof course.sections } = {};
-            course.sections.forEach((section: Section) => {
-                if (!sectionsByTerm[section.computedTerm]) {
-                    sectionsByTerm[section.computedTerm] = [];
-                }
-                sectionsByTerm[section.computedTerm].push(section);
-            });
-
-            html += '<div class="schedule-sections-container">';
-
-            // Display sections grouped by term
-            const terms = Object.keys(sectionsByTerm).sort();
-            terms.forEach(term => {
-                html += `<div class="term-sections" data-term="${term}">`;
-                html += `<div class="term-label">${term} Term</div>`;
-                
-                sectionsByTerm[term].forEach((section: Section) => {
-                    const isSelected = selectedCourse.selectedSectionNumber === section.number;
-                    const selectedClass = isSelected ? 'selected' : '';
-                    
-                    // Sort periods by type priority (lecture first, then lab, then discussion)
-                    const sortedPeriods = [...section.periods].sort((a, b) => {
-                        const typePriority = (type: string) => {
-                            const lower = type.toLowerCase();
-                            if (lower.includes('lec') || lower.includes('lecture')) return 1;
-                            if (lower.includes('lab')) return 2;
-                            if (lower.includes('dis') || lower.includes('discussion') || lower.includes('rec')) return 3;
-                            return 4;
-                        };
-                        return typePriority(a.type) - typePriority(b.type);
-                    });
-                    
-                    html += `
-                        <div class="section-option ${selectedClass}"  data-section="${section.number}">
-                            <div class="section-info">
-                                <div class="section-number">${section.number}</div>
-                                <div class="section-periods">`;
-                    
-                    // Display all periods for this section
-                    sortedPeriods.forEach((period, _index) => {
-                        const timeRange = TimeUtils.formatTimeRange(period.startTime, period.endTime);
-                        const days = TimeUtils.formatDays(period.days);
-                        const periodTypeLabel = this.getPeriodTypeLabel(period.type);
-                        const professor = period.professor && period.professor !== 'TBA' && period.professor !== 'Not Assigned' && period.professor.trim() !== '' ? period.professor : 'TBA';
-
-                        html += `
-                            <div class="period-info" data-period-type="${period.type.toLowerCase()}">
-                                <div class="period-header">
-                                    <span class="period-type-label">${periodTypeLabel}</span>
-                                    <span class="period-schedule">${days} ${timeRange} - ${professor}</span>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    html += `
-                                </div>
-                            </div>
-                            <button class="section-select-btn ${selectedClass}" data-section="${section.number}">
-                                ${isSelected ? '✓' : '+'}
-                            </button>
-                        </div>
-                    `;
-                });
-                
-                html += '</div>';
-            });
-
-            html += '</div></div>';
+            html += '</div>'; // Close schedule-course-item
         });
-        
+
         return html;
     }
     
@@ -625,12 +511,46 @@ export class ScheduleController {
         });
     }
 
+    /**
+     * Apply wizard preview overlay to selected courses
+     */
+    private applyPreviewOverlay(courses: SelectedCourse[]): SelectedCourse[] {
+        if (!this.wizardPreviewCourse || !this.wizardPreviewSelections) {
+            return courses;
+        }
+
+        // Create a copy of courses array to avoid mutating original
+        const previewCourses = courses.map(sc => ({...sc}));
+
+        // Find the course being previewed
+        const previewIndex = previewCourses.findIndex(
+            sc => sc.course.id === this.wizardPreviewCourse!.id
+        );
+
+        if (previewIndex >= 0) {
+            // Update with preview selections
+            previewCourses[previewIndex] = {
+                ...previewCourses[previewIndex],
+                selectedLecture: this.wizardPreviewSelections.lecture,
+                selectedDiscussion: this.wizardPreviewSelections.discussion,
+                selectedLab: this.wizardPreviewSelections.lab
+            };
+        }
+
+        return previewCourses;
+    }
+
     renderScheduleGrids(): void {
-        const rawSelectedCourses = this.courseSelectionService.getSelectedCourses();
-        
+        let rawSelectedCourses = this.courseSelectionService.getSelectedCourses();
+
+        // Apply preview overlay if wizard is open
+        if (this.wizardPreviewCourse && this.wizardPreviewSelections) {
+            rawSelectedCourses = this.applyPreviewOverlay(rawSelectedCourses);
+        }
+
         // Sync section objects with section numbers before validation
         this.syncSectionObjects(rawSelectedCourses);
-        
+
         const selectedCourses = validateSelectedCourses(rawSelectedCourses);
         const grids = ['A', 'B', 'C', 'D'];
         
@@ -725,50 +645,65 @@ export class ScheduleController {
     private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number): { content: string, classes: string } {
         // Find all sections that occupy this cell
         const occupyingSections: any[] = [];
-        
-        
+
+
         for (const selectedCourse of courses) {
-            if (!selectedCourse.selectedSection) {
-                continue;
+            // Collect all component sections (lecture, discussion, lab)
+            const sections: Section[] = [];
+
+            if (selectedCourse.selectedLecture) {
+                sections.push(selectedCourse.selectedLecture);
             }
-            
-            const section = selectedCourse.selectedSection;
-            
-            // Check if this section has any period that occupies this time slot on this day
-            const periodsOnThisDay = section.periods.filter((period: any) => period.days.has(day));
-            
-            
-            let sectionOccupiesSlot = false;
-            let sectionStartSlot = Infinity;
-            let sectionEndSlot = -1;
-            let isFirstSlot = false;
-            
-            for (const period of periodsOnThisDay) {
-                const startSlot = TimeUtils.timeToGridRowStart(period.startTime);
-                const endSlot = TimeUtils.timeToGridRowEnd(period.endTime);
-                
-                
-                if (timeSlot >= startSlot && timeSlot < endSlot) {
-                    sectionOccupiesSlot = true;
-                    sectionStartSlot = Math.min(sectionStartSlot, startSlot);
-                    sectionEndSlot = Math.max(sectionEndSlot, endSlot);
-                    
+            if (selectedCourse.selectedDiscussion) {
+                sections.push(selectedCourse.selectedDiscussion);
+            }
+            if (selectedCourse.selectedLab) {
+                sections.push(selectedCourse.selectedLab);
+            }
+
+            // Fallback to legacy selectedSection if no components are set
+            if (sections.length === 0 && selectedCourse.selectedSection) {
+                sections.push(selectedCourse.selectedSection);
+            }
+
+            // Process each section
+            for (const section of sections) {
+                // Check if this section has any period that occupies this time slot on this day
+                const periodsOnThisDay = section.periods.filter((period: any) => period.days.has(day));
+
+
+                let sectionOccupiesSlot = false;
+                let sectionStartSlot = Infinity;
+                let sectionEndSlot = -1;
+                let isFirstSlot = false;
+
+                for (const period of periodsOnThisDay) {
+                    const startSlot = TimeUtils.timeToGridRowStart(period.startTime);
+                    const endSlot = TimeUtils.timeToGridRowEnd(period.endTime);
+
+
+                    if (timeSlot >= startSlot && timeSlot < endSlot) {
+                        sectionOccupiesSlot = true;
+                        sectionStartSlot = Math.min(sectionStartSlot, startSlot);
+                        sectionEndSlot = Math.max(sectionEndSlot, endSlot);
+
+                    }
                 }
-            }
-            
-            if (sectionOccupiesSlot) {
-                // Check if this is the first slot for this section on this day
-                isFirstSlot = timeSlot === sectionStartSlot;
-                
-                
-                occupyingSections.push({
-                    course: selectedCourse,
-                    section,
-                    periodsOnThisDay,
-                    startSlot: sectionStartSlot,
-                    endSlot: sectionEndSlot,
-                    isFirstSlot
-                });
+
+                if (sectionOccupiesSlot) {
+                    // Check if this is the first slot for this section on this day
+                    isFirstSlot = timeSlot === sectionStartSlot;
+
+
+                    occupyingSections.push({
+                        course: selectedCourse,
+                        section,
+                        periodsOnThisDay,
+                        startSlot: sectionStartSlot,
+                        endSlot: sectionEndSlot,
+                        isFirstSlot
+                    });
+                }
             }
         }
         
@@ -790,7 +725,7 @@ export class ScheduleController {
         const content = primarySection.isFirstSlot ? `
             <div class="section-block ${hasConflict ? 'conflict' : ''}"
                  data-course-id="${primarySection.course.course.id}"
-                 data-section-number="${primarySection.course.selectedSectionNumber || ''}"
+                 data-section-number="${primarySection.section.number}"
                  data-selected-course-index="${primarySection.courseIndex || 0}"
                  data-row-span="${rowSpan}"
                  style="
@@ -840,21 +775,6 @@ export class ScheduleController {
         }
         
         return colors[Math.abs(hash) % colors.length];
-    }
-
-    private getPeriodTypeLabel(type: string): string {
-        const lower = type.toLowerCase();
-        
-        if (lower.includes('lec') || lower.includes('lecture')) return 'LEC';
-        if (lower.includes('lab')) return 'LAB';
-        if (lower.includes('dis') || lower.includes('discussion')) return 'DIS';
-        if (lower.includes('rec') || lower.includes('recitation')) return 'REC';
-        if (lower.includes('sem') || lower.includes('seminar')) return 'SEM';
-        if (lower.includes('studio')) return 'STU';
-        if (lower.includes('conference') || lower.includes('conf')) return 'CONF';
-        
-        // Return abbreviated version for unknown types (first 3-4 chars)
-        return type.substring(0, Math.min(4, type.length)).toUpperCase();
     }
 
     getCourseFromElement(element: HTMLElement): Course | undefined {
@@ -925,13 +845,30 @@ export class ScheduleController {
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
         const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
 
-        if (!selectedCourse || !selectedCourse.selectedSection) {
-            console.warn('Course or section not found:', courseId, sectionNumber);
+        if (!selectedCourse) {
+            console.warn('Course not found:', courseId);
             return;
         }
 
         const course = selectedCourse.course;
-        const section = selectedCourse.selectedSection;
+
+        // Find the section from component selections or legacy selectedSection
+        let section: Section | null = null;
+
+        if (selectedCourse.selectedLecture?.number === sectionNumber) {
+            section = selectedCourse.selectedLecture;
+        } else if (selectedCourse.selectedDiscussion?.number === sectionNumber) {
+            section = selectedCourse.selectedDiscussion;
+        } else if (selectedCourse.selectedLab?.number === sectionNumber) {
+            section = selectedCourse.selectedLab;
+        } else if (selectedCourse.selectedSection?.number === sectionNumber) {
+            section = selectedCourse.selectedSection;
+        }
+
+        if (!section) {
+            console.warn('Section not found:', sectionNumber);
+            return;
+        }
 
         // Create section data for modal controller
         const sectionData = {

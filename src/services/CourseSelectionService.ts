@@ -21,7 +21,7 @@ export interface CourseSelectionResult {
 }
 
 export interface SelectionChangeEvent {
-    type: 'course_added' | 'course_removed' | 'section_changed' | 'selection_cleared' | 'data_loaded';
+    type: 'course_added' | 'course_removed' | 'section_changed' | 'selection_cleared' | 'data_loaded' | 'components_changed';
     course?: Course;
     section?: string | null;
     selectedCourses: SelectedCourse[];
