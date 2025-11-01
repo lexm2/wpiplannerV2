@@ -69,10 +69,12 @@ export function parseSectionDetails(sectionDetails: string): ParsedMeetingPatter
  * M = Monday, T = Tuesday, W = Wednesday, R = Thursday, F = Friday
  *
  * Handles various formats:
- * - Single letters: "M-T-R-F" -> mon, tue, thu, fri
- * - Multiple patterns: "M-T-R-F; W" -> mon, tue, thu, fri, wed
+ * - Single letters: "M-T-R-F" -> M, T, R, F
+ * - Multiple patterns: "M-T-R-F; W" -> M, T, R, F, W
  * - Abbreviations: "Mon", "Tue", etc.
  * - Full names: "Monday", "Tuesday", etc.
+ *
+ * Returns single uppercase letters for compact display
  */
 function parseDays(dayString: string): string[] {
     const days: string[] = [];
@@ -88,21 +90,21 @@ function parseDays(dayString: string): string[] {
 
         // Match single letter codes (most common in Workday data)
         if (trimmed === 'M') {
-            if (!days.includes('mon')) days.push('mon');
+            if (!days.includes('M')) days.push('M');
         } else if (trimmed === 'T' || trimmed === 'TU' || trimmed === 'TUE' || trimmed === 'TUESDAY') {
-            if (!days.includes('tue')) days.push('tue');
+            if (!days.includes('T')) days.push('T');
         } else if (trimmed === 'W' || trimmed === 'WED' || trimmed === 'WEDNESDAY') {
-            if (!days.includes('wed')) days.push('wed');
+            if (!days.includes('W')) days.push('W');
         } else if (trimmed === 'R' || trimmed === 'TH' || trimmed === 'THU' || trimmed === 'THURSDAY') {
-            if (!days.includes('thu')) days.push('thu');
+            if (!days.includes('R')) days.push('R');
         } else if (trimmed === 'F' || trimmed === 'FRI' || trimmed === 'FRIDAY') {
-            if (!days.includes('fri')) days.push('fri');
+            if (!days.includes('F')) days.push('F');
         } else if (trimmed === 'S' || trimmed === 'SA' || trimmed === 'SAT' || trimmed === 'SATURDAY') {
-            if (!days.includes('sat')) days.push('sat');
+            if (!days.includes('S')) days.push('S');
         } else if (trimmed === 'U' || trimmed === 'SU' || trimmed === 'SUN' || trimmed === 'SUNDAY') {
-            if (!days.includes('sun')) days.push('sun');
+            if (!days.includes('U')) days.push('U');
         } else if (trimmed === 'MON' || trimmed === 'MONDAY') {
-            if (!days.includes('mon')) days.push('mon');
+            if (!days.includes('M')) days.push('M');
         }
         // Ignore unrecognized parts (could be numbers, location names, etc.)
     }

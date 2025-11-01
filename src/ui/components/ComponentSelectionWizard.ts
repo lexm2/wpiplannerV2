@@ -229,7 +229,7 @@ export class ComponentSelectionWizard {
         // Add to sidebar
         sidebarContainer.appendChild(this.wizardPanel);
 
-        // Trigger slide animation
+        // Trigger fade-in for background (instant) and slide-in for cards
         requestAnimationFrame(() => {
             this.wizardPanel?.classList.add('active');
         });
@@ -247,15 +247,28 @@ export class ComponentSelectionWizard {
     close(): void {
         if (!this.wizardPanel) return;
 
-        this.wizardPanel.classList.remove('active');
+        // Get the active step and add slide-down animation
+        const activeStep = this.wizardPanel.querySelector('.wizard-step.active');
+        if (activeStep) {
+            activeStep.classList.add('slide-out-down');
+            activeStep.classList.remove('slide-in-right', 'slide-in-left');
+        }
 
+        // Wait for slide-down animation, then fade out background
         setTimeout(() => {
-            if (this.wizardPanel && this.container && this.container.contains(this.wizardPanel)) {
-                this.container.removeChild(this.wizardPanel);
-                this.wizardPanel = null;
-                this.container = null;
+            if (this.wizardPanel) {
+                this.wizardPanel.classList.remove('active');
+
+                // Wait for background fade, then remove from DOM
+                setTimeout(() => {
+                    if (this.wizardPanel && this.container && this.container.contains(this.wizardPanel)) {
+                        this.container.removeChild(this.wizardPanel);
+                        this.wizardPanel = null;
+                        this.container = null;
+                    }
+                }, 200); // Match background fade duration
             }
-        }, 300); // Match CSS transition duration
+        }, 300); // Match slide-down animation duration
 
         document.removeEventListener('keydown', this.handleEscapeKey);
     }
@@ -411,12 +424,39 @@ export class ComponentSelectionWizard {
     /**
      * Transition to a different step with animation
      */
-    private transitionToStep(_toStep: WizardStep, _direction: 'forward' | 'backward'): void {
+    private transitionToStep(_toStep: WizardStep, direction: 'forward' | 'backward'): void {
         if (!this.wizardPanel) return;
 
-        // Re-render with new step
-        this.wizardPanel.innerHTML = this.renderWizardContent();
-        this.attachEventListeners();
+        // Get current step element
+        const currentStepElement = this.wizardPanel.querySelector('.wizard-step.active');
+
+        if (currentStepElement) {
+            // Add exit animation class based on direction
+            const exitClass = direction === 'forward' ? 'slide-out-left' : 'slide-out-right';
+            currentStepElement.classList.add(exitClass);
+            currentStepElement.classList.remove('slide-in-right', 'slide-in-left');
+
+            // Wait for exit animation to complete
+            setTimeout(() => {
+                // Re-render with new step (which includes slide-in-right by default)
+                this.wizardPanel!.innerHTML = this.renderWizardContent();
+
+                // Get the new step element and add appropriate slide-in animation
+                const newStepElement = this.wizardPanel!.querySelector('.wizard-step.active');
+                if (newStepElement) {
+                    // Remove default slide-in-right, add direction-specific animation
+                    newStepElement.classList.remove('slide-in-right');
+                    const enterClass = direction === 'forward' ? 'slide-in-right' : 'slide-in-left';
+                    newStepElement.classList.add(enterClass);
+                }
+
+                this.attachEventListeners();
+            }, 300); // Match animation duration
+        } else {
+            // No current step element, just render
+            this.wizardPanel.innerHTML = this.renderWizardContent();
+            this.attachEventListeners();
+        }
     }
 
     /**
@@ -533,7 +573,7 @@ export class ComponentSelectionWizard {
         }
 
         return `
-            <div class="wizard-step active" data-step="${this.currentStep}">
+            <div class="wizard-step active slide-in-right" data-step="${this.currentStep}">
                 <h3 class="wizard-step-title">${stepTitles[this.currentStep]}</h3>
                 ${sectionsHTML}
             </div>
@@ -585,7 +625,7 @@ export class ComponentSelectionWizard {
      */
     private renderSectionCard(section: Section): string {
         const period = section.periods[0];
-        const days = period ? Array.from(period.days).join('').toUpperCase() : 'TBA';
+        const days = period ? Array.from(period.days).join('') : 'TBA';
         const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
         const location = period?.location || 'TBA';
         const professor = period?.professor || 'Not Assigned';
