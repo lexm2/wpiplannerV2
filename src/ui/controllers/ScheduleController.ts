@@ -188,6 +188,16 @@ export class ScheduleController {
             lab: selections.lab?.number || null
         });
 
+        // Debug: Check if lecture has periods with days
+        if (selections.lecture) {
+            console.log('[Preview] Lecture section:', selections.lecture.number);
+            console.log('[Preview] Lecture periods:', selections.lecture.periods?.length);
+            if (selections.lecture.periods && selections.lecture.periods.length > 0) {
+                const firstPeriod = selections.lecture.periods[0];
+                console.log('[Preview] First period days:', Array.from(firstPeriod.days || []));
+            }
+        }
+
         // Store preview data
         this.wizardPreviewCourse = course;
         this.wizardPreviewSelections = selections;
@@ -653,15 +663,23 @@ export class ScheduleController {
 
     private renderPopulatedGrid(container: HTMLElement, courses: any[], _term: string): void {
         container.classList.remove('empty');
-        
+
+        console.log(`[Grid] renderPopulatedGrid for term ${_term} with ${courses.length} courses`);
+        courses.forEach((sc, idx) => {
+            console.log(`[Grid] Course ${idx}: ${sc.course.department.abbreviation}${sc.course.number}`);
+            console.log(`[Grid]   - selectedLecture:`, sc.selectedLecture?.number || 'none');
+            console.log(`[Grid]   - selectedDiscussion:`, sc.selectedDiscussion?.number || 'none');
+            console.log(`[Grid]   - selectedLab:`, sc.selectedLab?.number || 'none');
+        });
+
         // Clean up existing event listeners before replacing DOM content
         const existingListener = this.containerEventListeners.get(container);
         if (existingListener) {
             container.removeEventListener('click', existingListener);
             this.containerEventListeners.delete(container);
         }
-        
-        // Create 5-day (Mon-Fri) × 24 time slot grid (7 AM - 7 PM, 30-min intervals)
+
+        // Create 5-day (Mon-Fri) × 12 time slot grid (7 AM - 7 PM, hourly intervals)
         const weekdays = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
         const timeSlots = TimeUtils.TOTAL_TIME_SLOTS;
         
@@ -675,13 +693,13 @@ export class ScheduleController {
         
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {
-            const hour = Math.floor(slot / TimeUtils.SLOTS_PER_HOUR) + TimeUtils.START_HOUR;
-            const minutes = (slot % TimeUtils.SLOTS_PER_HOUR) * 30;
+            const hour = slot + TimeUtils.START_HOUR;
+            const minutes = 0; // Hourly intervals only
             const timeLabel = TimeUtils.formatTime({ hours: hour, minutes: minutes, displayTime: '' });
-            
+
             // Time label cell
             html += `<div class="time-label">${timeLabel}</div>`;
-            
+
             // Schedule cells for each day
             weekdays.forEach(day => {
                 const cell = this.getCellContent(courses, day, slot);
@@ -699,6 +717,13 @@ export class ScheduleController {
         // Find all sections that occupy this cell
         const occupyingSections: any[] = [];
 
+        // Log for first 3 slots on Monday/Tuesday to see patterns
+        const debugLog = timeSlot < 3 && day <= DayOfWeek.TUESDAY;
+
+        if (debugLog) {
+            console.log(`[Cell] Checking slot ${timeSlot} (${timeSlot + TimeUtils.START_HOUR}:00), day ${day} (${TimeUtils.getDayAbbr(day)})`);
+            console.log(`[Cell] Processing ${courses.length} courses`);
+        }
 
         for (const selectedCourse of courses) {
             // Collect all component sections (lecture, discussion, lab)
@@ -719,11 +744,35 @@ export class ScheduleController {
                 sections.push(selectedCourse.selectedSection);
             }
 
+            if (debugLog) {
+                console.log(`[Cell] Course ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number}: ${sections.length} sections`);
+                sections.forEach((s, idx) => {
+                    console.log(`[Cell]   Section ${idx}: ${s.number}, periods: ${s.periods?.length || 0}`);
+                });
+            }
+
             // Process each section
             for (const section of sections) {
+                if (debugLog && section.periods.length > 0) {
+                    console.log(`[Cell] Section ${section.number}: checking against day "${day}" (type: ${typeof day})`);
+                    const firstPeriod = section.periods[0];
+                    console.log(`[Cell]   period.days type:`, typeof firstPeriod.days, firstPeriod.days);
+                    console.log(`[Cell]   period.days contents:`, Array.from(firstPeriod.days));
+                    console.log(`[Cell]   period.days.has("${day}")?:`, firstPeriod.days.has(day));
+                }
+
                 // Check if this section has any period that occupies this time slot on this day
                 const periodsOnThisDay = section.periods.filter((period: any) => period.days.has(day));
 
+                if (debugLog) {
+                    console.log(`[Cell] Section ${section.number}: ${periodsOnThisDay.length} periods on day ${day}`);
+                    if (periodsOnThisDay.length > 0) {
+                        periodsOnThisDay.forEach(p => {
+                            const daysList = Array.from(p.days).join(',');
+                            console.log(`[Cell]   - ${p.startTime.hours}:${String(p.startTime.minutes).padStart(2, '0')} - ${p.endTime.hours}:${String(p.endTime.minutes).padStart(2, '0')}, days: ${daysList}`);
+                        });
+                    }
+                }
 
                 let sectionOccupiesSlot = false;
                 let sectionStartSlot = Infinity;
@@ -734,6 +783,11 @@ export class ScheduleController {
                     const startSlot = TimeUtils.timeToGridRowStart(period.startTime);
                     const endSlot = TimeUtils.timeToGridRowEnd(period.endTime);
 
+                    if (debugLog) {
+                        console.log(`[Cell]   Period: ${period.startTime.hours}:${period.startTime.minutes.toString().padStart(2, '0')} - ${period.endTime.hours}:${period.endTime.minutes.toString().padStart(2, '0')}`);
+                        console.log(`[Cell]   Slots: start=${startSlot}, end=${endSlot}, current=${timeSlot}`);
+                        console.log(`[Cell]   Occupies? ${timeSlot >= startSlot && timeSlot < endSlot}`);
+                    }
 
                     if (timeSlot >= startSlot && timeSlot < endSlot) {
                         sectionOccupiesSlot = true;
@@ -747,6 +801,15 @@ export class ScheduleController {
                     // Check if this is the first slot for this section on this day
                     isFirstSlot = timeSlot === sectionStartSlot;
 
+                    // Calculate actual start and end times in minutes for precise height
+                    let earliestStartMinutes = Infinity;
+                    let latestEndMinutes = -1;
+                    for (const period of periodsOnThisDay) {
+                        const startMinutes = period.startTime.hours * 60 + period.startTime.minutes;
+                        const endMinutes = period.endTime.hours * 60 + period.endTime.minutes;
+                        earliestStartMinutes = Math.min(earliestStartMinutes, startMinutes);
+                        latestEndMinutes = Math.max(latestEndMinutes, endMinutes);
+                    }
 
                     occupyingSections.push({
                         course: selectedCourse,
@@ -754,12 +817,18 @@ export class ScheduleController {
                         periodsOnThisDay,
                         startSlot: sectionStartSlot,
                         endSlot: sectionEndSlot,
-                        isFirstSlot
+                        isFirstSlot,
+                        startMinutes: earliestStartMinutes,
+                        endMinutes: latestEndMinutes
                     });
                 }
             }
         }
-        
+
+        if (debugLog) {
+            console.log(`[Cell] Found ${occupyingSections.length} occupying sections for this slot`);
+        }
+
         if (occupyingSections.length === 0) {
             return { content: '', classes: '' };
         }
@@ -768,26 +837,28 @@ export class ScheduleController {
         const hasConflict = occupyingSections.length > 1;
         const primarySection = occupyingSections[0];
         const courseColor = this.getCourseColor(primarySection.course.course.id);
-        
-        // Calculate how many rows this section should span
-        const rowSpan = primarySection.endSlot - primarySection.startSlot;
-        const heightInPixels = rowSpan * 30; // 30px per row
-        
-        
+
+        // Calculate precise height based on actual duration in minutes
+        // Each hourly slot represents 60 minutes
+        const durationMinutes = primarySection.endMinutes - primarySection.startMinutes;
+        const startOffsetMinutes = primarySection.startMinutes - (TimeUtils.START_HOUR * 60);
+        const slotStartMinutes = timeSlot * 60; // Minutes from START_HOUR for this slot
+        const topOffsetPercent = ((startOffsetMinutes - slotStartMinutes) / 60) * 100;
+        const heightPercent = (durationMinutes / 60) * 100;
+
+
         // Build content for the first section in the slot - simplified to show only course name
         const content = primarySection.isFirstSlot ? `
             <div class="section-block ${hasConflict ? 'conflict' : ''}"
                  data-course-id="${primarySection.course.course.id}"
                  data-section-number="${primarySection.section.number}"
                  data-selected-course-index="${primarySection.courseIndex || 0}"
-                 data-row-span="${rowSpan}"
                  style="
                 background-color: ${courseColor};
-                --row-span: ${rowSpan};
-                --pixel-height: ${heightInPixels}px;
+                height: ${heightPercent}%;
                 width: 100%;
                 position: absolute;
-                top: 0;
+                top: ${topOffsetPercent}%;
                 left: 0;
                 z-index: 10;
                 border: 1px solid rgba(0,0,0,0.2);

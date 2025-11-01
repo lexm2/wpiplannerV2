@@ -464,16 +464,16 @@
   flex: 1;
   display: grid;
   grid-template-columns: 60px repeat(5, 1fr);
-  grid-template-rows: 30px repeat(24, 30px);
+  grid-template-rows: auto repeat(12, 1fr);
   gap: 1px;
   background: var(--color-border);
   font-size: 0.7rem;
-  overflow: auto;
-  min-height: 200px;
+  overflow: hidden;
+  min-height: 150px;
 }
 
 .term-graph.focused-term .schedule-grid {
-  grid-template-rows: auto repeat(24, 1fr);
+  grid-template-rows: auto repeat(12, 1fr);
   overflow: hidden;
   min-height: 0;
 }
@@ -484,10 +484,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
-  padding: 0 0.25rem;
+  padding: 0.25rem;
   border-right: 2px solid var(--color-border);
 }
 
@@ -546,17 +546,9 @@
   cursor: pointer;
   transition: var(--effect-transition);
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   z-index: 10;
   overflow: hidden;
-  height: var(--pixel-height);
-}
-
-.term-graph.focused-term .section-block {
-  height: calc(var(--row-span) * 100%);
+  /* Height and position set inline based on actual class duration */
 }
 
 .section-block:hover {

@@ -435,19 +435,19 @@ export class CourseDataService {
     
     private parseConstructedDays(days: string[]): Set<DayOfWeek> {
         const daySet = new Set<DayOfWeek>();
-        
+
         for (const day of days) {
-            switch (day.toLowerCase()) {
-                case 'mon': daySet.add(DayOfWeek.MONDAY); break;
-                case 'tue': daySet.add(DayOfWeek.TUESDAY); break;
-                case 'wed': daySet.add(DayOfWeek.WEDNESDAY); break;
-                case 'thu': daySet.add(DayOfWeek.THURSDAY); break;
-                case 'fri': daySet.add(DayOfWeek.FRIDAY); break;
-                case 'sat': daySet.add(DayOfWeek.SATURDAY); break;
-                case 'sun': daySet.add(DayOfWeek.SUNDAY); break;
+            switch (day.toUpperCase()) {
+                case 'M': daySet.add(DayOfWeek.MONDAY); break;
+                case 'T': daySet.add(DayOfWeek.TUESDAY); break;
+                case 'W': daySet.add(DayOfWeek.WEDNESDAY); break;
+                case 'R': daySet.add(DayOfWeek.THURSDAY); break;
+                case 'F': daySet.add(DayOfWeek.FRIDAY); break;
+                case 'S': daySet.add(DayOfWeek.SATURDAY); break;
+                case 'U': daySet.add(DayOfWeek.SUNDAY); break;
             }
         }
-        
+
         return daySet;
     }
 

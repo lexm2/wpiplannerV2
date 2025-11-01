@@ -5,7 +5,7 @@ export class TimeUtils {
     static readonly START_HOUR = 7;  // 7 AM
     static readonly END_HOUR = 19;   // 7 PM
     static readonly TOTAL_HOURS = 12;
-    static readonly SLOTS_PER_HOUR = 2; // 30-minute intervals
+    static readonly SLOTS_PER_HOUR = 1; // 60-minute intervals (hourly)
     static readonly TOTAL_TIME_SLOTS = TimeUtils.TOTAL_HOURS * TimeUtils.SLOTS_PER_HOUR;
 
     // Days of the week in order
@@ -28,11 +28,11 @@ export class TimeUtils {
         const totalMinutes = time.hours * 60 + time.minutes;
         const startMinutes = TimeUtils.START_HOUR * 60;
         const relativeMinutes = totalMinutes - startMinutes;
-        
-        // Convert to 30-minute slots, round DOWN for start times
-        const slot = Math.floor(relativeMinutes / 30);
+
+        // Convert to 60-minute slots, round DOWN for start times
+        const slot = Math.floor(relativeMinutes / 60);
         const boundedSlot = Math.max(0, Math.min(slot, TimeUtils.TOTAL_TIME_SLOTS - 1));
-        
+
         return boundedSlot;
     }
 
@@ -44,12 +44,12 @@ export class TimeUtils {
         const totalMinutes = time.hours * 60 + time.minutes;
         const startMinutes = TimeUtils.START_HOUR * 60;
         const relativeMinutes = totalMinutes - startMinutes;
-        
-        // Convert to 30-minute slots, round UP for end times
-        const slot = Math.ceil(relativeMinutes / 30);
+
+        // Convert to 60-minute slots, round UP for end times
+        const slot = Math.ceil(relativeMinutes / 60);
         const boundedSlot = Math.max(0, Math.min(slot, TimeUtils.TOTAL_TIME_SLOTS - 1));
-        
-        
+
+
         return boundedSlot;
     }
 
@@ -134,15 +134,15 @@ export class TimeUtils {
      */
     static generateTimeLabels(): string[] {
         const labels: string[] = [];
-        
+
         for (let slot = 0; slot < TimeUtils.TOTAL_TIME_SLOTS; slot++) {
-            const hour = Math.floor(slot / TimeUtils.SLOTS_PER_HOUR) + TimeUtils.START_HOUR;
-            const minutes = (slot % TimeUtils.SLOTS_PER_HOUR) * 30;
-            
-            // Show labels for both :00 and :30 times
+            const hour = slot + TimeUtils.START_HOUR;
+            const minutes = 0; // Only show on-the-hour labels
+
+            // Show labels for hourly times only
             labels.push(TimeUtils.formatTime({ hours: hour, minutes: minutes, displayTime: '' }));
         }
-        
+
         return labels;
     }
 

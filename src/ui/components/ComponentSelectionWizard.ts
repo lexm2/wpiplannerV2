@@ -50,6 +50,10 @@ export class ComponentSelectionWizard {
         this.onCancel = onCancel;
         this.onSelectionChange = onSelectionChange;
 
+        console.log('[Wizard] Constructor called');
+        console.log('[Wizard] Has onSelectionChange callback:', !!this.onSelectionChange);
+        console.log('[Wizard] Course:', course.department.abbreviation + course.number);
+
         // Initialize selections from existing if editing
         this.selections = {
             lecture: existingSelections?.selectedLecture || null,
@@ -365,8 +369,12 @@ export class ComponentSelectionWizard {
         }
 
         // Trigger live preview callback
+        console.log('[Wizard] About to call onSelectionChange, exists:', !!this.onSelectionChange);
         if (this.onSelectionChange) {
+            console.log('[Wizard] Calling onSelectionChange with selections:', this.selections);
             this.onSelectionChange(this.selections);
+        } else {
+            console.warn('[Wizard] onSelectionChange is undefined! Cannot trigger preview.');
         }
     }
 

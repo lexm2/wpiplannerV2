@@ -68,13 +68,13 @@ export interface Time {
 }
 
 export enum DayOfWeek {
-    MONDAY = 'mon',
-    TUESDAY = 'tue',
-    WEDNESDAY = 'wed',
-    THURSDAY = 'thu',
-    FRIDAY = 'fri',
-    SATURDAY = 'sat',
-    SUNDAY = 'sun'
+    MONDAY = 'M',
+    TUESDAY = 'T',
+    WEDNESDAY = 'W',
+    THURSDAY = 'R',
+    FRIDAY = 'F',
+    SATURDAY = 'S',
+    SUNDAY = 'U'
 }
 
 export interface ScheduleDB {
