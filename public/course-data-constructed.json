@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 1, 2025, 10:49 PM",
+  "generated": "Nov 1, 2025, 11:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -13851,7 +13851,7 @@
                 "crn": 341859,
                 "number": "DL01",
                 "seats": 12,
-                "seats_available": 1,
+                "seats_available": 0,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4865",
@@ -13870,7 +13870,7 @@
                     "building": "",
                     "room": "Goddard Hall 306 CH Lab",
                     "seats": 12,
-                    "seats_available": 1,
+                    "seats_available": 0,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "DL01",
@@ -13886,7 +13886,7 @@
                   "crn": 341946,
                   "number": "DX01",
                   "seats": 12,
-                  "seats_available": 1,
+                  "seats_available": 0,
                   "actual_waitlist": 0,
                   "max_waitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4865",
@@ -13905,7 +13905,7 @@
                       "building": "",
                       "room": "Goddard Hall 306 CH Lab",
                       "seats": 12,
-                      "seats_available": 1,
+                      "seats_available": 0,
                       "actual_waitlist": 0,
                       "max_waitlist": 0,
                       "specific_section": "DX01",
