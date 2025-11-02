@@ -117,6 +117,25 @@ export class ScheduleController {
             return;
         }
 
+        // Get all currently selected courses for conflict detection context
+        const allSelectedCourses = this.courseSelectionService.getSelectedCourses();
+        console.log('[ScheduleController] All selected courses:', allSelectedCourses.length);
+        allSelectedCourses.forEach(sc => {
+            console.log(`  - ${sc.course.department.abbreviation}${sc.course.number}:`, {
+                lecture: sc.selectedLecture?.number,
+                discussion: sc.selectedDiscussion?.number,
+                lab: sc.selectedLab?.number,
+                lecturePeriods: sc.selectedLecture?.periods.length,
+                discussionPeriods: sc.selectedDiscussion?.periods.length,
+                labPeriods: sc.selectedLab?.periods.length
+            });
+        });
+
+        // Filter out the current course being edited from the context
+        // This prevents the wizard from checking conflicts against itself
+        const otherSelectedCourses = allSelectedCourses.filter(sc => sc.course.id !== freshCourse.id);
+        console.log('[ScheduleController] Other selected courses for conflict checking:', otherSelectedCourses.length);
+
         // Create new wizard with fresh course data
         this.componentWizard = new ComponentSelectionWizard(
             freshCourse,
@@ -125,7 +144,8 @@ export class ScheduleController {
             () => this.closeComponentWizard(),
             existingSelections,
             (selections) => this.onWizardSelectionChange(freshCourse, selections),
-            this.scheduleFilterService || undefined
+            this.scheduleFilterService || undefined,
+            otherSelectedCourses
         );
 
         this.componentWizard.open();

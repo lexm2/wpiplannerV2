@@ -39,6 +39,7 @@ export class ComponentSelectionWizard {
     private availableSteps: WizardStep[] = [];
     private wizardPanel: HTMLElement | null = null;
     private filterChangeHandler: (() => void) | null = null;
+    private allSelectedCourses: SelectedCourse[] = [];
 
     constructor(
         course: Course,
@@ -47,7 +48,8 @@ export class ComponentSelectionWizard {
         onCancel: () => void,
         existingSelections?: SelectedCourse,
         onSelectionChange?: (selections: WizardSelections) => void,
-        scheduleFilterService?: ScheduleFilterService
+        scheduleFilterService?: ScheduleFilterService,
+        allSelectedCourses?: SelectedCourse[]
     ) {
         this.course = course;
         this.courseDataService = courseDataService;
@@ -55,11 +57,23 @@ export class ComponentSelectionWizard {
         this.onCancel = onCancel;
         this.onSelectionChange = onSelectionChange;
         this.scheduleFilterService = scheduleFilterService || null;
+        this.allSelectedCourses = allSelectedCourses || [];
 
         console.log('[Wizard] Constructor called');
         console.log('[Wizard] Has onSelectionChange callback:', !!this.onSelectionChange);
         console.log('[Wizard] Has scheduleFilterService:', !!this.scheduleFilterService);
         console.log('[Wizard] Course:', course.department.abbreviation + course.number);
+        console.log('[Wizard] All selected courses count:', this.allSelectedCourses.length);
+        if (this.allSelectedCourses.length > 0) {
+            console.log('[Wizard] Selected courses for conflict context:');
+            this.allSelectedCourses.forEach(sc => {
+                console.log(`  - ${sc.course.department.abbreviation}${sc.course.number}:`, {
+                    lecture: sc.selectedLecture?.number,
+                    discussion: sc.selectedDiscussion?.number,
+                    lab: sc.selectedLab?.number
+                });
+            });
+        }
 
         // Initialize selections from existing if editing
         this.selections = {
@@ -239,6 +253,15 @@ export class ComponentSelectionWizard {
             }
         }
 
+        // Apply term filtering ONLY for child components (discussions/labs)
+        // based on the selected lecture's term
+        // NEVER filter lectures - users must be able to select any term freely
+        if (step !== 'lecture' && this.selections.lecture && sections.length > 0) {
+            const lectureTerm = this.selections.lecture.computedTerm;
+            console.log(`[Wizard] Filtering ${step} by lecture's term: ${lectureTerm}`);
+            sections = this.filterSectionsByTerm(sections, lectureTerm);
+        }
+
         // Apply schedule filters if available
         if (this.scheduleFilterService && sections.length > 0) {
             const filteredSections = this.applyScheduleFilters(sections, step);
@@ -247,6 +270,19 @@ export class ComponentSelectionWizard {
         }
 
         return sections;
+    }
+
+    /**
+     * Filter sections to only include those matching the specified term
+     * @param sections - Sections to filter
+     * @param term - The term to filter by (e.g., 'A', 'B', 'C', 'D', 'E')
+     * @returns Filtered sections matching the term
+     */
+    private filterSectionsByTerm(sections: Section[], term: string): Section[] {
+        console.log(`[Wizard] Filtering ${sections.length} sections by term: ${term}`);
+        const filtered = sections.filter(section => section.computedTerm === term);
+        console.log(`[Wizard] After term filtering: ${filtered.length} sections remain`);
+        return filtered;
     }
 
     /**
@@ -266,6 +302,13 @@ export class ComponentSelectionWizard {
             console.log(`[Wizard Filter] RMP service loaded:`, rateMyProfessorService.isLoaded());
         } else {
             console.log(`[Wizard Filter] ℹ RMP filter is NOT active`);
+        }
+
+        // Check for conflict filter specifically
+        const conflictFilter = activeFilters.find(f => f.id === 'periodConflict');
+        if (conflictFilter) {
+            console.log(`[Wizard Filter] ✓ Conflict filter is ACTIVE`);
+            console.log(`[Wizard Filter] All selected courses for context:`, this.allSelectedCourses.length);
         }
 
         // Filter sections individually through the schedule filter service
@@ -293,11 +336,19 @@ export class ComponentSelectionWizard {
                 lab: tempSelectedCourse.selectedLab?.number
             });
 
+            // Combine the temp selected course with all other selected courses for context
+            // This allows conflict detection to check against OTHER courses
+            const allCoursesForFiltering = [tempSelectedCourse, ...this.allSelectedCourses];
+            console.log(`[Wizard Filter] Passing ${allCoursesForFiltering.length} courses to filterSections (1 temp + ${this.allSelectedCourses.length} others)`);
+
             // Test if this section passes the filters
-            const filtered = this.scheduleFilterService.filterSections([tempSelectedCourse]);
+            const filtered = this.scheduleFilterService.filterSections(allCoursesForFiltering);
             const passes = filtered.length > 0;
 
-            console.log(`[Wizard Filter] Section ${section.number} ${passes ? 'PASSES' : 'FAILS'} filters`);
+            console.log(`[Wizard Filter] Section ${section.number} ${passes ? 'PASSES' : 'FAILS'} filters (filtered: ${filtered.length})`);
+            if (!passes && conflictFilter) {
+                console.log(`[Wizard Filter] Section ${section.number} was FILTERED OUT by conflict detection`);
+            }
 
             return passes;
         });

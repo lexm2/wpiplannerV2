@@ -135,6 +135,7 @@ export interface PeriodAvailabilityFilterCriteria {
 
 export interface PeriodConflictFilterCriteria {
     avoidConflicts: boolean;
+    selectedCourses?: any[]; // Array of SelectedCourse objects for context-aware conflict detection
 }
 
 export interface SectionCodeFilterCriteria {

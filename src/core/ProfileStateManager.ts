@@ -269,7 +269,7 @@ export class ProfileStateManager {
             const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
             if (selectedCourse) {
                 let sectionObject: Section | null = null;
-                
+
                 if (sectionNumber) {
                     // Find the section in the course
                     sectionObject = course.sections?.find(s => s.number === sectionNumber) || null;
@@ -293,6 +293,37 @@ export class ProfileStateManager {
 
                 this.updateActiveScheduleWithCurrentCourses();
                 this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
+            }
+        });
+    }
+
+    setSelectedComponents(
+        course: Course,
+        lecture: Section | null,
+        discussion: Section | null,
+        lab: Section | null,
+        source: string = 'user'
+    ): void {
+        this.withStateUpdate(() => {
+            const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
+            if (selectedCourse) {
+                // Update component selections
+                selectedCourse.selectedLecture = lecture;
+                selectedCourse.selectedDiscussion = discussion;
+                selectedCourse.selectedLab = lab;
+
+                // For backward compatibility, set selectedSection to lecture (primary component)
+                selectedCourse.selectedSection = lecture;
+                selectedCourse.selectedSectionNumber = lecture?.number || null;
+
+                this.updateActiveScheduleWithCurrentCourses();
+                this.emitEvent('courses_changed', {
+                    course,
+                    lecture: lecture?.number,
+                    discussion: discussion?.number,
+                    lab: lab?.number,
+                    action: 'components_changed'
+                }, source);
             }
         });
     }

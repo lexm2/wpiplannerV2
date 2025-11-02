@@ -4,7 +4,7 @@ import { ProfileStateManager } from './ProfileStateManager'
 
 export interface PendingOperation {
     id: string;
-    type: 'select_course' | 'unselect_course' | 'set_section';
+    type: 'select_course' | 'unselect_course' | 'set_section' | 'set_components';
     courseId: string;
     data: any;
     timestamp: number;
@@ -289,7 +289,7 @@ export class UIStateBuffer {
             // Queue backend operation
             this.queueOperation({
                 id: this.generateOperationId(),
-                type: 'set_section', // Reuse set_section type for now
+                type: 'set_components',
                 courseId: course.id,
                 data: { course, lecture, discussion, lab },
                 timestamp: Date.now(),
@@ -601,7 +601,17 @@ export class UIStateBuffer {
                     'ui_buffer'
                 );
                 break;
-                
+
+            case 'set_components':
+                this.profileStateManager.setSelectedComponents(
+                    operation.data.course,
+                    operation.data.lecture,
+                    operation.data.discussion,
+                    operation.data.lab,
+                    'ui_buffer'
+                );
+                break;
+
             default:
                 throw new Error(`Unknown operation type: ${operation.type}`);
         }

@@ -76,13 +76,17 @@ function createCourse(id: string, number: string, sections: Section[]): Course {
 
 // Helper function to create a selected course
 function createSelectedCourse(course: Course, selectedSectionNumber: string | null = null): SelectedCourse {
-    const selectedSection = selectedSectionNumber ? 
+    const selectedSection = selectedSectionNumber ?
         course.sections.find(s => s.number === selectedSectionNumber) || null : null;
 
+    // Use new format: assign section as lecture by default (tests don't use hierarchical structure)
     return {
         course,
-        selectedSection,
-        selectedSectionNumber,
+        selectedLecture: selectedSection,
+        selectedDiscussion: null,
+        selectedLab: null,
+        selectedSection,  // Keep for now
+        selectedSectionNumber,  // Keep for now
         isRequired: false
     };
 }

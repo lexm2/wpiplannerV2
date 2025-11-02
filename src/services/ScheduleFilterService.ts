@@ -527,10 +527,17 @@ export class ScheduleFilterService {
                 }
             } else if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
                 // Special handling for conflict filter which needs additional context
+                console.log('[ScheduleFilterService] Applying conflict filter');
+                console.log('[ScheduleFilterService] Input sections:', allSections.length);
+                console.log('[ScheduleFilterService] Selected courses for context:', selectedCourses.length);
+                console.log('[ScheduleFilterService] Criteria:', activeFilter.criteria);
+
                 allSections = this.periodConflictFilter.applyToSectionsWithContext(allSections, {
                     ...activeFilter.criteria,
                     selectedCourses: selectedCourses
                 });
+
+                console.log('[ScheduleFilterService] Output sections after conflict filter:', allSections.length);
             } else {
                 const sectionFilter = this.registeredSectionFilters.get(activeFilter.id);
                 if (sectionFilter && (sectionFilter as any).applyToSectionsWithContext) {
