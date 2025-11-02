@@ -456,35 +456,76 @@ describe('PeriodConflictFilter', () => {
             expect(result[0].section.number).toBe('B01');
         });
 
-        test('should NOT filter sections from same course even if they conflict', () => {
-            // Create a course with multiple sections that conflict with each other
-            const section1 = createSection(12345, 'A01', [
+        test('should filter discussion/lab sections that conflict with selected lecture from same course', () => {
+            // Create a course with lecture and discussion that conflict
+            const lecture = createSection(12345, 'A01', [
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
             ]);
-            const section2 = createSection(12346, 'B01', [
-                createPeriod('Lecture', 'Prof B', 11, 13, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY]), // Conflicts with A01
-                createPeriod('Lab', 'Prof B', 14, 16, [DayOfWeek.FRIDAY])
+            const discussion1 = createSection(12346, 'D01', [
+                createPeriod('Discussion', 'TA A', 11, 12, [DayOfWeek.MONDAY]), // Conflicts with lecture
             ]);
-            const course = createCourse('CS-101', 'CS-101', [section1, section2]);
-            const selectedCourseObj = createSelectedCourse(course, 'A01'); // Select A01
+            const discussion2 = createSection(12347, 'D02', [
+                createPeriod('Discussion', 'TA B', 14, 15, [DayOfWeek.MONDAY]), // Does not conflict
+            ]);
+            const course = createCourse('CS-101', 'CS-101', [lecture, discussion1, discussion2]);
+
+            // Simulate wizard: lecture is selected, testing discussions
+            const selectedCourseWithLecture: SelectedCourse = {
+                course,
+                selectedLecture: lecture,
+                selectedDiscussion: null,
+                selectedLab: null,
+                selectedSection: lecture,
+                selectedSectionNumber: 'A01',
+                isRequired: false
+            };
+
+            // Test D01 (conflicts with lecture)
+            const tempCourseD01: SelectedCourse = {
+                course,
+                selectedLecture: lecture,
+                selectedDiscussion: discussion1,  // Testing this discussion
+                selectedLab: null,
+                selectedSection: discussion1,
+                selectedSectionNumber: 'D01',
+                isRequired: false
+            };
 
             const sectionsWithContext = [
-                { course: selectedCourseObj, section: section1 }, // A01 (selected)
-                { course: selectedCourseObj, section: section2 }  // B01 (conflicts but same course)
+                { course: tempCourseD01, section: discussion1 }
             ];
 
             const criteria: PeriodConflictCriteria = {
                 avoidConflicts: true,
-                selectedCourses: [selectedCourseObj]
+                selectedCourses: [selectedCourseWithLecture]
             };
 
             const filter = new PeriodConflictFilter(conflictDetector);
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
-            
-            // Both sections should remain - same course conflicts are allowed
-            expect(result).toHaveLength(2);
-            expect(result[0].section.number).toBe('A01');
-            expect(result[1].section.number).toBe('B01');
+
+            // Discussion D01 should be filtered out because it conflicts with the lecture
+            expect(result).toHaveLength(0);
+
+            // Test D02 (does not conflict)
+            const tempCourseD02: SelectedCourse = {
+                course,
+                selectedLecture: lecture,
+                selectedDiscussion: discussion2,  // Testing this discussion
+                selectedLab: null,
+                selectedSection: discussion2,
+                selectedSectionNumber: 'D02',
+                isRequired: false
+            };
+
+            const sectionsWithContext2 = [
+                { course: tempCourseD02, section: discussion2 }
+            ];
+
+            const result2 = filter.applyToSectionsWithContext(sectionsWithContext2, criteria);
+
+            // Discussion D02 should pass because it doesn't conflict
+            expect(result2).toHaveLength(1);
+            expect(result2[0].section.number).toBe('D02');
         });
 
         test('should handle multiple sections from different courses', () => {

@@ -265,26 +265,41 @@ export class PeriodConflictFilter implements SectionFilter {
 
             console.log(`[PeriodConflictFilter] Testing section ${currentSection.number} from ${currentCourse.department.abbreviation}${currentCourse.number}`);
 
-            // Get selected sections from OTHER courses (exclude current course)
-            const otherCoursesSelectedSections: Section[] = [];
+            // Build list of sections to check against:
+            // 1. Same course: selected components EXCEPT the section being tested (to check lecture vs discussion, etc.)
+            // 2. Other courses: ALL selected sections (to check cross-course conflicts)
+            const sectionsToCheckAgainst: Section[] = [];
+
             for (const [courseId, selectedSections] of selectedSectionsByCourse.entries()) {
-                if (courseId !== currentCourse.id) {
-                    // Add all selected sections from this other course
-                    otherCoursesSelectedSections.push(...selectedSections);
-                    console.log(`[PeriodConflictFilter]   Will check against ${selectedSections.length} sections from course ${courseId}`);
+                if (courseId === currentCourse.id) {
+                    // Same course: check against other components (exclude current section being tested)
+                    // This allows checking discussion against lecture, lab against lecture, etc.
+                    const otherComponents = selectedSections.filter(s => s.crn !== currentSection.crn);
+                    sectionsToCheckAgainst.push(...otherComponents);
+
+                    if (otherComponents.length > 0) {
+                        console.log(`[PeriodConflictFilter]   Checking against ${otherComponents.length} other components from same course`);
+                        otherComponents.forEach(s => {
+                            console.log(`[PeriodConflictFilter]     - ${s.number} (${s.periods.length} periods)`);
+                        });
+                    }
+                } else {
+                    // Different course: check against ALL selected sections
+                    sectionsToCheckAgainst.push(...selectedSections);
+                    console.log(`[PeriodConflictFilter]   Checking against ${selectedSections.length} sections from other course ${courseId}`);
                     selectedSections.forEach(s => {
                         console.log(`[PeriodConflictFilter]     - ${s.number} (${s.periods.length} periods)`);
                     });
                 }
             }
 
-            // If no other courses have selected sections, no conflicts to check
-            if (otherCoursesSelectedSections.length === 0) {
-                console.log(`[PeriodConflictFilter]   ✓ PASS - No other courses to check`);
+            // If no sections to check against, no conflicts possible
+            if (sectionsToCheckAgainst.length === 0) {
+                console.log(`[PeriodConflictFilter]   ✓ PASS - No selected sections to check against`);
                 return true;
             }
 
-            // Check if ANY period in the current section conflicts with selected sections from other courses
+            // Check if ANY period in the current section conflicts
             for (const currentPeriod of currentSection.periods) {
                 // Create a temporary section containing just this period
                 const tempSection: Section = {
@@ -300,8 +315,8 @@ export class PeriodConflictFilter implements SectionFilter {
                     computedTerm: 'TEMP'
                 };
 
-                // Test if this period conflicts with any selected sections from OTHER courses
-                const testSections = [...otherCoursesSelectedSections, tempSection];
+                // Test if this period conflicts with any selected sections
+                const testSections = [...sectionsToCheckAgainst, tempSection];
                 const conflicts = this.conflictDetector.detectConflicts(testSections);
 
                 // If ANY period in this section conflicts, filter out the ENTIRE section
