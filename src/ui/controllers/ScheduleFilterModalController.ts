@@ -768,9 +768,15 @@ export class ScheduleFilterModalController {
             ratingMinInput.addEventListener('input', () => {
                 const min = parseFloat(ratingMinInput.value);
                 const max = parseFloat(ratingMaxInput.value);
+
+                // Prevent min from exceeding max
                 if (min > max) {
-                    ratingMaxInput.value = ratingMinInput.value;
+                    ratingMinInput.value = max.toString();
                 }
+
+                // Update max slider's min constraint
+                ratingMaxInput.min = ratingMinInput.value;
+
                 if (ratingMinValue) ratingMinValue.textContent = parseFloat(ratingMinInput.value).toFixed(1);
                 if (ratingMaxValue) ratingMaxValue.textContent = parseFloat(ratingMaxInput.value).toFixed(1);
                 debouncedUpdateFilter();
@@ -778,9 +784,15 @@ export class ScheduleFilterModalController {
             ratingMaxInput.addEventListener('input', () => {
                 const min = parseFloat(ratingMinInput.value);
                 const max = parseFloat(ratingMaxInput.value);
+
+                // Prevent max from going below min
                 if (max < min) {
-                    ratingMinInput.value = ratingMaxInput.value;
+                    ratingMaxInput.value = min.toString();
                 }
+
+                // Update min slider's max constraint
+                ratingMinInput.max = ratingMaxInput.value;
+
                 if (ratingMinValue) ratingMinValue.textContent = parseFloat(ratingMinInput.value).toFixed(1);
                 if (ratingMaxValue) ratingMaxValue.textContent = parseFloat(ratingMaxInput.value).toFixed(1);
                 debouncedUpdateFilter();
@@ -792,9 +804,15 @@ export class ScheduleFilterModalController {
             difficultyMinInput.addEventListener('input', () => {
                 const min = parseFloat(difficultyMinInput.value);
                 const max = parseFloat(difficultyMaxInput.value);
+
+                // Prevent min from exceeding max
                 if (min > max) {
-                    difficultyMaxInput.value = difficultyMinInput.value;
+                    difficultyMinInput.value = max.toString();
                 }
+
+                // Update max slider's min constraint
+                difficultyMaxInput.min = difficultyMinInput.value;
+
                 if (difficultyMinValue) difficultyMinValue.textContent = parseFloat(difficultyMinInput.value).toFixed(1);
                 if (difficultyMaxValue) difficultyMaxValue.textContent = parseFloat(difficultyMaxInput.value).toFixed(1);
                 debouncedUpdateFilter();
@@ -802,9 +820,15 @@ export class ScheduleFilterModalController {
             difficultyMaxInput.addEventListener('input', () => {
                 const min = parseFloat(difficultyMinInput.value);
                 const max = parseFloat(difficultyMaxInput.value);
+
+                // Prevent max from going below min
                 if (max < min) {
-                    difficultyMinInput.value = difficultyMaxInput.value;
+                    difficultyMaxInput.value = min.toString();
                 }
+
+                // Update min slider's max constraint
+                difficultyMinInput.max = difficultyMaxInput.value;
+
                 if (difficultyMinValue) difficultyMinValue.textContent = parseFloat(difficultyMinInput.value).toFixed(1);
                 if (difficultyMaxValue) difficultyMaxValue.textContent = parseFloat(difficultyMaxInput.value).toFixed(1);
                 debouncedUpdateFilter();

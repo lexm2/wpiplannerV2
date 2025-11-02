@@ -1233,6 +1233,17 @@
   align-items: center;
 }
 
+/* Background track for dual slider */
+.filter-dual-slider::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  z-index: 0;
+}
+
 .filter-dual-slider input[type="range"] {
   position: absolute;
   width: 100%;
@@ -1241,19 +1252,20 @@
   pointer-events: none;
   -webkit-appearance: none;
   appearance: none;
+  z-index: 1;
 }
 
 .filter-dual-slider input[type="range"]::-webkit-slider-track {
   width: 100%;
   height: 8px;
-  background: var(--color-border);
+  background: transparent;
   border-radius: 4px;
 }
 
 .filter-dual-slider input[type="range"]::-moz-range-track {
   width: 100%;
   height: 8px;
-  background: var(--color-border);
+  background: transparent;
   border-radius: 4px;
 }
 

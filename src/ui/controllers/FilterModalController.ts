@@ -686,9 +686,15 @@ export class FilterModalController {
             ratingMinInput.addEventListener('input', () => {
                 const min = parseFloat(ratingMinInput.value);
                 const max = parseFloat(ratingMaxInput.value);
+
+                // Prevent min from exceeding max
                 if (min > max) {
-                    ratingMaxInput.value = ratingMinInput.value;
+                    ratingMinInput.value = max.toString();
                 }
+
+                // Update max slider's min constraint
+                ratingMaxInput.min = ratingMinInput.value;
+
                 if (ratingMinValue) ratingMinValue.textContent = parseFloat(ratingMinInput.value).toFixed(1);
                 if (ratingMaxValue) ratingMaxValue.textContent = parseFloat(ratingMaxInput.value).toFixed(1);
                 debouncedUpdateFilter();
@@ -696,9 +702,15 @@ export class FilterModalController {
             ratingMaxInput.addEventListener('input', () => {
                 const min = parseFloat(ratingMinInput.value);
                 const max = parseFloat(ratingMaxInput.value);
+
+                // Prevent max from going below min
                 if (max < min) {
-                    ratingMinInput.value = ratingMaxInput.value;
+                    ratingMaxInput.value = min.toString();
                 }
+
+                // Update min slider's max constraint
+                ratingMinInput.max = ratingMaxInput.value;
+
                 if (ratingMinValue) ratingMinValue.textContent = parseFloat(ratingMinInput.value).toFixed(1);
                 if (ratingMaxValue) ratingMaxValue.textContent = parseFloat(ratingMaxInput.value).toFixed(1);
                 debouncedUpdateFilter();
@@ -710,9 +722,15 @@ export class FilterModalController {
             difficultyMinInput.addEventListener('input', () => {
                 const min = parseFloat(difficultyMinInput.value);
                 const max = parseFloat(difficultyMaxInput.value);
+
+                // Prevent min from exceeding max
                 if (min > max) {
-                    difficultyMaxInput.value = difficultyMinInput.value;
+                    difficultyMinInput.value = max.toString();
                 }
+
+                // Update max slider's min constraint
+                difficultyMaxInput.min = difficultyMinInput.value;
+
                 if (difficultyMinValue) difficultyMinValue.textContent = parseFloat(difficultyMinInput.value).toFixed(1);
                 if (difficultyMaxValue) difficultyMaxValue.textContent = parseFloat(difficultyMaxInput.value).toFixed(1);
                 debouncedUpdateFilter();
@@ -720,9 +738,15 @@ export class FilterModalController {
             difficultyMaxInput.addEventListener('input', () => {
                 const min = parseFloat(difficultyMinInput.value);
                 const max = parseFloat(difficultyMaxInput.value);
+
+                // Prevent max from going below min
                 if (max < min) {
-                    difficultyMinInput.value = difficultyMaxInput.value;
+                    difficultyMaxInput.value = min.toString();
                 }
+
+                // Update min slider's max constraint
+                difficultyMinInput.max = difficultyMaxInput.value;
+
                 if (difficultyMinValue) difficultyMinValue.textContent = parseFloat(difficultyMinInput.value).toFixed(1);
                 if (difficultyMaxValue) difficultyMaxValue.textContent = parseFloat(difficultyMaxInput.value).toFixed(1);
                 debouncedUpdateFilter();
@@ -734,9 +758,15 @@ export class FilterModalController {
             retakeMinInput.addEventListener('input', () => {
                 const min = parseInt(retakeMinInput.value);
                 const max = parseInt(retakeMaxInput.value);
+
+                // Prevent min from exceeding max
                 if (min > max) {
-                    retakeMaxInput.value = retakeMinInput.value;
+                    retakeMinInput.value = max.toString();
                 }
+
+                // Update max slider's min constraint
+                retakeMaxInput.min = retakeMinInput.value;
+
                 if (retakeMinValue) retakeMinValue.textContent = retakeMinInput.value;
                 if (retakeMaxValue) retakeMaxValue.textContent = retakeMaxInput.value;
                 debouncedUpdateFilter();
@@ -744,9 +774,15 @@ export class FilterModalController {
             retakeMaxInput.addEventListener('input', () => {
                 const min = parseInt(retakeMinInput.value);
                 const max = parseInt(retakeMaxInput.value);
+
+                // Prevent max from going below min
                 if (max < min) {
-                    retakeMinInput.value = retakeMaxInput.value;
+                    retakeMaxInput.value = min.toString();
                 }
+
+                // Update min slider's max constraint
+                retakeMinInput.max = retakeMaxInput.value;
+
                 if (retakeMinValue) retakeMinValue.textContent = retakeMinInput.value;
                 if (retakeMaxValue) retakeMaxValue.textContent = retakeMaxInput.value;
                 debouncedUpdateFilter();
