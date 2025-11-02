@@ -140,3 +140,12 @@ export interface PeriodConflictFilterCriteria {
 export interface SectionCodeFilterCriteria {
     codes: string[];
 }
+
+export interface RMPRatingFilterCriteria {
+    minRating?: number;         // Minimum average rating (0-5 scale)
+    maxRating?: number;         // Maximum average rating (0-5 scale)
+    minDifficulty?: number;     // Minimum difficulty rating (0-5 scale)
+    maxDifficulty?: number;     // Maximum difficulty rating (0-5 scale)
+    minWouldTakeAgain?: number; // Minimum "would take again" percentage (0-100)
+    maxWouldTakeAgain?: number; // Maximum "would take again" percentage (0-100)
+}

@@ -78,16 +78,8 @@ export class ComponentSelectionWizard {
             this.scheduleFilterService.addEventListener(this.filterChangeHandler);
         }
 
-        // Load Rate My Professor data asynchronously
-        console.log('[Wizard] Initiating RMP data load...');
-        rateMyProfessorService.loadData()
-            .then(() => {
-                console.log('[Wizard] ✓ RMP data loaded successfully');
-                console.log('[Wizard] RMP service state - isLoaded:', rateMyProfessorService.isLoaded());
-            })
-            .catch(err => {
-                console.error('[Wizard] ✗ Failed to load RMP data:', err);
-            });
+        // RMP data is loaded centrally by MainController during app initialization
+        // No need to load it here - it's already available via the singleton
     }
 
     /**
@@ -263,8 +255,18 @@ export class ComponentSelectionWizard {
     private applyScheduleFilters(sections: Section[], step: WizardStep): Section[] {
         if (!this.scheduleFilterService) return sections;
 
+        const activeFilters = this.scheduleFilterService.getActiveFilters();
         console.log(`[Wizard Filter] Filtering ${sections.length} ${step} sections`);
-        console.log(`[Wizard Filter] Active filters:`, this.scheduleFilterService.getActiveFilters());
+        console.log(`[Wizard Filter] Active filters (${activeFilters.length}):`, activeFilters);
+
+        // Check for RMP filter specifically
+        const rmpFilter = activeFilters.find(f => f.id === 'periodRmpRating');
+        if (rmpFilter) {
+            console.log(`[Wizard Filter] ✓ RMP filter is ACTIVE with criteria:`, rmpFilter.criteria);
+            console.log(`[Wizard Filter] RMP service loaded:`, rateMyProfessorService.isLoaded());
+        } else {
+            console.log(`[Wizard Filter] ℹ RMP filter is NOT active`);
+        }
 
         // Filter sections individually through the schedule filter service
         const filteredSections = sections.filter(section => {
@@ -375,6 +377,14 @@ export class ComponentSelectionWizard {
         if (!sidebarContainer) {
             console.error('Sidebar container not found');
             return;
+        }
+
+        // Verify RMP data is loaded (should be loaded by MainController during app init)
+        if (!rateMyProfessorService.isLoaded()) {
+            console.warn('[Wizard] ⚠️ WARNING: RMP data is not loaded! RMP filters will not work properly.');
+            console.warn('[Wizard] This may indicate a race condition - RMP data should be loaded during app initialization');
+        } else {
+            console.log('[Wizard] ✓ RMP data is loaded and ready');
         }
 
         this.container = sidebarContainer;
@@ -678,6 +688,7 @@ export class ComponentSelectionWizard {
                 <div class="wizard-course-name">${this.course.name}</div>
             </div>
 
+            ${this.renderFilterStatus()}
             ${this.renderBreadcrumbs()}
 
             <div class="wizard-content">
@@ -686,6 +697,68 @@ export class ComponentSelectionWizard {
 
             <div class="wizard-footer">
                 ${this.renderFooter()}
+            </div>
+        `;
+    }
+
+    /**
+     * Render filter status indicator
+     */
+    private renderFilterStatus(): string {
+        if (!this.scheduleFilterService || this.scheduleFilterService.isEmpty()) {
+            return '';
+        }
+
+        const activeFilters = this.scheduleFilterService.getActiveFilters();
+        const filterDescriptions: string[] = [];
+
+        activeFilters.forEach(filter => {
+            // Get display value from each filter
+            if (filter.id === 'periodRmpRating' && filter.criteria) {
+                const parts: string[] = [];
+                const { minRating, maxRating, minDifficulty, maxDifficulty, minWouldTakeAgain, maxWouldTakeAgain } = filter.criteria;
+
+                // Show rating range if not at defaults
+                if ((minRating ?? 0) > 0 || (maxRating ?? 5) < 5) {
+                    parts.push(`${(minRating ?? 0).toFixed(1)}-${(maxRating ?? 5).toFixed(1)} rating`);
+                }
+                // Show difficulty range if not at defaults
+                if ((minDifficulty ?? 0) > 0 || (maxDifficulty ?? 5) < 5) {
+                    parts.push(`${(minDifficulty ?? 0).toFixed(1)}-${(maxDifficulty ?? 5).toFixed(1)} difficulty`);
+                }
+                // Show retake range if not at defaults
+                if ((minWouldTakeAgain ?? 0) > 0 || (maxWouldTakeAgain ?? 100) < 100) {
+                    parts.push(`${minWouldTakeAgain ?? 0}-${maxWouldTakeAgain ?? 100}% retake`);
+                }
+
+                if (parts.length > 0) {
+                    filterDescriptions.push(`RMP: ${parts.join('<span class="filter-separator">●</span>')}`);
+                }
+            } else if (filter.id !== 'searchText') {
+                // Add other filters (excluding search text which is shown elsewhere)
+                filterDescriptions.push(filter.name);
+            }
+        });
+
+        if (filterDescriptions.length === 0) {
+            return '';
+        }
+
+        // Create filter items with separators
+        const filterItems = filterDescriptions.map((desc, index) => {
+            if (index === 0) {
+                return desc;
+            }
+            return `<span class="filter-separator">●</span>${desc}`;
+        }).join('');
+
+        return `
+            <div class="wizard-filter-status">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="filter-icon">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M20 3h-16a1 1 0 0 0 -1 1v2.227l.008 .223a3 3 0 0 0 .772 1.795l4.22 4.641v8.114a1 1 0 0 0 1.316 .949l6 -2l.108 -.043a1 1 0 0 0 .576 -.906v-6.586l4.121 -4.12a3 3 0 0 0 .879 -2.123v-2.171a1 1 0 0 0 -1 -1z" />
+                </svg>
+                <span class="filter-text">Filters: ${filterItems}</span>
             </div>
         `;
     }

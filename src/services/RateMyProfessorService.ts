@@ -32,7 +32,8 @@ interface RateMyProfessorData {
 
 export class RateMyProfessorService {
     private data: RateMyProfessorData | null = null;
-    private professorMap: Map<string, Professor> = new Map();
+    private professorsByFullName: Map<string, Professor> = new Map();
+    private professorsByLastName: Map<string, Professor[]> = new Map();
     private loading: boolean = false;
     private loadError: Error | null = null;
 
@@ -68,26 +69,28 @@ export class RateMyProfessorService {
             console.log('[RMP Service] Fetch successful, parsing JSON...');
             this.data = await response.json();
 
-            // Build professor map for quick lookups
+            // Build professor maps for quick lookups
             // Normalize names for better matching (lowercase, trim)
             if (this.data && this.data.professors) {
                 for (const professor of this.data.professors) {
                     const fullName = this.normalizeName(`${professor.firstName} ${professor.lastName}`);
                     const lastName = this.normalizeName(professor.lastName);
 
-                    // Store by full name and last name for flexible matching
-                    this.professorMap.set(fullName, professor);
+                    // Store by full name (unique)
+                    this.professorsByFullName.set(fullName, professor);
 
-                    // Also store by last name (may have collisions, but will get most recent)
-                    if (!this.professorMap.has(lastName)) {
-                        this.professorMap.set(lastName, professor);
+                    // Store by last name (may have multiple professors per last name)
+                    if (!this.professorsByLastName.has(lastName)) {
+                        this.professorsByLastName.set(lastName, []);
                     }
+                    this.professorsByLastName.get(lastName)!.push(professor);
                 }
             }
 
             console.log(`[RMP Service] Loaded ${this.data?.totalProfessors || 0} professors`);
-            console.log(`[RMP Service] Built professor map with ${this.professorMap.size} entries`);
-            console.log(`[RMP Service] Sample map entries:`, Array.from(this.professorMap.keys()).slice(0, 5));
+            console.log(`[RMP Service] Built full name map with ${this.professorsByFullName.size} entries`);
+            console.log(`[RMP Service] Built last name map with ${this.professorsByLastName.size} unique last names`);
+            console.log(`[RMP Service] Sample full name entries:`, Array.from(this.professorsByFullName.keys()).slice(0, 5));
         } catch (error) {
             this.loadError = error as Error;
             console.error('[RMP Service] Failed to load data:', error);
@@ -104,15 +107,115 @@ export class RateMyProfessorService {
     }
 
     /**
-     * Find a professor by name
-     * Tries various matching strategies:
-     * 1. Full name match (First Last)
-     * 2. Last name match
-     * 3. Partial last name match (for names like "O'Brien")
+     * Extract last name from a professor name
+     * Handles "First Last" and "Last, First" formats
+     */
+    private extractLastName(professorName: string): string {
+        const normalized = this.normalizeName(professorName);
+        const nameParts = normalized.split(/[,\s]+/).filter(p => p.length > 0);
+
+        // Handle "Last, First" format
+        if (normalized.includes(',')) {
+            return nameParts[0] || '';
+        }
+
+        // Handle "First Last" format (most common)
+        if (nameParts.length > 0) {
+            return nameParts[nameParts.length - 1];
+        }
+
+        return normalized;
+    }
+
+    /**
+     * Extract first name from a professor name
+     * Handles "First Last" and "Last, First" formats
+     */
+    private extractFirstName(professorName: string): string {
+        const normalized = this.normalizeName(professorName);
+        const nameParts = normalized.split(/[,\s]+/).filter(p => p.length > 0);
+
+        // Handle "Last, First" format
+        if (normalized.includes(',')) {
+            return nameParts.slice(1).join(' ');
+        }
+
+        // Handle "First Last" format - everything except last part
+        if (nameParts.length > 1) {
+            return nameParts.slice(0, -1).join(' ');
+        }
+
+        return '';
+    }
+
+    /**
+     * Calculate similarity between two first names for disambiguation
+     * Returns a score from 0-100
+     */
+    private calculateFirstNameSimilarity(query: string, candidate: string): number {
+        // Exact match
+        if (query === candidate) return 100;
+
+        // Starts with (e.g., "moh" matches "mohammed")
+        if (candidate.startsWith(query)) return 80;
+        if (query.startsWith(candidate)) return 70;
+
+        // Contains
+        if (candidate.includes(query)) return 50;
+        if (query.includes(candidate)) return 40;
+
+        // Levenshtein distance for similarity
+        const distance = this.levenshteinDistance(query, candidate);
+        const maxLen = Math.max(query.length, candidate.length);
+        const similarity = 1 - (distance / maxLen);
+
+        return similarity * 30; // Scale to 0-30 points
+    }
+
+    /**
+     * Calculate Levenshtein distance between two strings
+     * Measures how many single-character edits are needed to change one string into another
+     */
+    private levenshteinDistance(a: string, b: string): number {
+        const matrix: number[][] = [];
+
+        for (let i = 0; i <= b.length; i++) {
+            matrix[i] = [i];
+        }
+
+        for (let j = 0; j <= a.length; j++) {
+            matrix[0][j] = j;
+        }
+
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1, // substitution
+                        matrix[i][j - 1] + 1,     // insertion
+                        matrix[i - 1][j] + 1      // deletion
+                    );
+                }
+            }
+        }
+
+        return matrix[b.length][a.length];
+    }
+
+    /**
+     * Find a professor by name using conservative matching strategy
+     *
+     * Strategy:
+     * 1. Try exact full name match (fast path)
+     * 2. Extract last name and lookup candidates
+     * 3a. If ONLY ONE professor with that last name → return it (no ambiguity)
+     * 3b. If MULTIPLE professors with same last name → use fuzzy matching on first name to disambiguate
      */
     findProfessor(professorName: string): Professor | null {
         console.log('[RMP Service] findProfessor() called with:', professorName);
-        console.log('[RMP Service] Data loaded:', !!this.data, 'Map size:', this.professorMap.size);
+        console.log('[RMP Service] Data loaded:', !!this.data, 'Maps ready:', this.professorsByFullName.size, 'full names,', this.professorsByLastName.size, 'last names');
 
         if (!this.data || !professorName) {
             console.log('[RMP Service] Early return - no data or no professor name');
@@ -122,47 +225,68 @@ export class RateMyProfessorService {
         const normalized = this.normalizeName(professorName);
         console.log('[RMP Service] Normalized name:', normalized);
 
-        // Try exact full name match
-        if (this.professorMap.has(normalized)) {
+        // Step 1: Try exact full name match (fast path)
+        if (this.professorsByFullName.has(normalized)) {
             console.log('[RMP Service] ✓ Found exact full name match');
-            return this.professorMap.get(normalized) || null;
+            return this.professorsByFullName.get(normalized) || null;
         }
-        console.log('[RMP Service] No exact match, trying last name...');
+        console.log('[RMP Service] No exact match, extracting last name...');
 
-        // Try last name match (handle "Last, First" or "First Last" formats)
-        const nameParts = normalized.split(/[,\s]+/).filter(p => p.length > 0);
-        if (nameParts.length > 0) {
-            const lastName = nameParts[nameParts.length - 1];
-            console.log('[RMP Service] Trying last name part:', lastName);
-            if (this.professorMap.has(lastName)) {
-                console.log('[RMP Service] ✓ Found last name match');
-                return this.professorMap.get(lastName) || null;
-            }
+        // Step 2: Extract last name and lookup candidates
+        const lastName = this.extractLastName(professorName);
+        console.log('[RMP Service] Extracted last name:', lastName);
 
-            // Try first part (in case of "Last, First" format)
-            const firstPart = nameParts[0];
-            console.log('[RMP Service] Trying first name part:', firstPart);
-            if (this.professorMap.has(firstPart)) {
-                console.log('[RMP Service] ✓ Found first part match');
-                return this.professorMap.get(firstPart) || null;
-            }
+        const candidates = this.professorsByLastName.get(lastName);
+
+        if (!candidates || candidates.length === 0) {
+            console.log('[RMP Service] ✗ No match found for last name:', lastName);
+            return null;
         }
 
-        console.log('[RMP Service] Trying fuzzy matching...');
-        // Try fuzzy matching on last name
-        for (const [key, professor] of this.professorMap.entries()) {
-            if (key.includes(normalized) || normalized.includes(key)) {
-                // Check if this is actually the last name match
-                const profLastName = this.normalizeName(professor.lastName);
-                if (profLastName.includes(normalized) || normalized.includes(profLastName)) {
-                    console.log('[RMP Service] ✓ Found fuzzy match:', key);
-                    return professor;
-                }
-            }
+        // Step 3a: If ONLY ONE professor with this last name → return it
+        if (candidates.length === 1) {
+            const professor = candidates[0];
+            console.log('[RMP Service] ✓ Found unique last name match:', `${professor.firstName} ${professor.lastName}`);
+            return professor;
         }
 
-        console.log('[RMP Service] ✗ No match found for:', professorName);
-        return null;
+        // Step 3b: MULTIPLE professors with same last name → disambiguate using first name
+        console.log(`[RMP Service] Multiple candidates (${candidates.length}) for last name '${lastName}', disambiguating...`);
+
+        const queryFirstName = this.extractFirstName(professorName);
+        console.log('[RMP Service] Extracted first name for disambiguation:', queryFirstName || '(none)');
+
+        if (!queryFirstName) {
+            // No first name to disambiguate with, return first candidate
+            const professor = candidates[0];
+            console.log('[RMP Service] ⚠ No first name provided, returning first candidate:', `${professor.firstName} ${professor.lastName}`);
+            return professor;
+        }
+
+        // Use fuzzy matching on first name to pick best match
+        const scored = candidates.map(prof => {
+            const profFirstName = this.normalizeName(prof.firstName);
+            const score = this.calculateFirstNameSimilarity(queryFirstName, profFirstName);
+            return {
+                professor: prof,
+                score: score
+            };
+        });
+
+        // Sort by score descending
+        scored.sort((a, b) => b.score - a.score);
+
+        // Log all candidates with scores for debugging
+        console.log('[RMP Service] Candidate scores:');
+        scored.forEach((item, idx) => {
+            console.log(`  ${idx + 1}. ${item.professor.firstName} ${item.professor.lastName}: ${item.score.toFixed(1)} pts`);
+        });
+
+        const bestMatch = scored[0].professor;
+        console.log('[RMP Service] ✓ Best match via first name fuzzy:',
+                    `${bestMatch.firstName} ${bestMatch.lastName} (score: ${scored[0].score.toFixed(1)})`);
+
+        return bestMatch;
     }
 
     /**

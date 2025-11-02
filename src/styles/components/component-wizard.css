@@ -496,3 +496,36 @@
         gap: 0.75rem;
     }
 }
+
+/* Filter Status Indicator */
+.wizard-filter-status {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-primary-transparent, rgba(74, 144, 226, 0.1));
+    border-left: 3px solid var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    margin: 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.wizard-filter-status .filter-icon {
+    flex-shrink: 0;
+    color: var(--color-primary);
+}
+
+.wizard-filter-status .filter-text {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.wizard-filter-status .filter-separator {
+    display: inline-block;
+    margin: 0 0.5rem;
+    color: var(--color-primary);
+    font-size: 0.6em;
+    font-weight: 900;
+    vertical-align: middle;
+}

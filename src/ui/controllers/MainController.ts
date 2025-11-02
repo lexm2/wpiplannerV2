@@ -17,6 +17,7 @@ import { CourseFilterService } from '../../services/CourseFilterService'
 import { ScheduleFilterService } from '../../services/ScheduleFilterService'
 import { SearchService } from '../../services/searchService'
 import { createDefaultFilters, SearchTextFilter } from '../../core/filters'
+import { rateMyProfessorService } from '../../services/RateMyProfessorService'
 import { UIStateManager } from './UIStateManager'
 import { TimestampManager } from './TimestampManager'
 import { OperationManager, DebouncedOperation } from '../../utils/RequestCancellation'
@@ -201,7 +202,7 @@ export class MainController {
         // Initialize search and filter services
         this.searchService = new SearchService();
         this.filterService = new CourseFilterService(this.searchService);
-        this.scheduleFilterService = new ScheduleFilterService();
+        this.scheduleFilterService = new ScheduleFilterService(rateMyProfessorService);
         
         // Initialize schedule management service with shared ProfileStateManager and CourseSelectionService
         this.scheduleManagementService = new ScheduleManagementService(this.profileStateManager, this.courseSelectionService);
@@ -261,7 +262,7 @@ export class MainController {
     }
 
     private initializeFilters(): void {
-        const filters = createDefaultFilters();
+        const filters = createDefaultFilters(rateMyProfessorService);
         filters.forEach(filter => {
             this.filterService.registerFilter(filter);
         });
@@ -292,6 +293,11 @@ export class MainController {
             console.log('MainController: Initializing theme from storage...');
             this._themeSelector.initializeTheme();
             console.log('Theme initialized');
+
+            // Load Rate My Professor data early so it's available for wizard and filters
+            console.log('MainController: Loading Rate My Professor data...');
+            await rateMyProfessorService.loadData();
+            console.log('RMP data loaded successfully');
 
             // Initialize CourseSelectionService SECOND to load persisted data
             console.log('MainController: Initializing CourseSelectionService...');

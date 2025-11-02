@@ -160,6 +160,7 @@ export class FilterModalController {
             <div class="filter-sections">
                 ${this.createSearchTextFilter()}
                 ${this.createProfessorFilter()}
+                ${this.createRMPRatingFilter()}
                 ${this.createDepartmentFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createCreditRangeFilter()}
@@ -340,6 +341,87 @@ export class FilterModalController {
         `;
     }
 
+    private createRMPRatingFilter(): string {
+        if (!this.filterService) return '';
+
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'rmpRating');
+        const minRating = activeFilter?.criteria?.minRating ?? 0;
+        const maxRating = activeFilter?.criteria?.maxRating ?? 5;
+        const minDifficulty = activeFilter?.criteria?.minDifficulty ?? 0;
+        const maxDifficulty = activeFilter?.criteria?.maxDifficulty ?? 5;
+        const minWouldTakeAgain = activeFilter?.criteria?.minWouldTakeAgain ?? 0;
+        const maxWouldTakeAgain = activeFilter?.criteria?.maxWouldTakeAgain ?? 100;
+
+        const hasActiveFilter = activeFilter && (
+            minRating > 0 || maxRating < 5 ||
+            minDifficulty > 0 || maxDifficulty < 5 ||
+            minWouldTakeAgain > 0 || maxWouldTakeAgain < 100
+        );
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Rate My Professor</h4>
+                    ${hasActiveFilter ? '<button class="filter-clear-section" data-filter="rmpRating">Clear</button>' : ''}
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-slider-container">
+                        <div class="filter-slider-group">
+                            <label>Rating</label>
+                            <div class="filter-slider-values">
+                                <span id="rmp-rating-min-value">${minRating.toFixed(1)}</span>
+                                <span>-</span>
+                                <span id="rmp-rating-max-value">${maxRating.toFixed(1)}</span>
+                                <span class="filter-input-hint">stars</span>
+                            </div>
+                            <div class="filter-dual-slider">
+                                <input type="range" min="0" max="5" step="0.1" value="${minRating}"
+                                       id="rmp-rating-min" class="filter-range-min" data-filter="rmpRating">
+                                <input type="range" min="0" max="5" step="0.1" value="${maxRating}"
+                                       id="rmp-rating-max" class="filter-range-max" data-filter="rmpRating">
+                            </div>
+                        </div>
+
+                        <div class="filter-slider-group">
+                            <label>Difficulty</label>
+                            <div class="filter-slider-values">
+                                <span id="rmp-difficulty-min-value">${minDifficulty.toFixed(1)}</span>
+                                <span>-</span>
+                                <span id="rmp-difficulty-max-value">${maxDifficulty.toFixed(1)}</span>
+                                <span class="filter-input-hint">scale</span>
+                            </div>
+                            <div class="filter-dual-slider">
+                                <input type="range" min="0" max="5" step="0.1" value="${minDifficulty}"
+                                       id="rmp-difficulty-min" class="filter-range-min" data-filter="rmpRating">
+                                <input type="range" min="0" max="5" step="0.1" value="${maxDifficulty}"
+                                       id="rmp-difficulty-max" class="filter-range-max" data-filter="rmpRating">
+                            </div>
+                        </div>
+
+                        <div class="filter-slider-group">
+                            <label>Would Take Again</label>
+                            <div class="filter-slider-values">
+                                <span id="rmp-retake-min-value">${minWouldTakeAgain}</span>
+                                <span>-</span>
+                                <span id="rmp-retake-max-value">${maxWouldTakeAgain}</span>
+                                <span class="filter-input-hint">%</span>
+                            </div>
+                            <div class="filter-dual-slider">
+                                <input type="range" min="0" max="100" step="1" value="${minWouldTakeAgain}"
+                                       id="rmp-retake-min" class="filter-range-min" data-filter="rmpRating">
+                                <input type="range" min="0" max="100" step="1" value="${maxWouldTakeAgain}"
+                                       id="rmp-retake-max" class="filter-range-max" data-filter="rmpRating">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filter-hint">
+                        <small>Note: Filters are off when at default ranges. Professors without RMP data are excluded when this filter is active.</small>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     private createTermFilter(): string {
         if (!this.filterService) return '';
         
@@ -377,6 +459,7 @@ export class FilterModalController {
 
         this.setupSearchTextFilter(modalElement);
         this.setupProfessorFilter(modalElement);
+        this.setupRMPRatingFilter(modalElement);
         this.setupDepartmentFilter(modalElement);
         this.setupAvailabilityFilter(modalElement);
         this.setupCreditRangeFilter(modalElement);
@@ -532,6 +615,162 @@ export class FilterModalController {
                 }
             });
         }
+    }
+
+    private setupRMPRatingFilter(modalElement: HTMLElement): void {
+        // Get all slider inputs
+        const ratingMinInput = modalElement.querySelector('#rmp-rating-min') as HTMLInputElement;
+        const ratingMaxInput = modalElement.querySelector('#rmp-rating-max') as HTMLInputElement;
+        const difficultyMinInput = modalElement.querySelector('#rmp-difficulty-min') as HTMLInputElement;
+        const difficultyMaxInput = modalElement.querySelector('#rmp-difficulty-max') as HTMLInputElement;
+        const retakeMinInput = modalElement.querySelector('#rmp-retake-min') as HTMLInputElement;
+        const retakeMaxInput = modalElement.querySelector('#rmp-retake-max') as HTMLInputElement;
+
+        // Get value display elements
+        const ratingMinValue = modalElement.querySelector('#rmp-rating-min-value');
+        const ratingMaxValue = modalElement.querySelector('#rmp-rating-max-value');
+        const difficultyMinValue = modalElement.querySelector('#rmp-difficulty-min-value');
+        const difficultyMaxValue = modalElement.querySelector('#rmp-difficulty-max-value');
+        const retakeMinValue = modalElement.querySelector('#rmp-retake-min-value');
+        const retakeMaxValue = modalElement.querySelector('#rmp-retake-max-value');
+
+        const clearBtn = modalElement.querySelector('.filter-clear-section[data-filter="rmpRating"]');
+
+        let debounceTimer: number | undefined;
+
+        const updateFilter = () => {
+            if (!this.filterService) return;
+
+            const minRating = parseFloat(ratingMinInput?.value || '0');
+            const maxRating = parseFloat(ratingMaxInput?.value || '5');
+            const minDifficulty = parseFloat(difficultyMinInput?.value || '0');
+            const maxDifficulty = parseFloat(difficultyMaxInput?.value || '5');
+            const minRetake = parseInt(retakeMinInput?.value || '0');
+            const maxRetake = parseInt(retakeMaxInput?.value || '100');
+
+            // Check if filter is at default values (filter is "off")
+            const isDefaultRating = minRating === 0 && maxRating === 5;
+            const isDefaultDifficulty = minDifficulty === 0 && maxDifficulty === 5;
+            const isDefaultRetake = minRetake === 0 && maxRetake === 100;
+
+            if (isDefaultRating && isDefaultDifficulty && isDefaultRetake) {
+                // All at defaults - remove filter
+                this.filterService.removeFilter('rmpRating');
+            } else {
+                // At least one range is modified
+                const criteria: any = {
+                    minRating,
+                    maxRating,
+                    minDifficulty,
+                    maxDifficulty,
+                    minWouldTakeAgain: minRetake,
+                    maxWouldTakeAgain: maxRetake
+                };
+                this.filterService.addFilter('rmpRating', criteria);
+            }
+
+            this.updatePreview(modalElement);
+        };
+
+        const debouncedUpdateFilter = () => {
+            if (debounceTimer) {
+                clearTimeout(debounceTimer);
+            }
+            debounceTimer = window.setTimeout(() => {
+                updateFilter();
+            }, 300); // 300ms debounce
+        };
+
+        // Setup rating sliders
+        if (ratingMinInput && ratingMaxInput) {
+            ratingMinInput.addEventListener('input', () => {
+                const min = parseFloat(ratingMinInput.value);
+                const max = parseFloat(ratingMaxInput.value);
+                if (min > max) {
+                    ratingMaxInput.value = ratingMinInput.value;
+                }
+                if (ratingMinValue) ratingMinValue.textContent = parseFloat(ratingMinInput.value).toFixed(1);
+                if (ratingMaxValue) ratingMaxValue.textContent = parseFloat(ratingMaxInput.value).toFixed(1);
+                debouncedUpdateFilter();
+            });
+            ratingMaxInput.addEventListener('input', () => {
+                const min = parseFloat(ratingMinInput.value);
+                const max = parseFloat(ratingMaxInput.value);
+                if (max < min) {
+                    ratingMinInput.value = ratingMaxInput.value;
+                }
+                if (ratingMinValue) ratingMinValue.textContent = parseFloat(ratingMinInput.value).toFixed(1);
+                if (ratingMaxValue) ratingMaxValue.textContent = parseFloat(ratingMaxInput.value).toFixed(1);
+                debouncedUpdateFilter();
+            });
+        }
+
+        // Setup difficulty sliders
+        if (difficultyMinInput && difficultyMaxInput) {
+            difficultyMinInput.addEventListener('input', () => {
+                const min = parseFloat(difficultyMinInput.value);
+                const max = parseFloat(difficultyMaxInput.value);
+                if (min > max) {
+                    difficultyMaxInput.value = difficultyMinInput.value;
+                }
+                if (difficultyMinValue) difficultyMinValue.textContent = parseFloat(difficultyMinInput.value).toFixed(1);
+                if (difficultyMaxValue) difficultyMaxValue.textContent = parseFloat(difficultyMaxInput.value).toFixed(1);
+                debouncedUpdateFilter();
+            });
+            difficultyMaxInput.addEventListener('input', () => {
+                const min = parseFloat(difficultyMinInput.value);
+                const max = parseFloat(difficultyMaxInput.value);
+                if (max < min) {
+                    difficultyMinInput.value = difficultyMaxInput.value;
+                }
+                if (difficultyMinValue) difficultyMinValue.textContent = parseFloat(difficultyMinInput.value).toFixed(1);
+                if (difficultyMaxValue) difficultyMaxValue.textContent = parseFloat(difficultyMaxInput.value).toFixed(1);
+                debouncedUpdateFilter();
+            });
+        }
+
+        // Setup "would take again" sliders
+        if (retakeMinInput && retakeMaxInput) {
+            retakeMinInput.addEventListener('input', () => {
+                const min = parseInt(retakeMinInput.value);
+                const max = parseInt(retakeMaxInput.value);
+                if (min > max) {
+                    retakeMaxInput.value = retakeMinInput.value;
+                }
+                if (retakeMinValue) retakeMinValue.textContent = retakeMinInput.value;
+                if (retakeMaxValue) retakeMaxValue.textContent = retakeMaxInput.value;
+                debouncedUpdateFilter();
+            });
+            retakeMaxInput.addEventListener('input', () => {
+                const min = parseInt(retakeMinInput.value);
+                const max = parseInt(retakeMaxInput.value);
+                if (max < min) {
+                    retakeMinInput.value = retakeMaxInput.value;
+                }
+                if (retakeMinValue) retakeMinValue.textContent = retakeMinInput.value;
+                if (retakeMaxValue) retakeMaxValue.textContent = retakeMaxInput.value;
+                debouncedUpdateFilter();
+            });
+        }
+
+        // Clear button - reset all to defaults
+        clearBtn?.addEventListener('click', () => {
+            if (ratingMinInput) ratingMinInput.value = '0';
+            if (ratingMaxInput) ratingMaxInput.value = '5';
+            if (difficultyMinInput) difficultyMinInput.value = '0';
+            if (difficultyMaxInput) difficultyMaxInput.value = '5';
+            if (retakeMinInput) retakeMinInput.value = '0';
+            if (retakeMaxInput) retakeMaxInput.value = '100';
+
+            if (ratingMinValue) ratingMinValue.textContent = '0.0';
+            if (ratingMaxValue) ratingMaxValue.textContent = '5.0';
+            if (difficultyMinValue) difficultyMinValue.textContent = '0.0';
+            if (difficultyMaxValue) difficultyMaxValue.textContent = '5.0';
+            if (retakeMinValue) retakeMinValue.textContent = '0';
+            if (retakeMaxValue) retakeMaxValue.textContent = '100';
+
+            updateFilter();
+        });
     }
 
     private setupTermFilter(modalElement: HTMLElement): void {

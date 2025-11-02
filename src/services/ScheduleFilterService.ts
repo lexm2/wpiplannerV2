@@ -13,6 +13,8 @@ import { SectionFilter, SelectedCourseFilter, CourseFilter, FilterEventListener,
 import { FilterState } from '../core/FilterState';
 import { RequiredStatusFilter } from '../core/filters/RequiredStatusFilter';
 import { SectionStatusFilter } from '../core/filters/SectionStatusFilter';
+import { PeriodRMPRatingFilter } from '../core/filters/PeriodRMPRatingFilter';
+import { RateMyProfessorService } from './RateMyProfessorService';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -109,10 +111,12 @@ export class ScheduleFilterService {
     private registeredSectionFilters!: Map<string, SectionFilter>;
     private registeredSelectedCourseFilters!: Map<string, SelectedCourseFilter>;
     private periodConflictFilter: PeriodConflictFilter | null = null;
-    
-    constructor() {
+    private rmpService: RateMyProfessorService | null = null;
+
+    constructor(rmpService?: RateMyProfessorService) {
         this.filterState = new FilterState();
-        
+        this.rmpService = rmpService || null;
+
         this.initializeFilters();
     }
     
@@ -126,10 +130,10 @@ export class ScheduleFilterService {
         this.registeredCourseFilters = new Map();
         this.registeredSectionFilters = new Map();
         this.registeredSelectedCourseFilters = new Map();
-        
+
         // Register CourseFilter implementations internally
         this.registerCourseFilter(new SearchTextFilter());
-        
+
         // Register SectionFilter implementations using registration methods
         this.registerSectionFilter(new PeriodDaysFilter());
         this.registerSectionFilter(new PeriodProfessorFilter());
@@ -137,7 +141,12 @@ export class ScheduleFilterService {
         this.registerSectionFilter(new PeriodTermFilter());
         this.registerSectionFilter(new PeriodAvailabilityFilter());
         this.registerSectionFilter(new SectionCodeFilter());
-        
+
+        // Register RMP filter if service is available
+        if (this.rmpService) {
+            this.registerSectionFilter(new PeriodRMPRatingFilter(this.rmpService));
+        }
+
         // Register SelectedCourseFilter implementations using registration methods
         this.registerSelectedCourseFilter(new RequiredStatusFilter());
         this.registerSelectedCourseFilter(new SectionStatusFilter());
@@ -525,6 +534,10 @@ export class ScheduleFilterService {
             } else {
                 const sectionFilter = this.registeredSectionFilters.get(activeFilter.id);
                 if (sectionFilter && (sectionFilter as any).applyToSectionsWithContext) {
+                    console.log(`[ScheduleFilterService] Applying section filter: ${activeFilter.id}`);
+                    if (activeFilter.id === 'periodRmpRating') {
+                        console.log('[ScheduleFilterService] ✓ Applying RMP filter with criteria:', activeFilter.criteria);
+                    }
                     allSections = (sectionFilter as any).applyToSectionsWithContext(allSections, activeFilter.criteria);
                 }
             }
