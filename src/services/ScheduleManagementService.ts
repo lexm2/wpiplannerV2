@@ -606,6 +606,11 @@ export class ScheduleManagementService {
                 };
             }
 
+            // CRITICAL FIX: Flush pending batch operations before deletion
+            // This ensures any pending course selections/changes are persisted
+            // before we delete the schedule
+            await this.courseSelectionService.flushPendingOperations();
+
             const result = await this.retryManager.executeWithRetry(
                 () => {
                     return this.profileStateManager.deleteSchedule(scheduleId, 'api');
@@ -622,8 +627,8 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Auto-save
-            const saveResult = await this.profileStateManager.save();
+            // Force immediate save (bypass debounce) for critical delete operation
+            const saveResult = await this.profileStateManager.saveImmediate();
             if (!saveResult.success) {
                 console.warn('Failed to auto-save after schedule deletion:', saveResult.error);
             }

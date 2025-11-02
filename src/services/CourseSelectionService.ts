@@ -10,6 +10,7 @@ import { BatchOperationManager } from '../core/BatchOperationManager'
 export interface CourseSelectionOptions {
     isRequired?: boolean;
     validateBeforeAdd?: boolean;
+    flushImmediately?: boolean; // Force immediate persistence (bypasses batch queue)
 }
 
 export interface CourseSelectionResult {
@@ -326,7 +327,8 @@ export class CourseSelectionService {
 
         const {
             isRequired = false,
-            validateBeforeAdd = true
+            validateBeforeAdd = true,
+            flushImmediately = false  // Add option to flush immediately for critical operations
         } = options;
 
         try {
@@ -343,7 +345,14 @@ export class CourseSelectionService {
             }
 
             // Use optimistic UI for instant response
-            return this.selectCourseOptimistic(course, isRequired);
+            const result = this.selectCourseOptimistic(course, isRequired);
+
+            // If immediate flush requested, wait for batch to process
+            if (flushImmediately && result.success) {
+                await this.flushPendingOperations();
+            }
+
+            return result;
 
         } catch (error) {
             console.error('Error selecting course:', error);
@@ -387,8 +396,10 @@ export class CourseSelectionService {
         }
     }
 
-    async setSelectedSection(course: Course, sectionNumber: string | null): Promise<CourseSelectionResult> {
+    async setSelectedSection(course: Course, sectionNumber: string | null, options: { flushImmediately?: boolean } = {}): Promise<CourseSelectionResult> {
         await this.ensureInitialized();
+
+        const { flushImmediately = false } = options;
 
         try {
             if (!this.isCourseSelected(course)) {
@@ -399,7 +410,14 @@ export class CourseSelectionService {
             }
 
             // Use optimistic UI approach for instant response
-            return this.setSelectedSectionOptimistic(course, sectionNumber);
+            const result = this.setSelectedSectionOptimistic(course, sectionNumber);
+
+            // If immediate flush requested, wait for batch to process
+            if (flushImmediately && result.success) {
+                await this.flushPendingOperations();
+            }
+
+            return result;
 
         } catch (error) {
             console.error('Error setting selected section:', error);
@@ -1131,5 +1149,14 @@ export class CourseSelectionService {
 
         console.log('Health Check:', this.performHealthCheck());
         console.log('=============================================');
+    }
+
+    /**
+     * Force immediate flush of all pending batch operations
+     * Critical for operations like deletion or navigation where
+     * data must be persisted before the operation completes.
+     */
+    async flushPendingOperations(): Promise<void> {
+        await this.batchOperationManager.flushPendingOperations();
     }
 }

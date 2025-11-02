@@ -262,6 +262,40 @@ export class BatchOperationManager {
         return this.processBatch();
     }
 
+    /**
+     * Force immediate flush of all pending operations
+     * This is critical for operations like deletion or navigation where
+     * data must be persisted immediately before the action completes.
+     */
+    async flushPendingOperations(): Promise<BatchResult> {
+        // If already processing, wait for it to complete
+        if (this.isProcessing) {
+            // Wait for current batch to finish
+            await new Promise(resolve => {
+                const checkInterval = setInterval(() => {
+                    if (!this.isProcessing) {
+                        clearInterval(checkInterval);
+                        resolve(undefined);
+                    }
+                }, 50);
+            });
+        }
+
+        // Process any remaining pending operations immediately
+        if (this.hasPendingOperations()) {
+            return await this.processBatch();
+        }
+
+        // No operations to flush
+        return {
+            success: true,
+            batchId: 'no-op',
+            operationsProcessed: 0,
+            operationsFailed: 0,
+            duration: 0
+        };
+    }
+
     hasPendingOperations(): boolean {
         return this.uiStateBuffer.hasPendingOperations();
     }

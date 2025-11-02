@@ -521,6 +521,22 @@ export class ProfileStateManager {
         }
     }
 
+    /**
+     * Save immediately without debouncing
+     * Used for critical operations like deletion or navigation where
+     * changes must be persisted immediately
+     */
+    async saveImmediate(): Promise<TransactionResult> {
+        // Clear any pending debounced save
+        if (this.saveDebounceTimer) {
+            clearTimeout(this.saveDebounceTimer);
+            this.saveDebounceTimer = null;
+        }
+
+        // Call save directly without debounce
+        return this.save();
+    }
+
     private saveSync(): void {
         // Synchronous version of save for beforeunload handler
         // Note: This bypasses the transaction system for immediate persistence
