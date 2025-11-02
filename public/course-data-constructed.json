@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 2, 2025, 6:19 PM",
+  "generated": "Nov 2, 2025, 6:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -11428,7 +11428,7 @@
                 "crn": 336831,
                 "number": "C01",
                 "seats": 5,
-                "seats_available": 2,
+                "seats_available": 1,
                 "actual_waitlist": 0,
                 "max_waitlist": 5,
                 "note": null,
@@ -11447,7 +11447,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 5,
-                    "seats_available": 2,
+                    "seats_available": 1,
                     "actual_waitlist": 0,
                     "max_waitlist": 5,
                     "specific_section": "C01",
