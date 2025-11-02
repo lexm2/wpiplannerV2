@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 2, 2025, 3:49 PM",
+  "generated": "Nov 2, 2025, 4:17 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -230453,7 +230453,7 @@
                 "crn": 337659,
                 "number": "S02",
                 "seats": 30,
-                "seats_available": 23,
+                "seats_available": 22,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -230472,7 +230472,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seats_available": 23,
+                    "seats_available": 22,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S02",
@@ -230723,7 +230723,7 @@
                 "crn": 337857,
                 "number": "S01",
                 "seats": 30,
-                "seats_available": 19,
+                "seats_available": 18,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -230742,7 +230742,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seats_available": 19,
+                    "seats_available": 18,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01",
