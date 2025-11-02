@@ -720,8 +720,6 @@ export class ScheduleController {
                 selectedLecture: this.wizardPreviewSelections.lecture,
                 selectedDiscussion: this.wizardPreviewSelections.discussion,
                 selectedLab: this.wizardPreviewSelections.lab,
-                selectedSection: null,
-                selectedSectionNumber: null,
                 isRequired: false
             });
         }
