@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 1, 2025, 11:49 PM",
+  "generated": "Nov 2, 2025, 1:18 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -68869,7 +68869,7 @@
                 "number": "C01",
                 "seats": 120,
                 "seats_available": 0,
-                "actual_waitlist": 8,
+                "actual_waitlist": 9,
                 "max_waitlist": 20,
                 "note": null,
                 "description": "Cat. I Students of this course will examine the fundamental principles of physical geology including the materials, structures, and surface features of the earth and the processes which produced them. Emphasis will be placed on the interrelationship of people and environment and applications to various fields of technology. The course includes field trips and a significant laboratory component.",
@@ -68888,7 +68888,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 120,
                     "seats_available": 0,
-                    "actual_waitlist": 8,
+                    "actual_waitlist": 9,
                     "max_waitlist": 20,
                     "specific_section": "C01",
                     "days": [
