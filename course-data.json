@@ -32692,7 +32692,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-340069"
     },
     {
@@ -93358,7 +93358,7 @@
       "Course_Title": "OIE 501 - Operations Management",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "29/60",
+      "Enrolled_Capacity": "30/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Sara Saberi",
       "Locations": "Online-asynchronous",
