@@ -54,7 +54,7 @@ function createSection(crn: number, sectionNumber: string, periods: Period[]): S
     };
 }
 
-// Helper function to create a course
+// Helper function to create a course (no longer uses sections array)
 function createCourse(id: string, number: string, sections: Section[]): Course {
     const department: Department = {
         abbreviation: 'TEST',
@@ -68,25 +68,18 @@ function createCourse(id: string, number: string, sections: Section[]): Course {
         name: `Test Course ${number}`,
         description: 'Test course description',
         department,
-        sections,
         minCredits: 3,
         maxCredits: 3
     };
 }
 
 // Helper function to create a selected course
-function createSelectedCourse(course: Course, selectedSectionNumber: string | null = null): SelectedCourse {
-    const selectedSection = selectedSectionNumber ?
-        course.sections.find(s => s.number === selectedSectionNumber) || null : null;
-
-    // Use new format: assign section as lecture by default (tests don't use hierarchical structure)
+function createSelectedCourse(course: Course, selectedSection: Section | null = null): SelectedCourse {
     return {
         course,
         selectedLecture: selectedSection,
         selectedDiscussion: null,
         selectedLab: null,
-        selectedSection,  // Keep for now
-        selectedSectionNumber,  // Keep for now
         isRequired: false
     };
 }
@@ -162,7 +155,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
             ]);
             const selectedCourse = createCourse('CS-101', 'CS-101', [selectedSection]);
-            const selectedCourseObj = createSelectedCourse(selectedCourse, 'A01');
+            const selectedCourseObj = createSelectedCourse(selectedCourse, selectedSection);
 
             // Test periods to filter
             const periods = [
@@ -191,7 +184,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
             ]);
             const selectedCourse = createCourse('CS-101', 'CS-101', [selectedSection]);
-            const selectedCourseObj = createSelectedCourse(selectedCourse, 'A01');
+            const selectedCourseObj = createSelectedCourse(selectedCourse, selectedSection);
 
             // Test periods on different days
             const periods = [
@@ -218,14 +211,14 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
             ]);
             const selectedCourse1 = createCourse('CS-101', 'CS-101', [selectedSection1]);
-            const selectedCourseObj1 = createSelectedCourse(selectedCourse1, 'A01');
+            const selectedCourseObj1 = createSelectedCourse(selectedCourse1, selectedSection1);
 
             // Selected Course 2: Tuesday/Thursday 14-16
             const selectedSection2 = createSection(67890, 'B01', [
                 createPeriod('Lecture', 'Prof B', 14, 16, [DayOfWeek.TUESDAY, DayOfWeek.THURSDAY])
             ]);
             const selectedCourse2 = createCourse('MATH-201', 'MATH-201', [selectedSection2]);
-            const selectedCourseObj2 = createSelectedCourse(selectedCourse2, 'B01');
+            const selectedCourseObj2 = createSelectedCourse(selectedCourse2, selectedSection2);
 
             // Test periods
             const periods = [
@@ -285,7 +278,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
             ]);
             const course1 = createCourse('CS-101', 'CS-101', [course1Section]);
-            const selectedCourse1 = createSelectedCourse(course1, 'A01');
+            const selectedCourse1 = createSelectedCourse(course1, course1Section);
 
             // Course 2 with conflicting periods
             const course2Section = createSection(67890, 'B01', [
@@ -316,7 +309,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
             ]);
             const course1 = createCourse('CS-101', 'CS-101', [course1Section]);
-            const selectedCourse1 = createSelectedCourse(course1, 'A01');
+            const selectedCourse1 = createSelectedCourse(course1, course1Section);
 
             // Course 2 with non-conflicting periods (Tue/Thu 10-12)
             const course2Section = createSection(67890, 'B01', [
@@ -348,14 +341,14 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
             ]);
             const course1 = createCourse('CS-101', 'CS-101', [course1Section]);
-            const selectedCourse1 = createSelectedCourse(course1, 'A01');
+            const selectedCourse1 = createSelectedCourse(course1, course1Section);
 
             // Course 2: Selected section Tue/Thu 14-16
             const course2Section = createSection(67890, 'B01', [
                 createPeriod('Lecture', 'Prof B', 14, 16, [DayOfWeek.TUESDAY, DayOfWeek.THURSDAY])
             ]);
             const course2 = createCourse('MATH-201', 'MATH-201', [course2Section]);
-            const selectedCourse2 = createSelectedCourse(course2, 'B01');
+            const selectedCourse2 = createSelectedCourse(course2, course2Section);
 
             // Course 3: Multiple sections, some conflicting with Course 1, some with Course 2
             const course3Section1 = createSection(11111, 'C01', [
@@ -397,7 +390,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
             ]);
             const course1 = createCourse('CS-101', 'CS-101', [course1Section]);
-            const selectedCourse1 = createSelectedCourse(course1, 'A01');
+            const selectedCourse1 = createSelectedCourse(course1, course1Section);
 
             // Course 2 with section having multiple periods: one conflicts, one doesn't
             const course2Section = createSection(67890, 'B01', [
@@ -429,7 +422,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
             ]);
             const course1 = createCourse('CS-101', 'CS-101', [course1Section]);
-            const selectedCourse1 = createSelectedCourse(course1, 'A01');
+            const selectedCourse1 = createSelectedCourse(course1, course1Section);
 
             // Course 2 with section having multiple periods: none conflict
             const course2Section = createSection(67890, 'B01', [
@@ -475,8 +468,6 @@ describe('PeriodConflictFilter', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: null,
                 selectedLab: null,
-                selectedSection: lecture,
-                selectedSectionNumber: 'A01',
                 isRequired: false
             };
 
@@ -486,8 +477,6 @@ describe('PeriodConflictFilter', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: discussion1,  // Testing this discussion
                 selectedLab: null,
-                selectedSection: discussion1,
-                selectedSectionNumber: 'D01',
                 isRequired: false
             };
 
@@ -512,8 +501,6 @@ describe('PeriodConflictFilter', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: discussion2,  // Testing this discussion
                 selectedLab: null,
-                selectedSection: discussion2,
-                selectedSectionNumber: 'D02',
                 isRequired: false
             };
 
@@ -534,7 +521,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
             ]);
             const course1 = createCourse('CS-101', 'CS-101', [course1Section]);
-            const selectedCourse1 = createSelectedCourse(course1, 'A01');
+            const selectedCourse1 = createSelectedCourse(course1, course1Section);
 
             // Course 2: Multiple sections
             const course2Section1 = createSection(67890, 'B01', [
@@ -573,7 +560,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lab', 'Prof A', 14, 16, [DayOfWeek.FRIDAY])
             ]);
             const course1 = createCourse('CS-101', 'CS-101', [course1Section]);
-            const selectedCourse1 = createSelectedCourse(course1, 'A01');
+            const selectedCourse1 = createSelectedCourse(course1, course1Section);
 
             // Course 2: Section that conflicts with Course 1's lab (not lecture)
             const course2Section = createSection(67890, 'B01', [
@@ -606,7 +593,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY])
             ]);
             const selectedCourse = createCourse('CS-101', 'CS-101', [selectedSection]);
-            const selectedCourseObj = createSelectedCourse(selectedCourse, 'A01');
+            const selectedCourseObj = createSelectedCourse(selectedCourse, selectedSection);
 
             const periods = [
                 createPeriod('Online', 'Prof B', 10, 12, []) // No days
@@ -630,7 +617,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lab', 'Prof A', 14, 16, [DayOfWeek.FRIDAY])
             ]);
             const selectedCourse = createCourse('CS-101', 'CS-101', [selectedSection]);
-            const selectedCourseObj = createSelectedCourse(selectedCourse, 'A01');
+            const selectedCourseObj = createSelectedCourse(selectedCourse, selectedSection);
 
             const periods = [
                 createPeriod('Lecture', 'Prof B', 11, 13, [DayOfWeek.MONDAY]), // Conflicts with lecture
@@ -656,7 +643,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY])
             ]);
             const selectedCourse = createCourse('CS-101', 'CS-101', [selectedSection]);
-            const selectedCourseObj = createSelectedCourse(selectedCourse, 'A01');
+            const selectedCourseObj = createSelectedCourse(selectedCourse, selectedSection);
 
             const periods = [
                 createPeriod('Lab', 'Prof B', 8, 10, [DayOfWeek.MONDAY]), // 8-10 (no overlap)
@@ -680,7 +667,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod('Lecture', 'Prof A', 10, 12, [DayOfWeek.MONDAY])
             ]);
             const selectedCourse = createCourse('CS-101', 'CS-101', [selectedSection]);
-            const selectedCourseObj = createSelectedCourse(selectedCourse, 'A01');
+            const selectedCourseObj = createSelectedCourse(selectedCourse, selectedSection);
 
             const periods = [
                 createPeriod('Lab', 'Prof B', 9, 11, [DayOfWeek.MONDAY]), // 9-11 (1 hour overlap)

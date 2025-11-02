@@ -321,7 +321,7 @@ export class ScheduleController {
         }
     }
     
-    private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, _selectedCourses: any[]): string {
+    private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, _selectedCourses: any[], dropdownStates?: Map<string, boolean>): string {
         // Group filtered sections by course
         const sectionsByCourse = new Map();
         
@@ -347,18 +347,21 @@ export class ScheduleController {
             return courseA.number.localeCompare(courseB.number);
         });
         
-        sortedEntries.forEach(([_courseId, data]) => {
+        sortedEntries.forEach(([courseId, data]) => {
             const selectedCourse = data.selectedCourse;
             const course = selectedCourse.course;
 
-            html += this.buildCourseHeaderHTML(course, selectedCourse);
+            // Check dropdown state, default to expanded if not specified
+            const isExpanded = dropdownStates ? (dropdownStates.get(courseId) ?? true) : true;
+
+            html += this.buildCourseHeaderHTML(course, selectedCourse, isExpanded);
             html += '</div>'; // Close schedule-course-item
         });
         
         return html;
     }
     
-    private buildCourseHeaderHTML(course: any, selectedCourse: any): string {
+    private buildCourseHeaderHTML(course: any, selectedCourse: any, isExpanded: boolean = false): string {
         const credits = course.minCredits === course.maxCredits
             ? `${course.minCredits} credits`
             : `${course.minCredits}-${course.maxCredits} credits`;
@@ -392,7 +395,7 @@ export class ScheduleController {
         }
 
         return `
-            <div class="schedule-course-item">
+            <div class="schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}">
                 <div class="schedule-course-header">
                     <div class="schedule-course-info">
                         <div class="schedule-course-code">${course.department.abbreviation}${course.number}</div>

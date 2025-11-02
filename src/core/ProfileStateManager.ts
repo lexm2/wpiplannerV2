@@ -112,7 +112,7 @@ export type StateChangeListener = (event: StateChangeEvent, state: ProfileState)
  * STATE MANAGEMENT FEATURES:
  * Course Selection:
  * - selectCourse() / unselectCourse() with required/optional flagging
- * - setSelectedSection() for section-specific choices
+ * - setSelectedComponents() for component selections (lecture/discussion/lab)
  * - clearAllSelections() for bulk operations
  * - Automatic active schedule synchronization
  * 
@@ -238,8 +238,6 @@ export class ProfileStateManager {
                 // Add new selection
                 const selectedCourse: SelectedCourse = {
                     course,
-                    selectedSection: null,
-                    selectedSectionNumber: null,
                     selectedLecture: null,
                     selectedDiscussion: null,
                     selectedLab: null,
@@ -267,33 +265,58 @@ export class ProfileStateManager {
     setSelectedSection(course: Course, sectionNumber: string | null, source: string = 'user'): void {
         this.withStateUpdate(() => {
             const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
-            if (selectedCourse) {
-                let sectionObject: Section | null = null;
+            if (!selectedCourse) return;
 
-                if (sectionNumber) {
-                    // Find the section in the course
-                    sectionObject = course.sections?.find(s => s.number === sectionNumber) || null;
-
-                    // Validate section object has required properties
-                    if (sectionObject && !sectionObject.computedTerm) {
-                        console.warn(`Section ${sectionNumber} for course ${course.department.abbreviation}${course.number} is missing computedTerm property`);
-                        // Don't set the section if it's missing required data
-                        sectionObject = null;
-                    }
-
-                    if (!sectionObject && sectionNumber) {
-                        console.warn(`Section ${sectionNumber} not found in course ${course.department.abbreviation}${course.number} sections:`,
-                            course.sections?.map(s => s.number));
-                    }
-                }
-
-                // Ensure we never set undefined - always use null
-                selectedCourse.selectedSection = sectionObject;
-                selectedCourse.selectedSectionNumber = sectionObject ? sectionNumber : null;
-
+            // If clearing selection
+            if (!sectionNumber) {
+                selectedCourse.selectedLecture = null;
+                selectedCourse.selectedDiscussion = null;
+                selectedCourse.selectedLab = null;
                 this.updateActiveScheduleWithCurrentCourses();
                 this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
+                return;
             }
+
+            // Find the section - check lectures first
+            if (course.lectures) {
+                for (const lectureGroup of course.lectures) {
+                    if (lectureGroup.section.number === sectionNumber) {
+                        selectedCourse.selectedLecture = lectureGroup.section;
+                        this.updateActiveScheduleWithCurrentCourses();
+                        this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
+                        return;
+                    }
+                    // Check discussions
+                    const discussion = lectureGroup.compatibleDiscussions.find(d => d.number === sectionNumber);
+                    if (discussion) {
+                        selectedCourse.selectedDiscussion = discussion;
+                        this.updateActiveScheduleWithCurrentCourses();
+                        this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
+                        return;
+                    }
+                    // Check labs
+                    const lab = lectureGroup.compatibleLabs.find(l => l.number === sectionNumber);
+                    if (lab) {
+                        selectedCourse.selectedLab = lab;
+                        this.updateActiveScheduleWithCurrentCourses();
+                        this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
+                        return;
+                    }
+                }
+            }
+
+            // Check standalone labs
+            if (course.standaloneLabs) {
+                const lab = course.standaloneLabs.find(l => l.number === sectionNumber);
+                if (lab) {
+                    selectedCourse.selectedLab = lab;
+                    this.updateActiveScheduleWithCurrentCourses();
+                    this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
+                    return;
+                }
+            }
+
+            console.warn(`Section ${sectionNumber} not found in course ${course.department.abbreviation}${course.number}`);
         });
     }
 
@@ -307,14 +330,9 @@ export class ProfileStateManager {
         this.withStateUpdate(() => {
             const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
             if (selectedCourse) {
-                // Update component selections
                 selectedCourse.selectedLecture = lecture;
                 selectedCourse.selectedDiscussion = discussion;
                 selectedCourse.selectedLab = lab;
-
-                // For backward compatibility, set selectedSection to lecture (primary component)
-                selectedCourse.selectedSection = lecture;
-                selectedCourse.selectedSectionNumber = lecture?.number || null;
 
                 this.updateActiveScheduleWithCurrentCourses();
                 this.emitEvent('courses_changed', {
@@ -361,9 +379,8 @@ export class ProfileStateManager {
             this.isLoadingFlag = true;
             this.state.activeScheduleId = scheduleId;
 
-            // Load schedule's courses and sync section objects
+            // Load schedule's courses
             this.state.selectedCourses = [...schedule.selectedCourses];
-            this.syncScheduleCoursesSectionObjects();
 
             this.emitEvent('active_schedule_changed', { schedule }, source);
             this.emitEvent('courses_changed', { action: 'loaded_from_schedule', schedule }, source);
@@ -761,23 +778,6 @@ export class ProfileStateManager {
         }, 0);
     }
 
-    private syncScheduleCoursesSectionObjects(): void {
-        this.state.selectedCourses.forEach(sc => {
-            // If we have a selectedSectionNumber but no selectedSection object (or invalid object)
-            if (sc.selectedSectionNumber && (!sc.selectedSection || !sc.selectedSection.computedTerm)) {
-                // Find the section object in the course
-                const sectionObject = sc.course.sections?.find(s => s.number === sc.selectedSectionNumber);
-                
-                if (sectionObject && sectionObject.computedTerm) {
-                    sc.selectedSection = sectionObject;
-                } else {
-                    // Clear invalid section references
-                    sc.selectedSection = null;
-                    sc.selectedSectionNumber = null;
-                }
-            }
-        });
-    }
 
     private generateScheduleId(): string {
         return `schedule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;

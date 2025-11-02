@@ -55,7 +55,6 @@ export const createMockCourse = (overrides: Partial<Course> = {}): Course => {
     name: 'Introduction to Programming Design',
     description: 'An introduction to the design and analysis of algorithms and data structures.',
     department,
-    sections: [createMockSection()],
     minCredits: 3,
     maxCredits: 3,
     ...overrides
@@ -130,8 +129,9 @@ export const createMockSelectedCourse = (overrides: Partial<SelectedCourse> = {}
   const course = createMockCourse()
   return {
     course,
-    selectedSection: null,
-    selectedSectionNumber: null,
+    selectedLecture: null,
+    selectedDiscussion: null,
+    selectedLab: null,
     isRequired: false,
     ...overrides
   }

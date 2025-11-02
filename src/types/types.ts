@@ -14,11 +14,8 @@ export interface Course {
     name: string;
     description: string;
     department: Department;
-    // NEW: Hierarchical structure
-    lectures?: LectureGroup[];          // Main structure for most courses
-    standaloneLabs?: Section[];         // For lab-only courses
-    // DEPRECATED: Old flat structure (may be removed in future)
-    sections?: Section[];
+    lectures?: LectureGroup[];
+    standaloneLabs?: Section[];
     minCredits: number;
     maxCredits: number;
 }

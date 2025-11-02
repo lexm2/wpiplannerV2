@@ -1,0 +1,1710 @@
+
+> wpi-planner-v2@1.0.0 test
+> vitest
+
+
+ RUN  v3.2.4 /home/lex/Documents/Github/wpiplannerV2
+
+ ✓ tests/unit/core/PeriodTypeFilter.test.ts (22 tests) 28ms
+ ✓ tests/unit/core/PeriodDaysFilter.test.ts (15 tests) 28ms
+ ✓ tests/unit/core/PeriodTermFilter.test.ts (22 tests) 28ms
+ ✓ tests/unit/core/AvailabilityFilter.test.ts (15 tests) 20ms
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Constructor & Initialization > should initialize with hierarchical course
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Constructor & Initialization > should initialize with existing selections
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Constructor & Initialization > should initialize with empty selections when no existing selections provided
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Step Determination > should determine lecture step for hierarchical course
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: lecture
+[Wizard] Available steps with valid options: lecture
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Step Determination > should determine all steps for full hierarchical course
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: lecture, discussion, lab
+[Wizard] Available steps with valid options: lecture, discussion, lab
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Step Determination > should determine start step as first available step
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: lecture
+[Wizard] Available steps with valid options: lecture
+
+stdout | tests/unit/core/PeriodConflictFilter.test.ts > PeriodConflictFilter > Section-Based Conflict Detection > should filter entire section if ANY period conflicts
+[PeriodConflictFilter] applyToSectionsWithContext called
+[PeriodConflictFilter] Criteria: {
+  avoidConflicts: [33mtrue[39m,
+  selectedCourses: [
+    {
+      course: [36m[Object][39m,
+      selectedLecture: [36m[Object][39m,
+      selectedDiscussion: [1mnull[22m,
+      selectedLab: [1mnull[22m,
+      isRequired: [33mfalse[39m
+    },
+    {
+      course: [36m[Object][39m,
+      selectedLecture: [1mnull[22m,
+      selectedDiscussion: [1mnull[22m,
+      selectedLab: [1mnull[22m,
+      isRequired: [33mfalse[39m
+    }
+  ]
+}
+[PeriodConflictFilter] avoidConflicts: [33mtrue[39m
+[PeriodConflictFilter] selectedCourses: [33m2[39m
+[PeriodConflictFilter] Processing course: TESTCS-101
+[PeriodConflictFilter]   selectedLecture: A01
+[PeriodConflictFilter]   selectedDiscussion: [90mundefined[39m
+[PeriodConflictFilter]   selectedLab: [90mundefined[39m
+[PeriodConflictFilter]   ✓ Added lecture to map: A01
+[PeriodConflictFilter] Processing course: TESTMATH-201
+[PeriodConflictFilter]   selectedLecture: [90mundefined[39m
+[PeriodConflictFilter]   selectedDiscussion: [90mundefined[39m
+[PeriodConflictFilter]   selectedLab: [90mundefined[39m
+[PeriodConflictFilter] Total selected sections in map: [33m1[39m
+[PeriodConflictFilter] Testing section B01 from TESTMATH-201
+[PeriodConflictFilter]   Checking against 1 sections from other course CS-101
+[PeriodConflictFilter]     - A01 (1 periods)
+[PeriodConflictFilter]   ✗ FAIL - Period conflicts detected: [33m1[39m
+[PeriodConflictFilter]     Period: Lecture [object Set] 11:0-13:0
+[PeriodConflictFilter] Filtered 1 sections down to 0
+
+stdout | tests/unit/core/PeriodConflictFilter.test.ts > PeriodConflictFilter > Section-Based Conflict Detection > should keep section if NO periods conflict
+[PeriodConflictFilter] applyToSectionsWithContext called
+[PeriodConflictFilter] Criteria: {
+  avoidConflicts: [33mtrue[39m,
+  selectedCourses: [
+    {
+      course: [36m[Object][39m,
+      selectedLecture: [36m[Object][39m,
+      selectedDiscussion: [1mnull[22m,
+      selectedLab: [1mnull[22m,
+      isRequired: [33mfalse[39m
+    },
+    {
+      course: [36m[Object][39m,
+      selectedLecture: [1mnull[22m,
+      selectedDiscussion: [1mnull[22m,
+      selectedLab: [1mnull[22m,
+      isRequired: [33mfalse[39m
+    }
+  ]
+}
+[PeriodConflictFilter] avoidConflicts: [33mtrue[39m
+[PeriodConflictFilter] selectedCourses: [33m2[39m
+[PeriodConflictFilter] Processing course: TESTCS-101
+[PeriodConflictFilter]   selectedLecture: A01
+[PeriodConflictFilter]   selectedDiscussion: [90mundefined[39m
+[PeriodConflictFilter]   selectedLab: [90mundefined[39m
+[PeriodConflictFilter]   ✓ Added lecture to map: A01
+[PeriodConflictFilter] Processing course: TESTMATH-201
+[PeriodConflictFilter]   selectedLecture: [90mundefined[39m
+[PeriodConflictFilter]   selectedDiscussion: [90mundefined[39m
+[PeriodConflictFilter]   selectedLab: [90mundefined[39m
+[PeriodConflictFilter] Total selected sections in map: [33m1[39m
+[PeriodConflictFilter] Testing section B01 from TESTMATH-201
+[PeriodConflictFilter]   Checking against 1 sections from other course CS-101
+[PeriodConflictFilter]     - A01 (1 periods)
+[PeriodConflictFilter]   ✓ PASS - No conflicts found
+[PeriodConflictFilter] Filtered 1 sections down to 1
+
+stdout | tests/unit/core/PeriodConflictFilter.test.ts > PeriodConflictFilter > Section-Based Conflict Detection > should filter discussion/lab sections that conflict with selected lecture from same course
+[PeriodConflictFilter] applyToSectionsWithContext called
+[PeriodConflictFilter] Criteria: {
+  avoidConflicts: [33mtrue[39m,
+  selectedCourses: [
+    {
+      course: [36m[Object][39m,
+      selectedLecture: [36m[Object][39m,
+      selectedDiscussion: [1mnull[22m,
+      selectedLab: [1mnull[22m,
+      isRequired: [33mfalse[39m
+    }
+  ]
+}
+[PeriodConflictFilter] avoidConflicts: [33mtrue[39m
+[PeriodConflictFilter] selectedCourses: [33m1[39m
+[PeriodConflictFilter] Processing course: TESTCS-101
+[PeriodConflictFilter]   selectedLecture: A01
+[PeriodConflictFilter]   selectedDiscussion: [90mundefined[39m
+[PeriodConflictFilter]   selectedLab: [90mundefined[39m
+[PeriodConflictFilter]   ✓ Added lecture to map: A01
+[PeriodConflictFilter] Total selected sections in map: [33m1[39m
+[PeriodConflictFilter] Testing section D01 from TESTCS-101
+[PeriodConflictFilter]   Checking against 1 other components from same course
+[PeriodConflictFilter]     - A01 (1 periods)
+[PeriodConflictFilter]   ✗ FAIL - Period conflicts detected: [33m1[39m
+[PeriodConflictFilter]     Period: Discussion [object Set] 11:0-12:0
+[PeriodConflictFilter] Filtered 1 sections down to 0
+[PeriodConflictFilter] applyToSectionsWithContext called
+[PeriodConflictFilter] Criteria: {
+  avoidConflicts: [33mtrue[39m,
+  selectedCourses: [
+    {
+      course: [36m[Object][39m,
+      selectedLecture: [36m[Object][39m,
+      selectedDiscussion: [1mnull[22m,
+      selectedLab: [1mnull[22m,
+      isRequired: [33mfalse[39m
+    }
+  ]
+}
+[PeriodConflictFilter] avoidConflicts: [33mtrue[39m
+[PeriodConflictFilter] selectedCourses: [33m1[39m
+[PeriodConflictFilter] Processing course: TESTCS-101
+[PeriodConflictFilter]   selectedLecture: A01
+[PeriodConflictFilter]   selectedDiscussion: [90mundefined[39m
+[PeriodConflictFilter]   selectedLab: [90mundefined[39m
+[PeriodConflictFilter]   ✓ Added lecture to map: A01
+[PeriodConflictFilter] Total selected sections in map: [33m1[39m
+[PeriodConflictFilter] Testing section D02 from TESTCS-101
+[PeriodConflictFilter]   Checking against 1 other components from same course
+[PeriodConflictFilter]     - A01 (1 periods)
+[PeriodConflictFilter]   ✓ PASS - No conflicts found
+[PeriodConflictFilter] Filtered 1 sections down to 1
+
+stdout | tests/unit/core/PeriodConflictFilter.test.ts > PeriodConflictFilter > Section-Based Conflict Detection > should handle multiple sections from different courses
+[PeriodConflictFilter] applyToSectionsWithContext called
+[PeriodConflictFilter] Criteria: {
+  avoidConflicts: [33mtrue[39m,
+  selectedCourses: [
+    {
+      course: [36m[Object][39m,
+      selectedLecture: [36m[Object][39m,
+      selectedDiscussion: [1mnull[22m,
+      selectedLab: [1mnull[22m,
+      isRequired: [33mfalse[39m
+    },
+    {
+      course: [36m[Object][39m,
+      selectedLecture: [1mnull[22m,
+      selectedDiscussion: [1mnull[22m,
+      selectedLab: [1mnull[22m,
+      isRequired: [33mfalse[39m
+    }
+  ]
+}
+[PeriodConflictFilter] avoidConflicts: [33mtrue[39m
+[PeriodConflictFilter] selectedCourses: [33m2[39m
+[PeriodConflictFilter] Processing course: TESTCS-101
+[PeriodConflictFilter]   selectedLecture: A01
+[PeriodConflictFilter]   selectedDiscussion: [90mundefined[39m
+[PeriodConflictFilter]   selectedLab: [90mundefined[39m
+[PeriodConflictFilter]   ✓ Added lecture to map: A01
+[PeriodConflictFilter] Processing course: TESTMATH-201
+[PeriodConflictFilter]   selectedLecture: [90mundefined[39m
+[PeriodConflictFilter]   selectedDiscussion: [90mundefined[39m
+[PeriodConflictFilter]   selectedLab: [90mundefined[39m
+[PeriodConflictFilter] Total selected sections in map: [33m1[39m
+[PeriodConflictFilter] Testing section B01 from TESTMATH-201
+[PeriodConflictFilter]   Checking against 1 sections from other course CS-101
+[PeriodConflictFilter]     - A01 (1 periods)
+[PeriodConflictFilter]   ✗ FAIL - Period conflicts detected: [33m1[39m
+[PeriodConflictFilter]     Period: Lecture [object Set] 11:0-13:0
+[PeriodConflictFilter] Testing section B02 from TESTMATH-201
+[PeriodConflictFilter]   Checking against 1 sections from other course CS-101
+[PeriodConflictFilter]     - A01 (1 periods)
+[PeriodConflictFilter]   ✓ PASS - No conflicts found
+[PeriodConflictFilter] Filtered 2 sections down to 1
+
+stdout | tests/unit/core/PeriodConflictFilter.test.ts > PeriodConflictFilter > Section-Based Conflict Detection > should work with complex multi-period sections
+[PeriodConflictFilter] applyToSectionsWithContext called
+[PeriodConflictFilter] Criteria: {
+  avoidConflicts: [33mtrue[39m,
+  selectedCourses: [
+    {
+      course: [36m[Object][39m,
+      selectedLecture: [36m[Object][39m,
+      selectedDiscussion: [1mnull[22m,
+      selectedLab: [1mnull[22m,
+      isRequired: [33mfalse[39m
+    },
+    {
+      course: [36m[Object][39m,
+      selectedLecture: [1mnull[22m,
+      selectedDiscussion: [1mnull[22m,
+      selectedLab: [1mnull[22m,
+      isRequired: [33mfalse[39m
+    }
+  ]
+}
+[PeriodConflictFilter] avoidConflicts: [33mtrue[39m
+[PeriodConflictFilter] selectedCourses: [33m2[39m
+[PeriodConflictFilter] Processing course: TESTCS-101
+[PeriodConflictFilter]   selectedLecture: A01
+[PeriodConflictFilter]   selectedDiscussion: [90mundefined[39m
+[PeriodConflictFilter]   selectedLab: [90mundefined[39m
+[PeriodConflictFilter]   ✓ Added lecture to map: A01
+[PeriodConflictFilter] Processing course: TESTPHYS-301
+[PeriodConflictFilter]   selectedLecture: [90mundefined[39m
+[PeriodConflictFilter]   selectedDiscussion: [90mundefined[39m
+[PeriodConflictFilter]   selectedLab: [90mundefined[39m
+[PeriodConflictFilter] Total selected sections in map: [33m1[39m
+[PeriodConflictFilter] Testing section B01 from TESTPHYS-301
+[PeriodConflictFilter]   Checking against 1 sections from other course CS-101
+[PeriodConflictFilter]     - A01 (2 periods)
+[PeriodConflictFilter]   ✗ FAIL - Period conflicts detected: [33m1[39m
+[PeriodConflictFilter]     Period: Workshop [object Set] 15:0-17:0
+[PeriodConflictFilter] Filtered 1 sections down to 0
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Step Determination > should check if step has options
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] getOptionsForStep(lecture)
+[Wizard] Current selections: { lecture: [1mnull[22m, discussion: [1mnull[22m, lab: [1mnull[22m }
+[Wizard] Course has 0 lecture groups
+[Wizard] Found 0 lecture groups
+[Wizard] After filtering placeholders: 0 lectures with valid time slots
+[Wizard] Before filters: 0 lecture sections
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Step Determination > should get options for lecture step
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] getOptionsForStep(lecture)
+[Wizard] Current selections: { lecture: [1mnull[22m, discussion: [1mnull[22m, lab: [1mnull[22m }
+[Wizard] Course has 0 lecture groups
+[Wizard] Found 0 lecture groups
+[Wizard] After filtering placeholders: 0 lectures with valid time slots
+[Wizard] Before filters: 0 lecture sections
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Step Determination > should return empty array for discussion step without lecture selected
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] getOptionsForStep(discussion)
+[Wizard] Current selections: { lecture: [1mnull[22m, discussion: [1mnull[22m, lab: [1mnull[22m }
+[Wizard] Course has 0 lecture groups
+[Wizard] No lecture selected, showing all discussions from all lecture groups
+[Wizard] Found 0 total discussions across all lecture groups
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Step Determination > should return empty array for lab step without lecture selected
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] getOptionsForStep(lab)
+[Wizard] Current selections: { lecture: [1mnull[22m, discussion: [1mnull[22m, lab: [1mnull[22m }
+[Wizard] Course has 0 lecture groups
+[Wizard] No lecture selected, showing all labs from all lecture groups
+[Wizard] Found 0 total labs across all lecture groups
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Navigation > should advance to next step
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Navigation > should not auto-complete when selecting last step (requires manual next)
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS102
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] selectSection() - step: lab, section: L01, previousSelection: none
+[Wizard] About to call onSelectionChange, exists: [33mfalse[39m
+[Wizard] nextStep() called - current: lab, index: -1
+[Wizard] Completing wizard
+
+stderr | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Navigation > should not auto-complete when selecting last step (requires manual next)
+[Wizard] onSelectionChange is undefined! Cannot trigger preview.
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Navigation > should go back to previous step
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+ ❯ tests/unit/core/PeriodConflictFilter.test.ts (19 tests | 5 failed) 52ms
+   ✓ PeriodConflictFilter > Basic Functionality > should return all periods when avoidConflicts is false 6ms
+   ✓ PeriodConflictFilter > Basic Functionality > should return all periods when no selected courses provided 1ms
+   ✓ PeriodConflictFilter > Basic Functionality > should return all periods when no sections are selected 1ms
+   × PeriodConflictFilter > Conflict Detection > should filter out periods that conflict with selected sections - same time overlap 12ms
+     → expected [ { type: 'Lecture', …(12) }, …(3) ] to have a length of 2 but got 4
+   ✓ PeriodConflictFilter > Conflict Detection > should not filter periods on different days 1ms
+   × PeriodConflictFilter > Conflict Detection > should handle multiple selected courses 2ms
+     → expected [ { type: 'Lecture', …(12) }, …(2) ] to have a length of 1 but got 3
+   ✓ PeriodConflictFilter > Same Course vs Different Course Conflicts > should NOT filter periods from same course even with time conflicts 1ms
+   ✓ PeriodConflictFilter > Same Course vs Different Course Conflicts > should filter periods from different courses with time conflicts 2ms
+   ✓ PeriodConflictFilter > Same Course vs Different Course Conflicts > should allow periods from different courses with no time conflicts 2ms
+   × PeriodConflictFilter > Same Course vs Different Course Conflicts > should handle mixed scenario: multiple courses with some selected sections 2ms
+     → course2Section1 is not defined
+   ✓ PeriodConflictFilter > Section-Based Conflict Detection > should filter entire section if ANY period conflicts 8ms
+   ✓ PeriodConflictFilter > Section-Based Conflict Detection > should keep section if NO periods conflict 2ms
+   ✓ PeriodConflictFilter > Section-Based Conflict Detection > should filter discussion/lab sections that conflict with selected lecture from same course 2ms
+   ✓ PeriodConflictFilter > Section-Based Conflict Detection > should handle multiple sections from different courses 1ms
+   ✓ PeriodConflictFilter > Section-Based Conflict Detection > should work with complex multi-period sections 2ms
+   ✓ PeriodConflictFilter > Edge Cases > should handle periods with no days 1ms
+   × PeriodConflictFilter > Edge Cases > should handle sections with multiple periods 1ms
+     → expected [ { type: 'Lecture', …(12) }, …(2) ] to have a length of 1 but got 3
+   ✓ PeriodConflictFilter > Edge Cases > should handle exact time boundaries (no overlap) 1ms
+   × PeriodConflictFilter > Edge Cases > should detect minimal overlaps 2ms
+     → expected [ { type: 'Lab', …(12) }, …(1) ] to have a length of +0 but got 2
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Navigation > should not go back from first step
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] prevStep() called - current: undefined, index: -1
+[Wizard] Already at first step, cannot go back
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Navigation > should jump to specific step via breadcrumb
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Navigation > should not jump to unavailable step
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Transaction Operations > should execute simple transaction successfully
+IndexedDB is not supported in this browser
+
+stdout | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Transaction Operations > should execute simple transaction successfully
+Transaction tx_1762054037010_1_k93o0cjhk committed successfully
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Selection Logic > should select lecture section
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] selectSection() - step: lecture, section: A01, previousSelection: none
+[Wizard] About to call onSelectionChange, exists: [33mfalse[39m
+
+stderr | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Selection Logic > should select lecture section
+[Wizard] onSelectionChange is undefined! Cannot trigger preview.
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Selection Logic > should select discussion section
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] selectSection() - step: discussion, section: A11, previousSelection: none
+[Wizard] About to call onSelectionChange, exists: [33mfalse[39m
+
+stderr | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Selection Logic > should select discussion section
+[Wizard] onSelectionChange is undefined! Cannot trigger preview.
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Transaction Operations > should rollback on transaction failure
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Transaction Operations > should handle localStorage quota exceeded error
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Data Integrity Verification > should verify data integrity successfully
+IndexedDB is not supported in this browser
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Selection Logic > should select lab section
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] selectSection() - step: lab, section: A21, previousSelection: none
+[Wizard] About to call onSelectionChange, exists: [33mfalse[39m
+
+stderr | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Selection Logic > should select lab section
+[Wizard] onSelectionChange is undefined! Cannot trigger preview.
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Data Integrity Verification > should detect localStorage issues
+IndexedDB is not supported in this browser
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Selection Logic > should clear dependent selections when changing lecture
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] selectSection() - step: lecture, section: A02, previousSelection: A01
+[Wizard] Clearing dependent selections (discussion/lab) due to lecture change
+[Wizard] About to call onSelectionChange, exists: [33mfalse[39m
+
+stderr | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Selection Logic > should clear dependent selections when changing lecture
+[Wizard] onSelectionChange is undefined! Cannot trigger preview.
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Data Integrity Verification > should detect data corruption
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Atomic Save Operations > should save user state atomically
+IndexedDB is not supported in this browser
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Selection Logic > should not clear dependent selections when selecting same lecture
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] selectSection() - step: lecture, section: A01, previousSelection: A01
+[Wizard] About to call onSelectionChange, exists: [33mfalse[39m
+
+stderr | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Selection Logic > should not clear dependent selections when selecting same lecture
+[Wizard] onSelectionChange is undefined! Cannot trigger preview.
+
+stdout | tests/unit/core/ProfileStateManager.test.ts > ProfileStateManager > Initialization and State Management > should create default schedule if none exist
+ProfileStateManager: Loaded 0 standalone courses from storage
+ProfileStateManager: Final loaded course count: 0
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Atomic Save Operations > should handle serialization of complex data types
+IndexedDB is not supported in this browser
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Completion & Cancellation > should call onComplete with selections when completed
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS102
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stdout | tests/unit/core/ProfileStateManager.test.ts > ProfileStateManager > Initialization and State Management > should load existing data from storage
+ProfileStateManager: Loaded 0 courses from active schedule "Existing Schedule"
+ProfileStateManager: Loaded 0 standalone courses from storage
+ProfileStateManager: Final loaded course count: 0
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Completion & Cancellation > should call onCancel when canceled
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Completion & Cancellation > should close wizard when completed
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS102
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Completion & Cancellation > should close wizard when canceled
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Schedule Management > should save and load schedules with conflict resolution
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Schedule Management > should update existing schedule atomically
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should persist theme selection through the unified storage system
+IndexedDB is not supported in this browser
+
+stdout | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should persist theme selection through the unified storage system
+ProfileStateManager: Loaded 0 standalone courses from storage
+ProfileStateManager: Final loaded course count: 0
+
+stderr | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should persist theme selection through the unified storage system
+IndexedDB not available, using localStorage fallback
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Schedule Management > should delete schedule atomically
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Export/Import with Integrity Checks > should export and import data with checksum validation
+IndexedDB is not supported in this browser
+
+stdout | tests/unit/services/CourseFilterService.test.ts > CourseFilterService > Priority System > should apply filters in priority order
+Filter application order (by priority):
+  1. Department (priority: 25)
+  2. Availability (priority: 100)
+  Applied Department: 15 → 5 courses
+  Applied Availability: 5 → 4 courses
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Export/Import with Integrity Checks > should reject import with invalid checksum
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should not have conflicting storage calls between ThemeSelector and ThemeManager
+IndexedDB is not supported in this browser
+
+stdout | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should not have conflicting storage calls between ThemeSelector and ThemeManager
+ProfileStateManager: Loaded 0 standalone courses from storage
+ProfileStateManager: Final loaded course count: 0
+
+stderr | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should not have conflicting storage calls between ThemeSelector and ThemeManager
+IndexedDB not available, using localStorage fallback
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Error Recovery > should handle corrupted localStorage gracefully
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Error Recovery > should handle localStorage unavailable gracefully
+IndexedDB is not supported in this browser
+
+stdout | tests/unit/services/CourseFilterService.test.ts > CourseFilterService > Priority System > should handle multiple filters efficiently
+Filtered 500 courses to 17 in 0.64ms
+
+stderr | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should load saved theme correctly on initialization
+IndexedDB is not supported in this browser
+
+stdout | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should load saved theme correctly on initialization
+ProfileStateManager: Loaded 0 standalone courses from storage
+ProfileStateManager: Final loaded course count: 0
+
+stderr | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should load saved theme correctly on initialization
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Open & Close > should append wizard panel to container when opened
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] getOptionsForStep(lecture)
+[Wizard] Current selections: { lecture: [1mnull[22m, discussion: [1mnull[22m, lab: [1mnull[22m }
+[Wizard] Course has 0 lecture groups
+[Wizard] Found 0 lecture groups
+[Wizard] After filtering placeholders: 0 lectures with valid time slots
+[Wizard] Before filters: 0 lecture sections
+
+stderr | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Open & Close > should append wizard panel to container when opened
+[Wizard] ⚠️ WARNING: RMP data is not loaded! RMP filters will not work properly.
+[Wizard] This may indicate a race condition - RMP data should be loaded during app initialization
+
+stdout | tests/unit/services/CourseFilterService.test.ts > CourseFilterService > Configuration > should toggle debug logging
+Filter application order (by priority):
+  1. Department (priority: 25)
+  Applied Department: 15 → 5 courses
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Error Recovery > should provide fallback values on load failures
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Performance and Memory Management > should handle large data sets without memory leaks
+IndexedDB is not supported in this browser
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Open & Close > should remove wizard panel when closed
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] getOptionsForStep(lecture)
+[Wizard] Current selections: { lecture: [1mnull[22m, discussion: [1mnull[22m, lab: [1mnull[22m }
+[Wizard] Course has 0 lecture groups
+[Wizard] Found 0 lecture groups
+[Wizard] After filtering placeholders: 0 lectures with valid time slots
+[Wizard] Before filters: 0 lecture sections
+
+stderr | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Open & Close > should remove wizard panel when closed
+[Wizard] ⚠️ WARNING: RMP data is not loaded! RMP filters will not work properly.
+[Wizard] This may indicate a race condition - RMP data should be loaded during app initialization
+
+stderr | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should load saved theme correctly on initialization
+Sync transaction tx_1762054037049_1_peykm71wg failed, rolling back: Error: Data integrity check failed: localStorage read/write test failed
+    at TransactionalStorageManager.executeSyncTransaction [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/TransactionalStorageManager.ts:535:23[90m)[39m
+    at TransactionalStorageManager.saveActiveScheduleId [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/TransactionalStorageManager.ts:409:21[90m)[39m
+    at ProfileStateManager.save [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:436:33[90m)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39mtests/integration/theme-persistence.test.ts:88:35
+    at [90mfile:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:155:11
+    at [90mfile:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:752:26
+    at [90mfile:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1863:10[90m)[39m
+    at runTest [90m(file:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1574:12[90m)[39m
+Sync transaction tx_1762054037061_2_g4srm775u failed, rolling back: Error: Data integrity check failed: localStorage read/write test failed
+    at TransactionalStorageManager.executeSyncTransaction [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/TransactionalStorageManager.ts:535:23[90m)[39m
+    at TransactionalStorageManager.saveScheduleToLocalStorage [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/TransactionalStorageManager.ts:300:21[90m)[39m
+    at TransactionalStorageManager.saveSchedule [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/TransactionalStorageManager.ts:256:25[90m)[39m
+    at ProfileStateManager.save [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:439:43[90m)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39mtests/integration/theme-persistence.test.ts:88:35
+    at [90mfile:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:155:11
+    at [90mfile:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:752:26
+    at [90mfile:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1863:10[90m)[39m
+
+stderr | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should load saved theme correctly on initialization
+Sync transaction tx_1762054037068_3_2x4zukats failed, rolling back: Error: Data integrity check failed: localStorage read/write test failed
+    at TransactionalStorageManager.executeSyncTransaction [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/TransactionalStorageManager.ts:535:23[90m)[39m
+    at TransactionalStorageManager.saveSelectedCourses [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/TransactionalStorageManager.ts:364:29[90m)[39m
+    at ProfileStateManager.save [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:442:33[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39mtests/integration/theme-persistence.test.ts:88:9
+    at [90mfile:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:752:20
+Sync transaction tx_1762054037069_4_bmp328ogw failed, rolling back: Error: Data integrity check failed: localStorage read/write test failed
+    at TransactionalStorageManager.executeSyncTransaction [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/TransactionalStorageManager.ts:535:23[90m)[39m
+    at TransactionalStorageManager.savePreferences [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/TransactionalStorageManager.ts:343:21[90m)[39m
+    at ProfileStateManager.save [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:443:33[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39mtests/integration/theme-persistence.test.ts:88:9
+    at [90mfile:///home/lex/Documents/Github/wpiplannerV2/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:752:20
+
+stderr | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should render dropdown with correct active theme after initialization
+IndexedDB is not supported in this browser
+
+stdout | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should render dropdown with correct active theme after initialization
+ProfileStateManager: Loaded 0 standalone courses from storage
+ProfileStateManager: Final loaded course count: 0
+
+stderr | tests/integration/theme-persistence.test.ts > Theme Persistence Integration > should render dropdown with correct active theme after initialization
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Open & Close > should add active class to panel when opened
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] getOptionsForStep(lecture)
+[Wizard] Current selections: { lecture: [1mnull[22m, discussion: [1mnull[22m, lab: [1mnull[22m }
+[Wizard] Course has 0 lecture groups
+[Wizard] Found 0 lecture groups
+[Wizard] After filtering placeholders: 0 lectures with valid time slots
+[Wizard] Before filters: 0 lecture sections
+
+stderr | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Open & Close > should add active class to panel when opened
+[Wizard] ⚠️ WARNING: RMP data is not loaded! RMP filters will not work properly.
+[Wizard] This may indicate a race condition - RMP data should be loaded during app initialization
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Rendering > should render wizard content
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] getOptionsForStep(lecture)
+[Wizard] Current selections: { lecture: [1mnull[22m, discussion: [1mnull[22m, lab: [1mnull[22m }
+[Wizard] Course has 0 lecture groups
+[Wizard] Found 0 lecture groups
+[Wizard] After filtering placeholders: 0 lectures with valid time slots
+[Wizard] Before filters: 0 lecture sections
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Rendering > should render breadcrumbs for multi-step wizard
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+ ✓ tests/unit/services/CourseFilterService.test.ts (14 tests) 47ms
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Rendering > should not render breadcrumbs for single-step wizard
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS102
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Rendering > should render section cards
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] Rendering card - Professor: Prof Smith | RMP loaded: [33mfalse[39m
+[RMP Service] getRatingDisplay() called for: Prof Smith
+[RMP Service] findProfessor() called with: Prof Smith
+[RMP Service] Data loaded: [33mfalse[39m Maps ready: [33m0[39m full names, [33m0[39m last names
+[RMP Service] Early return - no data or no professor name
+[RMP Service] getRatingDisplay() - professor not found
+[Wizard] RMP data result: null
+
+stdout | tests/unit/components/ComponentSelectionWizard.test.ts > ComponentSelectionWizard > Rendering > should show selected badge on selected section
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] Rendering card - Professor: Prof Smith | RMP loaded: [33mfalse[39m
+[RMP Service] getRatingDisplay() called for: Prof Smith
+[RMP Service] findProfessor() called with: Prof Smith
+[RMP Service] Data loaded: [33mfalse[39m Maps ready: [33m0[39m full names, [33m0[39m last names
+[RMP Service] Early return - no data or no professor name
+[RMP Service] getRatingDisplay() - professor not found
+[Wizard] RMP data result: null
+
+ ✓ tests/unit/components/ComponentSelectionWizard.test.ts (33 tests) 132ms
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Performance and Memory Management > should clean up after failed transactions
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/core/TransactionalStorageManager.test.ts > TransactionalStorageManager > Concurrent Access Protection > should handle multiple rapid save operations
+IndexedDB is not supported in this browser
+
+ ✓ tests/unit/core/TransactionalStorageManager.test.ts (19 tests) 100ms
+ ✓ tests/integration/theme-persistence.test.ts (4 tests) 97ms
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseDataService > should use CourseDataService to determine course structure
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseDataService > should use CourseDataService to determine course structure
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseDataService > should use CourseDataService to determine course structure
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] Available steps with valid options: 
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseDataService > should get sections from CourseDataService
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseDataService > should get sections from CourseDataService
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseDataService > should get sections from CourseDataService
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] getOptionsForStep(lecture)
+[Wizard] Current selections: { lecture: [1mnull[22m, discussion: [1mnull[22m, lab: [1mnull[22m }
+[Wizard] Course has 0 lecture groups
+[Wizard] Found 0 lecture groups
+[Wizard] After filtering placeholders: 0 lectures with valid time slots
+[Wizard] Before filters: 0 lecture sections
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseDataService > should handle hierarchical course detection
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseDataService > should handle hierarchical course detection
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseDataService > should handle hierarchical course detection
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: lecture, discussion, lab
+[Wizard] Available steps with valid options: lecture, discussion, lab
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseSelectionService > should complete with selections that can be passed to service
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseSelectionService > should complete with selections that can be passed to service
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseSelectionService > should complete with selections that can be passed to service
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseSelectionService > should provide selections in correct format for service
+IndexedDB is not supported in this browser
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Initialization > should initialize successfully
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Initialization > should initialize successfully
+CourseSelectionService initialized successfully
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseSelectionService > should provide selections in correct format for service
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Integration with CourseSelectionService > should provide selections in correct format for service
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > End-to-End Component Flow > should complete full selection flow for multi-step course with manual navigation
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > End-to-End Component Flow > should complete full selection flow for multi-step course with manual navigation
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > End-to-End Component Flow > should complete full selection flow for multi-step course with manual navigation
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] selectSection() - step: lecture, section: A01, previousSelection: none
+[Wizard] About to call onSelectionChange, exists: [33mfalse[39m
+[Wizard] nextStep() called - current: lecture, index: -1
+[Wizard] Completing wizard
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > End-to-End Component Flow > should complete full selection flow for multi-step course with manual navigation
+[Wizard] onSelectionChange is undefined! Cannot trigger preview.
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > End-to-End Component Flow > should handle cancel during selection
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > End-to-End Component Flow > should handle cancel during selection
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > End-to-End Component Flow > should handle cancel during selection
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > End-to-End Component Flow > should preserve partial selections when navigating between steps
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > End-to-End Component Flow > should preserve partial selections when navigating between steps
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > End-to-End Component Flow > should preserve partial selections when navigating between steps
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Error Handling > should handle missing DOM container gracefully
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Error Handling > should handle missing DOM container gracefully
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Error Handling > should handle missing DOM container gracefully
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Error Handling > should handle missing DOM container gracefully
+Sidebar container not found
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should select course successfully
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should select course successfully
+CourseSelectionService initialized successfully
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Error Handling > should handle course with no sections
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Error Handling > should handle course with no sections
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Error Handling > should handle course with no sections
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+[Wizard] getOptionsForStep(lecture)
+[Wizard] Current selections: { lecture: [1mnull[22m, discussion: [1mnull[22m, lab: [1mnull[22m }
+[Wizard] Course has 0 lecture groups
+[Wizard] Found 0 lecture groups
+[Wizard] After filtering placeholders: 0 lectures with valid time slots
+[Wizard] Before filters: 0 lecture sections
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Error Handling > should handle invalid step gracefully
+IndexedDB is not supported in this browser
+
+stderr | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Error Handling > should handle invalid step gracefully
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/integration/ComponentSelectionWizard.integration.test.ts > ComponentSelectionWizard Integration > Error Handling > should handle invalid step gracefully
+[Wizard] Constructor called
+[Wizard] Has onSelectionChange callback: [33mfalse[39m
+[Wizard] Has scheduleFilterService: [33mfalse[39m
+[Wizard] Course: CS101
+[Wizard] All selected courses count: [33m0[39m
+[Wizard] Available steps with valid options: 
+
+stdout | tests/integration/AvailabilityFilterIntegration.test.ts > AvailabilityFilter Integration > end-to-end filtering with real services > should work with multiple active filters
+Initializing CourseSelectionService...
+
+stderr | tests/integration/AvailabilityFilterIntegration.test.ts > AvailabilityFilter Integration > end-to-end filtering with real services > should work with multiple active filters
+IndexedDB is not supported in this browser
+IndexedDB not available, using localStorage fallback
+Health check found issues: [
+  [32m'Service not initialized'[39m,
+  [32m'State: Data integrity issue: localStorage read/write test failed'[39m
+]
+
+stdout | tests/integration/AvailabilityFilterIntegration.test.ts > AvailabilityFilter Integration > end-to-end filtering with real services > should work with multiple active filters
+CourseSelectionService initialized successfully
+
+ ✓ tests/integration/ComponentSelectionWizard.integration.test.ts (11 tests) 74ms
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should select course as required
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should select course as required
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should unselect course successfully
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should unselect course successfully
+CourseSelectionService initialized successfully
+
+stdout | tests/integration/AvailabilityFilterIntegration.test.ts > AvailabilityFilter Integration > filter coordination edge cases > should handle filter removal and re-addition
+Initializing CourseSelectionService...
+
+stderr | tests/integration/AvailabilityFilterIntegration.test.ts > AvailabilityFilter Integration > filter coordination edge cases > should handle filter removal and re-addition
+IndexedDB is not supported in this browser
+IndexedDB not available, using localStorage fallback
+Health check found issues: [
+  [32m'Service not initialized'[39m,
+  [32m'State: Data integrity issue: localStorage read/write test failed'[39m
+]
+
+stdout | tests/integration/AvailabilityFilterIntegration.test.ts > AvailabilityFilter Integration > filter coordination edge cases > should handle filter removal and re-addition
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should handle unselecting non-selected course
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should handle unselecting non-selected course
+CourseSelectionService initialized successfully
+
+stdout | tests/integration/AvailabilityFilterIntegration.test.ts > AvailabilityFilter Integration > filter coordination edge cases > should handle concurrent filter modifications
+Initializing CourseSelectionService...
+
+stderr | tests/integration/AvailabilityFilterIntegration.test.ts > AvailabilityFilter Integration > filter coordination edge cases > should handle concurrent filter modifications
+IndexedDB is not supported in this browser
+IndexedDB not available, using localStorage fallback
+Health check found issues: [
+  [32m'Service not initialized'[39m,
+  [32m'State: Data integrity issue: localStorage read/write test failed'[39m
+]
+
+stdout | tests/integration/AvailabilityFilterIntegration.test.ts > AvailabilityFilter Integration > filter coordination edge cases > should handle concurrent filter modifications
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should toggle course selection
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should toggle course selection
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should clear all selections
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Course Selection > should clear all selections
+CourseSelectionService initialized successfully
+
+ ✓ tests/integration/AvailabilityFilterIntegration.test.ts (6 tests | 3 skipped) 36ms
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Section Selection > should set selected section successfully
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Section Selection > should set selected section successfully
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Section Selection > should clear selected section
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Section Selection > should clear selected section
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Section Selection > should validate section exists in course
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Section Selection > should validate section exists in course
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Section Selection > should require course to be selected first
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Section Selection > should require course to be selected first
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/core/ProfileStateManager.test.ts > ProfileStateManager > Data Persistence and Loading > should save and load state successfully
+ProfileStateManager: Loaded 1 courses from active schedule "Test Schedule"
+ProfileStateManager: Final loaded course count: 1
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Section Selection > should get selected section object
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Section Selection > should get selected section object
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Queries > should return correct course selection status
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Queries > should return correct course selection status
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Queries > should get selected course details
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Queries > should get selected course details
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Queries > should get all selected courses
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Queries > should get all selected courses
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Queries > should get selected course IDs
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Queries > should get selected course IDs
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Event Handling > should notify listeners of course selection changes
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Event Handling > should notify listeners of course selection changes
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Event Handling > should notify listeners of section changes
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Event Handling > should notify listeners of section changes
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Event Handling > should handle listener errors gracefully
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Event Handling > should handle listener errors gracefully
+CourseSelectionService initialized successfully
+
+stderr | tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildCourseHeaderHTML should create expanded class when isExpanded is true
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildCourseHeaderHTML should create expanded class when isExpanded is true
+IndexedDB not available, using localStorage fallback
+
+stderr | tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildCourseHeaderHTML should default to collapsed when isExpanded is not provided
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildCourseHeaderHTML should default to collapsed when isExpanded is not provided
+IndexedDB not available, using localStorage fallback
+
+stderr | tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildFilteredSectionsHTML should default to expanded when no previous state
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildFilteredSectionsHTML should default to expanded when no previous state
+IndexedDB not available, using localStorage fallback
+
+stderr | tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildFilteredSectionsHTML should preserve existing state when provided
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildFilteredSectionsHTML should preserve existing state when provided
+IndexedDB not available, using localStorage fallback
+
+stderr | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Event Handling > should handle listener errors gracefully
+Error in selection change listener: Error: Listener error
+    at errorListener [90m(/home/lex/Documents/Github/wpiplannerV2/[39mtests/unit/services/CourseSelectionService.test.ts:348:43[90m)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/services/CourseSelectionService.ts:860:17
+    at Set.forEach (<anonymous>)
+    at CourseSelectionService.notifySelectionListeners [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/services/CourseSelectionService.ts:858:33[90m)[39m
+    at CourseSelectionService.selectCourseOptimistic [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/services/CourseSelectionService.ts:930:18[90m)[39m
+    at CourseSelectionService.selectCourse [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/services/CourseSelectionService.ts:346:25[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should filter sections by section code
+[ScheduleFilterService] Applying section filter: sectionCode
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Event Handling > should remove listeners correctly
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Event Handling > should remove listeners correctly
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should filter sections by multiple section codes
+[ScheduleFilterService] Applying section filter: sectionCode
+
+stderr | tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildFilteredSectionsHTML should preserve expanded state when provided
+IndexedDB is not supported in this browser
+
+stderr | tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildFilteredSectionsHTML should preserve expanded state when provided
+IndexedDB not available, using localStorage fallback
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should filter sections by partial section code match
+[ScheduleFilterService] Applying section filter: sectionCode
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should return empty array for non-matching section codes
+[ScheduleFilterService] Applying section filter: sectionCode
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Persistence > should handle save failures
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Persistence > should handle save failures
+CourseSelectionService initialized successfully
+
+ ❯ tests/unit/ui/ScheduleController.test.ts (5 tests | 5 failed) 69ms
+   × ScheduleController Expansion State > buildCourseHeaderHTML should create expanded class when isExpanded is true 38ms
+     → expected '\n            <div class="schedule-co…' to contain 'schedule-course-item expanded'
+   × ScheduleController Expansion State > buildCourseHeaderHTML should default to collapsed when isExpanded is not provided 7ms
+     → expected '\n            <div class="schedule-co…' to contain 'schedule-course-item collapsed'
+   × ScheduleController Expansion State > buildFilteredSectionsHTML should default to expanded when no previous state 6ms
+     → expected '\n            <div class="schedule-co…' to contain 'schedule-course-item expanded'
+   × ScheduleController Expansion State > buildFilteredSectionsHTML should preserve existing state when provided 6ms
+     → expected '\n            <div class="schedule-co…' to contain 'schedule-course-item collapsed'
+   × ScheduleController Expansion State > buildFilteredSectionsHTML should preserve expanded state when provided 10ms
+     → expected '\n            <div class="schedule-co…' to contain 'schedule-course-item expanded'
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Persistence > should not auto-save when disabled
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Data Persistence > should not auto-save when disabled
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Export/Import > should export selections successfully
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Export/Import > should export selections successfully
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Health Checks and Error Recovery > should perform health check successfully
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Health Checks and Error Recovery > should perform health check successfully
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Health Checks and Error Recovery > should detect health issues
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Health Checks and Error Recovery > should detect health issues
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Health Checks and Error Recovery > should handle initialization errors gracefully
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Health Checks and Error Recovery > should handle initialization errors gracefully
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Concurrent Operations > should handle multiple concurrent course selections
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Concurrent Operations > should handle multiple concurrent course selections
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should combine multiple filters
+[ScheduleFilterService] Applying section filter: sectionCode
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Concurrent Operations > should handle concurrent selection and section changes
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Concurrent Operations > should handle concurrent selection and section changes
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Edge Cases and Error Handling > should handle malformed course data
+Initializing CourseSelectionService...
+
+stdout | tests/unit/services/CourseSelectionService.test.ts > CourseSelectionService > Edge Cases and Error Handling > should handle malformed course data
+CourseSelectionService initialized successfully
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should exclude sections with periods on Wednesday
+[ScheduleFilterService] Applying section filter: periodDays
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should exclude sections with periods on Tuesday
+[ScheduleFilterService] Applying section filter: periodDays
+
+ ✓ tests/unit/services/CourseSelectionService.test.ts (38 tests | 9 skipped) 184ms
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should exclude sections with periods on multiple days
+[ScheduleFilterService] Applying section filter: periodDays
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should return all sections when excluding non-existent days
+[ScheduleFilterService] Applying section filter: periodDays
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should exclude sections with Lab period types
+[ScheduleFilterService] Applying section filter: periodType
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should exclude sections with Lecture period types
+[ScheduleFilterService] Applying section filter: periodType
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should exclude sections with multiple period types
+[ScheduleFilterService] Applying section filter: periodType
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should return all sections when excluding non-existent period types
+[ScheduleFilterService] Applying section filter: periodType
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > filterSections > should handle case insensitive period type exclusion
+[ScheduleFilterService] Applying section filter: periodType
+
+stderr | tests/unit/core/ProfileStateManager.test.ts > ProfileStateManager > Event System > should handle listener errors gracefully
+Error in state change listener: Error: Listener error
+    at errorListener [90m(/home/lex/Documents/Github/wpiplannerV2/[39mtests/unit/core/ProfileStateManager.test.ts:486:15[90m)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:708:25
+    at Set.forEach (<anonymous>)
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:706:32
+    at Array.forEach (<anonymous>)
+    at Timeout._onTimeout [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:705:29[90m)[39m
+[90m    at listOnTimeout (node:internal/timers:569:17)[39m
+[90m    at processTimers (node:internal/timers:512:7)[39m
+Error in state change listener: Error: Listener error
+    at errorListener [90m(/home/lex/Documents/Github/wpiplannerV2/[39mtests/unit/core/ProfileStateManager.test.ts:486:15[90m)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:708:25
+    at Set.forEach (<anonymous>)
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:706:32
+    at Array.forEach (<anonymous>)
+    at Timeout._onTimeout [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:705:29[90m)[39m
+[90m    at listOnTimeout (node:internal/timers:569:17)[39m
+[90m    at processTimers (node:internal/timers:512:7)[39m
+Error in state change listener: Error: Listener error
+    at errorListener [90m(/home/lex/Documents/Github/wpiplannerV2/[39mtests/unit/core/ProfileStateManager.test.ts:486:15[90m)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:708:25
+    at Set.forEach (<anonymous>)
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:706:32
+    at Array.forEach (<anonymous>)
+    at Timeout._onTimeout [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:705:29[90m)[39m
+[90m    at listOnTimeout (node:internal/timers:569:17)[39m
+[90m    at processTimers (node:internal/timers:512:7)[39m
+Error in state change listener: Error: Listener error
+    at errorListener [90m(/home/lex/Documents/Github/wpiplannerV2/[39mtests/unit/core/ProfileStateManager.test.ts:486:15[90m)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:708:25
+    at Set.forEach (<anonymous>)
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:706:32
+    at Array.forEach (<anonymous>)
+    at Timeout._onTimeout [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:705:29[90m)[39m
+[90m    at listOnTimeout (node:internal/timers:569:17)[39m
+[90m    at processTimers (node:internal/timers:512:7)[39m
+Error in state change listener: Error: Listener error
+    at errorListener [90m(/home/lex/Documents/Github/wpiplannerV2/[39mtests/unit/core/ProfileStateManager.test.ts:486:15[90m)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:708:25
+    at Set.forEach (<anonymous>)
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:706:32
+    at Array.forEach (<anonymous>)
+    at Timeout._onTimeout [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:705:29[90m)[39m
+[90m    at listOnTimeout (node:internal/timers:569:17)[39m
+[90m    at processTimers (node:internal/timers:512:7)[39m
+Error in state change listener: Error: Listener error
+    at errorListener [90m(/home/lex/Documents/Github/wpiplannerV2/[39mtests/unit/core/ProfileStateManager.test.ts:486:15[90m)[39m
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:708:25
+    at Set.forEach (<anonymous>)
+    at [90m/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:706:32
+    at Array.forEach (<anonymous>)
+    at Timeout._onTimeout [90m(/home/lex/Documents/Github/wpiplannerV2/[39msrc/core/ProfileStateManager.ts:705:29[90m)[39m
+[90m    at listOnTimeout (node:internal/timers:569:17)[39m
+[90m    at processTimers (node:internal/timers:512:7)[39m
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > term filtering > should filter sections to show only A term
+[ScheduleFilterService] Applying section filter: periodTerm
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > term filtering > should filter sections to show only B term
+[ScheduleFilterService] Applying section filter: periodTerm
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > term filtering > should filter sections to show multiple terms
+[ScheduleFilterService] Applying section filter: periodTerm
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > term filtering > should return empty array when no sections match selected terms
+[ScheduleFilterService] Applying section filter: periodTerm
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > term filtering > should handle case insensitive term filtering
+[ScheduleFilterService] Applying section filter: periodTerm
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > term filtering > should combine term filter with other filters
+[ScheduleFilterService] Applying section filter: sectionCode
+[ScheduleFilterService] Applying section filter: periodTerm
+
+stdout | tests/unit/core/ProfileStateManager.test.ts > ProfileStateManager > Export/Import > should export and import data successfully
+ProfileStateManager: Loaded 0 standalone courses from storage
+ProfileStateManager: Final loaded course count: 0
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > getAvailableTerms > should return available terms with proper formatting
+[DEBUG] getAvailableTerms called with 1 courses
+[DEBUG] Processing course CS-103 with 4 sections
+[DEBUG] Section A01: computedTerm = "A"
+[DEBUG] Section AL01: computedTerm = "A"
+[DEBUG] Section B01: computedTerm = "A"
+[DEBUG] Section A01: computedTerm = "D"
+[DEBUG] Available terms found: [ [32m'A'[39m, [32m'D'[39m ]
+
+stdout | tests/unit/services/ScheduleFilterService.test.ts > ScheduleFilterService > getAvailableTerms > should return unique terms only
+[DEBUG] getAvailableTerms called with 1 courses
+[DEBUG] Processing course CS-103 with 4 sections
+[DEBUG] Section A01: computedTerm = "A"
+[DEBUG] Section AL01: computedTerm = "A"
+[DEBUG] Section B01: computedTerm = "A"
+[DEBUG] Section A01: computedTerm = "D"
+[DEBUG] Available terms found: [ [32m'A'[39m, [32m'D'[39m ]
+
+ ❯ tests/unit/core/ProfileStateManager.test.ts (24 tests | 2 failed | 1 skipped) 323ms
+   ✓ ProfileStateManager > Initialization and State Management > should initialize with default state 9ms
+   ✓ ProfileStateManager > Initialization and State Management > should create default schedule if none exist 4ms
+   ✓ ProfileStateManager > Initialization and State Management > should load existing data from storage 5ms
+   ✓ ProfileStateManager > Course Selection Management > should select course successfully 13ms
+   ✓ ProfileStateManager > Course Selection Management > should unselect course successfully 24ms
+   × ProfileStateManager > Course Selection Management > should set selected section successfully 24ms
+     → profileStateManager.setSelectedSection is not a function
+   ✓ ProfileStateManager > Course Selection Management > should clear all selections 24ms
+   ✓ ProfileStateManager > Schedule Management > should create new schedule successfully 26ms
+   ✓ ProfileStateManager > Schedule Management > should set active schedule and load its courses 14ms
+   ✓ ProfileStateManager > Schedule Management > should update schedule successfully 23ms
+   ✓ ProfileStateManager > Schedule Management > should delete schedule and switch to another 13ms
+   ✓ ProfileStateManager > Schedule Management > should not allow deleting last schedule 2ms
+   ✓ ProfileStateManager > Schedule Management > should duplicate schedule successfully 23ms
+   ✓ ProfileStateManager > Preferences Management > should update preferences successfully 26ms
+   ✓ ProfileStateManager > Data Persistence and Loading > should save and load state successfully 3ms
+   ↓ ProfileStateManager > Data Persistence and Loading > should handle save failures gracefully
+   ✓ ProfileStateManager > Event System > should properly manage event listeners 41ms
+   ✓ ProfileStateManager > Event System > should handle listener errors gracefully 29ms
+   × ProfileStateManager > Debounced Saving > should debounce multiple rapid changes 3ms
+     → profileStateManager.setSelectedSection is not a function
+   ✓ ProfileStateManager > Health Checks > should return healthy state for normal operation 2ms
+   ✓ ProfileStateManager > Health Checks > should detect inconsistent state 2ms
+   ✓ ProfileStateManager > Export/Import > should export and import data successfully 3ms
+   ✓ ProfileStateManager > Export/Import > should handle import of invalid data 2ms
+   ✓ ProfileStateManager > Concurrent Operations > should handle multiple concurrent course selections 4ms
+ ✓ tests/unit/services/ScheduleFilterService.test.ts (27 tests) 123ms
+ ✓ tests/unit/core/PeriodConflictFilterRegistration.test.ts (6 tests) 12ms
+ ✓ tests/unit/utils/termUtils.test.ts (18 tests) 17ms
+ ✓ tests/unit/core/SectionCodeFilter.test.ts (4 tests) 7ms
+ ✓ tests/unit/core/ConflictDetector.test.ts (9 tests) 12ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/core/PeriodConflictFilter.test.ts > PeriodConflictFilter > Conflict Detection > should filter out periods that conflict with selected sections - same time overlap
+AssertionError: expected [ { type: 'Lecture', …(12) }, …(3) ] to have a length of 2 but got 4
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 2[39m
+[31m+ 4[39m
+
+ ❯ tests/unit/core/PeriodConflictFilter.test.ts:176:28
+    174|             
+    175|             // Should only return the 2 non-conflicting periods
+    176|             expect(result).toHaveLength(2);
+       |                            ^
+    177|             expect(result[0].professor).toBe('Prof C'); // Tuesday per…
+    178|             expect(result[1].professor).toBe('Prof D'); // 8-10 Monday…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  tests/unit/core/PeriodConflictFilter.test.ts > PeriodConflictFilter > Conflict Detection > should handle multiple selected courses
+AssertionError: expected [ { type: 'Lecture', …(12) }, …(2) ] to have a length of 1 but got 3
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 3[39m
+
+ ❯ tests/unit/core/PeriodConflictFilter.test.ts:238:28
+    236|             
+    237|             // Should only return the non-conflicting period
+    238|             expect(result).toHaveLength(1);
+       |                            ^
+    239|             expect(result[0].professor).toBe('Prof E');
+    240|         });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  tests/unit/core/PeriodConflictFilter.test.ts > PeriodConflictFilter > Same Course vs Different Course Conflicts > should handle mixed scenario: multiple courses with some selected sections
+ReferenceError: course2Section1 is not defined
+ ❯ tests/unit/core/PeriodConflictFilter.test.ts:351:67
+    349|             ]);
+    350|             const course2 = createCourse('MATH-201', 'MATH-201', [cour…
+    351|             const selectedCourse2 = createSelectedCourse(course2, cour…
+       |                                                                   ^
+    352| 
+    353|             // Course 3: Multiple sections, some conflicting with Cour…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  tests/unit/core/PeriodConflictFilter.test.ts > PeriodConflictFilter > Edge Cases > should handle sections with multiple periods
+AssertionError: expected [ { type: 'Lecture', …(12) }, …(2) ] to have a length of 1 but got 3
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 3[39m
+
+ ❯ tests/unit/core/PeriodConflictFilter.test.ts:636:28
+    634|             
+    635|             // Should only return the non-conflicting period
+    636|             expect(result).toHaveLength(1);
+       |                            ^
+    637|             expect(result[0].professor).toBe('Prof D');
+    638|         });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  tests/unit/core/PeriodConflictFilter.test.ts > PeriodConflictFilter > Edge Cases > should detect minimal overlaps
+AssertionError: expected [ { type: 'Lab', …(12) }, …(1) ] to have a length of +0 but got 2
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 0[39m
+[31m+ 2[39m
+
+ ❯ tests/unit/core/PeriodConflictFilter.test.ts:685:28
+    683|             
+    684|             // Both periods should be filtered out due to overlap
+    685|             expect(result).toHaveLength(0);
+       |                            ^
+    686|         });
+    687|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  tests/unit/core/ProfileStateManager.test.ts > ProfileStateManager > Course Selection Management > should set selected section successfully
+TypeError: profileStateManager.setSelectedSection is not a function
+ ❯ tests/unit/core/ProfileStateManager.test.ts:162:27
+    160|       profileStateManager.addListener((event) => listeners.push(event))
+    161| 
+    162|       profileStateManager.setSelectedSection(mockCourse, 'A01', 'test')
+       |                           ^
+    163| 
+    164|       const state = profileStateManager.getState()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  tests/unit/core/ProfileStateManager.test.ts > ProfileStateManager > Debounced Saving > should debounce multiple rapid changes
+TypeError: profileStateManager.setSelectedSection is not a function
+ ❯ tests/unit/core/ProfileStateManager.test.ts:511:27
+    509|       // Make rapid changes
+    510|       profileStateManager.selectCourse(mockCourse, false, 'test')
+    511|       profileStateManager.setSelectedSection(mockCourse, 'A01', 'test')
+       |                           ^
+    512|       profileStateManager.updatePreferences({ theme: 'test-theme' }, '…
+    513| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildCourseHeaderHTML should create expanded class when isExpanded is true
+AssertionError: expected '\n            <div class="schedule-co…' to contain 'schedule-course-item expanded'
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- schedule-course-item expanded[39m
+[31m+[39m
+[31m+             <div class="schedule-course-item">[39m
+[31m+                 <div class="schedule-course-header">[39m
+[31m+                     <div class="schedule-course-info">[39m
+[31m+                         <div class="schedule-course-code">CS101</div>[39m
+[31m+                         <div class="schedule-course-name">Intro to Programming</div>[39m
+[31m+                         [39m
+[31m+                         <div class="schedule-course-credits">3.0 credits</div>[39m
+[31m+                     </div>[39m
+[31m+                     <div class="header-controls">[39m
+[31m+                         <button class="course-remove-btn" title="Remove from selection">[39m
+[31m+                             ×[39m
+[31m+                         </button>[39m
+[31m+                     </div>[39m
+[31m+                 </div>[39m
+[31m+         [39m
+
+ ❯ tests/unit/ui/ScheduleController.test.ts:91:30
+     89|         const collapsedHTML = scheduleControllerAny.buildCourseHeaderH…
+     90|         
+     91|         expect(expandedHTML).toContain('schedule-course-item expanded'…
+       |                              ^
+     92|         expect(collapsedHTML).toContain('schedule-course-item collapse…
+     93|         expect(expandedHTML).not.toContain('collapsed');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildCourseHeaderHTML should default to collapsed when isExpanded is not provided
+AssertionError: expected '\n            <div class="schedule-co…' to contain 'schedule-course-item collapsed'
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- schedule-course-item collapsed[39m
+[31m+[39m
+[31m+             <div class="schedule-course-item">[39m
+[31m+                 <div class="schedule-course-header">[39m
+[31m+                     <div class="schedule-course-info">[39m
+[31m+                         <div class="schedule-course-code">CS101</div>[39m
+[31m+                         <div class="schedule-course-name">Intro to Programming</div>[39m
+[31m+                         [39m
+[31m+                         <div class="schedule-course-credits">3.0 credits</div>[39m
+[31m+                     </div>[39m
+[31m+                     <div class="header-controls">[39m
+[31m+                         <button class="course-remove-btn" title="Remove from selection">[39m
+[31m+                             ×[39m
+[31m+                         </button>[39m
+[31m+                     </div>[39m
+[31m+                 </div>[39m
+[31m+         [39m
+
+ ❯ tests/unit/ui/ScheduleController.test.ts:102:29
+    100|         const defaultHTML = scheduleControllerAny.buildCourseHeaderHTM…
+    101|         
+    102|         expect(defaultHTML).toContain('schedule-course-item collapsed'…
+       |                             ^
+    103|         expect(defaultHTML).not.toContain('expanded');
+    104|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildFilteredSectionsHTML should default to expanded when no previous state
+AssertionError: expected '\n            <div class="schedule-co…' to contain 'schedule-course-item expanded'
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- schedule-course-item expanded[39m
+[31m+[39m
+[31m+             <div class="schedule-course-item">[39m
+[31m+                 <div class="schedule-course-header">[39m
+[31m+                     <div class="schedule-course-info">[39m
+[31m+                         <div class="schedule-course-code">CS101</div>[39m
+[31m+                         <div class="schedule-course-name">Intro to Programming</div>[39m
+[31m+                         [39m
+[31m+                         <div class="schedule-course-credits">3.0 credits</div>[39m
+[31m+                     </div>[39m
+[31m+                     <div class="header-controls">[39m
+[31m+                         <button class="course-remove-btn" title="Remove from selection">[39m
+[31m+                             ×[39m
+[31m+                         </button>[39m
+[31m+                     </div>[39m
+[31m+                 </div>[39m
+[31m+         </div>[39m
+
+ ❯ tests/unit/ui/ScheduleController.test.ts:119:22
+    117|         
+    118|         // Should default to expanded for filtering
+    119|         expect(html).toContain('schedule-course-item expanded');
+       |                      ^
+    120|         expect(html).not.toContain('collapsed');
+    121|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildFilteredSectionsHTML should preserve existing state when provided
+AssertionError: expected '\n            <div class="schedule-co…' to contain 'schedule-course-item collapsed'
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- schedule-course-item collapsed[39m
+[31m+[39m
+[31m+             <div class="schedule-course-item">[39m
+[31m+                 <div class="schedule-course-header">[39m
+[31m+                     <div class="schedule-course-info">[39m
+[31m+                         <div class="schedule-course-code">CS101</div>[39m
+[31m+                         <div class="schedule-course-name">Intro to Programming</div>[39m
+[31m+                         [39m
+[31m+                         <div class="schedule-course-credits">3.0 credits</div>[39m
+[31m+                     </div>[39m
+[31m+                     <div class="header-controls">[39m
+[31m+                         <button class="course-remove-btn" title="Remove from selection">[39m
+[31m+                             ×[39m
+[31m+                         </button>[39m
+[31m+                     </div>[39m
+[31m+                 </div>[39m
+[31m+         </div>[39m
+
+ ❯ tests/unit/ui/ScheduleController.test.ts:138:22
+    136|         
+    137|         // Should preserve the collapsed state
+    138|         expect(html).toContain('schedule-course-item collapsed');
+       |                      ^
+    139|         expect(html).not.toContain('expanded');
+    140|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  tests/unit/ui/ScheduleController.test.ts > ScheduleController Expansion State > buildFilteredSectionsHTML should preserve expanded state when provided
+AssertionError: expected '\n            <div class="schedule-co…' to contain 'schedule-course-item expanded'
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- schedule-course-item expanded[39m
+[31m+[39m
+[31m+             <div class="schedule-course-item">[39m
+[31m+                 <div class="schedule-course-header">[39m
+[31m+                     <div class="schedule-course-info">[39m
+[31m+                         <div class="schedule-course-code">CS101</div>[39m
+[31m+                         <div class="schedule-course-name">Intro to Programming</div>[39m
+[31m+                         [39m
+[31m+                         <div class="schedule-course-credits">3.0 credits</div>[39m
+[31m+                     </div>[39m
+[31m+                     <div class="header-controls">[39m
+[31m+                         <button class="course-remove-btn" title="Remove from selection">[39m
+[31m+                             ×[39m
+[31m+                         </button>[39m
+[31m+                     </div>[39m
+[31m+                 </div>[39m
+[31m+         </div>[39m
+
+ ❯ tests/unit/ui/ScheduleController.test.ts:157:22
+    155|         
+    156|         // Should preserve the expanded state
+    157|         expect(html).toContain('schedule-course-item expanded');
+       |                      ^
+    158|         expect(html).not.toContain('collapsed');
+    159|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+
+ Test Files  3 failed | 16 passed (19)
+      Tests  12 failed | 286 passed | 13 skipped (311)
+   Start at  23:27:15
+   Duration  2.52s (transform 2.59s, setup 702ms, collect 5.14s, tests 1.39s, environment 12.97s, prepare 3.24s)
+

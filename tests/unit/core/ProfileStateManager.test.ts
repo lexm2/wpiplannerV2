@@ -12,21 +12,25 @@ describe('ProfileStateManager', () => {
   let mockStorage: any
   let consoleSpy: any
 
+  const mockSection = createMockSection({
+    crn: 12345,
+    number: 'A01',
+    description: 'Fall 2024 section',
+    term: 'Fall 2024',
+    computedTerm: 'A',
+    periods: []
+  })
+
   const mockCourse: Course = createMockCourse({
     id: 'CS-101',
     number: '101',
     name: 'Introduction to Computer Science',
     description: 'Basic CS course',
-    sections: [
-      createMockSection({
-        crn: 12345,
-        number: 'A01',
-        description: 'Fall 2024 section',
-        term: 'Fall 2024',
-        computedTerm: 'A',
-        periods: []
-      })
-    ]
+    lectures: [{
+      section: mockSection,
+      compatibleDiscussions: [],
+      compatibleLabs: []
+    }]
   })
 
   beforeEach(() => {
@@ -163,8 +167,7 @@ describe('ProfileStateManager', () => {
 
       const state = profileStateManager.getState()
       const selectedCourse = state.selectedCourses.find(sc => sc.course.id === mockCourse.id)
-      expect(selectedCourse?.selectedSectionNumber).toBe('A01')
-      expect(selectedCourse?.selectedSection?.number).toBe('A01')
+      expect(selectedCourse?.selectedLecture?.number).toBe('A01')
 
       // Wait for async event processing
       await new Promise(resolve => setTimeout(resolve, 10))

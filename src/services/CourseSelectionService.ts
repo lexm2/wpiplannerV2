@@ -3,7 +3,6 @@ import { SelectedCourse } from '../types/schedule'
 import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../core/ProfileStateManager'
 import { DataValidator } from '../core/DataValidator'
 import { RetryManager } from '../core/RetryManager'
-import { ProfileMigrationService } from '../core/ProfileMigrationService'
 import { Validators } from '../utils/validators'
 import { UIStateBuffer } from '../core/UIStateBuffer'
 import { BatchOperationManager } from '../core/BatchOperationManager'
@@ -258,11 +257,10 @@ export class CourseSelectionService {
     private profileStateManager: ProfileStateManager;
     private dataValidator: DataValidator;
     private retryManager: RetryManager;
-    private migrationService: ProfileMigrationService;
     private selectionListeners = new Set<SelectionChangeListener>();
     private isInitialized = false;
     private initializationPromise: Promise<boolean> | null = null;
-    
+
     // Optimistic UI Components
     private uiStateBuffer: UIStateBuffer;
     private batchOperationManager: BatchOperationManager;
@@ -271,17 +269,11 @@ export class CourseSelectionService {
     constructor(
         profileStateManager?: ProfileStateManager,
         dataValidator?: DataValidator,
-        retryManager?: RetryManager,
-        migrationService?: ProfileMigrationService
+        retryManager?: RetryManager
     ) {
         this.profileStateManager = profileStateManager || new ProfileStateManager();
         this.dataValidator = dataValidator || new DataValidator();
         this.retryManager = retryManager || RetryManager.createStorageRetryManager();
-        this.migrationService = migrationService || new ProfileMigrationService(
-            this.dataValidator,
-            this.profileStateManager['storageManager'],
-            this.retryManager
-        );
 
         // Initialize Optimistic UI Components
         this.uiStateBuffer = new UIStateBuffer(this.profileStateManager);
@@ -303,12 +295,6 @@ export class CourseSelectionService {
     private async performInitialization(): Promise<boolean> {
         try {
             console.log('Initializing CourseSelectionService...');
-
-            // Check and perform migrations if needed
-            const migrationResult = await this.checkAndPerformMigrations();
-            if (!migrationResult) {
-                console.warn('Migration check failed, proceeding with existing data');
-            }
 
             // NOTE: ProfileStateManager is already initialized by StorageService before this service
             // Redundant loadFromStorage() call removed to prevent duplicate schedule creation race condition
@@ -878,34 +864,6 @@ export class CourseSelectionService {
         });
     }
 
-    private async checkAndPerformMigrations(): Promise<boolean> {
-        try {
-            // Export current data
-            const currentData = this.profileStateManager.exportData();
-            if (!currentData) {
-                return true; // No data to migrate
-            }
-
-            const parsedData = JSON.parse(currentData);
-            
-            // Check if migration is needed
-            const migrationResult = await this.migrationService.migrateToLatest(parsedData);
-
-            if (migrationResult.success && migrationResult.itemsChanged > 0) {
-                console.log(`Migration completed: ${migrationResult.itemsChanged} items updated from ${migrationResult.fromVersion} to ${migrationResult.toVersion}`);
-
-                // Import migrated data
-                if (migrationResult.migratedData) {
-                    await this.profileStateManager.importData(JSON.stringify(migrationResult.migratedData));
-                }
-            }
-
-            return migrationResult.success;
-        } catch (error) {
-            console.error('Migration check failed:', error);
-            return false;
-        }
-    }
 
     private async attemptDataRepair(): Promise<boolean> {
         try {

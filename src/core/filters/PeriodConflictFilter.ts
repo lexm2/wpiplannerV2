@@ -27,14 +27,17 @@ export class PeriodConflictFilter implements SectionFilter {
             return periods;
         }
 
-        // Get currently selected sections (where selectedSectionNumber is not null)
+        // Get currently selected sections from lecture/discussion/lab
         const selectedSections: Section[] = [];
         for (const selectedCourse of criteria.selectedCourses) {
-            if (selectedCourse.selectedSectionNumber) {
-                const section = selectedCourse.course.sections?.find(s => s.number === selectedCourse.selectedSectionNumber);
-                if (section) {
-                    selectedSections.push(section);
-                }
+            if (selectedCourse.selectedLecture) {
+                selectedSections.push(selectedCourse.selectedLecture);
+            }
+            if (selectedCourse.selectedDiscussion) {
+                selectedSections.push(selectedCourse.selectedDiscussion);
+            }
+            if (selectedCourse.selectedLab) {
+                selectedSections.push(selectedCourse.selectedLab);
             }
         }
 
