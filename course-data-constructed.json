@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 2, 2025, 6:22 AM",
+  "generated": "Nov 2, 2025, 6:46 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -58190,7 +58190,7 @@
                 "crn": 337691,
                 "number": "S01 - ST: Physical Security of Microelectronic Systems",
                 "seats": 30,
-                "seats_available": 22,
+                "seats_available": 21,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -58209,7 +58209,7 @@
                     "building": "",
                     "room": "Washburn 323",
                     "seats": 30,
-                    "seats_available": 22,
+                    "seats_available": 21,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01 - ST: Physical Security of Microelectronic Systems",
@@ -58355,7 +58355,7 @@
                 "crn": 337606,
                 "number": "S01",
                 "seats": 60,
-                "seats_available": 46,
+                "seats_available": 45,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -58374,7 +58374,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 60,
-                    "seats_available": 46,
+                    "seats_available": 45,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01",
