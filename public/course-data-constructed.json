@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 2, 2025, 9:26 PM",
+  "generated": "Nov 2, 2025, 9:36 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -49055,7 +49055,7 @@
                 "number": "S01",
                 "seats": 30,
                 "seats_available": 0,
-                "actual_waitlist": 2,
+                "actual_waitlist": 3,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "This course covers core security threats and mitigations at the network level. Topics include: denial-of-service, network capabilities, intrusion detection and prevention systems, worms, botnets, Web attacks, anonymity, honeypots, cybercrime (such as phishing), and legality and ethics. The course prepares students to think broadly and concretely about network security; it is not designed to teach students low-level tools for monitoring or maintaining system security. Assignments and projects will assess each student’s ability to think both conceptually and practically about network security. (Prerequisites: a strong background in computer networking and systems, either at the undergraduate or graduate level, and moderate programming experience.)",
@@ -49074,7 +49074,7 @@
                     "room": "Higgins Labs 114",
                     "seats": 30,
                     "seats_available": 0,
-                    "actual_waitlist": 2,
+                    "actual_waitlist": 3,
                     "max_waitlist": 10,
                     "specific_section": "S01",
                     "days": [
@@ -181515,7 +181515,7 @@
                 "crn": 337742,
                 "number": "S01",
                 "seats": 60,
-                "seats_available": 31,
+                "seats_available": 30,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -181534,7 +181534,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seats_available": 31,
+                    "seats_available": 30,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01",
