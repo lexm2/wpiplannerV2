@@ -578,6 +578,8 @@ export class MainController {
 
         if (plannerTab) {
             plannerTab.addEventListener('click', () => {
+                // Close wizard when switching to planner/classes page
+                this.scheduleController.closeComponentWizard();
                 this.uiStateManager.switchToPage('planner');
             });
         }
