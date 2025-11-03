@@ -1,5 +1,5 @@
 import { Schedule, SchedulePreferences, SelectedCourse } from '../types/schedule'
-import { Course, Section } from '../types/types'
+import { Course, Section, Department } from '../types/types'
 import { TransactionalStorageManager, TransactionResult } from './TransactionalStorageManager'
 
 export interface StateChangeEvent {
@@ -164,10 +164,16 @@ export class ProfileStateManager {
     private isLoadingFlag = false;
     private eventQueue: StateChangeEvent[] = [];
     private processingQueue = false;
+    private allDepartments: Department[] = [];
 
     constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
         this.state = this.createInitialState();
+    }
+
+    setCourseData(departments: Department[]): void {
+        this.allDepartments = departments;
+        console.log(`📚 Course catalog set with ${departments.length} departments`);
     }
 
     // Public API for state access
@@ -362,8 +368,9 @@ export class ProfileStateManager {
             this.isLoadingFlag = true;
             this.state.activeScheduleId = scheduleId;
 
-            // Load schedule's courses
-            this.state.selectedCourses = [...schedule.selectedCourses];
+            // Load schedule's courses and resolve section references
+            const loadedCourses = [...schedule.selectedCourses];
+            this.state.selectedCourses = this.resolveCourseReferences(loadedCourses);
 
             this.emitEvent('active_schedule_changed', { schedule }, source);
             this.emitEvent('courses_changed', { action: 'loaded_from_schedule', schedule }, source);
@@ -539,6 +546,11 @@ export class ProfileStateManager {
             const schedulesResult = await this.storageManager.loadAllSchedules();
             if (schedulesResult.valid && schedulesResult.data) {
                 this.state.schedules = schedulesResult.data;
+
+                // Resolve course references for all schedules
+                for (const schedule of this.state.schedules) {
+                    schedule.selectedCourses = this.resolveCourseReferences(schedule.selectedCourses);
+                }
             }
 
             // Load active schedule ID
@@ -556,6 +568,7 @@ export class ProfileStateManager {
                 }
             }
 
+            // Resolve references for active courses (already resolved in schedule, but ensure consistency)
             this.state.selectedCourses = loadedCourses;
 
             // Log what was loaded
@@ -640,6 +653,53 @@ export class ProfileStateManager {
             healthy: issues.length === 0,
             issues
         };
+    }
+
+    private resolveCourseReferences(selectedCourses: SelectedCourse[]): SelectedCourse[] {
+        if (this.allDepartments.length === 0) {
+            console.warn('⚠️ Course catalog not available, skipping section reference resolution');
+            return selectedCourses;
+        }
+
+        console.log(`🔍 Resolving course references for ${selectedCourses.length} courses`);
+
+        return selectedCourses.map(selectedCourse => {
+            const courseId = selectedCourse.course.id;
+
+            let liveCourse: Course | undefined;
+            for (const dept of this.allDepartments) {
+                liveCourse = dept.courses.find(c => c.id === courseId);
+                if (liveCourse) break;
+            }
+
+            if (!liveCourse) {
+                console.warn(`⚠️ Course ${courseId} not found in catalog, keeping original reference`);
+                return selectedCourse;
+            }
+
+            const resolveSection = (section: Section | null): Section | null => {
+                if (!section || !liveCourse) return null;
+
+                const liveSection = liveCourse.sections.find(s => s.crn === section.crn);
+                if (!liveSection) {
+                    console.warn(`⚠️ Section CRN ${section.crn} not found for course ${courseId}`);
+                    return null;
+                }
+                return liveSection;
+            };
+
+            const resolved: SelectedCourse = {
+                course: liveCourse,
+                selectedLecture: resolveSection(selectedCourse.selectedLecture),
+                selectedDiscussion: resolveSection(selectedCourse.selectedDiscussion),
+                selectedLab: resolveSection(selectedCourse.selectedLab),
+                selectedSection: resolveSection(selectedCourse.selectedSection),
+                selectedSectionNumber: selectedCourse.selectedSectionNumber,
+                isRequired: selectedCourse.isRequired
+            };
+
+            return resolved;
+        });
     }
 
     // Private helper methods

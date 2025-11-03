@@ -840,30 +840,39 @@ export class ScheduleManagementService {
             // Resolve name conflicts automatically
             const uniqueName = this.generateUniqueScheduleName(data.schedule.name);
 
-            // Create new schedule with imported data and unique name
-            const importedSchedule: Schedule = {
-                ...data.schedule,
-                id: this.generateScheduleId(), // Generate new ID to avoid conflicts
-                name: uniqueName
-            };
-
+            // Create schedule using proper API
             const result = await this.retryManager.executeWithRetry(
                 () => {
-                    // Manually add to state
-                    const schedules = this.profileStateManager.getAllSchedules();
-                    schedules.push(importedSchedule);
-                    return importedSchedule;
+                    return this.profileStateManager.createSchedule(uniqueName, 'api');
                 },
                 {
-                    operationName: `import schedule "${importedSchedule.name}"`,
+                    operationName: `import schedule "${uniqueName}"`,
                 }
             );
 
-            if (!result.success) {
+            if (!result.success || !result.result) {
                 return {
                     success: false,
                     error: `Failed to import schedule: ${result.error?.message || 'Unknown error'}`
                 };
+            }
+
+            const importedSchedule = result.result;
+
+            // Update with imported courses and generated schedules
+            if (data.schedule.selectedCourses && data.schedule.selectedCourses.length > 0) {
+                const updateResult = await this.updateScheduleCourses(importedSchedule.id, data.schedule.selectedCourses);
+                if (!updateResult.success) {
+                    return {
+                        success: false,
+                        error: `Schedule imported but failed to add courses: ${updateResult.error}`
+                    };
+                }
+            }
+
+            // Copy generated schedules if present
+            if (data.schedule.generatedSchedules && data.schedule.generatedSchedules.length > 0) {
+                importedSchedule.generatedSchedules = [...data.schedule.generatedSchedules];
             }
 
             // Auto-save

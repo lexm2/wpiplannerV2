@@ -336,10 +336,13 @@ export class MainController {
             this.departmentController.setAllDepartments(this.allDepartments);
             this.courseController.setAllDepartments(this.allDepartments);
             this.courseSelectionService.setAllDepartments(this.allDepartments);
-            
+
+            // Set course catalog in ProfileStateManager for section reference resolution
+            this.profileStateManager.setCourseData(this.allDepartments);
+
             // Initialize search service with course data
             this.searchService.setCourseData(this.allDepartments);
-            
+
             // Initialize filter modal with course data
             this.filterModalController.setCourseData(this.allDepartments);
             

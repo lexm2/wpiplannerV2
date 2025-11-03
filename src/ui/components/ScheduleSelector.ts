@@ -572,9 +572,10 @@ export class ScheduleSelector {
                 reader.onload = async (event) => {
                     const jsonData = event.target?.result as string;
                     const importResult = await this.scheduleManagementService.importSchedule(jsonData);
-                    
+
                     if (importResult.success && importResult.schedule) {
-                        alert(`Successfully imported "${importResult.schedule.name}"`);
+                        await this.scheduleManagementService.setActiveSchedule(importResult.schedule.id);
+                        alert(`Successfully imported and activated "${importResult.schedule.name}"`);
                         this.updateScheduleList();
                     } else {
                         alert(importResult.error || 'Failed to import schedule. Please check the file format.');
