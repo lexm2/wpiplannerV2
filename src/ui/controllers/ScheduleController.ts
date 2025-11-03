@@ -780,15 +780,7 @@ export class ScheduleController {
     }
 
     private renderEmptyGrid(container: HTMLElement, term: string, hasCoursesWithoutSections: boolean = false): void {
-        const message = hasCoursesWithoutSections 
-            ? `No sections selected for ${term} term<br><small>Select specific sections in the left panel to see schedule</small>`
-            : `No classes scheduled for ${term} term`;
-            
-        container.innerHTML = `
-            <div class="empty-schedule">
-                <div class="empty-message">${message}</div>
-            </div>
-        `;
+        container.innerHTML = '';
         container.classList.add('empty');
     }
 
