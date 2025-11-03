@@ -1,124 +1,140 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * TransactionalStorageManager - Atomic localStorage Operations Foundation
+ * TransactionalStorageManager - Hybrid Storage Architecture
  * ═══════════════════════════════════════════════════════════════════════════════
- * 
+ *
  * ARCHITECTURE ROLE:
- * - Low-level localStorage operations with transaction support and data consistency
+ * - Hybrid storage strategy: IndexedDB for schedules, localStorage for small data
  * - Foundation layer providing atomic operations for ProfileStateManager
  * - Handles serialization/deserialization of complex data types (Sets, nested objects)
  * - Prevents data corruption through transactional operations and rollback support
- * - Bridge between application state and browser localStorage persistence
- * 
+ * - Bridge between application state and browser storage mechanisms
+ *
+ * STORAGE STRATEGY:
+ * IndexedDB (Primary - Large Data):
+ * - All schedule data (course selections, sections, configurations)
+ * - No size limitations for schedule storage
+ * - Optimized for complex course/section hierarchies
+ *
+ * localStorage (Secondary - Small Data):
+ * - User preferences and settings
+ * - Theme selections
+ * - Active schedule ID
+ * - Filter states (course/schedule filters)
+ *
  * DEPENDENCIES:
- * - Schedule, SchedulePreferences, SelectedCourse types → Data models for storage operations
- * - UserScheduleState interface → Legacy state model for backward compatibility
- * - Browser localStorage API → Underlying persistence mechanism
- * - JSON serialization/deserialization → Data transformation for storage
- * 
+ * - IndexedDBStorageManager → Primary storage backend for schedule data
+ * - Schedule, SchedulePreferences, SelectedCourse types → Data models
+ * - Browser localStorage API → Preferences and settings storage
+ * - JSON serialization/deserialization → Data transformation
+ *
  * USED BY:
  * - ProfileStateManager → Primary consumer for all state persistence operations
  * - Import/Export functionality → Data portability operations
  * - Health checking systems → Storage integrity verification
- * 
+ *
  * STORAGE ARCHITECTURE INTEGRATION:
  * ```
  * ProfileStateManager (Single Source of Truth)
  *           ↓
  * TransactionalStorageManager (This Component)
  *           ↓
- *      localStorage
+ *    ┌──────┴──────┐
+ * IndexedDB    localStorage
+ * (Schedules)  (Preferences)
  * ```
- * 
+ *
  * KEY FEATURES:
  * Transaction Management:
  * - executeTransaction() with atomic operations and automatic rollback
  * - Backup creation before operations to enable rollback
  * - Data integrity verification after each transaction
  * - Transaction logging for debugging and audit trails
- * 
+ *
  * Data Operations:
+ * IndexedDB Operations (Schedule Data):
  * - saveSchedule() / loadSchedule() / deleteSchedule() for schedule management
- * - savePreferences() / loadPreferences() for user settings persistence
- * - saveSelectedCourses() / loadSelectedCourses() for course selection state
- * - saveThemePreference() / loadThemePreference() for UI theme persistence
+ * - All schedule operations use IndexedDB exclusively
+ * - No localStorage fallback for schedule data
+ *
+ * localStorage Operations (Small Data):
+ * - savePreferences() / loadPreferences() for user settings
+ * - saveThemePreference() / loadThemePreference() for UI theme
  * - saveActiveScheduleId() / loadActiveScheduleId() for active schedule tracking
- * 
+ *
  * Serialization System:
  * - Custom replacer/reviver for JSON serialization handling
  * - Set serialization/deserialization support (converted to/from arrays)
  * - Department reference optimization (removes circular references)
- * - Section object filtering to prevent duplicate storage
  * - Safe error handling for malformed data
- * 
+ *
  * Data Integrity & Safety:
  * - verifyDataIntegrity() checks after every operation
  * - Atomic transactions prevent partial data corruption
  * - Rollback capability restores previous state on failures
- * - Health checking with localStorage availability testing
+ * - Health checking with storage availability testing
  * - Checksum generation/verification for import/export operations
- * 
+ *
  * Import/Export Functionality:
  * - exportData() generates JSON with version and checksum information
  * - importData() with integrity verification and checksum validation
  * - Cross-version compatibility support for future migrations
  * - Comprehensive data portability for user backups
- * 
+ *
  * STORAGE KEY ARCHITECTURE:
- * - USER_STATE: Legacy user state for backward compatibility
+ * localStorage Keys (5 keys - small data only):
  * - PREFERENCES: Schedule generation preferences and user settings
- * - SCHEDULES: All saved schedules with course selections
- * - SELECTED_COURSES: Standalone course selections (fallback)
  * - THEME: Active theme selection for UI appearance
  * - ACTIVE_SCHEDULE_ID: Currently active schedule identifier
  * - TRANSACTION_LOG: Operation logging for debugging (reserved)
- * 
- * TRANSACTION FLOW:
- * 1. Begin transaction with unique ID generation
- * 2. Create backup of all affected localStorage keys
- * 3. Execute all operations in sequence
- * 4. Verify data integrity after operations
- * 5. Commit transaction on success OR rollback on failure
- * 6. Clean up transaction records and return result
- * 
+ * - USER_STATE: Legacy user state (deprecated, kept for migration)
+ *
+ * IndexedDB Stores:
+ * - schedules: All schedule data with course selections
+ *
+ * INITIALIZATION & LIFECYCLE:
+ * - IndexedDB initialized synchronously on first use
+ * - ensureInitialized() called before any schedule operations
+ * - localStorage available immediately (no async init needed)
+ * - No fallback routing - dedicated storage per data type
+ *
  * ERROR HANDLING & RECOVERY:
- * - Try/catch blocks around all localStorage operations
+ * - Try/catch blocks around all storage operations
  * - Graceful degradation with default values for missing data
  * - Automatic rollback on transaction failures
  * - Health checking detects and reports storage issues
  * - Safe loading with fallback to default values
- * 
+ *
  * PERFORMANCE OPTIMIZATIONS:
- * - Lazy loading patterns for large data structures
+ * - IndexedDB for large datasets (no localStorage quota issues)
  * - Efficient serialization avoiding unnecessary data
  * - Batch operations within single transactions
  * - Integrity verification only on critical operations
- * 
+ *
  * ARCHITECTURAL PATTERNS:
  * - Repository: Centralized data access layer
  * - Transaction: Atomic operations with rollback capability
- * - Template Method: Consistent operation patterns for all data types  
- * - Strategy: Pluggable serialization/deserialization strategies
- * - Singleton: Shared storage manager instance across components
- * 
+ * - Strategy: Storage routing based on data type (large vs small)
+ * - Adapter: Unified interface over IndexedDB and localStorage
+ *
  * BENEFITS ACHIEVED:
- * - Eliminated data corruption through atomic operations
- * - Consistent serialization/deserialization across all data types
+ * - Eliminated localStorage quota issues for large schedules
+ * - Consistent serialization/deserialization across storage types
+ * - Clear separation of concerns (schedules vs preferences)
  * - Reliable rollback capability for failed operations
  * - Health monitoring and integrity verification
- * - Data portability through export/import functionality
  * - Foundation for unified storage architecture
- * 
+ *
  * INTEGRATION NOTES:
  * - Designed specifically as foundation for ProfileStateManager
  * - Handles complex data types (Sets, circular references) transparently
- * - Provides transaction abstraction over localStorage limitations
+ * - IndexedDB ensures unlimited schedule storage capacity
  * - Enables event-driven architecture through reliable persistence
  * - Supports multi-schedule functionality through efficient storage patterns
- * 
+ *
  * ═══════════════════════════════════════════════════════════════════════════════
  */
-import { Schedule, UserScheduleState, SchedulePreferences, SelectedCourse } from '../types/schedule'
+import { Schedule, UserScheduleState, SchedulePreferences } from '../types/schedule'
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
 import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
 
@@ -148,7 +164,6 @@ export class TransactionalStorageManager {
         USER_STATE: 'wpi-planner-user-state',
         PREFERENCES: 'wpi-planner-preferences',
         SCHEDULES: 'wpi-planner-schedules',
-        SELECTED_COURSES: 'wpi-planner-selected-courses',
         THEME: 'wpi-planner-theme',
         ACTIVE_SCHEDULE_ID: 'wpi-planner-active-schedule-id',
         TRANSACTION_LOG: 'wpi-planner-transaction-log'
@@ -157,25 +172,31 @@ export class TransactionalStorageManager {
     private activeTransactions = new Map<string, StorageTransaction>();
     private transactionCounter = 0;
     private indexedDBStorage: IndexedDBStorageManager;
-    private useIndexedDB = false;
+    private indexedDBInitialized = false;
 
     constructor() {
         this.indexedDBStorage = new IndexedDBStorageManager();
-        this.initializeIndexedDB();
     }
 
-    private async initializeIndexedDB(): Promise<void> {
+    /**
+     * Ensures IndexedDB is initialized before any schedule operations.
+     * Called automatically by all schedule-related methods.
+     */
+    private async ensureInitialized(): Promise<void> {
+        if (this.indexedDBInitialized) {
+            return;
+        }
+
         try {
             const isCompatible = await this.indexedDBStorage.checkCompatibility();
-            if (isCompatible) {
-                this.useIndexedDB = true;
-                console.log('IndexedDB initialized successfully');
-            } else {
-                console.warn('IndexedDB not available, using localStorage fallback');
+            if (!isCompatible) {
+                throw new Error('IndexedDB not available in this browser');
             }
+            this.indexedDBInitialized = true;
+            console.log('IndexedDB initialized successfully');
         } catch (error) {
             console.error('Failed to initialize IndexedDB:', error);
-            this.useIndexedDB = false;
+            throw new Error('IndexedDB initialization failed - schedule operations unavailable');
         }
     }
 
@@ -245,98 +266,43 @@ export class TransactionalStorageManager {
     }
 
     async saveSchedule(schedule: Schedule): Promise<TransactionResult> {
-        if (this.useIndexedDB) {
-            const result = await this.indexedDBStorage.saveSchedule(schedule);
-            return {
-                success: result.success,
-                transactionId: `indexeddb-${Date.now()}`,
-                error: result.error ? new Error(result.error) : undefined
-            };
-        } else {
-            return this.saveScheduleToLocalStorage(schedule);
-        }
+        await this.ensureInitialized();
+        const result = await this.indexedDBStorage.saveSchedule(schedule);
+        return {
+            success: result.success,
+            transactionId: `indexeddb-${Date.now()}`,
+            error: result.error ? new Error(result.error) : undefined
+        };
     }
 
     async loadSchedule(scheduleId: string): Promise<{ data: Schedule | null; valid: boolean; error?: string }> {
-        if (this.useIndexedDB) {
-            const result = await this.indexedDBStorage.loadSchedule(scheduleId);
-            return {
-                data: result.data || null,
-                valid: result.success,
-                error: result.error
-            };
-        } else {
-            return this.loadScheduleFromLocalStorage(scheduleId);
-        }
+        await this.ensureInitialized();
+        const result = await this.indexedDBStorage.loadSchedule(scheduleId);
+        return {
+            data: result.data || null,
+            valid: result.success,
+            error: result.error
+        };
     }
 
     async loadAllSchedules(): Promise<{ data: Schedule[] | null; valid: boolean; error?: string }> {
-        if (this.useIndexedDB) {
-            const result = await this.indexedDBStorage.loadAllSchedules();
-            return {
-                data: result.data || [],
-                valid: result.success,
-                error: result.error
-            };
-        } else {
-            return this.loadAllSchedulesFromLocalStorage();
-        }
+        await this.ensureInitialized();
+        const result = await this.indexedDBStorage.loadAllSchedules();
+        return {
+            data: result.data || [],
+            valid: result.success,
+            error: result.error
+        };
     }
 
     async deleteSchedule(scheduleId: string): Promise<TransactionResult> {
-        if (this.useIndexedDB) {
-            const result = await this.indexedDBStorage.deleteSchedule(scheduleId);
-            return {
-                success: result.success,
-                transactionId: `indexeddb-${Date.now()}`,
-                error: result.error ? new Error(result.error) : undefined
-            };
-        } else {
-            return this.deleteScheduleFromLocalStorage(scheduleId);
-        }
-    }
-
-    private saveScheduleToLocalStorage(schedule: Schedule): TransactionResult {
-        return this.executeSyncTransaction(() => {
-            const schedules = this.loadAllSchedulesFromLocalStorage().data || [];
-            const existingIndex = schedules.findIndex(s => s.id === schedule.id);
-
-            if (existingIndex >= 0) {
-                schedules[existingIndex] = schedule;
-            } else {
-                schedules.push(schedule);
-            }
-
-            const serializedSchedules = this.safeStringify(schedules);
-            localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.SCHEDULES, serializedSchedules);
-        });
-    }
-
-    private loadScheduleFromLocalStorage(scheduleId: string): { data: Schedule | null; valid: boolean; error?: string } {
-        const schedulesResult = this.loadAllSchedulesFromLocalStorage();
-        if (!schedulesResult.valid || !schedulesResult.data) {
-            return { data: null, valid: false, error: schedulesResult.error };
-        }
-
-        const schedule = schedulesResult.data.find(s => s.id === scheduleId) || null;
-        return { data: schedule, valid: true };
-    }
-
-    private loadAllSchedulesFromLocalStorage(): { data: Schedule[] | null; valid: boolean; error?: string } {
-        return this.safeLoad<Schedule[]>(
-            TransactionalStorageManager.STORAGE_KEYS.SCHEDULES,
-            [],
-            'schedules'
-        );
-    }
-
-    private deleteScheduleFromLocalStorage(scheduleId: string): TransactionResult {
-        return this.executeSyncTransaction(() => {
-            const schedules = this.loadAllSchedulesFromLocalStorage().data || [];
-            const filtered = schedules.filter(s => s.id !== scheduleId);
-            const serializedSchedules = this.safeStringify(filtered);
-            localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.SCHEDULES, serializedSchedules);
-        });
+        await this.ensureInitialized();
+        const result = await this.indexedDBStorage.deleteSchedule(scheduleId);
+        return {
+            success: result.success,
+            transactionId: `indexeddb-${Date.now()}`,
+            error: result.error ? new Error(result.error) : undefined
+        };
     }
 
     savePreferences(preferences: SchedulePreferences): TransactionResult {
@@ -355,29 +321,6 @@ export class TransactionalStorageManager {
         
         return {
             data: result.data || this.getDefaultPreferences(),
-            valid: result.valid,
-            error: result.error
-        };
-    }
-
-    saveSelectedCourses(selectedCourses: SelectedCourse[]): TransactionResult {
-        const result = this.executeSyncTransaction(() => {
-            const serializedCourses = this.safeStringify(selectedCourses);
-            localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.SELECTED_COURSES, serializedCourses);
-        });
-        return result;
-    }
-
-    loadSelectedCourses(): { data: SelectedCourse[]; valid: boolean; error?: string } {
-        const result = this.safeLoad<SelectedCourse[]>(
-            TransactionalStorageManager.STORAGE_KEYS.SELECTED_COURSES,
-            [],
-            'selected courses'
-        );
-        
-        
-        return {
-            data: result.data || [],
             valid: result.valid,
             error: result.error
         };
@@ -441,29 +384,27 @@ export class TransactionalStorageManager {
         });
     }
 
-    exportData(): { data: string | null; valid: boolean; error?: string } {
+    async exportData(): Promise<{ data: string | null; valid: boolean; error?: string }> {
         try {
             const state = this.loadUserState().data;
-            const schedules = this.loadAllSchedulesFromLocalStorage().data || [];
+            const schedulesResult = await this.loadAllSchedules();
+            const schedules = schedulesResult.data || [];
             const preferences = this.loadPreferences().data;
-            const selectedCourses = this.loadSelectedCourses().data || [];
 
             const exportData = {
-                version: '2.0',
+                version: '3.0',
                 timestamp: new Date().toISOString(),
                 checksum: '',
                 state,
                 schedules,
-                preferences,
-                selectedCourses
+                preferences
             };
 
             // Generate checksum for integrity verification (use custom replacer for Sets)
             const dataString = this.safeStringify({
                 state: exportData.state,
                 schedules: exportData.schedules,
-                preferences: exportData.preferences,
-                selectedCourses: exportData.selectedCourses
+                preferences: exportData.preferences
             });
             exportData.checksum = this.generateChecksum(dataString);
 
@@ -480,8 +421,8 @@ export class TransactionalStorageManager {
         }
     }
 
-    importData(jsonData: string): TransactionResult {
-        return this.executeSyncTransaction(() => {
+    async importData(jsonData: string): Promise<TransactionResult> {
+        try {
             const data = JSON.parse(jsonData, this.reviver);
 
             // Verify checksum if available (use custom replacer for Sets)
@@ -489,15 +430,14 @@ export class TransactionalStorageManager {
                 const verifyData = {
                     state: data.state,
                     schedules: data.schedules,
-                    preferences: data.preferences,
-                    selectedCourses: data.selectedCourses
+                    preferences: data.preferences
                 };
                 const calculatedChecksum = this.generateChecksum(this.safeStringify(verifyData));
                 if (calculatedChecksum !== data.checksum) {
                     throw new Error('Data integrity check failed - checksum mismatch');
                 }
             }
-            
+
             if (data.state) {
                 localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.USER_STATE, this.safeStringify(data.state));
             }
@@ -505,12 +445,24 @@ export class TransactionalStorageManager {
                 localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.PREFERENCES, this.safeStringify(data.preferences));
             }
             if (data.schedules) {
-                localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.SCHEDULES, this.safeStringify(data.schedules));
+                // Import schedules to IndexedDB (await each save)
+                await this.ensureInitialized();
+                for (const schedule of data.schedules) {
+                    await this.saveSchedule(schedule);
+                }
             }
-            if (data.selectedCourses) {
-                localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.SELECTED_COURSES, this.safeStringify(data.selectedCourses));
-            }
-        });
+
+            return {
+                success: true,
+                transactionId: `import-${Date.now()}`
+            };
+        } catch (error) {
+            return {
+                success: false,
+                transactionId: `import-${Date.now()}`,
+                error: error as Error
+            };
+        }
     }
 
     private executeSyncTransaction(operation: () => void): TransactionResult {
@@ -644,25 +596,15 @@ export class TransactionalStorageManager {
             localStorage.setItem(testKey, testValue);
             const retrieved = localStorage.getItem(testKey);
             localStorage.removeItem(testKey);
-            
+
             if (retrieved !== testValue) {
                 return { valid: false, error: 'localStorage read/write test failed' };
             }
 
-            // Verify key data structures can be parsed
-            const schedules = this.loadAllSchedulesFromLocalStorage();
-            if (!schedules.valid) {
-                return { valid: false, error: `Schedule data invalid: ${schedules.error}` };
-            }
-
+            // Verify preferences data can be parsed (schedules are in IndexedDB, checked separately)
             const preferences = this.loadPreferences();
             if (!preferences.valid) {
                 return { valid: false, error: `Preferences data invalid: ${preferences.error}` };
-            }
-
-            const selectedCourses = this.loadSelectedCourses();
-            if (!selectedCourses.valid) {
-                return { valid: false, error: `Selected courses data invalid: ${selectedCourses.error}` };
             }
 
             return { valid: true };
@@ -724,25 +666,13 @@ export class TransactionalStorageManager {
         isUsingIndexedDB: boolean;
         schedulesSizes?: Map<string, number>;
     }> {
-        if (this.useIndexedDB) {
-            const stats = await this.indexedDBStorage.getStorageStats();
-            return {
-                totalSchedules: stats.data?.totalSchedules || 0,
-                estimatedSize: stats.data?.estimatedSize || 0,
-                isUsingIndexedDB: true,
-                schedulesSizes: stats.data?.schedulesSizes
-            };
-        } else {
-            const schedulesResult = this.loadAllSchedulesFromLocalStorage();
-            const schedules = schedulesResult.data || [];
-            const serialized = this.safeStringify(schedules);
-            const size = new Blob([serialized]).size;
-
-            return {
-                totalSchedules: schedules.length,
-                estimatedSize: size,
-                isUsingIndexedDB: false
-            };
-        }
+        await this.ensureInitialized();
+        const stats = await this.indexedDBStorage.getStorageStats();
+        return {
+            totalSchedules: stats.data?.totalSchedules || 0,
+            estimatedSize: stats.data?.estimatedSize || 0,
+            isUsingIndexedDB: true,
+            schedulesSizes: stats.data?.schedulesSizes
+        };
     }
 }

@@ -5,6 +5,8 @@ export interface SelectedCourse {
     selectedLecture: Section | null;
     selectedDiscussion: Section | null;
     selectedLab: Section | null;
+    selectedSection: Section | null;
+    selectedSectionNumber: string | null;
     isRequired: boolean;
 }
 

@@ -35,11 +35,12 @@ export function createJSONReplacer(): (key: string, value: any) => any {
             };
         }
 
-        // Optimization: Remove selectedSection to avoid redundant data
-        // (section data is already available elsewhere in the structure)
-        if (key === 'selectedSection' && value && typeof value === 'object' && value.number) {
-            return undefined;
-        }
+        // FIXED: DO NOT delete selectedSection - it contains critical selection state
+        // The "optimization" comment was incorrect - this data is needed for rendering
+        // Commenting out to prevent data loss during save operations
+        // if (key === 'selectedSection' && value && typeof value === 'object' && value.number) {
+        //     return undefined;
+        // }
 
         return value;
     };

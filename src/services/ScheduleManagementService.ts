@@ -328,9 +328,10 @@ export class ScheduleManagementService {
 
             // Auto-save if requested
             if (autoSave) {
-                const saveResult = await this.profileStateManager.save();
-                if (!saveResult.success) {
-                    console.warn('Failed to auto-save after schedule creation:', saveResult.error);
+                try {
+                    await this.profileStateManager.save();
+                } catch (error) {
+                    console.warn('Failed to auto-save after schedule creation:', error);
                 }
             }
 
@@ -476,9 +477,10 @@ export class ScheduleManagementService {
 
             // Auto-save if requested
             if (autoSave) {
-                const saveResult = await this.profileStateManager.save();
-                if (!saveResult.success) {
-                    console.warn('Failed to auto-save after schedule update:', saveResult.error);
+                try {
+                    await this.profileStateManager.save();
+                } catch (error) {
+                    console.warn('Failed to auto-save after schedule update:', error);
                 }
             }
 
@@ -556,9 +558,10 @@ export class ScheduleManagementService {
             const duplicatedSchedule = result.result;
 
             // Auto-save
-            const saveResult = await this.profileStateManager.save();
-            if (!saveResult.success) {
-                console.warn('Failed to auto-save after schedule duplication:', saveResult.error);
+            try {
+                await this.profileStateManager.save();
+            } catch (error) {
+                console.warn('Failed to auto-save after schedule duplication:', error);
             }
 
             // Notify listeners
@@ -606,11 +609,6 @@ export class ScheduleManagementService {
                 };
             }
 
-            // CRITICAL FIX: Flush pending batch operations before deletion
-            // This ensures any pending course selections/changes are persisted
-            // before we delete the schedule
-            await this.courseSelectionService.flushPendingOperations();
-
             const result = await this.retryManager.executeWithRetry(
                 () => {
                     return this.profileStateManager.deleteSchedule(scheduleId, 'api');
@@ -627,10 +625,11 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Force immediate save (bypass debounce) for critical delete operation
-            const saveResult = await this.profileStateManager.saveImmediate();
-            if (!saveResult.success) {
-                console.warn('Failed to auto-save after schedule deletion:', saveResult.error);
+            // Force immediate save for critical delete operation
+            try {
+                await this.profileStateManager.save();
+            } catch (error) {
+                console.warn('Failed to auto-save after schedule deletion:', error);
             }
 
             // Notify listeners
@@ -741,10 +740,9 @@ export class ScheduleManagementService {
     async save(): Promise<{ success: boolean; error?: string }> {
         try {
             await this.ensureInitialized();
-            const result = await this.profileStateManager.save();
+            await this.profileStateManager.save();
             return {
-                success: result.success,
-                error: result.error?.message
+                success: true
             };
         } catch (error) {
             return {
@@ -869,9 +867,10 @@ export class ScheduleManagementService {
             }
 
             // Auto-save
-            const saveResult = await this.profileStateManager.save();
-            if (!saveResult.success) {
-                console.warn('Failed to auto-save after schedule import:', saveResult.error);
+            try {
+                await this.profileStateManager.save();
+            } catch (error) {
+                console.warn('Failed to auto-save after schedule import:', error);
             }
 
             // Notify listeners

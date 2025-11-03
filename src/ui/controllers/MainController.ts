@@ -80,6 +80,7 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * 
  * INITIALIZATION FLOW (Critical Order):
  * 1. Core Storage Setup:
+ *    - Clear legacy localStorage schedule keys (now using IndexedDB)
  *    - Create ProfileStateManager instance
  *    - Initialize StorageService with shared ProfileStateManager
  *    - Configure ThemeManager to use StorageService (unified storage)
@@ -149,12 +150,6 @@ import { ThemeManager } from '../../themes/ThemeManager'
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 export class MainController {
-    // Status indicator text constants
-    private static readonly STATUS_TEXT_IDLE = 'No changes';
-    private static readonly STATUS_TEXT_SAVING = 'Saving';
-    private static readonly STATUS_TEXT_SAVED = 'All changes saved';
-    private static readonly STATUS_TEXT_ERROR = 'Save failed - will retry';
-
     private courseDataService: CourseDataService;
     private scheduleSelector: ScheduleSelector | null = null;
     private _themeSelector: ThemeSelector;
@@ -251,10 +246,6 @@ export class MainController {
             this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
         });
         
-        // Setup optimistic UI event handlers
-        this.setupOptimisticUIEventHandlers();
-        this.enableOptimisticUIDebug();
-        
         // IMPORTANT: Initialize filters LAST (triggers events that use operationManager)
         this.initializeFilters();
         
@@ -282,35 +273,16 @@ export class MainController {
 
     private async init(): Promise<void> {
         this.uiStateManager.showLoadingState();
-        
+
         try {
-            // Initialize StorageService FIRST
-            console.log('MainController: Initializing StorageService...');
-            const storageInitResult = await this.storageService.initialize();
-            console.log('StorageService initialized:', storageInitResult);
+            // Clear legacy localStorage schedule data (now using IndexedDB)
+            this.clearLegacyLocalStorage();
 
-            // Initialize theme after storage is loaded
-            console.log('MainController: Initializing theme from storage...');
+            // Initialize StorageService and load persisted data
+            await this.storageService.initialize();
             this._themeSelector.initializeTheme();
-            console.log('Theme initialized');
-
-            // Load Rate My Professor data early so it's available for wizard and filters
-            console.log('MainController: Loading Rate My Professor data...');
             await rateMyProfessorService.loadData();
-            console.log('RMP data loaded successfully');
-
-            // Initialize CourseSelectionService SECOND to load persisted data
-            console.log('MainController: Initializing CourseSelectionService...');
-            const initResult = await this.courseSelectionService.initialize();
-            console.log('CourseSelectionService initialized:', initResult);
-            
-            // Check what was loaded from storage
-            const loadedCourses = this.courseSelectionService.getSelectedCourses();
-            console.log(`Loaded ${loadedCourses.length} selected courses from storage:`, loadedCourses.map(sc => ({
-                course: `${sc.course.department.abbreviation}${sc.course.number}`,
-                selectedSection: sc.selectedSectionNumber,
-                hasSection: sc.selectedSection !== null
-            })));
+            await this.courseSelectionService.initialize();
             
             await this.loadCourseData();
             this.departmentController.displayDepartments();
@@ -322,6 +294,7 @@ export class MainController {
             this.initializeDefaultDepartmentView();
             
             this.setupEventListeners();
+            this.setupSaveIndicatorListener();
             this.setupCourseSelectionListener();
             this.courseController.displaySelectedCourses();
             
@@ -337,6 +310,23 @@ export class MainController {
             console.error('Failed to initialize application:', error);
             this.uiStateManager.showErrorMessage('Failed to initialize application. Some features may not work properly.');
         }
+    }
+
+    /**
+     * Clears legacy localStorage keys that contain schedule data.
+     * All schedule data now stored in IndexedDB, localStorage only used for small data.
+     */
+    private clearLegacyLocalStorage(): void {
+        const keysToRemove = [
+            'wpi-planner-schedules',
+            'wpi-planner-user-state'
+        ];
+
+        keysToRemove.forEach(key => {
+            localStorage.removeItem(key);
+        });
+
+        console.log('✅ Cleared legacy localStorage schedule keys');
     }
 
     private async loadCourseData(): Promise<void> {
@@ -800,6 +790,34 @@ export class MainController {
     private previousSelectedCoursesCount = 0;
     private previousSelectedCoursesMap = new Map<string, string | null>();
 
+    private setupSaveIndicatorListener(): void {
+        // Listen for save state changes from ProfileStateManager
+        this.profileStateManager.addListener((event) => {
+            if (event.type === 'save_state_changed') {
+                this.updateSaveIndicator(event.data.hasUnsavedChanges);
+            }
+        });
+    }
+
+    private updateSaveIndicator(hasUnsavedChanges: boolean): void {
+        const indicator = document.getElementById('optimistic-ui-status');
+        if (!indicator) return;
+
+        if (hasUnsavedChanges) {
+            indicator.textContent = 'Saving...';
+            indicator.className = 'optimistic-status saving';
+        } else {
+            indicator.textContent = 'Saved';
+            indicator.className = 'optimistic-status saved';
+
+            // Return to "No changes" after 1.5 seconds
+            setTimeout(() => {
+                indicator.textContent = 'No changes';
+                indicator.className = 'optimistic-status idle';
+            }, 1500);
+        }
+    }
+
     private setupCourseSelectionListener(): void {
         this.courseSelectionService.onSelectionChangeWithType((event) => {
             const selectedCourses = event.selectedCourses;
@@ -1011,86 +1029,6 @@ export class MainController {
             loadMoreButton.textContent = originalText;
             loadMoreButton.disabled = false;
             throw error; // Re-throw so the caller can handle it
-        }
-    }
-
-    // Optimistic UI Integration Methods
-    private setupOptimisticUIEventHandlers(): void {
-        // Listen for batch operation state changes
-        document.addEventListener('batchOperationStateChange', (e: any) => {
-            const { state, pendingOperations, isProcessing } = e.detail;
-            this.updateOptimisticUIFeedback(state, pendingOperations, isProcessing);
-        });
-    }
-
-    private updateOptimisticUIFeedback(state: string, pendingOperations: number, _isProcessing: boolean): void {
-        // Update UI to show optimistic operation status
-        const statusIndicator = this.findOrCreateStatusIndicator();
-
-        switch (state) {
-            case 'saving':
-                statusIndicator.textContent = `${MainController.STATUS_TEXT_SAVING} ${pendingOperations} change${pendingOperations === 1 ? '' : 's'}...`;
-                statusIndicator.className = 'optimistic-status saving';
-                break;
-            case 'saved':
-                statusIndicator.textContent = MainController.STATUS_TEXT_SAVED;
-                statusIndicator.className = 'optimistic-status saved';
-                break;
-            case 'error':
-                statusIndicator.textContent = MainController.STATUS_TEXT_ERROR;
-                statusIndicator.className = 'optimistic-status error';
-                break;
-            case 'idle':
-            default:
-                statusIndicator.textContent = MainController.STATUS_TEXT_IDLE;
-                statusIndicator.className = 'optimistic-status idle';
-                break;
-        }
-
-        // Auto-hide saved/error messages and return to idle state
-        if (state === 'saved' || state === 'error') {
-            setTimeout(() => {
-                statusIndicator.textContent = MainController.STATUS_TEXT_IDLE;
-                statusIndicator.className = 'optimistic-status idle';
-            }, state === 'saved' ? 2000 : 4000);
-        }
-    }
-
-    private findOrCreateStatusIndicator(): HTMLElement {
-        let indicator = document.getElementById('optimistic-ui-status');
-        if (!indicator) {
-            // Status indicator should now be pre-existing in HTML, but fallback to creation if needed
-            indicator = document.createElement('div');
-            indicator.id = 'optimistic-ui-status';
-            indicator.className = 'optimistic-status idle';
-            indicator.textContent = MainController.STATUS_TEXT_IDLE;
-
-            // Try to insert in dedicated container
-            const statusContainer = document.querySelector('.status-indicator-container');
-            if (statusContainer) {
-                statusContainer.appendChild(indicator);
-            } else {
-                // Fallback: insert in header
-                const header = document.querySelector('.header-controls');
-                if (header) {
-                    header.appendChild(indicator);
-                }
-            }
-        }
-        return indicator;
-    }
-
-    // Debug methods for optimistic UI testing
-    enableOptimisticUIDebug(): void {
-        console.log('Enabling optimistic UI debug mode');
-        
-        // Add debug info to window for testing
-        if (typeof window !== 'undefined') {
-            (window as any).optimisticUIDebug = {
-                debugService: () => this.courseSelectionService.debugState(),
-                getPendingOps: () => this.courseSelectionService['uiStateBuffer']?.getPendingOperationsCount() || 0,
-                forceBatchSync: () => this.courseSelectionService['batchOperationManager']?.processBatchNow()
-            };
         }
     }
 

@@ -165,8 +165,13 @@ export class StorageService implements ThemeStorage {
 
     // Data management
     async save(): Promise<boolean> {
-        const result = await this.profileStateManager.save();
-        return result.success;
+        try {
+            await this.profileStateManager.save();
+            return true;
+        } catch (error) {
+            console.error('Save failed:', error);
+            return false;
+        }
     }
 
     hasUnsavedChanges(): boolean {

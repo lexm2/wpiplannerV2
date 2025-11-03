@@ -25,45 +25,38 @@ export type StateChangeListener = (event: StateChangeEvent, state: ProfileState)
  * ═══════════════════════════════════════════════════════════════════════════════
  * ProfileStateManager - Unified Application State & Persistence Foundation
  * ═══════════════════════════════════════════════════════════════════════════════
- * 
+ *
  * ARCHITECTURE ROLE:
  * - Single source of truth for all application data and state management
  * - Central coordination hub for course selections, schedules, and user preferences
- * - Foundation layer that eliminates data corruption through unified persistence
+ * - Synchronous persistence layer ensuring immediate data consistency
  * - Event-driven state management with real-time notifications across all components
  * - Core persistence coordinator integrating with transactional storage system
- * 
+ *
  * DEPENDENCIES:
  * - TransactionalStorageManager → Low-level storage operations with atomic transactions
  * - Schedule, SelectedCourse, SchedulePreferences types → Data models and contracts
  * - Course type → Core academic data structure for course selection operations
  * - StateChangeEvent system → Event-driven architecture for cross-component notifications
  * - localStorage (via TransactionalStorageManager) → Browser persistence layer
- * 
+ *
  * USED BY:
- * - CourseSelectionService → High-level course selection API with ProfileStateManager coordination
+ * - CourseSelectionService → High-level course selection API with synchronous persistence
  * - ScheduleManagementService → Schedule operations and multi-schedule management
- * - MainController → Application initialization and core functionality coordination  
+ * - MainController → Application initialization and core functionality coordination
  * - ThemeManager → User preferences and theme persistence
  * - ALL UI Controllers → State access and event-driven updates
  * - ALL Services → Shared state access and persistence operations
- * 
- * UNIFIED STORAGE ARCHITECTURE:
- * Before (Multiple Storage Systems - Data Corruption Issues):
- * ```
- * CourseManager ←→ localStorage
- * StorageManager ←→ localStorage  
- * ThemeManager ←→ localStorage
- * [Competing writes, data corruption, inconsistent state]
- * ```
- * 
- * After (Unified Architecture - Single Source of Truth):
+ *
+ * HYBRID STORAGE ARCHITECTURE:
  * ```
  *                ProfileStateManager (Single Source of Truth)
  *                            ↓
  *                TransactionalStorageManager
  *                            ↓
- *                       localStorage
+ *                    ┌──────┴──────┐
+ *                IndexedDB      localStorage
+ *                (Schedules)    (Preferences)
  *                            ↑
  *      ┌─────────────────────────────────────────────────────┐
  *      │                                                     │
@@ -71,36 +64,39 @@ export type StateChangeListener = (event: StateChangeEvent, state: ProfileState)
  *      ↑
  * ThemeSelector
  * ```
- * 
+ *
  * DATA FLOW & STATE MANAGEMENT:
  * State Update Process:
  * 1. External component calls ProfileStateManager method (selectCourse, createSchedule, etc.)
  * 2. withStateUpdate() wrapper executes the state change atomically
  * 3. hasUnsavedChanges flag set to true, save state change event emitted
- * 4. Debounced save (500ms) triggers background persistence via TransactionalStorageManager
+ * 4. Synchronous save() triggers immediate persistence via TransactionalStorageManager
  * 5. StateChangeEvent emitted to all registered listeners with new state
  * 6. Event queue processes events asynchronously to prevent recursion
  * 7. UI components receive events and update accordingly
- * 
+ *
  * Persistence Flow:
- * 1. State changes trigger debouncedSave() to batch operations
- * 2. save() method creates transactional operations array
- * 3. TransactionalStorageManager.executeTransaction() ensures atomicity
- * 4. On success: hasUnsavedChanges = false, lastSaved timestamp updated
- * 5. save_state_changed event emitted for UI feedback
- * 
+ * 1. State changes trigger immediate save() - no batching or debouncing
+ * 2. save() method writes to TransactionalStorageManager
+ * 3. Schedules routed to IndexedDB, preferences/theme to localStorage
+ * 4. All operations awaited to ensure completion
+ * 5. On success: hasUnsavedChanges = false, lastSaved timestamp updated
+ * 6. save_state_changed event emitted for UI feedback
+ *
  * Loading Flow:
- * 1. initializeFromStorage() during constructor
- * 2. loadFromStorage() coordinates data loading from multiple storage keys
- * 3. Preferences, schedules, active schedule ID loaded in sequence
- * 4. Selected courses loaded from active schedule or fallback to standalone
- * 5. Default schedule created if none exist
- * 6. Loading flags cleared, state marked as clean (no unsaved changes)
- * 
+ * 1. loadFromStorage() coordinates data loading from IndexedDB and localStorage
+ * 2. IndexedDB initialized automatically on first schedule operation
+ * 3. Preferences loaded from localStorage
+ * 4. All schedules loaded from IndexedDB
+ * 5. Active schedule ID loaded from localStorage
+ * 6. Selected courses loaded from active schedule
+ * 7. Default schedule created if none exist
+ * 8. Loading flags cleared, state marked as clean (no unsaved changes)
+ *
  * KEY FEATURES:
- * - Atomic state updates with transactional persistence
+ * - Atomic state updates with immediate synchronous persistence
  * - Event-driven architecture with cross-component notifications
- * - Debounced saves (500ms) to prevent excessive storage operations
+ * - Synchronous saves prevent data loss on page close (Firefox-safe)
  * - Multi-schedule support with active schedule management
  * - Course selection with section tracking and preferences
  * - Schedule preferences management (time ranges, preferred days, themes)
@@ -143,17 +139,19 @@ export type StateChangeListener = (event: StateChangeEvent, state: ProfileState)
  * - Eliminated data corruption from competing storage systems
  * - Single source of truth prevents inconsistent state
  * - Event-driven updates ensure UI consistency across components
- * - Debounced saves optimize performance and reduce storage overhead
+ * - IndexedDB eliminates localStorage quota issues for large schedules
+ * - Immediate saves prevent data loss (no batching or debouncing)
  * - Transactional persistence prevents partial data corruption
  * - Comprehensive state management reduces component coupling
  * - Health checking enables proactive issue detection
  * - Export/import enables data portability and backup functionality
- * 
+ *
  * RECENT ARCHITECTURAL EVOLUTION:
  * - Replaced CourseManager + StorageManager dual system
  * - Integrated TransactionalStorageManager for atomic operations
  * - Added comprehensive event system for cross-component coordination
- * - Implemented debounced saving for performance optimization
+ * - Migrated schedule storage to IndexedDB for unlimited capacity
+ * - Implemented immediate synchronous saves (removed debouncing)
  * - Added multi-schedule support with active schedule management
  * - Integrated health checking and consistency validation
  * 
@@ -163,8 +161,6 @@ export class ProfileStateManager {
     private state: ProfileState;
     private listeners = new Set<StateChangeListener>();
     private storageManager: TransactionalStorageManager;
-    private saveDebounceTimer: NodeJS.Timeout | null = null;
-    private readonly DEBOUNCE_DELAY = 500; // 500ms debounce
     private isLoadingFlag = false;
     private eventQueue: StateChangeEvent[] = [];
     private processingQueue = false;
@@ -172,21 +168,6 @@ export class ProfileStateManager {
     constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
         this.state = this.createInitialState();
-
-        // Save any pending changes before page unload
-        if (typeof window !== 'undefined') {
-            window.addEventListener('beforeunload', () => {
-                if (this.state.hasUnsavedChanges) {
-                    // Cancel any pending debounced save
-                    if (this.saveDebounceTimer) {
-                        clearTimeout(this.saveDebounceTimer);
-                        this.saveDebounceTimer = null;
-                    }
-                    // Perform immediate synchronous save
-                    this.saveSync();
-                }
-            });
-        }
     }
 
     // Public API for state access
@@ -241,6 +222,8 @@ export class ProfileStateManager {
                     selectedLecture: null,
                     selectedDiscussion: null,
                     selectedLab: null,
+                    selectedSection: null,
+                    selectedSectionNumber: null,
                     isRequired
                 };
                 this.state.selectedCourses.push(selectedCourse);
@@ -385,8 +368,6 @@ export class ProfileStateManager {
             this.emitEvent('active_schedule_changed', { schedule }, source);
             this.emitEvent('courses_changed', { action: 'loaded_from_schedule', schedule }, source);
 
-            // Save active schedule ID
-            this.debouncedSave();
             this.isLoadingFlag = false;
             return true;
         });
@@ -482,94 +463,71 @@ export class ProfileStateManager {
         this.listeners.clear();
     }
 
-    // Persistence methods
-    async save(): Promise<TransactionResult> {
-        if (this.saveDebounceTimer) {
-            clearTimeout(this.saveDebounceTimer);
-            this.saveDebounceTimer = null;
-        }
-
+    // Persistence methods - All saves are immediate (async for IndexedDB compatibility)
+    async save(): Promise<void> {
         try {
+            console.log('%c📝 SAVING TO STORAGE', 'color: #4CAF50; font-weight: bold; font-size: 14px');
+            console.log('Active Schedule ID:', this.state.activeScheduleId);
+            console.log('Number of Schedules:', this.state.schedules.length);
+
+            // Log what we're about to save
+            const dataToSave = {
+                activeScheduleId: this.state.activeScheduleId,
+                schedules: this.state.schedules.map(s => ({
+                    id: s.id,
+                    name: s.name,
+                    selectedCourses: s.selectedCourses.map(sc => ({
+                        courseId: sc.course.id,
+                        courseName: `${sc.course.department.abbreviation}${sc.course.number}`,
+                        selectedSection: sc.selectedSectionNumber,
+                        isRequired: sc.isRequired
+                    }))
+                })),
+                preferences: this.state.preferences
+            };
+            console.log('Data being saved:', JSON.stringify(dataToSave, null, 2));
+
             this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
 
+            // Await all schedule saves (async for IndexedDB)
             for (const schedule of this.state.schedules) {
                 await this.storageManager.saveSchedule(schedule);
             }
 
-            this.storageManager.saveSelectedCourses(this.state.selectedCourses);
             this.storageManager.savePreferences(this.state.preferences);
 
             const previousUnsavedState = this.state.hasUnsavedChanges;
             this.state.hasUnsavedChanges = false;
             this.state.lastSaved = Date.now();
 
+            console.log('%c✅ SAVED - All data persisted to storage', 'color: #4CAF50; font-weight: bold');
+
             if (previousUnsavedState) {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
             }
-
-            return {
-                success: true,
-                transactionId: `save-${Date.now()}`
-            };
         } catch (error) {
-            console.error('Failed to save:', error);
-            return {
-                success: false,
-                transactionId: `save-${Date.now()}`,
-                error: error as Error
-            };
-        }
-    }
-
-    /**
-     * Save immediately without debouncing
-     * Used for critical operations like deletion or navigation where
-     * changes must be persisted immediately
-     */
-    async saveImmediate(): Promise<TransactionResult> {
-        // Clear any pending debounced save
-        if (this.saveDebounceTimer) {
-            clearTimeout(this.saveDebounceTimer);
-            this.saveDebounceTimer = null;
-        }
-
-        // Call save directly without debounce
-        return this.save();
-    }
-
-    private saveSync(): void {
-        // Synchronous version of save for beforeunload handler
-        // Note: This bypasses the transaction system for immediate persistence
-        try {
-            this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
-            this.state.schedules.forEach(schedule => {
-                this.storageManager.saveSchedule(schedule);
-            });
-            this.storageManager.saveSelectedCourses(this.state.selectedCourses);
-            this.storageManager.savePreferences(this.state.preferences);
-            this.state.hasUnsavedChanges = false;
-            this.state.lastSaved = Date.now();
-        } catch (error) {
-            console.error('Synchronous save failed:', error);
+            console.error('❌ Save failed:', error);
         }
     }
 
     async loadFromStorage(): Promise<boolean> {
         // Prevent concurrent calls - if already loading, skip this call
         if (this.isLoadingFlag) {
-            console.log('ProfileStateManager: Already loading from storage, skipping duplicate call');
+            console.log('⏭️ Already loading from storage, skipping duplicate call');
             return false;
         }
 
         // Skip if already loaded with schedules (redundant call prevention)
         if (this.state.schedules.length > 0 && !this.state.isLoading) {
-            console.log('ProfileStateManager: Already loaded with schedules, skipping redundant call');
+            console.log('⏭️ Already loaded with schedules, skipping redundant call');
             return true;
         }
 
         try {
             this.state.isLoading = true;
             this.isLoadingFlag = true;
+
+            console.log('%c📂 LOADING FROM STORAGE', 'color: #2196F3; font-weight: bold; font-size: 14px');
 
             // Load preferences first
             const preferencesResult = this.storageManager.loadPreferences();
@@ -589,38 +547,53 @@ export class ProfileStateManager {
                 this.state.activeScheduleId = activeIdResult.data;
             }
 
-            // Load selected courses for active schedule or standalone
+            // Load selected courses from active schedule only (no fallback)
             let loadedCourses: SelectedCourse[] = [];
             if (this.state.activeScheduleId) {
                 const activeSchedule = this.state.schedules.find(s => s.id === this.state.activeScheduleId);
                 if (activeSchedule) {
                     loadedCourses = activeSchedule.selectedCourses;
-                    console.log(`ProfileStateManager: Loaded ${loadedCourses.length} courses from active schedule "${activeSchedule.name}"`);
-                }
-            }
-
-            // Fall back to standalone selected courses if no active schedule
-            if (loadedCourses.length === 0) {
-                const coursesResult = this.storageManager.loadSelectedCourses();
-                if (coursesResult.valid && coursesResult.data) {
-                    loadedCourses = coursesResult.data;
-                    console.log(`ProfileStateManager: Loaded ${loadedCourses.length} standalone courses from storage`);
-                } else {
-                    console.log('ProfileStateManager: No standalone courses found in storage');
                 }
             }
 
             this.state.selectedCourses = loadedCourses;
-            console.log(`ProfileStateManager: Final loaded course count: ${loadedCourses.length}`);
+
+            // Log what was loaded
+            console.log('%c✅ LOADED - Parsed Data:', 'color: #2196F3; font-weight: bold');
+            const loadedData = {
+                activeScheduleId: this.state.activeScheduleId,
+                schedulesCount: this.state.schedules.length,
+                schedules: this.state.schedules.map(s => ({
+                    id: s.id,
+                    name: s.name,
+                    coursesCount: s.selectedCourses.length,
+                    selectedCourses: s.selectedCourses.map(sc => ({
+                        courseId: sc.course.id,
+                        courseName: `${sc.course.department.abbreviation}${sc.course.number}`,
+                        selectedSection: sc.selectedSectionNumber,
+                        isRequired: sc.isRequired
+                    }))
+                })),
+                selectedCoursesCount: loadedCourses.length,
+                selectedCourses: loadedCourses.map(sc => ({
+                    courseId: sc.course.id,
+                    courseName: `${sc.course.department.abbreviation}${sc.course.number}`,
+                    selectedSection: sc.selectedSectionNumber
+                }))
+            };
+            console.log(JSON.stringify(loadedData, null, 2));
+            console.log('---');
 
             // If no schedules exist, create a default one
             if (this.state.schedules.length === 0) {
+                console.log('📝 No schedules found, creating default schedule');
                 const defaultSchedule = this.createSchedule('My Schedule', 'system');
                 this.state.activeScheduleId = defaultSchedule.id;
             }
 
             // If no active schedule but schedules exist, set the last one as active
             if (!this.state.activeScheduleId && this.state.schedules.length > 0) {
+                console.log('📝 No active schedule, setting last schedule as active');
                 this.state.activeScheduleId = this.state.schedules[this.state.schedules.length - 1].id;
             }
 
@@ -629,7 +602,7 @@ export class ProfileStateManager {
             return true;
 
         } catch (error) {
-            console.error('Failed to load from storage:', error);
+            console.error('❌ Load failed:', error);
             return false;
         } finally {
             this.state.isLoading = false;
@@ -638,13 +611,13 @@ export class ProfileStateManager {
     }
 
     // Export/Import functionality
-    exportData(): string | null {
-        const exportResult = this.storageManager.exportData();
+    async exportData(): Promise<string | null> {
+        const exportResult = await this.storageManager.exportData();
         return exportResult.valid ? exportResult.data : null;
     }
 
     async importData(jsonData: string): Promise<TransactionResult> {
-        const result = this.storageManager.importData(jsonData);
+        const result = await this.storageManager.importData(jsonData);
         if (result.success) {
             // Reload state from storage after successful import
             await this.loadFromStorage();
@@ -691,9 +664,9 @@ export class ProfileStateManager {
     }
 
 
-    private withStateUpdate<T>(updateFn: () => T): T {
+    private withStateUpdate(updateFn: () => void): void {
         const previousUnsavedState = this.state.hasUnsavedChanges;
-        const result = updateFn();
+        updateFn();
         this.state.hasUnsavedChanges = true;
 
         // Emit save state change event if state actually changed
@@ -701,8 +674,8 @@ export class ProfileStateManager {
             this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
         }
 
-        this.debouncedSave();
-        return result;
+        // Fire and forget - save happens in background
+        this.save().catch(error => console.error('Save failed:', error));
     }
 
     private async withStateUpdateAsync<T>(updateFn: () => Promise<T>): Promise<T> {
@@ -715,7 +688,7 @@ export class ProfileStateManager {
             this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
         }
 
-        this.debouncedSave();
+        await this.save();
         return result;
     }
 
@@ -729,7 +702,8 @@ export class ProfileStateManager {
             this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
         }
 
-        this.debouncedSave();
+        // Fire and forget - save happens in background
+        this.save().catch(error => console.error('Save failed:', error));
         return result;
     }
 
@@ -740,18 +714,6 @@ export class ProfileStateManager {
                 this.state.schedules[activeScheduleIndex].selectedCourses = [...this.state.selectedCourses];
             }
         }
-    }
-
-    private debouncedSave(): void {
-        if (this.saveDebounceTimer) {
-            clearTimeout(this.saveDebounceTimer);
-        }
-
-        this.saveDebounceTimer = setTimeout(async () => {
-            if (!this.isLoadingFlag) {
-                await this.save();
-            }
-        }, this.DEBOUNCE_DELAY);
     }
 
     private emitEvent(type: StateChangeEvent['type'], data: any, source: string): void {
