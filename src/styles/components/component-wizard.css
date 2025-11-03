@@ -428,7 +428,6 @@
 /* Ensure sidebar container can hold wizard */
 .schedule-selected-courses {
     position: relative;
-    overflow: hidden;
 }
 
 /* Rate My Professor Badge */
