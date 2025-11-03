@@ -343,7 +343,10 @@ export class ComponentSelectionWizard {
 
             // Test if this section passes the filters
             const filtered = this.scheduleFilterService.filterSections(allCoursesForFiltering);
-            const passes = filtered.length > 0;
+            const passes = filtered.some(item =>
+                item.section.crn === section.crn &&
+                item.course.course.id === this.course.id
+            );
 
             console.log(`[Wizard Filter] Section ${section.number} ${passes ? 'PASSES' : 'FAILS'} filters (filtered: ${filtered.length})`);
             if (!passes && conflictFilter) {
