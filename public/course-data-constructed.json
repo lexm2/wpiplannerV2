@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 3, 2025, 11:14 PM",
+  "generated": "Nov 3, 2025, 11:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -230873,7 +230873,7 @@
                 "crn": 344760,
                 "number": "S02 - ST: Technical Decision and Risk Analysis",
                 "seats": 30,
-                "seats_available": 22,
+                "seats_available": 21,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -230892,7 +230892,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seats_available": 22,
+                    "seats_available": 21,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S02 - ST: Technical Decision and Risk Analysis",
