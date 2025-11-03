@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 3, 2025, 3:41 PM",
+  "generated": "Nov 3, 2025, 3:51 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -224086,8 +224086,8 @@
               "section": {
                 "crn": 336943,
                 "number": "DL01",
-                "seats": 102,
-                "seats_available": 0,
+                "seats": 108,
+                "seats_available": 6,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4455",
@@ -224105,8 +224105,8 @@
                     "location": "Olin Hall 107",
                     "building": "",
                     "room": "Olin Hall 107",
-                    "seats": 102,
-                    "seats_available": 0,
+                    "seats": 108,
+                    "seats_available": 6,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "DL01",
