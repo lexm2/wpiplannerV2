@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 3, 2025, 10:15 PM",
+  "generated": "Nov 3, 2025, 10:39 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -44290,7 +44290,7 @@
                 "number": "D01",
                 "seats": 100,
                 "seats_available": 33,
-                "actual_waitlist": 1,
+                "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
                 "description": "Cat. I This course introduces the theoretical foundations of computer science. These form the basis for a more complete understanding of the proficiency in computer science. Topics include computational models, formal languages, and an introduction to compatibility and complexity theory, including NP-completeness. Students will be expected to complete a variety of exercises and proofs. Undergraduate credit may not be earned both for this course and for CS 5003. Recommended Background: Discrete mathematics (CS 2022 or equivalent) and algorithms (CS 2223 or equivalent). Students who have credit for CS 4121 may not receive credit for CS 3133.",
@@ -44309,7 +44309,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 100,
                     "seats_available": 33,
-                    "actual_waitlist": 1,
+                    "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "D01",
                     "days": [
