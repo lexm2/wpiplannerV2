@@ -443,6 +443,9 @@ export class ComponentSelectionWizard {
 
         this.container = sidebarContainer;
 
+        // Prevent background scrolling
+        sidebarContainer.classList.add('wizard-active');
+
         // Create wizard panel
         this.wizardPanel = document.createElement('div');
         this.wizardPanel.className = 'wizard-inline-panel';
@@ -483,6 +486,8 @@ export class ComponentSelectionWizard {
         setTimeout(() => {
             if (this.wizardPanel && this.container && this.container.contains(this.wizardPanel)) {
                 this.container.removeChild(this.wizardPanel);
+                // Re-enable background scrolling
+                this.container.classList.remove('wizard-active');
                 this.wizardPanel = null;
                 this.container = null;
             }

@@ -89,6 +89,10 @@
   position: relative; /* Allow wizard to position absolutely inside */
 }
 
+.schedule-selected-courses.wizard-active {
+  overflow-y: hidden;
+}
+
 .schedule-selected-courses .empty-state {
   color: var(--color-text-secondary);
   font-style: italic;
