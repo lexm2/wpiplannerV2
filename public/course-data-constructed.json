@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 3, 2025, 12:34 PM",
+  "generated": "Nov 3, 2025, 1:19 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4271,7 +4271,7 @@
                 "number": "C03",
                 "seats": 24,
                 "seats_available": 12,
-                "actual_waitlist": 2,
+                "actual_waitlist": 1,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "Cat. I This course focuses on the methods, procedures and techniques of creating and manipulating images through electronic and digital means. Students will develop an understanding of image alteration. Topics may include color theory, displays, modeling, shading, and visual perception. Recommended background: AR 1100.",
@@ -4290,7 +4290,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seats_available": 12,
-                    "actual_waitlist": 2,
+                    "actual_waitlist": 1,
                     "max_waitlist": 10,
                     "specific_section": "C03",
                     "days": [
@@ -235327,8 +235327,8 @@
                 "crn": 337288,
                 "number": "D01",
                 "seats": 30,
-                "seats_available": 0,
-                "actual_waitlist": 1,
+                "seats_available": 1,
+                "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": null,
                 "description": "Cat. I Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -235346,8 +235346,8 @@
                     "building": "",
                     "room": "Athletic Field",
                     "seats": 30,
-                    "seats_available": 0,
-                    "actual_waitlist": 1,
+                    "seats_available": 1,
+                    "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "D01",
                     "days": [
@@ -236145,8 +236145,8 @@
                 "crn": 337289,
                 "number": "D01",
                 "seats": 25,
-                "seats_available": 0,
-                "actual_waitlist": 1,
+                "seats_available": 1,
+                "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) This course will teach basic strength training principles and techniques. Students will develop and implement an individualized conditioning program.",
@@ -236164,8 +236164,8 @@
                     "building": "",
                     "room": "Recreation Center Fitness Area",
                     "seats": 25,
-                    "seats_available": 0,
-                    "actual_waitlist": 1,
+                    "seats_available": 1,
+                    "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "D01",
                     "days": [
