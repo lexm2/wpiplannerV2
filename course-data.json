@@ -32070,7 +32070,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337844"
     },
     {
@@ -33070,7 +33070,7 @@
       "Course_Title": "CS 586 - Big Data Analytics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "36/40",
+      "Enrolled_Capacity": "35/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Yanhua Li",
       "Locations": "Higgins Labs 154",
@@ -34235,7 +34235,7 @@
       "Course_Title": "DS 504 - Big Data Analytics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "36/40",
+      "Enrolled_Capacity": "35/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Yanhua Li",
       "Locations": "Higgins Labs 154",
