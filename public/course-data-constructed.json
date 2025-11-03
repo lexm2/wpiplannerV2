@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 3, 2025, 2:58 AM",
+  "generated": "Nov 3, 2025, 3:52 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -48077,7 +48077,7 @@
                 "number": "S01",
                 "seats": 30,
                 "seats_available": 19,
-                "actual_waitlist": 1,
+                "actual_waitlist": 2,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "An introduction to the theory and design of database management systems. Topics covered include internals of database management systems, fundamental concepts in database theory, and database application design and development. In particular, logical design and conceptual modeling, physical database design strategies, relational data model and query languages, query optimization, transaction management and distributed databases. Typically there are hands-on assignments and/or a course project. Selected topics from the current database research literature may be touched upon as well. (Prerequisite: CS 5084 would be helpful.)",
@@ -48096,7 +48096,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seats_available": 19,
-                    "actual_waitlist": 1,
+                    "actual_waitlist": 2,
                     "max_waitlist": 10,
                     "specific_section": "S01",
                     "days": []
@@ -236146,7 +236146,7 @@
                 "number": "D01",
                 "seats": 25,
                 "seats_available": 0,
-                "actual_waitlist": 3,
+                "actual_waitlist": 2,
                 "max_waitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) This course will teach basic strength training principles and techniques. Students will develop and implement an individualized conditioning program.",
@@ -236165,7 +236165,7 @@
                     "room": "Recreation Center Fitness Area",
                     "seats": 25,
                     "seats_available": 0,
-                    "actual_waitlist": 3,
+                    "actual_waitlist": 2,
                     "max_waitlist": 15,
                     "specific_section": "D01",
                     "days": [
