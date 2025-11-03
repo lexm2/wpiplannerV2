@@ -117,6 +117,7 @@ async function getTeacher(id: string): Promise<any> {
       node(id: $id) {
         ... on Teacher {
           id
+          legacyId
           firstName
           lastName
           department
@@ -197,6 +198,7 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
         // Create professor object with cleaned data
         const professor: Professor = {
           id: details.id,
+          legacyId: details.legacyId,
           firstName: details.firstName || teacher.firstName,
           lastName: details.lastName || teacher.lastName,
           department: details.department || 'Unknown',
@@ -204,6 +206,7 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
           avgDifficulty: details.avgDifficulty || 0,
           numRatings: details.numRatings || 0,
           wouldTakeAgainPercent: details.wouldTakeAgainPercent ?? null,
+          profileUrl: `https://www.ratemyprofessors.com/professor/${details.legacyId}`,
         };
 
         professors.push(professor);

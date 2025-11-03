@@ -7,6 +7,7 @@
  */
 export interface Professor {
   id: string;
+  legacyId: number;
   firstName: string;
   lastName: string;
   department: string;
@@ -14,6 +15,7 @@ export interface Professor {
   avgDifficulty: number;
   numRatings: number;
   wouldTakeAgainPercent: number | null;
+  profileUrl: string;
 }
 
 /**

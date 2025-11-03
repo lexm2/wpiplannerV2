@@ -1,4 +1,5 @@
 import { ModalService } from '../../services/ModalService';
+import { rateMyProfessorService } from '../../services/RateMyProfessorService';
 
 export interface SectionData {
     courseCode: string;
@@ -95,7 +96,14 @@ export class SectionInfoModalController {
             : '';
 
         const professors = [...new Set(data.section.periods.map(p => p.professor).filter(p => p && p.trim()))];
-        const professorDisplay = professors.length > 0 ? professors.join(', ') : 'TBA';
+        const professorDisplay = professors.length > 0
+            ? professors.map(prof => {
+                const rmpUrl = rateMyProfessorService.getProfessorRMPUrl(prof);
+                return rmpUrl
+                    ? `<a href="${rmpUrl}" target="_blank" rel="noopener noreferrer" class="professor-link">${prof}</a>`
+                    : prof;
+            }).join(', ')
+            : 'TBA';
 
         const meetingTimes = data.section.periods.map(period => {
             const daysArray = Array.from(period.days).sort();

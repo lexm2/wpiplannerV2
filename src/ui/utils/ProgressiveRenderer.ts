@@ -2,6 +2,7 @@ import { Course } from '../../types/types';
 import { CancellationToken, CancellationError } from '../../utils/RequestCancellation';
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics';
 import { getProfessorsByTerm } from '../../utils/courseUtils';
+import { rateMyProfessorService } from '../../services/RateMyProfessorService';
 
 export interface RenderBatchCallback {
     (batchIndex: number, batchCount: number, totalCount: number): void;
@@ -195,7 +196,7 @@ export class ProgressiveRenderer {
                                     ${hasWarning ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="warning-icon" title="All sections full"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" /></svg>' : ''}
                                 </div>
                                 <div class="course-sections">
-                                    ${(course.sections ?? []).map(section => {
+                                    ${(course.sections ?? []).map((section: { seatsAvailable: number; periods: any[]; number: any; }) => {
                                         const isFull = section.seatsAvailable <= 0;
                                         const professors = new Set<string>();
                                         section.periods.forEach(period => {
@@ -206,8 +207,17 @@ export class ProgressiveRenderer {
                                                 professors.add(period.professor);
                                             }
                                         });
-                                        const profList = Array.from(professors).join(', ') || 'TBA';
-                                        return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${section.number}" title="${profList}: ${section.number}">${profList}: ${section.number}</span>`;
+                                        const profArray = Array.from(professors);
+                                        const profListPlain = profArray.join(', ') || 'TBA';
+                                        const profListHtml = profArray.length > 0
+                                            ? profArray.map(prof => {
+                                                const rmpUrl = rateMyProfessorService.getProfessorRMPUrl(prof);
+                                                return rmpUrl
+                                                    ? `<a href="${rmpUrl}" target="_blank" rel="noopener noreferrer" class="professor-link">${prof}</a>`
+                                                    : prof;
+                                            }).join(', ')
+                                            : 'TBA';
+                                        return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${section.number}" title="${profListPlain}: ${section.number}">${profListHtml}: ${section.number}</span>`;
                                     }).join('')}
                                 </div>
                             </div>

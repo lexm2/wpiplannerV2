@@ -9,6 +9,7 @@
 
 interface Professor {
     id: string;
+    legacyId: number;
     firstName: string;
     lastName: string;
     department: string;
@@ -16,6 +17,7 @@ interface Professor {
     avgDifficulty: number;
     numRatings: number;
     wouldTakeAgainPercent: number | null;
+    profileUrl: string;
 }
 
 interface RateMyProfessorData {
@@ -325,6 +327,20 @@ export class RateMyProfessorService {
                 : null,
             hasData: true
         };
+    }
+
+    /**
+     * Get RateMyProfessors URL for a professor
+     * Returns null if professor not found
+     */
+    getProfessorRMPUrl(professorName: string): string | null {
+        const professor = this.findProfessor(professorName);
+
+        if (!professor) {
+            return null;
+        }
+
+        return professor.profileUrl;
     }
 
     /**

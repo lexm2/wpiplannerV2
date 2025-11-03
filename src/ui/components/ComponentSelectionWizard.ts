@@ -959,6 +959,7 @@ export class ComponentSelectionWizard {
         console.log('[Wizard] Rendering card - Professor:', professor, '| RMP loaded:', rateMyProfessorService.isLoaded());
         const rmpData = professor !== 'Not Assigned' ? rateMyProfessorService.getRatingDisplay(professor) : null;
         console.log('[Wizard] RMP data result:', rmpData ? `Rating: ${rmpData.rating}` : 'null');
+        const rmpUrl = professor !== 'Not Assigned' ? rateMyProfessorService.getProfessorRMPUrl(professor) : null;
 
         return `
             <div
@@ -974,7 +975,7 @@ export class ComponentSelectionWizard {
                 </div>
                 <div class="section-card-location">${location}</div>
                 <div class="section-card-professor">
-                    ${professor}
+                    ${rmpUrl ? `<a href="${rmpUrl}" target="_blank" rel="noopener noreferrer" class="professor-link">${professor}</a>` : professor}
                     ${rmpData ? this.renderRMPBadge(rmpData) : ''}
                 </div>
                 <div class="section-card-footer">

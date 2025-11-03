@@ -2,6 +2,7 @@ import { Course, Department, Section } from '../../types/types'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { CourseFilterService } from '../../services/CourseFilterService'
 import { CourseDataService } from '../../services/courseDataService'
+import { rateMyProfessorService } from '../../services/RateMyProfessorService'
 import { ProgressiveRenderer, ProgressiveRenderOptions } from '../utils/ProgressiveRenderer'
 import { CancellationToken } from '../../utils/RequestCancellation'
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
@@ -694,6 +695,7 @@ export class CourseController {
         const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
         const location = period?.location || 'TBA';
         const professor = period?.professor || 'Not Assigned';
+        const rmpUrl = professor !== 'Not Assigned' ? rateMyProfessorService.getProfessorRMPUrl(professor) : null;
 
         return `
             <div class="section-card">
@@ -707,7 +709,7 @@ export class CourseController {
                         <strong>${days}</strong> ${time}
                     </div>
                     <div class="section-location">${location}</div>
-                    <div class="section-professor">${professor}</div>
+                    <div class="section-professor">${rmpUrl ? `<a href="${rmpUrl}" target="_blank" rel="noopener noreferrer" class="professor-link">${professor}</a>` : professor}</div>
                     <div class="section-seats">
                         Seats: ${section.seatsAvailable}/${section.seats}
                         ${section.actualWaitlist > 0 ? `(Waitlist: ${section.actualWaitlist}/${section.maxWaitlist})` : ''}
