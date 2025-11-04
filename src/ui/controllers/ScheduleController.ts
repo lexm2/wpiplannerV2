@@ -233,8 +233,8 @@ export class ScheduleController {
         const selectedCoursesContainer = document.getElementById('schedule-selected-courses');
         const countElement = document.getElementById('schedule-selected-count');
 
-        if (!selectedCoursesContainer || !countElement) {
-            console.log('❌ Missing DOM elements - selectedCoursesContainer or countElement not found');
+        if (!selectedCoursesContainer) {
+            console.log('❌ Missing DOM element - selectedCoursesContainer not found');
             return;
         }
 
@@ -252,7 +252,9 @@ export class ScheduleController {
         
         if (selectedCourses.length === 0) {
             console.log('Early return: 0 selected courses - displaying empty state');
-            countElement.textContent = '(0)';
+            if (countElement) {
+                countElement.textContent = '(0)';
+            }
 
             // Preserve wizard if open
             const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
@@ -265,7 +267,9 @@ export class ScheduleController {
 
         if (hasActiveFilters && filteredSections.length === 0) {
             console.log('Early return: 0 sections match active filters - displaying empty state');
-            countElement.textContent = '(0 sections match filters)';
+            if (countElement) {
+                countElement.textContent = '(0 sections match filters)';
+            }
 
             // Preserve wizard if open
             const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
@@ -283,8 +287,10 @@ export class ScheduleController {
             html = this.buildFilteredSectionsHTML(filteredSections, selectedCourses);
 
             // Update count to show section matches
-            const uniqueCourses = new Set(filteredSections.map(fs => fs.course.course.id)).size;
-            countElement.textContent = `(${filteredSections.length} sections in ${uniqueCourses} courses)`;
+            if (countElement) {
+                const uniqueCourses = new Set(filteredSections.map(fs => fs.course.course.id)).size;
+                countElement.textContent = `(${filteredSections.length} sections in ${uniqueCourses} courses)`;
+            }
         } else {
             // Display all courses normally when no filters are active
             const sortedCourses = selectedCourses.sort((a, b) => {
@@ -294,7 +300,9 @@ export class ScheduleController {
             });
 
             html = this.buildAllCoursesHTML(sortedCourses);
-            countElement.textContent = `(${selectedCourses.length})`;
+            if (countElement) {
+                countElement.textContent = `(${selectedCourses.length})`;
+            }
         }
 
         // Check if wizard is open before wiping innerHTML

@@ -9,7 +9,7 @@
 
 .schedule-page-layout {
   display: grid;
-  grid-template-columns: 37.5rem 1fr; /* 600px equivalent - wider for wizard integration */
+  grid-template-columns: 25rem 1fr;
   height: 100%;
   gap: 0;
   overflow: hidden;
@@ -25,20 +25,13 @@
 }
 
 .schedule-sidebar-header {
-  padding: 1.5rem 1.5rem 1rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
 }
 
 .schedule-selector-container {
   margin-bottom: 1rem;
-}
-
-.schedule-sidebar-header h2 {
-  font-size: 1.25rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
-  margin: 0;
 }
 
 .schedule-filter-controls {
@@ -789,4 +782,21 @@
   color: var(--color-text-secondary);
   font-style: italic;
   font-size: 0.8rem;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1024px) {
+  .schedule-page-layout {
+    grid-template-columns: 20rem 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .schedule-page-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-sidebar {
+    display: none;
+  }
 }
