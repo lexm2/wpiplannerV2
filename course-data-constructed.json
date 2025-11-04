@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 4, 2025, 7:49 PM",
+  "generated": "Nov 4, 2025, 8:18 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -242736,7 +242736,7 @@
                 "number": "C03",
                 "seats": 25,
                 "seats_available": 1,
-                "actual_waitlist": 7,
+                "actual_waitlist": 6,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "WPE 1612 Introductory Yoga Cat. I (1/12 unit) This yoga class focuses on connecting the mind, body, and spirit through an awareness of breath. Participating in yoga can improve core strength, flexibility, balance, mindfulness, and relaxation and decrease stress. Those with any level of yoga experience (including first timers) are welcome.",
@@ -242755,7 +242755,7 @@
                     "room": "Recreation Center Dance",
                     "seats": 25,
                     "seats_available": 1,
-                    "actual_waitlist": 7,
+                    "actual_waitlist": 6,
                     "max_waitlist": 10,
                     "specific_section": "C03",
                     "days": [
