@@ -201,13 +201,6 @@ export class ComponentSelectionWizard {
 
                 sections = validLectures.map(lg => lg.section);
 
-                // Apply reverse filtering if discussion or lab is selected
-                if (this.selections.discussion || this.selections.lab) {
-                    console.log(`[Wizard] Applying reverse filter based on selected child components`);
-                    sections = this.filterLecturesByChildSelections(sections);
-                    console.log(`[Wizard] After reverse filtering: ${sections.length} compatible lectures`);
-                }
-
                 console.log(`[Wizard] Before filters: ${sections.length} lecture sections`);
             }
         } else if (step === 'discussion') {
@@ -442,6 +435,9 @@ export class ComponentSelectionWizard {
         }
 
         this.container = sidebarContainer;
+
+        // Scroll container to top so wizard is visible in viewport
+        sidebarContainer.scrollTop = 0;
 
         // Prevent background scrolling
         sidebarContainer.classList.add('wizard-active');
