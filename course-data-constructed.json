@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 4, 2025, 2:44 PM",
+  "generated": "Nov 4, 2025, 2:55 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -75836,7 +75836,7 @@
                 "crn": 337554,
                 "number": "D02 - PRAC IN HUA: Nature, Design & Art",
                 "seats": 12,
-                "seats_available": 1,
+                "seats_available": 0,
                 "actual_waitlist": 0,
                 "max_waitlist": 0,
                 "note": null,
@@ -75855,7 +75855,7 @@
                     "building": "",
                     "room": "Salisbury Labs 226 HUA Seminar Room",
                     "seats": 12,
-                    "seats_available": 1,
+                    "seats_available": 0,
                     "actual_waitlist": 0,
                     "max_waitlist": 0,
                     "specific_section": "D02 - PRAC IN HUA: Nature, Design & Art",
