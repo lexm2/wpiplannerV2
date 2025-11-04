@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 4, 2025, 2:16 PM",
+  "generated": "Nov 4, 2025, 2:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -234413,7 +234413,7 @@
                 "crn": 334712,
                 "number": "B01",
                 "seats": 30,
-                "seats_available": 2,
+                "seats_available": 1,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -234432,7 +234432,7 @@
                     "building": "",
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
-                    "seats_available": 2,
+                    "seats_available": 1,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "B01",
