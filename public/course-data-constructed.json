@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 4, 2025, 9:52 AM",
+  "generated": "Nov 4, 2025, 10:19 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -223831,7 +223831,7 @@
                 "number": "CL01",
                 "seats": 80,
                 "seats_available": 0,
-                "actual_waitlist": 5,
+                "actual_waitlist": 4,
                 "max_waitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4409",
                 "description": "RBE 2001: Unified Robotics I: Mechanical Applications in Robotics (Units: 1/3, Cat. I) This course focuses on mechanical concepts in the design, construction, and actuation of a robot. Topics include the effective conversion of electrical power to mechanical power, power transmission and control for locomotion and payload manipulation, and the application of kinematic principles for the design of planar manipulators. The course will present the physical operation and common robotic applications of different types of actuators, including solenoids, electrical motors, and pneumatic, hydraulic, and soft actuators. The course will address the design of mechanical systems for a robot to meet requirements including chassis strength, durability, reliability, and robustness. gripper Laboratory sessions consist of hands-on exercises and team projects where students design and test mechanical systems for specific tasks. Recommended background: Knowledge of Embedded Systems, such as covered in ECE 2049. Knowledge of statics, such as covered in ES 2501. Ability to use CAD to design parts, such as found in ES 1310.",
@@ -223850,7 +223850,7 @@
                     "room": "Unity Hall 520",
                     "seats": 80,
                     "seats_available": 0,
-                    "actual_waitlist": 5,
+                    "actual_waitlist": 4,
                     "max_waitlist": 10,
                     "specific_section": "CL01",
                     "days": [
@@ -243286,8 +243286,8 @@
                 "crn": 337403,
                 "number": "D01 - ST in Holistic Well-Being: Exploring the Impact of Nutrition on Brain, Body and Planet",
                 "seats": 20,
-                "seats_available": 0,
-                "actual_waitlist": 1,
+                "seats_available": 1,
+                "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "WPE 1699 Special Topics in Holistic Well-Being, Cat. I (1/12 unit) This course provides an opportunity for students to learn about a special topic in holistic wellbeing. The topics are subject to change on a rotating basis to provide flexibility in the offerings based upon student interest and the latest practice and science of well-being.",
@@ -243305,8 +243305,8 @@
                     "building": "",
                     "room": "Daniels Hall 102E",
                     "seats": 20,
-                    "seats_available": 0,
-                    "actual_waitlist": 1,
+                    "seats_available": 1,
+                    "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "D01 - ST in Holistic Well-Being: Exploring the Impact of Nutrition on Brain, Body and Planet",
                     "days": [
