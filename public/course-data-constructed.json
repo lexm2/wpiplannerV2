@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 4, 2025, 10:14 PM",
+  "generated": "Nov 4, 2025, 10:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -161871,7 +161871,7 @@
                 "number": "S02",
                 "seats": 30,
                 "seats_available": 17,
-                "actual_waitlist": 0,
+                "actual_waitlist": 1,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "This course is an introduction to statistics for graduate students in engineering and the sciences. Topics covered include basic data analysis, issues in the design of studies, an introduction to probability, point and interval estimation and hypothesis testing for means and proportions from one and two samples, simple and multiple regression, analysis of one and two-way tables, one-way analysis of variance. As time permits, additional topics, such as distribution-free methods and the design and analysis of factorial studies will be considered. (Prerequisites: Integral and differential calculus.)",
@@ -161890,7 +161890,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seats_available": 17,
-                    "actual_waitlist": 0,
+                    "actual_waitlist": 1,
                     "max_waitlist": 10,
                     "specific_section": "S02",
                     "days": []
