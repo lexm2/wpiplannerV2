@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 4, 2025, 6:23 PM",
+  "generated": "Nov 4, 2025, 6:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -169074,7 +169074,7 @@
                 "crn": 334945,
                 "number": "B01",
                 "seats": 140,
-                "seats_available": 36,
+                "seats_available": 35,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -169093,7 +169093,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 140,
-                    "seats_available": 36,
+                    "seats_available": 35,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "B01",
