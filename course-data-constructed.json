@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 4, 2025, 6:51 AM",
+  "generated": "Nov 4, 2025, 7:15 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -225049,7 +225049,7 @@
                 "crn": 345620,
                 "number": "CL01",
                 "seats": 60,
-                "seats_available": 18,
+                "seats_available": 17,
                 "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4958",
@@ -225068,7 +225068,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 60,
-                    "seats_available": 18,
+                    "seats_available": 17,
                     "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "CL01",
@@ -225087,7 +225087,7 @@
                   "crn": 345543,
                   "number": "CX01",
                   "seats": 30,
-                  "seats_available": 18,
+                  "seats_available": 17,
                   "actual_waitlist": 0,
                   "max_waitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4958",
@@ -225106,7 +225106,7 @@
                       "building": "",
                       "room": "Atwater Kent 120D Robotics Lab",
                       "seats": 30,
-                      "seats_available": 18,
+                      "seats_available": 17,
                       "actual_waitlist": 0,
                       "max_waitlist": 0,
                       "specific_section": "CX01",
