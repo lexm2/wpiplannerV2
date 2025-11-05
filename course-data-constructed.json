@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 5, 2025, 9:15 PM",
+  "generated": "Nov 5, 2025, 9:30 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -42445,7 +42445,7 @@
                 "crn": 336929,
                 "number": "D01",
                 "seats": 125,
-                "seats_available": 97,
+                "seats_available": 96,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -42464,7 +42464,7 @@
                     "building": "",
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "seats": 125,
-                    "seats_available": 97,
+                    "seats_available": 96,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "D01",
@@ -44249,8 +44249,8 @@
                 "crn": 336386,
                 "number": "C01",
                 "seats": 100,
-                "seats_available": 18,
-                "actual_waitlist": 1,
+                "seats_available": 17,
+                "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
                 "description": "Cat. IThis course introduces the theoretical foundations of computer science. These form the basis for a more complete understanding of the proficiency in computer science.Topics include computational models, formal languages, and an introduction to compatibility and complexity theory, including NP-completeness.Students will be expected to complete a variety of exercises and proofs.Undergraduate credit may not be earned both for this course and for CS 5003.Recommended Background: Discrete mathematics (CS 2022 or equivalent) and algorithms (CS 2223 or equivalent).Students who have credit for CS 4121 may not receive credit for CS 3133.",
@@ -44268,8 +44268,8 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 100,
-                    "seats_available": 18,
-                    "actual_waitlist": 1,
+                    "seats_available": 17,
+                    "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "C01",
                     "days": [
