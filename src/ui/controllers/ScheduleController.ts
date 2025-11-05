@@ -10,6 +10,8 @@ import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard
 import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/ConflictDetector'
 import { getComputedTerm, validateSelectedCourses } from '../../utils/typeGuards'
+import { AutoScheduler } from '../../services/AutoScheduler'
+import { ICONS } from '../../utils/iconPaths'
 
 interface WizardSelections {
     lecture: Section | null;
@@ -1238,6 +1240,81 @@ export class ScheduleController {
         termGraphs.forEach(graph => {
             graph.classList.remove('focused-term');
         });
+    }
+
+    setupAutoScheduleButton(): void {
+        const autoScheduleBtn = document.getElementById('auto-schedule-btn');
+        if (!autoScheduleBtn) {
+            console.warn('Auto-schedule button not found');
+            return;
+        }
+
+        autoScheduleBtn.addEventListener('click', () => this.handleAutoSchedule());
+    }
+
+    private async handleAutoSchedule(): Promise<void> {
+        if (!this.scheduleFilterService) {
+            alert('Filter service not available. Please try again.');
+            return;
+        }
+
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+
+        if (selectedCourses.length === 0) {
+            alert('No courses selected. Please select courses first.');
+            return;
+        }
+
+        const autoScheduleBtn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
+        if (autoScheduleBtn) {
+            autoScheduleBtn.disabled = true;
+            autoScheduleBtn.textContent = 'Generating...';
+        }
+
+        try {
+            const autoScheduler = new AutoScheduler(this.scheduleFilterService);
+            const schedule = autoScheduler.generateSchedule(selectedCourses);
+
+            if (!schedule) {
+                alert('Could not generate a valid schedule. Try adjusting your filters or course selections.');
+                return;
+            }
+
+            let autoFilledCount = 0;
+            let lockedCount = 0;
+
+            for (const result of schedule) {
+                if (result.isLocked) {
+                    lockedCount++;
+                    continue;
+                }
+
+                await this.courseSelectionService.setSelectedComponents(
+                    result.course,
+                    result.combination.lecture,
+                    result.combination.discussion,
+                    result.combination.lab
+                );
+                autoFilledCount++;
+            }
+
+            this.displayScheduleSelectedCourses();
+            this.renderScheduleGrids();
+
+            let message = `Successfully generated schedule!`;
+            if (lockedCount > 0) {
+                message += ` (${autoFilledCount} courses auto-filled, ${lockedCount} already selected)`;
+            }
+            console.log(message);
+        } catch (error) {
+            console.error('Error generating schedule:', error);
+            alert('An error occurred while generating the schedule. Please try again.');
+        } finally {
+            if (autoScheduleBtn) {
+                autoScheduleBtn.disabled = false;
+                autoScheduleBtn.innerHTML = `<img src="${ICONS.WAND}" alt="Auto-schedule" class="auto-schedule-icon" /><span>Auto-Schedule</span>`;
+            }
+        }
     }
 
 }

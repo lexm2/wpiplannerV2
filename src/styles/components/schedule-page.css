@@ -86,11 +86,44 @@
   overflow-y: hidden;
 }
 
+.schedule-selected-courses.wizard-active ~ .schedule-selected-courses-footer {
+  display: none;
+}
+
 .schedule-selected-courses .empty-state {
   color: var(--color-text-secondary);
   font-style: italic;
   text-align: center;
   margin-top: 2rem;
+}
+
+/* Auto-schedule footer */
+.schedule-selected-courses-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-background-alt);
+  flex-shrink: 0;
+}
+
+.auto-schedule-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.auto-schedule-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auto-schedule-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 
 /* Schedule course items with sections */

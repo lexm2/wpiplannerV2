@@ -1,7 +1,15 @@
 /**
- * Centralized icon path constants for type-safe static asset references.
- * All icons are served statically from the public/icons/ directory.
+ * Centralized icon path constants for type-safe asset references.
+ * Icons are imported from src/assets/icons/ and Vite handles base path resolution.
  */
+
+import filterIcon from '../assets/icons/filter.svg?url';
+import filterFilledIcon from '../assets/icons/filter-filled.svg?url';
+import fileExportIcon from '../assets/icons/file-export.svg?url';
+import downloadIcon from '../assets/icons/download.svg?url';
+import alertCircleIcon from '../assets/icons/alert-circle.svg?url';
+import adjustmentsAltIcon from '../assets/icons/adjustments-alt.svg?url';
+import wandIcon from '../assets/icons/wand.svg?url';
 
 export type IconName =
   | 'FILTER'
@@ -13,7 +21,7 @@ export type IconName =
   | 'WAND';
 
 /**
- * Icon paths for static SVG assets.
+ * Icon paths for SVG assets with Vite base path resolution.
  *
  * Available icons:
  * - FILTER: Outline filter icon (24x24)
@@ -25,11 +33,11 @@ export type IconName =
  * - WAND: Magic wand icon (24x24)
  */
 export const ICONS: Record<IconName, string> = {
-  FILTER: '/icons/filter.svg',
-  FILTER_FILLED: '/icons/filter-filled.svg',
-  FILE_EXPORT: '/icons/file-export.svg',
-  DOWNLOAD: '/icons/download.svg',
-  ALERT_CIRCLE: '/icons/alert-circle.svg',
-  ADJUSTMENTS_ALT: '/icons/adjustments-alt.svg',
-  WAND: '/icons/wand.svg',
+  FILTER: filterIcon,
+  FILTER_FILLED: filterFilledIcon,
+  FILE_EXPORT: fileExportIcon,
+  DOWNLOAD: downloadIcon,
+  ALERT_CIRCLE: alertCircleIcon,
+  ADJUSTMENTS_ALT: adjustmentsAltIcon,
+  WAND: wandIcon,
 } as const;
