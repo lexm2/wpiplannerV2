@@ -804,7 +804,7 @@ export class CourseController {
                         <div class="selected-course-credits">${credits}</div>
                     </div>
                     <button class="course-remove-btn" title="Remove from selection">
-                        ${getInlineSVG('X', 'x-icon')}
+                        ${getInlineSVG('TRASH', 'trash-icon')}
                     </button>
                 </div>
             `;

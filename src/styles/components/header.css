@@ -127,7 +127,8 @@
 
 /* Override icon colors for schedule page buttons in header-controls */
 .header-controls .course-clear-sections-btn:hover .eraser-icon,
-.header-controls .course-remove-btn:hover .x-icon {
+.header-controls .course-remove-btn:hover .x-icon,
+.header-controls .course-remove-btn:hover .trash-icon {
   color: var(--color-text) !important;
   opacity: 1;
 }

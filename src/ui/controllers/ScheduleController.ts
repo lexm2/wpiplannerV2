@@ -421,7 +421,7 @@ export class ScheduleController {
                             ${getInlineSVG('ERASER', 'eraser-icon')}
                         </button>
                         <button class="course-remove-btn" title="Remove from selection">
-                            ${getInlineSVG('X', 'x-icon')}
+                            ${getInlineSVG('TRASH', 'trash-icon')}
                         </button>
                     </div>
                 </div>

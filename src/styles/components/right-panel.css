@@ -162,7 +162,8 @@
   border-color: var(--color-danger);
 }
 
-.x-icon {
+.x-icon,
+.trash-icon {
   width: 16px;
   height: 16px;
   display: block;
@@ -172,7 +173,8 @@
   opacity: 0.7;
 }
 
-.course-remove-btn:hover .x-icon {
+.course-remove-btn:hover .x-icon,
+.course-remove-btn:hover .trash-icon {
   opacity: 1;
   color: var(--color-danger);
 }
