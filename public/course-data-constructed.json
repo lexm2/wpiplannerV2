@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 5, 2025, 12:33 PM",
+  "generated": "Nov 5, 2025, 1:20 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -69769,44 +69769,6 @@
             },
             {
               "section": {
-                "crn": 336797,
-                "number": "C01 - Topics In International Politics",
-                "seats": 56,
-                "seats_available": 45,
-                "actual_waitlist": 0,
-                "max_waitlist": 15,
-                "note": null,
-                "description": "Cat. II GOV 1320 is a survey course designed to introduce students to the basic concepts of international relations: power and influence, nations and states, sovereignty and law. These concepts will be explored through the study of issues such as diplomacy and its uses, theories of collective security and conflict, and international order and development. The study of international organizations such as the UN, the European Union or the Organization of American States will also supplement the students’ understanding of the basic concepts. The course may also include comparative political analysis of states or regions. It is designed to provide the basic background materials for students who wish to complete IQPs on topics that involve international relations or comparative political systems. This course will be offered in 2019-20, and in alternating years thereafter.",
-                "term": "202201",
-                "computedTerm": "C",
-                "is_gps": true,
-                "is_interest_list": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "start_time": "11:00",
-                    "end_time": "12:50",
-                    "location": "Innovation Studio 205 Active Learning Classroom North",
-                    "building": "",
-                    "room": "Innovation Studio 205 Active Learning Classroom North",
-                    "seats": 56,
-                    "seats_available": 45,
-                    "actual_waitlist": 0,
-                    "max_waitlist": 15,
-                    "specific_section": "C01 - Topics In International Politics",
-                    "days": [
-                      "T",
-                      "F"
-                    ]
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
                 "crn": 337222,
                 "number": "D01 - Topics In International Politics: Law, International NGOs, and Human Rights",
                 "seats": 50,
@@ -69977,54 +69939,6 @@
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "B01",
-                    "days": [
-                      "M",
-                      "R"
-                    ]
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "GOV-2313",
-          "number": "2313",
-          "name": "Intellectual Property Law",
-          "description": "Cat. II Intellectual property includes ideas, and the works of inventors, authors, composers and other creative people. Patents, copyrights and trademarks establish legal rights in intellectual property. Alternatively, control over the use of an idea might be maintained by treating it as a trade secret. In these ways, the ideas of inventors and creators are protected and others are prohibited from appropriating the ideas and creative works of others. This course addresses the concept of intellectual property and the public policies that support the law of patent, copyright and trademark. Subjects include the process of obtaining patents, trademarks and copyrights; requirements of originality and, for patents, utility; infringement issues; and the problems posed by international trade and efforts to address them through the World Intellectual Property Organization. Recommended background: GOV 1310 or GOV 2310. This course will be offered in 2019-20, and in alternating years thereafter.",
-          "min_credits": 3,
-          "max_credits": 3,
-          "lectures": [
-            {
-              "section": {
-                "crn": 337255,
-                "number": "D01",
-                "seats": 50,
-                "seats_available": 41,
-                "actual_waitlist": 0,
-                "max_waitlist": 15,
-                "note": null,
-                "description": "Cat. II Intellectual property includes ideas, and the works of inventors, authors, composers and other creative people. Patents, copyrights and trademarks establish legal rights in intellectual property. Alternatively, control over the use of an idea might be maintained by treating it as a trade secret. In these ways, the ideas of inventors and creators are protected and others are prohibited from appropriating the ideas and creative works of others. This course addresses the concept of intellectual property and the public policies that support the law of patent, copyright and trademark. Subjects include the process of obtaining patents, trademarks and copyrights; requirements of originality and, for patents, utility; infringement issues; and the problems posed by international trade and efforts to address them through the World Intellectual Property Organization. Recommended background: GOV 1310 or GOV 2310. This course will be offered in 2019-20, and in alternating years thereafter.",
-                "term": "202201",
-                "computedTerm": "D",
-                "is_gps": false,
-                "is_interest_list": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Michelle Rosenberg",
-                    "start_time": "12:00",
-                    "end_time": "13:50",
-                    "location": "Salisbury Labs 402",
-                    "building": "",
-                    "room": "Salisbury Labs 402",
-                    "seats": 50,
-                    "seats_available": 41,
-                    "actual_waitlist": 0,
-                    "max_waitlist": 15,
-                    "specific_section": "D01",
                     "days": [
                       "M",
                       "R"
@@ -238990,7 +238904,7 @@
                 "crn": 336282,
                 "number": "C01",
                 "seats": 15,
-                "seats_available": 8,
+                "seats_available": 7,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -239009,7 +238923,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 15,
-                    "seats_available": 8,
+                    "seats_available": 7,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C01",
