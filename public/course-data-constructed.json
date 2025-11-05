@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 5, 2025, 6:48 PM",
+  "generated": "Nov 5, 2025, 7:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -57222,7 +57222,7 @@
                 "crn": 337614,
                 "number": "S01",
                 "seats": 40,
-                "seats_available": 15,
+                "seats_available": 14,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -57241,7 +57241,7 @@
                     "building": "",
                     "room": "Atwater Kent 233",
                     "seats": 40,
-                    "seats_available": 15,
+                    "seats_available": 14,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01",
@@ -57269,7 +57269,7 @@
                 "crn": 353659,
                 "number": "S01",
                 "seats": 25,
-                "seats_available": 25,
+                "seats_available": 24,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -57288,7 +57288,7 @@
                     "building": "",
                     "room": "Unity Hall 405",
                     "seats": 25,
-                    "seats_available": 25,
+                    "seats_available": 24,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01",
