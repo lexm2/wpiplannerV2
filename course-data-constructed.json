@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 5, 2025, 3:52 PM",
+  "generated": "Nov 5, 2025, 4:21 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -169062,7 +169062,7 @@
                 "crn": 337381,
                 "number": "D01",
                 "seats": 140,
-                "seats_available": 94,
+                "seats_available": 93,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -169081,7 +169081,7 @@
                     "building": "",
                     "room": "Olin Hall 107",
                     "seats": 140,
-                    "seats_available": 94,
+                    "seats_available": 93,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "D01",
