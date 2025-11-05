@@ -1,18 +1,23 @@
 import { Course, Section, Period, Department } from '../types/types'
 import { Schedule, SelectedCourse, SchedulePreferences } from '../types/schedule'
+import { getAllSections } from './courseUtils'
 
 export class Validators {
     static isValidCourse(course: any): course is Course {
-        return course &&
-            typeof course.id === 'string' &&
-            typeof course.number === 'string' &&
-            typeof course.name === 'string' &&
-            typeof course.description === 'string' &&
-            this.isValidDepartment(course.department) &&
-            Array.isArray(course.sections) &&
-            course.sections.every((s: any) => this.isValidSection(s)) &&
-            typeof course.minCredits === 'number' &&
-            typeof course.maxCredits === 'number';
+        if (!course ||
+            typeof course.id !== 'string' ||
+            typeof course.number !== 'string' ||
+            typeof course.name !== 'string' ||
+            typeof course.description !== 'string' ||
+            !this.isValidDepartment(course.department) ||
+            typeof course.minCredits !== 'number' ||
+            typeof course.maxCredits !== 'number') {
+            return false;
+        }
+
+        // Validate sections from hierarchical structure
+        const sections = getAllSections(course);
+        return sections.every((s: any) => this.isValidSection(s));
     }
 
     static isValidDepartment(department: any): department is Department {
@@ -102,18 +107,7 @@ export class Validators {
             return {
                 ...course,
                 name: this.sanitizeString(course.name),
-                description: this.sanitizeString(course.description),
-                sections: course.sections?.map((section: Section) => ({
-                    ...section,
-                    description: this.sanitizeString(section.description),
-                    periods: section.periods.map((period: Period) => ({
-                        ...period,
-                        professor: this.sanitizeString(period.professor),
-                        location: this.sanitizeString(period.location),
-                        building: this.sanitizeString(period.building),
-                        room: this.sanitizeString(period.room)
-                    }))
-                }))
+                description: this.sanitizeString(course.description)
             };
         } catch (error) {
             console.warn('Error sanitizing course data:', error);

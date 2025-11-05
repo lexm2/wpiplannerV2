@@ -1,6 +1,7 @@
 import { Schedule, SchedulePreferences, SelectedCourse } from '../types/schedule'
 import { Course, Section, Department } from '../types/types'
 import { TransactionalStorageManager, TransactionResult } from './TransactionalStorageManager'
+import { getAllSections } from '../utils/courseUtils'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -680,7 +681,8 @@ export class ProfileStateManager {
             const resolveSection = (section: Section | null): Section | null => {
                 if (!section || !liveCourse) return null;
 
-                const liveSection = liveCourse.sections.find(s => s.crn === section.crn);
+                const allSections = getAllSections(liveCourse);
+                const liveSection = allSections.find((s: Section) => s.crn === section.crn);
                 if (!liveSection) {
                     console.warn(`⚠️ Section CRN ${section.crn} not found for course ${courseId}`);
                     return null;

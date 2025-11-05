@@ -9,6 +9,7 @@
 import { Course } from '../../types/types';
 import { CourseFilter, RMPRatingFilterCriteria } from '../../types/filters';
 import { RateMyProfessorService } from '../../services/RateMyProfessorService';
+import { getAllSections } from '../../utils/courseUtils';
 
 export class RMPRatingFilter implements CourseFilter {
     readonly id = 'rmpRating';
@@ -36,7 +37,8 @@ export class RMPRatingFilter implements CourseFilter {
 
         return courses.filter(course => {
             // Check if any section has a professor that meets the criteria
-            const hasQualifyingSection = course.sections?.some(section => {
+            const sections = getAllSections(course);
+            const hasQualifyingSection = sections.some(section => {
                 // Check all periods in the section
                 return section.periods.some(period => {
                     // Skip if no professor assigned
@@ -85,7 +87,7 @@ export class RMPRatingFilter implements CourseFilter {
                     // All criteria passed
                     return true;
                 });
-            }) ?? false;
+            });
 
             return hasQualifyingSection;
         });

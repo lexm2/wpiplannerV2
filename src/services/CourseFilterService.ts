@@ -2,6 +2,7 @@ import { Course } from '../types/types';
 import { CourseFilter, FilterEventListener, ActiveFilter } from '../types/filters';
 import { FilterState } from '../core/FilterState';
 import { SearchService } from './searchService';
+import { getAllSections } from '../utils/courseUtils';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -403,7 +404,8 @@ export class CourseFilterService {
     private getTermOptions(courses: Course[]): string[] {
         const terms = new Set<string>();
         courses.forEach(course => {
-            course.sections?.forEach(section => {
+            const sections = getAllSections(course);
+            sections.forEach(section => {
                 if (section.computedTerm) {
                     terms.add(section.computedTerm);
                 }

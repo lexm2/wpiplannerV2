@@ -728,6 +728,8 @@ export class ScheduleController {
                 selectedLecture: this.wizardPreviewSelections.lecture,
                 selectedDiscussion: this.wizardPreviewSelections.discussion,
                 selectedLab: this.wizardPreviewSelections.lab,
+                selectedSection: this.wizardPreviewSelections.lecture,
+                selectedSectionNumber: this.wizardPreviewSelections.lecture?.number || null,
                 isRequired: false
             });
         }
@@ -776,9 +778,7 @@ export class ScheduleController {
             });
             
             if (termCourses.length === 0) {
-                // Check if there are selected courses without sections for better messaging
-                const coursesWithoutSections = selectedCourses.filter(sc => !sc.selectedSection);
-                this.renderEmptyGrid(gridContainer, term, coursesWithoutSections.length > 0);
+                this.renderEmptyGrid(gridContainer);
                 return;
             }
             
@@ -787,7 +787,7 @@ export class ScheduleController {
         
     }
 
-    private renderEmptyGrid(container: HTMLElement, term: string, hasCoursesWithoutSections: boolean = false): void {
+    private renderEmptyGrid(container: HTMLElement): void {
         container.innerHTML = '';
         container.classList.add('empty');
     }

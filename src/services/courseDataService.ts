@@ -1,4 +1,5 @@
 import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek } from '../types/types'
+import { getAllSections } from '../utils/courseUtils'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -282,22 +283,14 @@ export class CourseDataService {
                     ? this.parseConstructedSections(courseData.standaloneLabs)
                     : undefined;
 
-                // Parse OLD flat structure for backward compatibility
-                const sections = courseData.sections
-                    ? this.parseConstructedSections(courseData.sections)
-                    : this.flattenLectureGroups(lectures, standaloneLabs);
-
                 const course: Course = {
                     id: courseId,
                     number: courseData.number,
                     name: courseData.name,
                     description: this.stripHtml(courseData.description || ''),
                     department: department,
-                    // NEW hierarchical structure
                     lectures: lectures.length > 0 ? lectures : undefined,
                     standaloneLabs: standaloneLabs,
-                    // DEPRECATED: Maintain for backward compatibility
-                    sections: sections,
                     minCredits: courseData.min_credits || 0,
                     maxCredits: courseData.max_credits || 0
                 };
@@ -364,31 +357,6 @@ export class CourseDataService {
         });
     }
 
-    /**
-     * Flattens lecture groups into a flat sections array for backward compatibility
-     * Combines all sections from lectures, discussions, and labs into one array
-     */
-    private flattenLectureGroups(
-        lectures: import('../types/types').LectureGroup[],
-        standaloneLabs: Section[] | undefined
-    ): Section[] {
-        const sections: Section[] = [];
-
-        // Add all lecture sections and their compatible components
-        for (const lectureGroup of lectures) {
-            sections.push(lectureGroup.section);
-            sections.push(...lectureGroup.compatibleDiscussions);
-            sections.push(...lectureGroup.compatibleLabs);
-        }
-
-        // Add standalone labs
-        if (standaloneLabs) {
-            sections.push(...standaloneLabs);
-        }
-
-        return sections;
-    }
-    
     private parseConstructedPeriods(periods: any[]): Period[] {
         return periods.map(periodData => {
             const period: Period = {
@@ -608,7 +576,7 @@ export class CourseDataService {
      * Useful for backward compatibility and general section iteration
      */
     getAllSectionsForCourse(course: Course): Section[] {
-        return course.sections || [];
+        return getAllSections(course);
     }
 
 }

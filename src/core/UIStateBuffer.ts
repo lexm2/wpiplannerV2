@@ -1,6 +1,7 @@
 import { Course, Section } from '../types/types'
 import { SelectedCourse } from '../types/schedule'
 import { ProfileStateManager } from './ProfileStateManager'
+import { getAllSections } from '../utils/courseUtils'
 
 export interface PendingOperation {
     id: string;
@@ -242,7 +243,8 @@ export class UIStateBuffer {
             let sectionObject: Section | null = null;
 
             if (sectionNumber) {
-                sectionObject = course.sections?.find(s => s.number === sectionNumber) || null;
+                const allSections = getAllSections(course);
+                sectionObject = allSections.find(s => s.number === sectionNumber) || null;
                 if (sectionObject && !sectionObject.computedTerm) {
                     console.warn(`Section ${sectionNumber} missing computedTerm property`);
                     sectionObject = null;
@@ -522,9 +524,10 @@ export class UIStateBuffer {
                 const selectedCourse = this.uiState.selectedCourses.find(sc => sc.course.id === sectionCourse.id);
                 if (selectedCourse) {
                     let sectionObject: Section | null = null;
-                    
+
                     if (sectionNumber) {
-                        sectionObject = sectionCourse.sections.find((s: any) => s.number === sectionNumber) || null;
+                        const allSections = getAllSections(sectionCourse);
+                        sectionObject = allSections.find((s: Section) => s.number === sectionNumber) || null;
                         if (sectionObject && !sectionObject.computedTerm) {
                             console.warn(`Section ${sectionNumber} missing computedTerm property`);
                             sectionObject = null;

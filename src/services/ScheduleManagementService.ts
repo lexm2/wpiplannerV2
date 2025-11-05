@@ -1053,10 +1053,6 @@ export class ScheduleManagementService {
         }
     }
 
-    private generateScheduleId(): string {
-        return `schedule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
-
     private generateUniqueScheduleName(baseName: string): string {
         const existingSchedules = this.getAllSchedules();
         const existingNames = new Set(existingSchedules.map(s => s.name));

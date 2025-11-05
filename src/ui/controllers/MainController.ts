@@ -5,6 +5,7 @@ import { ThemeSelector } from '../components/ThemeSelector'
 import { ScheduleSelector } from '../components/ScheduleSelector'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { ConflictDetector } from '../../core/ConflictDetector'
+import { getAllSections } from '../../utils/courseUtils'
 import { ModalService } from '../../services/ModalService'
 import { DepartmentController } from './DepartmentController'
 import { CourseController } from './CourseController'
@@ -501,7 +502,7 @@ export class MainController {
                                             lecturesCount: course.lectures?.length || 0,
                                             hasStandaloneLabs: !!course.standaloneLabs && course.standaloneLabs.length > 0,
                                             standaloneLabs: course.standaloneLabs?.length || 0,
-                                            sectionsCount: course.sections?.length || 0
+                                            sectionsCount: getAllSections(course).length
                                         }
                                     });
                                 }

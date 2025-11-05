@@ -309,8 +309,7 @@ export class ComponentSelectionWizard {
             // Create a temporary course object with ONLY the section being tested
             // This ensures filterSections only evaluates this single section
             const tempCourse: Course = {
-                ...this.course,
-                sections: [section]
+                ...this.course
             };
 
             // Create a temporary SelectedCourse with this section in the appropriate slot
@@ -319,6 +318,8 @@ export class ComponentSelectionWizard {
                 selectedLecture: step === 'lecture' ? section : (this.selections.lecture || null),
                 selectedDiscussion: step === 'discussion' ? section : (this.selections.discussion || null),
                 selectedLab: step === 'lab' ? section : (this.selections.lab || null),
+                selectedSection: step === 'lecture' ? section : (this.selections.lecture || null),
+                selectedSectionNumber: step === 'lecture' ? section.number : (this.selections.lecture?.number || null),
                 isRequired: false
             };
 
@@ -335,13 +336,13 @@ export class ComponentSelectionWizard {
             console.log(`[Wizard Filter] Passing ${allCoursesForFiltering.length} courses to filterSections (1 temp + ${this.allSelectedCourses.length} others)`);
 
             // Test if this section passes the filters
-            const filtered = this.scheduleFilterService.filterSections(allCoursesForFiltering);
-            const passes = filtered.some(item =>
+            const filtered = this.scheduleFilterService?.filterSections(allCoursesForFiltering);
+            const passes = filtered ? filtered.some(item =>
                 item.section.crn === section.crn &&
                 item.course.course.id === this.course.id
-            );
+            ) : true;
 
-            console.log(`[Wizard Filter] Section ${section.number} ${passes ? 'PASSES' : 'FAILS'} filters (filtered: ${filtered.length})`);
+            console.log(`[Wizard Filter] Section ${section.number} ${passes ? 'PASSES' : 'FAILS'} filters (filtered: ${filtered?.length ?? 0})`);
             if (!passes && conflictFilter) {
                 console.log(`[Wizard Filter] Section ${section.number} was FILTERED OUT by conflict detection`);
             }
@@ -387,33 +388,6 @@ export class ComponentSelectionWizard {
         }
 
         return Array.from(allLabs.values());
-    }
-
-    /**
-     * Filter lectures to show only those compatible with selected discussion/lab
-     */
-    private filterLecturesByChildSelections(lectures: Section[]): Section[] {
-        const lectureGroups = this.courseDataService.getLecturesForCourse(this.course);
-
-        // If a discussion is selected, filter to lectures that have this discussion
-        if (this.selections.discussion) {
-            const compatibleLectureGroups = lectureGroups.filter(lg =>
-                lg.compatibleDiscussions.some(d => d.crn === this.selections.discussion!.crn)
-            );
-            const compatibleCRNs = new Set(compatibleLectureGroups.map(lg => lg.section.crn));
-            lectures = lectures.filter(lecture => compatibleCRNs.has(lecture.crn));
-        }
-
-        // If a lab is selected, filter to lectures that have this lab
-        if (this.selections.lab) {
-            const compatibleLectureGroups = lectureGroups.filter(lg =>
-                lg.compatibleLabs.some(l => l.crn === this.selections.lab!.crn)
-            );
-            const compatibleCRNs = new Set(compatibleLectureGroups.map(lg => lg.section.crn));
-            lectures = lectures.filter(lecture => compatibleCRNs.has(lecture.crn));
-        }
-
-        return lectures;
     }
 
     /**

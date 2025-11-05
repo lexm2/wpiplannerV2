@@ -1,5 +1,6 @@
 import { Course } from '../../types/types';
 import { CourseFilter, AvailabilityFilterCriteria } from '../../types/filters';
+import { getAllSections } from '../../utils/courseUtils';
 
 export class AvailabilityFilter implements CourseFilter {
     readonly id = 'availability';
@@ -17,15 +18,16 @@ export class AvailabilityFilter implements CourseFilter {
             ? new Set(termCriteria.terms.map((t: string) => t.toUpperCase()))
             : null;
 
-        return courses.filter(course =>
-            course.sections?.some(section => {
+        return courses.filter(course => {
+            const sections = getAllSections(course);
+            return sections.some(section => {
                 // If term filter is active, only check availability in those specific terms
                 if (activeTerms && !activeTerms.has(section.computedTerm)) {
                     return false;
                 }
                 return section.seatsAvailable > 0;
-            }) ?? false
-        );
+            });
+        });
     }
     
     isValidCriteria(criteria: any): criteria is AvailabilityFilterCriteria {

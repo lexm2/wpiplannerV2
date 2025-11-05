@@ -1,26 +1,28 @@
 import { Course } from '../../types/types';
 import { CourseFilter, TermFilterCriteria } from '../../types/filters';
+import { getAllSections } from '../../utils/courseUtils';
 
 export class TermFilter implements CourseFilter {
     readonly id = 'term';
     readonly name = 'Term';
     readonly description = 'Filter courses by academic term';
     readonly priority = 25;
-    
+
     apply(courses: Course[], criteria: TermFilterCriteria): Course[] {
         if (!criteria.terms || criteria.terms.length === 0) {
             return courses;
         }
-        
+
         const termSet = new Set(
             criteria.terms.map(term => term.toUpperCase())
         );
-        
-        return courses.filter(course =>
-            course.sections?.some(section => {
+
+        return courses.filter(course => {
+            const sections = getAllSections(course);
+            return sections.some(section => {
                 return termSet.has(section.computedTerm);
-            }) ?? false
-        );
+            });
+        });
     }
     
     isValidCriteria(criteria: any): criteria is TermFilterCriteria {

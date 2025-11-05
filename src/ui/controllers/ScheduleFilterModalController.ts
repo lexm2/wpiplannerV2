@@ -2,6 +2,7 @@ import { ModalService } from '../../services/ModalService';
 import { ScheduleFilterService } from '../../services/ScheduleFilterService';
 import { SelectedCourse } from '../../types/schedule';
 import { DualRangeSlider } from '../components/DualRangeSlider';
+import { getAllSections } from '../../utils/courseUtils';
 
 export class ScheduleFilterModalController {
     private modalService: ModalService;
@@ -873,7 +874,8 @@ export class ScheduleFilterModalController {
         const sectionCodes = new Set<string>();
         
         for (const selectedCourse of this.selectedCourses) {
-            for (const section of selectedCourse.course.sections ?? []) {
+            const sections = getAllSections(selectedCourse.course);
+            for (const section of sections) {
                 if (section.number && section.number.trim() !== '') {
                     sectionCodes.add(section.number.trim());
                 }

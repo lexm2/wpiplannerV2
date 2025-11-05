@@ -6,6 +6,7 @@
 
 import { Schedule, SelectedCourse } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';
+import { getAllSections } from './courseUtils';
 
 export interface ICSExportOptions {
     academicYear?: number;
@@ -27,13 +28,13 @@ export class ICSGenerator {
 
     private static dayToICS(day: DayOfWeek): string {
         const mapping: Record<DayOfWeek, string> = {
-            'mon': 'MO',
-            'tue': 'TU',
-            'wed': 'WE',
-            'thu': 'TH',
-            'fri': 'FR',
-            'sat': 'SA',
-            'sun': 'SU'
+            [DayOfWeek.MONDAY]: 'MO',
+            [DayOfWeek.TUESDAY]: 'TU',
+            [DayOfWeek.WEDNESDAY]: 'WE',
+            [DayOfWeek.THURSDAY]: 'TH',
+            [DayOfWeek.FRIDAY]: 'FR',
+            [DayOfWeek.SATURDAY]: 'SA',
+            [DayOfWeek.SUNDAY]: 'SU'
         };
         return mapping[day];
     }
@@ -95,8 +96,13 @@ export class ICSGenerator {
 
     private static findNextDayOfWeek(startDate: Date, targetDay: DayOfWeek): Date {
         const dayMapping: Record<DayOfWeek, number> = {
-            'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3,
-            'thu': 4, 'fri': 5, 'sat': 6
+            [DayOfWeek.SUNDAY]: 0,
+            [DayOfWeek.MONDAY]: 1,
+            [DayOfWeek.TUESDAY]: 2,
+            [DayOfWeek.WEDNESDAY]: 3,
+            [DayOfWeek.THURSDAY]: 4,
+            [DayOfWeek.FRIDAY]: 5,
+            [DayOfWeek.SATURDAY]: 6
         };
 
         const targetDayNum = dayMapping[targetDay];
@@ -235,8 +241,9 @@ END:VTIMEZONE`;
                 continue;
             }
 
-            const section = selectedCourse.course.sections?.find(
-                s => s.number === selectedCourse.selectedSectionNumber
+            const sections = getAllSections(selectedCourse.course);
+            const section = sections.find(
+                (s: Section) => s.number === selectedCourse.selectedSectionNumber
             );
 
             if (!section) {

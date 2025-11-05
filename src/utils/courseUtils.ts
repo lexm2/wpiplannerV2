@@ -3,7 +3,61 @@
  * Helper functions for processing and formatting course data
  */
 
-import { Course } from '../types/types';
+import { Course, Section } from '../types/types';
+
+/**
+ * Flattens hierarchical lecture structure into a single array of all sections
+ * @param course - The course to extract sections from
+ * @returns Array of all sections (lectures, discussions, labs, and standalone labs)
+ */
+export function getAllSections(course: Course): Section[] {
+    const sections: Section[] = [];
+
+    if (course.lectures) {
+        course.lectures.forEach(lectureGroup => {
+            sections.push(lectureGroup.section);
+            sections.push(...lectureGroup.compatibleDiscussions);
+            sections.push(...lectureGroup.compatibleLabs);
+        });
+    }
+
+    if (course.standaloneLabs) {
+        sections.push(...course.standaloneLabs);
+    }
+
+    return sections;
+}
+
+/**
+ * Extracts only lecture sections from a course
+ * @param course - The course to extract lectures from
+ * @returns Array of lecture sections only
+ */
+export function getLectureSections(course: Course): Section[] {
+    if (!course.lectures) return [];
+    return course.lectures.map(lectureGroup => lectureGroup.section);
+}
+
+/**
+ * Extracts all lab sections (from lecture groups and standalone)
+ * @param course - The course to extract labs from
+ * @returns Array of all lab sections
+ */
+export function getLabSections(course: Course): Section[] {
+    const labs: Section[] = [];
+
+    if (course.lectures) {
+        course.lectures.forEach(lectureGroup => {
+            labs.push(...lectureGroup.compatibleLabs);
+        });
+    }
+
+    if (course.standaloneLabs) {
+        labs.push(...course.standaloneLabs);
+    }
+
+    return labs;
+}
 
 /**
  * Extracts and formats professors grouped by term for a course
@@ -14,7 +68,8 @@ export function getProfessorsByTerm(course: Course): string {
     const termProfessors = new Map<string, Set<string>>();
 
     // Aggregate professors by term across all sections
-    course.sections?.forEach(section => {
+    const allSections = getAllSections(course);
+    allSections.forEach(section => {
         const term = section.computedTerm;
 
         // Initialize set for this term if not exists

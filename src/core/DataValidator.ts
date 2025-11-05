@@ -2,20 +2,20 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  * DataValidator - Comprehensive Data Integrity & Quality Validation System
  * ═══════════════════════════════════════════════════════════════════════════════
- * 
+ *
  * ARCHITECTURE ROLE:
  * - Validates course data integrity and format consistency across the application
  * - Ensures data consistency and type safety for all stored and loaded data structures
  * - Handles edge cases in WPI course data and user-generated content
  * - Provides schema validation with automatic repair capabilities
  * - Foundation for data migration and import/export operations
- * 
+ *
  * DEPENDENCIES:
  * - Schedule, SchedulePreferences, SelectedCourse types → Core data models for validation
  * - Course, Section, Department types → Academic data structures requiring validation
  * - UserScheduleState interface → Legacy state model validation
  * - ValidationResult, ValidationError interfaces → Result reporting structures
- * 
+ *
  * USED BY:
  * - ProfileStateManager → Data validation during loading and saving operations
  * - TransactionalStorageManager → Integrity checking before storage operations
@@ -23,7 +23,7 @@
  * - Import/Export functionality → Data validation during data portability operations
  * - ProfileMigrationService → Schema validation during version migrations
  * - Health checking systems → Data consistency verification
- * 
+ *
  * VALIDATION ARCHITECTURE:
  * ```
  * Input Data
@@ -38,7 +38,7 @@
  *     ↓
  * ValidationResult (Errors, Warnings, Repaired Data)
  * ```
- * 
+ *
  * KEY FEATURES:
  * Schema Validation:
  * - validateSchedule() ensures complete schedule data integrity
@@ -47,77 +47,77 @@
  * - validateDepartment() validates department reference consistency
  * - validateSchedulePreferences() validates user preference structures
  * - validateUserScheduleState() validates legacy state formats
- * 
+ *
  * Data Integrity Checking:
  * - checkDataIntegrity() validates cross-reference consistency
  * - Detects dangling references (active schedule ID → non-existent schedule)
  * - Identifies duplicate schedule IDs causing data corruption
  * - Finds orphaned course selections not associated with schedules
  * - Validates referential integrity across related data structures
- * 
+ *
  * Auto-Repair System:
  * - repairSchedule() fixes common schedule data issues
  * - repairSelectedCourse() ensures section selection consistency
  * - SchemaValidationOptions.repairInPlace enables automatic corrections
  * - Graceful degradation with default values for missing fields
  * - Maintains data usability while reporting issues
- * 
+ *
  * Validation Result System:
  * - ValidationResult contains errors, warnings, and validity status
  * - ValidationError provides detailed error information with severity levels
  * - ValidationWarning reports non-critical issues with suggestions
  * - Structured error codes enable programmatic error handling
  * - Field-level error reporting for precise issue identification
- * 
+ *
  * VALIDATION COVERAGE:
  * Schedule Validation:
  * - Required fields (id, name) presence and type checking
  * - selectedCourses array structure and content validation
  * - generatedSchedules array presence and format
  * - Nested validation of all contained course selections
- * 
+ *
  * Course Data Validation:
  * - Course ID, number, name, credits field validation
  * - Department object structure and referential integrity
  * - Sections array presence and format validation
  * - Section-to-course relationship consistency
- * 
+ *
  * Preferences Validation:
  * - preferredTimeRange with logical time ordering
  * - preferredDays Set validation and day name verification
  * - Boolean flag validation (avoidBackToBackClasses)
  * - Time format validation (hours 0-23, minutes 0-59)
- * 
+ *
  * Section Selection Validation:
  * - selectedSection/selectedSectionNumber consistency
  * - Section object completeness and required fields
  * - Course-to-section reference integrity
  * - isRequired boolean field validation
- * 
+ *
  * SCHEMA MIGRATION SUPPORT:
  * - detectSchemaVersion() identifies data format versions
  * - Support for legacy data format compatibility
  * - Version-aware validation with backward compatibility
  * - Migration pathway validation for safe upgrades
- * 
+ *
  * VALIDATION OPTIONS:
  * - allowPartialData: Permits incomplete data for progressive loading
  * - strict: Enforces stricter validation rules for production data
  * - repairInPlace: Enables automatic data repair during validation
  * - Configurable validation behavior for different use cases
- * 
+ *
  * ERROR SEVERITY LEVELS:
  * - 'critical': Data corruption or complete invalidity
  * - 'error': Significant issues preventing normal operation
  * - Warnings: Non-critical issues with suggested improvements
  * - Detailed error codes for programmatic handling
- * 
+ *
  * PERFORMANCE OPTIMIZATIONS:
  * - Batch validation for array data structures
  * - Early termination for critical validation failures
  * - Efficient validation order (required fields first)
  * - Minimal object traversal for performance
- * 
+ *
  * INTEGRATION PATTERNS:
  * Data Loading Flow:
  * 1. Load data from storage
@@ -125,20 +125,20 @@
  * 3. Auto-repair if enabled and issues detected
  * 4. Report warnings/errors to user if necessary
  * 5. Proceed with validated/repaired data
- * 
+ *
  * Data Saving Flow:
  * 1. Validate data before storage operation
  * 2. Ensure data integrity across references
  * 3. Report critical issues preventing save
  * 4. Auto-repair minor issues if configured
- * 
+ *
  * ARCHITECTURAL PATTERNS:
  * - Template Method: Consistent validation workflow across data types
  * - Strategy: Configurable validation behavior via options
  * - Composite: Nested validation for complex data structures
  * - Builder: ValidationResult construction with incremental error addition
  * - Visitor: Traversal of complex data structures for validation
- * 
+ *
  * BENEFITS ACHIEVED:
  * - Prevents data corruption through comprehensive validation
  * - Ensures type safety and data consistency across application
@@ -147,17 +147,18 @@
  * - Provides detailed error reporting for debugging and user feedback
  * - Auto-repair capabilities maintain data usability
  * - Foundation for reliable import/export functionality
- * 
+ *
  * DATA QUALITY ASSURANCE:
  * - Runtime type checking beyond TypeScript compile-time safety
  * - Business rule validation for academic data constraints
  * - Cross-reference integrity validation
  * - Format validation for structured data (time, IDs, etc.)
  * - Consistency validation across related data structures
- * 
+ *
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 import { Schedule, SelectedCourse } from '../types/schedule'
+import { getAllSections } from '../utils/courseUtils'
 
 export interface ValidationResult {
     valid: boolean;
@@ -382,16 +383,9 @@ export class DataValidator {
             }
         }
 
-        // Validate sections array
-        if (!Array.isArray(course.sections)) {
-            result.errors.push({
-                field: 'sections',
-                message: 'Sections must be an array',
-                severity: 'error',
-                code: 'INVALID_ARRAY'
-            });
-            result.valid = false;
-        } else if (course.sections.length === 0) {
+        // Validate sections (hierarchical structure)
+        const allSections = getAllSections(course);
+        if (allSections.length === 0) {
             result.warnings.push({
                 field: 'sections',
                 message: 'Course has no sections',
@@ -679,8 +673,9 @@ export class DataValidator {
 
         // Ensure section consistency
         if (selectedCourse.selectedSectionNumber && !selectedCourse.selectedSection) {
-            // Try to find the section object
-            const section = selectedCourse.course.sections?.find(s => s.number === selectedCourse.selectedSectionNumber);
+            // Try to find the section object from hierarchical structure
+            const allSections = getAllSections(selectedCourse.course);
+            const section = allSections.find(s => s.number === selectedCourse.selectedSectionNumber);
             selectedCourse.selectedSection = section || null;
         }
 

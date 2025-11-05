@@ -15,6 +15,7 @@ import { RequiredStatusFilter } from '../core/filters/RequiredStatusFilter';
 import { SectionStatusFilter } from '../core/filters/SectionStatusFilter';
 import { PeriodRMPRatingFilter } from '../core/filters/PeriodRMPRatingFilter';
 import { RateMyProfessorService } from './RateMyProfessorService';
+import { getAllSections } from '../utils/courseUtils';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -401,17 +402,18 @@ export class ScheduleFilterService {
     // Helper method to extract all sections with their course context
     private getAllSectionsWithContext(selectedCourses: SelectedCourse[]): Array<{course: SelectedCourse, section: Section}> {
         const sectionsWithContext: Array<{course: SelectedCourse, section: Section}> = [];
-        
+
         for (const selectedCourse of selectedCourses) {
             // Get all sections for this course
-            for (const section of selectedCourse.course.sections ?? []) {
+            const sections = getAllSections(selectedCourse.course);
+            for (const section of sections) {
                 sectionsWithContext.push({
                     course: selectedCourse,
                     section: section
                 });
             }
         }
-        
+
         return sectionsWithContext;
     }
 
@@ -434,10 +436,11 @@ export class ScheduleFilterService {
     // Convert periods back to sections (used for conflict detection)
     private periodsToSections(periodsWithContext: Array<{course: SelectedCourse, period: Period}>): Array<{course: SelectedCourse, section: Section}> {
         const sectionMap = new Map<string, {course: SelectedCourse, section: Section}>();
-        
+
         for (const item of periodsWithContext) {
             // Find the section that contains this period
-            const section = item.course.course.sections?.find(s => s.periods.includes(item.period));
+            const sections = getAllSections(item.course.course);
+            const section = sections.find(s => s.periods.includes(item.period));
             if (section) {
                 const sectionKey = `${item.course.course.id}-${section.number}`;
                 if (!sectionMap.has(sectionKey)) {
@@ -448,17 +451,18 @@ export class ScheduleFilterService {
                 }
             }
         }
-        
+
         return Array.from(sectionMap.values());
     }
 
     // Helper method to extract all periods with their course context
     private getAllPeriodsWithContext(selectedCourses: SelectedCourse[]): Array<{course: SelectedCourse, period: Period}> {
         const periodsWithContext: Array<{course: SelectedCourse, period: Period}> = [];
-        
+
         for (const selectedCourse of selectedCourses) {
             // Get all sections for this course (not just selected one for search purposes)
-            for (const section of selectedCourse.course.sections ?? []) {
+            const sections = getAllSections(selectedCourse.course);
+            for (const section of sections) {
                 for (const period of section.periods) {
                     periodsWithContext.push({
                         course: selectedCourse,
@@ -635,8 +639,9 @@ export class ScheduleFilterService {
         const professors = new Set<string>();
 
         selectedCourses.forEach(sc => {
-            sc.course.sections?.forEach(section => {
-                section.periods.forEach(period => {
+            const sections = getAllSections(sc.course);
+            sections.forEach((section: Section) => {
+                section.periods.forEach((period: Period) => {
                     if (period.professor && period.professor.trim()) {
                         professors.add(period.professor.trim());
                     }
@@ -655,8 +660,9 @@ export class ScheduleFilterService {
         const types = new Set<string>();
 
         selectedCourses.forEach(sc => {
-            sc.course.sections?.forEach(section => {
-                section.periods.forEach(period => {
+            const sections = getAllSections(sc.course);
+            sections.forEach((section: Section) => {
+                section.periods.forEach((period: Period) => {
                     if (period.type && period.type.trim()) {
                         types.add(period.type.trim());
                     }
@@ -690,7 +696,8 @@ export class ScheduleFilterService {
         const sectionCodes = new Set<string>();
 
         selectedCourses.forEach(sc => {
-            sc.course.sections?.forEach(section => {
+            const sections = getAllSections(sc.course);
+            sections.forEach((section: Section) => {
                 if (section.number && section.number.trim()) {
                     sectionCodes.add(section.number.trim());
                 }
@@ -709,14 +716,15 @@ export class ScheduleFilterService {
         const terms = new Set<string>();
         
         selectedCourses.forEach(sc => {
-            console.log(`[DEBUG] Processing course ${sc.course.id} with ${sc.course.sections?.length ?? 0} sections`);
-            sc.course.sections?.forEach(section => {
+            const sections = getAllSections(sc.course);
+            console.log(`[DEBUG] Processing course ${sc.course.id} with ${sections.length} sections`);
+            sections.forEach((section: Section) => {
                 console.log(`[DEBUG] Section ${section.number}: computedTerm = "${section.computedTerm}"`);
 
                 // Filter out invalid computed terms
-                if (section.computedTerm && 
-                    section.computedTerm.trim() && 
-                    section.computedTerm !== 'undefined' && 
+                if (section.computedTerm &&
+                    section.computedTerm.trim() &&
+                    section.computedTerm !== 'undefined' &&
                     typeof section.computedTerm === 'string') {
                     terms.add(section.computedTerm.trim());
                 } else {

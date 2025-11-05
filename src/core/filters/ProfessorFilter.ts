@@ -1,28 +1,30 @@
 import { Course } from '../../types/types';
 import { CourseFilter, ProfessorFilterCriteria } from '../../types/filters';
+import { getAllSections } from '../../utils/courseUtils';
 
 export class ProfessorFilter implements CourseFilter {
     readonly id = 'professor';
     readonly name = 'Professor';
     readonly description = 'Filter courses by instructor';
     readonly priority = 7;
-    
+
     apply(courses: Course[], criteria: ProfessorFilterCriteria): Course[] {
         if (!criteria.professors || criteria.professors.length === 0) {
             return courses;
         }
-        
+
         const professorSet = new Set(
             criteria.professors.map(prof => prof.toLowerCase())
         );
-        
-        return courses.filter(course =>
-            course.sections?.some(section =>
+
+        return courses.filter(course => {
+            const sections = getAllSections(course);
+            return sections.some(section =>
                 section.periods.some(period =>
                     professorSet.has(period.professor.toLowerCase())
                 )
-            ) ?? false
-        );
+            );
+        });
     }
     
     isValidCriteria(criteria: any): criteria is ProfessorFilterCriteria {
