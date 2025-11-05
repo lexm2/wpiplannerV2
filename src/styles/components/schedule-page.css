@@ -132,6 +132,8 @@
   width: 18px;
   height: 18px;
   display: block;
+  stroke: currentColor;
+  color: inherit;
 }
 
 /* Schedule course items with sections */
@@ -247,11 +249,15 @@
   width: 16px;
   height: 16px;
   display: block;
+  pointer-events: none;
+  stroke: currentColor;
+  color: var(--color-text-secondary);
   opacity: 0.7;
 }
 
 .course-clear-sections-btn:hover .eraser-icon {
   opacity: 1;
+  color: var(--color-warning);
 }
 
 .term-sections {

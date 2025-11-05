@@ -67,6 +67,28 @@
   color: var(--color-text-inverse);
 }
 
+.check-icon,
+.plus-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  pointer-events: none;
+  stroke: currentColor;
+  color: inherit;
+}
+
+.course-select-btn.selected .check-icon {
+  stroke: var(--color-text-inverse);
+}
+
+.course-select-btn:not(.selected) .plus-icon {
+  stroke: var(--color-text-secondary);
+}
+
+.course-select-btn:not(.selected):hover .plus-icon {
+  stroke: var(--color-primary);
+}
+
 .course-item.selected {
   border-color: var(--color-primary);
   background: var(--color-primary-background);

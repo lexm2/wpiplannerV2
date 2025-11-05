@@ -108,6 +108,30 @@
   align-items: center;
 }
 
+.header-controls .btn {
+  color: var(--color-primary);
+}
+
+.header-controls .btn:hover {
+  color: var(--color-text-inverse);
+}
+
+.header-controls .btn svg {
+  stroke: currentColor;
+  fill: none;
+}
+
+.header-controls .btn:hover svg {
+  stroke: var(--color-text-inverse);
+}
+
+/* Override icon colors for schedule page buttons in header-controls */
+.header-controls .course-clear-sections-btn:hover .eraser-icon,
+.header-controls .course-remove-btn:hover .x-icon {
+  color: var(--color-text) !important;
+  opacity: 1;
+}
+
 .status-indicator-container {
   display: flex;
   align-items: center;

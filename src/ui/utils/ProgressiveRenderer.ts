@@ -3,6 +3,7 @@ import { CancellationToken, CancellationError } from '../../utils/RequestCancell
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics';
 import { getProfessorsByTerm, getAllSections } from '../../utils/courseUtils';
 import { rateMyProfessorService } from '../../services/RateMyProfessorService';
+import { getInlineSVG } from '../../utils/iconPaths';
 
 export interface RenderBatchCallback {
     (batchIndex: number, batchCount: number, totalCount: number): void;
@@ -186,7 +187,7 @@ export class ProgressiveRenderer {
                         <div class="course-header">
                             <div class="course-header-controls">
                                 <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
-                                    ${isSelected ? '✓' : '+'}
+                                    ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
                                 </button>
                                 <div class="course-code">${course.department.abbreviation}${course.number}</div>
                             </div>
@@ -325,7 +326,7 @@ export class ProgressiveRenderer {
                             <div class="course-card-controls">
                                 <div class="course-code">${course.department.abbreviation}${course.number}</div>
                                 <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
-                                    ${isSelected ? '✓' : '+'}
+                                    ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
                                 </button>
                             </div>
                         </div>

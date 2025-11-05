@@ -42,6 +42,9 @@
   width: 18px;
   height: 18px;
   display: block;
+  pointer-events: none;
+  fill: currentColor;
+  color: inherit;
 }
 
 .content-header h2 {

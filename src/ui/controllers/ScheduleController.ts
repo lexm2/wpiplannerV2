@@ -11,7 +11,7 @@ import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/ConflictDetector'
 import { getComputedTerm, validateSelectedCourses } from '../../utils/typeGuards'
 import { AutoScheduler } from '../../services/AutoScheduler'
-import { ICONS } from '../../utils/iconPaths'
+import { getInlineSVG } from '../../utils/iconPaths'
 
 interface WizardSelections {
     lecture: Section | null;
@@ -418,10 +418,10 @@ export class ScheduleController {
                     </div>
                     <div class="header-controls">
                         <button class="course-clear-sections-btn" title="Clear selected sections">
-                            <img src="" alt="Clear sections" class="eraser-icon" />
+                            ${getInlineSVG('ERASER', 'eraser-icon')}
                         </button>
                         <button class="course-remove-btn" title="Remove from selection">
-                            ×
+                            ${getInlineSVG('X', 'x-icon')}
                         </button>
                     </div>
                 </div>
@@ -521,10 +521,7 @@ export class ScheduleController {
     }
     
     private initializeEraserIcons(container: HTMLElement): void {
-        const eraserIcons = container.querySelectorAll('.eraser-icon');
-        eraserIcons.forEach(icon => {
-            (icon as HTMLImageElement).src = ICONS.ERASER;
-        });
+        // No longer needed - icons are now inline SVG
     }
 
     private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: any[]): void {
@@ -677,10 +674,10 @@ export class ScheduleController {
             // Update button appearance
             if (isSelected) {
                 button.classList.add('selected');
-                button.textContent = '✓';
+                button.innerHTML = getInlineSVG('CHECK', 'check-icon');
             } else {
                 button.classList.remove('selected');
-                button.textContent = '+';
+                button.innerHTML = getInlineSVG('PLUS', 'plus-icon');
             }
         });
 
@@ -1389,7 +1386,7 @@ export class ScheduleController {
         } finally {
             if (autoScheduleBtn) {
                 autoScheduleBtn.disabled = false;
-                autoScheduleBtn.innerHTML = `<img src="${ICONS.WAND}" alt="Auto-schedule" class="auto-schedule-icon" /><span>Auto-Schedule</span>`;
+                autoScheduleBtn.innerHTML = `${getInlineSVG('WAND', 'auto-schedule-icon')}<span>Auto-Schedule</span>`;
             }
         }
     }

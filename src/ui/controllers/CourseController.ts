@@ -6,6 +6,7 @@ import { rateMyProfessorService } from '../../services/RateMyProfessorService'
 import { ProgressiveRenderer, ProgressiveRenderOptions } from '../utils/ProgressiveRenderer'
 import { CancellationToken } from '../../utils/RequestCancellation'
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
+import { getInlineSVG } from '../../utils/iconPaths'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -477,15 +478,15 @@ export class CourseController {
 
     private updateCourseSelectionUI(element: HTMLElement, isSelected: boolean): void {
         const selectBtn = element.querySelector('.course-select-btn');
-        
+
         if (selectBtn) {
             if (isSelected) {
                 element.classList.add('selected');
-                selectBtn.textContent = '✓';
+                selectBtn.innerHTML = getInlineSVG('CHECK', 'check-icon');
                 selectBtn.classList.add('selected');
             } else {
                 element.classList.remove('selected');
-                selectBtn.textContent = '+';
+                selectBtn.innerHTML = getInlineSVG('PLUS', 'plus-icon');
                 selectBtn.classList.remove('selected');
             }
         }
@@ -803,7 +804,7 @@ export class CourseController {
                         <div class="selected-course-credits">${credits}</div>
                     </div>
                     <button class="course-remove-btn" title="Remove from selection">
-                        ×
+                        ${getInlineSVG('X', 'x-icon')}
                     </button>
                 </div>
             `;

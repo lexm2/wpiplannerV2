@@ -6,6 +6,7 @@
     "primary": "#b8394a",
     "primaryHover": "#9c2f3d",
     "primaryLight": "#d4556b",
+    "primaryBackground": "rgba(184, 57, 74, 0.1)",
     "secondary": "#f8f8fa",
     "secondaryHover": "#ededef",
     "background": "#ffffff",
@@ -21,6 +22,8 @@
     "success": "#28a745",
     "warning": "#fd7e14",
     "error": "#dc3545",
+    "danger": "#dc3545",
+    "dangerBackground": "rgba(220, 53, 69, 0.1)",
     "info": "#17a2b8"
   },
   "typography": {

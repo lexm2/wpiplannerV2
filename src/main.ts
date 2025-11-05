@@ -1,26 +1,30 @@
 import './style.css'
 import { MainController } from './ui/controllers/MainController'
-import { ICONS } from './utils/iconPaths'
+import { getInlineSVG } from './utils/iconPaths'
 
 function initializeIcons(): void {
-  const filterBtnIcon = document.querySelector('#filter-btn img') as HTMLImageElement;
+  const filterBtn = document.getElementById('filter-btn');
+  const filterBtnIcon = filterBtn?.querySelector('img');
   if (filterBtnIcon) {
-    filterBtnIcon.src = ICONS.FILTER_FILLED;
+    filterBtnIcon.outerHTML = getInlineSVG('FILTER_FILLED', 'filter-icon');
   }
 
-  const scheduleFilterBtnIcon = document.querySelector('#schedule-filter-btn img') as HTMLImageElement;
+  const scheduleFilterBtn = document.getElementById('schedule-filter-btn');
+  const scheduleFilterBtnIcon = scheduleFilterBtn?.querySelector('img');
   if (scheduleFilterBtnIcon) {
-    scheduleFilterBtnIcon.src = ICONS.FILTER_FILLED;
+    scheduleFilterBtnIcon.outerHTML = getInlineSVG('FILTER_FILLED', 'filter-icon');
   }
 
-  const autoScheduleBtnIcon = document.querySelector('#auto-schedule-btn img') as HTMLImageElement;
+  const autoScheduleBtn = document.getElementById('auto-schedule-btn');
+  const autoScheduleBtnIcon = autoScheduleBtn?.querySelector('img');
   if (autoScheduleBtnIcon) {
-    autoScheduleBtnIcon.src = ICONS.WAND;
+    autoScheduleBtnIcon.outerHTML = getInlineSVG('WAND', 'auto-schedule-icon');
   }
 
-  const clearAllSectionsBtnIcon = document.querySelector('#clear-all-sections-btn img') as HTMLImageElement;
+  const clearAllSectionsBtn = document.getElementById('clear-all-sections-btn');
+  const clearAllSectionsBtnIcon = clearAllSectionsBtn?.querySelector('img');
   if (clearAllSectionsBtnIcon) {
-    clearAllSectionsBtnIcon.src = ICONS.ERASER;
+    clearAllSectionsBtnIcon.outerHTML = getInlineSVG('ERASER', 'clear-all-eraser-icon');
   }
 }
 

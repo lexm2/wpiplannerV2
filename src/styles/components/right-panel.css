@@ -146,26 +146,35 @@
 }
 
 .course-remove-btn {
-  width: 24px;
-  height: 24px;
+  padding: 0.25rem 0.5rem;
+  background: transparent;
   border: 1px solid var(--color-border);
-  border-radius: 50%;
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
+  border-radius: var(--effect-border-radius);
   cursor: pointer;
-  transition: var(--effect-transition);
   display: flex;
   align-items: center;
-  justify-content: center;
+  transition: var(--effect-transition);
   flex-shrink: 0;
-  margin-top: 0.125rem;
 }
 
 .course-remove-btn:hover {
+  background: var(--color-danger-background);
   border-color: var(--color-danger);
-  background: var(--color-danger);
-  color: var(--color-text-inverse);
+}
+
+.x-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  pointer-events: none;
+  stroke: currentColor;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.course-remove-btn:hover .x-icon {
+  opacity: 1;
+  color: var(--color-danger);
 }
 
 .selected-courses-content .empty-state {
