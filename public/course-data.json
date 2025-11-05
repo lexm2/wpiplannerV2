@@ -28940,7 +28940,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "3/5",
+      "Waitlist_Waitlist_Capacity": "2/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338752"
     },
     {
@@ -84341,7 +84341,7 @@
       "Course_Title": "ME 591 - Graduate Seminar",
       "Credits": "0",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "105/140",
+      "Enrolled_Capacity": "107/140",
       "Instructional_Format": "Seminar",
       "Instructors": "Kedar Prashant Shete",
       "Locations": "Salisbury Labs 115 Kinnicutt Hall",
