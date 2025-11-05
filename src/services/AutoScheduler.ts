@@ -1,7 +1,8 @@
 import type { Course, Section } from '../types/types';
-import type { SelectedCourse } from '../types/schedule';
+import type { SelectedCourse, ScheduleScore, ScoreWeights, SchedulePreferences } from '../types/schedule';
 import { ConflictDetector } from '../core/ConflictDetector';
 import type { ScheduleFilterService } from './ScheduleFilterService';
+import { ScheduleScorer } from './ScheduleScorer';
 
 interface SectionCombination {
   lecture: Section | null;
@@ -13,6 +14,12 @@ interface ScheduleResult {
   course: Course;
   combination: SectionCombination;
   isLocked?: boolean;
+}
+
+interface ScoredScheduleResult {
+  schedule: ScheduleResult[];
+  score: ScheduleScore;
+  id: string;
 }
 
 export class AutoScheduler {
@@ -221,11 +228,22 @@ export class AutoScheduler {
   }
 
   private sectionPassesFilters(section: Section, selectedCourse: SelectedCourse): boolean {
+    if (!this.hasValidTimeSlot(section)) {
+      return false;
+    }
+
     const filteredSections = this.scheduleFilterService.filterSections([selectedCourse]);
 
     return filteredSections.some(
       fs => fs.section.crn === section.crn
     );
+  }
+
+  private hasValidTimeSlot(section: Section): boolean {
+    return section.periods.some(period => {
+      return period.startTime.hours !== period.endTime.hours ||
+             period.startTime.minutes !== period.endTime.minutes;
+    });
   }
 
   private hasConflictsInCurrentSelection(currentSelection: ScheduleResult[]): boolean {
@@ -262,5 +280,179 @@ export class AutoScheduler {
     }
 
     return this.conflictDetector.isValidSchedule(allSections);
+  }
+
+  generateAllSchedules(
+    selectedCourses: SelectedCourse[],
+    maxResults: number = 1000,
+    timeoutMs: number = 5000
+  ): ScheduleResult[][] {
+    if (selectedCourses.length === 0) {
+      return [];
+    }
+
+    const lockedCourses: ScheduleResult[] = [];
+    const incompleteCourses: SelectedCourse[] = [];
+
+    for (const selectedCourse of selectedCourses) {
+      if (this.hasCompleteSelection(selectedCourse)) {
+        lockedCourses.push({
+          course: selectedCourse.course,
+          combination: {
+            lecture: selectedCourse.selectedLecture,
+            discussion: selectedCourse.selectedDiscussion,
+            lab: selectedCourse.selectedLab
+          },
+          isLocked: true
+        });
+      } else {
+        incompleteCourses.push(selectedCourse);
+      }
+    }
+
+    if (incompleteCourses.length === 0) {
+      return [lockedCourses];
+    }
+
+    const candidatesPerCourse: Map<Course, SectionCombination[]> = new Map();
+
+    for (const selectedCourse of incompleteCourses) {
+      const candidates = this.getCandidateCombinations(selectedCourse);
+
+      if (candidates.length === 0) {
+        return [];
+      }
+
+      candidatesPerCourse.set(selectedCourse.course, candidates);
+    }
+
+    const courses = Array.from(candidatesPerCourse.keys())
+      .sort((a, b) => {
+        const aCount = candidatesPerCourse.get(a)?.length || 0;
+        const bCount = candidatesPerCourse.get(b)?.length || 0;
+        return aCount - bCount;
+      });
+
+    const allSolutions: ScheduleResult[][] = [];
+    const startTime = Date.now();
+
+    this.backtrackAll(
+      0,
+      courses,
+      candidatesPerCourse,
+      [...lockedCourses],
+      allSolutions,
+      maxResults,
+      startTime,
+      timeoutMs
+    );
+
+    return allSolutions;
+  }
+
+  private backtrackAll(
+    courseIndex: number,
+    courses: Course[],
+    candidatesPerCourse: Map<Course, SectionCombination[]>,
+    currentSelection: ScheduleResult[],
+    allSolutions: ScheduleResult[][],
+    maxResults: number,
+    startTime: number,
+    timeoutMs: number
+  ): void {
+    if (allSolutions.length >= maxResults) {
+      return;
+    }
+
+    if (Date.now() - startTime > timeoutMs) {
+      console.warn(`Schedule generation timeout after ${timeoutMs}ms - returning ${allSolutions.length} schedules`);
+      return;
+    }
+
+    if (courseIndex === courses.length) {
+      if (this.isValidSchedule(currentSelection)) {
+        allSolutions.push(currentSelection.map(sr => ({
+          course: sr.course,
+          combination: {
+            lecture: sr.combination.lecture,
+            discussion: sr.combination.discussion,
+            lab: sr.combination.lab
+          },
+          isLocked: sr.isLocked
+        })));
+      }
+      return;
+    }
+
+    const course = courses[courseIndex];
+    const candidates = candidatesPerCourse.get(course) || [];
+
+    for (const combination of candidates) {
+      currentSelection.push({ course, combination });
+
+      if (!this.hasConflictsInCurrentSelection(currentSelection)) {
+        this.backtrackAll(
+          courseIndex + 1,
+          courses,
+          candidatesPerCourse,
+          currentSelection,
+          allSolutions,
+          maxResults,
+          startTime,
+          timeoutMs
+        );
+      }
+
+      currentSelection.pop();
+    }
+  }
+
+  generateBestSchedule(
+    selectedCourses: SelectedCourse[],
+    preferences: SchedulePreferences,
+    weights?: ScoreWeights,
+    maxResults: number = 1000
+  ): ScheduleResult[] | null {
+    const allSchedules = this.generateAllSchedules(selectedCourses, maxResults);
+
+    if (allSchedules.length === 0) {
+      return null;
+    }
+
+    const scorer = new ScheduleScorer();
+    const scored = allSchedules.map((schedule, index) => ({
+      schedule,
+      score: scorer.calculateCompositeScore(schedule, preferences, weights),
+      id: `schedule-${index}`
+    }));
+
+    scored.sort((a, b) => b.score.totalScore - a.score.totalScore);
+
+    return scored[0].schedule;
+  }
+
+  generateScoredSchedules(
+    selectedCourses: SelectedCourse[],
+    preferences: SchedulePreferences,
+    weights?: ScoreWeights,
+    maxResults: number = 1000,
+    topN: number = 10
+  ): ScoredScheduleResult[] {
+    const allSchedules = this.generateAllSchedules(selectedCourses, maxResults);
+
+    if (allSchedules.length === 0) {
+      return [];
+    }
+
+    const scorer = new ScheduleScorer();
+    const scored = allSchedules.map((schedule, index) => ({
+      schedule,
+      score: scorer.calculateCompositeScore(schedule, preferences, weights),
+      id: `schedule-${index}`
+    }));
+
+    return scored
+      .sort((a, b) => b.score.totalScore - a.score.totalScore)
+      .slice(0, topN);
   }
 }

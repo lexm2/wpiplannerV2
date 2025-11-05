@@ -1273,7 +1273,20 @@ export class ScheduleController {
 
         try {
             const autoScheduler = new AutoScheduler(this.scheduleFilterService);
-            const schedule = autoScheduler.generateSchedule(selectedCourses);
+
+            const defaultPreferences = {
+                preferredTimeRange: {
+                    startTime: { hours: 8, minutes: 0 },
+                    endTime: { hours: 18, minutes: 0 }
+                },
+                preferredDays: new Set<string>(),
+                avoidBackToBackClasses: false
+            };
+
+            const schedule = autoScheduler.generateBestSchedule(
+                selectedCourses,
+                defaultPreferences
+            );
 
             if (!schedule) {
                 alert('Could not generate a valid schedule. Try adjusting your filters or course selections.');
@@ -1301,7 +1314,7 @@ export class ScheduleController {
             this.displayScheduleSelectedCourses();
             this.renderScheduleGrids();
 
-            let message = `Successfully generated schedule!`;
+            let message = `Successfully generated optimized schedule!`;
             if (lockedCount > 0) {
                 message += ` (${autoFilledCount} courses auto-filled, ${lockedCount} already selected)`;
             }
