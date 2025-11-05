@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 5, 2025, 2:54 AM",
+  "generated": "Nov 5, 2025, 3:42 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -47596,7 +47596,7 @@
                 "crn": 337761,
                 "number": "S03",
                 "seats": 30,
-                "seats_available": 11,
+                "seats_available": 10,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -47615,7 +47615,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seats_available": 11,
+                    "seats_available": 10,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S03",
@@ -233449,7 +233449,7 @@
                 "crn": 337608,
                 "number": "S01",
                 "seats": 20,
-                "seats_available": 15,
+                "seats_available": 14,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -233468,7 +233468,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 20,
-                    "seats_available": 15,
+                    "seats_available": 14,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01",
