@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 5, 2025, 9:48 PM",
+  "generated": "Nov 5, 2025, 10:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -234006,7 +234006,7 @@
                 "crn": 340268,
                 "number": "C04",
                 "seats": 30,
-                "seats_available": -1,
+                "seats_available": 0,
                 "actual_waitlist": 10,
                 "max_waitlist": 10,
                 "note": null,
@@ -234025,7 +234025,7 @@
                     "building": "",
                     "room": "Recreation Center Track",
                     "seats": 30,
-                    "seats_available": -1,
+                    "seats_available": 0,
                     "actual_waitlist": 10,
                     "max_waitlist": 10,
                     "specific_section": "C04",
