@@ -89,6 +89,35 @@
   stroke: var(--color-primary);
 }
 
+/* Check icon drawing animation */
+.check-icon path {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: draw-check 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes draw-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Scale-in effect for extra polish */
+.check-icon {
+  animation: scale-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 .course-item.selected {
   border-color: var(--color-primary);
   background: var(--color-primary-background);
