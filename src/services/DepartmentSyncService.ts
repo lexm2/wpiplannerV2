@@ -89,9 +89,6 @@ export class DepartmentSyncService {
                 this.filterService.removeFilter('department');
             }
 
-            // Clear the old department controller selection since we're using filters now
-            this.departmentController.clearDepartmentSelection();
-
             // Update UI states
             this.updateSidebarVisualState(newDepartments);
             this.syncFilterToModal();

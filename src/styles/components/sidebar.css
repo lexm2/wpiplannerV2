@@ -5,22 +5,6 @@
   overflow-y: auto;
 }
 
-.sidebar-header {
-  padding: 1.5rem 1.5rem 1rem;
-  border-bottom: 1px solid var(--color-border);
-  height: var(--synced-header-height);
-  min-height: fit-content;
-  display: flex;
-  align-items: center;
-}
-
-.sidebar-header h2 {
-  font-size: 1.25rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
-  margin: 0;
-}
-
 .department-categories {
   padding: 1rem;
 }
@@ -68,7 +52,8 @@
 /* All Departments special styling */
 .department-item.all-departments {
   font-weight: var(--font-weight-medium);
-  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-primary-background) 100%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;

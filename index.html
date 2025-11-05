@@ -88,14 +88,11 @@
         
         <div class="app-body" id="planner-page">
             <aside class="sidebar" role="complementary" aria-label="Department navigation">
-                <div class="sidebar-header">
-                    <h2>Departments</h2>
-                </div>
                 <div class="department-categories" id="department-list">
                     <div class="loading-message">Loading departments...</div>
                 </div>
             </aside>
-            
+
             <main class="main-content" role="main">
                 <div class="content-header">
                     <h2>Course Listings</h2>
@@ -114,20 +111,15 @@
                     <div class="loading-message">Loading courses...</div>
                 </div>
             </main>
-            
+
             <aside class="right-panel" role="complementary" aria-label="Course details and selection">
                 <section class="selected-courses-section">
-                    <div class="panel-header">
-                        <h2>Selected Courses <span id="selected-count" class="course-count">(0)</span></h2>
-                    </div>
+                    <span id="selected-count" style="display: none;"></span>
                     <div class="selected-courses-content" id="selected-courses-list">
                         <div class="empty-state">No courses selected yet</div>
                     </div>
                 </section>
                 <section class="course-description-section">
-                    <div class="panel-header">
-                        <h2>Course Details</h2>
-                    </div>
                     <div class="course-description-content" id="course-description">
                         <div class="empty-state">Select a course to view description</div>
                     </div>

@@ -23,7 +23,7 @@ export class DepartmentController {
     }
 
     getDepartmentById(deptId: string): Department | null {
-        return this.allDepartments.find(d => d.abbreviation === deptId) || null;
+        return this.allDepartments.find(d => d.abbreviation.toLowerCase() === deptId.toLowerCase()) || null;
     }
 
     selectDepartment(deptId: string): Department | null {

@@ -24,7 +24,9 @@
     "error": "#ff453a",
     "danger": "#ff453a",
     "dangerBackground": "rgba(255, 69, 58, 0.15)",
-    "info": "#64d2ff"
+    "info": "#64d2ff",
+    "gradientStart": "rgba(212, 66, 79, 0.15)",
+    "gradientEnd": "rgba(212, 66, 79, 0.35)"
   },
   "typography": {
     "fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",

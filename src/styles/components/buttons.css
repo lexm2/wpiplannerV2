@@ -26,7 +26,6 @@
 
 .btn-secondary:hover {
   background: var(--color-secondary-hover);
-  border-color: var(--color-border-hover);
 }
 
 .btn.active {

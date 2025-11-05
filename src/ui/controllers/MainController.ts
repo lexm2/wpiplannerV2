@@ -306,9 +306,6 @@ export class MainController {
             
             // Load saved filters AFTER all services are fully connected and ready
             this.filterService.loadFiltersFromStorage();
-            
-            this.uiStateManager.syncHeaderHeights();
-            this.uiStateManager.setupHeaderResizeObserver();
         } catch (error) {
             console.error('Failed to initialize application:', error);
             this.uiStateManager.showErrorMessage('Failed to initialize application. Some features may not work properly.');
@@ -714,37 +711,57 @@ export class MainController {
     }
 
     private refreshCurrentView(): void {
-        const selectedDepartment = this.departmentController.getSelectedDepartment();
         const hasFilters = !this.filterService.isEmpty();
-        
+
+        // Check if department filter is active
+        const departmentFilter = this.filterService.getActiveFilters()
+            .find(f => f.id === 'department');
+        const activeDepartmentIds = departmentFilter?.criteria?.departments || [];
+
         // Start a new render operation with cancellation support
         const cancellationToken = this.operationManager.startOperation('render', 'New render requested');
-        
+
         let coursesToDisplay: Course[] = [];
-        
+
         if (hasFilters) {
-            // Handle all filters (including search text)
-            const baseCourses = selectedDepartment ? selectedDepartment.courses : this.getAllCourses();
+            // Get base courses - if single department filter, use that department's courses
+            let baseCourses: Course[];
+            if (activeDepartmentIds.length === 1) {
+                const dept = this.departmentController.getDepartmentById(activeDepartmentIds[0]);
+                baseCourses = dept ? dept.courses : this.getAllCourses();
+            } else {
+                baseCourses = this.getAllCourses();
+            }
+
             coursesToDisplay = this.filterService.filterCourses(baseCourses);
-            this.updateFilteredHeader(coursesToDisplay.length, selectedDepartment);
-        } else if (selectedDepartment) {
-            // Show department courses without filters
-            coursesToDisplay = selectedDepartment.courses;
-            this.updateDepartmentHeader(selectedDepartment);
+
+            // Update header based on filter state
+            if (activeDepartmentIds.length === 1 && this.filterService.getActiveFilters().length === 1) {
+                // Single department filter only
+                const dept = this.departmentController.getDepartmentById(activeDepartmentIds[0]);
+                if (dept) {
+                    this.updateDepartmentHeader(dept);
+                } else {
+                    this.updateFilteredHeader(coursesToDisplay.length, null);
+                }
+            } else {
+                // Multiple filters or multiple departments
+                this.updateFilteredHeader(coursesToDisplay.length, null);
+            }
         } else {
-            // No filters, no department selected - show all courses ("All Departments" view)
+            // No filters - show all courses
             coursesToDisplay = this.getAllCourses();
             this.updateAllDepartmentsHeader();
         }
-        
+
         // Display courses with cancellation support
         this.displayCoursesWithCancellation(coursesToDisplay, cancellationToken);
-        
+
         // Save current filter state
         if (hasFilters) {
             this.filterService.saveFiltersToStorage();
         }
-        
+
         // Update filter button appearance and sync search input
         this.updateFilterButtonState();
         this.syncSearchInputFromFilters();

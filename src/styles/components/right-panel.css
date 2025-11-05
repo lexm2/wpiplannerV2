@@ -8,27 +8,12 @@
   gap: 0;
 }
 
-.panel-header {
-  padding: 1.5rem 1.5rem 1rem;
-  border-bottom: 1px solid var(--color-border);
-  height: var(--synced-header-height);
-  min-height: fit-content;
-  display: flex;
-  align-items: center;
-}
-
-.panel-header h2 {
-  font-size: 1.25rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
-  margin: 0;
-}
-
 /* Course description section - top half */
 .course-description-section {
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border);
 }
 
 .course-description-content {
@@ -79,7 +64,6 @@
 .selected-courses-content {
   flex: 1;
   padding: 1rem 1.5rem;
-  border-top: 1px solid var(--color-border);
   overflow-y: auto;
   box-sizing: border-box;
   width: 100%;

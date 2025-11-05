@@ -24,6 +24,10 @@
   --color-danger-background: rgba(211, 47, 47, 0.1);
   --color-info: #007aff;
 
+  /* Gradient colors */
+  --gradient-start: rgba(172, 43, 55, 0.05);
+  --gradient-end: rgba(172, 43, 55, 0.15);
+
   /* Typography - WPI Official */
   --font-family: 'Myriad Pro', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
