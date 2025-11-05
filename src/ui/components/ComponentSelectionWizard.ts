@@ -17,6 +17,7 @@ import { SelectedCourse } from '../../types/schedule';
 import { CourseDataService } from '../../services/courseDataService';
 import { ScheduleFilterService } from '../../services/ScheduleFilterService';
 import { rateMyProfessorService } from '../../services/RateMyProfessorService';
+import { getInlineSVG } from '../../utils/iconPaths';
 
 type WizardStep = 'lecture' | 'discussion' | 'lab';
 
@@ -807,7 +808,6 @@ export class ComponentSelectionWizard {
         const breadcrumbs = this.availableSteps.map((step, index) => {
             const isActive = step === this.currentStep;
             const isCompleted = this.selections[step] !== null;
-            const number = index + 1;
 
             return `
                 <button
@@ -815,12 +815,11 @@ export class ComponentSelectionWizard {
                     data-step="${step}"
                     ${isActive ? 'disabled' : ''}
                 >
-                    <span class="breadcrumb-number">${number}</span>
                     <span class="breadcrumb-label">${stepLabels[step]}</span>
                     ${isCompleted ? '<span class="breadcrumb-check">✓</span>' : ''}
                 </button>
             `;
-        }).join('<span class="breadcrumb-arrow">→</span>');
+        }).join(`<span class="breadcrumb-arrow">${getInlineSVG('ARROW_BAR_RIGHT', 'breadcrumb-arrow-icon')}</span>`);
 
         return `
             <div class="wizard-breadcrumbs">

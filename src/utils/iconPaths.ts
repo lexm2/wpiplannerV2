@@ -16,6 +16,7 @@ import eraserIcon from '../assets/icons/eraser.svg?url';
 import xIcon from '../assets/icons/x.svg?url';
 import checkIcon from '../assets/icons/check.svg?url';
 import plusIcon from '../assets/icons/plus.svg?url';
+import arrowBarRightIcon from '../assets/icons/arrow-bar-right.svg?url';
 
 export type IconName =
   | 'FILTER'
@@ -28,7 +29,8 @@ export type IconName =
   | 'ERASER'
   | 'X'
   | 'CHECK'
-  | 'PLUS';
+  | 'PLUS'
+  | 'ARROW_BAR_RIGHT';
 
 /**
  * Icon paths for SVG assets with Vite base path resolution.
@@ -58,6 +60,7 @@ export const ICONS: Record<IconName, string> = {
   X: xIcon,
   CHECK: checkIcon,
   PLUS: plusIcon,
+  ARROW_BAR_RIGHT: arrowBarRightIcon,
 } as const;
 
 /**
@@ -76,6 +79,7 @@ export const INLINE_SVGS: Record<IconName, string> = {
   X: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>`,
   CHECK: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>`,
   PLUS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>`,
+  ARROW_BAR_RIGHT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 12l-10 0" /><path d="M20 12l-4 4" /><path d="M20 12l-4 -4" /><path d="M4 4l0 16" /></svg>`,
 } as const;
 
 /**

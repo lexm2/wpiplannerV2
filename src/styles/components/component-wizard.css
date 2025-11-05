@@ -70,7 +70,7 @@
 
 /* Breadcrumbs */
 .wizard-breadcrumbs {
-    padding: 1rem 1.5rem;
+    padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--color-border);
     display: flex;
     align-items: center;
@@ -83,8 +83,8 @@
 .wizard-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.8rem;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
     background: none;
     border: 1px solid var(--color-border);
     border-radius: 6px;
@@ -117,12 +117,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.4rem;
-    height: 1.4rem;
+    width: 1.2rem;
+    height: 1.2rem;
     border-radius: 50%;
     background-color: var(--color-surface-elevated);
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .wizard-breadcrumb.active .breadcrumb-number {
@@ -146,6 +146,15 @@
 .breadcrumb-arrow {
     color: var(--color-text-secondary);
     font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+.breadcrumb-arrow-icon {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    color: inherit;
 }
 
 /* Content */
@@ -383,6 +392,7 @@
     align-items: center;
     gap: 0.75rem;
     background-color: var(--color-surface);
+    border-top: 1px solid var(--color-border);
     z-index: 5;
     pointer-events: none;
 }
@@ -424,11 +434,13 @@
 .wizard-btn-text {
     background-color: var(--color-surface-elevated);
     color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-hover);
 }
 
 .wizard-btn-text:hover {
     color: var(--color-text);
     background-color: var(--color-surface-hover);
+    border-color: var(--color-primary);
 }
 
 /* Ensure sidebar container can hold wizard */
@@ -541,6 +553,7 @@
 @media (max-height: 1100px) {
     .wizard-footer {
         background-color: transparent;
+        border-top: none;
     }
 }
 
