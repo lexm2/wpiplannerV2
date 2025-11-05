@@ -318,28 +318,41 @@ export class ProgressiveRenderer {
             const batchHtml = batchCourses.map(course => {
                 const isSelected = courseSelectionService.isCourseSelected(course);
                 const hasWarning = this.courseHasWarning(course);
-                const credits = course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits}-${course.maxCredits}`;
-                
+
+                // Get unique professors across all sections
+                const allSections = getAllSections(course);
+                const uniqueProfessors = [...new Set(
+                    allSections.flatMap(section =>
+                        section.periods
+                            .map(period => period.professor)
+                            .filter(prof => prof && prof.trim() && prof !== 'TBA' && prof !== 'Not Assigned')
+                    )
+                )].sort();
+
+                // Create professor links
+                const professorDisplay = uniqueProfessors.length > 0
+                    ? uniqueProfessors.map(prof => {
+                        const rmpUrl = rateMyProfessorService.getProfessorRMPUrl(prof);
+                        return rmpUrl
+                            ? `<a href="${rmpUrl}" target="_blank" rel="noopener noreferrer" class="professor-link">${prof}</a>`
+                            : prof;
+                    }).join(', ')
+                    : 'TBA';
+
                 return `
                     <div class="course-card ${isSelected ? 'selected' : ''}" data-course-id="${course.id}">
                         <div class="course-card-header">
                             <div class="course-card-controls">
-                                <div class="course-code">${course.department.abbreviation}${course.number}</div>
+                                <div class="course-title-main">${course.name}</div>
                                 <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
                                     ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
                                 </button>
                             </div>
                         </div>
-                        <div class="course-title">
-                            ${course.name}
-                            ${hasWarning ? `<span class="warning-icon-wrapper" title="All sections full">${getInlineSVG('ALERT_SQUARE_ROUNDED', 'warning-icon')}</span>` : ''}
-                        </div>
+                        <div class="course-code-badge">${course.department.abbreviation}${course.number}</div>
                         <div class="course-info">
-                            <div class="course-info-top">
-                                <span class="course-credits">${credits} credits</span>
-                                <span class="course-sections-count">${getAllSections(course).length} section${getAllSections(course).length !== 1 ? 's' : ''}</span>
-                            </div>
-                            <div class="course-professors-compact">${getProfessorsByTerm(course)}</div>
+                            <div class="course-professors-list">${professorDisplay}</div>
+                            ${hasWarning ? `<div class="course-warning" title="All sections full">${getInlineSVG('ALERT_SQUARE_ROUNDED', 'warning-icon')} All sections full</div>` : ''}
                         </div>
                     </div>
                 `;
