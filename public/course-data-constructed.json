@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 5, 2025, 7:27 PM",
+  "generated": "Nov 5, 2025, 7:38 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -42407,7 +42407,7 @@
                 "crn": 342509,
                 "number": "C01",
                 "seats": 80,
-                "seats_available": 58,
+                "seats_available": 57,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -42426,7 +42426,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 80,
-                    "seats_available": 58,
+                    "seats_available": 57,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C01",
@@ -42485,7 +42485,7 @@
                 "crn": 336930,
                 "number": "D02",
                 "seats": 70,
-                "seats_available": 25,
+                "seats_available": 26,
                 "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": null,
@@ -42504,7 +42504,7 @@
                     "building": "",
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 70,
-                    "seats_available": 25,
+                    "seats_available": 26,
                     "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "D02",
