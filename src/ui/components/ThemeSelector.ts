@@ -97,7 +97,7 @@ export class ThemeSelector {
     }
 
     private loadSavedTheme(): void {
-        const savedTheme = this.profileStateManager.getPreferences().theme || 'wpi-classic';
+        const savedTheme = this.profileStateManager.getPreferences().theme || 'wpi-dark';
         this.themeManager.setTheme(savedTheme);
         this.updateCurrentThemeDisplay();
     }

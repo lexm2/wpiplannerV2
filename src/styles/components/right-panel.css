@@ -79,7 +79,6 @@
 .selected-courses-content {
   flex: 1;
   padding: 1rem 1.5rem;
-  background: var(--color-surface);
   border-top: 1px solid var(--color-border);
   overflow-y: auto;
   box-sizing: border-box;

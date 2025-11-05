@@ -335,13 +335,13 @@ export class TransactionalStorageManager {
     loadThemePreference(): { data: string; valid: boolean; error?: string } {
         try {
             const savedTheme = localStorage.getItem(TransactionalStorageManager.STORAGE_KEYS.THEME);
-            return { 
-                data: savedTheme || 'wpi-classic',
+            return {
+                data: savedTheme || 'wpi-dark',
                 valid: true
             };
         } catch (error) {
-            return { 
-                data: 'wpi-classic',
+            return {
+                data: 'wpi-dark',
                 valid: false,
                 error: `Failed to load theme preference: ${error}`
             };
@@ -539,7 +539,7 @@ export class TransactionalStorageManager {
             },
             preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
             avoidBackToBackClasses: false,
-            theme: 'wpi-classic'
+            theme: 'wpi-dark'
         };
     }
 

@@ -94,7 +94,7 @@ export class StorageService implements ThemeStorage {
 
     loadThemePreference(): string {
         const preferences = this.profileStateManager.getPreferences();
-        return preferences.theme || 'wpi-classic';
+        return preferences.theme || 'wpi-dark';
     }
 
     // Preferences operations

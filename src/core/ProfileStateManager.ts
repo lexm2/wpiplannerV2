@@ -717,7 +717,7 @@ export class ProfileStateManager {
                 },
                 preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
                 avoidBackToBackClasses: false,
-                theme: 'wpi-classic'
+                theme: 'wpi-dark'
             },
             isLoading: false,
             lastSaved: 0,

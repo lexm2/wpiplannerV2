@@ -88,10 +88,10 @@ class DefaultThemeStorage implements ThemeStorage {
     loadThemePreference(): string {
         try {
             const savedTheme = localStorage.getItem(this.storageKey);
-            return savedTheme || 'wpi-classic';
+            return savedTheme || 'wpi-dark';
         } catch (error) {
             console.warn('Failed to load theme preference:', error);
-            return 'wpi-classic';
+            return 'wpi-dark';
         }
     }
 
@@ -109,7 +109,7 @@ class ProfileStateManagerThemeStorage implements ThemeStorage {
 
     loadThemePreference(): string {
         const preferences = this.profileStateManager.getPreferences();
-        return preferences.theme || 'wpi-classic';
+        return preferences.theme || 'wpi-dark';
     }
 
     saveThemePreference(themeId: string): void {
@@ -119,7 +119,7 @@ class ProfileStateManagerThemeStorage implements ThemeStorage {
 
 export class ThemeManager {
     private static instance: ThemeManager;
-    private currentTheme: ThemeId = 'wpi-classic';
+    private currentTheme: ThemeId = 'wpi-dark';
     private themes: Map<ThemeId, ThemeDefinition> = new Map();
     private listeners: Set<ThemeChangeListener> = new Set();
     private storage: ThemeStorage = new DefaultThemeStorage();
@@ -276,7 +276,7 @@ export class ThemeManager {
                 return 'high-contrast';
             }
         }
-        return 'wpi-classic';
+        return 'wpi-dark';
     }
 
     useSystemPreference(): boolean {
@@ -354,7 +354,7 @@ export class ThemeManager {
         }
 
         if (this.currentTheme === themeId) {
-            this.setTheme('wpi-classic'); // Fallback to default
+            this.setTheme('wpi-dark'); // Fallback to default
         }
 
         return this.themes.delete(themeId);
