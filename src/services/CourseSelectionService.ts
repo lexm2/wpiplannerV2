@@ -17,7 +17,7 @@ export interface CourseSelectionResult {
 }
 
 export interface SelectionChangeEvent {
-    type: 'course_added' | 'course_removed' | 'section_changed' | 'selection_cleared' | 'data_loaded' | 'components_changed';
+    type: 'course_added' | 'course_removed' | 'section_changed' | 'selection_cleared' | 'data_loaded' | 'components_changed' | 'components_cleared';
     course?: Course;
     section?: string | null;
     selectedCourses: SelectedCourse[];
@@ -385,6 +385,75 @@ export class CourseSelectionService {
             return {
                 success: false,
                 error: `Error clearing selections: ${error}`
+            };
+        }
+    }
+
+    async clearCourseComponents(course: Course): Promise<CourseSelectionResult> {
+        await this.ensureInitialized();
+
+        try {
+            if (!this.isCourseSelected(course)) {
+                return {
+                    success: false,
+                    error: 'Course must be selected before clearing components'
+                };
+            }
+
+            this.profileStateManager.setSelectedComponents(course, null, null, null, 'service');
+
+            const selectedCourse = this.profileStateManager.getSelectedCourse(course);
+
+            this.notifySelectionListeners({
+                type: 'components_changed',
+                course,
+                selectedCourses: this.profileStateManager.getSelectedCourses(),
+                timestamp: Date.now()
+            });
+
+            return {
+                success: true,
+                course: selectedCourse
+            };
+
+        } catch (error) {
+            console.error('Error clearing course components:', error);
+            return {
+                success: false,
+                error: `Error clearing course components: ${error}`
+            };
+        }
+    }
+
+    async clearAllComponents(): Promise<{ success: boolean; error?: string }> {
+        await this.ensureInitialized();
+
+        try {
+            const selectedCourses = this.profileStateManager.getSelectedCourses();
+
+            for (const selectedCourse of selectedCourses) {
+                this.profileStateManager.setSelectedComponents(
+                    selectedCourse.course,
+                    null,
+                    null,
+                    null,
+                    'service'
+                );
+            }
+
+            this.notifySelectionListeners({
+                type: 'components_cleared',
+                selectedCourses: this.profileStateManager.getSelectedCourses(),
+                timestamp: Date.now()
+            });
+
+            return { success: true };
+
+        } catch (error) {
+            console.error('Error clearing components:', error);
+            return {
+                success: false,
+                error: `Error clearing components: ${error}`
             };
         }
     }

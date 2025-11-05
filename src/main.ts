@@ -17,6 +17,11 @@ function initializeIcons(): void {
   if (autoScheduleBtnIcon) {
     autoScheduleBtnIcon.src = ICONS.WAND;
   }
+
+  const clearAllSectionsBtnIcon = document.querySelector('#clear-all-sections-btn img') as HTMLImageElement;
+  if (clearAllSectionsBtnIcon) {
+    clearAllSectionsBtnIcon.src = ICONS.ERASER;
+  }
 }
 
 initializeIcons();

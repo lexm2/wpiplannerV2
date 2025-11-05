@@ -298,6 +298,7 @@ export class MainController {
             this.setupSaveIndicatorListener();
             this.setupCourseSelectionListener();
             this.scheduleController.setupAutoScheduleButton();
+            this.scheduleController.setupClearAllSectionsButton();
             this.courseController.displaySelectedCourses();
             
             // Initial UI sync for selected courses (use efficient targeted updates)
@@ -461,6 +462,29 @@ export class MainController {
                         this.uiStateManager.showErrorMessage('Failed to remove course. Please try again.');
                     });
                 }
+            }
+
+            if (target.classList.contains('course-clear-sections-btn') || target.closest('.course-clear-sections-btn')) {
+                e.stopPropagation();
+
+                const button = target.classList.contains('course-clear-sections-btn')
+                    ? target
+                    : target.closest('.course-clear-sections-btn') as HTMLElement;
+
+                let course;
+                if (this.uiStateManager.currentPage === 'schedule') {
+                    course = this.scheduleController.getCourseFromElement(button);
+                } else {
+                    course = this.courseController.getCourseFromElement(button);
+                }
+
+                if (course) {
+                    this.courseSelectionService.clearCourseComponents(course).catch(error => {
+                        console.error('Failed to clear course components:', error);
+                        this.uiStateManager.showErrorMessage('Failed to clear sections. Please try again.');
+                    });
+                }
+                return;
             }
 
             // Handle clicking on schedule course header to open wizard
@@ -830,7 +854,10 @@ export class MainController {
             const isCoursesAddedOrRemoved = currentCount !== this.previousSelectedCoursesCount;
             
             // Handle schedule changes and data loads with full refresh
-            const requiresFullRefresh = event.type === 'data_loaded' || event.type === 'selection_cleared';
+            const requiresFullRefresh = event.type === 'data_loaded'
+                || event.type === 'selection_cleared'
+                || event.type === 'components_cleared'
+                || event.type === 'components_changed';
             if (requiresFullRefresh) {
                 this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
                 this.courseController.displaySelectedCourses();

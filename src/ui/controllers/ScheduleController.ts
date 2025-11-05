@@ -317,6 +317,9 @@ export class ScheduleController {
             selectedCoursesContainer.appendChild(wizardPanel);
         }
 
+        // Initialize eraser icons
+        this.initializeEraserIcons(selectedCoursesContainer);
+
         // Set up DOM element mapping for course association
         if (!hasActiveFilters) {
             const sortedCourses = selectedCourses.sort((a, b) => {
@@ -414,6 +417,9 @@ export class ScheduleController {
                         <div class="schedule-course-credits">${credits}</div>
                     </div>
                     <div class="header-controls">
+                        <button class="course-clear-sections-btn" title="Clear selected sections">
+                            <img src="" alt="Clear sections" class="eraser-icon" />
+                        </button>
                         <button class="course-remove-btn" title="Remove from selection">
                             ×
                         </button>
@@ -514,6 +520,13 @@ export class ScheduleController {
         return html;
     }
     
+    private initializeEraserIcons(container: HTMLElement): void {
+        const eraserIcons = container.querySelectorAll('.eraser-icon');
+        eraserIcons.forEach(icon => {
+            (icon as HTMLImageElement).src = ICONS.ERASER;
+        });
+    }
+
     private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: any[]): void {
         // Associate DOM elements with Course objects
         const courseElements = selectedCoursesContainer.querySelectorAll('.schedule-course-item');
@@ -525,6 +538,13 @@ export class ScheduleController {
         });
         
         removeButtons.forEach((button, index) => {
+            const course = sortedCourses[index]?.course;
+            this.elementToCourseMap.set(button as HTMLElement, course);
+        });
+
+        // Associate clear sections buttons with their Course objects
+        const clearSectionsButtons = selectedCoursesContainer.querySelectorAll('.course-clear-sections-btn');
+        clearSectionsButtons.forEach((button, index) => {
             const course = sortedCourses[index]?.course;
             this.elementToCourseMap.set(button as HTMLElement, course);
         });
@@ -580,6 +600,13 @@ export class ScheduleController {
         });
         
         removeButtons.forEach((button, index) => {
+            const course = uniqueCourses[index]?.course;
+            this.elementToCourseMap.set(button as HTMLElement, course);
+        });
+
+        // Associate clear sections buttons with their Course objects
+        const clearSectionsButtons = selectedCoursesContainer.querySelectorAll('.course-clear-sections-btn');
+        clearSectionsButtons.forEach((button, index) => {
             const course = uniqueCourses[index]?.course;
             this.elementToCourseMap.set(button as HTMLElement, course);
         });
@@ -1250,6 +1277,43 @@ export class ScheduleController {
         }
 
         autoScheduleBtn.addEventListener('click', () => this.handleAutoSchedule());
+    }
+
+    setupClearAllSectionsButton(): void {
+        const clearAllBtn = document.getElementById('clear-all-sections-btn');
+        if (!clearAllBtn) {
+            console.warn('Clear all sections button not found');
+            return;
+        }
+
+        clearAllBtn.addEventListener('click', () => this.handleClearAllSections());
+    }
+
+    private async handleClearAllSections(): Promise<void> {
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+
+        if (selectedCourses.length === 0) {
+            alert('No courses selected.');
+            return;
+        }
+
+        const hasAnySections = selectedCourses.some(sc =>
+            sc.selectedLecture || sc.selectedDiscussion || sc.selectedLab
+        );
+
+        if (!hasAnySections) {
+            alert('No sections selected to clear.');
+            return;
+        }
+
+        if (confirm('Clear all selected sections for all courses?')) {
+            try {
+                await this.courseSelectionService.clearAllComponents();
+            } catch (error) {
+                console.error('Failed to clear all components:', error);
+                alert('Failed to clear sections. Please try again.');
+            }
+        }
     }
 
     private async handleAutoSchedule(): Promise<void> {

@@ -10,6 +10,7 @@ import downloadIcon from '../assets/icons/download.svg?url';
 import alertCircleIcon from '../assets/icons/alert-circle.svg?url';
 import adjustmentsAltIcon from '../assets/icons/adjustments-alt.svg?url';
 import wandIcon from '../assets/icons/wand.svg?url';
+import eraserIcon from '../assets/icons/eraser.svg?url';
 
 export type IconName =
   | 'FILTER'
@@ -18,7 +19,8 @@ export type IconName =
   | 'DOWNLOAD'
   | 'ALERT_CIRCLE'
   | 'ADJUSTMENTS_ALT'
-  | 'WAND';
+  | 'WAND'
+  | 'ERASER';
 
 /**
  * Icon paths for SVG assets with Vite base path resolution.
@@ -31,6 +33,7 @@ export type IconName =
  * - ALERT_CIRCLE: Alert/warning circle icon (24x24)
  * - ADJUSTMENTS_ALT: Settings/adjustments icon (24x24)
  * - WAND: Magic wand icon (24x24)
+ * - ERASER: Eraser icon (24x24)
  */
 export const ICONS: Record<IconName, string> = {
   FILTER: filterIcon,
@@ -40,4 +43,5 @@ export const ICONS: Record<IconName, string> = {
   ALERT_CIRCLE: alertCircleIcon,
   ADJUSTMENTS_ALT: adjustmentsAltIcon,
   WAND: wandIcon,
+  ERASER: eraserIcon,
 } as const;
