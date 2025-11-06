@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 6, 2025, 5:40 PM",
+  "generated": "Nov 6, 2025, 5:50 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -66335,7 +66335,7 @@
                 "crn": 337647,
                 "number": "S01",
                 "seats": 30,
-                "seats_available": 13,
+                "seats_available": 12,
                 "actual_waitlist": 0,
                 "max_waitlist": 0,
                 "note": null,
@@ -66354,7 +66354,7 @@
                     "building": "",
                     "room": "Gateway Park 1 Room 1002",
                     "seats": 30,
-                    "seats_available": 13,
+                    "seats_available": 12,
                     "actual_waitlist": 0,
                     "max_waitlist": 0,
                     "specific_section": "S01",
@@ -181429,7 +181429,7 @@
                 "crn": 337742,
                 "number": "S01",
                 "seats": 60,
-                "seats_available": 29,
+                "seats_available": 28,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -181448,7 +181448,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seats_available": 29,
+                    "seats_available": 28,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01",
