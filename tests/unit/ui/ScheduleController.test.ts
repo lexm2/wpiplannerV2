@@ -351,7 +351,6 @@ describe('ScheduleController Auto-Schedule Cycling', () => {
 
         scheduleControllerAny.generatedSchedules = mockSchedules;
         scheduleControllerAny.currentScheduleIndex = 0;
-        scheduleControllerAny.lastAutoScheduleState = 'some-hash';
 
         // Verify schedules exist
         expect(scheduleControllerAny.generatedSchedules).toHaveLength(2);
@@ -363,7 +362,6 @@ describe('ScheduleController Auto-Schedule Cycling', () => {
         // The selection change listener should have fired and cleared schedules
         expect(scheduleControllerAny.generatedSchedules).toHaveLength(0);
         expect(scheduleControllerAny.currentScheduleIndex).toBe(0);
-        expect(scheduleControllerAny.lastAutoScheduleState).toBe('');
     });
 
     test('should not clear schedules when isApplyingAutoSchedule flag is true', async () => {
