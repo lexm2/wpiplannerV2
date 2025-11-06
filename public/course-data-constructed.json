@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 6, 2025, 12:33 PM",
+  "generated": "Nov 6, 2025, 1:20 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -221226,7 +221226,7 @@
                 "crn": 338519,
                 "number": "D01",
                 "seats": 54,
-                "seats_available": 31,
+                "seats_available": 30,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -221245,7 +221245,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 54,
-                    "seats_available": 31,
+                    "seats_available": 30,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "D01",
@@ -243299,6 +243299,43 @@
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "F01 - ST in Holistic Well-Being: Strategies for College Learning and Productivity",
+                    "days": [
+                      "W"
+                    ]
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 353573,
+                "number": "S01 - Special Topics in Holistic Well-Being",
+                "seats": 12,
+                "seats_available": 12,
+                "actual_waitlist": 0,
+                "max_waitlist": 0,
+                "note": null,
+                "description": "WPE 1699 Special Topics in Holistic Well-Being, Cat. I (1/12 unit) This course provides an opportunity for students to learn about a special topic in holistic wellbeing. The topics are subject to change on a rotating basis to provide flexibility in the offerings based upon student interest and the latest practice and science of well-being.",
+                "term": "202201",
+                "computedTerm": "A",
+                "is_gps": true,
+                "is_interest_list": false,
+                "periods": [
+                  {
+                    "type": "Workshop",
+                    "professor": "Amy Curran",
+                    "start_time": "14:00",
+                    "end_time": "14:50",
+                    "location": "Salisbury Labs 305",
+                    "building": "",
+                    "room": "Salisbury Labs 305",
+                    "seats": 12,
+                    "seats_available": 12,
+                    "actual_waitlist": 0,
+                    "max_waitlist": 0,
+                    "specific_section": "S01 - Special Topics in Holistic Well-Being",
                     "days": [
                       "W"
                     ]
