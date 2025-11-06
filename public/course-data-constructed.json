@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 6, 2025, 8:51 PM",
+  "generated": "Nov 6, 2025, 9:14 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -16627,7 +16627,7 @@
                 "number": "S01",
                 "seats": 30,
                 "seats_available": 0,
-                "actual_waitlist": 2,
+                "actual_waitlist": 1,
                 "max_waitlist": 5,
                 "note": null,
                 "description": "Biomaterials are an integral part of medical devices, implants, controlled drug delivery systems, and tissue engineered constructs. Extensive research efforts have been expended on understanding how biologic systems interact with biomaterials. Meanwhile, controversy has revolved around biomaterials and their availability as a result of the backlash to the huge liability resulting from controversies related to material and processing shortcomings of medical devices. This course specifically addresses the unique role of biomaterials in medical device design and the use of emerging biomaterials technology in medical devices. The need to understand design requirements of medical devices based on safety and efficacy will be addressed. Unexpected device failure can occur if testing fails to account for synergistic interactions from chronic loading, aqueous environments, and biologic interactions. Testing methodologies are readily available to assess accelerated effects of loading in physiologic-like environments. This combined with subchronic effects of animal implants is a potential tool in assessing durability. It is difficult to predict the chronic effects of the total biologic environment. The ultimate determination of safety comes not only from following the details of regulations, but with an understanding of potential failure modes and designs that lowers the risk of these failures. This course will evaluate biomaterials and their properties as related to the design and reliability of medical devices.",
@@ -16646,7 +16646,7 @@
                     "room": "Olin Hall 126",
                     "seats": 30,
                     "seats_available": 0,
-                    "actual_waitlist": 2,
+                    "actual_waitlist": 1,
                     "max_waitlist": 5,
                     "specific_section": "S01",
                     "days": [
