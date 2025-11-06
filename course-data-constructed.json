@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 6, 2025, 2:16 PM",
+  "generated": "Nov 6, 2025, 2:43 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -70714,7 +70714,7 @@
                 "crn": 336546,
                 "number": "C01 - Topics In Urban History",
                 "seats": 35,
-                "seats_available": 19,
+                "seats_available": 18,
                 "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": null,
@@ -70733,7 +70733,7 @@
                     "building": "",
                     "room": "Stratton Hall 301",
                     "seats": 35,
-                    "seats_available": 19,
+                    "seats_available": 18,
                     "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "C01 - Topics In Urban History",
