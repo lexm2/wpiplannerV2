@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 6, 2025, 10:15 PM",
+  "generated": "Nov 6, 2025, 10:34 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -236555,7 +236555,7 @@
                 "crn": 336355,
                 "number": "C02 - Healthy Alternative: Zumba",
                 "seats": 30,
-                "seats_available": 5,
+                "seats_available": 6,
                 "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": null,
@@ -236574,7 +236574,7 @@
                     "building": "",
                     "room": "Recreation Center Dance",
                     "seats": 30,
-                    "seats_available": 5,
+                    "seats_available": 6,
                     "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "C02 - Healthy Alternative: Zumba",
