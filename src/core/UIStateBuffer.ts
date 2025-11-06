@@ -200,7 +200,8 @@ export class UIStateBuffer {
                 selectedLecture: null,
                 selectedDiscussion: null,
                 selectedLab: null,
-                isRequired
+                isRequired,
+                lockedSections: new Set()
             };
             this.uiState.selectedCourses.push(selectedCourse);
         }
@@ -500,7 +501,8 @@ export class UIStateBuffer {
                         selectedLecture: null,
                         selectedDiscussion: null,
                         selectedLab: null,
-                        isRequired
+                        isRequired,
+                        lockedSections: new Set()
                     };
                     this.uiState.selectedCourses.push(selectedCourse);
                 }

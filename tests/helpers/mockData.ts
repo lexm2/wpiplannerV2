@@ -132,7 +132,146 @@ export const createMockSelectedCourse = (overrides: Partial<SelectedCourse> = {}
     selectedLecture: null,
     selectedDiscussion: null,
     selectedLab: null,
+    selectedSection: null,
+    selectedSectionNumber: null,
     isRequired: false,
+    lockedSections: new Set<string>(),
     ...overrides
+  }
+}
+
+export const createMockSelectedCourseWithLocks = (
+  course: Course,
+  lockedCrns: string[]
+): SelectedCourse => {
+  return {
+    course,
+    selectedLecture: null,
+    selectedDiscussion: null,
+    selectedLab: null,
+    selectedSection: null,
+    selectedSectionNumber: null,
+    isRequired: false,
+    lockedSections: new Set(lockedCrns)
+  }
+}
+
+export const createCoursesWithConflicts = (): {
+  course1: Course;
+  course2: Course;
+  conflictingSection1: Section;
+  conflictingSection2: Section;
+} => {
+  const conflictingPeriod1 = createMockPeriod({
+    startTime: createMockTime(10, 0),
+    endTime: createMockTime(11, 50),
+    days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
+  })
+
+  const conflictingPeriod2 = createMockPeriod({
+    startTime: createMockTime(10, 30),
+    endTime: createMockTime(12, 20),
+    days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
+  })
+
+  const conflictingSection1 = createMockSection({
+    crn: 10001,
+    number: 'A01',
+    periods: [conflictingPeriod1]
+  })
+
+  const conflictingSection2 = createMockSection({
+    crn: 10002,
+    number: 'B01',
+    periods: [conflictingPeriod2]
+  })
+
+  const course1 = createMockCourse({
+    id: 'CS-1101',
+    number: '1101',
+    name: 'Intro to Programming',
+    lectures: [{
+      section: conflictingSection1,
+      compatibleDiscussions: [],
+      compatibleLabs: []
+    }]
+  })
+
+  const course2 = createMockCourse({
+    id: 'MA-1021',
+    number: '1021',
+    name: 'Calculus I',
+    lectures: [{
+      section: conflictingSection2,
+      compatibleDiscussions: [],
+      compatibleLabs: []
+    }]
+  })
+
+  return { course1, course2, conflictingSection1, conflictingSection2 }
+}
+
+export const createLargeCombinationSpace = (
+  numCourses: number = 5,
+  sectionsPerCourse: number = 10
+): Course[] => {
+  const courses: Course[] = []
+
+  for (let i = 0; i < numCourses; i++) {
+    const lectures: Array<{ section: Section; compatibleDiscussions: Section[]; compatibleLabs: Section[] }> = []
+
+    for (let j = 0; j < sectionsPerCourse; j++) {
+      const section = createMockSection({
+        crn: 20000 + i * 100 + j,
+        number: `A${j.toString().padStart(2, '0')}`,
+        periods: [createMockPeriod({
+          startTime: createMockTime(8 + j, 0),
+          endTime: createMockTime(9 + j, 50),
+          days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY])
+        })]
+      })
+
+      lectures.push({
+        section,
+        compatibleDiscussions: [],
+        compatibleLabs: []
+      })
+    }
+
+    courses.push(createMockCourse({
+      id: `TEST-${i + 1}000`,
+      number: `${i + 1}000`,
+      name: `Test Course ${i + 1}`,
+      lectures
+    }))
+  }
+
+  return courses
+}
+
+export const createMockScheduleFilterService = () => {
+  return {
+    filterSections: (selectedCourses: SelectedCourse[]) => {
+      const allSections: Array<{ section: Section }> = []
+      for (const sc of selectedCourses) {
+        if (sc.course.lectures) {
+          for (const lg of sc.course.lectures) {
+            allSections.push({ section: lg.section })
+            for (const disc of lg.compatibleDiscussions) {
+              allSections.push({ section: disc })
+            }
+            for (const lab of lg.compatibleLabs) {
+              allSections.push({ section: lab })
+            }
+          }
+        }
+        if (sc.course.standaloneLabs) {
+          for (const lab of sc.course.standaloneLabs) {
+            allSections.push({ section: lab })
+          }
+        }
+      }
+      return allSections
+    }
   }
 }

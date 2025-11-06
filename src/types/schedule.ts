@@ -8,6 +8,7 @@ export interface SelectedCourse {
     selectedSection: Section | null;
     selectedSectionNumber: string | null;
     isRequired: boolean;
+    lockedSections: Set<string>;
 }
 
 export interface Schedule {

@@ -98,7 +98,8 @@ export function repairSelectedCourse(sc: any): SelectedCourse | null {
         selectedLecture: null,
         selectedDiscussion: null,
         selectedLab: null,
-        isRequired: Boolean(sc.isRequired)
+        isRequired: Boolean(sc.isRequired),
+        lockedSections: new Set()
     };
     
     // Try to repair section selection

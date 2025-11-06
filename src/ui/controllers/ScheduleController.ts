@@ -756,7 +756,8 @@ export class ScheduleController {
                 selectedLab: this.wizardPreviewSelections.lab,
                 selectedSection: this.wizardPreviewSelections.lecture,
                 selectedSectionNumber: this.wizardPreviewSelections.lecture?.number || null,
-                isRequired: false
+                isRequired: false,
+                lockedSections: new Set()
             });
         }
 
@@ -874,14 +875,6 @@ export class ScheduleController {
         // Find all sections that occupy this cell
         const occupyingSections: any[] = [];
 
-        // Log for first 3 slots on Monday/Tuesday to see patterns
-        const debugLog = timeSlot < 3 && day <= DayOfWeek.TUESDAY;
-
-        if (debugLog) {
-            console.log(`[Cell] Checking slot ${timeSlot} (${timeSlot + TimeUtils.START_HOUR}:00), day ${day} (${TimeUtils.getDayAbbr(day)})`);
-            console.log(`[Cell] Processing ${courses.length} courses`);
-        }
-
         for (const selectedCourse of courses) {
             // Collect all component sections (lecture, discussion, lab)
             const sections: Section[] = [];
@@ -901,35 +894,10 @@ export class ScheduleController {
                 sections.push(selectedCourse.selectedSection);
             }
 
-            if (debugLog) {
-                console.log(`[Cell] Course ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number}: ${sections.length} sections`);
-                sections.forEach((s, idx) => {
-                    console.log(`[Cell]   Section ${idx}: ${s.number}, periods: ${s.periods?.length || 0}`);
-                });
-            }
-
             // Process each section
             for (const section of sections) {
-                if (debugLog && section.periods.length > 0) {
-                    console.log(`[Cell] Section ${section.number}: checking against day "${day}" (type: ${typeof day})`);
-                    const firstPeriod = section.periods[0];
-                    console.log(`[Cell]   period.days type:`, typeof firstPeriod.days, firstPeriod.days);
-                    console.log(`[Cell]   period.days contents:`, Array.from(firstPeriod.days));
-                    console.log(`[Cell]   period.days.has("${day}")?:`, firstPeriod.days.has(day));
-                }
-
                 // Check if this section has any period that occupies this time slot on this day
                 const periodsOnThisDay = section.periods.filter((period: any) => period.days.has(day));
-
-                if (debugLog) {
-                    console.log(`[Cell] Section ${section.number}: ${periodsOnThisDay.length} periods on day ${day}`);
-                    if (periodsOnThisDay.length > 0) {
-                        periodsOnThisDay.forEach(p => {
-                            const daysList = Array.from(p.days).join(',');
-                            console.log(`[Cell]   - ${p.startTime.hours}:${String(p.startTime.minutes).padStart(2, '0')} - ${p.endTime.hours}:${String(p.endTime.minutes).padStart(2, '0')}, days: ${daysList}`);
-                        });
-                    }
-                }
 
                 let sectionOccupiesSlot = false;
                 let sectionStartSlot = Infinity;
@@ -939,12 +907,6 @@ export class ScheduleController {
                 for (const period of periodsOnThisDay) {
                     const startSlot = TimeUtils.timeToGridRowStart(period.startTime);
                     const endSlot = TimeUtils.timeToGridRowEnd(period.endTime);
-
-                    if (debugLog) {
-                        console.log(`[Cell]   Period: ${period.startTime.hours}:${period.startTime.minutes.toString().padStart(2, '0')} - ${period.endTime.hours}:${period.endTime.minutes.toString().padStart(2, '0')}`);
-                        console.log(`[Cell]   Slots: start=${startSlot}, end=${endSlot}, current=${timeSlot}`);
-                        console.log(`[Cell]   Occupies? ${timeSlot >= startSlot && timeSlot < endSlot}`);
-                    }
 
                     if (timeSlot >= startSlot && timeSlot < endSlot) {
                         sectionOccupiesSlot = true;
@@ -980,10 +942,6 @@ export class ScheduleController {
                     });
                 }
             }
-        }
-
-        if (debugLog) {
-            console.log(`[Cell] Found ${occupyingSections.length} occupying sections for this slot`);
         }
 
         if (occupyingSections.length === 0) {
@@ -1324,6 +1282,24 @@ export class ScheduleController {
         if (selectedCourses.length === 0) {
             alert('No courses selected. Please select courses first.');
             return;
+        }
+
+        for (const selectedCourse of selectedCourses) {
+            if (!selectedCourse.lockedSections) {
+                selectedCourse.lockedSections = new Set();
+            }
+
+            if (selectedCourse.selectedLecture) {
+                selectedCourse.lockedSections.add(String(selectedCourse.selectedLecture.crn));
+            }
+
+            if (selectedCourse.selectedDiscussion) {
+                selectedCourse.lockedSections.add(String(selectedCourse.selectedDiscussion.crn));
+            }
+
+            if (selectedCourse.selectedLab) {
+                selectedCourse.lockedSections.add(String(selectedCourse.selectedLab.crn));
+            }
         }
 
         const autoScheduleBtn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;

@@ -231,7 +231,8 @@ export class ProfileStateManager {
                     selectedLab: null,
                     selectedSection: null,
                     selectedSectionNumber: null,
-                    isRequired
+                    isRequired,
+                    lockedSections: new Set()
                 };
                 this.state.selectedCourses.push(selectedCourse);
             }
@@ -342,6 +343,41 @@ export class ProfileStateManager {
             this.updateActiveScheduleWithCurrentCourses();
             this.emitEvent('courses_changed', { action: 'cleared' }, source);
         });
+    }
+
+    lockSection(course: Course, sectionCrn: string, source: string = 'user'): void {
+        this.withStateUpdate(() => {
+            const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
+            if (selectedCourse) {
+                if (!selectedCourse.lockedSections) {
+                    selectedCourse.lockedSections = new Set();
+                }
+                selectedCourse.lockedSections.add(sectionCrn);
+                this.updateActiveScheduleWithCurrentCourses();
+                this.emitEvent('courses_changed', { course, sectionCrn, action: 'section_locked' }, source);
+            }
+        });
+    }
+
+    unlockSection(course: Course, sectionCrn: string, source: string = 'user'): void {
+        this.withStateUpdate(() => {
+            const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
+            if (selectedCourse && selectedCourse.lockedSections) {
+                selectedCourse.lockedSections.delete(sectionCrn);
+                this.updateActiveScheduleWithCurrentCourses();
+                this.emitEvent('courses_changed', { course, sectionCrn, action: 'section_unlocked' }, source);
+            }
+        });
+    }
+
+    isSectionLocked(course: Course, sectionCrn: string): boolean {
+        const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
+        return selectedCourse?.lockedSections?.has(sectionCrn) || false;
+    }
+
+    getLockedSections(course: Course): Set<string> {
+        const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
+        return selectedCourse?.lockedSections || new Set();
     }
 
     // Schedule management methods
@@ -690,6 +726,10 @@ export class ProfileStateManager {
                 return liveSection;
             };
 
+            const lockedSections = selectedCourse.lockedSections instanceof Set
+                ? selectedCourse.lockedSections
+                : new Set(Array.isArray(selectedCourse.lockedSections) ? selectedCourse.lockedSections : []);
+
             const resolved: SelectedCourse = {
                 course: liveCourse,
                 selectedLecture: resolveSection(selectedCourse.selectedLecture),
@@ -697,7 +737,8 @@ export class ProfileStateManager {
                 selectedLab: resolveSection(selectedCourse.selectedLab),
                 selectedSection: resolveSection(selectedCourse.selectedSection),
                 selectedSectionNumber: selectedCourse.selectedSectionNumber,
-                isRequired: selectedCourse.isRequired
+                isRequired: selectedCourse.isRequired,
+                lockedSections
             };
 
             return resolved;

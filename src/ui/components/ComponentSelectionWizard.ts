@@ -321,7 +321,8 @@ export class ComponentSelectionWizard {
                 selectedLab: step === 'lab' ? section : (this.selections.lab || null),
                 selectedSection: step === 'lecture' ? section : (this.selections.lecture || null),
                 selectedSectionNumber: step === 'lecture' ? section.number : (this.selections.lecture?.number || null),
-                isRequired: false
+                isRequired: false,
+                lockedSections: new Set()
             };
 
             console.log(`[Wizard Filter] Testing section ${section.number} (CRN: ${section.crn}, Term: ${section.computedTerm})`);

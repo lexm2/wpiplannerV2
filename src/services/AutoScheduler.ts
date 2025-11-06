@@ -1,6 +1,6 @@
 import type { Course, Section } from '../types/types';
 import type { SelectedCourse, ScheduleScore, ScoreWeights, SchedulePreferences } from '../types/schedule';
-import { ConflictDetector } from '../core/ConflictDetector';
+import { TimeSlotMap } from '../core/TimeSlotMap';
 import type { ScheduleFilterService } from './ScheduleFilterService';
 import { ScheduleScorer } from './ScheduleScorer';
 
@@ -22,30 +22,47 @@ interface ScoredScheduleResult {
   id: string;
 }
 
+interface CourseTypeInfo {
+  hasLectures: boolean;
+  hasDiscussions: boolean;
+  hasLabs: boolean;
+  isStandaloneLab: boolean;
+}
+
+const MAX_COMBINATIONS_WARNING = 100000;
+
 export class AutoScheduler {
-  private conflictDetector: ConflictDetector;
+  private timeSlotMap: TimeSlotMap;
 
   constructor(private scheduleFilterService: ScheduleFilterService) {
-    this.conflictDetector = new ConflictDetector();
+    this.timeSlotMap = new TimeSlotMap();
   }
 
   generateSchedule(selectedCourses: SelectedCourse[]): ScheduleResult[] | null {
+    const allSchedules = this.generateAllSchedules(selectedCourses, 1);
+    return allSchedules.length > 0 ? allSchedules[0] : null;
+  }
+
+  generateAllSchedules(
+    selectedCourses: SelectedCourse[],
+    maxResults: number = 1000,
+    timeoutMs: number = 5000
+  ): ScheduleResult[][] {
     if (selectedCourses.length === 0) {
       return [];
     }
 
-    const lockedCourses: ScheduleResult[] = [];
+    const startTime = Date.now();
+
+    const lockedSections: ScheduleResult[] = [];
     const incompleteCourses: SelectedCourse[] = [];
 
     for (const selectedCourse of selectedCourses) {
-      if (this.hasCompleteSelection(selectedCourse)) {
-        lockedCourses.push({
+      const lockedCombination = this.getLockedCombination(selectedCourse);
+      if (lockedCombination) {
+        lockedSections.push({
           course: selectedCourse.course,
-          combination: {
-            lecture: selectedCourse.selectedLecture,
-            discussion: selectedCourse.selectedDiscussion,
-            lab: selectedCourse.selectedLab
-          },
+          combination: lockedCombination,
           isLocked: true
         });
       } else {
@@ -54,110 +71,162 @@ export class AutoScheduler {
     }
 
     if (incompleteCourses.length === 0) {
-      return lockedCourses;
+      return [lockedSections];
     }
 
+    console.log(`Auto-scheduler: ${lockedSections.length} locked, ${incompleteCourses.length} incomplete courses`);
+
     const candidatesPerCourse: Map<Course, SectionCombination[]> = new Map();
+    let totalCombinations = 1;
 
     for (const selectedCourse of incompleteCourses) {
       const candidates = this.getCandidateCombinations(selectedCourse);
 
       if (candidates.length === 0) {
-        return null;
+        console.warn(`No valid candidates for ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number}`);
+        return [];
       }
 
       candidatesPerCourse.set(selectedCourse.course, candidates);
+      totalCombinations *= candidates.length;
     }
 
-    const courses = Array.from(candidatesPerCourse.keys());
-    const result: ScheduleResult[] = [...lockedCourses];
+    if (totalCombinations > MAX_COMBINATIONS_WARNING) {
+      console.warn(`Warning: ${totalCombinations} possible combinations. This may take a while...`);
+      console.warn(`Consider adding more filters or locking some sections to reduce the search space.`);
+    }
 
-    if (this.backtrack(0, courses, candidatesPerCourse, result)) {
-      return result;
+    this.timeSlotMap.clear();
+    const allSections = this.getAllSectionsFromCandidates(candidatesPerCourse);
+    for (const section of allSections) {
+      this.timeSlotMap.addSection(section);
+    }
+
+    const overlaps = this.buildOverlapMap(allSections);
+    console.log(`Built overlap map: ${overlaps.size} section pairs have conflicts`);
+
+    const cartesianProduct = this.generateCartesianProduct(
+      incompleteCourses,
+      candidatesPerCourse,
+      maxResults * 10
+    );
+
+    console.log(`Generated ${cartesianProduct.length} combinations (before conflict filtering)`);
+
+    const validSchedules: ScheduleResult[][] = [];
+
+    for (const combo of cartesianProduct) {
+      if (Date.now() - startTime > timeoutMs) {
+        console.warn(`Timeout after ${timeoutMs}ms - returning ${validSchedules.length} schedules`);
+        break;
+      }
+
+      if (validSchedules.length >= maxResults) {
+        break;
+      }
+
+      const fullSchedule = [...lockedSections, ...combo];
+
+      if (this.isValidScheduleUsingOverlapMap(fullSchedule, overlaps)) {
+        validSchedules.push(fullSchedule);
+      }
+    }
+
+    console.log(`Found ${validSchedules.length} valid conflict-free schedules`);
+
+    return validSchedules;
+  }
+
+  private getLockedCombination(selectedCourse: SelectedCourse): SectionCombination | null {
+    const lockedSections = selectedCourse.lockedSections || new Set();
+    const typeInfo = this.detectCourseTypes(selectedCourse.course);
+
+    let lectureCount = 0;
+    let discussionCount = 0;
+    let labCount = 0;
+
+    let lockedLecture: Section | null = null;
+    let lockedDiscussion: Section | null = null;
+    let lockedLab: Section | null = null;
+
+    if (selectedCourse.selectedLecture && lockedSections.has(String(selectedCourse.selectedLecture.crn))) {
+      lockedLecture = selectedCourse.selectedLecture;
+      lectureCount = 1;
+    }
+
+    if (selectedCourse.selectedDiscussion && lockedSections.has(String(selectedCourse.selectedDiscussion.crn))) {
+      lockedDiscussion = selectedCourse.selectedDiscussion;
+      discussionCount = 1;
+    }
+
+    if (selectedCourse.selectedLab && lockedSections.has(String(selectedCourse.selectedLab.crn))) {
+      lockedLab = selectedCourse.selectedLab;
+      labCount = 1;
+    }
+
+    const hasAllRequired =
+      (!typeInfo.hasLectures || lectureCount === 1) &&
+      (!typeInfo.hasDiscussions || discussionCount === 1) &&
+      (!typeInfo.hasLabs || labCount === 1);
+
+    if (hasAllRequired) {
+      return {
+        lecture: lockedLecture,
+        discussion: lockedDiscussion,
+        lab: lockedLab
+      };
     }
 
     return null;
   }
 
-  private hasCompleteSelection(selectedCourse: SelectedCourse): boolean {
-    const course = selectedCourse.course;
+  private detectCourseTypes(course: Course): CourseTypeInfo {
+    let hasLectures = false;
+    let hasDiscussions = false;
+    let hasLabs = false;
 
-    if (course.standaloneLabs && course.standaloneLabs.length > 0) {
-      return selectedCourse.selectedLab !== null;
-    }
+    if (course.lectures && course.lectures.length > 0) {
+      hasLectures = true;
 
-    if (!course.lectures || course.lectures.length === 0) {
-      return false;
-    }
-
-    if (!selectedCourse.selectedLecture) {
-      return false;
-    }
-
-    const lectureGroup = course.lectures.find(
-      lg => lg.section.crn === selectedCourse.selectedLecture?.crn
-    );
-
-    if (!lectureGroup) {
-      return false;
-    }
-
-    const hasDiscussions = lectureGroup.compatibleDiscussions && lectureGroup.compatibleDiscussions.length > 0;
-    const hasLabs = lectureGroup.compatibleLabs && lectureGroup.compatibleLabs.length > 0;
-
-    if (hasDiscussions && !selectedCourse.selectedDiscussion) {
-      return false;
-    }
-
-    if (hasLabs && !selectedCourse.selectedLab) {
-      return false;
-    }
-
-    return true;
-  }
-
-  private backtrack(
-    courseIndex: number,
-    courses: Course[],
-    candidatesPerCourse: Map<Course, SectionCombination[]>,
-    currentSelection: ScheduleResult[]
-  ): boolean {
-    if (courseIndex === courses.length) {
-      return this.isValidSchedule(currentSelection);
-    }
-
-    const course = courses[courseIndex];
-    const candidates = candidatesPerCourse.get(course) || [];
-
-    for (const combination of candidates) {
-      currentSelection.push({ course, combination });
-
-      if (!this.hasConflictsInCurrentSelection(currentSelection)) {
-        if (this.backtrack(courseIndex + 1, courses, candidatesPerCourse, currentSelection)) {
-          return true;
+      for (const lectureGroup of course.lectures) {
+        if (lectureGroup.compatibleDiscussions && lectureGroup.compatibleDiscussions.length > 0) {
+          hasDiscussions = true;
+        }
+        if (lectureGroup.compatibleLabs && lectureGroup.compatibleLabs.length > 0) {
+          hasLabs = true;
         }
       }
-
-      currentSelection.pop();
     }
 
-    return false;
+    const isStandaloneLab = !hasLectures && !!(course.standaloneLabs && course.standaloneLabs.length > 0);
+    if (isStandaloneLab) {
+      hasLabs = true;
+    }
+
+    return { hasLectures, hasDiscussions, hasLabs, isStandaloneLab };
   }
 
   private getCandidateCombinations(selectedCourse: SelectedCourse): SectionCombination[] {
     const course = selectedCourse.course;
+    const lockedSections = selectedCourse.lockedSections || new Set();
     const candidates: SectionCombination[] = [];
 
-    if (course.standaloneLabs && course.standaloneLabs.length > 0) {
-      if (selectedCourse.selectedLab) {
-        candidates.push({ lecture: null, discussion: null, lab: selectedCourse.selectedLab });
-      } else {
-        for (const lab of course.standaloneLabs) {
-          if (this.sectionPassesFilters(lab, selectedCourse)) {
+    const typeInfo = this.detectCourseTypes(course);
+
+    if (typeInfo.isStandaloneLab) {
+      const labCandidates = (course.standaloneLabs || [])
+        .filter(lab => this.hasValidTimeSlot(lab) && this.sectionPassesFilters(lab, selectedCourse));
+
+      for (const lab of labCandidates) {
+        if (lockedSections.has(String(lab.crn)) || !selectedCourse.selectedLab) {
+          if (lockedSections.has(String(lab.crn)) || !selectedCourse.selectedLab || selectedCourse.selectedLab.crn === lab.crn) {
             candidates.push({ lecture: null, discussion: null, lab });
           }
+        } else {
+          candidates.push({ lecture: null, discussion: null, lab });
         }
       }
+
       return candidates;
     }
 
@@ -165,61 +234,63 @@ export class AutoScheduler {
       return candidates;
     }
 
-    const lectureGroups = selectedCourse.selectedLecture
-      ? course.lectures.filter(lg => lg.section.crn === selectedCourse.selectedLecture?.crn)
-      : course.lectures;
-
-    for (const lectureGroup of lectureGroups) {
+    for (const lectureGroup of course.lectures) {
       const lecture = lectureGroup.section;
 
-      if (!selectedCourse.selectedLecture && !this.sectionPassesFilters(lecture, selectedCourse)) {
+      if (!this.hasValidTimeSlot(lecture)) {
         continue;
       }
 
-      const discussions = lectureGroup.compatibleDiscussions || [];
-      const labs = lectureGroup.compatibleLabs || [];
+      const isLectureLocked = lockedSections.has(String(lecture.crn));
+      const isLecturePreSelected = selectedCourse.selectedLecture && selectedCourse.selectedLecture.crn === lecture.crn;
 
-      const discussionCandidates = selectedCourse.selectedDiscussion
-        ? [selectedCourse.selectedDiscussion]
-        : discussions.filter(d => this.sectionPassesFilters(d, selectedCourse));
+      if (!isLectureLocked && !isLecturePreSelected) {
+        if (selectedCourse.selectedLecture) {
+          continue;
+        }
+        if (!this.sectionPassesFilters(lecture, selectedCourse)) {
+          continue;
+        }
+      }
 
-      const labCandidates = selectedCourse.selectedLab
-        ? [selectedCourse.selectedLab]
-        : labs.filter(l => this.sectionPassesFilters(l, selectedCourse));
+      const discussionCandidates: (Section | null)[] = [];
+      const labCandidates: (Section | null)[] = [];
 
-      if (discussionCandidates.length === 0 && labCandidates.length === 0) {
-        candidates.push({ lecture, discussion: null, lab: null });
-      } else if (discussionCandidates.length === 0 && labCandidates.length > 0) {
-        for (const lab of labCandidates) {
-          candidates.push({ lecture, discussion: null, lab });
-        }
-        if (!selectedCourse.selectedLab && labs.length > 0) {
-          candidates.push({ lecture, discussion: null, lab: null });
-        }
-      } else if (discussionCandidates.length > 0 && labCandidates.length === 0) {
-        for (const discussion of discussionCandidates) {
-          candidates.push({ lecture, discussion, lab: null });
-        }
-        if (!selectedCourse.selectedDiscussion && discussions.length > 0) {
-          candidates.push({ lecture, discussion: null, lab: null });
+      if (typeInfo.hasDiscussions) {
+        const discussions = (lectureGroup.compatibleDiscussions || [])
+          .filter(d => this.hasValidTimeSlot(d) && this.sectionPassesFilters(d, selectedCourse));
+
+        for (const discussion of discussions) {
+          const isDiscussionLocked = lockedSections.has(String(discussion.crn));
+          const isDiscussionPreSelected = selectedCourse.selectedDiscussion && selectedCourse.selectedDiscussion.crn === discussion.crn;
+
+          if (isDiscussionLocked || isDiscussionPreSelected || !selectedCourse.selectedDiscussion) {
+            discussionCandidates.push(discussion);
+          }
         }
       } else {
-        for (const discussion of discussionCandidates) {
-          for (const lab of labCandidates) {
-            candidates.push({ lecture, discussion, lab });
-          }
-          if (!selectedCourse.selectedLab && labs.length > 0) {
-            candidates.push({ lecture, discussion, lab: null });
+        discussionCandidates.push(null);
+      }
+
+      if (typeInfo.hasLabs) {
+        const labs = (lectureGroup.compatibleLabs || [])
+          .filter(l => this.hasValidTimeSlot(l) && this.sectionPassesFilters(l, selectedCourse));
+
+        for (const lab of labs) {
+          const isLabLocked = lockedSections.has(String(lab.crn));
+          const isLabPreSelected = selectedCourse.selectedLab && selectedCourse.selectedLab.crn === lab.crn;
+
+          if (isLabLocked || isLabPreSelected || !selectedCourse.selectedLab) {
+            labCandidates.push(lab);
           }
         }
+      } else {
+        labCandidates.push(null);
+      }
 
-        if (!selectedCourse.selectedDiscussion && discussions.length > 0) {
-          for (const lab of labCandidates) {
-            candidates.push({ lecture, discussion: null, lab });
-          }
-          if (!selectedCourse.selectedLab && labs.length > 0) {
-            candidates.push({ lecture, discussion: null, lab: null });
-          }
+      for (const discussion of discussionCandidates) {
+        for (const lab of labCandidates) {
+          candidates.push({ lecture, discussion, lab });
         }
       }
     }
@@ -240,171 +311,146 @@ export class AutoScheduler {
   }
 
   private hasValidTimeSlot(section: Section): boolean {
+    if (!section.periods || section.periods.length === 0) {
+      return false;
+    }
+
     return section.periods.some(period => {
-      return period.startTime.hours !== period.endTime.hours ||
+      const hasTime = period.startTime.hours !== period.endTime.hours ||
              period.startTime.minutes !== period.endTime.minutes;
+      const hasDays = period.days && period.days.size > 0;
+      return hasTime && hasDays;
     });
   }
 
-  private hasConflictsInCurrentSelection(currentSelection: ScheduleResult[]): boolean {
+  private getAllSectionsFromCandidates(candidatesPerCourse: Map<Course, SectionCombination[]>): Section[] {
     const allSections: Section[] = [];
+    const seen = new Set<string>();
 
-    for (const result of currentSelection) {
-      if (result.combination.lecture) {
-        allSections.push(result.combination.lecture);
-      }
-      if (result.combination.discussion) {
-        allSections.push(result.combination.discussion);
-      }
-      if (result.combination.lab) {
-        allSections.push(result.combination.lab);
+    for (const combinations of candidatesPerCourse.values()) {
+      for (const combo of combinations) {
+        if (combo.lecture && !seen.has(String(combo.lecture.crn))) {
+          allSections.push(combo.lecture);
+          seen.add(String(combo.lecture.crn));
+        }
+        if (combo.discussion && !seen.has(String(combo.discussion.crn))) {
+          allSections.push(combo.discussion);
+          seen.add(String(combo.discussion.crn));
+        }
+        if (combo.lab && !seen.has(String(combo.lab.crn))) {
+          allSections.push(combo.lab);
+          seen.add(String(combo.lab.crn));
+        }
       }
     }
 
-    return !this.conflictDetector.isValidSchedule(allSections);
+    return allSections;
   }
 
-  private isValidSchedule(schedule: ScheduleResult[]): boolean {
-    const allSections: Section[] = [];
+  private buildOverlapMap(sections: Section[]): Map<string, Set<string>> {
+    const overlaps = new Map<string, Set<string>>();
+
+    for (let i = 0; i < sections.length; i++) {
+      for (let j = i + 1; j < sections.length; j++) {
+        const section1 = sections[i];
+        const section2 = sections[j];
+
+        if (this.timeSlotMap.hasOverlap(section1, section2)) {
+          const key1 = String(section1.crn);
+          const key2 = String(section2.crn);
+
+          if (!overlaps.has(key1)) {
+            overlaps.set(key1, new Set());
+          }
+          overlaps.get(key1)!.add(key2);
+
+          if (!overlaps.has(key2)) {
+            overlaps.set(key2, new Set());
+          }
+          overlaps.get(key2)!.add(key1);
+        }
+      }
+    }
+
+    return overlaps;
+  }
+
+  private generateCartesianProduct(
+    courses: SelectedCourse[],
+    candidatesPerCourse: Map<Course, SectionCombination[]>,
+    maxCombinations: number
+  ): ScheduleResult[][] {
+    const results: ScheduleResult[][] = [];
+
+    const courseList = courses.map(sc => sc.course);
+    const candidateLists = courseList.map(course => candidatesPerCourse.get(course) || []);
+
+    const indices = new Array(courseList.length).fill(0);
+
+    while (true) {
+      if (results.length >= maxCombinations) {
+        console.warn(`Reached max combinations limit of ${maxCombinations}`);
+        break;
+      }
+
+      const combo: ScheduleResult[] = [];
+      for (let i = 0; i < courseList.length; i++) {
+        combo.push({
+          course: courseList[i],
+          combination: candidateLists[i][indices[i]]
+        });
+      }
+      results.push(combo);
+
+      let carry = 1;
+      for (let i = courseList.length - 1; i >= 0 && carry; i--) {
+        indices[i] += carry;
+        if (indices[i] >= candidateLists[i].length) {
+          indices[i] = 0;
+          carry = 1;
+        } else {
+          carry = 0;
+        }
+      }
+
+      if (carry) {
+        break;
+      }
+    }
+
+    return results;
+  }
+
+  private isValidScheduleUsingOverlapMap(
+    schedule: ScheduleResult[],
+    overlaps: Map<string, Set<string>>
+  ): boolean {
+    const crns: string[] = [];
 
     for (const result of schedule) {
       if (result.combination.lecture) {
-        allSections.push(result.combination.lecture);
+        crns.push(String(result.combination.lecture.crn));
       }
       if (result.combination.discussion) {
-        allSections.push(result.combination.discussion);
+        crns.push(String(result.combination.discussion.crn));
       }
       if (result.combination.lab) {
-        allSections.push(result.combination.lab);
+        crns.push(String(result.combination.lab.crn));
       }
     }
 
-    return this.conflictDetector.isValidSchedule(allSections);
-  }
+    for (let i = 0; i < crns.length; i++) {
+      for (let j = i + 1; j < crns.length; j++) {
+        const crn1 = crns[i];
+        const crn2 = crns[j];
 
-  generateAllSchedules(
-    selectedCourses: SelectedCourse[],
-    maxResults: number = 1000,
-    timeoutMs: number = 5000
-  ): ScheduleResult[][] {
-    if (selectedCourses.length === 0) {
-      return [];
-    }
-
-    const lockedCourses: ScheduleResult[] = [];
-    const incompleteCourses: SelectedCourse[] = [];
-
-    for (const selectedCourse of selectedCourses) {
-      if (this.hasCompleteSelection(selectedCourse)) {
-        lockedCourses.push({
-          course: selectedCourse.course,
-          combination: {
-            lecture: selectedCourse.selectedLecture,
-            discussion: selectedCourse.selectedDiscussion,
-            lab: selectedCourse.selectedLab
-          },
-          isLocked: true
-        });
-      } else {
-        incompleteCourses.push(selectedCourse);
+        if (overlaps.has(crn1) && overlaps.get(crn1)!.has(crn2)) {
+          return false;
+        }
       }
     }
 
-    if (incompleteCourses.length === 0) {
-      return [lockedCourses];
-    }
-
-    const candidatesPerCourse: Map<Course, SectionCombination[]> = new Map();
-
-    for (const selectedCourse of incompleteCourses) {
-      const candidates = this.getCandidateCombinations(selectedCourse);
-
-      if (candidates.length === 0) {
-        return [];
-      }
-
-      candidatesPerCourse.set(selectedCourse.course, candidates);
-    }
-
-    const courses = Array.from(candidatesPerCourse.keys())
-      .sort((a, b) => {
-        const aCount = candidatesPerCourse.get(a)?.length || 0;
-        const bCount = candidatesPerCourse.get(b)?.length || 0;
-        return aCount - bCount;
-      });
-
-    const allSolutions: ScheduleResult[][] = [];
-    const startTime = Date.now();
-
-    this.backtrackAll(
-      0,
-      courses,
-      candidatesPerCourse,
-      [...lockedCourses],
-      allSolutions,
-      maxResults,
-      startTime,
-      timeoutMs
-    );
-
-    return allSolutions;
-  }
-
-  private backtrackAll(
-    courseIndex: number,
-    courses: Course[],
-    candidatesPerCourse: Map<Course, SectionCombination[]>,
-    currentSelection: ScheduleResult[],
-    allSolutions: ScheduleResult[][],
-    maxResults: number,
-    startTime: number,
-    timeoutMs: number
-  ): void {
-    if (allSolutions.length >= maxResults) {
-      return;
-    }
-
-    if (Date.now() - startTime > timeoutMs) {
-      console.warn(`Schedule generation timeout after ${timeoutMs}ms - returning ${allSolutions.length} schedules`);
-      return;
-    }
-
-    if (courseIndex === courses.length) {
-      if (this.isValidSchedule(currentSelection)) {
-        allSolutions.push(currentSelection.map(sr => ({
-          course: sr.course,
-          combination: {
-            lecture: sr.combination.lecture,
-            discussion: sr.combination.discussion,
-            lab: sr.combination.lab
-          },
-          isLocked: sr.isLocked
-        })));
-      }
-      return;
-    }
-
-    const course = courses[courseIndex];
-    const candidates = candidatesPerCourse.get(course) || [];
-
-    for (const combination of candidates) {
-      currentSelection.push({ course, combination });
-
-      if (!this.hasConflictsInCurrentSelection(currentSelection)) {
-        this.backtrackAll(
-          courseIndex + 1,
-          courses,
-          candidatesPerCourse,
-          currentSelection,
-          allSolutions,
-          maxResults,
-          startTime,
-          timeoutMs
-        );
-      }
-
-      currentSelection.pop();
-    }
+    return true;
   }
 
   generateBestSchedule(

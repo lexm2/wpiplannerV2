@@ -572,6 +572,96 @@ export class CourseSelectionService {
         });
     }
 
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════════
+     * SECTION LOCKING METHODS (NEW)
+     * ═══════════════════════════════════════════════════════════════════════════════
+     * These methods support locking/unlocking individual sections (lecture, discussion, lab)
+     * to prevent auto-scheduler from changing user's manual selections.
+     */
+
+    async lockSection(course: Course, sectionCrn: string): Promise<CourseSelectionResult> {
+        await this.ensureInitialized();
+
+        try {
+            if (!this.isCourseSelected(course)) {
+                return {
+                    success: false,
+                    error: 'Course must be selected before locking a section'
+                };
+            }
+
+            this.profileStateManager.lockSection(course, sectionCrn, 'service');
+
+            const selectedCourse = this.profileStateManager.getSelectedCourse(course);
+
+            this.notifySelectionListeners({
+                type: 'components_changed',
+                course,
+                selectedCourses: this.profileStateManager.getSelectedCourses(),
+                timestamp: Date.now()
+            });
+
+            return {
+                success: true,
+                course: selectedCourse
+            };
+
+        } catch (error) {
+            console.error('Error locking section:', error);
+            return {
+                success: false,
+                error: `Error locking section: ${error}`
+            };
+        }
+    }
+
+    async unlockSection(course: Course, sectionCrn: string): Promise<CourseSelectionResult> {
+        await this.ensureInitialized();
+
+        try {
+            if (!this.isCourseSelected(course)) {
+                return {
+                    success: false,
+                    error: 'Course must be selected before unlocking a section'
+                };
+            }
+
+            this.profileStateManager.unlockSection(course, sectionCrn, 'service');
+
+            const selectedCourse = this.profileStateManager.getSelectedCourse(course);
+
+            this.notifySelectionListeners({
+                type: 'components_changed',
+                course,
+                selectedCourses: this.profileStateManager.getSelectedCourses(),
+                timestamp: Date.now()
+            });
+
+            return {
+                success: true,
+                course: selectedCourse
+            };
+
+        } catch (error) {
+            console.error('Error unlocking section:', error);
+            return {
+                success: false,
+                error: `Error unlocking section: ${error}`
+            };
+        }
+    }
+
+    isSectionLocked(course: Course, sectionCrn: string): boolean {
+        if (!this.isInitialized) return false;
+        return this.profileStateManager.isSectionLocked(course, sectionCrn);
+    }
+
+    getLockedSections(course: Course): Set<string> {
+        if (!this.isInitialized) return new Set();
+        return this.profileStateManager.getLockedSections(course);
+    }
+
     // Query methods
     isCourseSelected(course: Course): boolean {
         if (!this.isInitialized) return false;
