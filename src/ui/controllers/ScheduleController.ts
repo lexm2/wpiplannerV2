@@ -11,6 +11,7 @@ import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/ConflictDetector'
 import { getComputedTerm, validateSelectedCourses } from '../../utils/typeGuards'
 import { AutoScheduler } from '../../services/AutoScheduler'
+import { ScheduleScorer } from '../../services/ScheduleScorer'
 import { getInlineSVG } from '../../utils/iconPaths'
 
 interface WizardSelections {
@@ -33,6 +34,9 @@ export class ScheduleController {
     private wizardPreviewSelections: WizardSelections | null = null;
     private courseColorMap: Map<string, string> = new Map();
     private usedColors: Set<string> = new Set();
+    private generatedSchedules: any[][] = [];
+    private currentScheduleIndex: number = 0;
+    private lastAutoScheduleState: string = '';
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
@@ -1244,6 +1248,15 @@ export class ScheduleController {
         clearAllBtn.addEventListener('click', () => this.handleClearAllSections());
     }
 
+    setupCourseSelectionChangeListener(): void {
+        this.courseSelectionService.onSelectionChange(() => {
+            this.generatedSchedules = [];
+            this.currentScheduleIndex = 0;
+            this.lastAutoScheduleState = '';
+            this.updateAutoScheduleButtonUI();
+        });
+    }
+
     private async handleClearAllSections(): Promise<void> {
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
 
@@ -1268,6 +1281,32 @@ export class ScheduleController {
                 console.error('Failed to clear all components:', error);
                 alert('Failed to clear sections. Please try again.');
             }
+        }
+    }
+
+    private createScheduleStateHash(courses: SelectedCourse[]): string {
+        return courses
+            .map(sc => `${sc.course.id}:${Array.from(sc.lockedSections).sort().join(',')}`)
+            .sort()
+            .join('|');
+    }
+
+    private updateAutoScheduleButtonUI(): void {
+        const btn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
+        if (!btn) return;
+
+        if (this.generatedSchedules.length === 0) {
+            btn.innerHTML = `${getInlineSVG('WAND', 'auto-schedule-icon')}<span>Auto-Schedule</span>`;
+            btn.disabled = false;
+            btn.title = 'Automatically generate a schedule';
+        } else if (this.currentScheduleIndex < this.generatedSchedules.length - 1) {
+            btn.innerHTML = `${getInlineSVG('CALENDAR_UP', 'auto-schedule-icon')}<span>${this.currentScheduleIndex + 1}/${this.generatedSchedules.length}</span>`;
+            btn.disabled = false;
+            btn.title = 'Show next schedule option';
+        } else {
+            btn.innerHTML = `${getInlineSVG('CALENDAR_UP', 'auto-schedule-icon')}<span>${this.currentScheduleIndex + 1}/${this.generatedSchedules.length}</span>`;
+            btn.disabled = true;
+            btn.title = 'No more schedule options available';
         }
     }
 
@@ -1302,6 +1341,21 @@ export class ScheduleController {
             }
         }
 
+        const currentStateHash = this.createScheduleStateHash(selectedCourses);
+        const stateChanged = currentStateHash !== this.lastAutoScheduleState;
+
+        if (!stateChanged && this.generatedSchedules.length > 0) {
+            if (this.currentScheduleIndex < this.generatedSchedules.length - 1) {
+                this.currentScheduleIndex++;
+                await this.applyScheduleAtIndex(this.currentScheduleIndex);
+                this.updateAutoScheduleButtonUI();
+                console.log(`Showing schedule ${this.currentScheduleIndex + 1} of ${this.generatedSchedules.length}`);
+            } else {
+                alert('No more schedule options available.');
+            }
+            return;
+        }
+
         const autoScheduleBtn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
         if (autoScheduleBtn) {
             autoScheduleBtn.disabled = true;
@@ -1320,51 +1374,71 @@ export class ScheduleController {
                 avoidBackToBackClasses: false
             };
 
-            const schedule = autoScheduler.generateBestSchedule(
+            const allSchedules = autoScheduler.generateAllSchedules(
                 selectedCourses,
-                defaultPreferences
+                1000
             );
 
-            if (!schedule) {
+            if (allSchedules.length === 0) {
                 alert('Could not generate a valid schedule. Try adjusting your filters or course selections.');
+                this.generatedSchedules = [];
+                this.currentScheduleIndex = 0;
+                this.lastAutoScheduleState = '';
+                this.updateAutoScheduleButtonUI();
                 return;
             }
 
-            let autoFilledCount = 0;
-            let lockedCount = 0;
+            const scorer = new ScheduleScorer();
+            const scored = allSchedules.map((schedule, index) => ({
+                schedule,
+                score: scorer.calculateCompositeScore(schedule, defaultPreferences),
+                id: `schedule-${index}`
+            }));
 
-            for (const result of schedule) {
-                if (result.isLocked) {
-                    lockedCount++;
-                    continue;
-                }
+            scored.sort((a, b) => b.score.totalScore - a.score.totalScore);
 
-                await this.courseSelectionService.setSelectedComponents(
-                    result.course,
-                    result.combination.lecture,
-                    result.combination.discussion,
-                    result.combination.lab
-                );
-                autoFilledCount++;
-            }
+            this.generatedSchedules = scored.map(s => s.schedule);
+            this.currentScheduleIndex = 0;
+            this.lastAutoScheduleState = currentStateHash;
 
-            this.displayScheduleSelectedCourses();
-            this.renderScheduleGrids();
+            await this.applyScheduleAtIndex(0);
+            this.updateAutoScheduleButtonUI();
 
-            let message = `Successfully generated optimized schedule!`;
-            if (lockedCount > 0) {
-                message += ` (${autoFilledCount} courses auto-filled, ${lockedCount} already selected)`;
-            }
-            console.log(message);
+            console.log(`Generated ${this.generatedSchedules.length} valid schedules. Showing best option (1/${this.generatedSchedules.length})`);
         } catch (error) {
             console.error('Error generating schedule:', error);
             alert('An error occurred while generating the schedule. Please try again.');
-        } finally {
-            if (autoScheduleBtn) {
-                autoScheduleBtn.disabled = false;
-                autoScheduleBtn.innerHTML = `${getInlineSVG('WAND', 'auto-schedule-icon')}<span>Auto-Schedule</span>`;
-            }
+            this.generatedSchedules = [];
+            this.currentScheduleIndex = 0;
+            this.lastAutoScheduleState = '';
+            this.updateAutoScheduleButtonUI();
         }
+    }
+
+    private async applyScheduleAtIndex(index: number): Promise<void> {
+        const schedule = this.generatedSchedules[index];
+        if (!schedule) return;
+
+        let autoFilledCount = 0;
+        let lockedCount = 0;
+
+        for (const result of schedule) {
+            if (result.isLocked) {
+                lockedCount++;
+                continue;
+            }
+
+            await this.courseSelectionService.setSelectedComponents(
+                result.course,
+                result.combination.lecture,
+                result.combination.discussion,
+                result.combination.lab
+            );
+            autoFilledCount++;
+        }
+
+        this.displayScheduleSelectedCourses();
+        this.renderScheduleGrids();
     }
 
 }

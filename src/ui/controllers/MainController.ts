@@ -299,6 +299,7 @@ export class MainController {
             this.setupCourseSelectionListener();
             this.scheduleController.setupAutoScheduleButton();
             this.scheduleController.setupClearAllSectionsButton();
+            this.scheduleController.setupCourseSelectionChangeListener();
             this.courseController.displaySelectedCourses();
             
             // Initial UI sync for selected courses (use efficient targeted updates)
