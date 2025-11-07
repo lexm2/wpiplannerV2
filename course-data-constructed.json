@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 6, 2025, 11:50 PM",
+  "generated": "Nov 7, 2025, 1:14 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -242611,7 +242611,7 @@
                 "crn": 336134,
                 "number": "C02",
                 "seats": 25,
-                "seats_available": 8,
+                "seats_available": 7,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -242630,7 +242630,7 @@
                     "building": "",
                     "room": "Recreation Center Dance",
                     "seats": 25,
-                    "seats_available": 8,
+                    "seats_available": 7,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C02",
@@ -242687,7 +242687,7 @@
                 "crn": 354240,
                 "number": "C04",
                 "seats": 25,
-                "seats_available": 22,
+                "seats_available": 19,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -242706,7 +242706,7 @@
                     "building": "",
                     "room": "Recreation Center Dance",
                     "seats": 25,
-                    "seats_available": 22,
+                    "seats_available": 19,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C04",
