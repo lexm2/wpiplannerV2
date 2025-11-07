@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 7, 2025, 9:36 PM",
+  "generated": "Nov 7, 2025, 9:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -46351,7 +46351,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seats_available": 0,
-                "actual_waitlist": 2,
+                "actual_waitlist": 3,
                 "max_waitlist": 5,
                 "note": null,
                 "description": "Cat. II This course provides an introduction to Knowledge Discovery in Databases (KDD) and Data Mining. KDD deals with data integration techniques and with the discovery, interpretation and visualization of patterns in large collections of data. Topics covered in this course include data warehousing and mediation techniques; data mining methods such as rule-based learning, decision trees, association rules and sequence mining; and data visualization. The work discussed originates in the fields of artificial intelligence, machine learning, statistical data analysis, data visualization, databases, and information retrieval. Several scientific and industrial applications of KDD will be studied. Recommended background: MA 2611, CS 2223, and CS 3431, or CS 3733. This course will be offered in 2019-20, and in alternating years thereafter.",
@@ -46370,7 +46370,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 50,
                     "seats_available": 0,
-                    "actual_waitlist": 2,
+                    "actual_waitlist": 3,
                     "max_waitlist": 5,
                     "specific_section": "D01",
                     "days": [
