@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 7, 2025, 7:37 PM",
+  "generated": "Nov 7, 2025, 7:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -17950,7 +17950,7 @@
                 "crn": 340374,
                 "number": "S01",
                 "seats": 30,
-                "seats_available": 28,
+                "seats_available": 27,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -17969,7 +17969,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seats_available": 28,
+                    "seats_available": 27,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01",
@@ -180400,7 +180400,7 @@
                 "crn": 337740,
                 "number": "S01",
                 "seats": 55,
-                "seats_available": 23,
+                "seats_available": 22,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -180419,7 +180419,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 55,
-                    "seats_available": 23,
+                    "seats_available": 22,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01",
