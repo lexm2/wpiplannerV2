@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 7, 2025, 9:49 PM",
+  "generated": "Nov 7, 2025, 10:14 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -71994,6 +71994,54 @@
                     "days": [
                       "T",
                       "F"
+                    ]
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "HI-3317",
+          "number": "3317",
+          "name": "Topics In Environmental History",
+          "description": "HI 3317 Topics in Environmental History (Cat. II) In this seminar course, students will explore one aspect of U.S. or global environmental history in more depth. Topics vary each year but may include environmental thought, environmental reform movements, comparative environmental movements, natural disasters, the history of ecology, built environments, environmental justice, New England environmental history, or the environmental history of South Asia or another region of the world. The course will require substantial reading and writing. This course may be repeated for different topics . This course will be offered in 2022- 23, and in alternating years thereafter. Recommended Background: HI 2400 Topics in Environmental History.",
+          "min_credits": 3,
+          "max_credits": 3,
+          "lectures": [
+            {
+              "section": {
+                "crn": 354392,
+                "number": "D01 - Topics In Environmental History",
+                "seats": 20,
+                "seats_available": 20,
+                "actual_waitlist": 0,
+                "max_waitlist": 5,
+                "note": null,
+                "description": "HI 3317 Topics in Environmental History (Cat. II) In this seminar course, students will explore one aspect of U.S. or global environmental history in more depth. Topics vary each year but may include environmental thought, environmental reform movements, comparative environmental movements, natural disasters, the history of ecology, built environments, environmental justice, New England environmental history, or the environmental history of South Asia or another region of the world. The course will require substantial reading and writing. This course may be repeated for different topics . This course will be offered in 2022- 23, and in alternating years thereafter. Recommended Background: HI 2400 Topics in Environmental History.",
+                "term": "202201",
+                "computedTerm": "D",
+                "is_gps": true,
+                "is_interest_list": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Joseph Cullon",
+                    "start_time": "10:00",
+                    "end_time": "11:50",
+                    "location": "Stratton Hall 202 (new)",
+                    "building": "",
+                    "room": "Stratton Hall 202 (new)",
+                    "seats": 20,
+                    "seats_available": 20,
+                    "actual_waitlist": 0,
+                    "max_waitlist": 5,
+                    "specific_section": "D01 - Topics In Environmental History",
+                    "days": [
+                      "M",
+                      "R"
                     ]
                   }
                 ]
