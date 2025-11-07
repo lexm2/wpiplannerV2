@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 7, 2025, 3:40 PM",
+  "generated": "Nov 7, 2025, 3:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -2641,7 +2641,7 @@
                 "crn": 336814,
                 "number": "C03",
                 "seats": 25,
-                "seats_available": 13,
+                "seats_available": 12,
                 "actual_waitlist": 0,
                 "max_waitlist": 0,
                 "note": null,
@@ -2660,7 +2660,7 @@
                     "building": "",
                     "room": "Online-synchronous",
                     "seats": 25,
-                    "seats_available": 13,
+                    "seats_available": 12,
                     "actual_waitlist": 0,
                     "max_waitlist": 0,
                     "specific_section": "C03",
@@ -31600,7 +31600,7 @@
                 "crn": 337171,
                 "number": "D01",
                 "seats": 80,
-                "seats_available": 1,
+                "seats_available": 0,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -31619,7 +31619,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 80,
-                    "seats_available": 1,
+                    "seats_available": 0,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "D01",
