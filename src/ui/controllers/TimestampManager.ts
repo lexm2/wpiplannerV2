@@ -75,8 +75,8 @@ export class TimestampManager {
     }
 
     private createUpdateNotification(): void {
-        const timestampsContainer = document.querySelector('.timestamps-container');
-        if (!timestampsContainer) return;
+        const headerSubtitle = document.querySelector('.header-subtitle');
+        if (!headerSubtitle) return;
 
         this.updateNotificationElement = document.createElement('div');
         this.updateNotificationElement.className = 'update-notification';
@@ -95,6 +95,6 @@ export class TimestampManager {
             });
         }
 
-        timestampsContainer.appendChild(this.updateNotificationElement);
+        headerSubtitle.appendChild(this.updateNotificationElement);
     }
 }

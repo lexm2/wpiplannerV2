@@ -65,7 +65,6 @@
   background: var(--color-accent);
   border: 1px solid var(--color-primary);
   border-radius: 6px;
-  margin-top: 0.25rem;
   animation: slideIn 0.3s ease;
 }
 
