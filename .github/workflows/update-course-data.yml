@@ -1,6 +1,9 @@
 name: Update Course Data and Deploy
 
 on:
+  push:
+    branches:
+      - master
   schedule:
     - cron: '*/15 * * * *' # Every 15 minutes
   workflow_dispatch: # Allow manual trigger

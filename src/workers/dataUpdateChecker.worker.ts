@@ -55,6 +55,7 @@ function stopChecking(): void {
 
 async function checkForUpdates(): Promise<void> {
   try {
+    console.log('[DataUpdateChecker] Checking for updates...');
     const response = await fetch('/wpiplannerV2/last-updated.json', {
       cache: 'no-cache',
       headers: {
@@ -63,26 +64,33 @@ async function checkForUpdates(): Promise<void> {
     });
 
     if (!response.ok) {
+      console.log(`[DataUpdateChecker] Fetch failed with status: ${response.status}`);
       return;
     }
 
     const data = await response.json() as { timestamp: string; utc: string };
     const serverTimestamp = data.timestamp;
 
+    console.log(`[DataUpdateChecker] Server timestamp: ${serverTimestamp}, Last loaded: ${lastLoadedTimestamp || 'none'}`);
+
     if (!lastLoadedTimestamp) {
       lastLoadedTimestamp = serverTimestamp;
+      console.log('[DataUpdateChecker] First check - storing timestamp');
       return;
     }
 
     if (serverTimestamp > lastLoadedTimestamp) {
+      console.log('[DataUpdateChecker] New data available! Notifying main thread...');
       const message: UpdateResponseMessage = {
         type: 'update-available',
         serverTimestamp,
       };
       self.postMessage(message);
+    } else {
+      console.log('[DataUpdateChecker] No updates available');
     }
   } catch (error) {
-    // Silently ignore errors (expected in local development due to CORS)
+    console.log('[DataUpdateChecker] Error checking for updates:', error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
