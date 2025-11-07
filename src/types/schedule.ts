@@ -60,22 +60,21 @@ export interface ScheduleScore {
     consecutiveClassScore: number;
     buildingTransitionScore: number;
     balancedLoadScore: number;
+    earlyMorningPenalty: number;
+    professorRatingScore: number;
+    classesPerTermScore: number;
 }
 
 export interface ScoreWeights {
+    professorRating: number;
+    earlyMorning: number;
+    classesPerTerm: number;
     timeGap: number;
-    compactness: number;
-    timePreference: number;
-    consecutiveClass: number;
-    buildingTransition: number;
-    balancedLoad: number;
 }
 
 export const DEFAULT_SCORE_WEIGHTS: ScoreWeights = {
-    timeGap: 0.25,
-    compactness: 0.20,
-    timePreference: 0.20,
-    consecutiveClass: 0.15,
-    buildingTransition: 0.10,
-    balancedLoad: 0.10
+    professorRating: 0.25,
+    earlyMorning: 0.10,
+    classesPerTerm: 0.50,
+    timeGap: 0.15
 };

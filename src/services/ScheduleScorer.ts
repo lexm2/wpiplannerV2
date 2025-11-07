@@ -2,6 +2,7 @@ import { DayOfWeek } from '../types/types';
 import type { Section, Period } from '../types/types';
 import { DEFAULT_SCORE_WEIGHTS } from '../types/schedule';
 import type { ScheduleScore, ScoreWeights, SchedulePreferences } from '../types/schedule';
+import { rateMyProfessorService } from './RateMyProfessorService';
 
 interface ScheduleResult {
   course: {
@@ -25,159 +26,40 @@ export class ScheduleScorer {
     weights: ScoreWeights = DEFAULT_SCORE_WEIGHTS
   ): ScheduleScore {
     const timeGapScore = this.calculateTimeGapScore(schedule);
-    const compactnessScore = this.calculateCompactnessScore(schedule);
-    const timePreferenceScore = this.calculateTimePreferenceScore(schedule, preferences);
-    const consecutiveClassScore = this.calculateConsecutiveClassScore(schedule, preferences);
-    const buildingTransitionScore = this.calculateBuildingTransitionScore(schedule);
-    const balancedLoadScore = this.calculateBalancedLoadScore(schedule);
+    const earlyMorningPenalty = this.calculateEarlyMorningPenalty(schedule);
+    const professorRatingScore = this.calculateProfessorRatingScore(schedule);
+    const classesPerTermScore = this.calculateClassesPerTermScore(schedule);
 
     const totalScore =
-      timeGapScore * weights.timeGap +
-      compactnessScore * weights.compactness +
-      timePreferenceScore * weights.timePreference +
-      consecutiveClassScore * weights.consecutiveClass +
-      buildingTransitionScore * weights.buildingTransition +
-      balancedLoadScore * weights.balancedLoad;
+      professorRatingScore * weights.professorRating +
+      earlyMorningPenalty * weights.earlyMorning +
+      classesPerTermScore * weights.classesPerTerm +
+      timeGapScore * weights.timeGap;
 
     return {
       totalScore: Math.round(totalScore),
       timeGapScore: Math.round(timeGapScore),
-      compactnessScore: Math.round(compactnessScore),
-      timePreferenceScore: Math.round(timePreferenceScore),
-      consecutiveClassScore: Math.round(consecutiveClassScore),
-      buildingTransitionScore: Math.round(buildingTransitionScore),
-      balancedLoadScore: Math.round(balancedLoadScore)
+      compactnessScore: 0,
+      timePreferenceScore: 0,
+      consecutiveClassScore: 0,
+      buildingTransitionScore: 0,
+      balancedLoadScore: 0,
+      earlyMorningPenalty: Math.round(earlyMorningPenalty),
+      professorRatingScore: Math.round(professorRatingScore),
+      classesPerTermScore: Math.round(classesPerTermScore)
     };
   }
 
   private calculateTimeGapScore(schedule: ScheduleResult[]): number {
     const allSections = this.extractAllSections(schedule);
-    const dailyGaps = this.calculateDailyGaps(allSections);
-    const totalGapMinutes = dailyGaps.reduce((sum, gap) => sum + gap, 0);
+    let perfectGapsCount = 0;
 
-    return Math.max(0, 300 - (totalGapMinutes / 10));
-  }
-
-  private calculateDailyGaps(sections: Section[]): number[] {
     const days: DayOfWeek[] = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
-    const gaps: number[] = [];
 
     for (const day of days) {
       const periodsOnDay: Period[] = [];
 
-      for (const section of sections) {
-        for (const period of section.periods) {
-          if (period.days.has(day)) {
-            periodsOnDay.push(period);
-          }
-        }
-      }
-
-      if (periodsOnDay.length <= 1) {
-        continue;
-      }
-
-      periodsOnDay.sort((a, b) => {
-        const aMinutes = a.startTime.hours * 60 + a.startTime.minutes;
-        const bMinutes = b.startTime.hours * 60 + b.startTime.minutes;
-        return aMinutes - bMinutes;
-      });
-
-      let dayGap = 0;
-      for (let i = 0; i < periodsOnDay.length - 1; i++) {
-        const endMinutes = periodsOnDay[i].endTime.hours * 60 + periodsOnDay[i].endTime.minutes;
-        const nextStartMinutes = periodsOnDay[i + 1].startTime.hours * 60 + periodsOnDay[i + 1].startTime.minutes;
-        const gap = nextStartMinutes - endMinutes;
-        if (gap > 0) {
-          dayGap += gap;
-        }
-      }
-
-      gaps.push(dayGap);
-    }
-
-    return gaps;
-  }
-
-  private calculateCompactnessScore(schedule: ScheduleResult[]): number {
-    const allSections = this.extractAllSections(schedule);
-    const daysUsed = this.countUniqueDaysUsed(allSections);
-
-    const compactnessMap: Record<number, number> = {
-      1: 300,
-      2: 250,
-      3: 200,
-      4: 150,
-      5: 100
-    };
-
-    return compactnessMap[daysUsed] || 50;
-  }
-
-  private countUniqueDaysUsed(sections: Section[]): number {
-    const daysSet = new Set<DayOfWeek>();
-
-    for (const section of sections) {
-      for (const period of section.periods) {
-        period.days.forEach(day => daysSet.add(day));
-      }
-    }
-
-    return daysSet.size;
-  }
-
-  private calculateTimePreferenceScore(
-    schedule: ScheduleResult[],
-    preferences: SchedulePreferences
-  ): number {
-    let score = 200;
-    const allSections = this.extractAllSections(schedule);
-
-    for (const section of allSections) {
-      for (const period of section.periods) {
-        if (!this.isWithinTimeRange(period, preferences.preferredTimeRange)) {
-          score -= 20;
-        }
-      }
-    }
-
-    return Math.max(0, score);
-  }
-
-  private isWithinTimeRange(
-    period: Period,
-    timeRange: { startTime: { hours: number; minutes: number }; endTime: { hours: number; minutes: number }}
-  ): boolean {
-    const periodStart = period.startTime.hours * 60 + period.startTime.minutes;
-    const periodEnd = period.endTime.hours * 60 + period.endTime.minutes;
-    const rangeStart = timeRange.startTime.hours * 60 + timeRange.startTime.minutes;
-    const rangeEnd = timeRange.endTime.hours * 60 + timeRange.endTime.minutes;
-
-    return periodStart >= rangeStart && periodEnd <= rangeEnd;
-  }
-
-  private calculateConsecutiveClassScore(
-    schedule: ScheduleResult[],
-    preferences: SchedulePreferences
-  ): number {
-    const allSections = this.extractAllSections(schedule);
-    const consecutivePairCount = this.countConsecutiveClassPairs(allSections);
-
-    if (preferences.avoidBackToBackClasses) {
-      return Math.max(0, 150 - (consecutivePairCount * 25));
-    } else {
-      return 150 + (consecutivePairCount * 15);
-    }
-  }
-
-  private countConsecutiveClassPairs(sections: Section[]): number {
-    const days: DayOfWeek[] = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
-    let consecutiveCount = 0;
-
-    for (const day of days) {
-      const periodsOnDay: Period[] = [];
-
-      for (const section of sections) {
+      for (const section of allSections) {
         for (const period of section.periods) {
           if (period.days.has(day)) {
             periodsOnDay.push(period);
@@ -200,98 +82,15 @@ export class ScheduleScorer {
         const nextStartMinutes = periodsOnDay[i + 1].startTime.hours * 60 + periodsOnDay[i + 1].startTime.minutes;
         const gap = nextStartMinutes - endMinutes;
 
-        if (gap >= 0 && gap <= 15) {
-          consecutiveCount++;
+        if (gap === 10) {
+          perfectGapsCount++;
         }
       }
     }
 
-    return consecutiveCount;
+    return perfectGapsCount * 50;
   }
 
-  private calculateBuildingTransitionScore(schedule: ScheduleResult[]): number {
-    const allSections = this.extractAllSections(schedule);
-    const transitions = this.countBuildingTransitions(allSections);
-
-    return Math.max(0, 150 - (transitions * 10));
-  }
-
-  private countBuildingTransitions(sections: Section[]): number {
-    const days: DayOfWeek[] = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
-    let transitions = 0;
-
-    for (const day of days) {
-      const periodsOnDay: Period[] = [];
-
-      for (const section of sections) {
-        for (const period of section.periods) {
-          if (period.days.has(day)) {
-            periodsOnDay.push(period);
-          }
-        }
-      }
-
-      if (periodsOnDay.length <= 1) {
-        continue;
-      }
-
-      periodsOnDay.sort((a, b) => {
-        const aMinutes = a.startTime.hours * 60 + a.startTime.minutes;
-        const bMinutes = b.startTime.hours * 60 + b.startTime.minutes;
-        return aMinutes - bMinutes;
-      });
-
-      for (let i = 0; i < periodsOnDay.length - 1; i++) {
-        const currentBuilding = periodsOnDay[i].building || '';
-        const nextBuilding = periodsOnDay[i + 1].building || '';
-
-        if (currentBuilding && nextBuilding && currentBuilding !== nextBuilding) {
-          transitions++;
-        }
-      }
-    }
-
-    return transitions;
-  }
-
-  private calculateBalancedLoadScore(schedule: ScheduleResult[]): number {
-    const allSections = this.extractAllSections(schedule);
-    const classesPerDay = this.countClassesPerDay(allSections);
-
-    if (classesPerDay.length === 0) {
-      return 100;
-    }
-
-    const avg = classesPerDay.reduce((sum, count) => sum + count, 0) / classesPerDay.length;
-    const variance = classesPerDay.reduce((sum, count) => sum + Math.pow(count - avg, 2), 0) / classesPerDay.length;
-    const stdDev = Math.sqrt(variance);
-
-    return Math.max(0, 100 - (stdDev * 30));
-  }
-
-  private countClassesPerDay(sections: Section[]): number[] {
-    const days: DayOfWeek[] = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
-    const counts: number[] = [];
-
-    for (const day of days) {
-      let count = 0;
-
-      for (const section of sections) {
-        for (const period of section.periods) {
-          if (period.days.has(day)) {
-            count++;
-            break;
-          }
-        }
-      }
-
-      if (count > 0) {
-        counts.push(count);
-      }
-    }
-
-    return counts;
-  }
 
   private extractAllSections(schedule: ScheduleResult[]): Section[] {
     const sections: Section[] = [];
@@ -309,5 +108,55 @@ export class ScheduleScorer {
     }
 
     return sections;
+  }
+
+  private calculateEarlyMorningPenalty(schedule: ScheduleResult[]): number {
+    const allSections = this.extractAllSections(schedule);
+    let earlyMorningCount = 0;
+
+    for (const section of allSections) {
+      for (const period of section.periods) {
+        if (period.startTime.hours === 8 && period.startTime.minutes === 0) {
+          earlyMorningCount++;
+        }
+      }
+    }
+
+    return earlyMorningCount * -100;
+  }
+
+  private calculateProfessorRatingScore(schedule: ScheduleResult[]): number {
+    const allSections = this.extractAllSections(schedule);
+    let totalRating = 0;
+    let ratedProfessors = 0;
+
+    for (const section of allSections) {
+      for (const period of section.periods) {
+        if (!period.professor) continue;
+
+        const professor = rateMyProfessorService.findProfessor(period.professor);
+        if (professor && professor.numRatings > 0) {
+          totalRating += professor.avgRating;
+          ratedProfessors++;
+        }
+      }
+    }
+
+    if (ratedProfessors === 0) return 100;
+
+    const avgRating = totalRating / ratedProfessors;
+    return (avgRating / 5.0) * 200;
+  }
+
+  private calculateClassesPerTermScore(schedule: ScheduleResult[]): number {
+    const courseCount = schedule.length;
+
+    if (courseCount === 3) {
+      return 200;
+    } else if (courseCount < 3) {
+      return 100;
+    } else {
+      return -150;
+    }
   }
 }
