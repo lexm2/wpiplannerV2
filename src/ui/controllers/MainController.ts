@@ -990,10 +990,8 @@ export class MainController {
             }
 
             this.refreshCurrentView();
-
-            console.log('Course data refreshed successfully');
         } catch (error) {
-            console.error('Failed to refresh course data:', error);
+            // Silently fail - errors expected in local development
         }
     }
 

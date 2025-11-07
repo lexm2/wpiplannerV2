@@ -63,7 +63,7 @@ async function checkForUpdates(): Promise<void> {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
+      return;
     }
 
     const data = await response.json() as { timestamp: string; utc: string };
@@ -82,11 +82,7 @@ async function checkForUpdates(): Promise<void> {
       self.postMessage(message);
     }
   } catch (error) {
-    const message: UpdateResponseMessage = {
-      type: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    };
-    self.postMessage(message);
+    // Silently ignore errors (expected in local development due to CORS)
   }
 }
 

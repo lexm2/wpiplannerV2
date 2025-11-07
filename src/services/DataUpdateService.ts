@@ -70,7 +70,7 @@ export class DataUpdateService {
   }
 
   private handleWorkerMessage(event: MessageEvent<UpdateResponseMessage>): void {
-    const { type, serverTimestamp, error } = event.data;
+    const { type, serverTimestamp } = event.data;
 
     switch (type) {
       case 'update-available':
@@ -78,14 +78,11 @@ export class DataUpdateService {
           this.dispatchUpdateEvent(serverTimestamp);
         }
         break;
-      case 'error':
-        console.error('Data update check error:', error);
-        break;
     }
   }
 
   private handleWorkerError(error: ErrorEvent): void {
-    console.error('Worker error:', error);
+    // Silently ignore worker errors (expected in local development)
   }
 
   private dispatchUpdateEvent(serverTimestamp: string): void {

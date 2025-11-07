@@ -5,6 +5,10 @@ on:
     - cron: '*/15 * * * *' # Every 15 minutes
   workflow_dispatch: # Allow manual trigger
 
+concurrency:
+  group: course-data-update
+  cancel-in-progress: false
+
 permissions:
   contents: write
   pages: write
@@ -53,11 +57,12 @@ jobs:
         run: |
           # Create timestamp file with current UTC time
           echo "{\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%S.000Z)\",\"utc\":\"$(date -u +%Y-%m-%d\ %H:%M\ UTC)\"}" > public/last-updated.json
-          
+
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add public/course-data.json public/course-data-constructed.json public/last-updated.json
           git commit -m "Update course data $(date -u +%Y-%m-%d\ %H:%M\ UTC)"
+          git pull --rebase origin master
           git push
 
       - name: Build TypeScript application
@@ -76,4 +81,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          publish_branch: gh-pages
           enable_jekyll: false
