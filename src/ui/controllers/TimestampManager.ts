@@ -1,5 +1,10 @@
 export class TimestampManager {
-    constructor() {}
+    private updateNotificationElement: HTMLElement | null = null;
+    private onRefreshCallback: (() => void) | null = null;
+
+    constructor() {
+        this.createUpdateNotification();
+    }
 
     updateClientTimestamp(): void {
         const clientTimestampElement = document.getElementById('client-timestamp');
@@ -19,15 +24,15 @@ export class TimestampManager {
         }
     }
 
-    async loadServerTimestamp(): Promise<void> {
+    async loadServerTimestamp(): Promise<string | null> {
         const serverTimestampElement = document.getElementById('server-timestamp');
-        if (!serverTimestampElement) return;
+        if (!serverTimestampElement) return null;
 
         try {
             const response = await fetch('./last-updated.json', {
                 cache: 'no-cache'
             });
-            
+
             if (response.ok) {
                 const timestampData = await response.json();
                 const serverDate = new Date(timestampData.timestamp);
@@ -42,12 +47,54 @@ export class TimestampManager {
                 };
                 const formattedTime = serverDate.toLocaleDateString('en-US', options).replace(',', ' at');
                 serverTimestampElement.textContent = `Server updated: ${formattedTime}`;
+                return timestampData.timestamp;
             } else {
                 throw new Error(`Failed to fetch server timestamp: ${response.status}`);
             }
         } catch (error) {
             console.warn('Failed to load server timestamp:', error);
             serverTimestampElement.textContent = 'Server timestamp unavailable';
+            return null;
         }
+    }
+
+    showUpdateNotification(): void {
+        if (this.updateNotificationElement) {
+            this.updateNotificationElement.style.display = 'flex';
+        }
+    }
+
+    hideUpdateNotification(): void {
+        if (this.updateNotificationElement) {
+            this.updateNotificationElement.style.display = 'none';
+        }
+    }
+
+    onRefresh(callback: () => void): void {
+        this.onRefreshCallback = callback;
+    }
+
+    private createUpdateNotification(): void {
+        const timestampsContainer = document.querySelector('.timestamps-container');
+        if (!timestampsContainer) return;
+
+        this.updateNotificationElement = document.createElement('div');
+        this.updateNotificationElement.className = 'update-notification';
+        this.updateNotificationElement.style.display = 'none';
+        this.updateNotificationElement.innerHTML = `
+            <span class="update-text">New data available</span>
+            <button class="update-refresh-btn" aria-label="Refresh course data">Refresh</button>
+        `;
+
+        const refreshBtn = this.updateNotificationElement.querySelector('.update-refresh-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                if (this.onRefreshCallback) {
+                    this.onRefreshCallback();
+                }
+            });
+        }
+
+        timestampsContainer.appendChild(this.updateNotificationElement);
     }
 }

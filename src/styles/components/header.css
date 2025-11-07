@@ -57,6 +57,55 @@
   color: var(--color-text-secondary);
 }
 
+.update-notification {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background: var(--color-accent);
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  margin-top: 0.25rem;
+  animation: slideIn 0.3s ease;
+}
+
+.update-notification .update-text {
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+}
+
+.update-notification .update-refresh-btn {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: var(--font-weight-medium);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.update-notification .update-refresh-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.update-notification .update-refresh-btn:active {
+  transform: translateY(0);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 .header-navigation {
   display: flex;

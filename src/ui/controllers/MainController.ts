@@ -27,6 +27,8 @@ import { ScheduleManagementService } from '../../services/ScheduleManagementServ
 import { ProfileStateManager } from '../../core/ProfileStateManager'
 import { StorageService } from '../../services/StorageService'
 import { ThemeManager } from '../../themes/ThemeManager'
+import { DataUpdateService } from '../../services/DataUpdateService'
+import type { DataUpdateAvailableEvent } from '../../types/worker'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -175,6 +177,7 @@ export class MainController {
     private debouncedSearch: DebouncedOperation;
     private departmentSyncService: DepartmentSyncService;
     private scheduleManagementService: ScheduleManagementService;
+    private dataUpdateService: DataUpdateService;
     private allDepartments: Department[] = [];
 
 
@@ -208,6 +211,9 @@ export class MainController {
         this.timestampManager = new TimestampManager();
         this.operationManager = new OperationManager();
         this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
+
+        // Initialize data update service
+        this.dataUpdateService = new DataUpdateService();
         
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
@@ -353,9 +359,16 @@ export class MainController {
             
             // Initialize default schedule if needed (await to ensure it completes)
             await this.scheduleManagementService.initializeDefaultScheduleIfNeeded();
-            
+
             this.timestampManager.updateClientTimestamp();
-            this.timestampManager.loadServerTimestamp();
+            const serverTimestamp = await this.timestampManager.loadServerTimestamp();
+
+            // Start data update service and set up refresh callback
+            if (serverTimestamp) {
+                this.dataUpdateService.updateLastLoadedTimestamp(serverTimestamp);
+            }
+            this.dataUpdateService.start();
+            this.setupDataUpdateListener();
             
             // Expose debug methods globally for testing (development only)
             if (typeof window !== 'undefined') {
@@ -942,6 +955,46 @@ export class MainController {
         selectedCourses.forEach(sc => {
             this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
         });
+    }
+
+    private setupDataUpdateListener(): void {
+        window.addEventListener('data-update-available', ((event: DataUpdateAvailableEvent) => {
+            this.timestampManager.showUpdateNotification();
+        }) as EventListener);
+
+        this.timestampManager.onRefresh(() => {
+            this.refreshCourseData();
+        });
+    }
+
+    private async refreshCourseData(): Promise<void> {
+        try {
+            this.timestampManager.hideUpdateNotification();
+
+            const scheduleDB = await this.courseDataService.loadCourseData();
+            this.allDepartments = scheduleDB.departments;
+            this.departmentController.setAllDepartments(this.allDepartments);
+            this.courseController.setAllDepartments(this.allDepartments);
+            this.courseSelectionService.setAllDepartments(this.allDepartments);
+            this.profileStateManager.setCourseData(this.allDepartments);
+            this.searchService.setCourseData(this.allDepartments);
+            this.filterModalController.setCourseData(this.allDepartments);
+
+            this.courseSelectionService.reconstructSectionObjects();
+
+            this.timestampManager.updateClientTimestamp();
+            const serverTimestamp = await this.timestampManager.loadServerTimestamp();
+
+            if (serverTimestamp) {
+                this.dataUpdateService.updateLastLoadedTimestamp(serverTimestamp);
+            }
+
+            this.refreshCurrentView();
+
+            console.log('Course data refreshed successfully');
+        } catch (error) {
+            console.error('Failed to refresh course data:', error);
+        }
     }
 
     /**
