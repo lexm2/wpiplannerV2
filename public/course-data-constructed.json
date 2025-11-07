@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 7, 2025, 5:16 AM",
+  "generated": "Nov 7, 2025, 5:41 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -83146,7 +83146,7 @@
                 "crn": 341768,
                 "number": "C01",
                 "seats": 15,
-                "seats_available": 11,
+                "seats_available": 12,
                 "actual_waitlist": 0,
                 "max_waitlist": 5,
                 "note": null,
@@ -83165,7 +83165,7 @@
                     "building": "",
                     "room": "Kaven Hall 115",
                     "seats": 15,
-                    "seats_available": 11,
+                    "seats_available": 12,
                     "actual_waitlist": 0,
                     "max_waitlist": 5,
                     "specific_section": "C01",
