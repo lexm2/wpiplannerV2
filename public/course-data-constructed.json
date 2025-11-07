@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 7, 2025, 9:11 PM",
+  "generated": "Nov 7, 2025, 9:25 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -71444,7 +71444,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Chieko Nakajima",
                     "start_time": "09:00",
                     "end_time": "10:50",
                     "location": "Higgins Labs 154",
@@ -235608,9 +235608,9 @@
                     "professor": "Christopher Robertson",
                     "start_time": "09:00",
                     "end_time": "09:50",
-                    "location": "Harrington Auditorium 102",
+                    "location": "Recreation Center All Courts 3-4",
                     "building": "",
-                    "room": "Harrington Auditorium 102",
+                    "room": "Recreation Center All Courts 3-4",
                     "seats": 25,
                     "seats_available": 0,
                     "actual_waitlist": 0,
