@@ -5,7 +5,7 @@ export default defineConfig({
   publicDir: 'public',
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false,
     target: 'es2020'
   },
   server: {
