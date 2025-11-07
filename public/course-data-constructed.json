@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 7, 2025, 11:29 PM",
+  "generated": "Nov 7, 2025, 11:39 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -71020,7 +71020,7 @@
                 "crn": 336987,
                 "number": "D02",
                 "seats": 35,
-                "seats_available": 24,
+                "seats_available": 23,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -71039,7 +71039,7 @@
                     "building": "",
                     "room": "Olin Hall 109",
                     "seats": 35,
-                    "seats_available": 24,
+                    "seats_available": 23,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "D02",
@@ -71920,7 +71920,7 @@
                 "crn": 336989,
                 "number": "D01",
                 "seats": 20,
-                "seats_available": 16,
+                "seats_available": 17,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -71939,7 +71939,7 @@
                     "building": "",
                     "room": "Stratton Hall 311",
                     "seats": 20,
-                    "seats_available": 16,
+                    "seats_available": 17,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "D01",
