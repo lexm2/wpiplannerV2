@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 7, 2025, 4:44 PM",
+  "generated": "Nov 7, 2025, 4:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -12522,7 +12522,7 @@
                 "number": "C01 - ST: Quantitative Biology",
                 "seats": 30,
                 "seats_available": 0,
-                "actual_waitlist": 1,
+                "actual_waitlist": 2,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "An offering of this course will cover a topic of current interest in detail. See the Supplement section of the online catalog at www.wpi.edu/+gradcat for descriptions of courses to be offered in this academic year. Prerequisites will vary with topic.",
@@ -12541,7 +12541,7 @@
                     "room": "Higgins Labs 202",
                     "seats": 30,
                     "seats_available": 0,
-                    "actual_waitlist": 1,
+                    "actual_waitlist": 2,
                     "max_waitlist": 10,
                     "specific_section": "C01 - ST: Quantitative Biology",
                     "days": [
