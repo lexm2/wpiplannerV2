@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 8, 2025, 5:49 AM",
+  "generated": "Nov 8, 2025, 6:21 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -236107,7 +236107,7 @@
                 "crn": 337289,
                 "number": "D01",
                 "seats": 25,
-                "seats_available": 1,
+                "seats_available": 0,
                 "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": null,
@@ -236126,7 +236126,7 @@
                     "building": "",
                     "room": "Recreation Center Fitness Area",
                     "seats": 25,
-                    "seats_available": 1,
+                    "seats_available": 0,
                     "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "D01",
@@ -243172,7 +243172,7 @@
                 "crn": 336171,
                 "number": "C02 - ST in Holistic Well-Being: Intuitive Eating",
                 "seats": 20,
-                "seats_available": 3,
+                "seats_available": 2,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -243191,7 +243191,7 @@
                     "building": "",
                     "room": "Daniels Hall 102E",
                     "seats": 20,
-                    "seats_available": 3,
+                    "seats_available": 2,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C02 - ST in Holistic Well-Being: Intuitive Eating",
