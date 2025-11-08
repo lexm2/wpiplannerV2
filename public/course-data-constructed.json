@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 8, 2025, 3:26 AM",
+  "generated": "Nov 8, 2025, 3:48 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -48312,7 +48312,7 @@
                 "crn": 347130,
                 "number": "S02",
                 "seats": 30,
-                "seats_available": 29,
+                "seats_available": 28,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -48331,7 +48331,7 @@
                     "building": "",
                     "room": "Olin Hall 109",
                     "seats": 30,
-                    "seats_available": 29,
+                    "seats_available": 28,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S02",
@@ -49055,7 +49055,7 @@
                 "number": "S01",
                 "seats": 30,
                 "seats_available": 0,
-                "actual_waitlist": 3,
+                "actual_waitlist": 2,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "This course covers core security threats and mitigations at the network level. Topics include: denial-of-service, network capabilities, intrusion detection and prevention systems, worms, botnets, Web attacks, anonymity, honeypots, cybercrime (such as phishing), and legality and ethics. The course prepares students to think broadly and concretely about network security; it is not designed to teach students low-level tools for monitoring or maintaining system security. Assignments and projects will assess each student’s ability to think both conceptually and practically about network security. (Prerequisites: a strong background in computer networking and systems, either at the undergraduate or graduate level, and moderate programming experience.)",
@@ -49074,7 +49074,7 @@
                     "room": "Higgins Labs 114",
                     "seats": 30,
                     "seats_available": 0,
-                    "actual_waitlist": 3,
+                    "actual_waitlist": 2,
                     "max_waitlist": 10,
                     "specific_section": "S01",
                     "days": [
