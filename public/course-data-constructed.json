@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 8, 2025, 6:44 PM",
+  "generated": "Nov 8, 2025, 6:53 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -64464,7 +64464,7 @@
                 "crn": 337455,
                 "number": "DL01",
                 "seats": 90,
-                "seats_available": 0,
+                "seats_available": 1,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4436",
@@ -64483,7 +64483,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 90,
-                    "seats_available": 0,
+                    "seats_available": 1,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "DL01",
@@ -64499,7 +64499,7 @@
                   "crn": 337457,
                   "number": "DD01",
                   "seats": 90,
-                  "seats_available": 0,
+                  "seats_available": 1,
                   "actual_waitlist": 0,
                   "max_waitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4436",
@@ -64518,7 +64518,7 @@
                       "building": "",
                       "room": "Unity Hall 400",
                       "seats": 90,
-                      "seats_available": 0,
+                      "seats_available": 1,
                       "actual_waitlist": 0,
                       "max_waitlist": 0,
                       "specific_section": "DD01",
