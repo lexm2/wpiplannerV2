@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 8, 2025, 10:49 PM",
+  "generated": "Nov 8, 2025, 11:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -54517,7 +54517,7 @@
                 "crn": 336414,
                 "number": "CL01",
                 "seats": 80,
-                "seats_available": 0,
+                "seats_available": 1,
                 "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4349",
@@ -54536,7 +54536,7 @@
                     "building": "",
                     "room": "Atwater Kent 219",
                     "seats": 80,
-                    "seats_available": 0,
+                    "seats_available": 1,
                     "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "CL01",
@@ -54588,7 +54588,7 @@
                   "crn": 336416,
                   "number": "CX02",
                   "seats": 40,
-                  "seats_available": 4,
+                  "seats_available": 5,
                   "actual_waitlist": 0,
                   "max_waitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4349",
@@ -54607,7 +54607,7 @@
                       "building": "",
                       "room": "Atwater Kent 227 Lab Restricted Access",
                       "seats": 40,
-                      "seats_available": 4,
+                      "seats_available": 5,
                       "actual_waitlist": 0,
                       "max_waitlist": 0,
                       "specific_section": "CX02",
