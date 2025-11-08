@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 8, 2025, 4:41 AM",
+  "generated": "Nov 8, 2025, 4:50 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -180577,7 +180577,7 @@
                 "crn": 337786,
                 "number": "S01",
                 "seats": 50,
-                "seats_available": 37,
+                "seats_available": 36,
                 "actual_waitlist": 0,
                 "max_waitlist": 0,
                 "note": null,
@@ -180596,7 +180596,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seats_available": 37,
+                    "seats_available": 36,
                     "actual_waitlist": 0,
                     "max_waitlist": 0,
                     "specific_section": "S01",
