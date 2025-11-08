@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 8, 2025, 8:49 PM",
+  "generated": "Nov 8, 2025, 9:12 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -235642,7 +235642,7 @@
                 "number": "C03",
                 "seats": 25,
                 "seats_available": 0,
-                "actual_waitlist": 0,
+                "actual_waitlist": 1,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "Cat. I (1/12 units) This course will teach the use of bodyweight to develop personal strength and conditioning.",
@@ -235661,7 +235661,7 @@
                     "room": "Recreation Center All Courts 3-4",
                     "seats": 25,
                     "seats_available": 0,
-                    "actual_waitlist": 0,
+                    "actual_waitlist": 1,
                     "max_waitlist": 10,
                     "specific_section": "C03",
                     "days": [
