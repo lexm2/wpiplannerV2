@@ -72,6 +72,14 @@
                     <div class="status-indicator-container">
                         <div id="optimistic-ui-status" class="optimistic-status idle">No changes</div>
                     </div>
+                    <div class="undo-redo-controls">
+                        <button id="undo-btn" class="btn btn-icon" title="Undo (Ctrl+Z)" disabled>
+                            <img src="src/assets/icons/arrow-back-up.svg" alt="Undo" width="20" height="20">
+                        </button>
+                        <button id="redo-btn" class="btn btn-icon" title="Redo (Ctrl+Y)" disabled>
+                            <img src="src/assets/icons/arrow-forward-up.svg" alt="Redo" width="20" height="20">
+                        </button>
+                    </div>
                     <button id="schedule-picker-btn" class="btn btn-icon" title="Select Schedule">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -108,7 +116,6 @@
                     <div class="search-controls">
                         <input type="text" id="search-input" placeholder="Search courses..." class="search-input" aria-label="Search courses">
                         <button id="filter-btn" class="btn btn-secondary filter-btn" title="Filter courses" aria-label="Filter courses">
-                            <img src="" alt="Filter" class="filter-icon" />
                         </button>
                     </div>
                     <div class="view-controls">
@@ -149,7 +156,6 @@
                         <div class="schedule-filter-controls">
                             <input type="text" id="schedule-search-input" placeholder="Search selected courses..." class="search-input schedule-search-input">
                             <button id="schedule-filter-btn" class="btn btn-secondary filter-btn" title="Filter selected courses">
-                                <img src="" alt="Filter" class="filter-icon" />
                             </button>
                         </div>
                     </div>
@@ -158,11 +164,9 @@
                     </div>
                     <div class="schedule-selected-courses-footer">
                         <button id="clear-all-sections-btn" class="btn btn-secondary clear-all-sections-btn" title="Clear all selected sections" aria-label="Clear all sections">
-                            <img src="" alt="Clear all sections" class="clear-all-eraser-icon" />
                             <span>Clear All Sections</span>
                         </button>
                         <button id="auto-schedule-btn" class="btn btn-primary auto-schedule-btn" title="Automatically generate a schedule" aria-label="Auto-generate schedule">
-                            <img src="" alt="Auto-schedule" class="auto-schedule-icon" />
                             <span>Auto-Schedule</span>
                         </button>
                     </div>

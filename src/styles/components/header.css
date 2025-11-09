@@ -222,3 +222,41 @@
   height: 1.5rem;
 }
 
+.undo-redo-controls {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.undo-redo-controls .btn {
+  padding: 0.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.undo-redo-controls .btn:hover:not(:disabled) {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.undo-redo-controls .btn:hover:not(:disabled) img {
+  filter: brightness(0) invert(1);
+}
+
+.undo-redo-controls .btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--color-surface);
+}
+
+.undo-redo-controls .btn img {
+  display: block;
+  transition: filter 0.2s ease;
+}
+

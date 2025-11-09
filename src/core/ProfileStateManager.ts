@@ -2,6 +2,7 @@ import { Schedule, SchedulePreferences, SelectedCourse } from '../types/schedule
 import { Course, Section, Department } from '../types/types'
 import { TransactionalStorageManager, TransactionResult } from './TransactionalStorageManager'
 import { getAllSections } from '../utils/courseUtils'
+import { UndoRedoManager } from './UndoRedoManager'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -33,10 +34,13 @@ export class ProfileStateManager {
     private eventQueue: StateChangeEvent[] = [];
     private processingQueue = false;
     private allDepartments: Department[] = [];
+    private undoRedoManager: UndoRedoManager;
+    private isRestoringState = false;
 
     constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
         this.state = this.createInitialState();
+        this.undoRedoManager = new UndoRedoManager();
     }
 
     setCourseData(departments: Department[]): void {
@@ -272,6 +276,9 @@ export class ProfileStateManager {
             this.isLoadingFlag = true;
             this.state.activeScheduleId = scheduleId;
 
+            // Clear undo history when switching schedules
+            this.undoRedoManager.clear();
+
             // Load schedule's courses and resolve section references
             const loadedCourses = [...schedule.selectedCourses];
             this.state.selectedCourses = this.resolveCourseReferences(loadedCourses);
@@ -374,10 +381,83 @@ export class ProfileStateManager {
         this.listeners.clear();
     }
 
+    // Undo/Redo methods
+    async undo(): Promise<boolean> {
+        const snapshot = this.undoRedoManager.undo();
+        if (!snapshot) return false;
+
+        this.isRestoringState = true;
+        try {
+            this.state.activeScheduleId = snapshot.activeScheduleId;
+            this.state.schedules = Array.from(snapshot.schedules.values());
+            this.state.preferences = { ...snapshot.preferences };
+
+            if (this.state.activeScheduleId) {
+                const activeSchedule = this.state.schedules.find(s => s.id === this.state.activeScheduleId);
+                if (activeSchedule) {
+                    this.state.selectedCourses = this.resolveCourseReferences([...activeSchedule.selectedCourses]);
+                }
+            }
+
+            this.emitEvent('courses_changed', { action: 'undo' }, 'system');
+            await this.save();
+            return true;
+        } finally {
+            this.isRestoringState = false;
+        }
+    }
+
+    async redo(): Promise<boolean> {
+        const snapshot = this.undoRedoManager.redo();
+        if (!snapshot) return false;
+
+        this.isRestoringState = true;
+        try {
+            this.state.activeScheduleId = snapshot.activeScheduleId;
+            this.state.schedules = Array.from(snapshot.schedules.values());
+            this.state.preferences = { ...snapshot.preferences };
+
+            if (this.state.activeScheduleId) {
+                const activeSchedule = this.state.schedules.find(s => s.id === this.state.activeScheduleId);
+                if (activeSchedule) {
+                    this.state.selectedCourses = this.resolveCourseReferences([...activeSchedule.selectedCourses]);
+                }
+            }
+
+            this.emitEvent('courses_changed', { action: 'redo' }, 'system');
+            await this.save();
+            return true;
+        } finally {
+            this.isRestoringState = false;
+        }
+    }
+
+    canUndo(): boolean {
+        return this.undoRedoManager.canUndo();
+    }
+
+    canRedo(): boolean {
+        return this.undoRedoManager.canRedo();
+    }
+
+    onUndoRedoChange(listener: () => void): () => void {
+        return this.undoRedoManager.onChange(listener);
+    }
+
     // Persistence methods - All saves are immediate (async for IndexedDB compatibility)
     async save(): Promise<void> {
         try {
-            console.log('%c📝 SAVING TO STORAGE', 'color: #4CAF50; font-weight: bold; font-size: 14px');
+            // Capture snapshot before saving (unless we're restoring from undo/redo)
+            if (!this.isRestoringState) {
+                const schedulesMap = new Map(this.state.schedules.map(s => [s.id, s]));
+                this.undoRedoManager.captureSnapshot(
+                    this.state.activeScheduleId,
+                    schedulesMap,
+                    this.state.preferences
+                );
+            }
+
+            console.log('%cSAVING TO STORAGE', 'color: #4CAF50; font-weight: bold; font-size: 14px');
             console.log('Active Schedule ID:', this.state.activeScheduleId);
             console.log('Number of Schedules:', this.state.schedules.length);
 
@@ -411,26 +491,26 @@ export class ProfileStateManager {
             this.state.hasUnsavedChanges = false;
             this.state.lastSaved = Date.now();
 
-            console.log('%c✅ SAVED - All data persisted to storage', 'color: #4CAF50; font-weight: bold');
+            console.log('%cSAVED - All data persisted to storage', 'color: #4CAF50; font-weight: bold');
 
             if (previousUnsavedState) {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
             }
         } catch (error) {
-            console.error('❌ Save failed:', error);
+            console.error('Save failed:', error);
         }
     }
 
     async loadFromStorage(): Promise<boolean> {
         // Prevent concurrent calls - if already loading, skip this call
         if (this.isLoadingFlag) {
-            console.log('⏭️ Already loading from storage, skipping duplicate call');
+            console.log('⏭Already loading from storage, skipping duplicate call');
             return false;
         }
 
         // Skip if already loaded with schedules (redundant call prevention)
         if (this.state.schedules.length > 0 && !this.state.isLoading) {
-            console.log('⏭️ Already loaded with schedules, skipping redundant call');
+            console.log('⏭Already loaded with schedules, skipping redundant call');
             return true;
         }
 
@@ -438,7 +518,7 @@ export class ProfileStateManager {
             this.state.isLoading = true;
             this.isLoadingFlag = true;
 
-            console.log('%c📂 LOADING FROM STORAGE', 'color: #2196F3; font-weight: bold; font-size: 14px');
+            console.log('%cLOADING FROM STORAGE', 'color: #2196F3; font-weight: bold; font-size: 14px');
 
             // Load preferences first
             const preferencesResult = this.storageManager.loadPreferences();
@@ -476,7 +556,7 @@ export class ProfileStateManager {
             this.state.selectedCourses = loadedCourses;
 
             // Log what was loaded
-            console.log('%c✅ LOADED - Parsed Data:', 'color: #2196F3; font-weight: bold');
+            console.log('%cLOADED - Parsed Data:', 'color: #2196F3; font-weight: bold');
             const loadedData = {
                 activeScheduleId: this.state.activeScheduleId,
                 schedulesCount: this.state.schedules.length,
@@ -503,14 +583,14 @@ export class ProfileStateManager {
 
             // If no schedules exist, create a default one
             if (this.state.schedules.length === 0) {
-                console.log('📝 No schedules found, creating default schedule');
+                console.log('No schedules found, creating default schedule');
                 const defaultSchedule = this.createSchedule('My Schedule', 'system');
                 this.state.activeScheduleId = defaultSchedule.id;
             }
 
             // If no active schedule but schedules exist, set the last one as active
             if (!this.state.activeScheduleId && this.state.schedules.length > 0) {
-                console.log('📝 No active schedule, setting last schedule as active');
+                console.log('No active schedule, setting last schedule as active');
                 this.state.activeScheduleId = this.state.schedules[this.state.schedules.length - 1].id;
             }
 
@@ -519,7 +599,7 @@ export class ProfileStateManager {
             return true;
 
         } catch (error) {
-            console.error('❌ Load failed:', error);
+            console.error('Load failed:', error);
             return false;
         } finally {
             this.state.isLoading = false;
@@ -561,11 +641,11 @@ export class ProfileStateManager {
 
     private resolveCourseReferences(selectedCourses: SelectedCourse[]): SelectedCourse[] {
         if (this.allDepartments.length === 0) {
-            console.warn('⚠️ Course catalog not available, skipping section reference resolution');
+            console.warn('Course catalog not available, skipping section reference resolution');
             return selectedCourses;
         }
 
-        console.log(`🔍 Resolving course references for ${selectedCourses.length} courses`);
+        console.log(`Resolving course references for ${selectedCourses.length} courses`);
 
         return selectedCourses.map(selectedCourse => {
             const courseId = selectedCourse.course.id;
@@ -577,7 +657,7 @@ export class ProfileStateManager {
             }
 
             if (!liveCourse) {
-                console.warn(`⚠️ Course ${courseId} not found in catalog, keeping original reference`);
+                console.warn(`Course ${courseId} not found in catalog, keeping original reference`);
                 return selectedCourse;
             }
 
@@ -587,7 +667,7 @@ export class ProfileStateManager {
                 const allSections = getAllSections(liveCourse);
                 const liveSection = allSections.find((s: Section) => s.crn === section.crn);
                 if (!liveSection) {
-                    console.warn(`⚠️ Section CRN ${section.crn} not found for course ${courseId}`);
+                    console.warn(`Section CRN ${section.crn} not found for course ${courseId}`);
                     return null;
                 }
                 return liveSection;

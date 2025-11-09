@@ -1227,6 +1227,7 @@ export class ScheduleController {
             return;
         }
 
+        autoScheduleBtn.insertAdjacentHTML('afterbegin', getInlineSVG('WAND', 'auto-schedule-icon'));
         autoScheduleBtn.addEventListener('click', () => this.handleAutoSchedule());
     }
 
@@ -1237,6 +1238,7 @@ export class ScheduleController {
             return;
         }
 
+        clearAllBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'clear-all-eraser-icon'));
         clearAllBtn.addEventListener('click', () => this.handleClearAllSections());
     }
 

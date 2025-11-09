@@ -29,6 +29,7 @@ import { StorageService } from '../../services/StorageService'
 import { ThemeManager } from '../../themes/ThemeManager'
 import { DataUpdateService } from '../../services/DataUpdateService'
 import type { DataUpdateAvailableEvent } from '../../types/worker'
+import { getInlineSVG } from '../../utils/iconPaths'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -569,6 +570,7 @@ export class MainController {
         // Filter button
         const filterButton = document.getElementById('filter-btn');
         if (filterButton) {
+            filterButton.insertAdjacentHTML('afterbegin', getInlineSVG('FILTER_FILLED', 'filter-icon'));
             filterButton.addEventListener('click', () => {
                 this.filterModalController.show();
             });
@@ -577,6 +579,7 @@ export class MainController {
         // Schedule filter button
         const scheduleFilterButton = document.getElementById('schedule-filter-btn');
         if (scheduleFilterButton) {
+            scheduleFilterButton.insertAdjacentHTML('afterbegin', getInlineSVG('FILTER_FILLED', 'filter-icon'));
             scheduleFilterButton.addEventListener('click', () => {
                 const selectedCourses = this.courseSelectionService.getSelectedCourses();
                 this.scheduleFilterModalController.setSelectedCourses(selectedCourses);
@@ -600,6 +603,41 @@ export class MainController {
                 this.scheduleController.applyFiltersAndRefresh();
             });
         }
+
+        // Undo/Redo button event listeners
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
+
+        if (undoBtn) {
+            undoBtn.addEventListener('click', () => {
+                this.handleUndo();
+            });
+        }
+
+        if (redoBtn) {
+            redoBtn.addEventListener('click', () => {
+                this.handleRedo();
+            });
+        }
+
+        // Keyboard shortcuts for undo/redo
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                this.handleUndo();
+            } else if (e.ctrlKey && e.key === 'y') {
+                e.preventDefault();
+                this.handleRedo();
+            }
+        });
+
+        // Listen to undo/redo state changes to update button states
+        this.profileStateManager.onUndoRedoChange(() => {
+            this.updateUndoRedoButtons();
+        });
+
+        // Initial button state update
+        this.updateUndoRedoButtons();
     }
 
     private refreshCurrentView(): void {
@@ -857,6 +895,48 @@ export class MainController {
         selectedCourses.forEach(sc => {
             this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
         });
+    }
+
+    private handleUndo(): void {
+        this.profileStateManager.undo().then(() => {
+            this.refreshUIAfterUndoRedo();
+        }).catch(error => {
+            console.error('Undo failed:', error);
+            this.uiStateManager.showErrorMessage('Failed to undo. Please try again.');
+        });
+    }
+
+    private handleRedo(): void {
+        this.profileStateManager.redo().then(() => {
+            this.refreshUIAfterUndoRedo();
+        }).catch(error => {
+            console.error('Redo failed:', error);
+            this.uiStateManager.showErrorMessage('Failed to redo. Please try again.');
+        });
+    }
+
+    private refreshUIAfterUndoRedo(): void {
+        this.courseController.displaySelectedCourses();
+        this.scheduleController.displayScheduleSelectedCourses();
+
+        if (this.uiStateManager.currentPage === 'schedule') {
+            this.scheduleController.renderScheduleGrids();
+        } else {
+            this.refreshCurrentView();
+        }
+    }
+
+    private updateUndoRedoButtons(): void {
+        const undoBtn = document.getElementById('undo-btn') as HTMLButtonElement;
+        const redoBtn = document.getElementById('redo-btn') as HTMLButtonElement;
+
+        if (undoBtn) {
+            undoBtn.disabled = !this.profileStateManager.canUndo();
+        }
+
+        if (redoBtn) {
+            redoBtn.disabled = !this.profileStateManager.canRedo();
+        }
     }
 
     private setupDataUpdateListener(): void {
