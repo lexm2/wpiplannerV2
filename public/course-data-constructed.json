@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 9, 2025, 6:20 PM",
+  "generated": "Nov 9, 2025, 6:43 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -242161,7 +242161,7 @@
                 "crn": 340236,
                 "number": "C04",
                 "seats": 15,
-                "seats_available": 0,
+                "seats_available": 1,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -242180,7 +242180,7 @@
                     "building": "",
                     "room": "Daniels Hall 102E",
                     "seats": 15,
-                    "seats_available": 0,
+                    "seats_available": 1,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C04",
