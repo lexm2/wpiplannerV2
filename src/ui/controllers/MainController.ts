@@ -2,7 +2,6 @@ import { Course, Department } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
 import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
-import { ScheduleSelector } from '../components/ScheduleSelector'
 import { SchedulePickerModal } from '../components/SchedulePickerModal'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { ConflictDetector } from '../../core/ConflictDetector'
@@ -155,7 +154,6 @@ import type { DataUpdateAvailableEvent } from '../../types/worker'
  */
 export class MainController {
     private courseDataService: CourseDataService;
-    private scheduleSelector: ScheduleSelector | null = null;
     private schedulePickerModal: SchedulePickerModal | null = null;
     private _themeSelector: ThemeSelector;
     private profileStateManager: ProfileStateManager;
@@ -628,18 +626,6 @@ export class MainController {
         if (scheduleTab) {
             scheduleTab.addEventListener('click', async () => {
                 this.uiStateManager.switchToPage('schedule');
-
-                // Initialize schedule selector if not already created
-                if (!this.scheduleSelector) {
-                    try {
-                        // Ensure the schedule management service is initialized before creating selector
-                        await this.scheduleManagementService.initialize();
-
-                        this.scheduleSelector = new ScheduleSelector(this.scheduleManagementService, 'schedule-selector-container');
-                    } catch (error) {
-                        console.error('Failed to initialize schedule selector:', error);
-                    }
-                }
 
                 // Log selected section data for debugging
                 const selectedCourses = this.courseSelectionService.getSelectedCourses();
