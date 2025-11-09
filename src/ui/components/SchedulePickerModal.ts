@@ -60,15 +60,14 @@ export class SchedulePickerModal {
 
                         <div class="schedule-list" id="schedule-list-modal-${this.modalId}">
                         </div>
-
+                    </div>
+                    <div class="modal-footer">
                         <div class="storage-usage-container" id="storage-usage-container-modal">
                             <div class="storage-usage-text">Storage: Loading...</div>
                             <div class="storage-usage-bar">
                                 <div class="storage-usage-fill" id="storage-usage-fill-modal" style="width: 0%"></div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
                         <div class="modal-footer-buttons">
                             <button class="btn btn-secondary" id="import-schedule-btn-modal">Import</button>
                             <button class="btn btn-secondary" id="export-schedule-btn-modal">Export</button>
@@ -105,6 +104,11 @@ export class SchedulePickerModal {
                     </div>
                     <div class="schedule-item-actions">
                         ${isActive ? '<span class="active-indicator">✓</span>' : '<button class="btn-link switch-btn">Switch</button>'}
+                        <button class="btn-link inline-action-btn" data-action="rename">Rename</button>
+                        <button class="btn-link inline-action-btn" data-action="duplicate">Duplicate</button>
+                        <button class="btn-link inline-action-btn" data-action="export">Export</button>
+                        <button class="btn-link inline-action-btn" data-action="export-ics">Export ICS</button>
+                        ${schedules.length > 1 ? '<button class="btn-link inline-action-btn danger" data-action="delete">Delete</button>' : ''}
                         <button class="btn-link menu-btn" title="More options">⋮</button>
                     </div>
                     <div class="schedule-item-menu" style="display: none;">
@@ -213,7 +217,7 @@ export class SchedulePickerModal {
                 this.toggleScheduleMenu(target);
             }
 
-            if (target.classList.contains('menu-action')) {
+            if (target.classList.contains('menu-action') || target.classList.contains('inline-action-btn')) {
                 const action = target.getAttribute('data-action');
                 const scheduleId = target.closest('.schedule-item')?.getAttribute('data-schedule-id');
                 if (action && scheduleId) {
@@ -418,7 +422,7 @@ export class SchedulePickerModal {
     private async createNewSchedule(): Promise<void> {
         const name = prompt('Enter schedule name:');
         if (name?.trim()) {
-            await this.scheduleManagementService.createSchedule(name.trim());
+            await this.scheduleManagementService.createNewSchedule(name.trim());
             this.updateScheduleList();
         }
     }
