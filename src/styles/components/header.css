@@ -13,6 +13,7 @@
   align-items: center;
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 .header-left {
@@ -107,12 +108,12 @@
 }
 
 .header-navigation {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 2rem;
-  flex-shrink: 0;
-  min-width: 200px;
 }
 
 /* Pill-style navigation tabs */

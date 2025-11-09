@@ -66,22 +66,6 @@
   min-height: 0;
 }
 
-/* Toolbar - New Schedule Button */
-.schedule-picker-toolbar {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-background);
-  flex-shrink: 0;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.schedule-picker-toolbar .btn {
-  padding: 0.625rem 1.25rem;
-  font-size: 0.95rem;
-  border-radius: 6px;
-}
-
 /* Schedule List - Scrollable Area */
 .schedule-picker-modal-dialog .schedule-list {
   flex: 1;
@@ -103,13 +87,28 @@
 .schedule-picker-modal-dialog .schedule-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--color-border);
-  transition: background 0.15s ease;
+  transition: all 0.2s ease;
   position: relative;
   cursor: pointer;
   min-height: 72px;
+}
+
+.schedule-picker-modal-dialog .schedule-item.active {
+  background: var(--color-background);
+}
+
+.schedule-picker-modal-dialog .schedule-item.active::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background: var(--color-primary);
+  border-radius: 4px;
 }
 
 .schedule-picker-modal-dialog .schedule-item:last-child {
@@ -120,12 +119,8 @@
   background: var(--color-surface-hover);
 }
 
-.schedule-picker-modal-dialog .schedule-item.active {
-  background: var(--color-primary-light);
-}
-
 .schedule-picker-modal-dialog .schedule-item.active:hover {
-  background: var(--color-primary-light);
+  background: var(--color-surface-elevated);
 }
 
 /* Schedule Item Info */
@@ -147,6 +142,8 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  display: inline-block;
+  width: fit-content;
 }
 
 .schedule-picker-modal-dialog .schedule-item.active .schedule-item-name {
@@ -169,14 +166,6 @@
   margin-left: 1rem;
 }
 
-.schedule-picker-modal-dialog .active-indicator {
-  color: var(--color-primary);
-  font-weight: bold;
-  font-size: 1.25rem;
-  padding: 0.25rem 0.5rem;
-}
-
-.schedule-picker-modal-dialog .switch-btn,
 .schedule-picker-modal-dialog .menu-btn,
 .schedule-picker-modal-dialog .inline-action-btn {
   background: none;
@@ -190,7 +179,6 @@
   white-space: nowrap;
 }
 
-.schedule-picker-modal-dialog .switch-btn:hover,
 .schedule-picker-modal-dialog .menu-btn:hover,
 .schedule-picker-modal-dialog .inline-action-btn:hover {
   background: var(--color-background);

@@ -54,10 +54,6 @@ export class SchedulePickerModal {
                         <button class="modal-close" data-modal-close="${this.modalId}">×</button>
                     </div>
                     <div class="modal-body schedule-picker-body">
-                        <div class="schedule-picker-toolbar">
-                            <button class="btn btn-primary" id="new-schedule-btn-modal">+ New Schedule</button>
-                        </div>
-
                         <div class="schedule-list" id="schedule-list-modal-${this.modalId}">
                         </div>
                     </div>
@@ -69,6 +65,7 @@ export class SchedulePickerModal {
                             </div>
                         </div>
                         <div class="modal-footer-buttons">
+                            <button class="btn btn-primary" id="new-schedule-btn-modal">+ New Schedule</button>
                             <button class="btn btn-secondary" id="import-schedule-btn-modal">Import</button>
                             <button class="btn btn-secondary" id="export-schedule-btn-modal">Export</button>
                             <button class="btn btn-secondary" id="export-ics-btn-modal">Export ICS</button>
@@ -103,7 +100,6 @@ export class SchedulePickerModal {
                         <div class="schedule-item-details">${courseCount} course${courseCount === 1 ? '' : 's'}</div>
                     </div>
                     <div class="schedule-item-actions">
-                        ${isActive ? '<span class="active-indicator">✓</span>' : '<button class="btn-link switch-btn">Switch</button>'}
                         <button class="btn-link inline-action-btn" data-action="rename">Rename</button>
                         <button class="btn-link inline-action-btn" data-action="duplicate">Duplicate</button>
                         <button class="btn-link inline-action-btn" data-action="export">Export</button>
@@ -205,23 +201,29 @@ export class SchedulePickerModal {
         this.scheduleListClickHandler = (e) => {
             const target = e.target as HTMLElement;
 
-            if (target.classList.contains('switch-btn')) {
-                const scheduleId = target.closest('.schedule-item')?.getAttribute('data-schedule-id');
-                if (scheduleId) {
-                    this.switchToSchedule(scheduleId);
-                }
-            }
-
+            // Handle menu button click
             if (target.classList.contains('menu-btn')) {
                 e.stopPropagation();
                 this.toggleScheduleMenu(target);
+                return;
             }
 
+            // Handle action button clicks
             if (target.classList.contains('menu-action') || target.classList.contains('inline-action-btn')) {
                 const action = target.getAttribute('data-action');
                 const scheduleId = target.closest('.schedule-item')?.getAttribute('data-schedule-id');
                 if (action && scheduleId) {
                     this.handleScheduleAction(action, scheduleId);
+                }
+                return;
+            }
+
+            // Handle clicking anywhere on the schedule item (except buttons)
+            const scheduleItem = target.closest('.schedule-item') as HTMLElement;
+            if (scheduleItem && !target.closest('button') && !target.classList.contains('schedule-item-name')) {
+                const scheduleId = scheduleItem.getAttribute('data-schedule-id');
+                if (scheduleId) {
+                    this.switchToSchedule(scheduleId);
                 }
             }
         };
@@ -254,9 +256,6 @@ export class SchedulePickerModal {
     private switchToSchedule(scheduleId: string): void {
         try {
             this.scheduleManagementService.setActiveSchedule(scheduleId);
-            setTimeout(() => {
-                this.modalService.hideModal(this.modalId);
-            }, 100);
         } catch (error) {
             console.error('Failed to switch schedule:', error);
             alert('Failed to switch schedule. Please try again.');
