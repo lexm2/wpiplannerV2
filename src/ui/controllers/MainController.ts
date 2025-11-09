@@ -3,6 +3,7 @@ import { SelectedCourse } from '../../types/schedule'
 import { CourseDataService } from '../../services/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { ScheduleSelector } from '../components/ScheduleSelector'
+import { SchedulePickerModal } from '../components/SchedulePickerModal'
 import { CourseSelectionService } from '../../services/CourseSelectionService'
 import { ConflictDetector } from '../../core/ConflictDetector'
 import { getAllSections } from '../../utils/courseUtils'
@@ -155,6 +156,7 @@ import type { DataUpdateAvailableEvent } from '../../types/worker'
 export class MainController {
     private courseDataService: CourseDataService;
     private scheduleSelector: ScheduleSelector | null = null;
+    private schedulePickerModal: SchedulePickerModal | null = null;
     private _themeSelector: ThemeSelector;
     private profileStateManager: ProfileStateManager;
     private storageService: StorageService;
@@ -303,6 +305,7 @@ export class MainController {
             this.setupEventListeners();
             this.setupSaveIndicatorListener();
             this.setupCourseSelectionListener();
+            this.setupScheduleChangeListener();
             this.scheduleController.setupAutoScheduleButton();
             this.scheduleController.setupClearAllSectionsButton();
             this.scheduleController.setupCourseSelectionChangeListener();
@@ -594,6 +597,14 @@ export class MainController {
             });
         }
 
+        // Schedule picker button
+        const schedulePickerBtn = document.getElementById('schedule-picker-btn');
+        if (schedulePickerBtn) {
+            schedulePickerBtn.addEventListener('click', () => {
+                this.openSchedulePicker();
+            });
+        }
+
         // Clear selection
         const clearButton = document.getElementById('clear-selection');
         if (clearButton) {
@@ -819,6 +830,23 @@ export class MainController {
         }
     }
 
+    private openSchedulePicker(): void {
+        if (!this.schedulePickerModal) {
+            this.schedulePickerModal = new SchedulePickerModal(this.modalService, this.scheduleManagementService);
+        }
+        this.schedulePickerModal.show();
+    }
+
+    private updateSchedulePickerButton(): void {
+        const labelElement = document.getElementById('schedule-picker-label');
+        if (labelElement) {
+            const activeSchedule = this.scheduleManagementService.getActiveSchedule();
+            if (activeSchedule) {
+                labelElement.textContent = activeSchedule.name;
+            }
+        }
+    }
+
     private clearSelection(): void {
         // Clear selected sections
         document.querySelectorAll('.section-badge.selected').forEach(badge => {
@@ -834,8 +862,8 @@ export class MainController {
 
         // Clear department selection (this will activate "All Departments")
         this.departmentController.clearDepartmentSelection();
-        
-        // Reset to "All Departments" state 
+
+        // Reset to "All Departments" state
         this.refreshCurrentView(); // This will now show all courses since no department/filters are selected
 
         this.courseController.clearCourseSelection();
@@ -876,6 +904,13 @@ export class MainController {
                 indicator.className = 'optimistic-status idle';
             }, 1500);
         }
+    }
+
+    private setupScheduleChangeListener(): void {
+        this.scheduleManagementService.onActiveScheduleChange(() => {
+            this.updateSchedulePickerButton();
+        });
+        this.updateSchedulePickerButton();
     }
 
     private setupCourseSelectionListener(): void {
