@@ -381,17 +381,6 @@
     font-size: 0.875rem;
   }
 
-  /* Delete button styling on wide screens - only for active/selected schedules */
-  .schedule-picker-modal-dialog .schedule-item.active .inline-action-btn.danger {
-    background: var(--color-surface-hover);
-    color: var(--color-error);
-  }
-
-  .schedule-picker-modal-dialog .schedule-item.active .inline-action-btn.danger:hover {
-    background: #ffebee;
-    color: var(--color-error);
-  }
-
   /* Expand schedule item actions area */
   .schedule-picker-modal-dialog .schedule-item-actions {
     gap: 0.5rem;

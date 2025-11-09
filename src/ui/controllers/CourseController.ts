@@ -209,10 +209,61 @@ export class CourseController {
         };
         
         this.progressiveRenderer = new ProgressiveRenderer(renderOptions);
+
+        // Initialize selected courses expander
+        this.initializeSelectedCoursesExpander();
     }
 
     setFilterService(filterService: CourseFilterService): void {
         this.filterService = filterService;
+    }
+
+    private initializeSelectedCoursesExpander(): void {
+        const header = document.getElementById('selected-courses-header');
+        const content = document.getElementById('selected-courses-list');
+        const chevronContainer = document.getElementById('selected-courses-chevron');
+
+        if (!header || !content || !chevronContainer) return;
+
+        // Inject chevron icon (without adding the chevron-icon class to avoid double rotation)
+        chevronContainer.innerHTML = getInlineSVG('CHEVRON_DOWN');
+
+        // Load saved state from localStorage (default: collapsed)
+        const savedState = localStorage.getItem('selectedCoursesExpanded');
+        const isExpanded = savedState === 'true';
+
+        // Set initial state
+        header.setAttribute('aria-expanded', isExpanded.toString());
+        if (isExpanded) {
+            content.classList.add('expanded');
+        }
+
+        // Toggle function
+        const toggleExpander = () => {
+            const currentState = header.getAttribute('aria-expanded') === 'true';
+            const newState = !currentState;
+
+            header.setAttribute('aria-expanded', newState.toString());
+            if (newState) {
+                content.classList.add('expanded');
+            } else {
+                content.classList.remove('expanded');
+            }
+
+            // Save state to localStorage
+            localStorage.setItem('selectedCoursesExpanded', newState.toString());
+        };
+
+        // Add click handler
+        header.addEventListener('click', toggleExpander);
+
+        // Add keyboard handler for accessibility
+        header.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleExpander();
+            }
+        });
     }
 
     setAllDepartments(departments: Department[]): void {

@@ -1,5 +1,6 @@
 import { ThemeManager } from '../../themes/ThemeManager'
 import { ProfileStateManager } from '../../core/ProfileStateManager'
+import { getInlineSVG } from '../../utils/iconPaths'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -94,6 +95,12 @@ export class ThemeSelector {
         this.dropdownElement = document.getElementById('theme-dropdown');
         this.optionsElement = document.getElementById('theme-options');
         this.currentThemeNameElement = document.getElementById('current-theme-name');
+
+        // Inject chevron icon into dropdown arrow
+        const dropdownArrow = document.getElementById('theme-dropdown-arrow');
+        if (dropdownArrow) {
+            dropdownArrow.innerHTML = getInlineSVG('CHEVRON_DOWN', 'dropdown-arrow-icon');
+        }
     }
 
     private loadSavedTheme(): void {

@@ -20,6 +20,14 @@
 .dropdown-arrow {
   font-size: 0.8rem;
   transition: transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdown-arrow svg {
+  transform-origin: center;
+  display: block;
 }
 
 .theme-dropdown.open .dropdown-arrow {

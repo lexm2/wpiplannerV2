@@ -15,6 +15,7 @@ import arrowBarRightIcon from '../assets/icons/arrow-bar-right.svg?url';
 import calendarRepeatIcon from '../assets/icons/calendar-repeat.svg?url';
 import calendarUpIcon from '../assets/icons/calendar-up.svg?url';
 import checkIcon from '../assets/icons/check.svg?url';
+import chevronDownIcon from '../assets/icons/chevron-down.svg?url';
 import downloadIcon from '../assets/icons/download.svg?url';
 import eraserIcon from '../assets/icons/eraser.svg?url';
 import fileExportIcon from '../assets/icons/file-export.svg?url';
@@ -33,6 +34,7 @@ export type IconName =
   | 'CALENDAR_REPEAT'
   | 'CALENDAR_UP'
   | 'CHECK'
+  | 'CHEVRON_DOWN'
   | 'DOWNLOAD'
   | 'ERASER'
   | 'FILE_EXPORT'
@@ -54,6 +56,7 @@ export type IconName =
  * - CALENDAR_REPEAT: calendar-repeat.svg
  * - CALENDAR_UP: calendar-up.svg
  * - CHECK: check.svg
+ * - CHEVRON_DOWN: chevron-down.svg
  * - DOWNLOAD: download.svg
  * - ERASER: eraser.svg
  * - FILE_EXPORT: file-export.svg
@@ -72,6 +75,7 @@ export const ICONS: Record<IconName, string> = {
   CALENDAR_REPEAT: calendarRepeatIcon,
   CALENDAR_UP: calendarUpIcon,
   CHECK: checkIcon,
+  CHEVRON_DOWN: chevronDownIcon,
   DOWNLOAD: downloadIcon,
   ERASER: eraserIcon,
   FILE_EXPORT: fileExportIcon,
@@ -95,6 +99,7 @@ export const INLINE_SVGS: Record<IconName, string> = {
   CALENDAR_REPEAT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v3" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h12" /><path d="M20 14l2 2h-3" /><path d="M20 18l2 -2" /><path d="M19 16a3 3 0 1 0 2 5.236" /></svg>`,
   CALENDAR_UP: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M19 22v-6" /><path d="M22 19l-3 -3l-3 3" /></svg>`,
   CHECK: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>`,
+  CHEVRON_DOWN: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg>`,
   DOWNLOAD: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>`,
   ERASER: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19 20h-10.5l-4.21 -4.3a1 1 0 0 1 0 -1.41l10 -10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41l-9.2 9.3" /><path d="M18 13.3l-6.3 -6.3" /></svg>`,
   FILE_EXPORT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M11.5 21h-4.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v5m-5 6h7m-3 -3l3 3l-3 3" /></svg>`,

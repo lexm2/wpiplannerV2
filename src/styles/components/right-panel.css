@@ -4,7 +4,7 @@
   border-left: 1px solid var(--color-border);
   overflow-y: auto;
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: auto 1fr;
   gap: 0;
 }
 
@@ -59,14 +59,74 @@
 .selected-courses-section {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  height: fit-content;
+}
+
+.selected-courses-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  user-select: none;
+  transition: var(--effect-transition);
+}
+
+.selected-courses-header:hover {
+  background: var(--color-surface);
+}
+
+.selected-courses-header:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.selected-courses-title {
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chevron-icon {
+  transition: transform 0.3s ease;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chevron-icon svg {
+  transform-origin: center;
+  display: block;
+}
+
+.selected-courses-header[aria-expanded="true"] .chevron-icon {
+  transform: rotate(180deg);
 }
 
 .selected-courses-content {
-  flex: 1;
-  padding: 1rem 1.5rem;
-  overflow-y: auto;
+  padding: 0 1.5rem;
+  overflow: hidden;
   box-sizing: border-box;
   width: 100%;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+
+.selected-courses-content.expanded {
+  max-height: 1000px;
+  opacity: 1;
+  padding: 1rem 1.5rem;
+  overflow-y: auto;
 }
 
 .course-count {
