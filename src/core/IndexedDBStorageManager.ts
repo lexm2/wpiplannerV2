@@ -1,38 +1,5 @@
 /**
- * ═══════════════════════════════════════════════════════════════════════════════
- * IndexedDBStorageManager - Primary Schedule Storage Backend
- * ═══════════════════════════════════════════════════════════════════════════════
- *
- * ARCHITECTURE ROLE:
- * - Primary storage backend for all schedule data in the application
- * - High-capacity storage layer using browser IndexedDB API
- * - Handles large schedule collections without localStorage 5-10MB limits
- * - Provides async operations for non-blocking UI interactions
- * - Supports storage monitoring and usage statistics
- *
- * STORAGE STRATEGY:
- * - IndexedDB is the ONLY storage mechanism for schedules (no localStorage fallback)
- * - localStorage used separately for small data (preferences, theme, active schedule ID)
- * - Clear separation: IndexedDB = schedules, localStorage = configuration
- *
- * STORAGE ARCHITECTURE:
- * - Database: "wpi-planner-db"
- * - Object Stores: schedules (primary), preferences (reserved), selectedCourses (reserved)
- * - Indexes: By schedule ID, timestamp, name
- * - All schedule operations route through this manager exclusively
- *
- * KEY FEATURES:
- * - Unlimited storage capacity for schedules (browser quota applies, typically 50MB+)
- * - Async operations prevent UI blocking during large data operations
- * - Transaction support for data integrity and atomic operations
- * - Storage usage monitoring and statistics
- * - Automatic database versioning and migrations
- * - Mandatory initialization before use (called by TransactionalStorageManager)
- *
- * INTEGRATION:
- * - Used exclusively by TransactionalStorageManager for schedule operations
- * - Initialized on-demand before first schedule access
- * - No direct access from other components (encapsulated behind TransactionalStorageManager)
+ * IndexedDB storage backend for schedules with high capacity and async operations
  */
 
 import { Schedule } from '../types/schedule';
