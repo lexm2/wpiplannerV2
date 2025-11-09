@@ -13170,7 +13170,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Biomedical Engineering",
-      "Waitlist_Waitlist_Capacity": "1/5",
+      "Waitlist_Waitlist_Capacity": "0/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337787"
     },
     {
@@ -13239,7 +13239,7 @@
       "Course_Title": "BME 552 - Tissue Mechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "25/25",
+      "Enrolled_Capacity": "24/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Adriana Hera",
       "Locations": "Kaven Hall 115",
@@ -13247,7 +13247,7 @@
       "Meeting_Patterns": "R | 5:30 PM - 8:20 PM",
       "Offering_Period": "2026 Spring Semester",
       "Section_Details": "Kaven Hall 115 | R | 5:30 PM - 8:20 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Mechanical Engineering; Biomedical Engineering",
       "Waitlist_Waitlist_Capacity": "0/0",
@@ -84194,7 +84194,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336775"
     },
     {
@@ -84678,7 +84678,7 @@
       "Course_Title": "ME 552 - Tissue Mechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "25/25",
+      "Enrolled_Capacity": "24/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Adriana Hera",
       "Locations": "Kaven Hall 115",
@@ -84686,7 +84686,7 @@
       "Meeting_Patterns": "R | 5:30 PM - 8:20 PM",
       "Offering_Period": "2026 Spring Semester",
       "Section_Details": "Kaven Hall 115 | R | 5:30 PM - 8:20 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Mechanical Engineering; Biomedical Engineering",
       "Waitlist_Waitlist_Capacity": "0/0",
@@ -88939,7 +88939,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336775"
     },
     {
