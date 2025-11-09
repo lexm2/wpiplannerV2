@@ -1,3 +1,5 @@
+import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer';
+
 interface StateSnapshot {
   timestamp: number;
   activeScheduleId: string | null;
@@ -23,8 +25,8 @@ export class UndoRedoManager {
     const snapshot: StateSnapshot = {
       timestamp: Date.now(),
       activeScheduleId,
-      schedules: new Map(schedules),
-      preferences: { ...preferences }
+      schedules: this.deepCloneSchedulesMap(schedules),
+      preferences: this.deepClone(preferences)
     };
 
     this.history.push(snapshot);
@@ -79,5 +81,15 @@ export class UndoRedoManager {
 
   private notifyListeners(): void {
     this.listeners.forEach(listener => listener());
+  }
+
+  private deepClone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj, createJSONReplacer()), createJSONReviver());
+  }
+
+  private deepCloneSchedulesMap(schedules: Map<string, any>): Map<string, any> {
+    const schedulesArray = Array.from(schedules.entries());
+    const clonedArray = this.deepClone(schedulesArray);
+    return new Map(clonedArray);
   }
 }

@@ -3,6 +3,7 @@ import { Course, Section, Department } from '../types/types'
 import { TransactionalStorageManager, TransactionResult } from './TransactionalStorageManager'
 import { getAllSections } from '../utils/courseUtils'
 import { UndoRedoManager } from './UndoRedoManager'
+import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -388,17 +389,7 @@ export class ProfileStateManager {
 
         this.isRestoringState = true;
         try {
-            this.state.activeScheduleId = snapshot.activeScheduleId;
-            this.state.schedules = Array.from(snapshot.schedules.values());
-            this.state.preferences = { ...snapshot.preferences };
-
-            if (this.state.activeScheduleId) {
-                const activeSchedule = this.state.schedules.find(s => s.id === this.state.activeScheduleId);
-                if (activeSchedule) {
-                    this.state.selectedCourses = this.resolveCourseReferences([...activeSchedule.selectedCourses]);
-                }
-            }
-
+            this.restoreFromSnapshot(snapshot);
             this.emitEvent('courses_changed', { action: 'undo' }, 'system');
             await this.save();
             return true;
@@ -413,23 +404,36 @@ export class ProfileStateManager {
 
         this.isRestoringState = true;
         try {
-            this.state.activeScheduleId = snapshot.activeScheduleId;
-            this.state.schedules = Array.from(snapshot.schedules.values());
-            this.state.preferences = { ...snapshot.preferences };
-
-            if (this.state.activeScheduleId) {
-                const activeSchedule = this.state.schedules.find(s => s.id === this.state.activeScheduleId);
-                if (activeSchedule) {
-                    this.state.selectedCourses = this.resolveCourseReferences([...activeSchedule.selectedCourses]);
-                }
-            }
-
+            this.restoreFromSnapshot(snapshot);
             this.emitEvent('courses_changed', { action: 'redo' }, 'system');
             await this.save();
             return true;
         } finally {
             this.isRestoringState = false;
         }
+    }
+
+    private restoreFromSnapshot(snapshot: any): void {
+        this.state.activeScheduleId = snapshot.activeScheduleId;
+
+        const schedulesArray = Array.from(snapshot.schedules.values());
+        this.state.schedules = this.deepClone(schedulesArray);
+        this.state.preferences = this.deepClone(snapshot.preferences);
+
+        if (this.state.activeScheduleId) {
+            const activeSchedule = this.state.schedules.find(s => s.id === this.state.activeScheduleId);
+            if (activeSchedule) {
+                this.state.selectedCourses = this.resolveCourseReferences(activeSchedule.selectedCourses);
+            } else {
+                this.state.selectedCourses = [];
+            }
+        } else {
+            this.state.selectedCourses = [];
+        }
+    }
+
+    private deepClone<T>(obj: T): T {
+        return JSON.parse(JSON.stringify(obj, createJSONReplacer()), createJSONReviver());
     }
 
     canUndo(): boolean {
