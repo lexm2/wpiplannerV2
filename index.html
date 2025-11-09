@@ -48,8 +48,8 @@
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
     <link rel="shortcut icon" href="./favicon.ico">
-  <script type="module" crossorigin src="/wpiplannerV2/assets/index-BohRPwjf.js"></script>
-  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-H4RJOTRK.css">
+  <script type="module" crossorigin src="/wpiplannerV2/assets/index-DbMSvUhj.js"></script>
+  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-JJKJ-k3U.css">
 </head>
 <body>
     <div id="app">
@@ -86,7 +86,7 @@
                     <div class="theme-selector">
                         <div class="theme-dropdown" id="theme-dropdown">
                             <span id="current-theme-name">WPI Classic</span>
-                            <span class="dropdown-arrow">▼</span>
+                            <span class="dropdown-arrow" id="theme-dropdown-arrow"></span>
                         </div>
                         <div class="theme-options" id="theme-options">
                             <!-- Theme options will be populated by ThemeSelector -->
@@ -125,7 +125,13 @@
 
             <aside class="right-panel" role="complementary" aria-label="Course details and selection">
                 <section class="selected-courses-section">
-                    <span id="selected-count" style="display: none;"></span>
+                    <div class="selected-courses-header" id="selected-courses-header" role="button" tabindex="0" aria-expanded="false" aria-controls="selected-courses-list">
+                        <h3 class="selected-courses-title">
+                            Selected Courses
+                            <span id="selected-count" class="course-count"></span>
+                        </h3>
+                        <span class="chevron-icon" id="selected-courses-chevron"></span>
+                    </div>
                     <div class="selected-courses-content" id="selected-courses-list">
                         <div class="empty-state">No courses selected yet</div>
                     </div>
