@@ -48,8 +48,8 @@
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
     <link rel="shortcut icon" href="./favicon.ico">
-  <script type="module" crossorigin src="/wpiplannerV2/assets/index-DZOrK_ZG.js"></script>
-  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-B1nExr-c.css">
+  <script type="module" crossorigin src="/wpiplannerV2/assets/index-Bk97iIG0.js"></script>
+  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-Dw75hM9_.css">
 </head>
 <body>
     <div id="app">
@@ -73,6 +73,14 @@
                 <div class="header-controls">
                     <div class="status-indicator-container">
                         <div id="optimistic-ui-status" class="optimistic-status idle">No changes</div>
+                    </div>
+                    <div class="undo-redo-controls">
+                        <button id="undo-btn" class="btn btn-icon" title="Undo (Ctrl+Z)" disabled>
+                            <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='currentColor'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%20class='icon%20icon-tabler%20icons-tabler-outline%20icon-tabler-arrow-back-up'%3e%3cpath%20stroke='none'%20d='M0%200h24v24H0z'%20fill='none'/%3e%3cpath%20d='M9%2014l-4%20-4l4%20-4'%20/%3e%3cpath%20d='M5%2010h11a4%204%200%201%201%200%208h-1'%20/%3e%3c/svg%3e" alt="Undo" width="20" height="20">
+                        </button>
+                        <button id="redo-btn" class="btn btn-icon" title="Redo (Ctrl+Y)" disabled>
+                            <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='currentColor'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%20class='icon%20icon-tabler%20icons-tabler-outline%20icon-tabler-arrow-forward-up'%3e%3cpath%20stroke='none'%20d='M0%200h24v24H0z'%20fill='none'/%3e%3cpath%20d='M15%2014l4%20-4l-4%20-4'%20/%3e%3cpath%20d='M19%2010h-11a4%204%200%201%200%200%208h1'%20/%3e%3c/svg%3e" alt="Redo" width="20" height="20">
+                        </button>
                     </div>
                     <button id="schedule-picker-btn" class="btn btn-icon" title="Select Schedule">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -110,7 +118,6 @@
                     <div class="search-controls">
                         <input type="text" id="search-input" placeholder="Search courses..." class="search-input" aria-label="Search courses">
                         <button id="filter-btn" class="btn btn-secondary filter-btn" title="Filter courses" aria-label="Filter courses">
-                            <img src="" alt="Filter" class="filter-icon" />
                         </button>
                     </div>
                     <div class="view-controls">
@@ -151,7 +158,6 @@
                         <div class="schedule-filter-controls">
                             <input type="text" id="schedule-search-input" placeholder="Search selected courses..." class="search-input schedule-search-input">
                             <button id="schedule-filter-btn" class="btn btn-secondary filter-btn" title="Filter selected courses">
-                                <img src="" alt="Filter" class="filter-icon" />
                             </button>
                         </div>
                     </div>
@@ -160,11 +166,9 @@
                     </div>
                     <div class="schedule-selected-courses-footer">
                         <button id="clear-all-sections-btn" class="btn btn-secondary clear-all-sections-btn" title="Clear all selected sections" aria-label="Clear all sections">
-                            <img src="" alt="Clear all sections" class="clear-all-eraser-icon" />
                             <span>Clear All Sections</span>
                         </button>
                         <button id="auto-schedule-btn" class="btn btn-primary auto-schedule-btn" title="Automatically generate a schedule" aria-label="Auto-generate schedule">
-                            <img src="" alt="Auto-schedule" class="auto-schedule-icon" />
                             <span>Auto-Schedule</span>
                         </button>
                     </div>
