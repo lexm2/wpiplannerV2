@@ -2,10 +2,11 @@
 .right-panel {
   background: var(--color-background-alt);
   border-left: 1px solid var(--color-border);
-  overflow-y: auto;
+  overflow: hidden;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 0;
+  height: 100%;
 }
 
 /* Course description section - top half */
@@ -14,12 +15,15 @@
   flex-direction: column;
   border-bottom: 1px solid var(--color-border);
   border-top: 1px solid var(--color-border);
+  min-height: 0;
+  overflow: hidden;
 }
 
 .course-description-content {
   flex: 1;
   padding: 1rem 1.5rem;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .course-description-content .empty-state {
@@ -60,7 +64,8 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  height: fit-content;
+  max-height: 100%;
+  overflow: visible;
 }
 
 .selected-courses-header {
@@ -123,7 +128,7 @@
 }
 
 .selected-courses-content.expanded {
-  max-height: 1000px;
+  max-height: 50vh;
   opacity: 1;
   padding: 1rem 1.5rem;
   overflow-y: auto;
