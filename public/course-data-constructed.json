@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 9, 2025, 5:49 AM",
+  "generated": "Nov 9, 2025, 6:21 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -43533,7 +43533,7 @@
                 "crn": 336451,
                 "number": "C02",
                 "seats": 75,
-                "seats_available": 25,
+                "seats_available": 24,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -43552,7 +43552,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 75,
-                    "seats_available": 25,
+                    "seats_available": 24,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "C02",
