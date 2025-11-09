@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 9, 2025, 10:14 PM",
+  "generated": "Nov 9, 2025, 10:32 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -53985,7 +53985,7 @@
                 "crn": 336265,
                 "number": "CL01",
                 "seats": 64,
-                "seats_available": 1,
+                "seats_available": 2,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4360",
@@ -54004,7 +54004,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 64,
-                    "seats_available": 1,
+                    "seats_available": 2,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "CL01",
@@ -54023,7 +54023,7 @@
                   "crn": 336345,
                   "number": "CX01",
                   "seats": 32,
-                  "seats_available": 0,
+                  "seats_available": 1,
                   "actual_waitlist": 0,
                   "max_waitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4360",
@@ -54042,7 +54042,7 @@
                       "building": "",
                       "room": "Unity Hall 420",
                       "seats": 32,
-                      "seats_available": 0,
+                      "seats_available": 1,
                       "actual_waitlist": 0,
                       "max_waitlist": 0,
                       "specific_section": "CX01",
