@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 9, 2025, 2:55 AM",
+  "generated": "Nov 9, 2025, 3:42 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -236193,8 +236193,8 @@
                 "crn": 337336,
                 "number": "D02",
                 "seats": 30,
-                "seats_available": 0,
-                "actual_waitlist": 1,
+                "seats_available": 1,
+                "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introductory course designed to explore various leisure education alternatives.",
@@ -236212,8 +236212,8 @@
                     "building": "",
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
-                    "seats_available": 0,
-                    "actual_waitlist": 1,
+                    "seats_available": 1,
+                    "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "D02",
                     "days": [
