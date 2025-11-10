@@ -291,6 +291,11 @@
     animation-delay: calc(var(--card-index) * 40ms);
 }
 
+/* Ensure cards are visible when not animating out */
+.wizard-step:not(.slide-out-left):not(.slide-out-right) .wizard-section-card {
+    opacity: 1;
+}
+
 .wizard-section-card {
     background-color: var(--color-surface);
     border: 2px solid var(--color-border);
