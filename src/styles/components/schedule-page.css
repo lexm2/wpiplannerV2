@@ -861,6 +861,22 @@
   .schedule-page-layout {
     grid-template-columns: 20rem 1fr;
   }
+
+  .terms-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    padding: 0;
+    gap: 0;
+  }
+
+  .term-graph {
+    scroll-snap-align: start;
+    height: calc(100vh - var(--spacing-header-height));
+    min-height: unset;
+    border-radius: 0;
+  }
 }
 
 @media (max-width: 768px) {
