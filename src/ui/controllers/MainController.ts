@@ -618,6 +618,9 @@ export class MainController {
         // Mobile menu hamburger button
         this.setupMobileMenu();
 
+        // Schedule page mobile menu
+        this.setupScheduleMobileMenu();
+
         // Keyboard shortcuts for undo/redo
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
@@ -1069,6 +1072,55 @@ export class MainController {
         }
 
         this.mobileMenuOpen = null;
+    }
+
+    private setupScheduleMobileMenu(): void {
+        const scheduleMenuBtn = document.getElementById('schedule-mobile-menu-btn');
+        if (!scheduleMenuBtn) return;
+
+        // Inject hamburger icon
+        scheduleMenuBtn.insertAdjacentHTML('afterbegin', getInlineSVG('MENU_2', 'hamburger-icon'));
+
+        // Inject close icon into schedule close button
+        const scheduleCloseBtn = document.getElementById('schedule-mobile-close');
+        if (scheduleCloseBtn) {
+            scheduleCloseBtn.insertAdjacentHTML('afterbegin', getInlineSVG('X', 'close-icon'));
+        }
+
+        // Click handler for schedule floating button - toggles schedule sidebar
+        scheduleMenuBtn.addEventListener('click', () => {
+            const scheduleSidebar = document.querySelector('.schedule-sidebar') as HTMLElement;
+            if (!scheduleSidebar) return;
+
+            const isOpen = scheduleSidebar.classList.contains('mobile-open');
+
+            if (isOpen) {
+                // Close
+                scheduleSidebar.classList.remove('mobile-open');
+                if (this.mobileMenuBackdrop) {
+                    this.mobileMenuBackdrop.classList.remove('active');
+                }
+            } else {
+                // Open
+                scheduleSidebar.classList.add('mobile-open');
+                if (this.mobileMenuBackdrop) {
+                    this.mobileMenuBackdrop.classList.add('active');
+                }
+            }
+        });
+
+        // Click handler for schedule close button
+        if (scheduleCloseBtn) {
+            scheduleCloseBtn.addEventListener('click', () => {
+                const scheduleSidebar = document.querySelector('.schedule-sidebar') as HTMLElement;
+                if (scheduleSidebar) {
+                    scheduleSidebar.classList.remove('mobile-open');
+                }
+                if (this.mobileMenuBackdrop) {
+                    this.mobileMenuBackdrop.classList.remove('active');
+                }
+            });
+        }
     }
 
     // Public test method to manually trigger refresh prompt
