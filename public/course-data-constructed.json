@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 10, 2025, 7:49 PM",
+  "generated": "Nov 10, 2025, 8:19 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -165512,7 +165512,7 @@
                 "number": "CL01",
                 "seats": 40,
                 "seats_available": 0,
-                "actual_waitlist": 3,
+                "actual_waitlist": 4,
                 "max_waitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4374",
                 "description": "Cat. IThis course integrates students’ background in ME in a one-term designproject that is usually taken from a local company. Students must organizethemselves and the project to successfully realize a product that meets customerneeds. Activities include problem definition, design analysis, mathematicalmodelling, CAD modelling, manufacturing, testing, liaison to vendors,customer relations, marketing, technical management, purchasing, reportwriting, and oral presentations.Recommended background: mechanisms (ME 3310, ME 3311), stressanalysis (ES 3502), design (ME 3320), thermo-fluids (ES 3001, ES 3003,ES 3004), materials (ES 2001), manufacturing (ME 1800).",
@@ -165531,7 +165531,7 @@
                     "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                     "seats": 40,
                     "seats_available": 0,
-                    "actual_waitlist": 3,
+                    "actual_waitlist": 4,
                     "max_waitlist": 10,
                     "specific_section": "CL01",
                     "days": [
