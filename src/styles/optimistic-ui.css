@@ -71,6 +71,14 @@
     border: 1px solid #f5c6cb;
 }
 
+.optimistic-status.refresh-available {
+    background-color: var(--color-primary);
+    color: var(--color-text-inverse);
+    border: 1px solid var(--color-primary);
+    cursor: pointer;
+    font-weight: 600;
+}
+
 /* Batch operation feedback */
 .save-profile-btn.saving {
     opacity: 0.7;

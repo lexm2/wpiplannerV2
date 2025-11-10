@@ -90,3 +90,14 @@
 .search-input::placeholder {
   color: var(--color-text-secondary);
 }
+
+/* Responsive breakpoints for content-header */
+@media (max-width: 1600px) {
+  .content-header h2 {
+    display: none;
+  }
+
+  .view-controls {
+    display: none;
+  }
+}

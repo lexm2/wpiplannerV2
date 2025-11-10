@@ -1,9 +1,5 @@
 export class TimestampManager {
-    private updateNotificationElement: HTMLElement | null = null;
-    private onRefreshCallback: (() => void) | null = null;
-
     constructor() {
-        this.createUpdateNotification();
     }
 
     updateClientTimestamp(): void {
@@ -58,43 +54,4 @@ export class TimestampManager {
         }
     }
 
-    showUpdateNotification(): void {
-        if (this.updateNotificationElement) {
-            this.updateNotificationElement.style.display = 'flex';
-        }
-    }
-
-    hideUpdateNotification(): void {
-        if (this.updateNotificationElement) {
-            this.updateNotificationElement.style.display = 'none';
-        }
-    }
-
-    onRefresh(callback: () => void): void {
-        this.onRefreshCallback = callback;
-    }
-
-    private createUpdateNotification(): void {
-        const headerSubtitle = document.querySelector('.header-subtitle');
-        if (!headerSubtitle) return;
-
-        this.updateNotificationElement = document.createElement('div');
-        this.updateNotificationElement.className = 'update-notification';
-        this.updateNotificationElement.style.display = 'none';
-        this.updateNotificationElement.innerHTML = `
-            <span class="update-text">New data available</span>
-            <button class="update-refresh-btn" aria-label="Refresh course data">Refresh</button>
-        `;
-
-        const refreshBtn = this.updateNotificationElement.querySelector('.update-refresh-btn');
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', () => {
-                if (this.onRefreshCallback) {
-                    this.onRefreshCallback();
-                }
-            });
-        }
-
-        headerSubtitle.appendChild(this.updateNotificationElement);
-    }
 }

@@ -912,17 +912,34 @@ export class MainController {
 
     private setupDataUpdateListener(): void {
         window.addEventListener('data-update-available', ((event: DataUpdateAvailableEvent) => {
-            this.timestampManager.showUpdateNotification();
-        }) as EventListener);
+            const indicator = document.getElementById('optimistic-ui-status');
+            if (!indicator) return;
 
-        this.timestampManager.onRefresh(() => {
-            this.refreshCourseData();
-        });
+            // Check if indicator is hidden (below 1600px breakpoint)
+            const isHidden = window.getComputedStyle(indicator).display === 'none';
+
+            if (isHidden) {
+                // Auto-refresh if button is hidden
+                this.refreshCourseData();
+            } else {
+                // Show refresh button and wait for user click
+                indicator.textContent = 'Refresh';
+                indicator.className = 'optimistic-status refresh-available';
+
+                // Remove any existing click listeners to prevent duplicates
+                const newIndicator = indicator.cloneNode(true) as HTMLElement;
+                indicator.parentNode?.replaceChild(newIndicator, indicator);
+
+                // Add click listener to trigger refresh
+                newIndicator.addEventListener('click', () => {
+                    this.refreshCourseData();
+                });
+            }
+        }) as EventListener);
     }
 
     private async refreshCourseData(): Promise<void> {
         try {
-            this.timestampManager.hideUpdateNotification();
 
             const scheduleDB = await this.courseDataService.loadCourseData();
             this.allDepartments = scheduleDB.departments;
@@ -943,6 +960,12 @@ export class MainController {
             }
 
             this.refreshCurrentView();
+
+            const indicator = document.getElementById('optimistic-ui-status');
+            if (indicator && indicator.classList.contains('refresh-available')) {
+                indicator.textContent = 'No changes';
+                indicator.className = 'optimistic-status idle';
+            }
         } catch (error) {
             // Silently fail - errors expected in local development
         }
@@ -962,6 +985,15 @@ export class MainController {
         console.log(`Initial UI sync complete: Updated ${selectedCourses.length} selected courses`);
     }
 
+
+    // Public test method to manually trigger refresh prompt
+    public triggerTestRefresh(): void {
+        const event = new CustomEvent('data-update-available', {
+            detail: { serverTimestamp: new Date().toISOString() }
+        });
+        window.dispatchEvent(event);
+        console.log('Test refresh triggered - status indicator should show "Refresh" and auto-refresh data');
+    }
 
     // Public methods for easy access to selected courses
     public getSelectedCourses() {
