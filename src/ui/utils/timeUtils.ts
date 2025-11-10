@@ -1,9 +1,9 @@
 import { Time, DayOfWeek } from '../../types/types';
 
 export class TimeUtils {
-    // Schedule grid constants - 7 AM to 7 PM (12 hours)
-    static readonly START_HOUR = 7;  // 7 AM
-    static readonly END_HOUR = 19;   // 7 PM
+    // Schedule grid constants - 8 AM to 8 PM (12 hours)
+    static readonly START_HOUR = 8;  // 8 AM
+    static readonly END_HOUR = 20;   // 8 PM
     static readonly TOTAL_HOURS = 12;
     static readonly SLOTS_PER_HOUR = 1; // 60-minute intervals (hourly)
     static readonly TOTAL_TIME_SLOTS = TimeUtils.TOTAL_HOURS * TimeUtils.SLOTS_PER_HOUR;

@@ -172,6 +172,7 @@ export class MainController {
             this._themeSelector.initializeTheme();
             await rateMyProfessorService.loadData();
             await this.courseSelectionService.initialize();
+            await this.scheduleManagementService.initialize();
             
             await this.loadCourseData();
             this.departmentController.displayDepartments();
@@ -742,9 +743,12 @@ export class MainController {
         this.schedulePickerModal.show();
     }
 
-    private updateSchedulePickerButton(): void {
+    private async updateSchedulePickerButton(): Promise<void> {
         const labelElement = document.getElementById('schedule-picker-label');
         if (labelElement) {
+            // Wait for initialization if needed
+            await this.scheduleManagementService.initialize();
+
             const activeSchedule = this.scheduleManagementService.getActiveSchedule();
             if (activeSchedule) {
                 labelElement.textContent = activeSchedule.name;
