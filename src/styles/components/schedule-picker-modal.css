@@ -561,3 +561,16 @@
     font-size: 1.125rem;
   }
 }
+
+/* Width-based breakpoint for mobile footer */
+@media (max-width: 1000px) {
+  .schedule-picker-modal-dialog .modal-footer {
+    display: none;
+  }
+
+  .schedule-picker-modal-dialog .new-schedule-btn-header {
+    display: block !important;
+    margin-left: auto;
+    margin-right: 0.5rem;
+  }
+}

@@ -51,6 +51,7 @@ export class SchedulePickerModal {
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2 class="modal-title">Schedules</h2>
+                        <button class="btn btn-primary new-schedule-btn-header" id="new-schedule-btn-header-modal" style="display: none;">+ New Schedule</button>
                         <button class="modal-close" data-modal-close="${this.modalId}">×</button>
                     </div>
                     <div class="modal-body schedule-picker-body">
@@ -169,12 +170,14 @@ export class SchedulePickerModal {
 
     private setupModalEventListeners(modal: HTMLElement): void {
         const newScheduleBtn = modal.querySelector('#new-schedule-btn-modal');
+        const newScheduleBtnHeader = modal.querySelector('#new-schedule-btn-header-modal');
         const importBtn = modal.querySelector('#import-schedule-btn-modal');
         const exportBtn = modal.querySelector('#export-schedule-btn-modal');
         const exportIcsBtn = modal.querySelector('#export-ics-btn-modal');
         const closeBtn = modal.querySelector(`[data-modal-close="${this.modalId}"]`);
 
         newScheduleBtn?.addEventListener('click', () => this.createNewSchedule());
+        newScheduleBtnHeader?.addEventListener('click', () => this.createNewSchedule());
         importBtn?.addEventListener('click', () => this.importSchedule());
         exportBtn?.addEventListener('click', () => this.exportActiveSchedule());
         exportIcsBtn?.addEventListener('click', () => this.exportActiveScheduleICS());

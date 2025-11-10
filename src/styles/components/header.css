@@ -320,6 +320,14 @@
 }
 
 @media (max-width: 1000px) {
+  .header-left {
+    display: none;
+  }
+
+  .header-controls {
+    margin-left: auto;
+  }
+
   .header-controls > :not(.settings-menu-btn) {
     display: none;
   }
