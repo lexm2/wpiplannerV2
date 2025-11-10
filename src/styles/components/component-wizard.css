@@ -270,15 +270,13 @@
 
 /* Stagger animations using CSS variables */
 .wizard-step.slide-in-right .wizard-section-card {
-    animation: slideInRight 0.25s ease-out forwards;
+    animation: slideInRight 0.25s ease-out both;
     animation-delay: calc(var(--card-index) * 40ms);
-    opacity: 0;
 }
 
 .wizard-step.slide-in-left .wizard-section-card {
-    animation: slideInLeft 0.25s ease-out forwards;
+    animation: slideInLeft 0.25s ease-out both;
     animation-delay: calc(var(--card-index) * 40ms);
-    opacity: 0;
 }
 
 .wizard-step.slide-out-left .wizard-section-card {
@@ -289,11 +287,6 @@
 .wizard-step.slide-out-right .wizard-section-card {
     animation: slideOutRight 0.25s ease-out forwards;
     animation-delay: calc(var(--card-index) * 40ms);
-}
-
-/* Ensure cards are visible when not animating out */
-.wizard-step:not(.slide-out-left):not(.slide-out-right) .wizard-section-card {
-    opacity: 1;
 }
 
 .wizard-section-card {
