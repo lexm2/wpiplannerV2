@@ -14,6 +14,7 @@ import alertSquareRoundedIcon from '../assets/icons/alert-square-rounded.svg?url
 import arrowBackUpIcon from '../assets/icons/arrow-back-up.svg?url';
 import arrowBarRightIcon from '../assets/icons/arrow-bar-right.svg?url';
 import arrowForwardUpIcon from '../assets/icons/arrow-forward-up.svg?url';
+import brightnessIcon from '../assets/icons/brightness.svg?url';
 import calendarRepeatIcon from '../assets/icons/calendar-repeat.svg?url';
 import calendarUpIcon from '../assets/icons/calendar-up.svg?url';
 import checkIcon from '../assets/icons/check.svg?url';
@@ -25,6 +26,7 @@ import filterFilledIcon from '../assets/icons/filter-filled.svg?url';
 import filterIcon from '../assets/icons/filter.svg?url';
 import menu2Icon from '../assets/icons/menu-2.svg?url';
 import plusIcon from '../assets/icons/plus.svg?url';
+import settingsIcon from '../assets/icons/settings.svg?url';
 import trashIcon from '../assets/icons/trash.svg?url';
 import wandIcon from '../assets/icons/wand.svg?url';
 import xIcon from '../assets/icons/x.svg?url';
@@ -36,6 +38,7 @@ export type IconName =
   | 'ARROW_BACK_UP'
   | 'ARROW_BAR_RIGHT'
   | 'ARROW_FORWARD_UP'
+  | 'BRIGHTNESS'
   | 'CALENDAR_REPEAT'
   | 'CALENDAR_UP'
   | 'CHECK'
@@ -47,6 +50,7 @@ export type IconName =
   | 'FILTER'
   | 'MENU_2'
   | 'PLUS'
+  | 'SETTINGS'
   | 'TRASH'
   | 'WAND'
   | 'X';
@@ -61,6 +65,7 @@ export type IconName =
  * - ARROW_BACK_UP: arrow-back-up.svg
  * - ARROW_BAR_RIGHT: arrow-bar-right.svg
  * - ARROW_FORWARD_UP: arrow-forward-up.svg
+ * - BRIGHTNESS: brightness.svg
  * - CALENDAR_REPEAT: calendar-repeat.svg
  * - CALENDAR_UP: calendar-up.svg
  * - CHECK: check.svg
@@ -72,6 +77,7 @@ export type IconName =
  * - FILTER: filter.svg
  * - MENU_2: menu-2.svg
  * - PLUS: plus.svg
+ * - SETTINGS: settings.svg
  * - TRASH: trash.svg
  * - WAND: wand.svg
  * - X: x.svg
@@ -83,6 +89,7 @@ export const ICONS: Record<IconName, string> = {
   ARROW_BACK_UP: arrowBackUpIcon,
   ARROW_BAR_RIGHT: arrowBarRightIcon,
   ARROW_FORWARD_UP: arrowForwardUpIcon,
+  BRIGHTNESS: brightnessIcon,
   CALENDAR_REPEAT: calendarRepeatIcon,
   CALENDAR_UP: calendarUpIcon,
   CHECK: checkIcon,
@@ -94,6 +101,7 @@ export const ICONS: Record<IconName, string> = {
   FILTER: filterIcon,
   MENU_2: menu2Icon,
   PLUS: plusIcon,
+  SETTINGS: settingsIcon,
   TRASH: trashIcon,
   WAND: wandIcon,
   X: xIcon,
@@ -110,6 +118,7 @@ export const INLINE_SVGS: Record<IconName, string> = {
   ARROW_BACK_UP: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" /></svg>`,
   ARROW_BAR_RIGHT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 12l-10 0" /><path d="M20 12l-4 4" /><path d="M20 12l-4 -4" /><path d="M4 4l0 16" /></svg>`,
   ARROW_FORWARD_UP: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 14l4 -4l-4 -4" /><path d="M19 10h-11a4 4 0 1 0 0 8h1" /></svg>`,
+  BRIGHTNESS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -15 8.66l.005 -.324a10 10 0 0 1 14.995 -8.336m-9 1.732a8 8 0 0 0 4.001 14.928l-.001 -16a8 8 0 0 0 -4 1.072" /></svg>`,
   CALENDAR_REPEAT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v3" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h12" /><path d="M20 14l2 2h-3" /><path d="M20 18l2 -2" /><path d="M19 16a3 3 0 1 0 2 5.236" /></svg>`,
   CALENDAR_UP: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M19 22v-6" /><path d="M22 19l-3 -3l-3 3" /></svg>`,
   CHECK: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>`,
@@ -121,6 +130,7 @@ export const INLINE_SVGS: Record<IconName, string> = {
   FILTER: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v7l-6 2v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227z" /></svg>`,
   MENU_2: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M4 12l16 0" /><path d="M4 18l16 0" /></svg>`,
   PLUS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>`,
+  SETTINGS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" /><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>`,
   TRASH: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>`,
   WAND: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 21l15 -15l-3 -3l-15 15l3 3" /><path d="M15 6l3 3" /><path d="M9 3a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" /><path d="M19 13a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" /></svg>`,
   X: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>`,

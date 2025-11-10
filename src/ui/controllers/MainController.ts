@@ -38,6 +38,7 @@ export class MainController {
     private courseDataService: CourseDataService;
     private schedulePickerModal: SchedulePickerModal | null = null;
     private _themeSelector: ThemeSelector;
+    private themeManager: ThemeManager;
     private profileStateManager: ProfileStateManager;
     private storageService: StorageService;
     private courseSelectionService: CourseSelectionService;
@@ -69,8 +70,8 @@ export class MainController {
         this.storageService = StorageService.getInstance(this.profileStateManager);
         
         // Connect ThemeManager to use our unified storage
-        const themeManager = ThemeManager.getInstance();
-        themeManager.setStorage(this.storageService);
+        this.themeManager = ThemeManager.getInstance();
+        this.themeManager.setStorage(this.storageService);
         
         // Initialize services with shared ProfileStateManager
         this.courseDataService = new CourseDataService();
@@ -621,6 +622,9 @@ export class MainController {
         // Schedule page mobile menu
         this.setupScheduleMobileMenu();
 
+        // Settings menu for mobile
+        this.setupSettingsMenu();
+
         // Keyboard shortcuts for undo/redo
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
@@ -1120,6 +1124,133 @@ export class MainController {
                     this.mobileMenuBackdrop.classList.remove('active');
                 }
             });
+        }
+    }
+
+    private setupSettingsMenu(): void {
+        const settingsBtn = document.getElementById('settings-menu-btn');
+        if (!settingsBtn) return;
+
+        // Inject settings icon
+        settingsBtn.insertAdjacentHTML('afterbegin', getInlineSVG('SETTINGS', 'settings-icon'));
+
+        // Create dropdown menu element
+        const dropdown = document.createElement('div');
+        dropdown.className = 'settings-dropdown-menu';
+        dropdown.id = 'settings-dropdown-menu';
+
+        // Create menu items
+        const menuItems = [
+            {
+                icon: 'CALENDAR_UP',
+                label: 'Schedules',
+                action: () => {
+                    this.openSchedulePicker();
+                    this.closeSettingsMenu();
+                }
+            },
+            {
+                icon: 'BRIGHTNESS',
+                label: 'Toggle Theme',
+                action: () => {
+                    this.toggleTheme();
+                    this.closeSettingsMenu();
+                }
+            },
+            {
+                icon: 'ARROW_BACK_UP',
+                label: 'Undo',
+                id: 'settings-undo-btn',
+                action: () => {
+                    this.handleUndo();
+                    this.closeSettingsMenu();
+                },
+                checkDisabled: () => !this.profileStateManager.canUndo()
+            },
+            {
+                icon: 'ARROW_FORWARD_UP',
+                label: 'Redo',
+                id: 'settings-redo-btn',
+                action: () => {
+                    this.handleRedo();
+                    this.closeSettingsMenu();
+                },
+                checkDisabled: () => !this.profileStateManager.canRedo()
+            }
+        ];
+
+        menuItems.forEach(item => {
+            const menuItem = document.createElement('button');
+            menuItem.className = 'settings-menu-item';
+            if (item.id) menuItem.id = item.id;
+
+            // Add icon
+            menuItem.insertAdjacentHTML('afterbegin', getInlineSVG(item.icon as any, 'menu-item-icon'));
+
+            // Add label
+            const label = document.createElement('span');
+            label.textContent = item.label;
+            menuItem.appendChild(label);
+
+            // Check if should be disabled
+            if (item.checkDisabled && item.checkDisabled()) {
+                menuItem.disabled = true;
+            }
+
+            // Add click handler
+            menuItem.addEventListener('click', () => {
+                if (!menuItem.disabled) {
+                    item.action();
+                }
+            });
+
+            dropdown.appendChild(menuItem);
+        });
+
+        document.body.appendChild(dropdown);
+
+        // Toggle dropdown on settings button click
+        settingsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdown.classList.contains('active');
+
+            if (isOpen) {
+                this.closeSettingsMenu();
+            } else {
+                dropdown.classList.add('active');
+
+                // Update undo/redo button states
+                const undoBtn = document.getElementById('settings-undo-btn') as HTMLButtonElement;
+                const redoBtn = document.getElementById('settings-redo-btn') as HTMLButtonElement;
+                if (undoBtn) undoBtn.disabled = !this.profileStateManager.canUndo();
+                if (redoBtn) redoBtn.disabled = !this.profileStateManager.canRedo();
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            if (!dropdown.contains(target) && target !== settingsBtn && !settingsBtn.contains(target)) {
+                this.closeSettingsMenu();
+            }
+        });
+    }
+
+    private closeSettingsMenu(): void {
+        const dropdown = document.getElementById('settings-dropdown-menu');
+        if (dropdown) {
+            dropdown.classList.remove('active');
+        }
+    }
+
+    private toggleTheme(): void {
+        const currentThemeId = this.themeManager.getCurrentThemeId();
+
+        // Toggle between light and dark themes
+        if (currentThemeId === 'wpi-dark') {
+            this.themeManager.setTheme('wpi-light');
+        } else {
+            this.themeManager.setTheme('wpi-dark');
         }
     }
 

@@ -214,6 +214,100 @@
   height: 20px;
 }
 
+/* Settings menu button - hidden by default */
+.settings-menu-btn {
+  display: none;
+  padding: 0.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-menu-btn svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  stroke: var(--color-primary);
+  fill: var(--color-primary);
+}
+
+/* Settings dropdown menu */
+.settings-dropdown-menu {
+  display: none;
+  position: fixed;
+  top: calc(var(--spacing-header-height) + 0.5rem);
+  right: 2rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+.settings-dropdown-menu.active {
+  display: flex;
+  flex-direction: column;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.settings-menu-item:last-child {
+  border-bottom: none;
+}
+
+.settings-menu-item:hover:not(:disabled) {
+  background: var(--color-primary-background);
+}
+
+.settings-menu-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.settings-menu-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke: var(--color-text);
+  fill: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+.settings-menu-item:hover:not(:disabled) svg {
+  stroke: var(--color-primary);
+  fill: var(--color-primary);
+}
+
 /* Responsive breakpoints for header controls */
 @media (max-width: 1600px) {
   .timestamps-container {
@@ -222,6 +316,20 @@
 
   #optimistic-ui-status {
     display: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  .header-controls > :not(.settings-menu-btn) {
+    display: none;
+  }
+
+  #schedule-picker-btn {
+    display: none;
+  }
+
+  .settings-menu-btn {
+    display: flex;
   }
 }
 
