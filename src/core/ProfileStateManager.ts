@@ -416,7 +416,7 @@ export class ProfileStateManager {
     private restoreFromSnapshot(snapshot: any): void {
         this.state.activeScheduleId = snapshot.activeScheduleId;
 
-        const schedulesArray = Array.from(snapshot.schedules.values());
+        const schedulesArray = Array.from(snapshot.schedules.values()) as Schedule[];
         this.state.schedules = this.deepClone(schedulesArray);
         this.state.preferences = this.deepClone(snapshot.preferences);
 
