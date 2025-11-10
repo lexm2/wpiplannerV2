@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 10, 2025, 3:56 AM",
+  "generated": "Nov 10, 2025, 4:26 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -169073,7 +169073,7 @@
                 "crn": 336317,
                 "number": "C01",
                 "seats": 140,
-                "seats_available": 90,
+                "seats_available": 89,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -169092,7 +169092,7 @@
                     "building": "",
                     "room": "Olin Hall 107",
                     "seats": 140,
-                    "seats_available": 90,
+                    "seats_available": 89,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "C01",
@@ -242849,7 +242849,7 @@
                 "crn": 340287,
                 "number": "D03",
                 "seats": 25,
-                "seats_available": 6,
+                "seats_available": 4,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -242868,7 +242868,7 @@
                     "building": "",
                     "room": "Recreation Center Dance",
                     "seats": 25,
-                    "seats_available": 6,
+                    "seats_available": 4,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "D03",
