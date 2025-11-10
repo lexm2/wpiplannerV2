@@ -245,8 +245,8 @@
   border-color: var(--color-primary);
 }
 
-.undo-redo-controls .btn:hover:not(:disabled) img {
-  filter: brightness(0) invert(1);
+.undo-redo-controls .btn:hover:not(:disabled) svg {
+  stroke: var(--color-text-inverse);
 }
 
 .undo-redo-controls .btn:disabled {
@@ -255,8 +255,22 @@
   background: var(--color-surface);
 }
 
-.undo-redo-controls .btn img {
+.undo-redo-controls .btn svg {
   display: block;
-  transition: filter 0.2s ease;
+  transition: stroke 0.2s ease;
+  stroke: var(--color-primary);
+  width: 20px;
+  height: 20px;
+}
+
+/* Responsive breakpoints for header controls */
+@media (max-width: 1600px) {
+  .timestamps-container {
+    display: none;
+  }
+
+  #optimistic-ui-status {
+    display: none;
+  }
 }
 

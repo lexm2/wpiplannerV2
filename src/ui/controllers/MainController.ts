@@ -486,14 +486,6 @@ export class MainController {
             });
         }
 
-        // Clear selection
-        const clearButton = document.getElementById('clear-selection');
-        if (clearButton) {
-            clearButton.addEventListener('click', () => {
-                this.clearSelection();
-            });
-        }
-
         // Tab navigation
         const plannerTab = document.getElementById('planner-tab');
         const scheduleTab = document.getElementById('schedule-tab');
@@ -610,12 +602,14 @@ export class MainController {
         const redoBtn = document.getElementById('redo-btn');
 
         if (undoBtn) {
+            undoBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_BACK_UP'));
             undoBtn.addEventListener('click', () => {
                 this.handleUndo();
             });
         }
 
         if (redoBtn) {
+            redoBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_FORWARD_UP'));
             redoBtn.addEventListener('click', () => {
                 this.handleRedo();
             });
@@ -755,33 +749,6 @@ export class MainController {
             }
         }
     }
-
-    private clearSelection(): void {
-        // Clear selected sections
-        document.querySelectorAll('.section-badge.selected').forEach(badge => {
-            badge.classList.remove('selected');
-        });
-
-        // Clear search and filters
-        const searchInput = document.getElementById('search-input') as HTMLInputElement;
-        if (searchInput) {
-            searchInput.value = '';
-        }
-        this.filterService.removeFilter('searchText');
-
-        // Clear department selection (this will activate "All Departments")
-        this.departmentController.clearDepartmentSelection();
-
-        // Reset to "All Departments" state
-        this.refreshCurrentView(); // This will now show all courses since no department/filters are selected
-
-        this.courseController.clearCourseSelection();
-        this.courseController.displaySelectedCourses();
-    }
-
-
-
-
 
 
     private previousSelectedCoursesCount = 0;
