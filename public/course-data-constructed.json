@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 10, 2025, 1:47 PM",
+  "generated": "Nov 10, 2025, 2:16 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -18647,7 +18647,7 @@
                 "crn": 337029,
                 "number": "D01",
                 "seats": 90,
-                "seats_available": 6,
+                "seats_available": 7,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -18666,7 +18666,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 90,
-                    "seats_available": 6,
+                    "seats_available": 7,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "D01",
@@ -74250,43 +74250,6 @@
                     "specific_section": "C28 - INQ SEM: Latin America and the World",
                     "days": [
                       "R"
-                    ]
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 343076,
-                "number": "C29 - INQ SEM HUA: Mao Zedong and Maoism: China and Beyond",
-                "seats": 12,
-                "seats_available": 10,
-                "actual_waitlist": 0,
-                "max_waitlist": 0,
-                "note": null,
-                "description": "Cat. I This seminar serves as the culmination for a student's Humanities and Arts Requirement. The seminar provides opportunities for sustained critical inquiry into a focused thematic area. The seminar seeks to help students learn to communicate effectively, to think critically, and to appreciate diverse perspectives in a spirit of openness and cooperation through research, creativity, and investigation. The specific theme of each seminar will vary and will be defined by the instructor. Prior to enrolling in the seminar, a student must have completed five courses in Humanities and Arts, at least two of which must be thematically related and at least one of which must be at the 2000-level or above.",
-                "term": "202201",
-                "computedTerm": "C",
-                "is_gps": true,
-                "is_interest_list": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "Chieko Nakajima",
-                    "start_time": "09:00",
-                    "end_time": "10:50",
-                    "location": "Salisbury Labs 124 Conference Room",
-                    "building": "",
-                    "room": "Salisbury Labs 124 Conference Room",
-                    "seats": 12,
-                    "seats_available": 10,
-                    "actual_waitlist": 0,
-                    "max_waitlist": 0,
-                    "specific_section": "C29 - INQ SEM HUA: Mao Zedong and Maoism: China and Beyond",
-                    "days": [
-                      "M"
                     ]
                   }
                 ]
@@ -181565,7 +181528,7 @@
                 "crn": 337744,
                 "number": "S01",
                 "seats": 30,
-                "seats_available": 15,
+                "seats_available": 14,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -181584,7 +181547,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seats_available": 15,
+                    "seats_available": 14,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S01",
@@ -229240,7 +229203,7 @@
                 "crn": 337495,
                 "number": "D04",
                 "seats": 20,
-                "seats_available": 18,
+                "seats_available": 17,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -229259,7 +229222,7 @@
                     "building": "",
                     "room": "Salisbury Labs 406",
                     "seats": 20,
-                    "seats_available": 18,
+                    "seats_available": 17,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "D04",
@@ -232047,7 +232010,7 @@
                 "number": "D01",
                 "seats": 20,
                 "seats_available": 4,
-                "actual_waitlist": 2,
+                "actual_waitlist": 1,
                 "max_waitlist": 5,
                 "note": null,
                 "description": "Cat. I This course is designed for students who wish to work intensively on their writing . The course will emphasize the processes of composing and revising, the rhetorical strategies of written exposition and argumentation, and the reading and citation practices central to academic inquiry . In a workshop setting, students will write a sequence of short papers and complete one longer writing project based on multiple source texts; learn to read critically and respond helpfully to each other’s writing; and make oral presentations from written texts . Where applicable, the topical theme of the class will be provided via the Registrar’s office .",
@@ -232066,7 +232029,7 @@
                     "room": "Olin Hall 109",
                     "seats": 20,
                     "seats_available": 4,
-                    "actual_waitlist": 2,
+                    "actual_waitlist": 1,
                     "max_waitlist": 5,
                     "specific_section": "D01",
                     "days": [
@@ -235166,7 +235129,7 @@
                 "number": "C01",
                 "seats": 30,
                 "seats_available": 0,
-                "actual_waitlist": 11,
+                "actual_waitlist": 10,
                 "max_waitlist": 15,
                 "note": null,
                 "description": "Cat. I Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -235185,7 +235148,7 @@
                     "room": "Recreation Center All Courts 3-4",
                     "seats": 30,
                     "seats_available": 0,
-                    "actual_waitlist": 11,
+                    "actual_waitlist": 10,
                     "max_waitlist": 15,
                     "specific_section": "C01",
                     "days": [
