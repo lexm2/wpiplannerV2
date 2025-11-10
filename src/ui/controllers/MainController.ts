@@ -615,6 +615,9 @@ export class MainController {
             });
         }
 
+        // Mobile menu hamburger button
+        this.setupMobileMenu();
+
         // Keyboard shortcuts for undo/redo
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
@@ -985,6 +988,88 @@ export class MainController {
         console.log(`Initial UI sync complete: Updated ${selectedCourses.length} selected courses`);
     }
 
+
+    // Mobile menu management
+    private mobileMenuBackdrop: HTMLElement | null = null;
+    private mobileMenuOpen: 'sidebar' | 'right-panel' | null = null;
+
+    private setupMobileMenu(): void {
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        if (!menuBtn) return;
+
+        // Inject hamburger icon
+        menuBtn.insertAdjacentHTML('afterbegin', getInlineSVG('MENU_2', 'hamburger-icon'));
+
+        // Inject close icon into close button
+        const closeBtn = document.getElementById('mobile-menu-close');
+        if (closeBtn) {
+            closeBtn.insertAdjacentHTML('afterbegin', getInlineSVG('X', 'close-icon'));
+        }
+
+        // Create backdrop element
+        this.mobileMenuBackdrop = document.createElement('div');
+        this.mobileMenuBackdrop.className = 'mobile-backdrop';
+        document.body.appendChild(this.mobileMenuBackdrop);
+
+        // Click handler for hamburger button - toggles right-panel
+        menuBtn.addEventListener('click', () => {
+            this.toggleMobileMenu('right-panel');
+        });
+
+        // Click handler for close button - closes menu
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.closeMobileMenu();
+            });
+        }
+
+        // Click handler for backdrop - closes menu
+        this.mobileMenuBackdrop.addEventListener('click', () => {
+            this.closeMobileMenu();
+        });
+    }
+
+    private toggleMobileMenu(panel: 'sidebar' | 'right-panel'): void {
+        const sidebar = document.querySelector('.sidebar') as HTMLElement;
+        const rightPanel = document.querySelector('.right-panel') as HTMLElement;
+
+        if (this.mobileMenuOpen === panel) {
+            // Close if same panel clicked again
+            this.closeMobileMenu();
+        } else {
+            // Close any open panel first
+            if (sidebar) sidebar.classList.remove('mobile-open');
+            if (rightPanel) rightPanel.classList.remove('mobile-open');
+
+            // Open requested panel
+            if (panel === 'sidebar' && sidebar) {
+                sidebar.classList.add('mobile-open');
+            } else if (panel === 'right-panel' && rightPanel) {
+                rightPanel.classList.add('mobile-open');
+            }
+
+            // Show backdrop
+            if (this.mobileMenuBackdrop) {
+                this.mobileMenuBackdrop.classList.add('active');
+            }
+
+            this.mobileMenuOpen = panel;
+        }
+    }
+
+    private closeMobileMenu(): void {
+        const sidebar = document.querySelector('.sidebar') as HTMLElement;
+        const rightPanel = document.querySelector('.right-panel') as HTMLElement;
+
+        if (sidebar) sidebar.classList.remove('mobile-open');
+        if (rightPanel) rightPanel.classList.remove('mobile-open');
+
+        if (this.mobileMenuBackdrop) {
+            this.mobileMenuBackdrop.classList.remove('active');
+        }
+
+        this.mobileMenuOpen = null;
+    }
 
     // Public test method to manually trigger refresh prompt
     public triggerTestRefresh(): void {

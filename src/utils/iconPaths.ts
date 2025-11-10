@@ -23,6 +23,7 @@ import eraserIcon from '../assets/icons/eraser.svg?url';
 import fileExportIcon from '../assets/icons/file-export.svg?url';
 import filterFilledIcon from '../assets/icons/filter-filled.svg?url';
 import filterIcon from '../assets/icons/filter.svg?url';
+import menu2Icon from '../assets/icons/menu-2.svg?url';
 import plusIcon from '../assets/icons/plus.svg?url';
 import trashIcon from '../assets/icons/trash.svg?url';
 import wandIcon from '../assets/icons/wand.svg?url';
@@ -44,6 +45,7 @@ export type IconName =
   | 'FILE_EXPORT'
   | 'FILTER_FILLED'
   | 'FILTER'
+  | 'MENU_2'
   | 'PLUS'
   | 'TRASH'
   | 'WAND'
@@ -68,6 +70,7 @@ export type IconName =
  * - FILE_EXPORT: file-export.svg
  * - FILTER_FILLED: filter-filled.svg
  * - FILTER: filter.svg
+ * - MENU_2: menu-2.svg
  * - PLUS: plus.svg
  * - TRASH: trash.svg
  * - WAND: wand.svg
@@ -89,6 +92,7 @@ export const ICONS: Record<IconName, string> = {
   FILE_EXPORT: fileExportIcon,
   FILTER_FILLED: filterFilledIcon,
   FILTER: filterIcon,
+  MENU_2: menu2Icon,
   PLUS: plusIcon,
   TRASH: trashIcon,
   WAND: wandIcon,
@@ -115,6 +119,7 @@ export const INLINE_SVGS: Record<IconName, string> = {
   FILE_EXPORT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M11.5 21h-4.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v5m-5 6h7m-3 -3l3 3l-3 3" /></svg>`,
   FILTER_FILLED: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 3h-16a1 1 0 0 0 -1 1v2.227l.008 .223a3 3 0 0 0 .772 1.795l4.22 4.641v8.114a1 1 0 0 0 1.316 .949l6 -2l.108 -.043a1 1 0 0 0 .576 -.906v-6.586l4.121 -4.12a3 3 0 0 0 .879 -2.123v-2.171a1 1 0 0 0 -1 -1z" /></svg>`,
   FILTER: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v7l-6 2v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227z" /></svg>`,
+  MENU_2: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M4 12l16 0" /><path d="M4 18l16 0" /></svg>`,
   PLUS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>`,
   TRASH: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>`,
   WAND: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 21l15 -15l-3 -3l-15 15l3 3" /><path d="M15 6l3 3" /><path d="M9 3a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" /><path d="M19 13a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" /></svg>`,
