@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 10, 2025, 3:18 PM",
+  "generated": "Nov 10, 2025, 3:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -233856,7 +233856,7 @@
                 "number": "C02",
                 "seats": 35,
                 "seats_available": 0,
-                "actual_waitlist": 14,
+                "actual_waitlist": 13,
                 "max_waitlist": 15,
                 "note": null,
                 "description": "Cat. I This course will teach basic walking techniques and principles with the goal for students to develop and implement an individualized conditioning program for themselves.",
@@ -233875,7 +233875,7 @@
                     "room": "Recreation Center Track",
                     "seats": 35,
                     "seats_available": 0,
-                    "actual_waitlist": 14,
+                    "actual_waitlist": 13,
                     "max_waitlist": 15,
                     "specific_section": "C02",
                     "days": [
