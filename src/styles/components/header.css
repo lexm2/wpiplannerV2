@@ -230,7 +230,7 @@
   display: block;
   width: 20px;
   height: 20px;
-  stroke: var(--color-primary);
+  stroke: var(--color-primary) !important;
   fill: var(--color-primary);
 }
 
@@ -324,11 +324,11 @@
     display: none;
   }
 
-  .header-controls {
+  .app-header .header-controls {
     margin-left: auto;
   }
 
-  .header-controls > :not(.settings-menu-btn) {
+  .app-header .header-controls > :not(.settings-menu-btn) {
     display: none;
   }
 

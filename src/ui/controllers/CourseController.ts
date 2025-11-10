@@ -238,8 +238,36 @@ export class CourseController {
             content.classList.add('expanded');
         }
 
-        // Toggle function
-        const toggleExpander = () => {
+        // Get backdrop element
+        const getBackdrop = (): HTMLElement | null => {
+            return document.querySelector('.mobile-backdrop');
+        };
+
+        // Check if mobile mode
+        const isMobile = (): boolean => {
+            return window.innerWidth <= 1200;
+        };
+
+        // Mobile overlay toggle
+        const toggleMobileOverlay = () => {
+            const backdrop = getBackdrop();
+            const isOpen = content.classList.contains('mobile-open');
+
+            if (isOpen) {
+                content.classList.remove('mobile-open');
+                if (backdrop) {
+                    backdrop.classList.remove('active');
+                }
+            } else {
+                content.classList.add('mobile-open');
+                if (backdrop) {
+                    backdrop.classList.add('active');
+                }
+            }
+        };
+
+        // Desktop expander toggle
+        const toggleDesktopExpander = () => {
             const currentState = header.getAttribute('aria-expanded') === 'true';
             const newState = !currentState;
 
@@ -254,6 +282,15 @@ export class CourseController {
             localStorage.setItem('selectedCoursesExpanded', newState.toString());
         };
 
+        // Unified toggle function
+        const toggleExpander = () => {
+            if (isMobile()) {
+                toggleMobileOverlay();
+            } else {
+                toggleDesktopExpander();
+            }
+        };
+
         // Add click handler
         header.addEventListener('click', toggleExpander);
 
@@ -262,6 +299,33 @@ export class CourseController {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 toggleExpander();
+            }
+        });
+
+        // Handle backdrop clicks to close mobile overlay
+        const handleBackdropClick = (e: MouseEvent) => {
+            const backdrop = e.target as HTMLElement;
+            if (backdrop.classList.contains('mobile-backdrop') && content.classList.contains('mobile-open')) {
+                content.classList.remove('mobile-open');
+                backdrop.classList.remove('active');
+            }
+        };
+
+        // Add backdrop listener
+        document.addEventListener('click', handleBackdropClick);
+
+        // Handle window resize to clean up state
+        window.addEventListener('resize', () => {
+            if (!isMobile()) {
+                // Switched to desktop - clean up mobile state
+                content.classList.remove('mobile-open');
+                const backdrop = getBackdrop();
+                if (backdrop) {
+                    backdrop.classList.remove('active');
+                }
+            } else {
+                // Switched to mobile - clean up desktop state
+                content.classList.remove('expanded');
             }
         });
     }

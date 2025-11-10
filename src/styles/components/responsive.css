@@ -172,6 +172,11 @@
     display: flex;
   }
 
+  /* Hide selected courses section on mobile */
+  .right-panel .selected-courses-section {
+    display: none;
+  }
+
   @keyframes slideInLeft {
     from {
       transform: translateX(-100%);
