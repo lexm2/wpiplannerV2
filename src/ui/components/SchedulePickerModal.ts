@@ -67,7 +67,7 @@ export class SchedulePickerModal {
                         <div class="modal-footer-buttons">
                             <button class="btn btn-primary" id="new-schedule-btn-modal">+ New Schedule</button>
                             <button class="btn btn-secondary" id="import-schedule-btn-modal">Import</button>
-                            <button class="btn btn-secondary" id="export-schedule-btn-modal">Export</button>
+                            <button class="btn btn-secondary" id="export-schedule-btn-modal">Export All</button>
                             <button class="btn btn-secondary" id="export-ics-btn-modal">Export ICS</button>
                         </div>
                     </div>
@@ -398,16 +398,46 @@ export class SchedulePickerModal {
     }
 
     private async duplicateSchedule(scheduleId: string): Promise<void> {
-        await this.scheduleManagementService.duplicateSchedule(scheduleId);
-        this.updateScheduleList();
+        const schedule = this.scheduleManagementService.getAllSchedules().find(s => s.id === scheduleId);
+        if (schedule) {
+            const newName = `${schedule.name} (Copy)`;
+            await this.scheduleManagementService.duplicateSchedule(scheduleId, newName);
+            this.updateScheduleList();
+        }
+    }
+
+    private triggerFileDownload(data: string, filename: string, mimeType: string): void {
+        const blob = new Blob([data], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     }
 
     private async exportSchedule(scheduleId: string): Promise<void> {
-        await this.scheduleManagementService.exportSchedule(scheduleId);
+        const result = await this.scheduleManagementService.exportSchedule(scheduleId);
+        if (result.success && result.data) {
+            const schedule = this.scheduleManagementService.getScheduleById(scheduleId);
+            const filename = `${schedule?.name || 'schedule'}.json`;
+            this.triggerFileDownload(result.data, filename, 'application/json');
+        } else {
+            alert(`Export failed: ${result.error || 'Unknown error'}`);
+        }
     }
 
     private async exportScheduleICS(scheduleId: string): Promise<void> {
-        await this.scheduleManagementService.exportScheduleAsICS(scheduleId);
+        const result = await this.scheduleManagementService.exportScheduleICS(scheduleId);
+        if (result.success && result.data) {
+            const schedule = this.scheduleManagementService.getScheduleById(scheduleId);
+            const filename = `${schedule?.name || 'schedule'}.ics`;
+            this.triggerFileDownload(result.data, filename, 'text/calendar');
+        } else {
+            alert(`ICS Export failed: ${result.error || 'Unknown error'}`);
+        }
     }
 
     private async deleteSchedule(scheduleId: string): Promise<void> {
@@ -436,8 +466,19 @@ export class SchedulePickerModal {
             if (file) {
                 try {
                     const text = await file.text();
-                    await this.scheduleManagementService.importSchedule(text);
-                    this.updateScheduleList();
+                    const result = await this.scheduleManagementService.importSchedule(text);
+
+                    if (result.success) {
+                        this.updateScheduleList();
+                        if (result.message) {
+                            alert(result.message);
+                        }
+                        if (result.warnings && result.warnings.length > 0) {
+                            console.warn('Import warnings:', result.warnings);
+                        }
+                    } else {
+                        alert(`Import failed: ${result.error}`);
+                    }
                 } catch (error) {
                     console.error('Failed to import schedule:', error);
                     alert('Failed to import schedule. Please check the file format.');
@@ -449,9 +490,13 @@ export class SchedulePickerModal {
     }
 
     private async exportActiveSchedule(): Promise<void> {
-        const activeScheduleId = this.scheduleManagementService.getActiveScheduleId();
-        if (activeScheduleId) {
-            await this.exportSchedule(activeScheduleId);
+        const result = await this.scheduleManagementService.exportAllSchedules();
+        if (result.success && result.data) {
+            const timestamp = new Date().toISOString().split('T')[0];
+            const filename = `wpi-schedules-${timestamp}.json`;
+            this.triggerFileDownload(result.data, filename, 'application/json');
+        } else {
+            alert(`Export failed: ${result.error || 'Unknown error'}`);
         }
     }
 

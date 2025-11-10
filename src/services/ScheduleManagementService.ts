@@ -11,6 +11,7 @@ export interface ScheduleOperationResult {
     schedule?: Schedule;
     error?: string;
     warnings?: string[];
+    message?: string;
 }
 
 export interface ScheduleChangeEvent {
@@ -638,6 +639,36 @@ export class ScheduleManagementService {
         }
     }
 
+    async exportAllSchedules(): Promise<{ success: boolean; data?: string; error?: string }> {
+        try {
+            const state = this.profileStateManager.getState();
+            const allSchedules = state.schedules || [];
+
+            if (allSchedules.length === 0) {
+                return {
+                    success: false,
+                    error: 'No schedules to export'
+                };
+            }
+
+            const exportData = {
+                version: '2.0',
+                timestamp: new Date().toISOString(),
+                schedules: allSchedules
+            };
+
+            return {
+                success: true,
+                data: safeStringify(exportData, 2)
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: `Export all failed: ${error}`
+            };
+        }
+    }
+
     async exportScheduleICS(scheduleId: string, options: ICSExportOptions = {}): Promise<ICSExportResult & { error?: string }> {
         try {
             const schedule = this.getScheduleById(scheduleId);
@@ -672,59 +703,83 @@ export class ScheduleManagementService {
             await this.ensureInitialized();
 
             const data = JSON.parse(jsonData);
-            if (!data.schedule) {
+
+            // Support both single schedule (old format) and multiple schedules (new format)
+            let schedulesToImport: any[] = [];
+            if (data.schedules && Array.isArray(data.schedules)) {
+                // New format: array of schedules
+                schedulesToImport = data.schedules;
+            } else if (data.schedule) {
+                // Old format: single schedule - convert to array
+                schedulesToImport = [data.schedule];
+            } else {
                 return {
                     success: false,
-                    error: 'Import data does not contain a valid schedule'
+                    error: 'Import data does not contain valid schedule(s)'
                 };
             }
 
-            // Validate imported schedule
-            const validation = this.dataValidator.validateSchedule(data.schedule);
-            if (!validation.valid) {
+            if (schedulesToImport.length === 0) {
                 return {
                     success: false,
-                    error: `Imported schedule validation failed: ${validation.errors.map(e => e.message).join(', ')}`,
-                    warnings: validation.warnings.map(w => w.message)
+                    error: 'No schedules found in import data'
                 };
             }
 
-            // Resolve name conflicts automatically
-            const uniqueName = this.generateUniqueScheduleName(data.schedule.name);
+            const importedSchedules: any[] = [];
+            const errors: string[] = [];
 
-            // Create schedule using proper API
-            const result = await this.retryManager.executeWithRetry(
-                () => {
-                    return this.profileStateManager.createSchedule(uniqueName, 'api');
-                },
-                {
-                    operationName: `import schedule "${uniqueName}"`,
+            // Import each schedule
+            for (const scheduleData of schedulesToImport) {
+                // Validate imported schedule
+                const validation = this.dataValidator.validateSchedule(scheduleData);
+                if (!validation.valid) {
+                    errors.push(`Schedule "${scheduleData.name}" validation failed: ${validation.errors.map(e => e.message).join(', ')}`);
+                    continue;
                 }
-            );
 
-            if (!result.success || !result.result) {
-                return {
-                    success: false,
-                    error: `Failed to import schedule: ${result.error?.message || 'Unknown error'}`
-                };
-            }
+                // Resolve name conflicts automatically
+                const uniqueName = this.generateUniqueScheduleName(scheduleData.name);
 
-            const importedSchedule = result.result;
+                // Create schedule using proper API
+                const result = await this.retryManager.executeWithRetry(
+                    () => {
+                        return this.profileStateManager.createSchedule(uniqueName, 'api');
+                    },
+                    {
+                        operationName: `import schedule "${uniqueName}"`,
+                    }
+                );
 
-            // Update with imported courses and generated schedules
-            if (data.schedule.selectedCourses && data.schedule.selectedCourses.length > 0) {
-                const updateResult = await this.updateScheduleCourses(importedSchedule.id, data.schedule.selectedCourses);
-                if (!updateResult.success) {
-                    return {
-                        success: false,
-                        error: `Schedule imported but failed to add courses: ${updateResult.error}`
-                    };
+                if (!result.success || !result.result) {
+                    errors.push(`Failed to import schedule "${scheduleData.name}": ${result.error?.message || 'Unknown error'}`);
+                    continue;
                 }
-            }
 
-            // Copy generated schedules if present
-            if (data.schedule.generatedSchedules && data.schedule.generatedSchedules.length > 0) {
-                importedSchedule.generatedSchedules = [...data.schedule.generatedSchedules];
+                const importedSchedule = result.result;
+
+                // Update with imported courses and generated schedules
+                if (scheduleData.selectedCourses && scheduleData.selectedCourses.length > 0) {
+                    const updateResult = await this.updateScheduleCourses(importedSchedule.id, scheduleData.selectedCourses);
+                    if (!updateResult.success) {
+                        errors.push(`Schedule "${scheduleData.name}" imported but failed to add courses: ${updateResult.error}`);
+                        continue;
+                    }
+                }
+
+                // Copy generated schedules if present
+                if (scheduleData.generatedSchedules && scheduleData.generatedSchedules.length > 0) {
+                    importedSchedule.generatedSchedules = [...scheduleData.generatedSchedules];
+                }
+
+                importedSchedules.push(importedSchedule);
+
+                // Notify listeners
+                this.notifyScheduleListeners({
+                    type: 'schedule_created',
+                    schedule: importedSchedule,
+                    timestamp: Date.now()
+                });
             }
 
             // Auto-save
@@ -734,16 +789,20 @@ export class ScheduleManagementService {
                 console.warn('Failed to auto-save after schedule import:', error);
             }
 
-            // Notify listeners
-            this.notifyScheduleListeners({
-                type: 'schedule_created',
-                schedule: importedSchedule,
-                timestamp: Date.now()
-            });
+            if (importedSchedules.length === 0) {
+                return {
+                    success: false,
+                    error: `Failed to import any schedules. Errors: ${errors.join('; ')}`
+                };
+            }
+
+            const resultMessage = `Successfully imported ${importedSchedules.length} schedule(s)${errors.length > 0 ? ` (${errors.length} failed)` : ''}`;
 
             return {
                 success: true,
-                schedule: importedSchedule
+                schedule: importedSchedules[0], // Return first schedule for backward compatibility
+                message: resultMessage,
+                warnings: errors.length > 0 ? errors : undefined
             };
 
         } catch (error) {
