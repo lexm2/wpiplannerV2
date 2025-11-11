@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 11, 2025, 9:30 PM",
+  "generated": "Nov 11, 2025, 9:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -49572,7 +49572,7 @@
                 "crn": 337874,
                 "number": "S01",
                 "seats": 40,
-                "seats_available": 6,
+                "seats_available": 5,
                 "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": null,
@@ -49591,7 +49591,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 40,
-                    "seats_available": 6,
+                    "seats_available": 5,
                     "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "S01",
@@ -51367,7 +51367,7 @@
                 "crn": 337874,
                 "number": "S01",
                 "seats": 40,
-                "seats_available": 6,
+                "seats_available": 5,
                 "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": null,
@@ -51386,7 +51386,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 40,
-                    "seats_available": 6,
+                    "seats_available": 5,
                     "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "S01",
