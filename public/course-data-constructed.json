@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 11, 2025, 10:40 PM",
+  "generated": "Nov 11, 2025, 10:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -2253,7 +2253,7 @@
                 "number": "C01",
                 "seats": 78,
                 "seats_available": 0,
-                "actual_waitlist": 3,
+                "actual_waitlist": 2,
                 "max_waitlist": 15,
                 "note": null,
                 "description": "The course covers broad topics in spacecraft attitude dynamics, stability and control. The course includes a review of particle and two-body dynamics and introduction to rigid body dynamics. Orbital and attitude maneuvers are presented. Attitude control devices and momentum exchange techniques such as spinners, dual spinners, gravity gradient, and geomagnetic torques are presented. Attitude sensors/actuators are presented and the attitude control problem is introduced. Open-loop stability analysis for a variety of equilibrium conditions is discussed. Control using momentum exchange and mass expulsion (thrusters) devices is discussed. The analyses and designs will be implemented using scientific computing software such as MATLAB®. Recommended background: astronautics (AE 2320 or equivalent), dynamics (ES 2503, PH 2201 or equivalent), control (AE 2310 or equivalent). Students may not receive credit for both AE 4320 and AE 4713.",
@@ -2272,7 +2272,7 @@
                     "room": "Unity Hall 420",
                     "seats": 78,
                     "seats_available": 0,
-                    "actual_waitlist": 3,
+                    "actual_waitlist": 2,
                     "max_waitlist": 15,
                     "specific_section": "C01",
                     "days": [
