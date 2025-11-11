@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 11, 2025, 9:51 AM",
+  "generated": "Nov 11, 2025, 10:18 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5137,7 +5137,7 @@
                 "number": "D01",
                 "seats": 24,
                 "seats_available": 9,
-                "actual_waitlist": 9,
+                "actual_waitlist": 8,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "This course introduces design principles and their application to create effective forms of graphic communication. The students will learn the fundamentals of visual communication and will work on projects to analyze, organize, and solve design problems. Topics may include: the design process; figure/ground; shape; dynamic balance; Gestalt principles; typography; layout and composition; color; production and presentation in digital formats.",
@@ -5156,7 +5156,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seats_available": 9,
-                    "actual_waitlist": 9,
+                    "actual_waitlist": 8,
                     "max_waitlist": 10,
                     "specific_section": "D01",
                     "days": [
@@ -8142,7 +8142,7 @@
                 "number": "D01",
                 "seats": 100,
                 "seats_available": 0,
-                "actual_waitlist": 8,
+                "actual_waitlist": 7,
                 "max_waitlist": 20,
                 "note": null,
                 "description": "BB 1001. Introduction to Biology (Cat. I; 1/3 unit) This course is designed for students seeking a broad overview of biologic concepts, especially at the cell and organism level. It is conducted in an active style including the use of case studies, class discussion/participation, and classroom polling systems. The major goal of this course is to help students become more informed citizens, skeptical when presented with data in the media, and knowledgeable enough to question and make informed decisions about scientific advances and science policy. It will primarily focus on current topics which may include genetic engineering, viruses and vaccines, antibiotic resistant bacteria, the evolution of infectious diseases. This course is intended for non-life science majors. Recommended background: High School Biology",
@@ -8161,7 +8161,7 @@
                     "room": "Unity Hall 400",
                     "seats": 100,
                     "seats_available": 0,
-                    "actual_waitlist": 8,
+                    "actual_waitlist": 7,
                     "max_waitlist": 20,
                     "specific_section": "D01",
                     "days": [
