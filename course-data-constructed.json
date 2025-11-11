@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 11, 2025, 3:17 PM",
+  "generated": "Nov 11, 2025, 3:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -31509,7 +31509,7 @@
                 "number": "C01",
                 "seats": 110,
                 "seats_available": 16,
-                "actual_waitlist": 0,
+                "actual_waitlist": 1,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "Cat. I Modern theories of aromaticity, including a general assessment of delocalized bonding. The chemistry of some significant functional groups not surveyed in Organic Chemistry I, and the meaning of acidity and basicity in organic chemistry, will be more fully explored. The course will provide an introduction to the systematic synthesis of polyfunctional organic compounds. Recommended background: CH 2310. The course is intended for chemists, chemical engineers and bio-science majors.",
@@ -31528,7 +31528,7 @@
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 110,
                     "seats_available": 16,
-                    "actual_waitlist": 0,
+                    "actual_waitlist": 1,
                     "max_waitlist": 10,
                     "specific_section": "C01",
                     "days": [
@@ -233810,7 +233810,7 @@
                 "number": "C02",
                 "seats": 35,
                 "seats_available": 0,
-                "actual_waitlist": 13,
+                "actual_waitlist": 14,
                 "max_waitlist": 15,
                 "note": null,
                 "description": "Cat. I This course will teach basic walking techniques and principles with the goal for students to develop and implement an individualized conditioning program for themselves.",
@@ -233829,7 +233829,7 @@
                     "room": "Recreation Center Track",
                     "seats": 35,
                     "seats_available": 0,
-                    "actual_waitlist": 13,
+                    "actual_waitlist": 14,
                     "max_waitlist": 15,
                     "specific_section": "C02",
                     "days": [
