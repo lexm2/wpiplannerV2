@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 11, 2025, 2:53 PM",
+  "generated": "Nov 11, 2025, 3:17 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -10291,7 +10291,7 @@
               "number": "CX01",
               "seats": 5,
               "seats_available": 0,
-              "actual_waitlist": 0,
+              "actual_waitlist": 1,
               "max_waitlist": 2,
               "note": null,
               "description": "BB 3813 Animal Cell Culture Techniques Laboratory (Cat. I; 1/6 unit) Basic laboratory skills in mammalian cell culture including cell counting, freezing and thawing cell lines, and culture of suspension and attached cells. Recommended background: knowledge of aseptic technique (BB 1801 or 2815 or equivalent) and cell biology (BB 2550 or equivalent). Students may not receive credit for this course and BB 3513.",
@@ -10310,7 +10310,7 @@
                   "room": "Goddard Hall 212 BB Lab",
                   "seats": 5,
                   "seats_available": 0,
-                  "actual_waitlist": 0,
+                  "actual_waitlist": 1,
                   "max_waitlist": 2,
                   "specific_section": "CX01",
                   "days": [
@@ -10325,7 +10325,7 @@
               "number": "CX02",
               "seats": 5,
               "seats_available": 0,
-              "actual_waitlist": 0,
+              "actual_waitlist": 1,
               "max_waitlist": 2,
               "note": null,
               "description": "BB 3813 Animal Cell Culture Techniques Laboratory (Cat. I; 1/6 unit) Basic laboratory skills in mammalian cell culture including cell counting, freezing and thawing cell lines, and culture of suspension and attached cells. Recommended background: knowledge of aseptic technique (BB 1801 or 2815 or equivalent) and cell biology (BB 2550 or equivalent). Students may not receive credit for this course and BB 3513.",
@@ -10344,7 +10344,7 @@
                   "room": "Goddard Hall 212 BB Lab",
                   "seats": 5,
                   "seats_available": 0,
-                  "actual_waitlist": 0,
+                  "actual_waitlist": 1,
                   "max_waitlist": 2,
                   "specific_section": "CX02",
                   "days": [
