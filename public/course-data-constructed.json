@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 12, 2025, 7:16 AM",
+  "generated": "Nov 12, 2025, 7:38 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -20783,7 +20783,7 @@
                 "crn": 342246,
                 "number": "S03 - SP:  Bridge Design and Construction",
                 "seats": 24,
-                "seats_available": 2,
+                "seats_available": 1,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -20802,7 +20802,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 24,
-                    "seats_available": 2,
+                    "seats_available": 1,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "S03 - SP:  Bridge Design and Construction",
@@ -219352,7 +219352,7 @@
                 "crn": 339154,
                 "number": "C01",
                 "seats": 40,
-                "seats_available": 10,
+                "seats_available": 9,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -219371,7 +219371,7 @@
                     "building": "",
                     "room": "Olin Hall 223",
                     "seats": 40,
-                    "seats_available": 10,
+                    "seats_available": 9,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C01",
