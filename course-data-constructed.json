@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 12, 2025, 4:52 AM",
+  "generated": "Nov 12, 2025, 5:17 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -44249,7 +44249,7 @@
                 "crn": 336386,
                 "number": "C01",
                 "seats": 100,
-                "seats_available": 16,
+                "seats_available": 15,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -44268,7 +44268,7 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 100,
-                    "seats_available": 16,
+                    "seats_available": 15,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "C01",
