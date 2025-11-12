@@ -2997,7 +2997,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "7/10",
+      "Waitlist_Waitlist_Capacity": "8/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337479"
     },
     {
@@ -3603,7 +3603,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337468"
     },
     {
@@ -17253,7 +17253,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: CH 1010 - Chemical Properties, Bonding, And Forces ()",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "52/999",
+      "Waitlist_Waitlist_Capacity": "53/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336253"
     },
     {
@@ -17451,7 +17451,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: CH 1010 - Chemical Properties, Bonding, And Forces ()",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "54/999",
+      "Waitlist_Waitlist_Capacity": "55/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336240"
     },
     {
@@ -17566,7 +17566,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: CH 1010 - Chemical Properties, Bonding, And Forces ()",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "53/999",
+      "Waitlist_Waitlist_Capacity": "54/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336684"
     },
     {
@@ -19694,7 +19694,7 @@
       "Course_Title": "CH 1030 - Kinetics, Equilibrium And Thermodynamics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "69/72",
+      "Enrolled_Capacity": "68/72",
       "Instructional_Format": "Lecture",
       "Instructors": "Destin Heilman",
       "Locations": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -19894,7 +19894,7 @@
       "Course_Title": "CH 1030 - Kinetics, Equilibrium And Thermodynamics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "23/24",
+      "Enrolled_Capacity": "22/24",
       "Instructional_Format": "Laboratory",
       "Locations": "Goddard Hall 306 CH Lab",
       "Meeting_Day_Patterns": "W-F",
@@ -35525,7 +35525,7 @@
       "Course_Title": "ECE 2010 - Introduction To Electrical And Computer Engineering",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "171/180",
+      "Enrolled_Capacity": "173/180",
       "Instructional_Format": "Lecture",
       "Instructors": "Mostafa Asheghan",
       "Locations": "Atwater Kent 116 Newell Hall",
@@ -35675,7 +35675,7 @@
       "Course_Title": "ECE 2010 - Introduction To Electrical And Computer Engineering",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "15/36",
+      "Enrolled_Capacity": "17/36",
       "Instructional_Format": "Laboratory",
       "Instructors": "Mostafa Asheghan",
       "Locations": "Atwater Kent 113 Semi-Conductor Lab",
@@ -97733,7 +97733,7 @@
       "Course_Title": "PH 1111 - Principles Of Physics-Mechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "14/40",
+      "Enrolled_Capacity": "15/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Kateryna Friedman",
       "Locations": "Innovation Studio 105 Active Learning Classroom",
@@ -116211,7 +116211,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337798"
     },
     {
@@ -120114,7 +120114,7 @@
       "Course_Title": "WR 1011 - Writing About Science And Technology",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "17/20",
+      "Enrolled_Capacity": "16/20",
       "Instructional_Format": "Lecture",
       "Locations": "Atwater Kent 232",
       "Meeting_Day_Patterns": "M-R",
