@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 12, 2025, 5:17 AM",
+  "generated": "Nov 12, 2025, 5:41 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -61635,7 +61635,7 @@
                 "crn": 336453,
                 "number": "CL01",
                 "seats": 64,
-                "seats_available": 29,
+                "seats_available": 30,
                 "actual_waitlist": 0,
                 "max_waitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4353",
@@ -61654,7 +61654,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 64,
-                    "seats_available": 29,
+                    "seats_available": 30,
                     "actual_waitlist": 0,
                     "max_waitlist": 0,
                     "specific_section": "CL01",
@@ -61704,7 +61704,7 @@
                   "crn": 336425,
                   "number": "CX04",
                   "seats": 32,
-                  "seats_available": 16,
+                  "seats_available": 17,
                   "actual_waitlist": 0,
                   "max_waitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4353",
@@ -61723,7 +61723,7 @@
                       "building": "",
                       "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                       "seats": 32,
-                      "seats_available": 16,
+                      "seats_available": 17,
                       "actual_waitlist": 0,
                       "max_waitlist": 0,
                       "specific_section": "CX04",
