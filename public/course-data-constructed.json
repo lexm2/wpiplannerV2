@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 12, 2025, 4:36 AM",
+  "generated": "Nov 12, 2025, 4:52 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -176210,7 +176210,7 @@
                 "crn": 336196,
                 "number": "C01",
                 "seats": 20,
-                "seats_available": 0,
+                "seats_available": 1,
                 "actual_waitlist": 0,
                 "max_waitlist": 5,
                 "note": null,
@@ -176229,7 +176229,7 @@
                     "building": "",
                     "room": "Alden Hall B30 Music Technology Lab",
                     "seats": 20,
-                    "seats_available": 0,
+                    "seats_available": 1,
                     "actual_waitlist": 0,
                     "max_waitlist": 5,
                     "specific_section": "C01",
@@ -179355,7 +179355,7 @@
                 "crn": 338959,
                 "number": "C01",
                 "seats": 20,
-                "seats_available": 15,
+                "seats_available": 14,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -179374,7 +179374,7 @@
                     "building": "",
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 20,
-                    "seats_available": 15,
+                    "seats_available": 14,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C01",
