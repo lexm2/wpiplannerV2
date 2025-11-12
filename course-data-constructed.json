@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 12, 2025, 8:22 AM",
+  "generated": "Nov 12, 2025, 8:48 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5414,7 +5414,7 @@
                 "crn": 336613,
                 "number": "C01 - Topics In Studio Art: Art in the Makerspace",
                 "seats": 24,
-                "seats_available": 8,
+                "seats_available": 7,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -5433,7 +5433,7 @@
                     "building": "",
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 24,
-                    "seats_available": 8,
+                    "seats_available": 7,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C01 - Topics In Studio Art: Art in the Makerspace",
@@ -236348,7 +236348,7 @@
                 "crn": 353499,
                 "number": "C01 - Healthy Alternative:  Zumba",
                 "seats": 30,
-                "seats_available": 27,
+                "seats_available": 26,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -236367,7 +236367,7 @@
                     "building": "",
                     "room": "Recreation Center Dance",
                     "seats": 30,
-                    "seats_available": 27,
+                    "seats_available": 26,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C01 - Healthy Alternative:  Zumba",
