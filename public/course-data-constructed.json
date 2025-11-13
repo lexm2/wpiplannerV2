@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 13, 2025, 4:44 AM",
+  "generated": "Nov 13, 2025, 4:54 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -36730,7 +36730,7 @@
                 "number": "D01",
                 "seats": 18,
                 "seats_available": 0,
-                "actual_waitlist": 5,
+                "actual_waitlist": 4,
                 "max_waitlist": 5,
                 "note": null,
                 "description": "Cat. IContinuation of CN 1542. Course will focus on practical conversations and recognition of Chinese characters, with greater emphasis placed on reading and writing.Recommended background: CN 1543.This course is closed to native speakers of Chinese and heritage speakers except with written permission from the instructor.",
@@ -36749,7 +36749,7 @@
                     "room": "Kaven Hall 204",
                     "seats": 18,
                     "seats_available": 0,
-                    "actual_waitlist": 5,
+                    "actual_waitlist": 4,
                     "max_waitlist": 5,
                     "specific_section": "D01",
                     "days": [
