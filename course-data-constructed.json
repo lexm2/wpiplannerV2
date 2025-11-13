@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 13, 2025, 11:15 PM",
+  "generated": "Nov 13, 2025, 11:37 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -73205,7 +73205,7 @@
                 "crn": 342589,
                 "number": "D02",
                 "seats": 20,
-                "seats_available": 11,
+                "seats_available": 12,
                 "actual_waitlist": 0,
                 "max_waitlist": 5,
                 "note": null,
@@ -73224,7 +73224,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 20,
-                    "seats_available": 11,
+                    "seats_available": 12,
                     "actual_waitlist": 0,
                     "max_waitlist": 5,
                     "specific_section": "D02",
@@ -176456,7 +176456,7 @@
                 "crn": 337350,
                 "number": "D02",
                 "seats": 25,
-                "seats_available": 9,
+                "seats_available": 8,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -176475,7 +176475,7 @@
                     "building": "",
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 25,
-                    "seats_available": 9,
+                    "seats_available": 8,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "D02",
