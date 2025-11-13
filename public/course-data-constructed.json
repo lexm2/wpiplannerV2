@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 13, 2025, 5:41 PM",
+  "generated": "Nov 13, 2025, 5:51 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -3957,7 +3957,7 @@
                 "number": "D01",
                 "seats": 24,
                 "seats_available": 0,
-                "actual_waitlist": 8,
+                "actual_waitlist": 9,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course provides an introduction to the basic principles of two and three-dimensionalvisual organization. The course focuses on graphic expression, ideadevelopment, and visual literacy. Students will be expected to master basicrendering skills, perspective drawing, concept art, and storyboarding throughtraditional and/or computer-based tools.",
@@ -3976,7 +3976,7 @@
                     "room": "Riley Commons",
                     "seats": 24,
                     "seats_available": 0,
-                    "actual_waitlist": 8,
+                    "actual_waitlist": 9,
                     "max_waitlist": 10,
                     "specific_section": "D01",
                     "days": [
@@ -3995,7 +3995,7 @@
                 "number": "D02",
                 "seats": 24,
                 "seats_available": 0,
-                "actual_waitlist": 4,
+                "actual_waitlist": 5,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "Cat. I This course provides an introduction to the basic principles of two and three-dimensional visual organization. The course focuses on graphic expression, idea development, and visual literacy. Students will be expected to master basic rendering skills, perspective drawing, concept art, and storyboarding through traditional and/or computer-based tools.",
@@ -4014,7 +4014,7 @@
                     "room": "Riley Commons",
                     "seats": 24,
                     "seats_available": 0,
-                    "actual_waitlist": 4,
+                    "actual_waitlist": 5,
                     "max_waitlist": 10,
                     "specific_section": "D02",
                     "days": [
@@ -24260,7 +24260,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seats_available": 0,
-                "actual_waitlist": 58,
+                "actual_waitlist": 57,
                 "max_waitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I The CH1010 course is an introduction to chemistry using the fundamental structures of atoms as a starting point. Emphasis is placed on discussing how all properties of matter as well as bonding mechanisms arise from atomic structure. Lewis structures and molecular orbitals are used to understand bonding, and the intermolecular forces present in chemicals systems are used as a prelude to reactivity patterns covered in future courses.",
@@ -24279,7 +24279,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seats_available": 0,
-                    "actual_waitlist": 58,
+                    "actual_waitlist": 57,
                     "max_waitlist": 999,
                     "specific_section": "Interest List-A Term",
                     "days": []
@@ -71912,7 +71912,7 @@
                 "number": "C01 - Topics In The History Of American Science And Technology",
                 "seats": 35,
                 "seats_available": 0,
-                "actual_waitlist": 3,
+                "actual_waitlist": 4,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "Cat. I This course surveys the interplay of science, technology and culture in American national development. Emphasis is placed upon building chronological narratives while attending to the themes, approaches, and sources historians use to explore Americans' enthusiastic but sometimes controversial embrace of science and technology. Chronologies and themes will vary across sections covering topics such as Science, Technology and Culture in Early America; Science, Technology in Industrializing America; Science and Technology in Post-1945 America; and Technology and Culture in the Rise of Urban America. This course may be repeated for different topics. No prior coursework or background in the history of science and technology is required.",
@@ -71931,7 +71931,7 @@
                     "room": "Washburn 323",
                     "seats": 35,
                     "seats_available": 0,
-                    "actual_waitlist": 3,
+                    "actual_waitlist": 4,
                     "max_waitlist": 10,
                     "specific_section": "C01 - Topics In The History Of American Science And Technology",
                     "days": [
@@ -223924,7 +223924,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Griffin Tabor",
+                    "professor": "Not Assigned",
                     "start_time": "12:00",
                     "end_time": "12:50",
                     "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -223962,7 +223962,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Griffin Tabor",
+                      "professor": "Not Assigned",
                       "start_time": "08:00",
                       "end_time": "09:50",
                       "location": "Innovation Studio 103 Robotics Lab",
@@ -223995,7 +223995,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Griffin Tabor",
+                      "professor": "Not Assigned",
                       "start_time": "10:00",
                       "end_time": "11:50",
                       "location": "Innovation Studio 103 Robotics Lab",
@@ -224876,7 +224876,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Jennifer Stander",
                     "start_time": "11:00",
                     "end_time": "11:50",
                     "location": "Atwater Kent 233",
@@ -224914,7 +224914,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jennifer Stander",
                       "start_time": "13:00",
                       "end_time": "14:50",
                       "location": "Atwater Kent 227 Lab Restricted Access",
@@ -224947,7 +224947,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jennifer Stander",
                       "start_time": "13:00",
                       "end_time": "14:50",
                       "location": "Atwater Kent 227 Lab Restricted Access",
