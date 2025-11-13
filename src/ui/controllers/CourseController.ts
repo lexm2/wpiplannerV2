@@ -912,7 +912,7 @@ export class CourseController {
                 : `${course.minCredits}-${course.maxCredits} credits`;
 
             html += `
-                <div class="selected-course-item">
+                <div class="selected-course-item" data-course-id="${course.id}">
                     <div class="selected-course-info">
                         <div class="selected-course-code">${course.department.abbreviation}${course.number}</div>
                         <div class="selected-course-name">${course.name}</div>
@@ -927,7 +927,12 @@ export class CourseController {
 
         selectedCoursesContainer.innerHTML = html;
 
-        // Associate remove buttons with Course objects  
+        // Associate selected course items and remove buttons with Course objects
+        const selectedCourseItems = selectedCoursesContainer.querySelectorAll('.selected-course-item');
+        selectedCourseItems.forEach((item, index) => {
+            this.elementToCourseMap.set(item as HTMLElement, sortedCourses[index].course);
+        });
+
         const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
         removeButtons.forEach((button, index) => {
             this.elementToCourseMap.set(button as HTMLElement, sortedCourses[index].course);

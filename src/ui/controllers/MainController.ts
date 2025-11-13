@@ -438,8 +438,8 @@ export class MainController {
             }
 
 
-            if (target.closest('.course-item, .course-card') && !target.classList.contains('course-select-btn') && !target.classList.contains('section-badge')) {
-                const courseElement = target.closest('.course-item, .course-card') as HTMLElement;
+            if (target.closest('.course-item, .course-card, .selected-course-item') && !target.classList.contains('course-select-btn') && !target.classList.contains('section-badge') && !target.classList.contains('course-remove-btn')) {
+                const courseElement = target.closest('.course-item, .course-card, .selected-course-item') as HTMLElement;
                 if (courseElement) {
                     this.courseController.selectCourse(courseElement);
                 }
