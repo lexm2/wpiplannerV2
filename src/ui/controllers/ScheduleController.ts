@@ -823,7 +823,7 @@ export class ScheduleController {
         container.classList.add('empty');
     }
 
-    private renderPopulatedGrid(container: HTMLElement, courses: any[], _term: string): void {
+    private renderPopulatedGrid(container: HTMLElement, courses: any[], term: string): void {
         container.classList.remove('empty');
 
         // Clean up existing event listeners before replacing DOM content
@@ -836,15 +836,16 @@ export class ScheduleController {
         // Create 5-day (Mon-Fri) × 12 time slot grid (7 AM - 7 PM, hourly intervals)
         const weekdays = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
         const timeSlots = TimeUtils.TOTAL_TIME_SLOTS;
-        
+
         let html = '';
-        
+        let hasConflicts = false;
+
         // First row: empty time cell + day headers
         html += '<div class="time-label"></div>'; // Empty corner cell
         weekdays.forEach(day => {
             html += `<div class="day-header">${TimeUtils.getDayAbbr(day)}</div>`;
         });
-        
+
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {
             const hour = slot + TimeUtils.START_HOUR;
@@ -857,14 +858,44 @@ export class ScheduleController {
             // Schedule cells for each day
             weekdays.forEach(day => {
                 const cell = this.getCellContent(courses, day, slot);
+                if (cell.classes.includes('has-conflict')) {
+                    hasConflicts = true;
+                }
                 html += `<div class="schedule-cell ${cell.classes}" data-day="${day}" data-slot="${slot}" style="position: relative;">${cell.content}</div>`;
             });
         }
-        
+
         container.innerHTML = html;
-        
+
+        // Update term header to show conflict warning if needed
+        this.updateTermHeaderConflictIndicator(term, hasConflicts);
+
         // Add click event listeners for section blocks
         this.addSectionBlockEventListeners(container);
+    }
+
+    private updateTermHeaderConflictIndicator(term: string, hasConflicts: boolean): void {
+        const termGraph = document.querySelector(`.term-graph[data-term="${term}"]`);
+        if (!termGraph) return;
+
+        const termHeader = termGraph.querySelector('.term-header');
+        if (!termHeader) return;
+
+        let warningIcon = termHeader.querySelector('.term-conflict-warning') as HTMLElement | null;
+
+        if (hasConflicts) {
+            if (!warningIcon) {
+                warningIcon = document.createElement('div');
+                warningIcon.className = 'term-conflict-warning';
+                warningIcon.innerHTML = getInlineSVG('ALERT_CIRCLE', 'conflict-warning-icon');
+                warningIcon.title = 'This term has overlapping courses';
+                termHeader.appendChild(warningIcon);
+            }
+        } else {
+            if (warningIcon) {
+                warningIcon.remove();
+            }
+        }
     }
 
     private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number): { content: string, classes: string } {

@@ -163,6 +163,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 1.5rem;
+    padding-bottom: 80px;
     background-color: var(--color-background);
 }
 
@@ -549,6 +550,10 @@
 
 /* Height breakpoint */
 @media (max-height: 1100px) {
+    .wizard-content {
+        padding-bottom: 0;
+    }
+
     .wizard-footer {
         background-color: transparent;
         border-top: none;
