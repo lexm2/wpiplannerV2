@@ -15,12 +15,11 @@ export class RMPRatingFilter implements SectionBasedFilter {
         const isDefaultRating = (criteria.minRating ?? 0) === 0 && (criteria.maxRating ?? 5) === 5;
         const isDefaultDifficulty = (criteria.minDifficulty ?? 0) === 0 && (criteria.maxDifficulty ?? 5) === 5;
         const isDefaultRetake = (criteria.minWouldTakeAgain ?? 0) === 0 && (criteria.maxWouldTakeAgain ?? 100) === 100;
+        const isDefaultInclude = (criteria.includeWithoutData ?? true) === true;
 
-        if (isDefaultRating && isDefaultDifficulty && isDefaultRetake) {
+        if (isDefaultRating && isDefaultDifficulty && isDefaultRetake && isDefaultInclude) {
             return sections;
         }
-
-        console.log('[RMP Filter] Filtering sections with criteria:', criteria);
 
         return sections.filter(fs => {
             return fs.section.periods.some(period => {
@@ -31,7 +30,7 @@ export class RMPRatingFilter implements SectionBasedFilter {
                 const rmpData = this.rmpService.getRatingDisplay(period.professor);
 
                 if (!rmpData) {
-                    return true;
+                    return criteria.includeWithoutData ?? true;
                 }
 
                 const rating = parseFloat(rmpData.rating);

@@ -31,9 +31,9 @@ export class PeriodRMPRatingFilter implements SectionFilter {
         // Get RMP data for this professor
         const rmpData = this.rmpService.getRatingDisplay(professorName);
 
-        // If no RMP data, include this professor (can't filter without data)
+        // If no RMP data, check if we should include professors without data
         if (!rmpData) {
-            return true;
+            return criteria.includeWithoutData ?? true;
         }
 
         const rating = parseFloat(rmpData.rating);
@@ -86,12 +86,11 @@ export class PeriodRMPRatingFilter implements SectionFilter {
         const isDefaultRating = (criteria.minRating ?? 0) === 0 && (criteria.maxRating ?? 5) === 5;
         const isDefaultDifficulty = (criteria.minDifficulty ?? 0) === 0 && (criteria.maxDifficulty ?? 5) === 5;
         const isDefaultRetake = (criteria.minWouldTakeAgain ?? 0) === 0 && (criteria.maxWouldTakeAgain ?? 100) === 100;
+        const isDefaultInclude = (criteria.includeWithoutData ?? true) === true;
 
-        if (isDefaultRating && isDefaultDifficulty && isDefaultRetake) {
+        if (isDefaultRating && isDefaultDifficulty && isDefaultRetake && isDefaultInclude) {
             return sections;
         }
-
-        console.log('[Period RMP Filter] Filtering sections with criteria:', criteria);
 
         return sections.filter(section => {
             // ALL periods must meet the criteria
@@ -108,35 +107,23 @@ export class PeriodRMPRatingFilter implements SectionFilter {
         sectionsWithContext: Array<{course: SelectedCourse, section: Section}>,
         criteria: RMPRatingFilterCriteria
     ): Array<{course: SelectedCourse, section: Section}> {
-        console.log('[Period RMP Filter] applyToSectionsWithContext called with', sectionsWithContext.length, 'sections');
-        console.log('[Period RMP Filter] Criteria:', criteria);
-
         // Check if filter is at default values (filter is "off")
         const isDefaultRating = (criteria.minRating ?? 0) === 0 && (criteria.maxRating ?? 5) === 5;
         const isDefaultDifficulty = (criteria.minDifficulty ?? 0) === 0 && (criteria.maxDifficulty ?? 5) === 5;
         const isDefaultRetake = (criteria.minWouldTakeAgain ?? 0) === 0 && (criteria.maxWouldTakeAgain ?? 100) === 100;
+        const isDefaultInclude = (criteria.includeWithoutData ?? true) === true;
 
-        console.log('[Period RMP Filter] Default checks:', { isDefaultRating, isDefaultDifficulty, isDefaultRetake });
-
-        if (isDefaultRating && isDefaultDifficulty && isDefaultRetake) {
-            console.log('[Period RMP Filter] All criteria at defaults, skipping filter (returning all sections)');
+        if (isDefaultRating && isDefaultDifficulty && isDefaultRetake && isDefaultInclude) {
             return sectionsWithContext;
         }
 
-        console.log('[Period RMP Filter] Applying filter (criteria is NOT at defaults)');
-
         const filtered = sectionsWithContext.filter(item => {
             // ALL periods must meet the criteria
-            const passes = item.section.periods.every(period =>
+            return item.section.periods.every(period =>
                 this.professorMeetsCriteria(period.professor, criteria)
             );
-            if (!passes) {
-                console.log('[Period RMP Filter] Section', item.section.number, 'filtered OUT');
-            }
-            return passes;
         });
 
-        console.log('[Period RMP Filter] Result:', filtered.length, 'of', sectionsWithContext.length, 'sections passed');
         return filtered;
     }
 
@@ -148,8 +135,9 @@ export class PeriodRMPRatingFilter implements SectionFilter {
         const isDefaultRating = (criteria.minRating ?? 0) === 0 && (criteria.maxRating ?? 5) === 5;
         const isDefaultDifficulty = (criteria.minDifficulty ?? 0) === 0 && (criteria.maxDifficulty ?? 5) === 5;
         const isDefaultRetake = (criteria.minWouldTakeAgain ?? 0) === 0 && (criteria.maxWouldTakeAgain ?? 100) === 100;
+        const isDefaultInclude = (criteria.includeWithoutData ?? true) === true;
 
-        if (isDefaultRating && isDefaultDifficulty && isDefaultRetake) {
+        if (isDefaultRating && isDefaultDifficulty && isDefaultRetake && isDefaultInclude) {
             return periods;
         }
 

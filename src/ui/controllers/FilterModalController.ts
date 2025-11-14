@@ -2,7 +2,8 @@ import { ModalService } from '../../services/ModalService';
 import { CourseFilterService } from '../../services/CourseFilterService';
 import { Course, Department } from '../../types/types';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
-import { DualRangeSlider } from '../components/DualRangeSlider';
+import { SharedFilterComponents } from '../components/SharedFilterComponents';
+import { SharedFilterSetup } from '../components/SharedFilterSetup';
 
 export class FilterModalController {
     private modalService: ModalService;
@@ -11,10 +12,6 @@ export class FilterModalController {
     private currentModalId: string | null = null;
     private isCategoryMode: boolean = false;
     private isUpdatingFilter: boolean = false;
-
-    private ratingSlider: DualRangeSlider | null = null;
-    private difficultySlider: DualRangeSlider | null = null;
-    private retakeSlider: DualRangeSlider | null = null;
 
     constructor(modalService: ModalService) {
         this.modalService = modalService;
@@ -316,131 +313,41 @@ export class FilterModalController {
     private createProfessorFilter(): string {
         if (!this.filterService) return '';
 
-        this.filterService.getFilterOptions('professor', this.allCourses) as string[];
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'professor');
         const activeProfessors = activeFilter?.criteria?.professors || [];
 
-        const selectedProfessorsChips = activeProfessors.map((prof: any) => `
-            <span class="filter-chip">
-                ${this.escapeHtml(prof)}
-                <button class="filter-chip-remove" data-professor="${this.escapeHtml(prof)}">×</button>
-            </span>
-        `).join('');
-
-        return `
-            <div class="filter-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Professors</h4>
-                </div>
-                <div class="filter-section-content">
-                    <div class="filter-search-container">
-                        <input type="text" class="filter-search professor-search" 
-                               placeholder="Search professors..." data-filter="professor">
-                        <div class="professor-dropdown" id="professor-dropdown" style="display: none;"></div>
-                    </div>
-                    <div class="filter-selected-chips">
-                        ${selectedProfessorsChips}
-                    </div>
-                </div>
-            </div>
-        `;
+        return SharedFilterComponents.createProfessorFilter({
+            idPrefix: '',
+            filterId: 'professor',
+            activeProfessors
+        });
     }
 
     private createRMPRatingFilter(): string {
         if (!this.filterService) return '';
 
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'rmpRating');
-        const minRating = activeFilter?.criteria?.minRating ?? 0;
-        const maxRating = activeFilter?.criteria?.maxRating ?? 5;
-        const minDifficulty = activeFilter?.criteria?.minDifficulty ?? 0;
-        const maxDifficulty = activeFilter?.criteria?.maxDifficulty ?? 5;
-        const minWouldTakeAgain = activeFilter?.criteria?.minWouldTakeAgain ?? 0;
-        const maxWouldTakeAgain = activeFilter?.criteria?.maxWouldTakeAgain ?? 100;
 
-        const hasActiveFilter = activeFilter && (
-            minRating > 0 || maxRating < 5 ||
-            minDifficulty > 0 || maxDifficulty < 5 ||
-            minWouldTakeAgain > 0 || maxWouldTakeAgain < 100
-        );
-
-        return `
-            <div class="filter-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Rate My Professor</h4>
-                    ${hasActiveFilter ? '<button class="filter-clear-section" data-filter="rmpRating">Clear</button>' : ''}
-                </div>
-                <div class="filter-section-content">
-                    <div class="filter-slider-container">
-                        <div class="filter-slider-group">
-                            <label>Rating</label>
-                            <div class="filter-slider-values">
-                                <span id="rmp-rating-min-value">${minRating.toFixed(1)}</span>
-                                <span>-</span>
-                                <span id="rmp-rating-max-value">${maxRating.toFixed(1)}</span>
-                                <span class="filter-input-hint">stars</span>
-                            </div>
-                            <div id="rmp-rating-slider-container"></div>
-                        </div>
-
-                        <div class="filter-slider-group">
-                            <label>Difficulty</label>
-                            <div class="filter-slider-values">
-                                <span id="rmp-difficulty-min-value">${minDifficulty.toFixed(1)}</span>
-                                <span>-</span>
-                                <span id="rmp-difficulty-max-value">${maxDifficulty.toFixed(1)}</span>
-                                <span class="filter-input-hint">scale</span>
-                            </div>
-                            <div id="rmp-difficulty-slider-container"></div>
-                        </div>
-
-                        <div class="filter-slider-group">
-                            <label>Would Take Again</label>
-                            <div class="filter-slider-values">
-                                <span id="rmp-retake-min-value">${minWouldTakeAgain}</span>
-                                <span>-</span>
-                                <span id="rmp-retake-max-value">${maxWouldTakeAgain}</span>
-                                <span class="filter-input-hint">%</span>
-                            </div>
-                            <div id="rmp-retake-slider-container"></div>
-                        </div>
-                    </div>
-                    <div class="filter-hint">
-                        <small>Note: Filters are off when at default ranges. Professors without RMP data are excluded when this filter is active.</small>
-                    </div>
-                </div>
-            </div>
-        `;
+        return SharedFilterComponents.createRMPRatingFilter({
+            idPrefix: '',
+            filterId: 'rmpRating',
+            activeFilter
+        });
     }
 
     private createTermFilter(): string {
         if (!this.filterService) return '';
-        
+
         const terms = this.filterService.getFilterOptions('term', this.allCourses) as string[];
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'term');
         const activeTerms = activeFilter?.criteria?.terms || [];
 
-        const termCheckboxes = terms.map(term => `
-            <label class="filter-toggle-label term-checkbox">
-                <input type="checkbox" class="filter-toggle" value="${term}" ${activeTerms.includes(term) ? 'checked' : ''} 
-                       data-filter="term">
-                <span class="filter-toggle-slider"></span>
-                <span class="filter-toggle-text">${term} Term</span>
-            </label>
-        `).join('');
-
-        return `
-            <div class="filter-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Terms</h4>
-                    <button class="filter-select-all" data-filter="term">All Terms</button>
-                </div>
-                <div class="filter-section-content">
-                    <div class="filter-checkbox-row">
-                        ${termCheckboxes}
-                    </div>
-                </div>
-            </div>
-        `;
+        return SharedFilterComponents.createTermFilter({
+            idPrefix: '',
+            filterId: 'term',
+            terms,
+            activeTerms
+        });
     }
 
 
@@ -552,212 +459,52 @@ export class FilterModalController {
     }
 
     private setupProfessorFilter(modalElement: HTMLElement): void {
-        const searchInput = modalElement.querySelector('.professor-search') as HTMLInputElement;
-        const dropdown = modalElement.querySelector('#professor-dropdown') as HTMLElement;
-        
-        if (searchInput && this.filterService) {
-            const professors = this.filterService.getFilterOptions('professor', this.allCourses) as string[];
-            
-            searchInput.addEventListener('input', () => {
-                const query = searchInput.value.toLowerCase();
-                if (query.length > 0) {
-                    const matches = professors.filter(prof => 
-                        prof.toLowerCase().includes(query) && prof !== 'TBA'
-                    ).slice(0, 10);
-                    
-                    dropdown.innerHTML = matches.map(prof => 
-                        `<div class="professor-option" data-professor="${prof}">${prof}</div>`
-                    ).join('');
-                    dropdown.style.display = matches.length > 0 ? 'block' : 'none';
+        if (!this.filterService) return;
+
+        const professors = this.filterService.getFilterOptions('professor', this.allCourses) as string[];
+
+        SharedFilterSetup.setupProfessorFilter({
+            modalElement,
+            filterService: this.filterService as any,
+            idPrefix: '',
+            filterId: 'professor',
+            professors,
+            updateFilter: (updatedProfessors: string[]) => {
+                if (updatedProfessors.length > 0) {
+                    this.filterService?.addFilter('professor', { professors: updatedProfessors });
                 } else {
-                    dropdown.style.display = 'none';
+                    this.filterService?.removeFilter('professor');
                 }
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target as Node) && !dropdown.contains(e.target as Node)) {
-                    dropdown.style.display = 'none';
-                }
-            });
-
-            dropdown.addEventListener('click', (e) => {
-                const target = e.target as HTMLElement;
-                if (target.classList.contains('professor-option')) {
-                    const professor = target.dataset.professor!;
-                    this.addProfessorFilter(professor, modalElement);
-                    searchInput.value = '';
-                    dropdown.style.display = 'none';
-                }
-            });
-        }
-
-        // Handle chip removal - use more specific delegation
-        const chipsContainer = modalElement.querySelector('.filter-selected-chips');
-        if (chipsContainer) {
-            chipsContainer.addEventListener('click', (e) => {
-                const target = e.target as HTMLElement;
-                if (target.classList.contains('filter-chip-remove')) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    const professor = this.unescapeHtml(target.dataset.professor!);
-                    this.removeProfessorFilter(professor, modalElement);
-                }
-            });
-        }
+                this.updatePreview(modalElement);
+            }
+        });
     }
 
     private setupRMPRatingFilter(modalElement: HTMLElement): void {
-        const activeFilter = this.filterService?.getActiveFilters().find(f => f.id === 'rmpRating');
-        const minRating = activeFilter?.criteria?.minRating ?? 0;
-        const maxRating = activeFilter?.criteria?.maxRating ?? 5;
-        const minDifficulty = activeFilter?.criteria?.minDifficulty ?? 0;
-        const maxDifficulty = activeFilter?.criteria?.maxDifficulty ?? 5;
-        const minWouldTakeAgain = activeFilter?.criteria?.minWouldTakeAgain ?? 0;
-        const maxWouldTakeAgain = activeFilter?.criteria?.maxWouldTakeAgain ?? 100;
+        if (!this.filterService) return;
 
-        const ratingMinValue = modalElement.querySelector('#rmp-rating-min-value');
-        const ratingMaxValue = modalElement.querySelector('#rmp-rating-max-value');
-        const difficultyMinValue = modalElement.querySelector('#rmp-difficulty-min-value');
-        const difficultyMaxValue = modalElement.querySelector('#rmp-difficulty-max-value');
-        const retakeMinValue = modalElement.querySelector('#rmp-retake-min-value');
-        const retakeMaxValue = modalElement.querySelector('#rmp-retake-max-value');
+        const sliderRefs: { rating?: any, difficulty?: any, retake?: any } = {};
 
-        const ratingContainer = modalElement.querySelector('#rmp-rating-slider-container');
-        const difficultyContainer = modalElement.querySelector('#rmp-difficulty-slider-container');
-        const retakeContainer = modalElement.querySelector('#rmp-retake-slider-container');
-
-        const clearBtn = modalElement.querySelector('.filter-clear-section[data-filter="rmpRating"]');
-
-        let debounceTimer: number | undefined;
-
-        const updateFilter = () => {
-            if (!this.filterService || !this.ratingSlider || !this.difficultySlider || !this.retakeSlider) return;
-
-            const minRating = this.ratingSlider.getMinValue();
-            const maxRating = this.ratingSlider.getMaxValue();
-            const minDifficulty = this.difficultySlider.getMinValue();
-            const maxDifficulty = this.difficultySlider.getMaxValue();
-            const minRetake = this.retakeSlider.getMinValue();
-            const maxRetake = this.retakeSlider.getMaxValue();
-
-            const isDefaultRating = minRating === 0 && maxRating === 5;
-            const isDefaultDifficulty = minDifficulty === 0 && maxDifficulty === 5;
-            const isDefaultRetake = minRetake === 0 && maxRetake === 100;
-
-            if (isDefaultRating && isDefaultDifficulty && isDefaultRetake) {
-                this.filterService.removeFilter('rmpRating');
-            } else {
-                const criteria: any = {
-                    minRating,
-                    maxRating,
-                    minDifficulty,
-                    maxDifficulty,
-                    minWouldTakeAgain: minRetake,
-                    maxWouldTakeAgain: maxRetake
-                };
-                this.filterService.addFilter('rmpRating', criteria);
-            }
-
-            this.updatePreview(modalElement);
-        };
-
-        const debouncedUpdateFilter = () => {
-            if (debounceTimer) {
-                clearTimeout(debounceTimer);
-            }
-            debounceTimer = window.setTimeout(() => {
-                updateFilter();
-            }, 300);
-        };
-
-        if (ratingContainer) {
-            this.ratingSlider = new DualRangeSlider({
-                min: 0,
-                max: 5,
-                step: 0.1,
-                minValue: minRating,
-                maxValue: maxRating,
-                leftLabel: 'Minimum Rating',
-                rightLabel: 'Maximum Rating',
-                onChange: (min, max) => {
-                    if (ratingMinValue) ratingMinValue.textContent = min.toFixed(1);
-                    if (ratingMaxValue) ratingMaxValue.textContent = max.toFixed(1);
-                    debouncedUpdateFilter();
-                }
-            });
-            ratingContainer.appendChild(this.ratingSlider.getElement());
-        }
-
-        if (difficultyContainer) {
-            this.difficultySlider = new DualRangeSlider({
-                min: 0,
-                max: 5,
-                step: 0.1,
-                minValue: minDifficulty,
-                maxValue: maxDifficulty,
-                leftLabel: 'Minimum Difficulty',
-                rightLabel: 'Maximum Difficulty',
-                onChange: (min, max) => {
-                    if (difficultyMinValue) difficultyMinValue.textContent = min.toFixed(1);
-                    if (difficultyMaxValue) difficultyMaxValue.textContent = max.toFixed(1);
-                    debouncedUpdateFilter();
-                }
-            });
-            difficultyContainer.appendChild(this.difficultySlider.getElement());
-        }
-
-        if (retakeContainer) {
-            this.retakeSlider = new DualRangeSlider({
-                min: 0,
-                max: 100,
-                step: 1,
-                minValue: minWouldTakeAgain,
-                maxValue: maxWouldTakeAgain,
-                leftLabel: 'Minimum Would Take Again',
-                rightLabel: 'Maximum Would Take Again',
-                onChange: (min, max) => {
-                    if (retakeMinValue) retakeMinValue.textContent = min.toString();
-                    if (retakeMaxValue) retakeMaxValue.textContent = max.toString();
-                    debouncedUpdateFilter();
-                }
-            });
-            retakeContainer.appendChild(this.retakeSlider.getElement());
-        }
-
-        clearBtn?.addEventListener('click', () => {
-            if (this.ratingSlider) {
-                this.ratingSlider.setMinValue(0);
-                this.ratingSlider.setMaxValue(5);
-                if (ratingMinValue) ratingMinValue.textContent = '0.0';
-                if (ratingMaxValue) ratingMaxValue.textContent = '5.0';
-            }
-            if (this.difficultySlider) {
-                this.difficultySlider.setMinValue(0);
-                this.difficultySlider.setMaxValue(5);
-                if (difficultyMinValue) difficultyMinValue.textContent = '0.0';
-                if (difficultyMaxValue) difficultyMaxValue.textContent = '5.0';
-            }
-            if (this.retakeSlider) {
-                this.retakeSlider.setMinValue(0);
-                this.retakeSlider.setMaxValue(100);
-                if (retakeMinValue) retakeMinValue.textContent = '0';
-                if (retakeMaxValue) retakeMaxValue.textContent = '100';
-            }
-            updateFilter();
-        });
+        SharedFilterSetup.setupRMPRatingFilter(
+            {
+                modalElement,
+                filterService: this.filterService as any,
+                idPrefix: '',
+                filterId: 'rmpRating',
+                updatePreview: (element: HTMLElement) => this.updatePreview(element)
+            },
+            sliderRefs
+        );
     }
 
     private setupTermFilter(modalElement: HTMLElement): void {
-        const checkboxes = modalElement.querySelectorAll('input[data-filter="term"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', () => this.updateTermFilter(modalElement));
-        });
+        if (!this.filterService) return;
 
-        const selectAll = modalElement.querySelector('.filter-select-all[data-filter="term"]');
-        selectAll?.addEventListener('click', () => {
-            checkboxes.forEach((cb: any) => cb.checked = true);
-            this.updateTermFilter(modalElement);
+        SharedFilterSetup.setupTermFilter({
+            modalElement,
+            filterService: this.filterService as any,
+            filterId: 'term',
+            updateFilter: () => this.updateTermFilter(modalElement)
         });
     }
 
@@ -1021,54 +768,6 @@ export class FilterModalController {
         this.updatePreview(modalElement);
     }
 
-    private addProfessorFilter(professor: string, modalElement: HTMLElement): void {
-        if (!this.filterService) return;
-        
-        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'professor');
-        const currentProfessors = activeFilter?.criteria?.professors || [];
-        
-        if (!currentProfessors.includes(professor)) {
-            const updatedProfessors = [...currentProfessors, professor];
-            this.filterService.addFilter('professor', { professors: updatedProfessors });
-            this.refreshProfessorChips(modalElement);
-            this.updatePreview(modalElement);
-        }
-    }
-
-    private removeProfessorFilter(professor: string, modalElement: HTMLElement): void {
-        if (!this.filterService) return;
-        
-        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'professor');
-        const currentProfessors = activeFilter?.criteria?.professors || [];
-        const updatedProfessors = currentProfessors.filter((p: string) => p !== professor);
-        
-        if (updatedProfessors.length > 0) {
-            this.filterService.addFilter('professor', { professors: updatedProfessors });
-        } else {
-            this.filterService.removeFilter('professor');
-        }
-        
-        this.refreshProfessorChips(modalElement);
-        this.updatePreview(modalElement);
-    }
-
-    private refreshProfessorChips(modalElement: HTMLElement): void {
-        if (!this.filterService) return;
-        
-        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'professor');
-        const professors = activeFilter?.criteria?.professors || [];
-        
-        const chipsContainer = modalElement.querySelector('.filter-selected-chips');
-        if (chipsContainer) {
-            chipsContainer.innerHTML = professors.map((prof: any) => `
-                <span class="filter-chip">
-                    ${this.escapeHtml(prof)}
-                    <button class="filter-chip-remove" data-professor="${this.escapeHtml(prof)}">×</button>
-                </span>
-            `).join('');
-        }
-    }
-
     private updateTermFilter(modalElement: HTMLElement): void {
         const checkboxes = modalElement.querySelectorAll('input[data-filter="term"]:checked') as NodeListOf<HTMLInputElement>;
         const terms = Array.from(checkboxes).map(cb => cb.value);
@@ -1105,11 +804,5 @@ export class FilterModalController {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
-    }
-
-    private unescapeHtml(text: string): string {
-        const div = document.createElement('div');
-        div.innerHTML = text;
-        return div.textContent || div.innerText || '';
     }
 }
