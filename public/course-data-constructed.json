@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 14, 2025, 4:20 PM",
+  "generated": "Nov 14, 2025, 4:47 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -10323,7 +10323,7 @@
               "number": "CX02",
               "seats": 5,
               "seats_available": 0,
-              "actual_waitlist": 1,
+              "actual_waitlist": 0,
               "max_waitlist": 2,
               "note": null,
               "description": "BB 3813 Animal Cell Culture Techniques Laboratory (Cat. I; 1/6 unit) Basic laboratory skills in mammalian cell culture including cell counting, freezing and thawing cell lines, and culture of suspension and attached cells. Recommended background: knowledge of aseptic technique (BB 1801 or 2815 or equivalent) and cell biology (BB 2550 or equivalent). Students may not receive credit for this course and BB 3513.",
@@ -10342,7 +10342,7 @@
                   "room": "Goddard Hall 212 BB Lab",
                   "seats": 5,
                   "seats_available": 0,
-                  "actual_waitlist": 1,
+                  "actual_waitlist": 0,
                   "max_waitlist": 2,
                   "specific_section": "CX02",
                   "days": [
@@ -32051,7 +32051,7 @@
                 "number": "C01",
                 "seats": 110,
                 "seats_available": 11,
-                "actual_waitlist": 1,
+                "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "Cat. I Modern theories of aromaticity, including a general assessment of delocalized bonding. The chemistry of some significant functional groups not surveyed in Organic Chemistry I, and the meaning of acidity and basicity in organic chemistry, will be more fully explored. The course will provide an introduction to the systematic synthesis of polyfunctional organic compounds. Recommended background: CH 2310. The course is intended for chemists, chemical engineers and bio-science majors.",
@@ -32070,7 +32070,7 @@
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 110,
                     "seats_available": 11,
-                    "actual_waitlist": 1,
+                    "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C01",
                     "days": [
@@ -32091,7 +32091,7 @@
                 "crn": 336306,
                 "number": "C02",
                 "seats": 80,
-                "seats_available": 31,
+                "seats_available": 32,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -32110,7 +32110,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 80,
-                    "seats_available": 31,
+                    "seats_available": 32,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "C02",
