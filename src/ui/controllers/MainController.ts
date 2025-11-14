@@ -195,9 +195,6 @@ export class MainController {
             
             // Initial UI sync for selected courses (use efficient targeted updates)
             this.syncInitialCourseSelectionUI();
-            
-            // Load saved filters AFTER all services are fully connected and ready
-            this.filterService.loadFiltersFromStorage();
         } catch (error) {
             console.error('Failed to initialize application:', error);
             this.uiStateManager.showErrorMessage('Failed to initialize application. Some features may not work properly.');
@@ -690,11 +687,6 @@ export class MainController {
 
         // Display courses with cancellation support
         this.displayCoursesWithCancellation(coursesToDisplay, cancellationToken);
-
-        // Save current filter state
-        if (hasFilters) {
-            this.filterService.saveFiltersToStorage();
-        }
 
         // Update filter button appearance and sync search input
         this.updateFilterButtonState();

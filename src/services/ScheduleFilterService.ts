@@ -7,9 +7,8 @@ import { PeriodTermFilter } from '../core/filters/PeriodTermFilter';
 import { PeriodAvailabilityFilter } from '../core/filters/PeriodAvailabilityFilter';
 import { PeriodConflictFilter } from '../core/filters/PeriodConflictFilter';
 import { SectionCodeFilter } from '../core/filters/SectionCodeFilter';
-import { SearchTextFilter } from '../core/filters';
 import { ConflictDetector } from '../core/ConflictDetector';
-import { SectionFilter, SelectedCourseFilter, CourseFilter, FilterEventListener, BaseFilter } from '../types/filters';
+import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter } from '../types/filters';
 import { FilterState } from '../core/FilterState';
 import { RequiredStatusFilter } from '../core/filters/RequiredStatusFilter';
 import { SectionStatusFilter } from '../core/filters/SectionStatusFilter';
@@ -108,7 +107,6 @@ import { getAllSections } from '../utils/courseUtils';
 
 export class ScheduleFilterService {
     private filterState: FilterState;
-    private registeredCourseFilters!: Map<string, CourseFilter>;
     private registeredSectionFilters!: Map<string, SectionFilter>;
     private registeredSelectedCourseFilters!: Map<string, SelectedCourseFilter>;
     private periodConflictFilter: PeriodConflictFilter | null = null;
@@ -128,12 +126,8 @@ export class ScheduleFilterService {
     
     private initializeFilters(): void {
         // Initialize filter registration Maps
-        this.registeredCourseFilters = new Map();
         this.registeredSectionFilters = new Map();
         this.registeredSelectedCourseFilters = new Map();
-
-        // Register CourseFilter implementations internally
-        this.registerCourseFilter(new SearchTextFilter());
 
         // Register SectionFilter implementations using registration methods
         this.registerSectionFilter(new PeriodDaysFilter());
@@ -151,27 +145,6 @@ export class ScheduleFilterService {
         // Register SelectedCourseFilter implementations using registration methods
         this.registerSelectedCourseFilter(new RequiredStatusFilter());
         this.registerSelectedCourseFilter(new SectionStatusFilter());
-    }
-    
-    // Course Filter Registration
-    registerCourseFilter(filter: CourseFilter): void {
-        this.registeredCourseFilters.set(filter.id, filter);
-    }
-    
-    unregisterCourseFilter(filterId: string): boolean {
-        const removed = this.registeredCourseFilters.delete(filterId);
-        if (removed) {
-            this.removeFilter(filterId);
-        }
-        return removed;
-    }
-    
-    getCourseFilter(filterId: string): CourseFilter | undefined {
-        return this.registeredCourseFilters.get(filterId);
-    }
-    
-    getAvailableCourseFilters(): CourseFilter[] {
-        return Array.from(this.registeredCourseFilters.values());
     }
 
     // Section Filter Registration  
@@ -218,8 +191,7 @@ export class ScheduleFilterService {
     
     // Unified Filter Lookup
     private getAnyRegisteredFilter(filterId: string): BaseFilter | undefined {
-        return this.registeredCourseFilters.get(filterId) ||
-               this.registeredSectionFilters.get(filterId) ||
+        return this.registeredSectionFilters.get(filterId) ||
                this.registeredSelectedCourseFilters.get(filterId);
     }
     
@@ -294,24 +266,6 @@ export class ScheduleFilterService {
     
     removeEventListener(listener: FilterEventListener): void {
         this.filterState.removeEventListener(listener);
-    }
-    
-    saveFiltersToStorage(): void {
-        // Use a different key for schedule filters, exclude transient filters
-        const serialized = this.filterState.serialize(['searchText', 'department']);
-        localStorage.setItem('wpi-schedule-filters', serialized);
-    }
-    
-    loadFiltersFromStorage(): boolean {
-        const stored = localStorage.getItem('wpi-schedule-filters');
-        if (stored) {
-            const success = this.filterState.deserialize(stored);
-            // Remove any loaded search or department filters
-            this.removeFilter('searchText');
-            this.removeFilter('department');
-            return success;
-        }
-        return false;
     }
     
     getFilterSummary(): string {

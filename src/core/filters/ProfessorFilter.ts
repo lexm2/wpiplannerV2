@@ -1,30 +1,27 @@
-import { Course } from '../../types/types';
-import { CourseFilter, ProfessorFilterCriteria } from '../../types/filters';
-import { getAllSections } from '../../utils/courseUtils';
+import { ProfessorFilterCriteria } from '../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../types/filterableUnit';
 
-export class ProfessorFilter implements CourseFilter {
+export class ProfessorFilter implements SectionBasedFilter {
     readonly id = 'professor';
     readonly name = 'Professor';
     readonly description = 'Filter courses by instructor';
     readonly priority = 7;
 
-    apply(courses: Course[], criteria: ProfessorFilterCriteria): Course[] {
+    apply(sections: FilterableSection[], criteria: ProfessorFilterCriteria): FilterableSection[] {
         if (!criteria.professors || criteria.professors.length === 0) {
-            return courses;
+            return sections;
         }
 
         const professorSet = new Set(
             criteria.professors.map(prof => prof.toLowerCase())
         );
 
-        return courses.filter(course => {
-            const sections = getAllSections(course);
-            return sections.some(section =>
-                section.periods.some(period =>
-                    professorSet.has(period.professor.toLowerCase())
-                )
-            );
-        });
+        return sections.filter(fs =>
+            fs.section.periods.some(period =>
+                professorSet.has(period.professor.toLowerCase())
+            )
+        );
     }
     
     isValidCriteria(criteria: any): criteria is ProfessorFilterCriteria {

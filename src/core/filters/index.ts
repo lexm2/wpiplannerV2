@@ -6,7 +6,7 @@ export { TermFilter } from './TermFilter';
 export { SearchTextFilter } from './SearchTextFilter';
 export { RMPRatingFilter } from './RMPRatingFilter';
 
-import { CourseFilter } from '../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { DepartmentFilter } from './DepartmentFilter';
 import { AvailabilityFilter } from './AvailabilityFilter';
 import { CreditRangeFilter } from './CreditRangeFilter';
@@ -16,7 +16,7 @@ import { RMPRatingFilter } from './RMPRatingFilter';
 import { RateMyProfessorService } from '../../services/RateMyProfessorService';
 
 // Default filter instances
-export const createDefaultFilters = (rmpService: RateMyProfessorService): CourseFilter[] => [
+export const createDefaultFilters = (rmpService: RateMyProfessorService): SectionBasedFilter[] => [
     new DepartmentFilter(),
     new AvailabilityFilter(),
     new CreditRangeFilter(),
@@ -26,9 +26,9 @@ export const createDefaultFilters = (rmpService: RateMyProfessorService): Course
 ];
 
 // Filter registry utility
-export const createFilterRegistry = (rmpService: RateMyProfessorService): Map<string, CourseFilter> => {
+export const createFilterRegistry = (rmpService: RateMyProfessorService): Map<string, SectionBasedFilter> => {
     const filters = createDefaultFilters(rmpService);
-    const registry = new Map<string, CourseFilter>();
+    const registry = new Map<string, SectionBasedFilter>();
 
     filters.forEach(filter => {
         registry.set(filter.id, filter);

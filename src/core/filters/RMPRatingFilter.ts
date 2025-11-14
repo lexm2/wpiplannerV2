@@ -1,95 +1,68 @@
-/**
- * RMPRatingFilter - Filter courses by Rate My Professor ratings
- *
- * Shows courses that have AT LEAST ONE section with a professor meeting the criteria.
- * Criteria can include minimum rating, maximum difficulty, and minimum "would take again" percentage.
- * Professors without RMP data are excluded when this filter is active.
- */
-
-import { Course } from '../../types/types';
-import { CourseFilter, RMPRatingFilterCriteria } from '../../types/filters';
+import { RMPRatingFilterCriteria } from '../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../types/filterableUnit';
 import { RateMyProfessorService } from '../../services/RateMyProfessorService';
-import { getAllSections } from '../../utils/courseUtils';
 
-export class RMPRatingFilter implements CourseFilter {
+export class RMPRatingFilter implements SectionBasedFilter {
     readonly id = 'rmpRating';
     readonly name = 'Rate My Professor';
     readonly description = 'Filter courses by professor ratings';
-    readonly priority = 8; // After professor filter (7), before availability (99)
+    readonly priority = 8;
 
     constructor(private rmpService: RateMyProfessorService) {}
 
-    /**
-     * Apply the RMP rating filter to courses
-     * A course passes if at least one section has a professor meeting all criteria
-     */
-    apply(courses: Course[], criteria: RMPRatingFilterCriteria): Course[] {
-        // Check if filter is at default values (filter is "off")
+    apply(sections: FilterableSection[], criteria: RMPRatingFilterCriteria): FilterableSection[] {
         const isDefaultRating = (criteria.minRating ?? 0) === 0 && (criteria.maxRating ?? 5) === 5;
         const isDefaultDifficulty = (criteria.minDifficulty ?? 0) === 0 && (criteria.maxDifficulty ?? 5) === 5;
         const isDefaultRetake = (criteria.minWouldTakeAgain ?? 0) === 0 && (criteria.maxWouldTakeAgain ?? 100) === 100;
 
         if (isDefaultRating && isDefaultDifficulty && isDefaultRetake) {
-            return courses;
+            return sections;
         }
 
-        console.log('[RMP Filter] Filtering courses with criteria:', criteria);
+        console.log('[RMP Filter] Filtering sections with criteria:', criteria);
 
-        return courses.filter(course => {
-            // Check if any section has a professor that meets the criteria
-            const sections = getAllSections(course);
-            const hasQualifyingSection = sections.some(section => {
-                // Check all periods in the section
-                return section.periods.some(period => {
-                    // Skip if no professor assigned
-                    if (!period.professor || period.professor === 'Not Assigned') {
-                        return false;
-                    }
+        return sections.filter(fs => {
+            return fs.section.periods.some(period => {
+                if (!period.professor || period.professor === 'Not Assigned') {
+                    return false;
+                }
 
-                    // Get RMP data for this professor
-                    const rmpData = this.rmpService.getRatingDisplay(period.professor);
+                const rmpData = this.rmpService.getRatingDisplay(period.professor);
 
-                    // If no RMP data, include this professor (can't filter without data)
-                    if (!rmpData) {
-                        return true;
-                    }
-
-                    const rating = parseFloat(rmpData.rating);
-                    const difficulty = parseFloat(rmpData.difficulty);
-                    const wouldTakeAgain = rmpData.wouldTakeAgain ? parseInt(rmpData.wouldTakeAgain) : null;
-
-                    // Check rating range
-                    if (criteria.minRating !== undefined && criteria.minRating > 0 && rating < criteria.minRating) {
-                        return false;
-                    }
-                    if (criteria.maxRating !== undefined && criteria.maxRating < 5 && rating > criteria.maxRating) {
-                        return false;
-                    }
-
-                    // Check difficulty range
-                    if (criteria.minDifficulty !== undefined && criteria.minDifficulty > 0 && difficulty < criteria.minDifficulty) {
-                        return false;
-                    }
-                    if (criteria.maxDifficulty !== undefined && criteria.maxDifficulty < 5 && difficulty > criteria.maxDifficulty) {
-                        return false;
-                    }
-
-                    // Check "would take again" range (only if data exists)
-                    if (wouldTakeAgain !== null) {
-                        if (criteria.minWouldTakeAgain !== undefined && criteria.minWouldTakeAgain > 0 && wouldTakeAgain < criteria.minWouldTakeAgain) {
-                            return false;
-                        }
-                        if (criteria.maxWouldTakeAgain !== undefined && criteria.maxWouldTakeAgain < 100 && wouldTakeAgain > criteria.maxWouldTakeAgain) {
-                            return false;
-                        }
-                    }
-
-                    // All criteria passed
+                if (!rmpData) {
                     return true;
-                });
-            });
+                }
 
-            return hasQualifyingSection;
+                const rating = parseFloat(rmpData.rating);
+                const difficulty = parseFloat(rmpData.difficulty);
+                const wouldTakeAgain = rmpData.wouldTakeAgain ? parseInt(rmpData.wouldTakeAgain) : null;
+
+                if (criteria.minRating !== undefined && criteria.minRating > 0 && rating < criteria.minRating) {
+                    return false;
+                }
+                if (criteria.maxRating !== undefined && criteria.maxRating < 5 && rating > criteria.maxRating) {
+                    return false;
+                }
+
+                if (criteria.minDifficulty !== undefined && criteria.minDifficulty > 0 && difficulty < criteria.minDifficulty) {
+                    return false;
+                }
+                if (criteria.maxDifficulty !== undefined && criteria.maxDifficulty < 5 && difficulty > criteria.maxDifficulty) {
+                    return false;
+                }
+
+                if (wouldTakeAgain !== null) {
+                    if (criteria.minWouldTakeAgain !== undefined && criteria.minWouldTakeAgain > 0 && wouldTakeAgain < criteria.minWouldTakeAgain) {
+                        return false;
+                    }
+                    if (criteria.maxWouldTakeAgain !== undefined && criteria.maxWouldTakeAgain < 100 && wouldTakeAgain > criteria.maxWouldTakeAgain) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
         });
     }
 

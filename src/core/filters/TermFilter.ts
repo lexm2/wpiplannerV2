@@ -1,28 +1,23 @@
-import { Course } from '../../types/types';
-import { CourseFilter, TermFilterCriteria } from '../../types/filters';
-import { getAllSections } from '../../utils/courseUtils';
+import { TermFilterCriteria } from '../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../types/filterableUnit';
 
-export class TermFilter implements CourseFilter {
+export class TermFilter implements SectionBasedFilter {
     readonly id = 'term';
     readonly name = 'Term';
     readonly description = 'Filter courses by academic term';
     readonly priority = 25;
 
-    apply(courses: Course[], criteria: TermFilterCriteria): Course[] {
+    apply(sections: FilterableSection[], criteria: TermFilterCriteria): FilterableSection[] {
         if (!criteria.terms || criteria.terms.length === 0) {
-            return courses;
+            return sections;
         }
 
         const termSet = new Set(
             criteria.terms.map(term => term.toUpperCase())
         );
 
-        return courses.filter(course => {
-            const sections = getAllSections(course);
-            return sections.some(section => {
-                return termSet.has(section.computedTerm);
-            });
-        });
+        return sections.filter(fs => termSet.has(fs.section.computedTerm));
     }
     
     isValidCriteria(criteria: any): criteria is TermFilterCriteria {

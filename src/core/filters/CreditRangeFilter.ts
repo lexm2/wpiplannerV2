@@ -1,15 +1,16 @@
-import { Course } from '../../types/types';
-import { CourseFilter, CreditRangeFilterCriteria } from '../../types/filters';
+import { CreditRangeFilterCriteria } from '../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../types/filterableUnit';
 
-export class CreditRangeFilter implements CourseFilter {
+export class CreditRangeFilter implements SectionBasedFilter {
     readonly id = 'creditRange';
     readonly name = 'Credit Range';
     readonly description = 'Filter courses by credit hours';
     readonly priority = 99;
-    
-    apply(courses: Course[], criteria: CreditRangeFilterCriteria): Course[] {
-        return courses.filter(course => {
-            // Course matches if its credit range overlaps with the filter range
+
+    apply(sections: FilterableSection[], criteria: CreditRangeFilterCriteria): FilterableSection[] {
+        return sections.filter(fs => {
+            const course = fs.course;
             return course.maxCredits >= criteria.min && course.minCredits <= criteria.max;
         });
     }

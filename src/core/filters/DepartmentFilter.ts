@@ -1,23 +1,24 @@
-import { Course } from '../../types/types';
-import { CourseFilter, DepartmentFilterCriteria } from '../../types/filters';
+import { DepartmentFilterCriteria } from '../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../types/filterableUnit';
 
-export class DepartmentFilter implements CourseFilter {
+export class DepartmentFilter implements SectionBasedFilter {
     readonly id = 'department';
     readonly name = 'Department';
     readonly description = 'Filter courses by department(s)';
     readonly priority = 25;
 
-    apply(courses: Course[], criteria: DepartmentFilterCriteria): Course[] {
+    apply(sections: FilterableSection[], criteria: DepartmentFilterCriteria): FilterableSection[] {
         if (!criteria.departments || criteria.departments.length === 0) {
-            return courses;
+            return sections;
         }
-        
+
         const departmentSet = new Set(
             criteria.departments.map(dept => dept.toLowerCase())
         );
-        
-        return courses.filter(course => 
-            departmentSet.has(course.department.abbreviation.toLowerCase())
+
+        return sections.filter(fs =>
+            departmentSet.has(fs.course.department.abbreviation.toLowerCase())
         );
     }
     

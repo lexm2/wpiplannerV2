@@ -1,16 +1,3 @@
-import { Course } from './types';
-
-export interface CourseFilter {
-    readonly id: string;
-    readonly name: string;
-    readonly description: string;
-    readonly priority?: number;
-
-    apply(courses: Course[], criteria: any, activeFilters?: Map<string, any>): Course[];
-    isValidCriteria(criteria: any): boolean;
-    getDisplayValue(criteria: any): string;
-}
-
 export interface SectionFilter {
     readonly id: string;
     readonly name: string;

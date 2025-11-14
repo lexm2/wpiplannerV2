@@ -1,8 +1,9 @@
 import { Course } from '../types/types';
-import { CourseFilter, FilterEventListener, ActiveFilter } from '../types/filters';
+import { FilterEventListener, ActiveFilter } from '../types/filters';
 import { FilterState } from '../core/FilterState';
 import { SearchService } from './searchService';
 import { getAllSections } from '../utils/courseUtils';
+import { SectionFilterPipeline, SectionBasedFilter } from '../core/SectionFilterPipeline';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -174,33 +175,37 @@ import { getAllSections } from '../utils/courseUtils';
  */
 export class CourseFilterService {
     private filterState: FilterState;
-    private registeredFilters: Map<string, CourseFilter> = new Map();
+    private registeredFilters: Map<string, SectionBasedFilter> = new Map();
     private searchService: SearchService;
     private debugLogging: boolean = false;
+    private sectionPipeline: SectionFilterPipeline;
 
     constructor(searchService: SearchService) {
         this.filterState = new FilterState();
         this.searchService = searchService;
+        this.sectionPipeline = new SectionFilterPipeline();
     }
-    
+
     // Filter Registration
-    registerFilter(filter: CourseFilter): void {
+    registerFilter(filter: SectionBasedFilter): void {
         this.registeredFilters.set(filter.id, filter);
+        this.sectionPipeline.registerFilter(filter);
     }
     
     unregisterFilter(filterId: string): boolean {
         const removed = this.registeredFilters.delete(filterId);
         if (removed) {
             this.removeFilter(filterId);
+            this.sectionPipeline.unregisterFilter(filterId);
         }
         return removed;
     }
-    
-    getRegisteredFilter(filterId: string): CourseFilter | undefined {
+
+    getRegisteredFilter(filterId: string): SectionBasedFilter | undefined {
         return this.registeredFilters.get(filterId);
     }
-    
-    getAvailableFilters(): CourseFilter[] {
+
+    getAvailableFilters(): SectionBasedFilter[] {
         return Array.from(this.registeredFilters.values());
     }
     
@@ -285,48 +290,24 @@ export class CourseFilterService {
     }
     
     /**
-     * Main filtering method with static priority-based execution.
-     * Applies filters in order of their defined priority values.
+     * Main filtering method using section-based filtering with priority queue execution.
+     * Filters sections first, then reconstructs courses that have at least one matching section.
      */
     filterCourses(courses: Course[]): Course[] {
         if (this.isEmpty()) {
             return courses;
         }
 
-        let filteredCourses = courses;
-        const activeFilters = this.getActiveFilters();
         const criteriaMap = this.getCriteriaMap();
 
-        // Sort filters by static priority (lower priority number = higher precedence)
-        const sortedFilters = activeFilters.sort((a, b) => {
-            const filterA = this.registeredFilters.get(a.id);
-            const filterB = this.registeredFilters.get(b.id);
-            const priorityA = filterA?.priority ?? 100;
-            const priorityB = filterB?.priority ?? 100;
-            return priorityA - priorityB;
-        });
-
-        // Log filter application order for debugging
-        if (this.debugLogging && sortedFilters.length > 0) {
-            console.log('Filter application order (by priority):');
-            sortedFilters.forEach((filter, index) => {
-                const filterImpl = this.registeredFilters.get(filter.id);
-                const priority = filterImpl?.priority ?? 100;
-                console.log(`  ${index + 1}. ${filter.name} (priority: ${priority})`);
-            });
+        if (this.debugLogging) {
+            console.log(`Filtering ${courses.length} courses with ${criteriaMap.size} active filters`);
         }
 
-        // Apply all filters sequentially in priority order
-        for (const activeFilter of sortedFilters) {
-            const filter = this.registeredFilters.get(activeFilter.id);
-            if (filter) {
-                const beforeCount = this.debugLogging ? filteredCourses.length : 0;
-                filteredCourses = filter.apply(filteredCourses, activeFilter.criteria, criteriaMap);
-                if (this.debugLogging) {
-                    const afterCount = filteredCourses.length;
-                    console.log(`  Applied ${activeFilter.name}: ${beforeCount} → ${afterCount} courses`);
-                }
-            }
+        const filteredCourses = this.sectionPipeline.filterCourses(courses, criteriaMap);
+
+        if (this.debugLogging) {
+            console.log(`Filtered result: ${filteredCourses.length} courses`);
         }
 
         return filteredCourses;
@@ -338,27 +319,9 @@ export class CourseFilterService {
     addEventListener(listener: FilterEventListener): void {
         this.filterState.addEventListener(listener);
     }
-    
+
     removeEventListener(listener: FilterEventListener): void {
         this.filterState.removeEventListener(listener);
-    }
-    
-    // Persistence
-    saveFiltersToStorage(): void {
-        const serialized = this.filterState.serialize(['searchText', 'department']);
-        localStorage.setItem('wpi-course-filters', serialized);
-    }
-    
-    loadFiltersFromStorage(): boolean {
-        const stored = localStorage.getItem('wpi-course-filters');
-        if (stored) {
-            const success = this.filterState.deserialize(stored);
-            // Remove any loaded search or department filters
-            this.removeFilter('searchText');
-            this.removeFilter('department');
-            return success;
-        }
-        return false;
     }
     
     // Helper Methods

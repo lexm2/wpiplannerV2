@@ -2,13 +2,13 @@ import { ActiveFilter, FilterChangeEvent, FilterEventListener, FilterCriteria } 
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * FilterState - Core Filter State Management & Selective Serialization Engine
+ * FilterState - Core Filter State Management Engine
  * ═══════════════════════════════════════════════════════════════════════════════
- * 
+ *
  * ARCHITECTURE ROLE:
  * - Core state management foundation for the comprehensive filtering system
  * - Event-driven filter coordination hub with real-time notifications
- * - Selective serialization engine preventing transient filter persistence
+ * - All filters are transient and cleared on page reload
  * - Foundation layer supporting CourseFilterService and UI filter interactions
  * - Centralized filter lifecycle management (add, update, remove, clear)
  * 
@@ -259,46 +259,5 @@ export class FilterState {
                 console.error('Error in filter event listener:', error);
             }
         });
-    }
-    
-    // Serialization for persistence
-    serialize(excludeFilters: string[] = []): string {
-        const data = {
-            filters: Array.from(this.activeFilters.entries())
-                .filter(([id]) => !excludeFilters.includes(id))
-                .map(([_id, filter]) => ({
-                    id: filter.id,
-                    name: filter.name,
-                    criteria: filter.criteria,
-                    displayValue: filter.displayValue
-                }))
-        };
-        return JSON.stringify(data);
-    }
-    
-    deserialize(data: string): boolean {
-        try {
-            const parsed = JSON.parse(data);
-            this.activeFilters.clear();
-            
-            if (parsed.filters && Array.isArray(parsed.filters)) {
-                parsed.filters.forEach((filter: ActiveFilter) => {
-                    // Skip search and department filters during deserialization
-                    if (filter.id !== 'searchText' && filter.id !== 'department') {
-                        this.activeFilters.set(filter.id, filter);
-                    }
-                });
-            }
-            
-            this.notifyListeners({
-                type: 'clear',
-                activeFilters: this.getActiveFilters()
-            });
-            
-            return true;
-        } catch (error) {
-            console.error('Failed to deserialize filter state:', error);
-            return false;
-        }
     }
 }

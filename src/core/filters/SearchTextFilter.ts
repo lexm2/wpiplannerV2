@@ -1,20 +1,22 @@
-import { Course } from '../../types/types';
-import { CourseFilter, SearchTextFilterCriteria } from '../../types/filters';
+import { SearchTextFilterCriteria } from '../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../types/filterableUnit';
 
-export class SearchTextFilter implements CourseFilter {
+export class SearchTextFilter implements SectionBasedFilter {
     readonly id = 'searchText';
     readonly name = 'Search Text';
     readonly description = 'Filter courses by search text';
     readonly priority = 1;
-    
-    apply(courses: Course[], criteria: SearchTextFilterCriteria): Course[] {
+
+    apply(sections: FilterableSection[], criteria: SearchTextFilterCriteria): FilterableSection[] {
         if (!criteria.query || !criteria.query.trim()) {
-            return courses;
+            return sections;
         }
-        
+
         const query = criteria.query.trim().toLowerCase();
-        
-        return courses.filter(course => {
+
+        return sections.filter(fs => {
+            const course = fs.course;
             const courseCode = `${course.department.abbreviation}${course.number}`;
             const courseText = [
                 course.id,

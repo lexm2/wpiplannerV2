@@ -463,7 +463,6 @@ export class ScheduleFilterModalController {
 
         // Apply filters button
         modalElement.querySelector('#apply-filters')?.addEventListener('click', () => {
-            this.applyFilters();
             this.hide();
         });
     }
@@ -623,11 +622,6 @@ export class ScheduleFilterModalController {
         if (filterCountElement) {
             filterCountElement.textContent = filterCount > 0 ? `(${filterCount})` : '';
         }
-    }
-
-    private applyFilters(): void {
-        // Save filter state
-        this.scheduleFilterService?.saveFiltersToStorage();
     }
 
     private setupProfessorFilter(modalElement: HTMLElement): void {

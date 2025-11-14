@@ -1,32 +1,28 @@
-import { Course } from '../../types/types';
-import { CourseFilter, AvailabilityFilterCriteria } from '../../types/filters';
-import { getAllSections } from '../../utils/courseUtils';
+import { AvailabilityFilterCriteria } from '../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../types/filterableUnit';
 
-export class AvailabilityFilter implements CourseFilter {
+export class AvailabilityFilter implements SectionBasedFilter {
     readonly id = 'availability';
     readonly name = 'Availability';
     readonly description = 'Show only courses with available seats';
+    readonly priority = 50;
 
-    apply(courses: Course[], criteria: AvailabilityFilterCriteria, activeFilters?: Map<string, any>): Course[] {
+    apply(sections: FilterableSection[], criteria: AvailabilityFilterCriteria, activeFilters?: Map<string, any>): FilterableSection[] {
         if (!criteria.availableOnly) {
-            return courses;
+            return sections;
         }
 
-        // Check if term filter is active
         const termCriteria = activeFilters?.get('term');
         const activeTerms = termCriteria?.terms
             ? new Set(termCriteria.terms.map((t: string) => t.toUpperCase()))
             : null;
 
-        return courses.filter(course => {
-            const sections = getAllSections(course);
-            return sections.some(section => {
-                // If term filter is active, only check availability in those specific terms
-                if (activeTerms && !activeTerms.has(section.computedTerm)) {
-                    return false;
-                }
-                return section.seatsAvailable > 0;
-            });
+        return sections.filter(fs => {
+            if (activeTerms && !activeTerms.has(fs.section.computedTerm)) {
+                return false;
+            }
+            return fs.section.seatsAvailable > 0;
         });
     }
     
