@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 14, 2025, 8:40 PM",
+  "generated": "Nov 14, 2025, 8:50 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -62423,7 +62423,7 @@
                 "number": "DL01",
                 "seats": 64,
                 "seats_available": 0,
-                "actual_waitlist": 14,
+                "actual_waitlist": 15,
                 "max_waitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4509",
                 "description": "Cat. I This introduction course in engineering graphical communications and design provides a solid background for all engineering disciplines. The ability to visualize, create and apply proper design intent and industry standards for simple parts, assemblies and drawings is a necessity for anyone in a technology environment. Computer Aided Design software is used as a tool to create 2D & 3D sketches, 3D parts, 3D assemblies and 2D drawings per an industry standard. Multiview and pictorial graphics techniques are integrated with ANSI standards for dimensioning and tolerances, sectioning, and generating detailed engineering drawings. Emphasis is placed on relating drawings to the required manufacturing processes. The design process and aids to creativity are combined with graphics procedures to incorporate functional design requirements in the geometric model. No prior engineering graphics or software knowledge is assumed.",
@@ -62442,7 +62442,7 @@
                     "room": "Kaven Hall 116",
                     "seats": 64,
                     "seats_available": 0,
-                    "actual_waitlist": 14,
+                    "actual_waitlist": 15,
                     "max_waitlist": 15,
                     "specific_section": "DL01",
                     "days": [
@@ -171989,7 +171989,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Jillian Kaplan",
                     "start_time": "12:00",
                     "end_time": "12:00",
                     "location": "Unknown",
@@ -180769,7 +180769,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seats_available": 11,
-                "actual_waitlist": 0,
+                "actual_waitlist": 1,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "Cat. I Leadership is a critical role in any global, technological organization. This course explores how the concepts of creativity, entrepreneurial and critical thinking, emotional and self-awareness, passion, diversity, communication, and ethics inform and affect leadership practice. The course considers a variety of contemporary leadership challenges including how leaders work effectively across cultural, technological, and disciplinary boundaries, how leaders foster new ideas and bring them to fruition, how they communicate effectively and persuasively to diverse stakeholders, and how they make decisions that are both ethical and effective. The course is designed to 1) increase students’ awareness of their own leadership styles, 2) examine the responsibilities of leadership, and 3) determine best practices in leadership. Students cannot receive credit for both BUS 1010 and OBC 1010.",
@@ -180788,7 +180788,7 @@
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
                     "seats_available": 11,
-                    "actual_waitlist": 0,
+                    "actual_waitlist": 1,
                     "max_waitlist": 10,
                     "specific_section": "D01",
                     "days": [
@@ -181203,7 +181203,7 @@
                 "crn": 337187,
                 "number": "D01",
                 "seats": 45,
-                "seats_available": 14,
+                "seats_available": 13,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -181222,7 +181222,7 @@
                     "building": "",
                     "room": "Olin Hall 223",
                     "seats": 45,
-                    "seats_available": 14,
+                    "seats_available": 13,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "D01",
