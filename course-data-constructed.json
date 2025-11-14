@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 14, 2025, 1:45 PM",
+  "generated": "Nov 14, 2025, 1:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -221592,7 +221592,7 @@
                 "number": "C01",
                 "seats": 55,
                 "seats_available": 0,
-                "actual_waitlist": 0,
+                "actual_waitlist": 1,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "PSY 1504: Strategies for Improving Cognitive Skills (Cat I) This course is intended for anyone interested in learning more about how the mind works and how to make it work better. The purpose of this course is (1) to provide students with the basic psychological knowledge needed to understand and evaluate such important cognitive skills as memory, problem solving, and decision making, and (2) to provide students the practical skills and experience necessary to improve and assess their cognitive performance. Topics will include but not be limited to: memory improvement, study skills, problem solving techniques, creativity training, brainstorming, making effective choices, evaluating claims about the mind, and cognitive health. No previous experience with psychology is needed.",
@@ -221611,7 +221611,7 @@
                     "room": "Salisbury Labs 104",
                     "seats": 55,
                     "seats_available": 0,
-                    "actual_waitlist": 0,
+                    "actual_waitlist": 1,
                     "max_waitlist": 10,
                     "specific_section": "C01",
                     "days": [
