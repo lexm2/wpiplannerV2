@@ -248,11 +248,10 @@ export class MainController {
             this.timestampManager.updateClientTimestamp();
             const serverTimestamp = await this.timestampManager.loadServerTimestamp();
 
-            // Start data update service and set up refresh callback
+            // Initialize data update service (worker will start when tab becomes unfocused)
             if (serverTimestamp) {
                 this.dataUpdateService.updateLastLoadedTimestamp(serverTimestamp);
             }
-            this.dataUpdateService.start();
             this.setupDataUpdateListener();
             
             // Expose debug methods globally for testing (development only)
@@ -949,36 +948,7 @@ export class MainController {
     }
 
     private async refreshCourseData(): Promise<void> {
-        try {
-
-            const scheduleDB = await this.courseDataService.loadCourseData();
-            this.allDepartments = scheduleDB.departments;
-            this.departmentController.setAllDepartments(this.allDepartments);
-            this.courseController.setAllDepartments(this.allDepartments);
-            this.courseSelectionService.setAllDepartments(this.allDepartments);
-            this.profileStateManager.setCourseData(this.allDepartments);
-            this.searchService.setCourseData(this.allDepartments);
-            this.filterModalController.setCourseData(this.allDepartments);
-
-            this.courseSelectionService.reconstructSectionObjects();
-
-            this.timestampManager.updateClientTimestamp();
-            const serverTimestamp = await this.timestampManager.loadServerTimestamp();
-
-            if (serverTimestamp) {
-                this.dataUpdateService.updateLastLoadedTimestamp(serverTimestamp);
-            }
-
-            this.refreshCurrentView();
-
-            const indicator = document.getElementById('optimistic-ui-status');
-            if (indicator && indicator.classList.contains('refresh-available')) {
-                indicator.textContent = 'No changes';
-                indicator.className = 'optimistic-status idle';
-            }
-        } catch (error) {
-            // Silently fail - errors expected in local development
-        }
+        window.location.reload();
     }
 
     /**

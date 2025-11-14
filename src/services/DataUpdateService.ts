@@ -14,6 +14,7 @@ export class DataUpdateService {
   private worker: Worker | null = null;
   private lastLoadedTimestamp: string | null = null;
   private readonly STORAGE_KEY = 'lastLoadedTimestamp';
+  private pendingUpdate: boolean = false;
 
   constructor() {
     this.lastLoadedTimestamp = this.loadLastTimestamp();
@@ -75,7 +76,13 @@ export class DataUpdateService {
     switch (type) {
       case 'update-available':
         if (serverTimestamp) {
-          this.dispatchUpdateEvent(serverTimestamp);
+          this.stop();
+          this.pendingUpdate = true;
+
+          if (!document.hidden) {
+            this.dispatchUpdateEvent(serverTimestamp);
+            this.pendingUpdate = false;
+          }
         }
         break;
     }
@@ -94,12 +101,16 @@ export class DataUpdateService {
 
   private setupVisibilityListener(): void {
     document.addEventListener('visibilitychange', () => {
-      if (this.worker) {
-        const message: UpdateCheckMessage = {
-          type: 'visibility-change',
-          isVisible: !document.hidden,
-        };
-        this.worker.postMessage(message);
+      if (document.hidden) {
+        this.start();
+      } else {
+        if (this.pendingUpdate) {
+          this.dispatchUpdateEvent(this.lastLoadedTimestamp || '');
+          this.pendingUpdate = false;
+        } else if (this.worker) {
+          this.checkNow();
+        }
+        this.stop();
       }
     });
   }

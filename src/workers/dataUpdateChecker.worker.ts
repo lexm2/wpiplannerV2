@@ -11,7 +11,6 @@ interface UpdateResponseMessage {
 
 let checkInterval: number | null = null;
 let lastLoadedTimestamp: string | null = null;
-let isPageVisible = true;
 const CHECK_INTERVAL_MS = 60000; // 1 minute
 
 self.addEventListener('message', (event: MessageEvent<UpdateCheckMessage>) => {
@@ -40,9 +39,7 @@ function startChecking(): void {
 
   checkForUpdates();
   checkInterval = self.setInterval(() => {
-    if (isPageVisible) {
-      checkForUpdates();
-    }
+    checkForUpdates();
   }, CHECK_INTERVAL_MS);
 }
 
@@ -80,12 +77,15 @@ async function checkForUpdates(): Promise<void> {
     }
 
     if (serverTimestamp > lastLoadedTimestamp) {
-      console.log('[DataUpdateChecker] New data available! Notifying main thread...');
+      console.log('[DataUpdateChecker] New data available! Notifying and terminating...');
       const message: UpdateResponseMessage = {
         type: 'update-available',
         serverTimestamp,
       };
       self.postMessage(message);
+
+      stopChecking();
+      self.close();
     } else {
       console.log('[DataUpdateChecker] No updates available');
     }
@@ -93,9 +93,3 @@ async function checkForUpdates(): Promise<void> {
     console.log('[DataUpdateChecker] Error checking for updates:', error instanceof Error ? error.message : 'Unknown error');
   }
 }
-
-self.addEventListener('message', (event: MessageEvent) => {
-  if (event.data.type === 'visibility-change') {
-    isPageVisible = event.data.isVisible;
-  }
-});
