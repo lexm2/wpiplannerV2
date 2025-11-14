@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 14, 2025, 2:51 AM",
+  "generated": "Nov 14, 2025, 3:43 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -11870,7 +11870,7 @@
                 "crn": 337717,
                 "number": "SL02 - ST: Antibody Therapeutics",
                 "seats": 30,
-                "seats_available": 24,
+                "seats_available": 23,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4539",
@@ -11889,7 +11889,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seats_available": 24,
+                    "seats_available": 23,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "SL02 - ST: Antibody Therapeutics",
@@ -11903,7 +11903,7 @@
                   "crn": 337817,
                   "number": "SX02 - ST: Antibody Therapeutics",
                   "seats": 30,
-                  "seats_available": 24,
+                  "seats_available": 23,
                   "actual_waitlist": 0,
                   "max_waitlist": 10,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4539",
@@ -11922,7 +11922,7 @@
                       "building": "",
                       "room": "Unknown",
                       "seats": 30,
-                      "seats_available": 24,
+                      "seats_available": 23,
                       "actual_waitlist": 0,
                       "max_waitlist": 10,
                       "specific_section": "SX02 - ST: Antibody Therapeutics",
