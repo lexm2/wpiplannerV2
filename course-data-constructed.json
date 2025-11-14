@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 14, 2025, 2:40 PM",
+  "generated": "Nov 14, 2025, 2:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -32091,8 +32091,8 @@
                 "crn": 336306,
                 "number": "C02",
                 "seats": 80,
-                "seats_available": 32,
-                "actual_waitlist": 1,
+                "seats_available": 31,
+                "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
                 "description": "Cat. I Modern theories of aromaticity, including a general assessment of delocalized bonding. The chemistry of some significant functional groups not surveyed in Organic Chemistry I, and the meaning of acidity and basicity in organic chemistry, will be more fully explored. The course will provide an introduction to the systematic synthesis of polyfunctional organic compounds. Recommended background: CH 2310. The course is intended for chemists, chemical engineers and bio-science majors.",
@@ -32110,8 +32110,8 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 80,
-                    "seats_available": 32,
-                    "actual_waitlist": 1,
+                    "seats_available": 31,
+                    "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "C02",
                     "days": [
@@ -77732,7 +77732,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "James Chiarelli",
+                    "professor": "Sarah Stanlick",
                     "start_time": "18:30",
                     "end_time": "20:20",
                     "location": "Salisbury Labs 105",
