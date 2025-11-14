@@ -17,6 +17,19 @@ export interface TermFilterOptions {
     activeTerms: string[];
 }
 
+export interface AvailabilityFilterOptions {
+    idPrefix: string;
+    filterId: string;
+    availableOnly: boolean;
+    minAvailable?: number;
+}
+
+export interface ConflictFilterOptions {
+    idPrefix: string;
+    filterId: string;
+    avoidConflicts: boolean;
+}
+
 export class SharedFilterComponents {
     static escapeHtml(text: string): string {
         const div = document.createElement('div');
@@ -139,6 +152,57 @@ export class SharedFilterComponents {
                     <div class="filter-checkbox-row">
                         ${termCheckboxes}
                     </div>
+                </div>
+            </div>
+        `;
+    }
+
+    static createAvailabilityFilter(options: AvailabilityFilterOptions): string {
+        const { idPrefix, availableOnly, minAvailable } = options;
+
+        const prefix = idPrefix ? `${idPrefix}-` : '';
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Availability</h4>
+                </div>
+                <div class="filter-section-content">
+                    <label class="filter-toggle-label">
+                        <input type="checkbox" class="filter-toggle" id="${prefix}available-only-filter"
+                               ${availableOnly ? 'checked' : ''}>
+                        <span class="filter-toggle-slider"></span>
+                        <span class="filter-toggle-text">Show only sections with available seats</span>
+                    </label>
+                    <div class="filter-range-container" style="margin-top: 0.75rem;">
+                        <div class="filter-range-input">
+                            <label>Minimum Available Seats</label>
+                            <input type="number" id="${prefix}min-seats-filter" min="0" max="999"
+                                   placeholder="Any" value="${minAvailable || ''}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    static createConflictFilter(options: ConflictFilterOptions): string {
+        const { idPrefix, avoidConflicts } = options;
+
+        const prefix = idPrefix ? `${idPrefix}-` : '';
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Schedule Conflicts</h4>
+                </div>
+                <div class="filter-section-content">
+                    <label class="filter-toggle-label">
+                        <input type="checkbox" class="filter-toggle" id="${prefix}avoid-conflicts-filter"
+                               ${avoidConflicts ? 'checked' : ''}>
+                        <span class="filter-toggle-slider"></span>
+                        <span class="filter-toggle-text">Hide periods that conflict with selected sections</span>
+                    </label>
                 </div>
             </div>
         `;

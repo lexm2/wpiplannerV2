@@ -165,6 +165,7 @@ export class FilterModalController {
                 ${this.createRMPRatingFilter()}
                 ${this.createDepartmentFilter()}
                 ${this.createAvailabilityFilter()}
+                ${this.createConflictFilter()}
                 ${this.createCreditRangeFilter()}
                 ${this.createTermFilter()}
             </div>
@@ -251,24 +252,30 @@ export class FilterModalController {
 
     private createAvailabilityFilter(): string {
         if (!this.filterService) return '';
-        
-        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'availability');
-        const isChecked = activeFilter?.criteria?.availableOnly || false;
 
-        return `
-            <div class="filter-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Availability</h4>
-                </div>
-                <div class="filter-section-content">
-                    <label class="filter-toggle-label">
-                        <input type="checkbox" class="filter-toggle" data-filter="availability" ${isChecked ? 'checked' : ''}>
-                        <span class="filter-toggle-slider"></span>
-                        <span class="filter-toggle-text">Show only courses with available seats</span>
-                    </label>
-                </div>
-            </div>
-        `;
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'availability');
+        const availableOnly = activeFilter?.criteria?.availableOnly || false;
+        const minAvailable = activeFilter?.criteria?.minAvailable;
+
+        return SharedFilterComponents.createAvailabilityFilter({
+            idPrefix: '',
+            filterId: 'availability',
+            availableOnly,
+            minAvailable
+        });
+    }
+
+    private createConflictFilter(): string {
+        if (!this.filterService) return '';
+
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'conflict');
+        const avoidConflicts = activeFilter?.criteria?.avoidConflicts || false;
+
+        return SharedFilterComponents.createConflictFilter({
+            idPrefix: '',
+            filterId: 'conflict',
+            avoidConflicts
+        });
     }
 
     private createCreditRangeFilter(): string {
@@ -359,6 +366,7 @@ export class FilterModalController {
         this.setupRMPRatingFilter(modalElement);
         this.setupDepartmentFilter(modalElement);
         this.setupAvailabilityFilter(modalElement);
+        this.setupConflictFilter(modalElement);
         this.setupCreditRangeFilter(modalElement);
         this.setupTermFilter(modalElement);
         this.setupClearAllButton(modalElement);
@@ -430,8 +438,19 @@ export class FilterModalController {
     }
 
     private setupAvailabilityFilter(modalElement: HTMLElement): void {
-        const toggle = modalElement.querySelector('input[data-filter="availability"]') as HTMLInputElement;
-        toggle?.addEventListener('change', () => this.updateAvailabilityFilter(modalElement));
+        SharedFilterSetup.setupAvailabilityFilter({
+            modalElement,
+            idPrefix: '',
+            updateFilter: () => this.updateAvailabilityFilter(modalElement)
+        });
+    }
+
+    private setupConflictFilter(modalElement: HTMLElement): void {
+        SharedFilterSetup.setupConflictFilter({
+            modalElement,
+            idPrefix: '',
+            updateFilter: () => this.updateConflictFilter(modalElement)
+        });
     }
 
     private setupCreditRangeFilter(modalElement: HTMLElement): void {
@@ -743,12 +762,30 @@ export class FilterModalController {
     }
 
     private updateAvailabilityFilter(modalElement: HTMLElement): void {
-        const toggle = modalElement.querySelector('input[data-filter="availability"]') as HTMLInputElement;
-        
-        if (toggle.checked) {
-            this.filterService?.addFilter('availability', { availableOnly: true });
+        const availableOnlyCheckbox = modalElement.querySelector('#available-only-filter') as HTMLInputElement;
+        const minSeatsInput = modalElement.querySelector('#min-seats-filter') as HTMLInputElement;
+
+        const availableOnly = availableOnlyCheckbox?.checked || false;
+        const minAvailable = minSeatsInput?.value ? parseInt(minSeatsInput.value) : undefined;
+
+        if (availableOnly || minAvailable) {
+            this.filterService?.addFilter('availability', {
+                availableOnly,
+                minAvailable: minAvailable || undefined
+            });
         } else {
             this.filterService?.removeFilter('availability');
+        }
+        this.updatePreview(modalElement);
+    }
+
+    private updateConflictFilter(modalElement: HTMLElement): void {
+        const avoidConflictsCheckbox = modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement;
+
+        if (avoidConflictsCheckbox?.checked) {
+            this.filterService?.addFilter('conflict', { avoidConflicts: true });
+        } else {
+            this.filterService?.removeFilter('conflict');
         }
         this.updatePreview(modalElement);
     }

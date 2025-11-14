@@ -31,6 +31,18 @@ export interface TermSetupOptions {
     updateFilter: () => void;
 }
 
+export interface AvailabilitySetupOptions {
+    modalElement: HTMLElement;
+    idPrefix: string;
+    updateFilter: () => void;
+}
+
+export interface ConflictSetupOptions {
+    modalElement: HTMLElement;
+    idPrefix: string;
+    updateFilter: () => void;
+}
+
 export class SharedFilterSetup {
     static setupRMPRatingFilter(
         options: RMPSetupOptions,
@@ -239,5 +251,32 @@ export class SharedFilterSetup {
             checkboxes.forEach(cb => (cb as HTMLInputElement).checked = true);
             updateFilter();
         });
+    }
+
+    static setupAvailabilityFilter(options: AvailabilitySetupOptions): void {
+        const { modalElement, idPrefix, updateFilter } = options;
+        const prefix = idPrefix ? `${idPrefix}-` : '';
+
+        const availableOnlyCheckbox = modalElement.querySelector(`#${prefix}available-only-filter`) as HTMLInputElement;
+        const minSeatsInput = modalElement.querySelector(`#${prefix}min-seats-filter`) as HTMLInputElement;
+
+        if (availableOnlyCheckbox) {
+            availableOnlyCheckbox.addEventListener('change', () => updateFilter());
+        }
+
+        if (minSeatsInput) {
+            minSeatsInput.addEventListener('input', () => updateFilter());
+        }
+    }
+
+    static setupConflictFilter(options: ConflictSetupOptions): void {
+        const { modalElement, idPrefix, updateFilter } = options;
+        const prefix = idPrefix ? `${idPrefix}-` : '';
+
+        const avoidConflictsCheckbox = modalElement.querySelector(`#${prefix}avoid-conflicts-filter`) as HTMLInputElement;
+
+        if (avoidConflictsCheckbox) {
+            avoidConflictsCheckbox.addEventListener('change', () => updateFilter());
+        }
     }
 }

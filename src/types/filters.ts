@@ -57,6 +57,7 @@ export interface DepartmentFilterCriteria {
 
 export interface AvailabilityFilterCriteria {
     availableOnly: boolean;
+    minAvailable?: number;
 }
 
 export interface CreditRangeFilterCriteria {

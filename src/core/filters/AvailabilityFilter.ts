@@ -9,7 +9,7 @@ export class AvailabilityFilter implements SectionBasedFilter {
     readonly priority = 50;
 
     apply(sections: FilterableSection[], criteria: AvailabilityFilterCriteria, activeFilters?: Map<string, any>): FilterableSection[] {
-        if (!criteria.availableOnly) {
+        if (!criteria.availableOnly && !criteria.minAvailable) {
             return sections;
         }
 
@@ -22,15 +22,41 @@ export class AvailabilityFilter implements SectionBasedFilter {
             if (activeTerms && !activeTerms.has(fs.section.computedTerm)) {
                 return false;
             }
-            return fs.section.seatsAvailable > 0;
+
+            // Filter by availability
+            if (criteria.availableOnly && fs.section.seatsAvailable <= 0) {
+                return false;
+            }
+
+            // Filter by minimum available seats
+            if (criteria.minAvailable && fs.section.seatsAvailable < criteria.minAvailable) {
+                return false;
+            }
+
+            return true;
         });
     }
     
     isValidCriteria(criteria: any): criteria is AvailabilityFilterCriteria {
-        return criteria && typeof criteria.availableOnly === 'boolean';
+        if (!criteria || typeof criteria.availableOnly !== 'boolean') {
+            return false;
+        }
+        if (criteria.minAvailable !== undefined && typeof criteria.minAvailable !== 'number') {
+            return false;
+        }
+        return true;
     }
-    
+
     getDisplayValue(criteria: AvailabilityFilterCriteria): string {
-        return criteria.availableOnly ? 'Available seats only' : 'All courses';
+        if (criteria.availableOnly && criteria.minAvailable) {
+            return `Available seats (min ${criteria.minAvailable})`;
+        }
+        if (criteria.availableOnly) {
+            return 'Available seats only';
+        }
+        if (criteria.minAvailable) {
+            return `Min ${criteria.minAvailable} seats`;
+        }
+        return 'All courses';
     }
 }

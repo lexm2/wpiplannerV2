@@ -231,28 +231,12 @@ export class ScheduleFilterModalController {
 
         const activeAvailability = this.getActiveAvailability();
 
-        return `
-            <div class="filter-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Availability</h4>
-                </div>
-                <div class="filter-section-content">
-                    <label class="filter-toggle-label">
-                        <input type="checkbox" class="filter-toggle" id="available-only-filter"
-                               ${activeAvailability.availableOnly ? 'checked' : ''}>
-                        <span class="filter-toggle-slider"></span>
-                        <span class="filter-toggle-text">Show only sections with available seats</span>
-                    </label>
-                    <div class="filter-range-container" style="margin-top: 0.75rem;">
-                        <div class="filter-range-input">
-                            <label>Minimum Available Seats</label>
-                            <input type="number" id="min-seats-filter" min="0" max="999"
-                                   placeholder="Any" value="${activeAvailability.minAvailable || ''}">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+        return SharedFilterComponents.createAvailabilityFilter({
+            idPrefix: '',
+            filterId: 'periodAvailability',
+            availableOnly: activeAvailability.availableOnly,
+            minAvailable: activeAvailability.minAvailable
+        });
     }
 
     private createConflictFilter(): string {
@@ -260,21 +244,11 @@ export class ScheduleFilterModalController {
 
         const activeConflictDetection = this.getActiveConflictDetection();
 
-        return `
-            <div class="filter-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Schedule Conflicts</h4>
-                </div>
-                <div class="filter-section-content">
-                    <label class="filter-toggle-label">
-                        <input type="checkbox" class="filter-toggle" id="avoid-conflicts-filter"
-                               ${activeConflictDetection.avoidConflicts ? 'checked' : ''}>
-                        <span class="filter-toggle-slider"></span>
-                        <span class="filter-toggle-text">Hide periods that conflict with selected sections</span>
-                    </label>
-                </div>
-            </div>
-        `;
+        return SharedFilterComponents.createConflictFilter({
+            idPrefix: '',
+            filterId: 'periodConflict',
+            avoidConflicts: activeConflictDetection.avoidConflicts
+        });
     }
 
     private escapeHtml(text: string): string {
@@ -340,32 +314,25 @@ export class ScheduleFilterModalController {
             });
         });
 
-        // Availability filters
-        const availableOnlyCheckbox = modalElement.querySelector('#available-only-filter') as HTMLInputElement;
-        const minSeatsInput = modalElement.querySelector('#min-seats-filter') as HTMLInputElement;
-
-        if (availableOnlyCheckbox) {
-            availableOnlyCheckbox.addEventListener('change', () => {
+        // Availability filter
+        SharedFilterSetup.setupAvailabilityFilter({
+            modalElement,
+            idPrefix: '',
+            updateFilter: () => {
                 this.updateAvailabilityFilter();
                 this.updatePreview(modalElement);
-            });
-        }
-
-        if (minSeatsInput) {
-            minSeatsInput.addEventListener('input', () => {
-                this.updateAvailabilityFilter();
-                this.updatePreview(modalElement);
-            });
-        }
+            }
+        });
 
         // Conflict detection filter
-        const avoidConflictsCheckbox = modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement;
-        if (avoidConflictsCheckbox) {
-            avoidConflictsCheckbox.addEventListener('change', () => {
+        SharedFilterSetup.setupConflictFilter({
+            modalElement,
+            idPrefix: '',
+            updateFilter: () => {
                 this.updateConflictFilter();
                 this.updatePreview(modalElement);
-            });
-        }
+            }
+        });
 
         // Clear all filters
         modalElement.querySelector('#clear-all-filters')?.addEventListener('click', () => {
