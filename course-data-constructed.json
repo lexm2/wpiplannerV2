@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 14, 2025, 5:33 PM",
+  "generated": "Nov 14, 2025, 5:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -16763,8 +16763,8 @@
               "section": {
                 "crn": 337665,
                 "number": "S01",
-                "seats": 25,
-                "seats_available": 0,
+                "seats": 20,
+                "seats_available": -5,
                 "actual_waitlist": 0,
                 "max_waitlist": 0,
                 "note": null,
@@ -16782,8 +16782,8 @@
                     "location": "Kaven Hall 115",
                     "building": "",
                     "room": "Kaven Hall 115",
-                    "seats": 25,
-                    "seats_available": 0,
+                    "seats": 20,
+                    "seats_available": -5,
                     "actual_waitlist": 0,
                     "max_waitlist": 0,
                     "specific_section": "S01",
@@ -63520,7 +63520,7 @@
                 "number": "DL02",
                 "seats": 90,
                 "seats_available": 0,
-                "actual_waitlist": 18,
+                "actual_waitlist": 19,
                 "max_waitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4527",
                 "description": "Cat. I This is an introductory course in the engineering mechanics sequence that serves as a foundation for other courses in mechanical engineering. The course covers general two- and three-dimensional force and couple systems, distributed loads, resultant forces, moments of forces, free body diagrams, equilibrium of particles and finite sized bodies. Specific topics include friction, trusses, shear forces, bodies subjected to distributed loads, bending moments in beams, and first and second moments of plane areas. Recommended background: Differential (MA 1021) and integral (MA 1022) calculus, vector algebra (MA 1023), and double and triple integration (MA 1024).",
@@ -63539,7 +63539,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 90,
                     "seats_available": 0,
-                    "actual_waitlist": 18,
+                    "actual_waitlist": 19,
                     "max_waitlist": 20,
                     "specific_section": "DL02",
                     "days": [
@@ -72266,7 +72266,7 @@
                 "number": "D01 - Topics In Modern European History",
                 "seats": 20,
                 "seats_available": 0,
-                "actual_waitlist": 3,
+                "actual_waitlist": 2,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "HI 2921 Topics in Modern European History (Cat. II) This seminar course examines topics in the cultural, socio-economic and political history of modern Europe. Topics may vary each year among the following: sport and society, film and history, nationalism, gender and class, political economy, environmental history Readings will include primary and secondary sources. This course may be repeated for different topics . No prior background is required. Students may not receive credit for both HI 3321 and HI 2921. This course will be offered in 2024-25 and in alternating years thereafter.",
@@ -72285,7 +72285,7 @@
                     "room": "Salisbury Labs 011",
                     "seats": 20,
                     "seats_available": 0,
-                    "actual_waitlist": 3,
+                    "actual_waitlist": 2,
                     "max_waitlist": 10,
                     "specific_section": "D01 - Topics In Modern European History",
                     "days": [
@@ -76089,7 +76089,7 @@
             {
               "section": {
                 "crn": 336828,
-                "number": "C08 - PRAC IN HUA: 2D Design to 3D Sculpture",
+                "number": "C08 - PRAC IN HUA: Advanced Contemporary Works",
                 "seats": 12,
                 "seats_available": 6,
                 "actual_waitlist": 0,
@@ -76113,7 +76113,7 @@
                     "seats_available": 6,
                     "actual_waitlist": 0,
                     "max_waitlist": 0,
-                    "specific_section": "C08 - PRAC IN HUA: 2D Design to 3D Sculpture",
+                    "specific_section": "C08 - PRAC IN HUA: Advanced Contemporary Works",
                     "days": [
                       "W"
                     ]
@@ -169340,8 +169340,8 @@
               "section": {
                 "crn": 337665,
                 "number": "S01",
-                "seats": 25,
-                "seats_available": 0,
+                "seats": 20,
+                "seats_available": -5,
                 "actual_waitlist": 0,
                 "max_waitlist": 0,
                 "note": null,
@@ -169359,8 +169359,8 @@
                     "location": "Kaven Hall 115",
                     "building": "",
                     "room": "Kaven Hall 115",
-                    "seats": 25,
-                    "seats_available": 0,
+                    "seats": 20,
+                    "seats_available": -5,
                     "actual_waitlist": 0,
                     "max_waitlist": 0,
                     "specific_section": "S01",
