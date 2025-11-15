@@ -48,8 +48,8 @@
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
     <link rel="shortcut icon" href="./favicon.ico">
-  <script type="module" crossorigin src="/wpiplannerV2/assets/index-Bw1VJZNz.js"></script>
-  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-CzWO3wzP.css">
+  <script type="module" crossorigin src="/wpiplannerV2/assets/index-Vr3wY8c0.js"></script>
+  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-CbKXrcnw.css">
 </head>
 <body>
     <div id="app">
@@ -75,6 +75,7 @@
                     <div class="status-indicator-container">
                         <div id="optimistic-ui-status" class="optimistic-status idle">No changes</div>
                     </div>
+                    <!-- <div id="onedrive-signin-container"></div> -->
                     <div class="undo-redo-controls">
                         <button id="undo-btn" class="btn btn-icon" title="Undo (Ctrl+Z)" disabled></button>
                         <button id="redo-btn" class="btn btn-icon" title="Redo (Ctrl+Y)" disabled></button>
@@ -114,6 +115,8 @@
                     <div class="search-controls">
                         <input type="text" id="search-input" placeholder="Search courses..." class="search-input" aria-label="Search courses">
                         <button id="filter-btn" class="btn btn-secondary filter-btn" title="Filter courses" aria-label="Filter courses">
+                        </button>
+                        <button id="clear-filters-btn" class="btn btn-secondary clear-filters-btn" title="Clear all filters" aria-label="Clear all filters">
                         </button>
                         <button id="mobile-menu-btn" class="btn btn-icon hamburger-btn" title="Menu" aria-label="Toggle menu"></button>
                     </div>
@@ -157,6 +160,8 @@
                         <div class="schedule-filter-controls">
                             <input type="text" id="schedule-search-input" placeholder="Search selected courses..." class="search-input schedule-search-input">
                             <button id="schedule-filter-btn" class="btn btn-secondary filter-btn" title="Filter selected courses">
+                            </button>
+                            <button id="schedule-clear-filters-btn" class="btn btn-secondary clear-filters-btn" title="Clear all filters" aria-label="Clear all filters">
                             </button>
                         </div>
                         <button id="schedule-mobile-close" class="schedule-mobile-close-btn" title="Close menu" aria-label="Close menu"></button>
