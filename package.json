@@ -33,5 +33,9 @@
     "typescript"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@azure/msal-browser": "^4.26.1",
+    "@microsoft/microsoft-graph-client": "^3.0.7"
+  }
 }

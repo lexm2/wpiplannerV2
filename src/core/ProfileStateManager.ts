@@ -4,6 +4,9 @@ import { TransactionalStorageManager, TransactionResult } from './TransactionalS
 import { getAllSections } from '../utils/courseUtils'
 import { UndoRedoManager } from './UndoRedoManager'
 import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
+import { OneDriveSyncService } from '../services/OneDriveSyncService'
+import { ONEDRIVE_CONFIG } from '../config/onedrive.config'
+import type { CloudStateData } from '../services/OneDriveSyncTypes'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -37,11 +40,22 @@ export class ProfileStateManager {
     private allDepartments: Department[] = [];
     private undoRedoManager: UndoRedoManager;
     private isRestoringState = false;
+    private cloudSyncService: OneDriveSyncService | null = null;
 
     constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
         this.state = this.createInitialState();
         this.undoRedoManager = new UndoRedoManager();
+        this.initializeCloudSync();
+    }
+
+    private async initializeCloudSync(): Promise<void> {
+        try {
+            this.cloudSyncService = OneDriveSyncService.getInstance();
+            await this.cloudSyncService.initialize();
+        } catch (error) {
+            console.warn('Cloud sync initialization failed:', error);
+        }
     }
 
     setCourseData(departments: Department[]): void {
@@ -500,6 +514,10 @@ export class ProfileStateManager {
             if (previousUnsavedState) {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
             }
+
+            if (ONEDRIVE_CONFIG.autoSyncEnabled && this.cloudSyncService?.isAuthenticated()) {
+                this.syncToCloud();
+            }
         } catch (error) {
             console.error('Save failed:', error);
         }
@@ -625,6 +643,45 @@ export class ProfileStateManager {
             this.emitEvent('schedule_changed', { action: 'imported' }, 'system');
         }
         return result;
+    }
+
+    private async syncToCloud(): Promise<void> {
+        if (!this.cloudSyncService) return;
+
+        try {
+            const exportedData = await this.exportData();
+            if (!exportedData) return;
+
+            const cloudData: CloudStateData = JSON.parse(exportedData);
+            await this.cloudSyncService.syncToCloud(cloudData);
+        } catch (error) {
+            console.error('Cloud sync failed:', error);
+        }
+    }
+
+    async pullFromCloudAndMerge(): Promise<boolean> {
+        if (!this.cloudSyncService?.isAuthenticated()) {
+            console.warn('Not authenticated with OneDrive');
+            return false;
+        }
+
+        try {
+            const result = await this.cloudSyncService.pullFromCloud();
+            if (result.success && result.data) {
+                const cloudData = result.data as CloudStateData;
+                const jsonData = JSON.stringify(cloudData);
+                const importResult = await this.importData(jsonData);
+                return importResult.success;
+            }
+            return false;
+        } catch (error) {
+            console.error('Failed to pull from cloud:', error);
+            return false;
+        }
+    }
+
+    getCloudSyncService(): OneDriveSyncService | null {
+        return this.cloudSyncService;
     }
 
     // Health check

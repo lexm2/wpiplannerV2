@@ -30,6 +30,10 @@ import { ThemeManager } from '../../themes/ThemeManager'
 import { DataUpdateService } from '../../services/DataUpdateService'
 import type { DataUpdateAvailableEvent } from '../../types/worker'
 import { getInlineSVG } from '../../utils/iconPaths'
+import { OneDriveSignIn } from '../components/OneDriveSignIn'
+import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
+import { OneDriveSyncService } from '../../services/OneDriveSyncService'
+import type { SyncEvent, ConflictData, CloudStateData } from '../../services/OneDriveSyncTypes'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -61,6 +65,9 @@ export class MainController {
     private departmentSyncService: DepartmentSyncService;
     private scheduleManagementService: ScheduleManagementService;
     private dataUpdateService: DataUpdateService;
+    private oneDriveSignIn: OneDriveSignIn;
+    private conflictModal: ConflictResolutionModal;
+    private oneDriveSyncService: OneDriveSyncService;
     private allDepartments: Department[] = [];
 
 
@@ -97,7 +104,12 @@ export class MainController {
 
         // Initialize data update service
         this.dataUpdateService = new DataUpdateService();
-        
+
+        // Initialize OneDrive sync components
+        this.oneDriveSignIn = new OneDriveSignIn();
+        this.conflictModal = new ConflictResolutionModal();
+        this.oneDriveSyncService = OneDriveSyncService.getInstance();
+
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
         this.scheduleController = new ScheduleController(this.courseSelectionService);
@@ -186,6 +198,8 @@ export class MainController {
             
             this.setupEventListeners();
             this.setupSaveIndicatorListener();
+            this.setupOneDriveSyncListeners();
+            this.oneDriveSignIn.render('onedrive-signin-container');
             this.setupCourseSelectionListener();
             this.setupScheduleChangeListener();
             this.scheduleController.setupAutoScheduleButton();
@@ -760,6 +774,78 @@ export class MainController {
         this.profileStateManager.addListener((event) => {
             if (event.type === 'save_state_changed') {
                 this.updateSaveIndicator(event.data.hasUnsavedChanges);
+            }
+        });
+    }
+
+    private setupOneDriveSyncListeners(): void {
+        this.oneDriveSyncService.addEventListener((event: SyncEvent) => {
+            this.handleSyncEvent(event);
+        });
+    }
+
+    private handleSyncEvent(event: SyncEvent): void {
+        const indicator = document.getElementById('optimistic-ui-status');
+        if (!indicator) return;
+
+        switch (event.type) {
+            case 'sync-started':
+                indicator.textContent = 'Syncing to cloud...';
+                indicator.className = 'optimistic-status syncing';
+                break;
+            case 'sync-completed':
+                indicator.textContent = 'Synced to cloud';
+                indicator.className = 'optimistic-status synced';
+                setTimeout(() => {
+                    indicator.textContent = 'No changes';
+                    indicator.className = 'optimistic-status idle';
+                }, 1500);
+                break;
+            case 'sync-failed':
+                indicator.textContent = 'Sync error';
+                indicator.className = 'optimistic-status error';
+                setTimeout(() => {
+                    indicator.textContent = 'No changes';
+                    indicator.className = 'optimistic-status idle';
+                }, 3000);
+                break;
+            case 'sync-conflict':
+                indicator.textContent = 'Sync conflict';
+                indicator.className = 'optimistic-status conflict';
+                this.handleSyncConflict(event.data as ConflictData);
+                break;
+            case 'offline-mode':
+                indicator.textContent = 'Offline mode';
+                indicator.className = 'optimistic-status offline';
+                break;
+            case 'online-mode':
+                indicator.textContent = 'No changes';
+                indicator.className = 'optimistic-status idle';
+                break;
+        }
+    }
+
+    private handleSyncConflict(conflictData: ConflictData): void {
+        this.conflictModal.show(conflictData, async (resolution) => {
+            if (resolution === 'cancel') {
+                const indicator = document.getElementById('optimistic-ui-status');
+                if (indicator) {
+                    indicator.textContent = 'No changes';
+                    indicator.className = 'optimistic-status idle';
+                }
+                return;
+            }
+
+            const result = await this.oneDriveSyncService.resolveConflict(
+                resolution,
+                conflictData.local,
+                conflictData.cloud
+            );
+
+            if (result.success) {
+                if (resolution === 'keep-cloud') {
+                    await this.profileStateManager.pullFromCloudAndMerge();
+                }
             }
         });
     }
