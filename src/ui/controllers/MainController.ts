@@ -168,9 +168,17 @@ export class MainController {
         this.filterService.addEventListener((_event) => {
             this.refreshCurrentView();
         });
-        
-        // Initialize filter button state
-        setTimeout(() => this.updateFilterButtonState(), 100);
+
+        // Set up schedule filter change listener
+        this.scheduleFilterService.addEventListener((_event) => {
+            this.scheduleController.refreshCourses();
+        });
+
+        // Initialize filter button states
+        setTimeout(() => {
+            this.updateFilterButtonState();
+            this.updateScheduleFilterButtonState();
+        }, 100);
     }
 
     private async init(): Promise<void> {
@@ -580,6 +588,19 @@ export class MainController {
             });
         }
 
+        // Clear filters button
+        const clearFiltersButton = document.getElementById('clear-filters-btn');
+        if (clearFiltersButton) {
+            clearFiltersButton.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'eraser-icon'));
+            clearFiltersButton.addEventListener('click', () => {
+                if (this.filterService) {
+                    this.filterService.clearFilters();
+                    this.updateFilterButtonState();
+                    this.updateClearFiltersButtonState();
+                }
+            });
+        }
+
         // Schedule filter button
         const scheduleFilterButton = document.getElementById('schedule-filter-btn');
         if (scheduleFilterButton) {
@@ -588,6 +609,19 @@ export class MainController {
                 const selectedCourses = this.courseSelectionService.getSelectedCourses();
                 this.scheduleFilterModalController.setSelectedCourses(selectedCourses);
                 this.scheduleFilterModalController.show();
+            });
+        }
+
+        // Schedule clear filters button
+        const scheduleClearFiltersButton = document.getElementById('schedule-clear-filters-btn');
+        if (scheduleClearFiltersButton) {
+            scheduleClearFiltersButton.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'eraser-icon'));
+            scheduleClearFiltersButton.addEventListener('click', () => {
+                if (this.scheduleFilterService) {
+                    this.scheduleFilterService.clearFilters();
+                    this.updateScheduleFilterButtonState();
+                    this.updateScheduleClearFiltersButtonState();
+                }
             });
         }
 
@@ -734,13 +768,59 @@ export class MainController {
         if (filterButton && this.filterService) {
             const hasActiveFilters = !this.filterService.isEmpty();
             const filterCount = this.filterService.getFilterCount();
-            
+
             if (hasActiveFilters) {
                 filterButton.classList.add('active');
                 filterButton.title = `${filterCount} filter${filterCount === 1 ? '' : 's'} active - Click to modify`;
             } else {
                 filterButton.classList.remove('active');
                 filterButton.title = 'Filter courses';
+            }
+        }
+        this.updateClearFiltersButtonState();
+    }
+
+    private updateClearFiltersButtonState(): void {
+        const clearFiltersButton = document.getElementById('clear-filters-btn');
+        if (clearFiltersButton && this.filterService) {
+            const hasActiveFilters = !this.filterService.isEmpty();
+
+            if (hasActiveFilters) {
+                clearFiltersButton.style.display = '';
+                clearFiltersButton.disabled = false;
+            } else {
+                clearFiltersButton.style.display = 'none';
+            }
+        }
+    }
+
+    private updateScheduleFilterButtonState(): void {
+        const scheduleFilterButton = document.getElementById('schedule-filter-btn');
+        if (scheduleFilterButton && this.scheduleFilterService) {
+            const hasActiveFilters = !this.scheduleFilterService.isEmpty();
+            const filterCount = this.scheduleFilterService.getFilterCount();
+
+            if (hasActiveFilters) {
+                scheduleFilterButton.classList.add('active');
+                scheduleFilterButton.title = `${filterCount} filter${filterCount === 1 ? '' : 's'} active - Click to modify`;
+            } else {
+                scheduleFilterButton.classList.remove('active');
+                scheduleFilterButton.title = 'Filter selected courses';
+            }
+        }
+        this.updateScheduleClearFiltersButtonState();
+    }
+
+    private updateScheduleClearFiltersButtonState(): void {
+        const scheduleClearFiltersButton = document.getElementById('schedule-clear-filters-btn');
+        if (scheduleClearFiltersButton && this.scheduleFilterService) {
+            const hasActiveFilters = !this.scheduleFilterService.isEmpty();
+
+            if (hasActiveFilters) {
+                scheduleClearFiltersButton.style.display = '';
+                scheduleClearFiltersButton.disabled = false;
+            } else {
+                scheduleClearFiltersButton.style.display = 'none';
             }
         }
     }

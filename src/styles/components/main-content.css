@@ -41,7 +41,30 @@
   height: 18px;
   display: block;
   pointer-events: none;
-  fill: currentColor;
+  color: inherit;
+}
+
+.clear-filters-btn {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 100%;
+  transition: opacity 0.2s ease;
+}
+
+.clear-filters-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.eraser-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  pointer-events: none;
   color: inherit;
 }
 

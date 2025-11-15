@@ -95,7 +95,7 @@
 }
 
 /* Conflict Resolution Modal */
-.modal {
+#conflict-resolution-modal.modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -107,11 +107,11 @@
     justify-content: center;
 }
 
-.modal.visible {
+#conflict-resolution-modal.modal.visible {
     display: flex;
 }
 
-.modal-backdrop {
+#conflict-resolution-modal .modal-backdrop {
     position: absolute;
     top: 0;
     left: 0;
@@ -121,7 +121,7 @@
     backdrop-filter: blur(2px);
 }
 
-.modal-content {
+#conflict-resolution-modal .modal-content {
     position: relative;
     background: var(--bg-primary);
     border-radius: 12px;
@@ -134,7 +134,7 @@
     flex-direction: column;
 }
 
-.modal-header {
+#conflict-resolution-modal .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -142,13 +142,13 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-.modal-header h2 {
+#conflict-resolution-modal .modal-header h2 {
     margin: 0;
     font-size: 1.5rem;
     color: var(--text-primary);
 }
 
-.modal-close {
+#conflict-resolution-modal .modal-close {
     background: none;
     border: none;
     font-size: 2rem;
@@ -164,12 +164,12 @@
     transition: all 0.2s ease;
 }
 
-.modal-close:hover {
+#conflict-resolution-modal .modal-close:hover {
     background: var(--bg-hover);
     color: var(--text-primary);
 }
 
-.modal-body {
+#conflict-resolution-modal .modal-body {
     padding: 1.5rem;
     overflow-y: auto;
     flex: 1;
@@ -247,7 +247,7 @@
     margin-bottom: 0.25rem;
 }
 
-.modal-footer {
+#conflict-resolution-modal .modal-footer {
     display: flex;
     gap: 0.75rem;
     padding: 1.5rem;
@@ -255,7 +255,7 @@
     justify-content: flex-end;
 }
 
-.btn {
+#conflict-resolution-modal .btn {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 6px;
@@ -265,47 +265,47 @@
     transition: all 0.2s ease;
 }
 
-.btn-primary {
+#conflict-resolution-modal .btn-primary {
     background: var(--primary-color);
     color: white;
 }
 
-.btn-primary:hover {
+#conflict-resolution-modal .btn-primary:hover {
     background: var(--primary-hover);
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.btn-primary:active {
+#conflict-resolution-modal .btn-primary:active {
     transform: translateY(0);
 }
 
-.btn-secondary {
+#conflict-resolution-modal .btn-secondary {
     background: var(--bg-secondary);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
 }
 
-.btn-secondary:hover {
+#conflict-resolution-modal .btn-secondary:hover {
     background: var(--bg-hover);
     border-color: var(--border-hover);
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .conflict-comparison {
+    #conflict-resolution-modal .conflict-comparison {
         grid-template-columns: 1fr;
     }
 
-    .modal-content {
+    #conflict-resolution-modal .modal-content {
         max-width: 95%;
     }
 
-    .modal-footer {
+    #conflict-resolution-modal .modal-footer {
         flex-direction: column;
     }
 
-    .btn {
+    #conflict-resolution-modal .btn {
         width: 100%;
     }
 }
