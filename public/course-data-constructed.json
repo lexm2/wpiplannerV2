@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 15, 2025, 7:48 PM",
+  "generated": "Nov 15, 2025, 8:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -1997,7 +1997,7 @@
                 "crn": 343142,
                 "number": "D01",
                 "seats": 60,
-                "seats_available": 34,
+                "seats_available": 33,
                 "actual_waitlist": 0,
                 "max_waitlist": 15,
                 "note": null,
@@ -2016,7 +2016,7 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 60,
-                    "seats_available": 34,
+                    "seats_available": 33,
                     "actual_waitlist": 0,
                     "max_waitlist": 15,
                     "specific_section": "D01",
