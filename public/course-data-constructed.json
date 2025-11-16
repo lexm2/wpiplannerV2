@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 16, 2025, 11:29 PM",
+  "generated": "Nov 16, 2025, 11:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -62645,7 +62645,7 @@
                 "number": "C01",
                 "seats": 20,
                 "seats_available": 0,
-                "actual_waitlist": 0,
+                "actual_waitlist": 1,
                 "max_waitlist": 5,
                 "note": null,
                 "description": "Systems Thinking is a holistic approach to problem solving that recognizes that system behavior and performance are the result of underlying structures. Systems Thinking provides tools that enable program managers, systems engineers, scientists, economists, and business managers to identify, understand, and control systems in order to improve system performance. The Systems Thinking analysis accounts for feedback and resistance to change often exhibited by real world systems. In this course, students will study system identification and delineation, causal loops and feedback diagrams, stock-and-flow diagrams, system leverage points, delays and oscillations, mental models and unintended consequences, and behavior patterns; and use these concepts to improve the performance of engineering, business, and complex social systems. The course will explore great system failures, how they might have been avoided, and how we can learn from them. Finally, students will learn how Systems Thinking explains the occasional irrational behavior of individuals, departments, businesses, and governments. Examples covered in this course may include the failure of strictly technological “fixes” to social issues (as in the government’s installation of wells in Togo in the 1980s,) the 2008 financial meltdown, the failure of the Lockheed L-188 Electra Turboprop Airplane, the failure of the Tacoma Narrows Bridge (“Galloping Gertie”) in 1940, the decline of many commercial fisheries around the world, the failure and success of companies like Research In Motion and Apple, and the unintended consequences of combating drug-related crime. Recommended background: None.",
@@ -62664,7 +62664,7 @@
                     "room": "Kaven Hall 204",
                     "seats": 20,
                     "seats_available": 0,
-                    "actual_waitlist": 0,
+                    "actual_waitlist": 1,
                     "max_waitlist": 5,
                     "specific_section": "C01",
                     "days": [
