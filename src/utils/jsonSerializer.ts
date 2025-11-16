@@ -1,15 +1,4 @@
-/**
- * Centralized JSON serialization utilities for handling circular references
- * and complex data types in the course/schedule data model.
- *
- * ROOT CAUSE OF CIRCULAR REFERENCES:
- * - Course.department contains a Department object
- * - Department.courses contains an array of Course objects
- * - This creates: Course → Department → Course[] → ... (infinite loop)
- *
- * This utility provides a safe serialization mechanism that breaks the cycle
- * by stripping unnecessary data during JSON serialization.
- */
+// Safely serializes and deserializes complex data with circular references (Course ↔ Department) and Set objects.
 
 /**
  * Creates a JSON replacer function that handles:

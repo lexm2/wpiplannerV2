@@ -1,8 +1,4 @@
-/**
- * ICS Calendar Generator
- * Exports WPI course schedules to iCalendar (.ics) format
- * Compatible with Google Calendar, Outlook, Apple Calendar, etc.
- */
+// Exports WPI course schedules to iCalendar (.ics) format compatible with Google Calendar, Outlook, and Apple Calendar.
 
 import { Schedule, SelectedCourse } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';

@@ -316,14 +316,6 @@ export class CourseDataService {
     }
 
     /**
-     * ═══════════════════════════════════════════════════════════════════════════════
-     * NEW HIERARCHICAL STRUCTURE HELPER METHODS
-     * ═══════════════════════════════════════════════════════════════════════════════
-     * These methods provide access to the NEW hierarchical course structure with
-     * lectures, compatible discussions, and compatible labs.
-     */
-
-    /**
      * Gets all lecture groups for a course
      * Returns empty array if course uses old flat structure or is lab-only
      */

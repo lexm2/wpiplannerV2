@@ -1,7 +1,4 @@
-/**
- * NEW HIERARCHICAL STRUCTURE
- * Courses now use lecture groups instead of flat combined sections
- */
+// Hierarchical course structure with lecture groups and compatible discussions/labs.
 export interface LectureGroup {
     section: Section;                 // The lecture section itself
     compatibleDiscussions: Section[]; // Discussions that work with this lecture

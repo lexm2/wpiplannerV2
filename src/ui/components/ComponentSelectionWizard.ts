@@ -1,16 +1,5 @@
-/**
- * ComponentSelectionWizard - Inline sidebar wizard for selecting course components
- *
- * Redesigned for sidebar integration with horizontal sliding panels.
- * Shows course list ↔ wizard steps (lectures → discussions → labs).
- *
- * Features:
- * - Inline rendering in sidebar (no overlay)
- * - Horizontal slide animations
- * - Smart step skipping (auto-skip if no options)
- * - Breadcrumb navigation
- * - Pre-selection support for editing
- */
+// Sidebar wizard for selecting course components (lectures, discussions, labs)
+// Supports inline rendering with horizontal slide animations and step skipping
 
 import { Course, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
