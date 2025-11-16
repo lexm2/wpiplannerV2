@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 16, 2025, 2:30 PM",
+  "generated": "Nov 16, 2025, 2:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -47979,7 +47979,7 @@
                 "number": "S01",
                 "seats": 15,
                 "seats_available": 0,
-                "actual_waitlist": 4,
+                "actual_waitlist": 5,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "This course acquaints participants with the fundamental concepts and state-of-the-art computer science research in mobile and ubiquitous computing. Topics covered include mobile systems issues, human activity and emotion sensing, location sensing, mobile HCI, mobile social networking, mobile health, power saving techniques, energy and mobile performance measurement studies and mobile security. The course consists of weekly presentations on current advanced literature, discussions and a term project. The term project involves implementing research ideas on a mobile device such as a smartphone. Prerequisite: CS 502 or an equivalent graduate level course in Operating Systems, and CS 513 or an equivalent graduate level course in Computer Networks, and proficiency in a high level programming language.",
@@ -47998,7 +47998,7 @@
                     "room": "Salisbury Labs 305",
                     "seats": 15,
                     "seats_available": 0,
-                    "actual_waitlist": 4,
+                    "actual_waitlist": 5,
                     "max_waitlist": 10,
                     "specific_section": "S01",
                     "days": [
