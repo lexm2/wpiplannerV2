@@ -20,6 +20,18 @@ interface ScheduleResult {
 }
 
 export class ScheduleScorer {
+  private static readonly PERFECT_GAP_MINUTES = 10;
+  private static readonly PERFECT_GAP_SCORE = 50;
+  private static readonly EARLY_MORNING_HOUR = 8;
+  private static readonly EARLY_MORNING_MINUTE = 0;
+  private static readonly EARLY_MORNING_PENALTY = -100;
+  private static readonly MAX_PROFESSOR_RATING = 5.0;
+  private static readonly PROFESSOR_RATING_MULTIPLIER = 200;
+  private static readonly DEFAULT_PROFESSOR_SCORE = 100;
+  private static readonly OPTIMAL_COURSES_PER_TERM = 3;
+  private static readonly OPTIMAL_TERM_SCORE = 200;
+  private static readonly UNDER_OPTIMAL_SCORE = 100;
+  private static readonly OVER_OPTIMAL_PENALTY = -150;
   calculateCompositeScore(
     schedule: ScheduleResult[],
     preferences: SchedulePreferences,
@@ -82,13 +94,13 @@ export class ScheduleScorer {
         const nextStartMinutes = periodsOnDay[i + 1].startTime.hours * 60 + periodsOnDay[i + 1].startTime.minutes;
         const gap = nextStartMinutes - endMinutes;
 
-        if (gap === 10) {
+        if (gap === ScheduleScorer.PERFECT_GAP_MINUTES) {
           perfectGapsCount++;
         }
       }
     }
 
-    return perfectGapsCount * 50;
+    return perfectGapsCount * ScheduleScorer.PERFECT_GAP_SCORE;
   }
 
 
@@ -116,13 +128,13 @@ export class ScheduleScorer {
 
     for (const section of allSections) {
       for (const period of section.periods) {
-        if (period.startTime.hours === 8 && period.startTime.minutes === 0) {
+        if (period.startTime.hours === ScheduleScorer.EARLY_MORNING_HOUR && period.startTime.minutes === ScheduleScorer.EARLY_MORNING_MINUTE) {
           earlyMorningCount++;
         }
       }
     }
 
-    return earlyMorningCount * -100;
+    return earlyMorningCount * ScheduleScorer.EARLY_MORNING_PENALTY;
   }
 
   private calculateProfessorRatingScore(schedule: ScheduleResult[]): number {
@@ -142,21 +154,21 @@ export class ScheduleScorer {
       }
     }
 
-    if (ratedProfessors === 0) return 100;
+    if (ratedProfessors === 0) return ScheduleScorer.DEFAULT_PROFESSOR_SCORE;
 
     const avgRating = totalRating / ratedProfessors;
-    return (avgRating / 5.0) * 200;
+    return (avgRating / ScheduleScorer.MAX_PROFESSOR_RATING) * ScheduleScorer.PROFESSOR_RATING_MULTIPLIER;
   }
 
   private calculateClassesPerTermScore(schedule: ScheduleResult[]): number {
     const courseCount = schedule.length;
 
-    if (courseCount === 3) {
-      return 200;
-    } else if (courseCount < 3) {
-      return 100;
+    if (courseCount === ScheduleScorer.OPTIMAL_COURSES_PER_TERM) {
+      return ScheduleScorer.OPTIMAL_TERM_SCORE;
+    } else if (courseCount < ScheduleScorer.OPTIMAL_COURSES_PER_TERM) {
+      return ScheduleScorer.UNDER_OPTIMAL_SCORE;
     } else {
-      return -150;
+      return ScheduleScorer.OVER_OPTIMAL_PENALTY;
     }
   }
 }

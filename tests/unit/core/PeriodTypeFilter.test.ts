@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { PeriodTypeFilter } from '../../../src/core/filters/PeriodTypeFilter';
-import { Period } from '../../../src/types/types';
+import { Period, PeriodType } from '../../../src/types/types';
 
 describe('PeriodTypeFilter', () => {
     let periodTypeFilter: PeriodTypeFilter;
@@ -101,11 +101,11 @@ describe('PeriodTypeFilter', () => {
     });
 
     describe('applyToPeriods - Exclusion Logic', () => {
-        const createPeriod = (type: string): Period => ({
+        const createPeriod = (type: PeriodType): Period => ({
             type,
             professor: 'Prof Smith',
-            startTime: { hours: 9, minutes: 0 },
-            endTime: { hours: 10, minutes: 50 },
+            startTime: { hours: 9, minutes: 0, displayTime: '9:00 AM' },
+            endTime: { hours: 10, minutes: 50, displayTime: '10:50 AM' },
             days: new Set(['mon', 'wed', 'fri']),
             location: 'SL 123',
             building: 'SL',
@@ -118,9 +118,9 @@ describe('PeriodTypeFilter', () => {
 
         test('should return all periods when no types are excluded', () => {
             const periods = [
-                createPeriod('Lecture'),
-                createPeriod('Lab'),
-                createPeriod('Discussion')
+                createPeriod(PeriodType.LECTURE),
+                createPeriod(PeriodType.LAB),
+                createPeriod(PeriodType.DISCUSSION)
             ];
 
             const result = periodTypeFilter.applyToPeriods(periods, { types: [] });
@@ -129,9 +129,9 @@ describe('PeriodTypeFilter', () => {
         });
 
         test('should exclude Lab periods', () => {
-            const lecturePeriod = createPeriod('Lecture');
-            const labPeriod = createPeriod('Lab');
-            const discussionPeriod = createPeriod('Discussion');
+            const lecturePeriod = createPeriod(PeriodType.LECTURE);
+            const labPeriod = createPeriod(PeriodType.LAB);
+            const discussionPeriod = createPeriod(PeriodType.DISCUSSION);
 
             const periods = [lecturePeriod, labPeriod, discussionPeriod];
 
@@ -145,10 +145,10 @@ describe('PeriodTypeFilter', () => {
         });
 
         test('should exclude multiple period types', () => {
-            const lecturePeriod = createPeriod('Lecture');
-            const labPeriod = createPeriod('Lab');
-            const discussionPeriod = createPeriod('Discussion');
-            const seminarPeriod = createPeriod('Seminar');
+            const lecturePeriod = createPeriod(PeriodType.LECTURE);
+            const labPeriod = createPeriod(PeriodType.LAB);
+            const discussionPeriod = createPeriod(PeriodType.DISCUSSION);
+            const seminarPeriod = createPeriod(PeriodType.SEMINAR);
 
             const periods = [lecturePeriod, labPeriod, discussionPeriod, seminarPeriod];
 
@@ -164,40 +164,40 @@ describe('PeriodTypeFilter', () => {
 
         test('should handle case insensitive type matching', () => {
             const periods = [
-                createPeriod('LECTURE'),
-                createPeriod('Lab'),
-                createPeriod('discussion')
+                createPeriod(PeriodType.LECTURE),
+                createPeriod(PeriodType.LAB),
+                createPeriod(PeriodType.DISCUSSION)
             ];
 
             const result = periodTypeFilter.applyToPeriods(periods, { types: ['lecture'] });
 
             // Should exclude LECTURE period regardless of case
             expect(result).toHaveLength(2);
-            expect(result[0].type).toBe('Lab');
-            expect(result[1].type).toBe('discussion');
+            expect(result[0].type).toBe(PeriodType.LAB);
+            expect(result[1].type).toBe(PeriodType.DISCUSSION);
         });
 
         test('should handle type normalization in exclusion', () => {
             const periods = [
-                createPeriod('LEC'),      // normalizes to 'lecture'
-                createPeriod('Laboratory'), // normalizes to 'lab'
-                createPeriod('DIS'),      // normalizes to 'discussion'
-                createPeriod('REC')       // normalizes to 'recitation'
+                createPeriod(PeriodType.LECTURE),
+                createPeriod(PeriodType.LAB),
+                createPeriod(PeriodType.DISCUSSION),
+                createPeriod(PeriodType.SEMINAR)
             ];
 
             const result = periodTypeFilter.applyToPeriods(periods, { types: ['lecture', 'lab'] });
 
-            // Should exclude LEC and Laboratory periods
+            // Should exclude Lecture and Lab periods
             expect(result).toHaveLength(2);
-            expect(result[0].type).toBe('DIS');
-            expect(result[1].type).toBe('REC');
+            expect(result[0].type).toBe(PeriodType.DISCUSSION);
+            expect(result[1].type).toBe(PeriodType.SEMINAR);
         });
 
         test('should handle unknown types gracefully', () => {
             const periods = [
-                createPeriod('Lecture'),
-                createPeriod('Lab'),
-                createPeriod('CustomType')
+                createPeriod(PeriodType.LECTURE),
+                createPeriod(PeriodType.LAB),
+                createPeriod(PeriodType.WORKSHOP)
             ];
 
             const result = periodTypeFilter.applyToPeriods(periods, { types: ['unknown'] });
@@ -209,13 +209,13 @@ describe('PeriodTypeFilter', () => {
 
         test('should exclude all periods when all types are excluded', () => {
             const periods = [
-                createPeriod('Lecture'),
-                createPeriod('Lab'),
-                createPeriod('Discussion')
+                createPeriod(PeriodType.LECTURE),
+                createPeriod(PeriodType.LAB),
+                createPeriod(PeriodType.DISCUSSION)
             ];
 
-            const result = periodTypeFilter.applyToPeriods(periods, { 
-                types: ['lecture', 'lab', 'discussion'] 
+            const result = periodTypeFilter.applyToPeriods(periods, {
+                types: ['lecture', 'lab', 'discussion']
             });
 
             // Should exclude all periods
@@ -227,23 +227,23 @@ describe('PeriodTypeFilter', () => {
         test('should provide correct exclusion behavior for section filtering', () => {
             // Test that the filter logic works correctly when applied to section periods
             const sectionWithLab = [
-                { type: 'Lecture' },
-                { type: 'Lab' }
+                { type: PeriodType.LECTURE },
+                { type: PeriodType.LAB }
             ] as Period[];
 
             const sectionWithoutLab = [
-                { type: 'Lecture' },
-                { type: 'Discussion' }
+                { type: PeriodType.LECTURE },
+                { type: PeriodType.DISCUSSION }
             ] as Period[];
 
-            // When filtering section periods, if ANY period is excluded, 
+            // When filtering section periods, if ANY period is excluded,
             // the section should be considered as having excluded content
             const resultWithLab = periodTypeFilter.applyToPeriods(sectionWithLab, { types: ['lab'] });
             const resultWithoutLab = periodTypeFilter.applyToPeriods(sectionWithoutLab, { types: ['lab'] });
 
             // Section with Lab should have some periods filtered out
             expect(resultWithLab.length).toBeLessThan(sectionWithLab.length);
-            
+
             // Section without Lab should have all periods remain
             expect(resultWithoutLab.length).toBe(sectionWithoutLab.length);
         });

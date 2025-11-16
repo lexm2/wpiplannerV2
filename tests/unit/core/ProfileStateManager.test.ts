@@ -108,7 +108,7 @@ describe('ProfileStateManager', () => {
   describe('Course Selection Management', () => {
     it('should select course successfully', async () => {
       const listeners: StateChangeEvent[] = []
-      
+
       // Add listener after setup is complete
       profileStateManager.addListener((event) => listeners.push(event))
 
@@ -120,61 +120,54 @@ describe('ProfileStateManager', () => {
       expect(state.selectedCourses[0].isRequired).toBe(false)
       expect(state.hasUnsavedChanges).toBe(true)
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      // Should only receive the course selection event
-      const courseEvents = listeners.filter(e => e.type === 'courses_changed' && e.data.action === 'selected')
-      expect(courseEvents.length).toBe(1)
-      expect(courseEvents[0].data.action).toBe('selected')
+      await vi.waitFor(() => {
+        const courseEvents = listeners.filter(e => e.type === 'courses_changed' && e.data.action === 'selected')
+        expect(courseEvents.length).toBe(1)
+        expect(courseEvents[0].data.action).toBe('selected')
+      })
     })
 
     it('should unselect course successfully', async () => {
       // First select a course
       profileStateManager.selectCourse(mockCourse, false, 'test')
 
-      // Wait for select events to complete
-      await new Promise(resolve => setTimeout(resolve, 10))
-
       const listeners: StateChangeEvent[] = []
-      profileStateManager.addListener((event) => listeners.push(event))
 
-      // Then unselect it
-      profileStateManager.unselectCourse(mockCourse, 'test')
+      await vi.waitFor(() => {
+        profileStateManager.addListener((event) => listeners.push(event))
+        profileStateManager.unselectCourse(mockCourse, 'test')
+      })
 
       const state = profileStateManager.getState()
       expect(state.selectedCourses.length).toBe(0)
       expect(state.hasUnsavedChanges).toBe(true)
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(listeners.length).toBe(1)
-      expect(listeners[0].type).toBe('courses_changed')
-      expect(listeners[0].data.action).toBe('unselected')
+      await vi.waitFor(() => {
+        expect(listeners.length).toBe(1)
+        expect(listeners[0].type).toBe('courses_changed')
+        expect(listeners[0].data.action).toBe('unselected')
+      })
     })
 
     it('should set selected section successfully', async () => {
       profileStateManager.selectCourse(mockCourse, false, 'test')
 
-      // Wait for select events to complete
-      await new Promise(resolve => setTimeout(resolve, 10))
-
       const listeners: StateChangeEvent[] = []
-      profileStateManager.addListener((event) => listeners.push(event))
 
-      profileStateManager.setSelectedSection(mockCourse, 'A01', 'test')
+      await vi.waitFor(() => {
+        profileStateManager.addListener((event) => listeners.push(event))
+        profileStateManager.setSelectedSection(mockCourse, 'A01', 'test')
+      })
 
       const state = profileStateManager.getState()
       const selectedCourse = state.selectedCourses.find(sc => sc.course.id === mockCourse.id)
       expect(selectedCourse?.selectedLecture?.number).toBe('A01')
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(listeners.length).toBe(1)
-      expect(listeners[0].type).toBe('courses_changed')
-      expect(listeners[0].data.action).toBe('section_changed')
+      await vi.waitFor(() => {
+        expect(listeners.length).toBe(1)
+        expect(listeners[0].type).toBe('courses_changed')
+        expect(listeners[0].data.action).toBe('section_changed')
+      })
     })
 
     it('should clear all selections', async () => {
@@ -188,31 +181,26 @@ describe('ProfileStateManager', () => {
 
       expect(profileStateManager.getState().selectedCourses.length).toBe(2)
 
-      // Wait for select events to complete
-      await new Promise(resolve => setTimeout(resolve, 10))
-
       const listeners: StateChangeEvent[] = []
-      profileStateManager.addListener((event) => listeners.push(event))
 
-      profileStateManager.clearAllSelections('test')
+      await vi.waitFor(() => {
+        profileStateManager.addListener((event) => listeners.push(event))
+        profileStateManager.clearAllSelections('test')
+      })
 
       const state = profileStateManager.getState()
       expect(state.selectedCourses.length).toBe(0)
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(listeners.length).toBe(1)
-      expect(listeners[0].type).toBe('courses_changed')
-      expect(listeners[0].data.action).toBe('cleared')
+      await vi.waitFor(() => {
+        expect(listeners.length).toBe(1)
+        expect(listeners[0].type).toBe('courses_changed')
+        expect(listeners[0].data.action).toBe('cleared')
+      })
     })
   })
 
   describe('Schedule Management', () => {
     it('should create new schedule successfully', async () => {
-      // Wait for any beforeEach events to complete
-      await new Promise(resolve => setTimeout(resolve, 10))
-
       const listeners: StateChangeEvent[] = []
       profileStateManager.addListener((event) => listeners.push(event))
 
@@ -223,27 +211,23 @@ describe('ProfileStateManager', () => {
       expect(schedule.selectedCourses).toEqual([])
 
       const state = profileStateManager.getState()
-      expect(state.schedules.length).toBe(2) // beforeEach creates 1, this creates 1 = 2 total
+      expect(state.schedules.length).toBe(2)
       expect(state.schedules.some(s => s.id === schedule.id)).toBe(true)
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(listeners.length).toBe(1)
-      expect(listeners[0].type).toBe('schedule_changed')
-      expect(listeners[0].data.action).toBe('created')
+      await vi.waitFor(() => {
+        expect(listeners.length).toBe(1)
+        expect(listeners[0].type).toBe('schedule_changed')
+        expect(listeners[0].data.action).toBe('created')
+      })
     })
 
     it('should set active schedule and load its courses', async () => {
-      // Create schedules with different courses
       const schedule1 = profileStateManager.createSchedule('Schedule 1', 'test')
       const schedule2 = profileStateManager.createSchedule('Schedule 2', 'test')
 
-      // Add courses to schedule1
       profileStateManager.setActiveSchedule(schedule1.id, 'test')
       profileStateManager.selectCourse(mockCourse, false, 'test')
 
-      // Switch to schedule2 (should be empty)
       const listeners: StateChangeEvent[] = []
       profileStateManager.addListener((event) => listeners.push(event))
 
@@ -251,63 +235,57 @@ describe('ProfileStateManager', () => {
 
       const state = profileStateManager.getState()
       expect(state.activeScheduleId).toBe(schedule2.id)
-      expect(state.selectedCourses.length).toBe(0) // Should be empty
+      expect(state.selectedCourses.length).toBe(0)
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(listeners.some(e => e.type === 'active_schedule_changed')).toBe(true)
-      expect(listeners.some(e => e.type === 'courses_changed')).toBe(true)
+      await vi.waitFor(() => {
+        expect(listeners.some(e => e.type === 'active_schedule_changed')).toBe(true)
+        expect(listeners.some(e => e.type === 'courses_changed')).toBe(true)
+      })
     })
 
     it('should update schedule successfully', async () => {
       const schedule = profileStateManager.createSchedule('Original Name', 'test')
 
-      // Wait for create events to complete
-      await new Promise(resolve => setTimeout(resolve, 10))
-
       const listeners: StateChangeEvent[] = []
-      profileStateManager.addListener((event) => listeners.push(event))
 
-      const success = profileStateManager.updateSchedule(schedule.id, { name: 'Updated Name' }, 'test')
-      expect(success).toBe(true)
+      await vi.waitFor(() => {
+        profileStateManager.addListener((event) => listeners.push(event))
+        const success = profileStateManager.updateSchedule(schedule.id, { name: 'Updated Name' }, 'test')
+        expect(success).toBe(true)
+      })
 
       const state = profileStateManager.getState()
       const updatedSchedule = state.schedules.find(s => s.id === schedule.id)
       expect(updatedSchedule?.name).toBe('Updated Name')
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(listeners.length).toBe(1)
-      expect(listeners[0].type).toBe('schedule_changed')
-      expect(listeners[0].data.action).toBe('updated')
+      await vi.waitFor(() => {
+        expect(listeners.length).toBe(1)
+        expect(listeners[0].type).toBe('schedule_changed')
+        expect(listeners[0].data.action).toBe('updated')
+      })
     })
 
     it('should delete schedule and switch to another', async () => {
       const schedule1 = profileStateManager.createSchedule('Schedule 1', 'test')
       const schedule2 = profileStateManager.createSchedule('Schedule 2', 'test')
 
-      // Set schedule1 as active
       profileStateManager.setActiveSchedule(schedule1.id, 'test')
 
       const listeners: StateChangeEvent[] = []
       profileStateManager.addListener((event) => listeners.push(event))
 
-      // Delete active schedule
       const success = await profileStateManager.deleteSchedule(schedule1.id, 'test')
       expect(success).toBe(true)
 
       const state = profileStateManager.getState()
-      expect(state.schedules.length).toBe(2) // beforeEach default + schedule2 = 2
+      expect(state.schedules.length).toBe(2)
       expect(state.schedules.some(s => s.id === schedule2.id)).toBe(true)
       expect(state.activeScheduleId).toBeTruthy()
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'deleted')).toBe(true)
-      expect(listeners.some(e => e.type === 'active_schedule_changed')).toBe(true)
+      await vi.waitFor(() => {
+        expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'deleted')).toBe(true)
+        expect(listeners.some(e => e.type === 'active_schedule_changed')).toBe(true)
+      })
     })
 
     it('should not allow deleting last schedule', async () => {
@@ -327,39 +305,33 @@ describe('ProfileStateManager', () => {
     it('should duplicate schedule successfully', async () => {
       const originalSchedule = profileStateManager.createSchedule('Original', 'test')
 
-      // Add courses to original
       profileStateManager.setActiveSchedule(originalSchedule.id, 'test')
       profileStateManager.selectCourse(mockCourse, true, 'test')
 
-      // Wait for all setup events to complete
-      await new Promise(resolve => setTimeout(resolve, 10))
-
       const listeners: StateChangeEvent[] = []
-      profileStateManager.addListener((event) => listeners.push(event))
 
-      const duplicated = profileStateManager.duplicateSchedule(originalSchedule.id, 'Duplicated', 'test')
-      expect(duplicated).toBeTruthy()
-      expect(duplicated!.name).toBe('Duplicated')
-      expect(duplicated!.id).not.toBe(originalSchedule.id)
-      expect(duplicated!.selectedCourses.length).toBe(1)
+      await vi.waitFor(() => {
+        profileStateManager.addListener((event) => listeners.push(event))
+        const duplicated = profileStateManager.duplicateSchedule(originalSchedule.id, 'Duplicated', 'test')
+        expect(duplicated).toBeTruthy()
+        expect(duplicated!.name).toBe('Duplicated')
+        expect(duplicated!.id).not.toBe(originalSchedule.id)
+        expect(duplicated!.selectedCourses.length).toBe(1)
+      })
 
       const state = profileStateManager.getState()
-      expect(state.schedules.length).toBe(3) // beforeEach default + original + duplicated = 3
+      expect(state.schedules.length).toBe(3)
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(listeners.length).toBe(1)
-      expect(listeners[0].type).toBe('schedule_changed')
-      expect(listeners[0].data.action).toBe('duplicated')
+      await vi.waitFor(() => {
+        expect(listeners.length).toBe(1)
+        expect(listeners[0].type).toBe('schedule_changed')
+        expect(listeners[0].data.action).toBe('duplicated')
+      })
     })
   })
 
   describe('Preferences Management', () => {
     it('should update preferences successfully', async () => {
-      // Wait for any beforeEach events to complete
-      await new Promise(resolve => setTimeout(resolve, 10))
-
       const listeners: StateChangeEvent[] = []
       profileStateManager.addListener((event) => listeners.push(event))
 
@@ -372,11 +344,10 @@ describe('ProfileStateManager', () => {
       expect(state.preferences.avoidBackToBackClasses).toBe(true)
       expect(state.preferences.theme).toBe('dark-mode')
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(listeners.length).toBe(1)
-      expect(listeners[0].type).toBe('preferences_changed')
+      await vi.waitFor(() => {
+        expect(listeners.length).toBe(1)
+        expect(listeners[0].type).toBe('preferences_changed')
+      })
     })
   })
 
@@ -435,53 +406,38 @@ describe('ProfileStateManager', () => {
       const listener1 = (event: StateChangeEvent) => events1.push(event)
       const listener2 = (event: StateChangeEvent) => events2.push(event)
 
-      // Add listeners AFTER setup events from beforeEach
       profileStateManager.addListener(listener1)
       profileStateManager.addListener(listener2)
 
-      // Trigger event
       profileStateManager.selectCourse(mockCourse, false, 'test')
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await vi.waitFor(() => {
+        const selectEvents1 = events1.filter(e => e.type === 'courses_changed' && e.data.action === 'selected')
+        const selectEvents2 = events2.filter(e => e.type === 'courses_changed' && e.data.action === 'selected')
+        expect(selectEvents1.length).toBe(1)
+        expect(selectEvents2.length).toBe(1)
+      })
 
-      // Filter to only count course selection events
-      const selectEvents1 = events1.filter(e => e.type === 'courses_changed' && e.data.action === 'selected')
-      const selectEvents2 = events2.filter(e => e.type === 'courses_changed' && e.data.action === 'selected')
-      expect(selectEvents1.length).toBe(1)
-      expect(selectEvents2.length).toBe(1)
-
-      // Remove one listener
       profileStateManager.removeListener(listener1)
-
-      // Trigger another event
       profileStateManager.unselectCourse(mockCourse, 'test')
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await vi.waitFor(() => {
+        const selectEvents1After = events1.filter(e => e.type === 'courses_changed' && e.data.action === 'selected')
+        expect(selectEvents1After.length).toBe(1)
 
-      // Listener1 should not receive new events
-      const selectEvents1After = events1.filter(e => e.type === 'courses_changed' && e.data.action === 'selected')
-      expect(selectEvents1After.length).toBe(1) // Should not change
+        const unselectEvents2 = events2.filter(e => e.type === 'courses_changed' && e.data.action === 'unselected')
+        expect(unselectEvents2.length).toBe(1)
+      })
 
-      // Listener2 should receive the unselect event
-      const unselectEvents2 = events2.filter(e => e.type === 'courses_changed' && e.data.action === 'unselected')
-      expect(unselectEvents2.length).toBe(1)
-
-      // Remove all listeners
       profileStateManager.removeAllListeners()
 
       const events2CountBefore = events2.length
-
-      // Trigger event
       profileStateManager.selectCourse(mockCourse, false, 'test')
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      // No new events should be received after removing all listeners
-      expect(events1.length).toBe(events1.length) // No change
-      expect(events2.length).toBe(events2CountBefore) // No change
+      await vi.waitFor(() => {
+        expect(events1.length).toBe(events1.length)
+        expect(events2.length).toBe(events2CountBefore)
+      }, { timeout: 100 })
     })
 
     it('should handle listener errors gracefully', async () => {
@@ -493,35 +449,31 @@ describe('ProfileStateManager', () => {
       profileStateManager.addListener(errorListener)
       profileStateManager.addListener(normalListener)
 
-      // Should not throw despite error in first listener
       expect(() => {
         profileStateManager.selectCourse(mockCourse, false, 'test')
       }).not.toThrow()
 
-      // Wait for async event processing
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(normalListener).toHaveBeenCalled()
+      await vi.waitFor(() => {
+        expect(normalListener).toHaveBeenCalled()
+      })
     })
   })
 
   describe('Debounced Saving', () => {
     it('should debounce multiple rapid changes', async () => {
+      vi.useFakeTimers()
       const saveSpy = vi.spyOn(profileStateManager, 'save')
 
-      // Make rapid changes
       profileStateManager.selectCourse(mockCourse, false, 'test')
       profileStateManager.setSelectedSection(mockCourse, 'A01', 'test')
       profileStateManager.updatePreferences({ theme: 'test-theme' }, 'test')
 
-      // Should not have saved yet
       expect(saveSpy).not.toHaveBeenCalled()
 
-      // Wait for debounce
-      await new Promise(resolve => setTimeout(resolve, 600))
+      await vi.advanceTimersByTimeAsync(600)
 
-      // Should have saved once
       expect(saveSpy).toHaveBeenCalledTimes(1)
+      vi.useRealTimers()
     })
   })
 

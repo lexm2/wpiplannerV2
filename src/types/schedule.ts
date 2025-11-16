@@ -1,4 +1,4 @@
-import { Course, Section } from './types'
+import { Course, Section, SimpleTime } from './types'
 
 export interface SelectedCourse {
     course: Course;
@@ -34,8 +34,8 @@ export interface TimeConflict {
 
 export interface SchedulePreferences {
     preferredTimeRange: {
-        startTime: { hours: number; minutes: number };
-        endTime: { hours: number; minutes: number };
+        startTime: SimpleTime;
+        endTime: SimpleTime;
     };
     preferredDays: Set<string>;
     avoidBackToBackClasses: boolean;
@@ -72,9 +72,9 @@ export interface ScoreWeights {
     timeGap: number;
 }
 
-export const DEFAULT_SCORE_WEIGHTS: ScoreWeights = {
+export const DEFAULT_SCORE_WEIGHTS = {
     professorRating: 0.25,
     earlyMorning: 0.10,
     classesPerTerm: 0.50,
     timeGap: 0.15
-};
+} as const;

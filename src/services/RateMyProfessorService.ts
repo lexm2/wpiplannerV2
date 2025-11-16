@@ -7,6 +7,8 @@
  * - Get rating information for display
  */
 
+import { logger } from '../utils/logger';
+
 interface Professor {
     id: string;
     legacyId: number;
@@ -43,7 +45,7 @@ export class RateMyProfessorService {
      * Load Rate My Professor data from JSON file
      */
     async loadData(): Promise<void> {
-        console.log('[RMP Service] loadData() called, data state:', this.data ? 'already loaded' : 'not loaded');
+        logger.log('[RMP Service] loadData() called, data state:', this.data ? 'already loaded' : 'not loaded');
 
         if (this.data) {
             // Already loaded
@@ -51,7 +53,7 @@ export class RateMyProfessorService {
         }
 
         if (this.loading) {
-            console.log('[RMP Service] Already loading, waiting...');
+            logger.log('[RMP Service] Already loading, waiting...');
             // Wait for existing load to complete
             while (this.loading) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -62,13 +64,13 @@ export class RateMyProfessorService {
         this.loading = true;
 
         try {
-            console.log('[RMP Service] Fetching from: ./rateMyProfessor.json');
+            logger.log('[RMP Service] Fetching from: ./rateMyProfessor.json');
             const response = await fetch('./rateMyProfessor.json');
             if (!response.ok) {
                 throw new Error(`Failed to load Rate My Professor data: ${response.status}`);
             }
 
-            console.log('[RMP Service] Fetch successful, parsing JSON...');
+            logger.log('[RMP Service] Fetch successful, parsing JSON...');
             this.data = await response.json();
 
             // Build professor maps for quick lookups
@@ -89,13 +91,13 @@ export class RateMyProfessorService {
                 }
             }
 
-            console.log(`[RMP Service] Loaded ${this.data?.totalProfessors || 0} professors`);
-            console.log(`[RMP Service] Built full name map with ${this.professorsByFullName.size} entries`);
-            console.log(`[RMP Service] Built last name map with ${this.professorsByLastName.size} unique last names`);
-            console.log(`[RMP Service] Sample full name entries:`, Array.from(this.professorsByFullName.keys()).slice(0, 5));
+            logger.log(`[RMP Service] Loaded ${this.data?.totalProfessors || 0} professors`);
+            logger.log(`[RMP Service] Built full name map with ${this.professorsByFullName.size} entries`);
+            logger.log(`[RMP Service] Built last name map with ${this.professorsByLastName.size} unique last names`);
+            logger.log(`[RMP Service] Sample full name entries:`, Array.from(this.professorsByFullName.keys()).slice(0, 5));
         } catch (error) {
             this.loadError = error as Error;
-            console.error('[RMP Service] Failed to load data:', error);
+            logger.error('[RMP Service] Failed to load data:', error);
         } finally {
             this.loading = false;
         }
@@ -216,52 +218,52 @@ export class RateMyProfessorService {
      * 3b. If MULTIPLE professors with same last name → use fuzzy matching on first name to disambiguate
      */
     findProfessor(professorName: string): Professor | null {
-        console.log('[RMP Service] findProfessor() called with:', professorName);
-        console.log('[RMP Service] Data loaded:', !!this.data, 'Maps ready:', this.professorsByFullName.size, 'full names,', this.professorsByLastName.size, 'last names');
+        logger.log('[RMP Service] findProfessor() called with:', professorName);
+        logger.log('[RMP Service] Data loaded:', !!this.data, 'Maps ready:', this.professorsByFullName.size, 'full names,', this.professorsByLastName.size, 'last names');
 
         if (!this.data || !professorName) {
-            console.log('[RMP Service] Early return - no data or no professor name');
+            logger.log('[RMP Service] Early return - no data or no professor name');
             return null;
         }
 
         const normalized = this.normalizeName(professorName);
-        console.log('[RMP Service] Normalized name:', normalized);
+        logger.log('[RMP Service] Normalized name:', normalized);
 
         // Step 1: Try exact full name match (fast path)
         if (this.professorsByFullName.has(normalized)) {
-            console.log('[RMP Service] ✓ Found exact full name match');
+            logger.log('[RMP Service] ✓ Found exact full name match');
             return this.professorsByFullName.get(normalized) || null;
         }
-        console.log('[RMP Service] No exact match, extracting last name...');
+        logger.log('[RMP Service] No exact match, extracting last name...');
 
         // Step 2: Extract last name and lookup candidates
         const lastName = this.extractLastName(professorName);
-        console.log('[RMP Service] Extracted last name:', lastName);
+        logger.log('[RMP Service] Extracted last name:', lastName);
 
         const candidates = this.professorsByLastName.get(lastName);
 
         if (!candidates || candidates.length === 0) {
-            console.log('[RMP Service] ✗ No match found for last name:', lastName);
+            logger.log('[RMP Service] ✗ No match found for last name:', lastName);
             return null;
         }
 
         // Step 3a: If ONLY ONE professor with this last name → return it
         if (candidates.length === 1) {
             const professor = candidates[0];
-            console.log('[RMP Service] ✓ Found unique last name match:', `${professor.firstName} ${professor.lastName}`);
+            logger.log('[RMP Service] ✓ Found unique last name match:', `${professor.firstName} ${professor.lastName}`);
             return professor;
         }
 
         // Step 3b: MULTIPLE professors with same last name → disambiguate using first name
-        console.log(`[RMP Service] Multiple candidates (${candidates.length}) for last name '${lastName}', disambiguating...`);
+        logger.log(`[RMP Service] Multiple candidates (${candidates.length}) for last name '${lastName}', disambiguating...`);
 
         const queryFirstName = this.extractFirstName(professorName);
-        console.log('[RMP Service] Extracted first name for disambiguation:', queryFirstName || '(none)');
+        logger.log('[RMP Service] Extracted first name for disambiguation:', queryFirstName || '(none)');
 
         if (!queryFirstName) {
             // No first name to disambiguate with, return first candidate
             const professor = candidates[0];
-            console.log('[RMP Service] ⚠ No first name provided, returning first candidate:', `${professor.firstName} ${professor.lastName}`);
+            logger.log('[RMP Service] ⚠ No first name provided, returning first candidate:', `${professor.firstName} ${professor.lastName}`);
             return professor;
         }
 
@@ -279,13 +281,13 @@ export class RateMyProfessorService {
         scored.sort((a, b) => b.score - a.score);
 
         // Log all candidates with scores for debugging
-        console.log('[RMP Service] Candidate scores:');
+        logger.log('[RMP Service] Candidate scores:');
         scored.forEach((item, idx) => {
-            console.log(`  ${idx + 1}. ${item.professor.firstName} ${item.professor.lastName}: ${item.score.toFixed(1)} pts`);
+            logger.log(`  ${idx + 1}. ${item.professor.firstName} ${item.professor.lastName}: ${item.score.toFixed(1)} pts`);
         });
 
         const bestMatch = scored[0].professor;
-        console.log('[RMP Service] ✓ Best match via first name fuzzy:',
+        logger.log('[RMP Service] ✓ Best match via first name fuzzy:',
                     `${bestMatch.firstName} ${bestMatch.lastName} (score: ${scored[0].score.toFixed(1)})`);
 
         return bestMatch;
@@ -302,20 +304,20 @@ export class RateMyProfessorService {
         wouldTakeAgain: string | null;
         hasData: boolean;
     } | null {
-        console.log('[RMP Service] getRatingDisplay() called for:', professorName);
+        logger.log('[RMP Service] getRatingDisplay() called for:', professorName);
         const professor = this.findProfessor(professorName);
 
         if (!professor) {
-            console.log('[RMP Service] getRatingDisplay() - professor not found');
+            logger.log('[RMP Service] getRatingDisplay() - professor not found');
             return null;
         }
 
         if (professor.numRatings === 0) {
-            console.log('[RMP Service] getRatingDisplay() - professor has 0 ratings');
+            logger.log('[RMP Service] getRatingDisplay() - professor has 0 ratings');
             return null;
         }
 
-        console.log('[RMP Service] getRatingDisplay() - returning data for:', `${professor.firstName} ${professor.lastName}`,
+        logger.log('[RMP Service] getRatingDisplay() - returning data for:', `${professor.firstName} ${professor.lastName}`,
                     'Rating:', professor.avgRating);
 
         return {

@@ -1,5 +1,6 @@
 import { ModalService } from '../../services/ModalService';
 import { rateMyProfessorService } from '../../services/RateMyProfessorService';
+import { PeriodType } from '../../types/types';
 
 export interface SectionData {
     courseCode: string;
@@ -76,8 +77,8 @@ export class SectionInfoModalController {
         `;
 
         // Prevent clicks on modal dialog from closing modal
-        const dialog = backdrop.querySelector('.modal-dialog') as HTMLElement;
-        if (dialog) {
+        const dialog = backdrop.querySelector('.modal-dialog');
+        if (dialog instanceof HTMLElement) {
             dialog.addEventListener('click', (event) => {
                 event.stopPropagation();
             });
@@ -156,9 +157,10 @@ export class SectionInfoModalController {
         `;
     }
 
-    private getPeriodTypeLabel(type: string): string {
-        const lower = type.toLowerCase();
-        
+    private getPeriodTypeLabel(type: string | PeriodType): string {
+        const typeStr = String(type);
+        const lower = typeStr.toLowerCase();
+
         if (lower.includes('lec') || lower.includes('lecture')) return 'LEC';
         if (lower.includes('lab')) return 'LAB';
         if (lower.includes('dis') || lower.includes('discussion')) return 'DIS';
@@ -166,8 +168,14 @@ export class SectionInfoModalController {
         if (lower.includes('sem') || lower.includes('seminar')) return 'SEM';
         if (lower.includes('studio')) return 'STU';
         if (lower.includes('conference') || lower.includes('conf')) return 'CONF';
-        
-        return type.substring(0, Math.min(4, type.length)).toUpperCase();
+        if (lower.includes('workshop')) return 'WKS';
+        if (lower.includes('experiential')) return 'EXP';
+        if (lower.includes('independent')) return 'IND';
+        if (lower.includes('internship')) return 'INT';
+        if (lower.includes('research')) return 'RES';
+        if (lower.includes('thesis')) return 'THS';
+
+        return typeStr.substring(0, Math.min(4, typeStr.length)).toUpperCase();
     }
 
     private getModalCSS(): string {

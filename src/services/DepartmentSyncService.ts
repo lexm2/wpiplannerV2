@@ -1,6 +1,7 @@
 import { CourseFilterService } from './CourseFilterService';
 import { DepartmentController } from '../ui/controllers/DepartmentController';
 import { FilterModalController } from '../ui/controllers/FilterModalController';
+import { logger } from '../utils/logger';
 
 export interface DepartmentSyncEventListener {
     (activeDepartments: string[]): void;
@@ -128,7 +129,8 @@ export class DepartmentSyncService {
     getActiveDepartments(): string[] {
         const activeFilters = this.filterService.getActiveFilters();
         const deptFilter = activeFilters.find(f => f.id === 'department');
-        return deptFilter?.criteria?.departments || [];
+        const criteria = deptFilter?.criteria as { departments?: string[] } | undefined;
+        return criteria?.departments || [];
     }
 
     // Clear all department selections
@@ -188,17 +190,17 @@ export class DepartmentSyncService {
 
     // Update visual state of sidebar departments
     private updateSidebarVisualState(activeDepartments: string[]): void {
-        console.log('Updating sidebar visual state for departments:', activeDepartments);
+        logger.log('Updating sidebar visual state for departments:', activeDepartments);
 
         // Debug: Check how many department items exist in DOM
         const allDeptItems = document.querySelectorAll('.department-item');
-        console.log(`Found ${allDeptItems.length} department items in DOM`);
+        logger.log(`Found ${allDeptItems.length} department items in DOM`);
 
         // Clear all active states first
         allDeptItems.forEach((item, index) => {
             const deptId = item.getAttribute('data-dept-id');
             if (item.classList.contains('active')) {
-                console.log(`Removing active class from ${deptId || `item-${index}`}`);
+                logger.log(`Removing active class from ${deptId || `item-${index}`}`);
             }
             item.classList.remove('active');
         });
@@ -208,7 +210,7 @@ export class DepartmentSyncService {
             const allDepartmentsElement = document.querySelector(`[data-dept-id="all"]`);
             if (allDepartmentsElement) {
                 allDepartmentsElement.classList.add('active');
-                console.log('Set "All Departments" as active (no specific departments selected)');
+                logger.log('Set "All Departments" as active (no specific departments selected)');
             }
             return;
         }
@@ -222,14 +224,14 @@ export class DepartmentSyncService {
             if (element) {
                 element.classList.add('active');
                 successCount++;
-                console.log(`Applied active styling to ${deptId} (normalized: ${normalizedId})`);
+                logger.log(`Applied active styling to ${deptId} (normalized: ${normalizedId})`);
             } else {
-                console.warn(`Could not find department element for ${deptId} (normalized: ${normalizedId})`);
+                logger.warn(`Could not find department element for ${deptId} (normalized: ${normalizedId})`);
                 this.debugDepartmentElementSearch(deptId);
             }
         });
 
-        console.log(`Successfully applied active styling to ${successCount}/${activeDepartments.length} departments`);
+        logger.log(`Successfully applied active styling to ${successCount}/${activeDepartments.length} departments`);
 
         // Update any multi-selection indicators
         this.updateMultiSelectionIndicators(activeDepartments);
@@ -271,21 +273,21 @@ export class DepartmentSyncService {
     // Debug method to help identify why a department element wasn't found
     private debugDepartmentElementSearch(deptId: string): void {
         const allDeptItems = document.querySelectorAll('.department-item');
-        console.log(`Debug search for ${deptId}:`);
-        console.log(`   Available department items:`);
+        logger.log(`Debug search for ${deptId}:`);
+        logger.log(`   Available department items:`);
 
         allDeptItems.forEach((item, index) => {
             const itemDeptId = item.getAttribute('data-dept-id');
             const textContent = item.textContent?.trim() || 'No text';
-            console.log(`   ${index + 1}. data-dept-id="${itemDeptId}" text="${textContent}"`);
+            logger.log(`   ${index + 1}. data-dept-id="${itemDeptId}" text="${textContent}"`);
         });
 
         // Also check if the department list container exists
         const departmentList = document.getElementById('department-list');
         if (!departmentList) {
-            console.error('Department list container (#department-list) not found in DOM!');
+            logger.error('Department list container (#department-list) not found in DOM!');
         } else {
-            console.log('Department list container exists');
+            logger.log('Department list container exists');
         }
     }
 
@@ -342,7 +344,7 @@ export class DepartmentSyncService {
 
     // Force a complete visual refresh of department states
     forceVisualRefresh(): void {
-        console.log('Forcing complete visual refresh of department states');
+        logger.log('Forcing complete visual refresh of department states');
         const activeDepartments = this.getActiveDepartments();
         this.updateSidebarVisualState(activeDepartments);
     }
@@ -359,27 +361,27 @@ export class DepartmentSyncService {
             }
         });
 
-        console.log('Department Sync Debug:');
-        console.log('  Filter state departments:', activeDepartments);
-        console.log('  Visually active departments:', visuallyActiveDepartments);
+        logger.log('Department Sync Debug:');
+        logger.log('  Filter state departments:', activeDepartments);
+        logger.log('  Visually active departments:', visuallyActiveDepartments);
 
         const missingVisual = activeDepartments.filter(id => !visuallyActiveDepartments.includes(id));
         const extraVisual = visuallyActiveDepartments.filter(id => !activeDepartments.includes(id));
 
         if (missingVisual.length > 0) {
-            console.warn('  Departments missing visual active state:', missingVisual);
+            logger.warn('  Departments missing visual active state:', missingVisual);
         }
         if (extraVisual.length > 0) {
-            console.warn('  Departments with incorrect visual active state:', extraVisual);
+            logger.warn('  Departments with incorrect visual active state:', extraVisual);
         }
         if (missingVisual.length === 0 && extraVisual.length === 0) {
-            console.log('  Visual state perfectly synced with filter state');
+            logger.log('  Visual state perfectly synced with filter state');
         }
     }
 
     // Temporary debug method to add visual debugging classes
     enableDebugMode(): void {
-        console.log('Enabling department selection debug mode');
+        logger.log('Enabling department selection debug mode');
         const activeDepartments = this.getActiveDepartments();
 
         // Add debug outline to all selected departments
@@ -398,7 +400,7 @@ export class DepartmentSyncService {
 
     // Remove debug visual classes
     disableDebugMode(): void {
-        console.log('Disabling department selection debug mode');
+        logger.log('Disabling department selection debug mode');
         document.querySelectorAll('.department-item.debug-selected').forEach(item => {
             item.classList.remove('debug-selected');
         });

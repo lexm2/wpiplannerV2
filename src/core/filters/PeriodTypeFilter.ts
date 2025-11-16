@@ -1,4 +1,4 @@
-import { Period, Section } from '../../types/types';
+import { Period, Section, PeriodType } from '../../types/types';
 import { SectionFilter, PeriodTypeFilterCriteria } from '../../types/filters';
 import { SelectedCourse } from '../../types/schedule';
 
@@ -63,9 +63,10 @@ export class PeriodTypeFilter implements SectionFilter {
         });
     }
     
-    public normalizeType(type: string): string {
-        const lower = type.toLowerCase().trim();
-        
+    public normalizeType(type: string | PeriodType): string {
+        const typeStr = String(type);
+        const lower = typeStr.toLowerCase().trim();
+
         // Normalize common type variations
         if (lower.includes('lec') || lower.includes('lecture')) return 'lecture';
         if (lower.includes('lab')) return 'lab';
@@ -74,7 +75,13 @@ export class PeriodTypeFilter implements SectionFilter {
         if (lower.includes('sem') || lower.includes('seminar')) return 'seminar';
         if (lower.includes('studio')) return 'studio';
         if (lower.includes('conference') || lower.includes('conf')) return 'conference';
-        
+        if (lower.includes('workshop')) return 'workshop';
+        if (lower.includes('experiential')) return 'experiential';
+        if (lower.includes('independent')) return 'independent study';
+        if (lower.includes('internship')) return 'internship';
+        if (lower.includes('research')) return 'research';
+        if (lower.includes('thesis')) return 'thesis';
+
         return lower;
     }
     
@@ -101,7 +108,7 @@ export class PeriodTypeFilter implements SectionFilter {
     
     private formatTypeName(type: string): string {
         const normalized = this.normalizeType(type);
-        
+
         const typeMap: { [key: string]: string } = {
             'lecture': 'Lecture',
             'lab': 'Lab',
@@ -109,9 +116,15 @@ export class PeriodTypeFilter implements SectionFilter {
             'recitation': 'Recitation',
             'seminar': 'Seminar',
             'studio': 'Studio',
-            'conference': 'Conference'
+            'conference': 'Conference',
+            'workshop': 'Workshop',
+            'experiential': 'Experiential',
+            'independent study': 'Independent Study',
+            'internship': 'Internship',
+            'research': 'Research',
+            'thesis': 'Thesis'
         };
-        
+
         return typeMap[normalized] || type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
     }
 }

@@ -8,7 +8,7 @@ import { PeriodAvailabilityFilter } from '../core/filters/PeriodAvailabilityFilt
 import { PeriodConflictFilter } from '../core/filters/PeriodConflictFilter';
 import { SectionCodeFilter } from '../core/filters/SectionCodeFilter';
 import { ConflictDetector } from '../core/ConflictDetector';
-import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter } from '../types/filters';
+import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter, PeriodConflictFilterCriteria } from '../types/filters';
 import { FilterState } from '../core/FilterState';
 import { RequiredStatusFilter } from '../core/filters/RequiredStatusFilter';
 import { SectionStatusFilter } from '../core/filters/SectionStatusFilter';
@@ -305,7 +305,8 @@ export class ScheduleFilterService {
         for (const activeFilter of sortedActiveFilters) {
             if (activeFilter.id === 'searchText') {
                 // Handle search text by filtering periods based on course/period content
-                const query = activeFilter.criteria.query?.toLowerCase().trim();
+                const criteria = activeFilter.criteria as { query?: string };
+                const query = criteria.query?.toLowerCase().trim();
                 if (query) {
                     allPeriods = allPeriods.filter(item => {
                         const course = item.course.course;
@@ -333,8 +334,9 @@ export class ScheduleFilterService {
             } else if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
                 // Special handling for conflict filter which needs section context
                 const sections = this.periodsToSections(allPeriods);
+                const conflictCriteria = activeFilter.criteria as PeriodConflictFilterCriteria;
                 const validSections = this.periodConflictFilter.applyToSectionsWithContext(sections, {
-                    ...activeFilter.criteria,
+                    ...conflictCriteria,
                     selectedCourses: selectedCourses
                 });
                 allPeriods = this.sectionsToPeriodsWithContext(validSections);
@@ -455,7 +457,8 @@ export class ScheduleFilterService {
         for (const activeFilter of sortedSectionFilters) {
             if (activeFilter.id === 'searchText') {
                 // Handle search text by filtering sections based on course/section content
-                const query = activeFilter.criteria.query?.toLowerCase().trim();
+                const criteria = activeFilter.criteria as { query?: string };
+                const query = criteria.query?.toLowerCase().trim();
                 if (query) {
                     allSections = allSections.filter(item => {
                         const course = item.course.course;
@@ -490,8 +493,9 @@ export class ScheduleFilterService {
                 console.log('[ScheduleFilterService] Selected courses for context:', selectedCourses.length);
                 console.log('[ScheduleFilterService] Criteria:', activeFilter.criteria);
 
+                const conflictCriteria = activeFilter.criteria as PeriodConflictFilterCriteria;
                 allSections = this.periodConflictFilter.applyToSectionsWithContext(allSections, {
-                    ...activeFilter.criteria,
+                    ...conflictCriteria,
                     selectedCourses: selectedCourses
                 });
 

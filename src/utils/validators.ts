@@ -1,106 +1,143 @@
-import { Course, Section, Period, Department } from '../types/types'
+import { Course, Section, Period, Department, PeriodType } from '../types/types'
 import { Schedule, SelectedCourse, SchedulePreferences } from '../types/schedule'
 import { getAllSections } from './courseUtils'
 
 export class Validators {
-    static isValidCourse(course: any): course is Course {
-        if (!course ||
-            typeof course.id !== 'string' ||
-            typeof course.number !== 'string' ||
-            typeof course.name !== 'string' ||
-            typeof course.description !== 'string' ||
-            !this.isValidDepartment(course.department) ||
-            typeof course.minCredits !== 'number' ||
-            typeof course.maxCredits !== 'number') {
+    static isValidCourse(course: unknown): course is Course {
+        if (!course || typeof course !== 'object') return false;
+
+        const courseObj = course as Record<string, unknown>;
+
+        if (typeof courseObj.id !== 'string' ||
+            typeof courseObj.number !== 'string' ||
+            typeof courseObj.name !== 'string' ||
+            typeof courseObj.description !== 'string' ||
+            !this.isValidDepartment(courseObj.department) ||
+            typeof courseObj.minCredits !== 'number' ||
+            typeof courseObj.maxCredits !== 'number') {
             return false;
         }
 
         // Validate sections from hierarchical structure
-        const sections = getAllSections(course);
-        return sections.every((s: any) => this.isValidSection(s));
+        const sections = getAllSections(courseObj as unknown as Course);
+        return sections.every((s: unknown) => this.isValidSection(s));
     }
 
-    static isValidDepartment(department: any): department is Department {
-        return department &&
-            typeof department.abbreviation === 'string' &&
-            typeof department.name === 'string' &&
+    static isValidDepartment(department: unknown): department is Department {
+        if (!department || typeof department !== 'object') return false;
+
+        const deptObj = department as Record<string, unknown>;
+
+        return typeof deptObj.abbreviation === 'string' &&
+            typeof deptObj.name === 'string' &&
             // Make courses array optional - it may not be present in serialized data
-            (department.courses === undefined || Array.isArray(department.courses));
+            (deptObj.courses === undefined || Array.isArray(deptObj.courses));
     }
 
-    static isValidSection(section: any): section is Section {
-        return section &&
-            typeof section.crn === 'number' &&
-            typeof section.number === 'string' &&
-            typeof section.seats === 'number' &&
-            typeof section.seatsAvailable === 'number' &&
-            typeof section.actualWaitlist === 'number' &&
-            typeof section.maxWaitlist === 'number' &&
-            typeof section.description === 'string' &&
-            typeof section.term === 'string' &&
-            Array.isArray(section.periods) &&
-            section.periods.every((p: any) => this.isValidPeriod(p));
+    static isValidSection(section: unknown): section is Section {
+        if (!section || typeof section !== 'object') return false;
+
+        const sectionObj = section as Record<string, unknown>;
+
+        return typeof sectionObj.crn === 'number' &&
+            typeof sectionObj.number === 'string' &&
+            typeof sectionObj.seats === 'number' &&
+            typeof sectionObj.seatsAvailable === 'number' &&
+            typeof sectionObj.actualWaitlist === 'number' &&
+            typeof sectionObj.maxWaitlist === 'number' &&
+            typeof sectionObj.description === 'string' &&
+            typeof sectionObj.term === 'string' &&
+            Array.isArray(sectionObj.periods) &&
+            sectionObj.periods.every((p: unknown) => this.isValidPeriod(p));
     }
 
-    static isValidPeriod(period: any): period is Period {
-        return period &&
-            typeof period.type === 'string' &&
-            typeof period.professor === 'string' &&
-            this.isValidTime(period.startTime) &&
-            this.isValidTime(period.endTime) &&
-            typeof period.location === 'string' &&
-            typeof period.building === 'string' &&
-            typeof period.room === 'string' &&
-            typeof period.seats === 'number' &&
-            typeof period.seatsAvailable === 'number' &&
-            typeof period.actualWaitlist === 'number' &&
-            typeof period.maxWaitlist === 'number' &&
-            period.days instanceof Set;
+    static isValidPeriod(period: unknown): period is Period {
+        if (!period || typeof period !== 'object') return false;
+
+        const periodObj = period as Record<string, unknown>;
+
+        return (typeof periodObj.type === 'string' || Object.values(PeriodType).includes(periodObj.type as PeriodType)) &&
+            typeof periodObj.professor === 'string' &&
+            this.isValidTime(periodObj.startTime) &&
+            this.isValidTime(periodObj.endTime) &&
+            typeof periodObj.location === 'string' &&
+            typeof periodObj.building === 'string' &&
+            typeof periodObj.room === 'string' &&
+            typeof periodObj.seats === 'number' &&
+            typeof periodObj.seatsAvailable === 'number' &&
+            typeof periodObj.actualWaitlist === 'number' &&
+            typeof periodObj.maxWaitlist === 'number' &&
+            periodObj.days instanceof Set;
     }
 
-    static isValidTime(time: any): boolean {
-        return time &&
-            typeof time.hours === 'number' &&
-            typeof time.minutes === 'number' &&
-            typeof time.displayTime === 'string' &&
-            time.hours >= 0 && time.hours <= 23 &&
-            time.minutes >= 0 && time.minutes <= 59;
+    static isValidTime(time: unknown): boolean {
+        if (!time || typeof time !== 'object') return false;
+
+        const timeObj = time as Record<string, unknown>;
+
+        return typeof timeObj.hours === 'number' &&
+            typeof timeObj.minutes === 'number' &&
+            typeof timeObj.displayTime === 'string' &&
+            timeObj.hours >= 0 && timeObj.hours <= 23 &&
+            timeObj.minutes >= 0 && timeObj.minutes <= 59;
     }
 
-    static isValidSchedulePreferences(preferences: any): preferences is SchedulePreferences {
-        return preferences &&
-            this.isValidTimeRange(preferences.preferredTimeRange) &&
-            preferences.preferredDays instanceof Set &&
-            typeof preferences.avoidBackToBackClasses === 'boolean';
+    static isValidSchedulePreferences(preferences: unknown): preferences is SchedulePreferences {
+        if (!preferences || typeof preferences !== 'object') return false;
+
+        const prefsObj = preferences as Record<string, unknown>;
+
+        return this.isValidTimeRange(prefsObj.preferredTimeRange) &&
+            prefsObj.preferredDays instanceof Set &&
+            typeof prefsObj.avoidBackToBackClasses === 'boolean';
     }
 
-    static isValidTimeRange(timeRange: any): boolean {
-        return timeRange &&
-            this.isValidTime(timeRange.startTime) &&
-            this.isValidTime(timeRange.endTime);
+    static isValidTimeRange(timeRange: unknown): boolean {
+        if (!timeRange || typeof timeRange !== 'object') return false;
+
+        const rangeObj = timeRange as Record<string, unknown>;
+
+        return this.isValidTime(rangeObj.startTime) &&
+            this.isValidTime(rangeObj.endTime);
     }
 
-    static isValidSelectedCourse(selectedCourse: any): selectedCourse is SelectedCourse {
-        return selectedCourse &&
-            this.isValidCourse(selectedCourse.course) &&
-            typeof selectedCourse.isRequired === 'boolean';
+    static isValidSelectedCourse(selectedCourse: unknown): selectedCourse is SelectedCourse {
+        if (!selectedCourse || typeof selectedCourse !== 'object') return false;
+
+        const scObj = selectedCourse as Record<string, unknown>;
+
+        return this.isValidCourse(scObj.course) &&
+            typeof scObj.isRequired === 'boolean';
     }
 
-    static isValidSchedule(schedule: any): schedule is Schedule {
-        return schedule &&
-            typeof schedule.id === 'string' &&
-            typeof schedule.name === 'string' &&
-            Array.isArray(schedule.selectedCourses) &&
-            schedule.selectedCourses.every((sc: any) => this.isValidSelectedCourse(sc)) &&
-            Array.isArray(schedule.generatedSchedules) &&
-            this.isValidSchedulePreferences(schedule.preferences);
+    static isValidSchedule(schedule: unknown): schedule is Schedule {
+        if (!schedule || typeof schedule !== 'object') return false;
+
+        const schedObj = schedule as Record<string, unknown>;
+
+        return typeof schedObj.id === 'string' &&
+            typeof schedObj.name === 'string' &&
+            Array.isArray(schedObj.selectedCourses) &&
+            schedObj.selectedCourses.every((sc: unknown) => this.isValidSelectedCourse(sc)) &&
+            Array.isArray(schedObj.generatedSchedules) &&
+            this.isValidSchedulePreferences(schedObj.preferences);
     }
 
     static sanitizeString(input: string): string {
         return input.replace(/<[^>]*>/g, '').trim();
     }
 
-    static sanitizeCourseData(course: any): Course | null {
+    static escapeHtml(text: string): string {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    static sanitizeClassName(className: string): string {
+        return className.replace(/[^a-zA-Z0-9_\-\s]/g, '');
+    }
+
+    static sanitizeCourseData(course: unknown): Course | null {
         try {
             if (!this.isValidCourse(course)) return null;
 

@@ -4,6 +4,7 @@ import { PerformanceMetrics } from '../../utils/PerformanceMetrics';
 import { getProfessorsByTerm, getAllSections } from '../../utils/courseUtils';
 import { rateMyProfessorService } from '../../services/RateMyProfessorService';
 import { getInlineSVG } from '../../utils/iconPaths';
+import { Validators } from '../../utils/validators';
 
 export interface RenderBatchCallback {
     (batchIndex: number, batchCount: number, totalCount: number): void;
@@ -58,11 +59,7 @@ export class ProgressiveRenderer {
         const totalBatches = Math.ceil(courses.length / this.batchSize);
         
         // Start performance tracking
-        const operationId = this.performanceMetrics?.startOperation('batch-render', {
-            itemCount: courses.length,
-            batchSize: this.batchSize,
-            batchCount: totalBatches
-        });
+        const operationId = this.performanceMetrics?.startOperation('batch-render');
 
         try {
             // Check for cancellation before starting
@@ -116,7 +113,10 @@ export class ProgressiveRenderer {
             if (operationId) {
                 this.performanceMetrics?.endOperation(operationId, {
                     completed: true,
-                    cancelled: false
+                    cancelled: false,
+                    itemCount: courses.length,
+                    batchSize: this.batchSize,
+                    batchCount: totalBatches
                 });
             }
             
@@ -183,17 +183,17 @@ export class ProgressiveRenderer {
                 const hasWarning = this.courseHasWarning(course);
                 
                 return `
-                    <div class="course-item ${isSelected ? 'selected' : ''}" data-course-id="${course.id}">
+                    <div class="course-item ${isSelected ? 'selected' : ''}" data-course-id="${Validators.escapeHtml(course.id)}">
                         <div class="course-header">
                             <div class="course-header-controls">
                                 <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
                                     ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
                                 </button>
-                                <div class="course-code">${course.department.abbreviation}${course.number}</div>
+                                <div class="course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
                             </div>
                             <div class="course-details">
                                 <div class="course-name">
-                                    ${course.name}
+                                    ${Validators.escapeHtml(course.name)}
                                     ${hasWarning ? `<span class="warning-icon-wrapper" title="All sections full">${getInlineSVG('ALERT_SQUARE_ROUNDED', 'warning-icon')}</span>` : ''}
                                 </div>
                                 <div class="course-sections">
@@ -212,13 +212,16 @@ export class ProgressiveRenderer {
                                         const profListPlain = profArray.join(', ') || 'TBA';
                                         const profListHtml = profArray.length > 0
                                             ? profArray.map(prof => {
+                                                const escapedProf = Validators.escapeHtml(prof);
                                                 const rmpUrl = rateMyProfessorService.getProfessorRMPUrl(prof);
                                                 return rmpUrl
-                                                    ? `<a href="${rmpUrl}" target="_blank" rel="noopener noreferrer" class="professor-link">${prof}</a>`
-                                                    : prof;
+                                                    ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProf}</a>`
+                                                    : escapedProf;
                                             }).join(', ')
                                             : 'TBA';
-                                        return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${section.number}" title="${profListPlain}: ${section.number}">${profListHtml}: ${section.number}</span>`;
+                                        const escapedSectionNumber = Validators.escapeHtml(section.number);
+                                        const escapedProfListPlain = Validators.escapeHtml(profListPlain);
+                                        return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${escapedSectionNumber}" title="${escapedProfListPlain}: ${escapedSectionNumber}">${profListHtml}: ${escapedSectionNumber}</span>`;
                                     }).join('')}
                                 </div>
                             </div>
@@ -332,24 +335,25 @@ export class ProgressiveRenderer {
                 // Create professor links
                 const professorDisplay = uniqueProfessors.length > 0
                     ? uniqueProfessors.map(prof => {
+                        const escapedProf = Validators.escapeHtml(prof);
                         const rmpUrl = rateMyProfessorService.getProfessorRMPUrl(prof);
                         return rmpUrl
-                            ? `<a href="${rmpUrl}" target="_blank" rel="noopener noreferrer" class="professor-link">${prof}</a>`
-                            : prof;
+                            ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProf}</a>`
+                            : escapedProf;
                     }).join(', ')
                     : 'TBA';
 
                 return `
-                    <div class="course-card ${isSelected ? 'selected' : ''}" data-course-id="${course.id}">
+                    <div class="course-card ${isSelected ? 'selected' : ''}" data-course-id="${Validators.escapeHtml(course.id)}">
                         <div class="course-card-header">
                             <div class="course-card-controls">
-                                <div class="course-title-main">${course.name}</div>
+                                <div class="course-title-main">${Validators.escapeHtml(course.name)}</div>
                                 <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
                                     ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
                                 </button>
                             </div>
                         </div>
-                        <div class="course-code-badge">${course.department.abbreviation}${course.number}</div>
+                        <div class="course-code-badge">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
                         <div class="course-info">
                             <div class="course-professors-list">${professorDisplay}</div>
                             ${hasWarning ? `<div class="course-warning" title="All sections full">${getInlineSVG('ALERT_SQUARE_ROUNDED', 'warning-icon')} All sections full</div>` : ''}

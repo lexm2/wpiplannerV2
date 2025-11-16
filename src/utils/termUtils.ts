@@ -4,6 +4,13 @@
  * These functions are kept for legacy support and testing purposes.
  */
 
+const TERM_MAP: { [key: string]: string } = {
+    'A': 'A Term',
+    'B': 'B Term',
+    'C': 'C Term',
+    'D': 'D Term'
+};
+
 /**
  * Extracts the academic term letter (A, B, C, D) from WPI section data
  * 
@@ -46,15 +53,7 @@ export function extractTermLetter(termString: string, sectionNumber?: string): s
  */
 export function formatTermName(termLetter: string): string {
     const normalized = termLetter.toUpperCase().trim();
-    
-    const termMap: { [key: string]: string } = {
-        'A': 'A Term',
-        'B': 'B Term',
-        'C': 'C Term', 
-        'D': 'D Term'
-    };
-    
-    return termMap[normalized] || `${termLetter.toUpperCase()} Term`;
+    return TERM_MAP[normalized] || `${termLetter.toUpperCase()} Term`;
 }
 
 /**

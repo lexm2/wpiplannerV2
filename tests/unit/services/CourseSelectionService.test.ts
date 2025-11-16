@@ -90,23 +90,6 @@ describe('CourseSelectionService', () => {
       expect(result).toBe(true)
     })
 
-    // TODO: CourseSelectionService may not have failure handling implemented
-    it.skip('should handle initialization failure gracefully', async () => {
-      vi.spyOn(mockProfileStateManager, 'loadFromStorage').mockRejectedValue(new Error('Load failure'))
-
-      const result = await courseSelectionService.initialize()
-      expect(result).toBe(false)
-    })
-
-    // TODO: CourseSelectionService may not prevent double initialization
-    it.skip('should not initialize twice', async () => {
-      const loadSpy = vi.spyOn(mockProfileStateManager, 'loadFromStorage')
-
-      await courseSelectionService.initialize()
-      await courseSelectionService.initialize()
-
-      expect(loadSpy).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe('Course Selection', () => {
@@ -133,40 +116,6 @@ describe('CourseSelectionService', () => {
       expect(result.course?.isRequired).toBe(true)
     })
 
-    // TODO: Validation feature may not be implemented
-    it.skip('should handle course selection with validation', async () => {
-      const invalidCourse = { ...mockCourse, id: '' } // Invalid course
-
-      const result = await courseSelectionService.selectCourse(invalidCourse, { validateBeforeAdd: true })
-
-      expect(result.success).toBe(false)
-      expect(result.error).toContain('Invalid course')
-    })
-
-    // TODO: Retry feature may not be implemented
-    it.skip('should retry on selection failure', async () => {
-      const retrySpy = vi.spyOn(mockRetryManager, 'executeWithRetry')
-        .mockResolvedValueOnce({
-          success: false,
-          error: new Error('First attempt failed'),
-          attempts: 1,
-          totalTime: 100,
-          lastAttemptTime: 100
-        })
-        .mockResolvedValueOnce({
-          success: true,
-          result: mockCourse,
-          attempts: 2,
-          totalTime: 200,
-          lastAttemptTime: 100
-        })
-
-      // This would normally fail, but retry should handle it
-      // For testing, we'll just verify retry was called
-      await courseSelectionService.selectCourse(mockCourse)
-      
-      expect(retrySpy).toHaveBeenCalled()
-    })
 
     it('should unselect course successfully', async () => {
       // First select the course
@@ -382,17 +331,6 @@ describe('CourseSelectionService', () => {
       await courseSelectionService.initialize()
     })
 
-    // TODO: Unsaved changes tracking may not be implemented
-    it.skip('should save and maintain unsaved changes status', async () => {
-      expect(courseSelectionService.hasUnsavedChanges()).toBe(false)
-
-      await courseSelectionService.selectCourse(mockCourse)
-      expect(courseSelectionService.hasUnsavedChanges()).toBe(true)
-
-      const result = await courseSelectionService.save()
-      expect(result.success).toBe(true)
-      expect(courseSelectionService.hasUnsavedChanges()).toBe(false)
-    })
 
     it('should handle save failures', async () => {
       vi.spyOn(mockProfileStateManager, 'save').mockResolvedValue({
@@ -405,17 +343,6 @@ describe('CourseSelectionService', () => {
       expect(result.error).toContain('Save failed')
     })
 
-    // TODO: Auto-save feature may not be implemented
-    it.skip('should auto-save when enabled', async () => {
-      const saveSpy = vi.spyOn(mockProfileStateManager, 'save')
-      
-      await courseSelectionService.selectCourse(mockCourse, { autoSave: true })
-      
-      // Wait for debounced save
-      await new Promise(resolve => setTimeout(resolve, 600))
-      
-      expect(saveSpy).toHaveBeenCalled()
-    })
 
     it('should not auto-save when disabled', async () => {
       const saveSpy = vi.spyOn(mockProfileStateManager, 'save')
@@ -444,30 +371,6 @@ describe('CourseSelectionService', () => {
       expect(exportedData.timestamp).toBeTruthy()
     })
 
-    // TODO: Import/export feature may not be fully implemented
-    it.skip('should import selections successfully', async () => {
-      // Create export data
-      await courseSelectionService.selectCourse(mockCourse, { isRequired: true })
-      const exportResult = await courseSelectionService.exportSelections()
-
-      // Clear current selections
-      await courseSelectionService.clearAllSelections()
-      expect(courseSelectionService.getSelectedCoursesCount()).toBe(0)
-
-      // Import
-      const importResult = await courseSelectionService.importSelections(exportResult.data!)
-      expect(importResult.success).toBe(true)
-
-      // Verify data imported
-      expect(courseSelectionService.getSelectedCoursesCount()).toBeGreaterThan(0)
-    })
-
-    // TODO: Import error handling may not be implemented
-    it.skip('should handle import of invalid data', async () => {
-      const result = await courseSelectionService.importSelections('invalid json')
-      expect(result.success).toBe(false)
-      expect(result.error).toContain('Import failed')
-    })
   })
 
   describe('Health Checks and Error Recovery', () => {
@@ -564,32 +467,5 @@ describe('CourseSelectionService', () => {
       expect(result.success).toBe(false)
     })
 
-    // TODO: Retry feature may not be implemented
-    it.skip('should handle network/storage failures with retry', async () => {
-      let attemptCount = 0
-      vi.spyOn(mockRetryManager, 'executeWithRetry').mockImplementation(async (operation) => {
-        attemptCount++
-        if (attemptCount < 3) {
-          return {
-            success: false,
-            error: new Error('Temporary failure'),
-            attempts: attemptCount,
-            totalTime: 100 * attemptCount,
-            lastAttemptTime: 100
-          }
-        }
-        return {
-          success: true,
-          result: await operation(),
-          attempts: attemptCount,
-          totalTime: 300,
-          lastAttemptTime: 100
-        }
-      })
-
-      const result = await courseSelectionService.selectCourse(mockCourse)
-      expect(result.success).toBe(true)
-      expect(attemptCount).toBe(3) // Should have retried
-    })
   })
 })

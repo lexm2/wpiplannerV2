@@ -25,18 +25,50 @@ export interface ICSExportResult {
 
 export class ICSGenerator {
     private static readonly DEFAULT_TIMEZONE = 'America/New_York';
+    private static readonly TERM_A_START_MONTH = 7;
+    private static readonly TERM_A_START_DAY = 25;
+    private static readonly TERM_A_END_MONTH = 9;
+    private static readonly TERM_A_END_DAY = 13;
+    private static readonly TERM_B_START_MONTH = 9;
+    private static readonly TERM_B_START_DAY = 21;
+    private static readonly TERM_B_END_MONTH = 11;
+    private static readonly TERM_B_END_DAY = 13;
+    private static readonly TERM_C_START_MONTH = 0;
+    private static readonly TERM_C_START_DAY = 6;
+    private static readonly TERM_C_END_MONTH = 2;
+    private static readonly TERM_C_END_DAY = 7;
+    private static readonly TERM_D_START_MONTH = 2;
+    private static readonly TERM_D_START_DAY = 17;
+    private static readonly TERM_D_END_MONTH = 4;
+    private static readonly TERM_D_END_DAY = 9;
+    private static readonly DAYS_IN_WEEK = 7;
+    private static readonly END_OF_DAY_HOUR = 23;
+    private static readonly END_OF_DAY_MINUTE = 59;
+    private static readonly END_OF_DAY_SECOND = 59;
+    private static readonly MIDNIGHT = 0;
+
+    private static readonly DAY_TO_ICS: Record<DayOfWeek, string> = {
+        [DayOfWeek.MONDAY]: 'MO',
+        [DayOfWeek.TUESDAY]: 'TU',
+        [DayOfWeek.WEDNESDAY]: 'WE',
+        [DayOfWeek.THURSDAY]: 'TH',
+        [DayOfWeek.FRIDAY]: 'FR',
+        [DayOfWeek.SATURDAY]: 'SA',
+        [DayOfWeek.SUNDAY]: 'SU'
+    };
+
+    private static readonly DAY_TO_NUMBER: Record<DayOfWeek, number> = {
+        [DayOfWeek.SUNDAY]: 0,
+        [DayOfWeek.MONDAY]: 1,
+        [DayOfWeek.TUESDAY]: 2,
+        [DayOfWeek.WEDNESDAY]: 3,
+        [DayOfWeek.THURSDAY]: 4,
+        [DayOfWeek.FRIDAY]: 5,
+        [DayOfWeek.SATURDAY]: 6
+    };
 
     private static dayToICS(day: DayOfWeek): string {
-        const mapping: Record<DayOfWeek, string> = {
-            [DayOfWeek.MONDAY]: 'MO',
-            [DayOfWeek.TUESDAY]: 'TU',
-            [DayOfWeek.WEDNESDAY]: 'WE',
-            [DayOfWeek.THURSDAY]: 'TH',
-            [DayOfWeek.FRIDAY]: 'FR',
-            [DayOfWeek.SATURDAY]: 'SA',
-            [DayOfWeek.SUNDAY]: 'SU'
-        };
-        return mapping[day];
+        return this.DAY_TO_ICS[day];
     }
 
     private static getTermDates(term: string, year: number): { start: Date, end: Date } | null {
@@ -49,23 +81,23 @@ export class ICSGenerator {
         switch (termLetter) {
             case 'A':
                 return {
-                    start: new Date(year, 7, 25),
-                    end: new Date(year, 9, 13)
+                    start: new Date(year, ICSGenerator.TERM_A_START_MONTH, ICSGenerator.TERM_A_START_DAY),
+                    end: new Date(year, ICSGenerator.TERM_A_END_MONTH, ICSGenerator.TERM_A_END_DAY)
                 };
             case 'B':
                 return {
-                    start: new Date(year, 9, 21),
-                    end: new Date(year, 11, 13)
+                    start: new Date(year, ICSGenerator.TERM_B_START_MONTH, ICSGenerator.TERM_B_START_DAY),
+                    end: new Date(year, ICSGenerator.TERM_B_END_MONTH, ICSGenerator.TERM_B_END_DAY)
                 };
             case 'C':
                 return {
-                    start: new Date(year + 1, 0, 6),
-                    end: new Date(year + 1, 2, 7)
+                    start: new Date(year + 1, ICSGenerator.TERM_C_START_MONTH, ICSGenerator.TERM_C_START_DAY),
+                    end: new Date(year + 1, ICSGenerator.TERM_C_END_MONTH, ICSGenerator.TERM_C_END_DAY)
                 };
             case 'D':
                 return {
-                    start: new Date(year + 1, 2, 17),
-                    end: new Date(year + 1, 4, 9)
+                    start: new Date(year + 1, ICSGenerator.TERM_D_START_MONTH, ICSGenerator.TERM_D_START_DAY),
+                    end: new Date(year + 1, ICSGenerator.TERM_D_END_MONTH, ICSGenerator.TERM_D_END_DAY)
                 };
             default:
                 return null;
@@ -90,27 +122,17 @@ export class ICSGenerator {
 
     private static createDateTime(baseDate: Date, hours: number, minutes: number): Date {
         const dt = new Date(baseDate);
-        dt.setHours(hours, minutes, 0, 0);
+        dt.setHours(hours, minutes, ICSGenerator.MIDNIGHT, ICSGenerator.MIDNIGHT);
         return dt;
     }
 
     private static findNextDayOfWeek(startDate: Date, targetDay: DayOfWeek): Date {
-        const dayMapping: Record<DayOfWeek, number> = {
-            [DayOfWeek.SUNDAY]: 0,
-            [DayOfWeek.MONDAY]: 1,
-            [DayOfWeek.TUESDAY]: 2,
-            [DayOfWeek.WEDNESDAY]: 3,
-            [DayOfWeek.THURSDAY]: 4,
-            [DayOfWeek.FRIDAY]: 5,
-            [DayOfWeek.SATURDAY]: 6
-        };
-
-        const targetDayNum = dayMapping[targetDay];
+        const targetDayNum = this.DAY_TO_NUMBER[targetDay];
         const currentDayNum = startDate.getDay();
         let daysToAdd = targetDayNum - currentDayNum;
 
         if (daysToAdd < 0) {
-            daysToAdd += 7;
+            daysToAdd += ICSGenerator.DAYS_IN_WEEK;
         }
 
         const result = new Date(startDate);
@@ -164,7 +186,7 @@ export class ICSGenerator {
             .map(day => this.dayToICS(day))
             .join(',');
         const untilDate = new Date(termDates.end);
-        untilDate.setHours(23, 59, 59, 0);
+        untilDate.setHours(ICSGenerator.END_OF_DAY_HOUR, ICSGenerator.END_OF_DAY_MINUTE, ICSGenerator.END_OF_DAY_SECOND, ICSGenerator.MIDNIGHT);
         const untilStr = this.formatICSDate(untilDate, true);
 
         lines.push(`RRULE:FREQ=WEEKLY;BYDAY=${byDays};UNTIL=${untilStr}`);

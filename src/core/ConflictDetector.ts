@@ -1,11 +1,15 @@
 /**
  * Detects time conflicts between course sections with caching optimization
  */
-import { Section, Period, DayOfWeek } from '../types/types'
+import { Section, Period, DayOfWeek, SimpleTime } from '../types/types'
 import { TimeConflict, ConflictType } from '../types/schedule'
+import { DateUtils } from '../utils/dateUtils'
 
 export class ConflictDetector {
+    private static readonly MAX_CACHE_SIZE = 1000;
     private conflictCache = new Map<string, TimeConflict[]>();
+    private cacheAccessOrder: string[] = [];
+
     detectConflicts(sections: Section[]): TimeConflict[] {
         const conflicts: TimeConflict[] = [];
         
@@ -16,7 +20,9 @@ export class ConflictDetector {
                 
                 if (!sectionConflicts) {
                     sectionConflicts = this.checkSectionConflicts(sections[i], sections[j]);
-                    this.conflictCache.set(cacheKey, sectionConflicts);
+                    this.addToCache(cacheKey, sectionConflicts);
+                } else {
+                    this.updateCacheAccess(cacheKey);
                 }
                 
                 conflicts.push(...sectionConflicts);
@@ -67,16 +73,12 @@ export class ConflictDetector {
     }
 
     private hasTimeOverlap(period1: Period, period2: Period): boolean {
-        const start1 = this.timeToMinutes(period1.startTime);
-        const end1 = this.timeToMinutes(period1.endTime);
-        const start2 = this.timeToMinutes(period2.startTime);
-        const end2 = this.timeToMinutes(period2.endTime);
+        const start1 = DateUtils.timeToMinutes(period1.startTime);
+        const end1 = DateUtils.timeToMinutes(period1.endTime);
+        const start2 = DateUtils.timeToMinutes(period2.startTime);
+        const end2 = DateUtils.timeToMinutes(period2.endTime);
 
         return start1 < end2 && start2 < end1;
-    }
-
-    private timeToMinutes(time: { hours: number; minutes: number }): number {
-        return time.hours * 60 + time.minutes;
     }
 
     isValidSchedule(sections: Section[]): boolean {
@@ -86,6 +88,26 @@ export class ConflictDetector {
 
     clearCache(): void {
         this.conflictCache.clear();
+        this.cacheAccessOrder = [];
+    }
+
+    private addToCache(key: string, value: TimeConflict[]): void {
+        if (this.conflictCache.size >= ConflictDetector.MAX_CACHE_SIZE) {
+            const lruKey = this.cacheAccessOrder.shift();
+            if (lruKey) {
+                this.conflictCache.delete(lruKey);
+            }
+        }
+        this.conflictCache.set(key, value);
+        this.cacheAccessOrder.push(key);
+    }
+
+    private updateCacheAccess(key: string): void {
+        const index = this.cacheAccessOrder.indexOf(key);
+        if (index > -1) {
+            this.cacheAccessOrder.splice(index, 1);
+            this.cacheAccessOrder.push(key);
+        }
     }
 
     private getCacheKey(section1: Section, section2: Section): string {

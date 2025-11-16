@@ -3,6 +3,10 @@ import { ModalService } from '../../services/ModalService';
 import { Schedule } from '../../types/schedule';
 
 export class SchedulePickerModal {
+    private static readonly MENU_WIDTH = 120;
+    private static readonly MENU_HEIGHT = 160;
+    private static readonly MENU_OFFSET = 4;
+    private static readonly VIEWPORT_PADDING = 8;
     private modalService: ModalService;
     private scheduleManagementService: ScheduleManagementService;
     private modalId: string;
@@ -284,23 +288,23 @@ export class SchedulePickerModal {
 
             if (isCurrentlyHidden) {
                 const btnRect = menuBtn.getBoundingClientRect();
-                const menuWidth = 120;
-                const menuHeight = 160;
+                const menuWidth = SchedulePickerModal.MENU_WIDTH;
+                const menuHeight = SchedulePickerModal.MENU_HEIGHT;
 
                 let left = btnRect.right - menuWidth;
-                let top = btnRect.bottom + 4;
+                let top = btnRect.bottom + SchedulePickerModal.MENU_OFFSET;
 
                 const viewportWidth = window.innerWidth;
                 const viewportHeight = window.innerHeight;
 
-                if (left < 8) {
-                    left = 8;
-                } else if (left + menuWidth > viewportWidth - 8) {
-                    left = viewportWidth - menuWidth - 8;
+                if (left < SchedulePickerModal.VIEWPORT_PADDING) {
+                    left = SchedulePickerModal.VIEWPORT_PADDING;
+                } else if (left + menuWidth > viewportWidth - SchedulePickerModal.VIEWPORT_PADDING) {
+                    left = viewportWidth - menuWidth - SchedulePickerModal.VIEWPORT_PADDING;
                 }
 
-                if (top + menuHeight > viewportHeight - 8) {
-                    top = btnRect.top - menuHeight - 4;
+                if (top + menuHeight > viewportHeight - SchedulePickerModal.VIEWPORT_PADDING) {
+                    top = btnRect.top - menuHeight - SchedulePickerModal.MENU_OFFSET;
                 }
 
                 menu.style.left = `${left}px`;

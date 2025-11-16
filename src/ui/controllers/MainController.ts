@@ -171,7 +171,7 @@ export class MainController {
 
         // Set up schedule filter change listener
         this.scheduleFilterService.addEventListener((_event) => {
-            this.scheduleController.refreshCourses();
+            this.scheduleController.applyFiltersAndRefresh();
         });
 
         // Initialize filter button states
@@ -695,7 +695,8 @@ export class MainController {
         // Check if department filter is active
         const departmentFilter = this.filterService.getActiveFilters()
             .find(f => f.id === 'department');
-        const activeDepartmentIds = departmentFilter?.criteria?.departments || [];
+        const departmentCriteria = departmentFilter?.criteria as { departments?: string[] } | undefined;
+        const activeDepartmentIds = departmentCriteria?.departments || [];
 
         // Start a new render operation with cancellation support
         const cancellationToken = this.operationManager.startOperation('render', 'New render requested');
@@ -781,7 +782,7 @@ export class MainController {
     }
 
     private updateClearFiltersButtonState(): void {
-        const clearFiltersButton = document.getElementById('clear-filters-btn');
+        const clearFiltersButton = document.getElementById('clear-filters-btn') as HTMLButtonElement | null;
         if (clearFiltersButton && this.filterService) {
             const hasActiveFilters = !this.filterService.isEmpty();
 
@@ -812,7 +813,7 @@ export class MainController {
     }
 
     private updateScheduleClearFiltersButtonState(): void {
-        const scheduleClearFiltersButton = document.getElementById('schedule-clear-filters-btn');
+        const scheduleClearFiltersButton = document.getElementById('schedule-clear-filters-btn') as HTMLButtonElement | null;
         if (scheduleClearFiltersButton && this.scheduleFilterService) {
             const hasActiveFilters = !this.scheduleFilterService.isEmpty();
 
@@ -1441,7 +1442,8 @@ export class MainController {
         const searchInput = document.getElementById('search-input') as HTMLInputElement;
         if (searchInput) {
             const searchTextFilter = this.filterService.getActiveFilters().find(f => f.id === 'searchText');
-            const currentQuery = searchTextFilter?.criteria?.query || '';
+            const searchCriteria = searchTextFilter?.criteria as { query?: string } | undefined;
+            const currentQuery = searchCriteria?.query || '';
             if (searchInput.value !== currentQuery) {
                 searchInput.value = currentQuery;
             }
@@ -1453,14 +1455,16 @@ export class MainController {
         if (contentHeader) {
             const filters = this.filterService.getActiveFilters();
             const searchTextFilter = filters.find(f => f.id === 'searchText');
-            
+
             if (searchTextFilter && filters.length === 1) {
                 // Only search text filter
-                const query = searchTextFilter.criteria.query;
+                const searchCriteria = searchTextFilter.criteria as { query?: string };
+                const query = searchCriteria.query;
                 contentHeader.textContent = `Search: "${query}" (${resultCount} results)`;
             } else if (searchTextFilter) {
                 // Search text + other filters
-                const query = searchTextFilter.criteria.query;
+                const searchCriteria = searchTextFilter.criteria as { query?: string };
+                const query = searchCriteria.query;
                 const otherFilters = filters.length - 1;
                 contentHeader.textContent = `Search: "${query}" + ${otherFilters} filter${otherFilters === 1 ? '' : 's'} (${resultCount} results)`;
             } else {

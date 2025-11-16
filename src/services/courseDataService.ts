@@ -1,4 +1,4 @@
-import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek } from '../types/types'
+import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek, PeriodType } from '../types/types'
 import { getAllSections } from '../utils/courseUtils'
 
 /**
@@ -178,7 +178,7 @@ export class CourseDataService {
     private parseConstructedPeriods(periods: any[]): Period[] {
         return periods.map(periodData => {
             const period: Period = {
-                type: periodData.type || 'Lecture',
+                type: this.parsePeriodType(periodData.type || 'Lecture'),
                 professor: periodData.professor || '',
                 professorEmail: undefined,
                 startTime: this.parseConstructedTime(periodData.start_time),
@@ -195,6 +195,36 @@ export class CourseDataService {
             };
             return period;
         });
+    }
+
+    private parsePeriodType(typeString: string): PeriodType {
+        const normalizedType = typeString.trim();
+
+        switch (normalizedType) {
+            case 'Lecture':
+                return PeriodType.LECTURE;
+            case 'Lab':
+                return PeriodType.LAB;
+            case 'Discussion':
+                return PeriodType.DISCUSSION;
+            case 'Seminar':
+                return PeriodType.SEMINAR;
+            case 'Workshop':
+                return PeriodType.WORKSHOP;
+            case 'Experiential':
+                return PeriodType.EXPERIENTIAL;
+            case 'Independent Study':
+                return PeriodType.INDEPENDENT_STUDY;
+            case 'Internship':
+                return PeriodType.INTERNSHIP;
+            case 'Research':
+                return PeriodType.RESEARCH;
+            case 'Thesis':
+                return PeriodType.THESIS;
+            default:
+                console.warn(`Unknown period type: "${typeString}", defaulting to Lecture`);
+                return PeriodType.LECTURE;
+        }
     }
     
     private parseConstructedTime(timeStr: string): Time {

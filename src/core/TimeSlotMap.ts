@@ -43,7 +43,10 @@ export class TimeSlotMap {
                         if (!this.sectionsBySlot.has(slotKey)) {
                             this.sectionsBySlot.set(slotKey, new Set());
                         }
-                        this.sectionsBySlot.get(slotKey)!.add(section);
+                        const slotSet = this.sectionsBySlot.get(slotKey);
+                        if (slotSet) {
+                            slotSet.add(section);
+                        }
                     }
                 }
             }

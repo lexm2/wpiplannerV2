@@ -7,6 +7,7 @@ import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
 import { OneDriveSyncService } from '../services/OneDriveSyncService'
 import { ONEDRIVE_CONFIG } from '../config/onedrive.config'
 import type { CloudStateData } from '../services/OneDriveSyncTypes'
+import { logger } from '../utils/logger'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -41,12 +42,15 @@ export class ProfileStateManager {
     private undoRedoManager: UndoRedoManager;
     private isRestoringState = false;
     private cloudSyncService: OneDriveSyncService | null = null;
+    private pendingSavePromises = new Set<Promise<void>>();
+    private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
 
     constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
         this.state = this.createInitialState();
         this.undoRedoManager = new UndoRedoManager();
         this.initializeCloudSync();
+        this.setupBeforeUnloadHandler();
     }
 
     private async initializeCloudSync(): Promise<void> {
@@ -54,13 +58,34 @@ export class ProfileStateManager {
             this.cloudSyncService = OneDriveSyncService.getInstance();
             await this.cloudSyncService.initialize();
         } catch (error) {
-            console.warn('Cloud sync initialization failed:', error);
+            logger.warn('Cloud sync initialization failed:', error);
         }
+    }
+
+    private setupBeforeUnloadHandler(): void {
+        if (typeof window === 'undefined') return;
+
+        this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
+            if (this.pendingSavePromises.size > 0) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        };
+
+        window.addEventListener('beforeunload', this.beforeUnloadHandler);
+    }
+
+    destroy(): void {
+        if (this.beforeUnloadHandler && typeof window !== 'undefined') {
+            window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+        }
+        this.removeAllListeners();
     }
 
     setCourseData(departments: Department[]): void {
         this.allDepartments = departments;
-        console.log(`📚 Course catalog set with ${departments.length} departments`);
+        logger.log(`📚 Course catalog set with ${departments.length} departments`);
     }
 
     // Public API for state access
@@ -91,6 +116,10 @@ export class ProfileStateManager {
 
     hasUnsavedChanges(): boolean {
         return this.state.hasUnsavedChanges;
+    }
+
+    hasPendingSaves(): boolean {
+        return this.pendingSavePromises.size > 0;
     }
 
     isLoading(): boolean {
@@ -193,7 +222,7 @@ export class ProfileStateManager {
                 }
             }
 
-            console.warn(`Section ${sectionNumber} not found in course ${course.department.abbreviation}${course.number}`);
+            logger.warn(`Section ${sectionNumber} not found in course ${course.department.abbreviation}${course.number}`);
         });
     }
 
@@ -337,7 +366,7 @@ export class ProfileStateManager {
             // Remove from storage
             const deleteResult = await this.storageManager.deleteSchedule(scheduleId);
             if (!deleteResult.success) {
-                console.warn('Failed to delete schedule from storage:', deleteResult.error);
+                logger.warn('Failed to delete schedule from storage:', deleteResult.error);
             }
 
             // If we deleted the active schedule, switch to another one
@@ -464,6 +493,17 @@ export class ProfileStateManager {
 
     // Persistence methods - All saves are immediate (async for IndexedDB compatibility)
     async save(): Promise<void> {
+        const savePromise = this.executeSave();
+        this.pendingSavePromises.add(savePromise);
+
+        try {
+            await savePromise;
+        } finally {
+            this.pendingSavePromises.delete(savePromise);
+        }
+    }
+
+    private async executeSave(): Promise<void> {
         try {
             // Capture snapshot before saving (unless we're restoring from undo/redo)
             if (!this.isRestoringState) {
@@ -475,9 +515,9 @@ export class ProfileStateManager {
                 );
             }
 
-            console.log('%cSAVING TO STORAGE', 'color: #4CAF50; font-weight: bold; font-size: 14px');
-            console.log('Active Schedule ID:', this.state.activeScheduleId);
-            console.log('Number of Schedules:', this.state.schedules.length);
+            logger.log('%cSAVING TO STORAGE', 'color: #4CAF50; font-weight: bold; font-size: 14px');
+            logger.log('Active Schedule ID:', this.state.activeScheduleId);
+            logger.log('Number of Schedules:', this.state.schedules.length);
 
             // Log what we're about to save
             const dataToSave = {
@@ -494,7 +534,7 @@ export class ProfileStateManager {
                 })),
                 preferences: this.state.preferences
             };
-            console.log('Data being saved:', JSON.stringify(dataToSave, null, 2));
+            logger.log('Data being saved:', JSON.stringify(dataToSave, null, 2));
 
             this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
 
@@ -509,7 +549,7 @@ export class ProfileStateManager {
             this.state.hasUnsavedChanges = false;
             this.state.lastSaved = Date.now();
 
-            console.log('%cSAVED - All data persisted to storage', 'color: #4CAF50; font-weight: bold');
+            logger.log('%cSAVED - All data persisted to storage', 'color: #4CAF50; font-weight: bold');
 
             if (previousUnsavedState) {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
@@ -519,20 +559,20 @@ export class ProfileStateManager {
                 this.syncToCloud();
             }
         } catch (error) {
-            console.error('Save failed:', error);
+            logger.error('Save failed:', error);
         }
     }
 
     async loadFromStorage(): Promise<boolean> {
         // Prevent concurrent calls - if already loading, skip this call
         if (this.isLoadingFlag) {
-            console.log('⏭Already loading from storage, skipping duplicate call');
+            logger.log('⏭Already loading from storage, skipping duplicate call');
             return false;
         }
 
         // Skip if already loaded with schedules (redundant call prevention)
         if (this.state.schedules.length > 0 && !this.state.isLoading) {
-            console.log('⏭Already loaded with schedules, skipping redundant call');
+            logger.log('⏭Already loaded with schedules, skipping redundant call');
             return true;
         }
 
@@ -540,7 +580,7 @@ export class ProfileStateManager {
             this.state.isLoading = true;
             this.isLoadingFlag = true;
 
-            console.log('%cLOADING FROM STORAGE', 'color: #2196F3; font-weight: bold; font-size: 14px');
+            logger.log('%cLOADING FROM STORAGE', 'color: #2196F3; font-weight: bold; font-size: 14px');
 
             // Load preferences first
             const preferencesResult = this.storageManager.loadPreferences();
@@ -578,7 +618,7 @@ export class ProfileStateManager {
             this.state.selectedCourses = loadedCourses;
 
             // Log what was loaded
-            console.log('%cLOADED - Parsed Data:', 'color: #2196F3; font-weight: bold');
+            logger.log('%cLOADED - Parsed Data:', 'color: #2196F3; font-weight: bold');
             const loadedData = {
                 activeScheduleId: this.state.activeScheduleId,
                 schedulesCount: this.state.schedules.length,
@@ -600,19 +640,19 @@ export class ProfileStateManager {
                     selectedSection: sc.selectedSectionNumber
                 }))
             };
-            console.log(JSON.stringify(loadedData, null, 2));
-            console.log('---');
+            logger.log(JSON.stringify(loadedData, null, 2));
+            logger.log('---');
 
             // If no schedules exist, create a default one
             if (this.state.schedules.length === 0) {
-                console.log('No schedules found, creating default schedule');
+                logger.log('No schedules found, creating default schedule');
                 const defaultSchedule = this.createSchedule('My Schedule', 'system');
                 this.state.activeScheduleId = defaultSchedule.id;
             }
 
             // If no active schedule but schedules exist, set the last one as active
             if (!this.state.activeScheduleId && this.state.schedules.length > 0) {
-                console.log('No active schedule, setting last schedule as active');
+                logger.log('No active schedule, setting last schedule as active');
                 this.state.activeScheduleId = this.state.schedules[this.state.schedules.length - 1].id;
             }
 
@@ -621,7 +661,7 @@ export class ProfileStateManager {
             return true;
 
         } catch (error) {
-            console.error('Load failed:', error);
+            logger.error('Load failed:', error);
             return false;
         } finally {
             this.state.isLoading = false;
@@ -655,13 +695,13 @@ export class ProfileStateManager {
             const cloudData: CloudStateData = JSON.parse(exportedData);
             await this.cloudSyncService.syncToCloud(cloudData);
         } catch (error) {
-            console.error('Cloud sync failed:', error);
+            logger.error('Cloud sync failed:', error);
         }
     }
 
     async pullFromCloudAndMerge(): Promise<boolean> {
         if (!this.cloudSyncService?.isAuthenticated()) {
-            console.warn('Not authenticated with OneDrive');
+            logger.warn('Not authenticated with OneDrive');
             return false;
         }
 
@@ -675,7 +715,7 @@ export class ProfileStateManager {
             }
             return false;
         } catch (error) {
-            console.error('Failed to pull from cloud:', error);
+            logger.error('Failed to pull from cloud:', error);
             return false;
         }
     }
@@ -702,11 +742,11 @@ export class ProfileStateManager {
 
     private resolveCourseReferences(selectedCourses: SelectedCourse[]): SelectedCourse[] {
         if (this.allDepartments.length === 0) {
-            console.warn('Course catalog not available, skipping section reference resolution');
+            logger.warn('Course catalog not available, skipping section reference resolution');
             return selectedCourses;
         }
 
-        console.log(`Resolving course references for ${selectedCourses.length} courses`);
+        logger.log(`Resolving course references for ${selectedCourses.length} courses`);
 
         return selectedCourses.map(selectedCourse => {
             const courseId = selectedCourse.course.id;
@@ -718,7 +758,7 @@ export class ProfileStateManager {
             }
 
             if (!liveCourse) {
-                console.warn(`Course ${courseId} not found in catalog, keeping original reference`);
+                logger.warn(`Course ${courseId} not found in catalog, keeping original reference`);
                 return selectedCourse;
             }
 
@@ -728,7 +768,7 @@ export class ProfileStateManager {
                 const allSections = getAllSections(liveCourse);
                 const liveSection = allSections.find((s: Section) => s.crn === section.crn);
                 if (!liveSection) {
-                    console.warn(`Section CRN ${section.crn} not found for course ${courseId}`);
+                    logger.warn(`Section CRN ${section.crn} not found for course ${courseId}`);
                     return null;
                 }
                 return liveSection;
@@ -786,7 +826,7 @@ export class ProfileStateManager {
         }
 
         // Fire and forget - save happens in background
-        this.save().catch(error => console.error('Save failed:', error));
+        this.save().catch(error => logger.error('Save failed:', error));
     }
 
     private async withStateUpdateAsync<T>(updateFn: () => Promise<T>): Promise<T> {
@@ -814,7 +854,7 @@ export class ProfileStateManager {
         }
 
         // Fire and forget - save happens in background
-        this.save().catch(error => console.error('Save failed:', error));
+        this.save().catch(error => logger.error('Save failed:', error));
         return result;
     }
 
@@ -853,7 +893,7 @@ export class ProfileStateManager {
                     try {
                         listener(event, this.getState());
                     } catch (error) {
-                        console.error('Error in state change listener:', error);
+                        logger.error('Error in state change listener:', error);
                     }
                 });
             });
@@ -869,24 +909,24 @@ export class ProfileStateManager {
 
 
     private generateScheduleId(): string {
-        return `schedule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        return `schedule_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     }
 
     // Debug methods
     debugState(): void {
-        console.log('=== PROFILE STATE DEBUG ===');
-        console.log('Active Schedule ID:', this.state.activeScheduleId);
-        console.log('Schedules:', this.state.schedules.map(s => ({
+        logger.log('=== PROFILE STATE DEBUG ===');
+        logger.log('Active Schedule ID:', this.state.activeScheduleId);
+        logger.log('Schedules:', this.state.schedules.map(s => ({
             id: s.id,
             name: s.name,
             courseCount: s.selectedCourses.length
         })));
-        console.log('Selected Courses:', this.state.selectedCourses.length);
-        console.log('Has Unsaved Changes:', this.state.hasUnsavedChanges);
-        console.log('Last Saved:', new Date(this.state.lastSaved).toISOString());
-        console.log('Listeners:', this.listeners.size);
-        console.log('Health Check:', this.isHealthy());
-        console.log('===============================');
+        logger.log('Selected Courses:', this.state.selectedCourses.length);
+        logger.log('Has Unsaved Changes:', this.state.hasUnsavedChanges);
+        logger.log('Last Saved:', new Date(this.state.lastSaved).toISOString());
+        logger.log('Listeners:', this.listeners.size);
+        logger.log('Health Check:', this.isHealthy());
+        logger.log('===============================');
     }
 
     async getStorageStats() {

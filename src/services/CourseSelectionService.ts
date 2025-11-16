@@ -35,6 +35,7 @@ export class CourseSelectionService {
     private selectionListeners = new Set<SelectionChangeListener>();
     private isInitialized = false;
     private initializationPromise: Promise<boolean> | null = null;
+    private sectionIndexCache = new WeakMap<Course, Map<string, Section>>();
 
     constructor(
         profileStateManager?: ProfileStateManager,
@@ -545,13 +546,30 @@ export class CourseSelectionService {
         return selectedCourses;
     }
 
+    private getSectionIndex(course: Course): Map<string, Section> {
+        let index = this.sectionIndexCache.get(course);
+
+        if (!index) {
+            index = new Map<string, Section>();
+            const allSections = this.getAllSectionsForCourse(course);
+
+            allSections.forEach(section => {
+                index!.set(section.number, section);
+            });
+
+            this.sectionIndexCache.set(course, index);
+        }
+
+        return index;
+    }
+
     private syncSectionObjects(selectedCourses: SelectedCourse[]): void {
         selectedCourses.forEach(sc => {
             // If we have a selectedSectionNumber but no selectedSection object (or invalid object)
             if (sc.selectedSectionNumber && (!sc.selectedSection || !sc.selectedSection.computedTerm)) {
-                // Find the section object in the course using hierarchical structure
-                const allSections = this.getAllSectionsForCourse(sc.course);
-                const sectionObject = allSections.find(s => s.number === sc.selectedSectionNumber);
+                // Use cached section index for O(1) lookup instead of O(n) find
+                const sectionIndex = this.getSectionIndex(sc.course);
+                const sectionObject = sectionIndex.get(sc.selectedSectionNumber);
 
                 if (sectionObject && sectionObject.computedTerm) {
                     sc.selectedSection = sectionObject;
@@ -766,13 +784,12 @@ export class CourseSelectionService {
         try {
             let reconstructedCount = 0;
             const selectedCourses = this.getSelectedCourses();
-            
+
             selectedCourses.forEach(selectedCourse => {
                 if (selectedCourse.selectedSectionNumber && !selectedCourse.selectedSection) {
-                    const allSections = this.getAllSectionsForCourse(selectedCourse.course);
-                    const sectionObject = allSections.find(s =>
-                        s.number === selectedCourse.selectedSectionNumber
-                    ) || null;
+                    // Use cached section index for O(1) lookup instead of O(n) find
+                    const sectionIndex = this.getSectionIndex(selectedCourse.course);
+                    const sectionObject = sectionIndex.get(selectedCourse.selectedSectionNumber) || null;
 
                     if (sectionObject) {
                         selectedCourse.selectedSection = sectionObject;
@@ -780,7 +797,7 @@ export class CourseSelectionService {
                     }
                 }
             });
-            
+
             if (reconstructedCount > 0) {
                 console.log(`Reconstructed ${reconstructedCount} section objects`);
                 // Save changes and notify listeners

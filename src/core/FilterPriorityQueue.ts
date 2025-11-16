@@ -13,10 +13,13 @@ export class FilterPriorityQueue<T> {
 
     extractMin(): T | null {
         if (this.heap.length === 0) return null;
-        if (this.heap.length === 1) return this.heap.pop()!.item;
+
+        const lastItem = this.heap.pop();
+        if (!lastItem) return null;
+        if (this.heap.length === 0) return lastItem.item;
 
         const min = this.heap[0].item;
-        this.heap[0] = this.heap.pop()!;
+        this.heap[0] = lastItem;
         this.bubbleDown(0);
         return min;
     }

@@ -103,6 +103,10 @@ export const INLINE_SVGS: Record<IconName, string> = {
 ${inlineSvgsObject}
 } as const;
 
+function sanitizeClassName(className: string): string {
+  return className.replace(/[^a-zA-Z0-9_\\-\\s]/g, '');
+}
+
 /**
  * Helper function to create an inline SVG with custom classes.
  * @param iconName The icon to render
@@ -113,8 +117,8 @@ export function getInlineSVG(iconName: IconName, className?: string): string {
   const svg = INLINE_SVGS[iconName];
   if (!className) return svg;
 
-  // Add class to the SVG element
-  return svg.replace('<svg', \`<svg class="\${className}"\`);
+  const safeClassName = sanitizeClassName(className);
+  return svg.replace('<svg', \`<svg class="\${safeClassName}"\`);
 }
 `;
 

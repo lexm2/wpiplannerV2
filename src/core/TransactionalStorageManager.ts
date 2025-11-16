@@ -146,7 +146,7 @@ export class TransactionalStorageManager {
         await this.ensureInitialized();
         const result = await this.indexedDBStorage.loadSchedule(scheduleId);
         return {
-            data: result.data || null,
+            data: result.data ?? null,
             valid: result.success,
             error: result.error
         };
@@ -156,7 +156,7 @@ export class TransactionalStorageManager {
         await this.ensureInitialized();
         const result = await this.indexedDBStorage.loadAllSchedules();
         return {
-            data: result.data || [],
+            data: result.data ?? [],
             valid: result.success,
             error: result.error
         };
@@ -185,9 +185,9 @@ export class TransactionalStorageManager {
             this.getDefaultPreferences(),
             'preferences'
         );
-        
+
         return {
-            data: result.data || this.getDefaultPreferences(),
+            data: result.data ?? this.getDefaultPreferences(),
             valid: result.valid,
             error: result.error
         };
@@ -203,7 +203,7 @@ export class TransactionalStorageManager {
         try {
             const savedTheme = localStorage.getItem(TransactionalStorageManager.STORAGE_KEYS.THEME);
             return {
-                data: savedTheme || 'wpi-dark',
+                data: savedTheme ?? 'wpi-dark',
                 valid: true
             };
         } catch (error) {
@@ -228,12 +228,12 @@ export class TransactionalStorageManager {
     loadActiveScheduleId(): { data: string | null; valid: boolean; error?: string } {
         try {
             const saved = localStorage.getItem(TransactionalStorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID);
-            return { 
-                data: saved && saved.length > 0 ? saved : null,
+            return {
+                data: (saved?.length ?? 0) > 0 ? saved : null,
                 valid: true
             };
         } catch (error) {
-            return { 
+            return {
                 data: null,
                 valid: false,
                 error: `Failed to load active schedule ID: ${error}`
@@ -255,7 +255,7 @@ export class TransactionalStorageManager {
         try {
             const state = this.loadUserState().data;
             const schedulesResult = await this.loadAllSchedules();
-            const schedules = schedulesResult.data || [];
+            const schedules = schedulesResult.data ?? [];
             const preferences = this.loadPreferences().data;
 
             const exportData = {
@@ -267,13 +267,12 @@ export class TransactionalStorageManager {
                 preferences
             };
 
-            // Generate checksum for integrity verification (use custom replacer for Sets)
             const dataString = this.safeStringify({
                 state: exportData.state,
                 schedules: exportData.schedules,
                 preferences: exportData.preferences
             });
-            exportData.checksum = this.generateChecksum(dataString);
+            exportData.checksum = await this.generateChecksum(dataString);
 
             return {
                 data: JSON.stringify(exportData, this.replacer, 2),
@@ -292,14 +291,13 @@ export class TransactionalStorageManager {
         try {
             const data = JSON.parse(jsonData, this.reviver);
 
-            // Verify checksum if available (use custom replacer for Sets)
             if (data.checksum) {
                 const verifyData = {
                     state: data.state,
                     schedules: data.schedules,
                     preferences: data.preferences
                 };
-                const calculatedChecksum = this.generateChecksum(this.safeStringify(verifyData));
+                const calculatedChecksum = await this.generateChecksum(this.safeStringify(verifyData));
                 if (calculatedChecksum !== data.checksum) {
                     throw new Error('Data integrity check failed - checksum mismatch');
                 }
@@ -411,7 +409,7 @@ export class TransactionalStorageManager {
     }
 
     private generateTransactionId(): string {
-        return `tx_${Date.now()}_${++this.transactionCounter}_${Math.random().toString(36).substr(2, 9)}`;
+        return `tx_${Date.now()}_${++this.transactionCounter}_${Math.random().toString(36).substring(2, 11)}`;
     }
 
     private extractKeysFromOperations(_operations: (() => void)[]): string[] {
@@ -480,16 +478,32 @@ export class TransactionalStorageManager {
         }
     }
 
-    private generateChecksum(data: string): string {
+    private async generateChecksum(data: string): Promise<string> {
+        if (typeof crypto !== 'undefined' && crypto.subtle) {
+            try {
+                const encoder = new TextEncoder();
+                const dataBuffer = encoder.encode(data);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch (error) {
+                console.warn('Web Crypto API failed, falling back to simple hash:', error);
+                return this.fallbackChecksum(data);
+            }
+        }
+        return this.fallbackChecksum(data);
+    }
+
+    private fallbackChecksum(data: string): string {
         let hash = 0;
         if (data.length === 0) return hash.toString();
-        
+
         for (let i = 0; i < data.length; i++) {
             const char = data.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
+            hash = hash & hash;
         }
-        
+
         return hash.toString();
     }
 
@@ -514,8 +528,8 @@ export class TransactionalStorageManager {
         // Check for active transactions that might be stuck
         if (this.activeTransactions.size > 0) {
             const stuckTransactions = Array.from(this.activeTransactions.values())
-                .filter(tx => Date.now() - tx.timestamp > 30000); // 30 seconds
-            
+                .filter(tx => Date.now() - tx.timestamp > 30_000); // 30 seconds
+
             if (stuckTransactions.length > 0) {
                 issues.push(`${stuckTransactions.length} transactions stuck for >30s`);
             }
@@ -536,8 +550,8 @@ export class TransactionalStorageManager {
         await this.ensureInitialized();
         const stats = await this.indexedDBStorage.getStorageStats();
         return {
-            totalSchedules: stats.data?.totalSchedules || 0,
-            estimatedSize: stats.data?.estimatedSize || 0,
+            totalSchedules: stats.data?.totalSchedules ?? 0,
+            estimatedSize: stats.data?.estimatedSize ?? 0,
             isUsingIndexedDB: true,
             schedulesSizes: stats.data?.schedulesSizes
         };

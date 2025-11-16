@@ -562,7 +562,8 @@ describe('ComponentSelectionWizard', () => {
             expect(panel).toBeTruthy();
         });
 
-        test('should remove wizard panel when closed', (done) => {
+        test('should remove wizard panel when closed', async () => {
+            vi.useFakeTimers();
             const course = createHierarchicalCourse();
             const wizard = new ComponentSelectionWizard(
                 course,
@@ -574,15 +575,15 @@ describe('ComponentSelectionWizard', () => {
             wizard.open();
             wizard.close();
 
-            setTimeout(() => {
-                const container = document.getElementById('schedule-selected-courses');
-                const panel = container?.querySelector('.wizard-inline-panel');
-                expect(panel).toBeFalsy();
-                done();
-            }, 350); // Wait for animation
+            await vi.advanceTimersByTimeAsync(350);
+
+            const container = document.getElementById('schedule-selected-courses');
+            const panel = container?.querySelector('.wizard-inline-panel');
+            expect(panel).toBeFalsy();
+            vi.useRealTimers();
         });
 
-        test('should add active class to panel when opened', (done) => {
+        test('should add active class to panel when opened', async () => {
             const course = createHierarchicalCourse();
             const wizard = new ComponentSelectionWizard(
                 course,
@@ -593,15 +594,16 @@ describe('ComponentSelectionWizard', () => {
 
             wizard.open();
 
-            // Wait for requestAnimationFrame to execute (double RAF needed)
-            requestAnimationFrame(() => {
+            await new Promise<void>((resolve) => {
                 requestAnimationFrame(() => {
-                    const panel = document.querySelector('.wizard-inline-panel');
-                    expect(panel).toBeTruthy();
-                    if (panel) {
-                        expect(panel.classList.contains('active')).toBe(true);
-                    }
-                    done();
+                    requestAnimationFrame(() => {
+                        const panel = document.querySelector('.wizard-inline-panel');
+                        expect(panel).toBeTruthy();
+                        if (panel) {
+                            expect(panel.classList.contains('active')).toBe(true);
+                        }
+                        resolve();
+                    });
                 });
             });
         });

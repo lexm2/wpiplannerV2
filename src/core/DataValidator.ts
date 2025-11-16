@@ -2,7 +2,9 @@
  * Validates course data integrity and format consistency
  */
 import { Schedule, SelectedCourse } from '../types/schedule'
+import { SimpleTime } from '../types/types'
 import { getAllSections } from '../utils/courseUtils'
+import { DateUtils } from '../utils/dateUtils'
 
 export interface ValidationResult {
     valid: boolean;
@@ -31,7 +33,7 @@ export interface SchemaValidationOptions {
 
 export class DataValidator {
     // Schema validation for core data types
-    validateSchedule(schedule: any, options: SchemaValidationOptions = {}): ValidationResult {
+    validateSchedule(schedule: unknown, options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
         if (!schedule || typeof schedule !== 'object') {
@@ -45,22 +47,18 @@ export class DataValidator {
             return result;
         }
 
+        const scheduleObj = schedule as Record<string, unknown>;
+
         // Validate required fields
-        this.validateRequiredField(schedule, 'id', 'string', result);
-        this.validateRequiredField(schedule, 'name', 'string', result);
+        this.validateRequiredField(scheduleObj, 'id', 'string', result);
+        this.validateRequiredField(scheduleObj, 'name', 'string', result);
         
         // Validate arrays
-        if (!Array.isArray(schedule.selectedCourses)) {
-            result.errors.push({
-                field: 'schedule.selectedCourses',
-                message: 'selectedCourses must be an array',
-                severity: 'error',
-                code: 'INVALID_ARRAY'
-            });
-            result.valid = false;
-        } else {
-            // Validate each selected course
-            schedule.selectedCourses.forEach((course: any, index: number) => {
+        this.validateArray(
+            scheduleObj,
+            'selectedCourses',
+            result,
+            (course: unknown, index: number) => {
                 const courseValidation = this.validateSelectedCourse(course, { ...options, allowPartialData: true });
                 if (!courseValidation.valid) {
                     courseValidation.errors.forEach(error => {
@@ -72,10 +70,10 @@ export class DataValidator {
                     result.valid = false;
                 }
                 result.warnings.push(...courseValidation.warnings);
-            });
-        }
+            }
+        );
 
-        if (!Array.isArray(schedule.generatedSchedules)) {
+        if (!Array.isArray(scheduleObj.generatedSchedules)) {
             result.errors.push({
                 field: 'schedule.generatedSchedules',
                 message: 'generatedSchedules must be an array',
@@ -87,13 +85,13 @@ export class DataValidator {
 
         // Auto-repair missing fields if requested
         if (options.repairInPlace && result.valid) {
-            this.repairSchedule(schedule);
+            this.repairSchedule(scheduleObj as any as Schedule);
         }
 
         return result;
     }
 
-    validateSelectedCourse(selectedCourse: any, options: SchemaValidationOptions = {}): ValidationResult {
+    validateSelectedCourse(selectedCourse: unknown, options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
         if (!selectedCourse || typeof selectedCourse !== 'object') {
@@ -107,8 +105,10 @@ export class DataValidator {
             return result;
         }
 
+        const selectedCourseObj = selectedCourse as Record<string, unknown>;
+
         // Validate course object
-        if (!selectedCourse.course) {
+        if (!selectedCourseObj.course) {
             result.errors.push({
                 field: 'course',
                 message: 'Course is required',
@@ -117,7 +117,7 @@ export class DataValidator {
             });
             result.valid = false;
         } else {
-            const courseValidation = this.validateCourse(selectedCourse.course, options);
+            const courseValidation = this.validateCourse(selectedCourseObj.course, options);
             if (!courseValidation.valid) {
                 courseValidation.errors.forEach(error => {
                     result.errors.push({
@@ -131,9 +131,9 @@ export class DataValidator {
         }
 
         // Validate isRequired field
-        if (typeof selectedCourse.isRequired !== 'boolean') {
+        if (typeof selectedCourseObj.isRequired !== 'boolean') {
             if (options.repairInPlace) {
-                selectedCourse.isRequired = false;
+                selectedCourseObj.isRequired = false;
                 result.warnings.push({
                     field: 'isRequired',
                     message: 'isRequired should be boolean, defaulted to false'
@@ -150,8 +150,8 @@ export class DataValidator {
         }
 
         // Validate section selection consistency
-        const hasSelectedSection = selectedCourse.selectedSection !== null;
-        const hasSelectedSectionNumber = selectedCourse.selectedSectionNumber !== null;
+        const hasSelectedSection = selectedCourseObj.selectedSection !== null;
+        const hasSelectedSectionNumber = selectedCourseObj.selectedSectionNumber !== null;
 
         if (hasSelectedSection !== hasSelectedSectionNumber) {
             result.warnings.push({
@@ -162,7 +162,7 @@ export class DataValidator {
         }
 
         // Validate section number format if present
-        if (selectedCourse.selectedSectionNumber && typeof selectedCourse.selectedSectionNumber !== 'string') {
+        if (selectedCourseObj.selectedSectionNumber && typeof selectedCourseObj.selectedSectionNumber !== 'string') {
             result.errors.push({
                 field: 'selectedSectionNumber',
                 message: 'selectedSectionNumber must be a string or null',
@@ -175,7 +175,7 @@ export class DataValidator {
         return result;
     }
 
-    validateCourse(course: any, options: SchemaValidationOptions = {}): ValidationResult {
+    validateCourse(course: unknown, options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
         if (!course || typeof course !== 'object') {
@@ -189,13 +189,15 @@ export class DataValidator {
             return result;
         }
 
+        const courseObj = course as Record<string, unknown>;
+
         // Validate required fields
-        this.validateRequiredField(course, 'id', 'string', result);
-        this.validateRequiredField(course, 'number', 'string', result);
-        this.validateRequiredField(course, 'name', 'string', result);
+        this.validateRequiredField(courseObj, 'id', 'string', result);
+        this.validateRequiredField(courseObj, 'number', 'string', result);
+        this.validateRequiredField(courseObj, 'name', 'string', result);
 
         // Validate credits (should be number)
-        if (course.credits !== undefined && (typeof course.credits !== 'number' || course.credits < 0)) {
+        if (courseObj.credits !== undefined && (typeof courseObj.credits !== 'number' || courseObj.credits < 0)) {
             result.errors.push({
                 field: 'credits',
                 message: 'Credits must be a non-negative number',
@@ -206,7 +208,7 @@ export class DataValidator {
         }
 
         // Validate department
-        if (!course.department || typeof course.department !== 'object') {
+        if (!courseObj.department || typeof courseObj.department !== 'object') {
             result.errors.push({
                 field: 'department',
                 message: 'Department must be an object',
@@ -215,7 +217,7 @@ export class DataValidator {
             });
             result.valid = false;
         } else {
-            const deptValidation = this.validateDepartment(course.department, options);
+            const deptValidation = this.validateDepartment(courseObj.department, options);
             if (!deptValidation.valid) {
                 deptValidation.errors.forEach(error => {
                     result.errors.push({
@@ -228,7 +230,7 @@ export class DataValidator {
         }
 
         // Validate sections (hierarchical structure)
-        const allSections = getAllSections(course);
+        const allSections = getAllSections(courseObj as any);
         if (allSections.length === 0) {
             result.warnings.push({
                 field: 'sections',
@@ -240,7 +242,7 @@ export class DataValidator {
         return result;
     }
 
-    validateDepartment(department: any, _options: SchemaValidationOptions = {}): ValidationResult {
+    validateDepartment(department: unknown, _options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
         if (!department || typeof department !== 'object') {
@@ -254,11 +256,13 @@ export class DataValidator {
             return result;
         }
 
-        this.validateRequiredField(department, 'abbreviation', 'string', result);
-        this.validateRequiredField(department, 'name', 'string', result);
+        const departmentObj = department as Record<string, unknown>;
+
+        this.validateRequiredField(departmentObj, 'abbreviation', 'string', result);
+        this.validateRequiredField(departmentObj, 'name', 'string', result);
 
         // Validate abbreviation format (should be uppercase letters)
-        if (department.abbreviation && !/^[A-Z]{2,6}$/.test(department.abbreviation)) {
+        if (departmentObj.abbreviation && typeof departmentObj.abbreviation === 'string' && !/^[A-Z]{2,6}$/.test(departmentObj.abbreviation)) {
             result.warnings.push({
                 field: 'abbreviation',
                 message: 'Department abbreviation should be 2-6 uppercase letters',
@@ -269,7 +273,7 @@ export class DataValidator {
         return result;
     }
 
-    validateSchedulePreferences(preferences: any, options: SchemaValidationOptions = {}): ValidationResult {
+    validateSchedulePreferences(preferences: unknown, options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
         if (!preferences || typeof preferences !== 'object') {
@@ -283,9 +287,11 @@ export class DataValidator {
             return result;
         }
 
+        const preferencesObj = preferences as Record<string, unknown>;
+
         // Validate preferredTimeRange
-        if (preferences.preferredTimeRange) {
-            const timeRange = preferences.preferredTimeRange;
+        if (preferencesObj.preferredTimeRange) {
+            const timeRange = preferencesObj.preferredTimeRange as any;
             
             if (!timeRange.startTime || !timeRange.endTime) {
                 result.errors.push({
@@ -308,7 +314,7 @@ export class DataValidator {
                 }
                 
                 // Check logical time ordering
-                if (this.timeToMinutes(timeRange.startTime) >= this.timeToMinutes(timeRange.endTime)) {
+                if (DateUtils.timeToMinutes(timeRange.startTime) >= DateUtils.timeToMinutes(timeRange.endTime)) {
                     result.errors.push({
                         field: 'preferredTimeRange',
                         message: 'Start time must be before end time',
@@ -321,12 +327,12 @@ export class DataValidator {
         }
 
         // Validate preferredDays
-        if (preferences.preferredDays) {
-            if (!(preferences.preferredDays instanceof Set)) {
+        if (preferencesObj.preferredDays) {
+            if (!(preferencesObj.preferredDays instanceof Set)) {
                 // Try to convert if it's an array
-                if (Array.isArray(preferences.preferredDays)) {
+                if (Array.isArray(preferencesObj.preferredDays)) {
                     if (options.repairInPlace) {
-                        preferences.preferredDays = new Set(preferences.preferredDays);
+                        preferencesObj.preferredDays = new Set(preferencesObj.preferredDays);
                         result.warnings.push({
                             field: 'preferredDays',
                             message: 'Converted preferredDays array to Set'
@@ -343,9 +349,9 @@ export class DataValidator {
                 }
             }
 
-            if (preferences.preferredDays instanceof Set) {
+            if (preferencesObj.preferredDays instanceof Set) {
                 const validDays = new Set(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
-                for (const day of preferences.preferredDays) {
+                for (const day of preferencesObj.preferredDays) {
                     if (!validDays.has(day)) {
                         result.warnings.push({
                             field: 'preferredDays',
@@ -358,9 +364,9 @@ export class DataValidator {
         }
 
         // Validate boolean fields
-        if (preferences.avoidBackToBackClasses !== undefined && typeof preferences.avoidBackToBackClasses !== 'boolean') {
+        if (preferencesObj.avoidBackToBackClasses !== undefined && typeof preferencesObj.avoidBackToBackClasses !== 'boolean') {
             if (options.repairInPlace) {
-                preferences.avoidBackToBackClasses = Boolean(preferences.avoidBackToBackClasses);
+                preferencesObj.avoidBackToBackClasses = Boolean(preferencesObj.avoidBackToBackClasses);
                 result.warnings.push({
                     field: 'avoidBackToBackClasses',
                     message: 'Converted avoidBackToBackClasses to boolean'
@@ -379,7 +385,7 @@ export class DataValidator {
         return result;
     }
 
-    validateUserScheduleState(userState: any, options: SchemaValidationOptions = {}): ValidationResult {
+    validateUserScheduleState(userState: unknown, options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
         if (!userState || typeof userState !== 'object') {
@@ -393,17 +399,14 @@ export class DataValidator {
             return result;
         }
 
+        const userStateObj = userState as Record<string, unknown>;
+
         // Validate savedSchedules
-        if (!Array.isArray(userState.savedSchedules)) {
-            result.errors.push({
-                field: 'savedSchedules',
-                message: 'savedSchedules must be an array',
-                severity: 'error',
-                code: 'INVALID_ARRAY'
-            });
-            result.valid = false;
-        } else {
-            userState.savedSchedules.forEach((schedule: any, index: number) => {
+        this.validateArray(
+            userStateObj,
+            'savedSchedules',
+            result,
+            (schedule: unknown, index: number) => {
                 const scheduleValidation = this.validateSchedule(schedule, options);
                 if (!scheduleValidation.valid) {
                     scheduleValidation.errors.forEach(error => {
@@ -415,12 +418,12 @@ export class DataValidator {
                     result.valid = false;
                 }
                 result.warnings.push(...scheduleValidation.warnings);
-            });
-        }
+            }
+        );
 
         // Validate preferences
-        if (userState.preferences) {
-            const preferencesValidation = this.validateSchedulePreferences(userState.preferences, options);
+        if (userStateObj.preferences) {
+            const preferencesValidation = this.validateSchedulePreferences(userStateObj.preferences, options);
             if (!preferencesValidation.valid) {
                 preferencesValidation.errors.forEach(error => {
                     result.errors.push({
@@ -458,9 +461,19 @@ export class DataValidator {
             }
         }
 
-        // Check for duplicate schedule IDs
-        const scheduleIds = data.schedules.map(s => s.id);
-        const duplicateIds = scheduleIds.filter((id, index) => scheduleIds.indexOf(id) !== index);
+        // Check for duplicate schedule IDs using Map for O(n) performance
+        const seenIds = new Map<string, number>();
+        const duplicateIds: string[] = [];
+
+        for (let i = 0; i < data.schedules.length; i++) {
+            const id = data.schedules[i].id;
+            if (seenIds.has(id)) {
+                duplicateIds.push(id);
+            } else {
+                seenIds.set(id, i);
+            }
+        }
+
         if (duplicateIds.length > 0) {
             result.errors.push({
                 field: 'schedules',
@@ -529,15 +542,20 @@ export class DataValidator {
     }
 
     // Schema migration utilities
-    detectSchemaVersion(data: any): string {
-        if (data.version) return data.version;
-        
+    detectSchemaVersion(data: unknown): string {
+        if (!data || typeof data !== 'object') return '1.0';
+
+        const dataObj = data as Record<string, unknown>;
+        if (dataObj.version && typeof dataObj.version === 'string') return dataObj.version;
+
         // Try to detect version based on data structure
-        if (data.selectedCourses && Array.isArray(data.selectedCourses)) {
+        if (dataObj.selectedCourses && Array.isArray(dataObj.selectedCourses)) {
             // Check if selectedCourses has both selectedSection and selectedSectionNumber
-            const hasModernStructure = data.selectedCourses.some((sc: any) => 
-                sc.hasOwnProperty('selectedSection') && sc.hasOwnProperty('selectedSectionNumber')
-            );
+            const hasModernStructure = dataObj.selectedCourses.some((sc: unknown) => {
+                if (!sc || typeof sc !== 'object') return false;
+                const scObj = sc as Record<string, unknown>;
+                return scObj.hasOwnProperty('selectedSection') && scObj.hasOwnProperty('selectedSectionNumber');
+            });
             if (hasModernStructure) return '2.0';
         }
 
@@ -545,7 +563,7 @@ export class DataValidator {
     }
 
     // Helper methods
-    private validateRequiredField(obj: any, field: string, expectedType: string, result: ValidationResult): void {
+    private validateRequiredField(obj: Record<string, unknown>, field: string, expectedType: string, result: ValidationResult): void {
         if (obj[field] === undefined || obj[field] === null) {
             result.errors.push({
                 field,
@@ -565,17 +583,34 @@ export class DataValidator {
         }
     }
 
-    private isValidTimeObject(time: any): boolean {
-        return time && 
-               typeof time === 'object' &&
-               typeof time.hours === 'number' &&
-               typeof time.minutes === 'number' &&
-               time.hours >= 0 && time.hours < 24 &&
-               time.minutes >= 0 && time.minutes < 60;
+    private isValidTimeObject(time: unknown): boolean {
+        if (!time || typeof time !== 'object') return false;
+        const timeObj = time as Record<string, unknown>;
+        return typeof timeObj.hours === 'number' &&
+               typeof timeObj.minutes === 'number' &&
+               timeObj.hours >= 0 && timeObj.hours < 24 &&
+               timeObj.minutes >= 0 && timeObj.minutes < 60;
     }
 
-    private timeToMinutes(time: { hours: number; minutes: number }): number {
-        return time.hours * 60 + time.minutes;
+    private validateArray(
+        obj: Record<string, unknown>,
+        field: string,
+        result: ValidationResult,
+        validator: (item: unknown, index: number) => void
+    ): void {
+        if (!Array.isArray(obj[field])) {
+            result.errors.push({
+                field,
+                message: `${field} must be an array`,
+                severity: 'error',
+                code: 'INVALID_ARRAY'
+            });
+            result.valid = false;
+        } else {
+            obj[field].forEach((item: unknown, index: number) => {
+                validator(item, index);
+            });
+        }
     }
 
     // Batch validation for multiple items

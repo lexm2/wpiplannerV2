@@ -2,12 +2,13 @@ import { Period, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
 import { ConflictDetector } from '../ConflictDetector';
 import { SectionFilter, PeriodConflictFilterCriteria } from '../../types/filters';
+import { logger } from '../../utils/logger';
 
 export interface PeriodConflictCriteria extends PeriodConflictFilterCriteria {
     selectedCourses?: SelectedCourse[];
 }
 
-export class PeriodConflictFilter implements SectionFilter {
+export class PeriodConflictFilter implements SectionFilter<PeriodConflictFilterCriteria> {
     readonly id = 'periodConflict';
     readonly name = 'Schedule Conflicts';
     readonly description = 'Hide periods that conflict with selected sections';
@@ -18,7 +19,22 @@ export class PeriodConflictFilter implements SectionFilter {
         this.conflictDetector = conflictDetector;
     }
 
-    apply(sections: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+    private createTempSection(period: Period): Section {
+        return {
+            crn: Math.floor(Math.random() * 99_999),
+            number: 'TEMP',
+            periods: [period],
+            seats: 999,
+            seatsAvailable: 999,
+            actualWaitlist: 0,
+            maxWaitlist: 0,
+            description: 'Temporary section for conflict detection',
+            term: 'TEMP',
+            computedTerm: 'TEMP'
+        };
+    }
+
+    apply(sections: Section[], criteria: PeriodConflictFilterCriteria, _activeFilters?: Map<string, unknown>): Section[] {
         return this.applyToSections(sections, criteria);
     }
 
@@ -48,25 +64,10 @@ export class PeriodConflictFilter implements SectionFilter {
 
         // Filter out periods that would cause conflicts
         return periods.filter(period => {
-            // Create a temporary section containing just this period
-            const tempSection: Section = {
-                crn: Math.floor(Math.random() * 99999),
-                number: 'TEMP',
-                periods: [period],
-                seats: 999,
-                seatsAvailable: 999,
-                actualWaitlist: 0,
-                maxWaitlist: 0,
-                description: 'Temporary section for conflict detection',
-                term: 'TEMP',
-                computedTerm: 'TEMP'
-            };
-
-            // Test if this temporary section conflicts with any selected sections
+            const tempSection = this.createTempSection(period);
             const testSections = [...selectedSections, tempSection];
             const conflicts = this.conflictDetector.detectConflicts(testSections);
-            
-            // Return true if no conflicts found (keep this period)
+
             return conflicts.length === 0;
         });
     }
@@ -124,25 +125,10 @@ export class PeriodConflictFilter implements SectionFilter {
                 return true;
             }
 
-            // Create a temporary section containing just this period
-            const tempSection: Section = {
-                crn: Math.floor(Math.random() * 99999),
-                number: 'TEMP',
-                periods: [currentPeriod],
-                seats: 999,
-                seatsAvailable: 999,
-                actualWaitlist: 0,
-                maxWaitlist: 0,
-                description: 'Temporary section for conflict detection',
-                term: 'TEMP',
-                computedTerm: 'TEMP'
-            };
-
-            // Test if this temporary section conflicts with selected sections from OTHER courses only
+            const tempSection = this.createTempSection(currentPeriod);
             const testSections = [...otherCoursesSelectedSections, tempSection];
             const conflicts = this.conflictDetector.detectConflicts(testSections);
-            
-            // Return true if no conflicts found (keep this period)
+
             return conflicts.length === 0;
         });
     }
@@ -180,31 +166,15 @@ export class PeriodConflictFilter implements SectionFilter {
         return sections.filter(currentSection => {
             // Check if ANY period in the current section conflicts with selected sections
             for (const currentPeriod of currentSection.periods) {
-                // Create a temporary section containing just this period
-                const tempSection: Section = {
-                    crn: Math.floor(Math.random() * 99999),
-                    number: 'TEMP',
-                    periods: [currentPeriod],
-                    seats: 999,
-                    seatsAvailable: 999,
-                    actualWaitlist: 0,
-                    maxWaitlist: 0,
-                    description: 'Temporary section for conflict detection',
-                    term: 'TEMP',
-                    computedTerm: 'TEMP'
-                };
-
-                // Test if this period conflicts with any selected sections
+                const tempSection = this.createTempSection(currentPeriod);
                 const testSections = [...selectedSections, tempSection];
                 const conflicts = this.conflictDetector.detectConflicts(testSections);
-                
-                // If ANY period in this section conflicts, filter out the ENTIRE section
+
                 if (conflicts.length > 0) {
                     return false;
                 }
             }
 
-            // No conflicts found for any period in this section
             return true;
         });
     }
@@ -214,13 +184,13 @@ export class PeriodConflictFilter implements SectionFilter {
         sectionsWithContext: Array<{course: SelectedCourse, section: Section}>,
         criteria: PeriodConflictCriteria
     ): Array<{course: SelectedCourse, section: Section}> {
-        console.log('[PeriodConflictFilter] applyToSectionsWithContext called');
-        console.log('[PeriodConflictFilter] Criteria:', criteria);
-        console.log('[PeriodConflictFilter] avoidConflicts:', criteria.avoidConflicts);
-        console.log('[PeriodConflictFilter] selectedCourses:', criteria.selectedCourses?.length);
+        logger.log('[PeriodConflictFilter] applyToSectionsWithContext called');
+        logger.log('[PeriodConflictFilter] Criteria:', criteria);
+        logger.log('[PeriodConflictFilter] avoidConflicts:', criteria.avoidConflicts);
+        logger.log('[PeriodConflictFilter] selectedCourses:', criteria.selectedCourses?.length);
 
         if (!criteria.avoidConflicts || !criteria.selectedCourses) {
-            console.log('[PeriodConflictFilter] Early return - avoidConflicts or selectedCourses missing');
+            logger.log('[PeriodConflictFilter] Early return - avoidConflicts or selectedCourses missing');
             return sectionsWithContext;
         }
 
@@ -228,24 +198,24 @@ export class PeriodConflictFilter implements SectionFilter {
         // NOTE: A SelectedCourse can have multiple selected sections (lecture, discussion, lab)
         const selectedSectionsByCourse = new Map<string, Section[]>();
         for (const selectedCourse of criteria.selectedCourses) {
-            console.log('[PeriodConflictFilter] Processing course:', selectedCourse.course.department.abbreviation + selectedCourse.course.number);
-            console.log('[PeriodConflictFilter]   selectedLecture:', selectedCourse.selectedLecture?.number);
-            console.log('[PeriodConflictFilter]   selectedDiscussion:', selectedCourse.selectedDiscussion?.number);
-            console.log('[PeriodConflictFilter]   selectedLab:', selectedCourse.selectedLab?.number);
+            logger.log('[PeriodConflictFilter] Processing course:', selectedCourse.course.department.abbreviation + selectedCourse.course.number);
+            logger.log('[PeriodConflictFilter]   selectedLecture:', selectedCourse.selectedLecture?.number);
+            logger.log('[PeriodConflictFilter]   selectedDiscussion:', selectedCourse.selectedDiscussion?.number);
+            logger.log('[PeriodConflictFilter]   selectedLab:', selectedCourse.selectedLab?.number);
 
             const sectionsForThisCourse: Section[] = [];
 
             if (selectedCourse.selectedLecture) {
                 sectionsForThisCourse.push(selectedCourse.selectedLecture);
-                console.log('[PeriodConflictFilter]   ✓ Added lecture to map:', selectedCourse.selectedLecture.number);
+                logger.log('[PeriodConflictFilter]   ✓ Added lecture to map:', selectedCourse.selectedLecture.number);
             }
             if (selectedCourse.selectedDiscussion) {
                 sectionsForThisCourse.push(selectedCourse.selectedDiscussion);
-                console.log('[PeriodConflictFilter]   ✓ Added discussion to map:', selectedCourse.selectedDiscussion.number);
+                logger.log('[PeriodConflictFilter]   ✓ Added discussion to map:', selectedCourse.selectedDiscussion.number);
             }
             if (selectedCourse.selectedLab) {
                 sectionsForThisCourse.push(selectedCourse.selectedLab);
-                console.log('[PeriodConflictFilter]   ✓ Added lab to map:', selectedCourse.selectedLab.number);
+                logger.log('[PeriodConflictFilter]   ✓ Added lab to map:', selectedCourse.selectedLab.number);
             }
 
             if (sectionsForThisCourse.length > 0) {
@@ -253,11 +223,11 @@ export class PeriodConflictFilter implements SectionFilter {
             }
         }
 
-        console.log('[PeriodConflictFilter] Total selected sections in map:', selectedSectionsByCourse.size);
+        logger.log('[PeriodConflictFilter] Total selected sections in map:', selectedSectionsByCourse.size);
 
         // If no sections are selected, show all sections
         if (selectedSectionsByCourse.size === 0) {
-            console.log('[PeriodConflictFilter] No selected sections - returning all');
+            logger.log('[PeriodConflictFilter] No selected sections - returning all');
             return sectionsWithContext;
         }
 
@@ -266,7 +236,7 @@ export class PeriodConflictFilter implements SectionFilter {
             const currentCourse = item.course.course;
             const currentSection = item.section;
 
-            console.log(`[PeriodConflictFilter] Testing section ${currentSection.number} from ${currentCourse.department.abbreviation}${currentCourse.number}`);
+            logger.log(`[PeriodConflictFilter] Testing section ${currentSection.number} from ${currentCourse.department.abbreviation}${currentCourse.number}`);
 
             // Build list of sections to check against:
             // 1. Same course: selected components EXCEPT the section being tested (to check lecture vs discussion, etc.)
@@ -281,71 +251,55 @@ export class PeriodConflictFilter implements SectionFilter {
                     sectionsToCheckAgainst.push(...otherComponents);
 
                     if (otherComponents.length > 0) {
-                        console.log(`[PeriodConflictFilter]   Checking against ${otherComponents.length} other components from same course`);
+                        logger.log(`[PeriodConflictFilter]   Checking against ${otherComponents.length} other components from same course`);
                         otherComponents.forEach(s => {
-                            console.log(`[PeriodConflictFilter]     - ${s.number} (${s.periods.length} periods)`);
+                            logger.log(`[PeriodConflictFilter]     - ${s.number} (${s.periods.length} periods)`);
                         });
                     }
                 } else {
                     // Different course: check against ALL selected sections
                     sectionsToCheckAgainst.push(...selectedSections);
-                    console.log(`[PeriodConflictFilter]   Checking against ${selectedSections.length} sections from other course ${courseId}`);
+                    logger.log(`[PeriodConflictFilter]   Checking against ${selectedSections.length} sections from other course ${courseId}`);
                     selectedSections.forEach(s => {
-                        console.log(`[PeriodConflictFilter]     - ${s.number} (${s.periods.length} periods)`);
+                        logger.log(`[PeriodConflictFilter]     - ${s.number} (${s.periods.length} periods)`);
                     });
                 }
             }
 
             // If no sections to check against, no conflicts possible
             if (sectionsToCheckAgainst.length === 0) {
-                console.log(`[PeriodConflictFilter]   ✓ PASS - No selected sections to check against`);
+                logger.log(`[PeriodConflictFilter]   ✓ PASS - No selected sections to check against`);
                 return true;
             }
 
             // Check if ANY period in the current section conflicts
             for (const currentPeriod of currentSection.periods) {
-                // Create a temporary section containing just this period
-                const tempSection: Section = {
-                    crn: Math.floor(Math.random() * 99999),
-                    number: 'TEMP',
-                    periods: [currentPeriod],
-                    seats: 999,
-                    seatsAvailable: 999,
-                    actualWaitlist: 0,
-                    maxWaitlist: 0,
-                    description: 'Temporary section for conflict detection',
-                    term: 'TEMP',
-                    computedTerm: 'TEMP'
-                };
-
-                // Test if this period conflicts with any selected sections
+                const tempSection = this.createTempSection(currentPeriod);
                 const testSections = [...sectionsToCheckAgainst, tempSection];
                 const conflicts = this.conflictDetector.detectConflicts(testSections);
 
-                // If ANY period in this section conflicts, filter out the ENTIRE section
                 if (conflicts.length > 0) {
-                    console.log(`[PeriodConflictFilter]   ✗ FAIL - Period conflicts detected:`, conflicts.length);
+                    logger.log(`[PeriodConflictFilter]   ✗ FAIL - Period conflicts detected:`, conflicts.length);
                     const daysStr = Array.isArray(currentPeriod.days) ? currentPeriod.days.join('') : currentPeriod.days;
-                    console.log(`[PeriodConflictFilter]     Period: ${currentPeriod.type} ${daysStr} ${currentPeriod.startTime.hours}:${currentPeriod.startTime.minutes}-${currentPeriod.endTime.hours}:${currentPeriod.endTime.minutes}`);
+                    logger.log(`[PeriodConflictFilter]     Period: ${currentPeriod.type} ${daysStr} ${currentPeriod.startTime.hours}:${currentPeriod.startTime.minutes}-${currentPeriod.endTime.hours}:${currentPeriod.endTime.minutes}`);
                     return false;
                 }
             }
 
-            // No conflicts found for any period in this section
-            console.log(`[PeriodConflictFilter]   ✓ PASS - No conflicts found`);
+            logger.log(`[PeriodConflictFilter]   ✓ PASS - No conflicts found`);
             return true;
         });
 
-        console.log(`[PeriodConflictFilter] Filtered ${sectionsWithContext.length} sections down to ${result.length}`);
+        logger.log(`[PeriodConflictFilter] Filtered ${sectionsWithContext.length} sections down to ${result.length}`);
         return result;
     }
 
 
-    isValidCriteria(criteria: any): boolean {
+    isValidCriteria(criteria: unknown): criteria is PeriodConflictFilterCriteria {
         if (!criteria || typeof criteria !== 'object') {
             return false;
         }
-        return typeof criteria.avoidConflicts === 'boolean';
+        return typeof (criteria as PeriodConflictFilterCriteria).avoidConflicts === 'boolean';
     }
 
     getDisplayValue(criteria: PeriodConflictFilterCriteria): string {

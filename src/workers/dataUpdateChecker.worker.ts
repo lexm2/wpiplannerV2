@@ -11,7 +11,7 @@ interface UpdateResponseMessage {
 
 let checkInterval: number | null = null;
 let lastLoadedTimestamp: string | null = null;
-const CHECK_INTERVAL_MS = 60000; // 1 minute
+const CHECK_INTERVAL_MS = 60_000; // 1 minute
 
 self.addEventListener('message', (event: MessageEvent<UpdateCheckMessage>) => {
   const { type, lastLoadedTimestamp: timestamp } = event.data;
@@ -68,7 +68,7 @@ async function checkForUpdates(): Promise<void> {
     const data = await response.json() as { timestamp: string; utc: string };
     const serverTimestamp = data.timestamp;
 
-    console.log(`[DataUpdateChecker] Server timestamp: ${serverTimestamp}, Last loaded: ${lastLoadedTimestamp || 'none'}`);
+    console.log(`[DataUpdateChecker] Server timestamp: ${serverTimestamp}, Last loaded: ${lastLoadedTimestamp ?? 'none'}`);
 
     if (!lastLoadedTimestamp) {
       lastLoadedTimestamp = serverTimestamp;

@@ -70,8 +70,8 @@ export class InfoModalController {
         `;
 
         // Prevent clicks on modal dialog from closing modal
-        const dialog = backdrop.querySelector('.modal-dialog') as HTMLElement;
-        if (dialog) {
+        const dialog = backdrop.querySelector('.modal-dialog');
+        if (dialog instanceof HTMLElement) {
             dialog.addEventListener('click', (event) => {
                 event.stopPropagation();
             });

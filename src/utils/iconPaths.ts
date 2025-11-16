@@ -136,6 +136,10 @@ export const INLINE_SVGS: Record<IconName, string> = {
   X: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>`,
 } as const;
 
+function sanitizeClassName(className: string): string {
+  return className.replace(/[^a-zA-Z0-9_\-\s]/g, '');
+}
+
 /**
  * Helper function to create an inline SVG with custom classes.
  * @param iconName The icon to render
@@ -146,6 +150,6 @@ export function getInlineSVG(iconName: IconName, className?: string): string {
   const svg = INLINE_SVGS[iconName];
   if (!className) return svg;
 
-  // Add class to the SVG element
-  return svg.replace('<svg', `<svg class="${className}"`);
+  const safeClassName = sanitizeClassName(className);
+  return svg.replace('<svg', `<svg class="${safeClassName}"`);
 }

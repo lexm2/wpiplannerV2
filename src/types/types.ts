@@ -41,8 +41,21 @@ export interface Section {
     periods: Period[];
 }
 
+export enum PeriodType {
+    LECTURE = 'Lecture',
+    LAB = 'Lab',
+    DISCUSSION = 'Discussion',
+    SEMINAR = 'Seminar',
+    WORKSHOP = 'Workshop',
+    EXPERIENTIAL = 'Experiential',
+    INDEPENDENT_STUDY = 'Independent Study',
+    INTERNSHIP = 'Internship',
+    RESEARCH = 'Research',
+    THESIS = 'Thesis'
+}
+
 export interface Period {
-    type: string;
+    type: PeriodType;
     professor: string;
     professorEmail?: string;
     startTime: Time;
@@ -63,6 +76,8 @@ export interface Time {
     minutes: number;
     displayTime: string;
 }
+
+export type SimpleTime = Omit<Time, 'displayTime'>;
 
 export enum DayOfWeek {
     MONDAY = 'M',
@@ -93,4 +108,8 @@ export interface PlannerState {
     };
 }
 
-export type Semester = 'fall' | 'spring' | 'summer';
+export enum Semester {
+    FALL = 'fall',
+    SPRING = 'spring',
+    SUMMER = 'summer'
+}

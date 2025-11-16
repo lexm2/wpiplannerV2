@@ -65,16 +65,19 @@ export const CATEGORY_ORDER = [
 ];
 
 export function getDepartmentCategory(departmentAbbreviation: string): string {
-    return DEPARTMENT_CATEGORIES[departmentAbbreviation] || 'Other';
+    return DEPARTMENT_CATEGORIES[departmentAbbreviation] ?? 'Other';
 }
 
-export function groupDepartmentsByCategory(departments: Department[]): { [key: string]: Department[] } {
-    const categories: { [key: string]: Department[] } = {};
-    
-    // Initialize all categories
+const initializeCategories = (): Record<string, Department[]> => {
+    const categories: Record<string, Department[]> = {};
     CATEGORY_ORDER.forEach(category => {
         categories[category] = [];
     });
+    return categories;
+};
+
+export function groupDepartmentsByCategory(departments: Department[]): Record<string, Department[]> {
+    const categories = initializeCategories();
 
     departments.forEach(dept => {
         const category = getDepartmentCategory(dept.abbreviation);

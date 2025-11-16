@@ -208,9 +208,6 @@ describe('CourseFilterService', () => {
             const result = courseFilterService.filterCourses(largeCourseSet);
             const time = performance.now() - start;
 
-            console.log(`Filtered ${largeCourseSet.length} courses to ${result.length} in ${time.toFixed(2)}ms`);
-
-            // Should be very fast
             expect(time).toBeLessThan(50);
             expect(result.length).toBeGreaterThanOrEqual(0);
         });

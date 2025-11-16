@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { ComponentSelectionWizard } from '../../src/ui/components/ComponentSelectionWizard';
 import { CourseDataService } from '../../src/services/courseDataService';
 import { CourseSelectionService } from '../../src/services/CourseSelectionService';
-import { Course, Section, Period, Department } from '../../src/types/types';
+import { Course, Section, Period, Department, PeriodType } from '../../src/types/types';
 
 describe('ComponentSelectionWizard Integration', () => {
     let courseDataService: CourseDataService;
@@ -14,7 +14,7 @@ describe('ComponentSelectionWizard Integration', () => {
         courses: []
     };
 
-    const createPeriod = (type: string): Period => ({
+    const createPeriod = (type: PeriodType): Period => ({
         type,
         professor: 'Prof Smith',
         startTime: { hours: 9, minutes: 0, displayTime: '9:00 AM' },
@@ -22,10 +22,14 @@ describe('ComponentSelectionWizard Integration', () => {
         days: new Set(['mon', 'wed', 'fri']),
         location: 'SL 123',
         building: 'SL',
-        room: '123'
+        room: '123',
+        seats: 30,
+        seatsAvailable: 5,
+        actualWaitlist: 0,
+        maxWaitlist: 10
     });
 
-    const createSection = (crn: number, number: string, type: string): Section => ({
+    const createSection = (crn: number, number: string, type: PeriodType): Section => ({
         crn,
         number,
         seats: 30,
@@ -48,10 +52,10 @@ describe('ComponentSelectionWizard Integration', () => {
         maxCredits: '3.0',
         department: department,
         sections: [
-            createSection(12345, 'A01', 'Lecture'),
-            createSection(12346, 'A02', 'Lecture'),
-            createSection(12347, 'A11', 'Discussion'),
-            createSection(12348, 'A21', 'Lab')
+            createSection(12345, 'A01', PeriodType.LECTURE),
+            createSection(12346, 'A02', PeriodType.LECTURE),
+            createSection(12347, 'A11', PeriodType.DISCUSSION),
+            createSection(12348, 'A21', PeriodType.LAB)
         ]
     });
 
@@ -105,9 +109,9 @@ describe('ComponentSelectionWizard Integration', () => {
             vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
             vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
                 {
-                    section: createSection(12345, 'A01', 'Lecture'),
-                    compatibleDiscussions: [createSection(12347, 'A11', 'Discussion')],
-                    compatibleLabs: [createSection(12348, 'A21', 'Lab')]
+                    section: createSection(12345, 'A01', PeriodType.LECTURE),
+                    compatibleDiscussions: [createSection(12347, 'A11', PeriodType.DISCUSSION)],
+                    compatibleLabs: [createSection(12348, 'A21', PeriodType.LAB)]
                 }
             ]);
 
@@ -140,7 +144,7 @@ describe('ComponentSelectionWizard Integration', () => {
             );
 
             wizard['currentStep'] = 'lecture';
-            wizard['selections'].lecture = createSection(12345, 'A01', 'Lecture');
+            wizard['selections'].lecture = createSection(12345, 'A01', PeriodType.LECTURE);
             wizard['complete']();
 
             expect(capturedSelections).toBeDefined();
@@ -161,8 +165,8 @@ describe('ComponentSelectionWizard Integration', () => {
             );
 
             wizard['selections'] = {
-                lecture: createSection(12345, 'A01', 'Lecture'),
-                discussion: createSection(12347, 'A11', 'Discussion'),
+                lecture: createSection(12345, 'A01', PeriodType.LECTURE),
+                discussion: createSection(12347, 'A11', PeriodType.DISCUSSION),
                 lab: null
             };
 
@@ -191,7 +195,7 @@ describe('ComponentSelectionWizard Integration', () => {
 
             // Simulate selecting lecture
             wizard['currentStep'] = 'lecture';
-            wizard.selectSection(createSection(12345, 'A01', 'Lecture'));
+            wizard.selectSection(createSection(12345, 'A01', PeriodType.LECTURE));
 
             // Should not auto-advance (requires manual navigation)
             expect(completed).toBe(false);
@@ -233,7 +237,7 @@ describe('ComponentSelectionWizard Integration', () => {
                 vi.fn()
             );
 
-            const lecture = createSection(12345, 'A01', 'Lecture');
+            const lecture = createSection(12345, 'A01', PeriodType.LECTURE);
             wizard['currentStep'] = 'lecture';
             wizard['selections'].lecture = lecture;
 

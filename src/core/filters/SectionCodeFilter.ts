@@ -2,13 +2,13 @@ import { Section } from '../../types/types';
 import { SectionFilter, SectionCodeFilterCriteria } from '../../types/filters';
 import { SelectedCourse } from '../../types/schedule';
 
-export class SectionCodeFilter implements SectionFilter {
+export class SectionCodeFilter implements SectionFilter<SectionCodeFilterCriteria> {
     readonly id = 'sectionCode';
     readonly name = 'Section Code';
     readonly description = 'Filter by section codes (AL01, AX01, A01, etc.)';
     readonly priority = 2;
 
-    apply(sections: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
+    apply(sections: Section[], criteria: SectionCodeFilterCriteria, _activeFilters?: Map<string, unknown>): Section[] {
         return this.applyToSections(sections, criteria);
     }
 
@@ -80,12 +80,13 @@ export class SectionCodeFilter implements SectionFilter {
         });
     }
 
-    isValidCriteria(criteria: any): boolean {
+    isValidCriteria(criteria: unknown): criteria is SectionCodeFilterCriteria {
         if (!criteria || typeof criteria !== 'object') {
             return false;
         }
-        return Array.isArray(criteria.codes) && 
-               criteria.codes.every((code: any) => typeof code === 'string');
+        const c = criteria as SectionCodeFilterCriteria;
+        return Array.isArray(c.codes) &&
+               c.codes.every((code: unknown) => typeof code === 'string');
     }
 
     getDisplayValue(criteria: SectionCodeFilterCriteria): string {

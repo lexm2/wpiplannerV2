@@ -1,52 +1,63 @@
-export interface SectionFilter {
+import { Section, SimpleTime } from './types';
+import { SelectedCourse } from './schedule';
+
+export interface FilterMetadata {
     readonly id: string;
     readonly name: string;
     readonly description: string;
     readonly priority?: number;
-
-    apply(sections: any[], criteria: any, activeFilters?: Map<string, any>): any[];
-    isValidCriteria(criteria: any): boolean;
-    getDisplayValue(criteria: any): string;
 }
 
-export interface SelectedCourseFilter {
-    readonly id: string;
-    readonly name: string;
-    readonly description: string;
-    readonly priority?: number;
-
-    apply(selectedCourses: any[], criteria: any, activeFilters?: Map<string, any>): any[];
-    isValidCriteria(criteria: any): boolean;
-    getDisplayValue(criteria: any): string;
+export interface SectionFilter<TCriteria = unknown> extends FilterMetadata {
+    apply(sections: Section[], criteria: TCriteria, activeFilters?: Map<string, unknown>): Section[];
+    isValidCriteria(criteria: unknown): criteria is TCriteria;
+    getDisplayValue(criteria: TCriteria): string;
 }
 
-export interface BaseFilter {
-    readonly id: string;
-    readonly name: string;
-    readonly description: string;
-    readonly priority?: number;
+export interface SelectedCourseFilter<TCriteria = unknown> extends FilterMetadata {
+    apply(selectedCourses: SelectedCourse[], criteria: TCriteria, activeFilters?: Map<string, unknown>): SelectedCourse[];
+    isValidCriteria(criteria: unknown): criteria is TCriteria;
+    getDisplayValue(criteria: TCriteria): string;
+}
 
-    isValidCriteria(criteria: any): boolean;
-    getDisplayValue(criteria: any): string;
+export interface BaseFilter<TCriteria = unknown> extends FilterMetadata {
+    isValidCriteria(criteria: unknown): criteria is TCriteria;
+    getDisplayValue(criteria: TCriteria): string;
 }
 
 export interface FilterCriteria {
-    [filterId: string]: any;
+    [filterId: string]: unknown;
 }
 
-export interface ActiveFilter {
+export interface ActiveFilter<TCriteria = unknown> {
     id: string;
     name: string;
-    criteria: any;
+    criteria: TCriteria;
     displayValue: string;
 }
 
-export interface FilterChangeEvent {
-    type: 'add' | 'remove' | 'clear' | 'update';
-    filterId?: string;
-    criteria?: any;
-    activeFilters: ActiveFilter[];
-}
+export type FilterChangeEvent<TCriteria = unknown> =
+    | {
+        type: 'add';
+        filterId: string;
+        criteria: TCriteria;
+        activeFilters: ActiveFilter<unknown>[];
+    }
+    | {
+        type: 'remove';
+        filterId: string;
+        activeFilters: ActiveFilter<unknown>[];
+    }
+    | {
+        type: 'clear';
+        activeFilters: ActiveFilter<unknown>[];
+    }
+    | {
+        type: 'update';
+        filterId: string;
+        criteria: TCriteria;
+        activeFilters: ActiveFilter<unknown>[];
+    };
 
 export type FilterEventListener = (event: FilterChangeEvent) => void;
 
@@ -71,8 +82,8 @@ export interface ProfessorFilterCriteria {
 
 export interface TimeSlotFilterCriteria {
     timeSlots: Array<{
-        startTime: { hours: number; minutes: number };
-        endTime: { hours: number; minutes: number };
+        startTime: SimpleTime;
+        endTime: SimpleTime;
         days: string[];
     }>;
 }
@@ -109,7 +120,7 @@ export interface PeriodProfessorFilterCriteria {
 }
 
 export interface PeriodTypeFilterCriteria {
-    types: string[];
+    types: string[]; // Can be string literals or PeriodType enum values (which are strings)
 }
 
 export interface PeriodTermFilterCriteria {
@@ -123,7 +134,7 @@ export interface PeriodAvailabilityFilterCriteria {
 
 export interface PeriodConflictFilterCriteria {
     avoidConflicts: boolean;
-    selectedCourses?: any[]; // Array of SelectedCourse objects for context-aware conflict detection
+    selectedCourses?: SelectedCourse[]; // Array of SelectedCourse objects for context-aware conflict detection
 }
 
 export interface SectionCodeFilterCriteria {

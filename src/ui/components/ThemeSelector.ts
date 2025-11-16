@@ -67,10 +67,21 @@ export class ThemeSelector {
     private optionsElement: HTMLElement | null = null;
     private currentThemeNameElement: HTMLElement | null = null;
     private isOpen: boolean = false;
+    private boundDocumentClick: () => void;
+    private boundOptionsClick: (e: Event) => void;
+    private boundDropdownClick: (e: Event) => void;
 
     constructor(profileStateManager?: ProfileStateManager) {
         this.themeManager = ThemeManager.getInstance();
         this.profileStateManager = profileStateManager || new ProfileStateManager();
+
+        this.boundDocumentClick = this.closeDropdown.bind(this);
+        this.boundOptionsClick = (e: Event) => e.stopPropagation();
+        this.boundDropdownClick = (e: Event) => {
+            e.stopPropagation();
+            this.toggleDropdown();
+        };
+
         this.init();
     }
 
@@ -104,7 +115,7 @@ export class ThemeSelector {
     }
 
     private loadSavedTheme(): void {
-        const savedTheme = this.profileStateManager.getPreferences().theme || 'wpi-dark';
+        const savedTheme = this.profileStateManager.getPreferences().theme ?? 'wpi-dark';
         this.themeManager.setTheme(savedTheme);
         this.updateCurrentThemeDisplay();
     }
@@ -112,20 +123,19 @@ export class ThemeSelector {
     private setupEventListeners(): void {
         if (!this.dropdownElement || !this.optionsElement) return;
 
-        // Toggle dropdown
-        this.dropdownElement.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.toggleDropdown();
-        });
+        this.dropdownElement.addEventListener('click', this.boundDropdownClick);
+        document.addEventListener('click', this.boundDocumentClick);
+        this.optionsElement.addEventListener('click', this.boundOptionsClick);
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', () => {
-            this.closeDropdown();
-        });
-
-        // Prevent closing when clicking inside options
         this.optionsElement.addEventListener('click', (e) => {
-            e.stopPropagation();
+            const target = e.target as HTMLElement;
+            const themeOption = target.closest('.theme-option') as HTMLElement;
+            if (themeOption) {
+                const themeId = themeOption.dataset.themeId;
+                if (themeId) {
+                    this.selectTheme(themeId);
+                }
+            }
         });
     }
 
@@ -171,16 +181,6 @@ export class ThemeSelector {
         });
 
         this.optionsElement.innerHTML = html;
-
-        // Add click listeners to theme options
-        this.optionsElement.querySelectorAll('.theme-option').forEach(option => {
-            option.addEventListener('click', () => {
-                const themeId = (option as HTMLElement).dataset.themeId;
-                if (themeId) {
-                    this.selectTheme(themeId);
-                }
-            });
-        });
     }
 
     private selectTheme(themeId: string): void {
@@ -227,5 +227,15 @@ export class ThemeSelector {
     // Public method to programmatically select a theme
     public setTheme(themeId: string): void {
         this.selectTheme(themeId);
+    }
+
+    public destroy(): void {
+        if (this.dropdownElement) {
+            this.dropdownElement.removeEventListener('click', this.boundDropdownClick);
+        }
+        if (this.optionsElement) {
+            this.optionsElement.removeEventListener('click', this.boundOptionsClick);
+        }
+        document.removeEventListener('click', this.boundDocumentClick);
     }
 }

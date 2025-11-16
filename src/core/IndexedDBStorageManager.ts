@@ -82,13 +82,10 @@ export class IndexedDBStorageManager {
     async saveSchedule(schedule: Schedule): Promise<StorageResult<void>> {
         try {
             await this.initialize();
-
-            if (!this.db) {
-                return { success: false, error: 'Database not initialized' };
-            }
+            const db = this.ensureDbInitialized();
 
             return new Promise((resolve) => {
-                const transaction = this.db!.transaction(
+                const transaction = db.transaction(
                     [IndexedDBStorageManager.STORE_NAMES.SCHEDULES],
                     'readwrite'
                 );
@@ -123,13 +120,10 @@ export class IndexedDBStorageManager {
     async loadSchedule(scheduleId: string): Promise<StorageResult<Schedule>> {
         try {
             await this.initialize();
-
-            if (!this.db) {
-                return { success: false, error: 'Database not initialized' };
-            }
+            const db = this.ensureDbInitialized();
 
             return new Promise((resolve) => {
-                const transaction = this.db!.transaction(
+                const transaction = db.transaction(
                     [IndexedDBStorageManager.STORE_NAMES.SCHEDULES],
                     'readonly'
                 );
@@ -162,13 +156,10 @@ export class IndexedDBStorageManager {
     async loadAllSchedules(): Promise<StorageResult<Schedule[]>> {
         try {
             await this.initialize();
-
-            if (!this.db) {
-                return { success: false, error: 'Database not initialized' };
-            }
+            const db = this.ensureDbInitialized();
 
             return new Promise((resolve) => {
-                const transaction = this.db!.transaction(
+                const transaction = db.transaction(
                     [IndexedDBStorageManager.STORE_NAMES.SCHEDULES],
                     'readonly'
                 );
@@ -198,13 +189,10 @@ export class IndexedDBStorageManager {
     async deleteSchedule(scheduleId: string): Promise<StorageResult<void>> {
         try {
             await this.initialize();
-
-            if (!this.db) {
-                return { success: false, error: 'Database not initialized' };
-            }
+            const db = this.ensureDbInitialized();
 
             return new Promise((resolve) => {
-                const transaction = this.db!.transaction(
+                const transaction = db.transaction(
                     [IndexedDBStorageManager.STORE_NAMES.SCHEDULES],
                     'readwrite'
                 );
@@ -271,13 +259,10 @@ export class IndexedDBStorageManager {
     async clearAllSchedules(): Promise<StorageResult<void>> {
         try {
             await this.initialize();
-
-            if (!this.db) {
-                return { success: false, error: 'Database not initialized' };
-            }
+            const db = this.ensureDbInitialized();
 
             return new Promise((resolve) => {
-                const transaction = this.db!.transaction(
+                const transaction = db.transaction(
                     [IndexedDBStorageManager.STORE_NAMES.SCHEDULES],
                     'readwrite'
                 );
@@ -324,6 +309,13 @@ export class IndexedDBStorageManager {
             this.db = null;
             this.initPromise = null;
         }
+    }
+
+    private ensureDbInitialized(): IDBDatabase {
+        if (!this.db) {
+            throw new Error('Database not initialized');
+        }
+        return this.db;
     }
 }
 

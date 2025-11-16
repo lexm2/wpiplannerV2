@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+import { SimpleTime } from '../../src/types/types'
 
 export const mockFetch = (data: any, ok: boolean = true) => {
   global.fetch = vi.fn().mockResolvedValue({
@@ -63,7 +64,7 @@ export const expectArrayToContain = <T>(actual: T[], expected: T[]) => {
 }
 
 // Helper for time comparisons
-export const expectTimeToEqual = (actual: { hours: number; minutes: number }, expected: { hours: number; minutes: number }) => {
+export const expectTimeToEqual = (actual: SimpleTime, expected: SimpleTime) => {
   expect(actual.hours).toBe(expected.hours)
   expect(actual.minutes).toBe(expected.minutes)
 }

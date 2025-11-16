@@ -1,7 +1,7 @@
 export interface RMPFilterOptions {
     idPrefix: string;
     filterId: string;
-    activeFilter?: any;
+    activeFilter?: unknown;
 }
 
 export interface ProfessorFilterOptions {
@@ -40,12 +40,15 @@ export class SharedFilterComponents {
     static createRMPRatingFilter(options: RMPFilterOptions): string {
         const { idPrefix, activeFilter } = options;
 
-        const minRating = activeFilter?.criteria?.minRating ?? 0;
-        const maxRating = activeFilter?.criteria?.maxRating ?? 5;
-        const minDifficulty = activeFilter?.criteria?.minDifficulty ?? 0;
-        const maxDifficulty = activeFilter?.criteria?.maxDifficulty ?? 5;
-        const minWouldTakeAgain = activeFilter?.criteria?.minWouldTakeAgain ?? 0;
-        const maxWouldTakeAgain = activeFilter?.criteria?.maxWouldTakeAgain ?? 100;
+        const filterObj = activeFilter && typeof activeFilter === 'object' ? activeFilter as Record<string, unknown> : null;
+        const criteria = filterObj?.criteria && typeof filterObj.criteria === 'object' ? filterObj.criteria as Record<string, unknown> : null;
+
+        const minRating = typeof criteria?.minRating === 'number' ? criteria.minRating : 0;
+        const maxRating = typeof criteria?.maxRating === 'number' ? criteria.maxRating : 5;
+        const minDifficulty = typeof criteria?.minDifficulty === 'number' ? criteria.minDifficulty : 0;
+        const maxDifficulty = typeof criteria?.maxDifficulty === 'number' ? criteria.maxDifficulty : 5;
+        const minWouldTakeAgain = typeof criteria?.minWouldTakeAgain === 'number' ? criteria.minWouldTakeAgain : 0;
+        const maxWouldTakeAgain = typeof criteria?.maxWouldTakeAgain === 'number' ? criteria.maxWouldTakeAgain : 100;
 
         return `
             <div class="filter-section">

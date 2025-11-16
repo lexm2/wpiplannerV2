@@ -25,10 +25,20 @@ export class DualRangeSlider {
     private currentMinValue: number;
     private currentMaxValue: number;
 
+    private boundDocumentMouseMove: (e: MouseEvent) => void;
+    private boundDocumentMouseUp: () => void;
+    private boundDocumentTouchMove: (e: TouchEvent) => void;
+    private boundDocumentTouchEnd: () => void;
+
     constructor(options: DualRangeSliderOptions) {
         this.options = options;
         this.currentMinValue = options.minValue;
         this.currentMaxValue = options.maxValue;
+
+        this.boundDocumentMouseMove = this.onDocumentMouseMove.bind(this);
+        this.boundDocumentMouseUp = this.onDocumentMouseUp.bind(this);
+        this.boundDocumentTouchMove = this.onDocumentTouchMove.bind(this);
+        this.boundDocumentTouchEnd = this.onDocumentTouchEnd.bind(this);
 
         this.container = this.createContainer();
         this.track = this.createTrack();
@@ -108,10 +118,10 @@ export class DualRangeSlider {
         this.rightThumb.addEventListener('mouseenter', () => this.showTooltip('right'));
         this.rightThumb.addEventListener('mouseleave', () => this.hideTooltip('right'));
 
-        document.addEventListener('mousemove', (e) => this.onDocumentMouseMove(e));
-        document.addEventListener('mouseup', () => this.onDocumentMouseUp());
-        document.addEventListener('touchmove', (e) => this.onDocumentTouchMove(e), { passive: false });
-        document.addEventListener('touchend', () => this.onDocumentTouchEnd());
+        document.addEventListener('mousemove', this.boundDocumentMouseMove);
+        document.addEventListener('mouseup', this.boundDocumentMouseUp);
+        document.addEventListener('touchmove', this.boundDocumentTouchMove, { passive: false });
+        document.addEventListener('touchend', this.boundDocumentTouchEnd);
     }
 
     private onThumbMouseDown(e: MouseEvent, side: 'left' | 'right'): void {
@@ -323,6 +333,11 @@ export class DualRangeSlider {
     }
 
     public destroy(): void {
+        document.removeEventListener('mousemove', this.boundDocumentMouseMove);
+        document.removeEventListener('mouseup', this.boundDocumentMouseUp);
+        document.removeEventListener('touchmove', this.boundDocumentTouchMove);
+        document.removeEventListener('touchend', this.boundDocumentTouchEnd);
+
         this.container.remove();
     }
 }

@@ -4,6 +4,7 @@ import { Course, Department } from '../../types/types';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
+import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria } from '../../types/filters';
 
 export class FilterModalController {
     private modalService: ModalService;
@@ -58,9 +59,10 @@ export class FilterModalController {
 
     private updateDepartmentCheckboxes(modalElement: HTMLElement): void {
         if (!this.filterService) return;
-        
+
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'department');
-        const activeDepartments = activeFilter?.criteria?.departments || [];
+        const criteria = activeFilter?.criteria as DepartmentFilterCriteria | undefined;
+        const activeDepartments = criteria?.departments || [];
         
         // Update all department checkboxes
         const checkboxes = modalElement.querySelectorAll('input[data-filter="department"]') as NodeListOf<HTMLInputElement>;
@@ -147,8 +149,8 @@ export class FilterModalController {
             </div>
         `;
 
-        const dialog = backdrop.querySelector('.modal-dialog') as HTMLElement;
-        if (dialog) {
+        const dialog = backdrop.querySelector('.modal-dialog');
+        if (dialog instanceof HTMLElement) {
             dialog.addEventListener('click', (event) => {
                 event.stopPropagation();
             });
@@ -174,9 +176,10 @@ export class FilterModalController {
 
     private createSearchTextFilter(): string {
         if (!this.filterService) return '';
-        
+
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'searchText');
-        const currentQuery = activeFilter?.criteria?.query || '';
+        const criteria = activeFilter?.criteria as SearchTextFilterCriteria | undefined;
+        const currentQuery = criteria?.query || '';
 
         return `
             <div class="filter-section search-text-section">
@@ -236,10 +239,11 @@ export class FilterModalController {
 
     private createIndividualDepartmentCheckboxes(): string {
         if (!this.filterService) return '';
-        
+
         const departments = this.filterService.getFilterOptions('department', this.allCourses) as string[];
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'department');
-        const activeDepartments = activeFilter?.criteria?.departments || [];
+        const criteria = activeFilter?.criteria as DepartmentFilterCriteria | undefined;
+        const activeDepartments = criteria?.departments || [];
 
         return departments.map(dept => `
             <label class="department-checkbox-label">
@@ -254,8 +258,9 @@ export class FilterModalController {
         if (!this.filterService) return '';
 
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'availability');
-        const availableOnly = activeFilter?.criteria?.availableOnly || false;
-        const minAvailable = activeFilter?.criteria?.minAvailable;
+        const criteria = activeFilter?.criteria as AvailabilityFilterCriteria | undefined;
+        const availableOnly = criteria?.availableOnly || false;
+        const minAvailable = criteria?.minAvailable;
 
         return SharedFilterComponents.createAvailabilityFilter({
             idPrefix: '',
@@ -269,7 +274,8 @@ export class FilterModalController {
         if (!this.filterService) return '';
 
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'conflict');
-        const avoidConflicts = activeFilter?.criteria?.avoidConflicts || false;
+        const criteria = activeFilter?.criteria as { avoidConflicts?: boolean } | undefined;
+        const avoidConflicts = criteria?.avoidConflicts || false;
 
         return SharedFilterComponents.createConflictFilter({
             idPrefix: '',
@@ -280,10 +286,11 @@ export class FilterModalController {
 
     private createCreditRangeFilter(): string {
         if (!this.filterService) return '';
-        
+
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'creditRange');
-        const minCredits = activeFilter?.criteria?.min || 1;
-        const maxCredits = activeFilter?.criteria?.max || 4;
+        const criteria = activeFilter?.criteria as CreditRangeFilterCriteria | undefined;
+        const minCredits = criteria?.min || 1;
+        const maxCredits = criteria?.max || 4;
 
         return `
             <div class="filter-section">
@@ -321,7 +328,8 @@ export class FilterModalController {
         if (!this.filterService) return '';
 
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'professor');
-        const activeProfessors = activeFilter?.criteria?.professors || [];
+        const criteria = activeFilter?.criteria as ProfessorFilterCriteria | undefined;
+        const activeProfessors = criteria?.professors || [];
 
         return SharedFilterComponents.createProfessorFilter({
             idPrefix: '',
@@ -347,7 +355,8 @@ export class FilterModalController {
 
         const terms = this.filterService.getFilterOptions('term', this.allCourses) as string[];
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'term');
-        const activeTerms = activeFilter?.criteria?.terms || [];
+        const criteria = activeFilter?.criteria as TermFilterCriteria | undefined;
+        const activeTerms = criteria?.terms || [];
 
         return SharedFilterComponents.createTermFilter({
             idPrefix: '',
@@ -678,9 +687,10 @@ export class FilterModalController {
 
     private createCategoryCheckboxes(): string {
         if (!this.filterService) return '';
-        
+
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'department');
-        const activeDepartments = activeFilter?.criteria?.departments || [];
+        const criteria = activeFilter?.criteria as DepartmentFilterCriteria | undefined;
+        const activeDepartments = criteria?.departments || [];
         
         // Get all available departments to determine which categories should be checked
         const allAvailableDepartments = this.filterService.getFilterOptions('department', this.allCourses) as string[];

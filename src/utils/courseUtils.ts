@@ -5,6 +5,8 @@
 
 import { Course, Section } from '../types/types';
 
+const EXCLUDED_PROFESSORS = new Set(['TBA', 'Not Assigned', '']);
+
 /**
  * Flattens hierarchical lecture structure into a single array of all sections
  * @param course - The course to extract sections from
@@ -79,11 +81,11 @@ export function getProfessorsByTerm(course: Course): string {
 
         // Add professors from all periods in this section
         section.periods.forEach(period => {
-            if (period.professor &&
-                period.professor !== 'TBA' &&
-                period.professor !== 'Not Assigned' &&
-                period.professor.trim() !== '') {
-                termProfessors.get(term)!.add(period.professor);
+            if (period.professor && !EXCLUDED_PROFESSORS.has(period.professor) && period.professor.trim() !== '') {
+                const termSet = termProfessors.get(term);
+                if (termSet) {
+                    termSet.add(period.professor);
+                }
             }
         });
     });

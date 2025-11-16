@@ -1,3 +1,5 @@
+import { SimpleTime } from './types';
+
 export interface SearchFilter {
     departments: string[];
     timeSlots: TimeSlot[];
@@ -7,8 +9,8 @@ export interface SearchFilter {
 }
 
 export interface TimeSlot {
-    startTime: { hours: number; minutes: number };
-    endTime: { hours: number; minutes: number };
+    startTime: SimpleTime;
+    endTime: SimpleTime;
     days: string[];
 }
 
@@ -37,14 +39,20 @@ export interface ScheduleGridCell {
     isConflict: boolean;
 }
 
-export interface DragDropState {
+export interface DragDropState<T = unknown> {
     isDragging: boolean;
-    draggedItem: any;
+    draggedItem: T | null;
     dropZone: string | null;
 }
 
+export enum ViewType {
+    SEARCH = 'search',
+    SCHEDULE = 'schedule',
+    PLANNER = 'planner'
+}
+
 export interface ViewState {
-    currentView: 'search' | 'schedule' | 'planner';
+    currentView: ViewType;
     selectedSemester: string;
     selectedYear: number;
     isLoading: boolean;
@@ -59,13 +67,19 @@ export enum ModalType {
     CUSTOM = 'custom'
 }
 
+export enum ButtonStyle {
+    PRIMARY = 'primary',
+    SECONDARY = 'secondary',
+    DANGER = 'danger'
+}
+
 export interface ModalButton {
     text: string;
-    style: 'primary' | 'secondary' | 'danger';
+    style: ButtonStyle;
     callback?: () => void;
 }
 
-export interface Modal {
+export interface Modal<TData = unknown> {
     id: string;
     title: string;
     content: string;
@@ -76,14 +90,14 @@ export interface Modal {
     closeOnEscape?: boolean;
     templatePath?: string;
     customCSS?: string;
-    data?: any;
+    data?: TData;
 }
 
-export interface TemplateModal {
+export interface TemplateModal<TData = unknown> {
     id: string;
     title: string;
     template: string;
-    data: any;
+    data: TData;
     closable?: boolean;
     closeOnBackdrop?: boolean;
     closeOnEscape?: boolean;

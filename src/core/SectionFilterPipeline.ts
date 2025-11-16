@@ -99,7 +99,8 @@ export class SectionFilterPipeline {
                 });
             }
 
-            const courseData = courseMap.get(courseId)!;
+            const courseData = courseMap.get(courseId);
+            if (!courseData) continue;
 
             if (fs.sectionType === 'lecture') {
                 const lectureCrn = String(fs.section.crn);
@@ -119,8 +120,8 @@ export class SectionFilterPipeline {
                         labs: []
                     });
                 }
-                const lectureData = courseData.lectureGroups.get(lectureCrn)!;
-                if (!lectureData.discussions.find(d => d.crn === fs.section.crn)) {
+                const lectureData = courseData.lectureGroups.get(lectureCrn);
+                if (lectureData && !lectureData.discussions.find(d => d.crn === fs.section.crn)) {
                     lectureData.discussions.push(fs.section);
                 }
             } else if (fs.sectionType === 'lab' && fs.lectureGroup) {
@@ -132,8 +133,8 @@ export class SectionFilterPipeline {
                         labs: []
                     });
                 }
-                const lectureData = courseData.lectureGroups.get(lectureCrn)!;
-                if (!lectureData.labs.find(l => l.crn === fs.section.crn)) {
+                const lectureData = courseData.lectureGroups.get(lectureCrn);
+                if (lectureData && !lectureData.labs.find(l => l.crn === fs.section.crn)) {
                     lectureData.labs.push(fs.section);
                 }
             } else if (fs.sectionType === 'standaloneLab') {
@@ -186,7 +187,8 @@ export class SectionFilterPipeline {
         const criteriaMap = activeFilters;
 
         while (!priorityQueue.isEmpty()) {
-            const activeFilter = priorityQueue.extractMin()!;
+            const activeFilter = priorityQueue.extractMin();
+            if (!activeFilter) break;
             filteredSections = activeFilter.filter.apply(filteredSections, activeFilter.criteria, criteriaMap);
         }
 

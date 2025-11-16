@@ -1,4 +1,4 @@
-import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB } from '../../src/types/types'
+import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB, PeriodType } from '../../src/types/types'
 import { SelectedCourse } from '../../src/types/schedule'
 
 export const createMockTime = (hours: number, minutes: number): Time => ({
@@ -8,7 +8,7 @@ export const createMockTime = (hours: number, minutes: number): Time => ({
 })
 
 export const createMockPeriod = (overrides: Partial<Period> = {}): Period => ({
-  type: 'Lecture',
+  type: PeriodType.LECTURE,
   professor: 'Dr. Test Professor',
   professorEmail: 'test@wpi.edu',
   startTime: createMockTime(9, 0),
@@ -89,8 +89,27 @@ export const createMockScheduleDB = (overrides: Partial<ScheduleDB> = {}): Sched
   }
 }
 
-// Sample WPI JSON entry for testing parsing
-export const createMockWPIEntry = (overrides: any = {}) => ({
+interface WPIEntryData {
+  Academic_Level?: string
+  Academic_Units?: string
+  Academic_Year?: string
+  Course_Description?: string
+  Course_Section?: string
+  Course_Section_Description?: string
+  Course_Title?: string
+  Credits?: string
+  Enrolled_Capacity?: string
+  Instructional_Format?: string
+  Instructors?: string
+  Locations?: string
+  Meeting_Day_Patterns?: string
+  Meeting_Patterns?: string
+  Offering_Period?: string
+  Section_Status?: string
+  Waitlist_Waitlist_Capacity?: string
+}
+
+export const createMockWPIEntry = (overrides: Partial<WPIEntryData> = {}): WPIEntryData => ({
   "Academic_Level": "Undergraduate",
   "Academic_Units": "Computer Science Department",
   "Academic_Year": "2024 - 2025 Academic Year",
@@ -249,9 +268,13 @@ export const createLargeCombinationSpace = (
   return courses
 }
 
-export const createMockScheduleFilterService = () => {
+interface MockScheduleFilterService {
+  filterSections: (selectedCourses: SelectedCourse[]) => Array<{ section: Section }>
+}
+
+export const createMockScheduleFilterService = (): MockScheduleFilterService => {
   return {
-    filterSections: (selectedCourses: SelectedCourse[]) => {
+    filterSections: (selectedCourses: SelectedCourse[]): Array<{ section: Section }> => {
       const allSections: Array<{ section: Section }> = []
       for (const sc of selectedCourses) {
         if (sc.course.lectures) {

@@ -4,6 +4,7 @@ import { SelectedCourse } from '../../types/schedule';
 import { getAllSections } from '../../utils/courseUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
+import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTypeFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria } from '../../types/filters';
 
 export class ScheduleFilterModalController {
     private modalService: ModalService;
@@ -87,8 +88,8 @@ export class ScheduleFilterModalController {
             </div>
         `;
 
-        const dialog = backdrop.querySelector('.modal-dialog') as HTMLElement;
-        if (dialog) {
+        const dialog = backdrop.querySelector('.modal-dialog');
+        if (dialog instanceof HTMLElement) {
             dialog.addEventListener('click', (event) => {
                 event.stopPropagation();
             });
@@ -115,7 +116,8 @@ export class ScheduleFilterModalController {
         if (!this.scheduleFilterService) return '';
 
         const searchFilter = this.scheduleFilterService.getActiveFilters().find(f => f.id === 'sectionCode');
-        const currentQuery = searchFilter?.criteria?.codes?.[0] || '';
+        const criteria = searchFilter?.criteria as SectionCodeFilterCriteria | undefined;
+        const currentQuery = criteria?.codes?.[0] || '';
 
         return `
             <div class="filter-section search-text-section">
@@ -259,28 +261,33 @@ export class ScheduleFilterModalController {
 
     private getActiveProfessors(): string[] {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodProfessor');
-        return filter?.criteria?.professors || [];
+        const criteria = filter?.criteria as PeriodProfessorFilterCriteria | undefined;
+        return criteria?.professors || [];
     }
 
     private getActivePeriodTypes(): string[] {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodType');
-        return filter?.criteria?.types || [];
+        const criteria = filter?.criteria as PeriodTypeFilterCriteria | undefined;
+        return criteria?.types || [];
     }
 
     private getActiveTerms(): string[] {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodTerm');
-        return filter?.criteria?.terms || [];
+        const criteria = filter?.criteria as PeriodTermFilterCriteria | undefined;
+        return criteria?.terms || [];
     }
 
 
     private getActiveAvailability(): { availableOnly: boolean; minAvailable?: number } {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodAvailability');
-        return filter?.criteria || { availableOnly: false };
+        const criteria = filter?.criteria as PeriodAvailabilityFilterCriteria | undefined;
+        return criteria || { availableOnly: false };
     }
 
     private getActiveConflictDetection(): { avoidConflicts: boolean } {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
-        return filter?.criteria || { avoidConflicts: false };
+        const criteria = filter?.criteria as PeriodConflictFilterCriteria | undefined;
+        return criteria || { avoidConflicts: false };
     }
 
     private setupFilterModalEventListeners(): void {

@@ -1,10 +1,10 @@
 import { DualRangeSlider } from './DualRangeSlider';
 
 export interface FilterServiceLike {
-    addFilter(filterId: string, criteria: any): boolean;
+    addFilter(filterId: string, criteria: unknown): boolean;
     removeFilter(filterId: string): boolean;
-    getFilterOptions(filterId: string, data: any): any;
-    getActiveFilters?: () => any[];
+    getFilterOptions(filterId: string, data: unknown): unknown;
+    getActiveFilters?: () => unknown[];
 }
 
 export interface RMPSetupOptions {
@@ -51,13 +51,19 @@ export class SharedFilterSetup {
         const { modalElement, filterService, idPrefix, filterId, updatePreview } = options;
 
         // Get current filter values
-        const activeFilter = filterService.getActiveFilters?.().find((f: any) => f.id === filterId);
-        const minRating = activeFilter?.criteria?.minRating ?? 0;
-        const maxRating = activeFilter?.criteria?.maxRating ?? 5;
-        const minDifficulty = activeFilter?.criteria?.minDifficulty ?? 0;
-        const maxDifficulty = activeFilter?.criteria?.maxDifficulty ?? 5;
-        const minRetake = activeFilter?.criteria?.minWouldTakeAgain ?? 0;
-        const maxRetake = activeFilter?.criteria?.maxWouldTakeAgain ?? 100;
+        const activeFilterRaw = filterService.getActiveFilters?.().find((f: unknown) => {
+            if (!f || typeof f !== 'object') return false;
+            return (f as Record<string, unknown>).id === filterId;
+        });
+        const activeFilter = activeFilterRaw && typeof activeFilterRaw === 'object' ? activeFilterRaw as Record<string, unknown> : null;
+        const criteria = activeFilter?.criteria && typeof activeFilter.criteria === 'object' ? activeFilter.criteria as Record<string, unknown> : null;
+
+        const minRating = typeof criteria?.minRating === 'number' ? criteria.minRating : 0;
+        const maxRating = typeof criteria?.maxRating === 'number' ? criteria.maxRating : 5;
+        const minDifficulty = typeof criteria?.minDifficulty === 'number' ? criteria.minDifficulty : 0;
+        const maxDifficulty = typeof criteria?.maxDifficulty === 'number' ? criteria.maxDifficulty : 5;
+        const minRetake = typeof criteria?.minWouldTakeAgain === 'number' ? criteria.minWouldTakeAgain : 0;
+        const maxRetake = typeof criteria?.maxWouldTakeAgain === 'number' ? criteria.maxWouldTakeAgain : 100;
 
         const ratingMinValue = modalElement.querySelector(`#${idPrefix}-rmp-rating-min-value`);
         const ratingMaxValue = modalElement.querySelector(`#${idPrefix}-rmp-rating-max-value`);
@@ -206,8 +212,13 @@ export class SharedFilterSetup {
                     searchInput.value = '';
                     dropdown.style.display = 'none';
 
-                    const currentFilter = filterService.getActiveFilters?.().find((f: any) => f.id === filterId);
-                    const activeProfessors = currentFilter?.criteria?.professors || [];
+                    const currentFilterRaw = filterService.getActiveFilters?.().find((f: unknown) => {
+                        if (!f || typeof f !== 'object') return false;
+                        return (f as Record<string, unknown>).id === filterId;
+                    });
+                    const currentFilter = currentFilterRaw && typeof currentFilterRaw === 'object' ? currentFilterRaw as Record<string, unknown> : null;
+                    const criteriaObj = currentFilter?.criteria && typeof currentFilter.criteria === 'object' ? currentFilter.criteria as Record<string, unknown> : null;
+                    const activeProfessors = Array.isArray(criteriaObj?.professors) ? criteriaObj.professors as string[] : [];
 
                     if (!activeProfessors.includes(professor)) {
                         activeProfessors.push(professor);
@@ -228,8 +239,14 @@ export class SharedFilterSetup {
                 const target = e.target as HTMLElement;
                 if (target.classList.contains('filter-chip-remove')) {
                     const professor = target.dataset.professor!;
-                    const currentFilter = filterService.getActiveFilters?.().find((f: any) => f.id === filterId);
-                    const activeProfessors = (currentFilter?.criteria?.professors || []).filter((p: string) => p !== professor);
+                    const currentFilterRaw = filterService.getActiveFilters?.().find((f: unknown) => {
+                        if (!f || typeof f !== 'object') return false;
+                        return (f as Record<string, unknown>).id === filterId;
+                    });
+                    const currentFilter = currentFilterRaw && typeof currentFilterRaw === 'object' ? currentFilterRaw as Record<string, unknown> : null;
+                    const criteriaObj = currentFilter?.criteria && typeof currentFilter.criteria === 'object' ? currentFilter.criteria as Record<string, unknown> : null;
+                    const professorsArray = Array.isArray(criteriaObj?.professors) ? criteriaObj.professors as unknown[] : [];
+                    const activeProfessors = professorsArray.filter((p: unknown) => typeof p === 'string' && p !== professor) as string[];
 
                     updateFilter(activeProfessors);
                     target.closest('.filter-chip')?.remove();

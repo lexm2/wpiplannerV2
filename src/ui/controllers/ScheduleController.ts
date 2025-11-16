@@ -13,6 +13,7 @@ import { getComputedTerm, validateSelectedCourses } from '../../utils/typeGuards
 import { AutoScheduler } from '../../services/AutoScheduler'
 import { ScheduleScorer } from '../../services/ScheduleScorer'
 import { getInlineSVG } from '../../utils/iconPaths'
+import { Validators } from '../../utils/validators'
 
 interface WizardSelections {
     lecture: Section | null;
@@ -415,8 +416,8 @@ export class ScheduleController {
             <div class="schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}">
                 <div class="schedule-course-header">
                     <div class="schedule-course-info">
-                        <div class="schedule-course-code">${course.department.abbreviation}${course.number}</div>
-                        <div class="schedule-course-name">${course.name}</div>
+                        <div class="schedule-course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
+                        <div class="schedule-course-name">${Validators.escapeHtml(course.name)}</div>
                         ${selectedComponentsHTML}
                         <div class="schedule-course-credits">${credits}</div>
                     </div>

@@ -19,19 +19,21 @@
  *
  * @returns A replacer function compatible with JSON.stringify
  */
-export function createJSONReplacer(): (key: string, value: any) => any {
-    return (key: string, value: any): any => {
+export function createJSONReplacer(): (key: string, value: unknown) => unknown {
+    return (key: string, value: unknown): unknown => {
         // Handle Set serialization
         if (value instanceof Set) {
-            return { __type: 'Set', value: [...value] };
+            const setArray: unknown[] = [];
+            value.forEach(item => setArray.push(item));
+            return { __type: 'Set', value: setArray };
         }
 
         // Break circular reference: Course → Department → Course[]
         // Keep only essential department info, strip the courses array
-        if (key === 'department' && value && value.courses) {
+        if (key === 'department' && value && typeof value === 'object' && 'courses' in value) {
             return {
-                abbreviation: value.abbreviation,
-                name: value.name
+                abbreviation: (value as Record<string, unknown>).abbreviation,
+                name: (value as Record<string, unknown>).name
             };
         }
 
@@ -52,11 +54,14 @@ export function createJSONReplacer(): (key: string, value: any) => any {
  *
  * @returns A reviver function compatible with JSON.parse
  */
-export function createJSONReviver(): (key: string, value: any) => any {
-    return (_key: string, value: any): any => {
+export function createJSONReviver(): (key: string, value: unknown) => unknown {
+    return (_key: string, value: unknown): unknown => {
         // Restore Set from serialized form
-        if (typeof value === 'object' && value !== null && value.__type === 'Set') {
-            return new Set(value.value);
+        if (typeof value === 'object' && value !== null && '__type' in value && (value as Record<string, unknown>).__type === 'Set') {
+            const setData = (value as Record<string, unknown>).value;
+            if (Array.isArray(setData)) {
+                return new Set(setData);
+            }
         }
         return value;
     };
@@ -68,9 +73,15 @@ export function createJSONReviver(): (key: string, value: any) => any {
  * @param data The data to stringify
  * @param space Optional indentation for pretty-printing (default: no formatting)
  * @returns JSON string representation
+ * @throws Error if stringification fails
  */
-export function safeStringify(data: any, space?: string | number): string {
-    return JSON.stringify(data, createJSONReplacer(), space);
+export function safeStringify(data: unknown, space?: string | number): string {
+    try {
+        return JSON.stringify(data, createJSONReplacer() as (key: string, value: unknown) => unknown, space);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error during JSON stringification';
+        throw new Error(`Failed to stringify data: ${message}`);
+    }
 }
 
 /**
@@ -78,7 +89,16 @@ export function safeStringify(data: any, space?: string | number): string {
  *
  * @param json The JSON string to parse
  * @returns Parsed object with complex types restored
+ * @throws Error if parsing fails or input is invalid
  */
-export function safeParse(json: string): any {
-    return JSON.parse(json, createJSONReviver());
+export function safeParse(json: string): unknown {
+    if (typeof json !== 'string' || !json.trim()) {
+        throw new Error('Invalid JSON input: expected non-empty string');
+    }
+    try {
+        return JSON.parse(json, createJSONReviver() as (key: string, value: unknown) => unknown);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error during JSON parsing';
+        throw new Error(`Failed to parse JSON: ${message}`);
+    }
 }

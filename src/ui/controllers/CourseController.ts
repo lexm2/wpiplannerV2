@@ -7,6 +7,7 @@ import { ProgressiveRenderer, ProgressiveRenderOptions } from '../utils/Progress
 import { CancellationToken } from '../../utils/RequestCancellation'
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
 import { getInlineSVG } from '../../utils/iconPaths'
+import { Validators } from '../../utils/validators'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -676,10 +677,10 @@ export class CourseController {
 
         let html = `
             <div class="course-info">
-                <div class="course-title">${course.name}</div>
-                <div class="course-code">${course.department.abbreviation}${course.number} (${credits})</div>
+                <div class="course-title">${Validators.escapeHtml(course.name)}</div>
+                <div class="course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)} (${credits})</div>
             </div>
-            <div class="course-description-text">${course.description}</div>
+            <div class="course-description-text">${Validators.escapeHtml(course.description)}</div>
         `;
 
         // Add tabs for hierarchical courses
@@ -762,7 +763,7 @@ export class CourseController {
             if (discussions.length === 0) continue;
 
             html += `<div class="lecture-group">`;
-            html += `<h4>Lecture ${lectureGroup.section.number} - ${discussions.length} Discussion(s)</h4>`;
+            html += `<h4>Lecture ${Validators.escapeHtml(lectureGroup.section.number)} - ${discussions.length} Discussion(s)</h4>`;
             html += '<div class="sections-list">';
 
             for (const discussion of discussions) {
@@ -796,7 +797,7 @@ export class CourseController {
                 if (labs.length === 0) continue;
 
                 html += `<div class="lecture-group">`;
-                html += `<h4>Lecture ${lectureGroup.section.number} - ${labs.length} Lab(s)</h4>`;
+                html += `<h4>Lecture ${Validators.escapeHtml(lectureGroup.section.number)} - ${labs.length} Lab(s)</h4>`;
                 html += '<div class="sections-list">';
 
                 for (const lab of labs) {
@@ -819,19 +820,20 @@ export class CourseController {
         const professor = period?.professor || 'Not Assigned';
         const rmpUrl = professor !== 'Not Assigned' ? rateMyProfessorService.getProfessorRMPUrl(professor) : null;
 
+        const escapedProfessor = Validators.escapeHtml(professor);
         return `
             <div class="section-card">
                 <div class="section-header">
-                    <span class="section-number">${section.number}</span>
-                    <span class="section-type">${type}</span>
+                    <span class="section-number">${Validators.escapeHtml(section.number)}</span>
+                    <span class="section-type">${Validators.escapeHtml(type)}</span>
                     <span class="section-crn">CRN: ${section.crn}</span>
                 </div>
                 <div class="section-details">
                     <div class="section-time">
-                        <strong>${days}</strong> ${time}
+                        <strong>${Validators.escapeHtml(days)}</strong> ${Validators.escapeHtml(time)}
                     </div>
-                    <div class="section-location">${location}</div>
-                    <div class="section-professor">${rmpUrl ? `<a href="${rmpUrl}" target="_blank" rel="noopener noreferrer" class="professor-link">${professor}</a>` : professor}</div>
+                    <div class="section-location">${Validators.escapeHtml(location)}</div>
+                    <div class="section-professor">${rmpUrl ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProfessor}</a>` : escapedProfessor}</div>
                     <div class="section-seats">
                         Seats: ${section.seatsAvailable}/${section.seats}
                         ${section.actualWaitlist > 0 ? `(Waitlist: ${section.actualWaitlist}/${section.maxWaitlist})` : ''}
@@ -918,10 +920,10 @@ export class CourseController {
                 : `${course.minCredits}-${course.maxCredits} credits`;
 
             html += `
-                <div class="selected-course-item" data-course-id="${course.id}">
+                <div class="selected-course-item" data-course-id="${Validators.escapeHtml(course.id)}">
                     <div class="selected-course-info">
-                        <div class="selected-course-code">${course.department.abbreviation}${course.number}</div>
-                        <div class="selected-course-name">${course.name}</div>
+                        <div class="selected-course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
+                        <div class="selected-course-name">${Validators.escapeHtml(course.name)}</div>
                         <div class="selected-course-credits">${credits}</div>
                     </div>
                     <button class="course-remove-btn" title="Remove from selection">

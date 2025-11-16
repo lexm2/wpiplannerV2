@@ -224,7 +224,7 @@ export class ModalService {
     }
 
     generateId(): string {
-        return `modal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        return `modal-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
     }
 
     // Utility method for backdrop and escape key handling

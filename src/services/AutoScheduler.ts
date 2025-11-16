@@ -427,7 +427,7 @@ export class AutoScheduler {
     const courseList = courses.map(sc => sc.course);
     const candidateLists = courseList.map(course => candidatesPerCourse.get(course) || []);
 
-    const indices = new Array(courseList.length).fill(0);
+    const indices = Array.from({ length: courseList.length }, () => 0);
 
     while (true) {
       if (results.length >= maxCombinations) {
@@ -467,28 +467,41 @@ export class AutoScheduler {
     schedule: ScheduleResult[],
     overlaps: Map<string, Set<string>>
   ): boolean {
-    const crns: string[] = [];
+    const crnSet = new Set<string>();
 
     for (const result of schedule) {
       if (result.combination.lecture) {
-        crns.push(String(result.combination.lecture.crn));
+        const crn = String(result.combination.lecture.crn);
+        if (overlaps.has(crn)) {
+          for (const existingCrn of crnSet) {
+            if (overlaps.get(crn)!.has(existingCrn)) {
+              return false;
+            }
+          }
+        }
+        crnSet.add(crn);
       }
       if (result.combination.discussion) {
-        crns.push(String(result.combination.discussion.crn));
+        const crn = String(result.combination.discussion.crn);
+        if (overlaps.has(crn)) {
+          for (const existingCrn of crnSet) {
+            if (overlaps.get(crn)!.has(existingCrn)) {
+              return false;
+            }
+          }
+        }
+        crnSet.add(crn);
       }
       if (result.combination.lab) {
-        crns.push(String(result.combination.lab.crn));
-      }
-    }
-
-    for (let i = 0; i < crns.length; i++) {
-      for (let j = i + 1; j < crns.length; j++) {
-        const crn1 = crns[i];
-        const crn2 = crns[j];
-
-        if (overlaps.has(crn1) && overlaps.get(crn1)!.has(crn2)) {
-          return false;
+        const crn = String(result.combination.lab.crn);
+        if (overlaps.has(crn)) {
+          for (const existingCrn of crnSet) {
+            if (overlaps.get(crn)!.has(existingCrn)) {
+              return false;
+            }
+          }
         }
+        crnSet.add(crn);
       }
     }
 
