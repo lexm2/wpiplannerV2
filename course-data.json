@@ -80345,7 +80345,7 @@
       "Course_Title": "MA 501 - Engineering Mathematics",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "12/30",
+      "Enrolled_Capacity": "13/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Jeffrey Barden",
       "Locations": "Online-asynchronous",
@@ -85366,7 +85366,7 @@
       "Course_Title": "ME 5358 - Plastics",
       "Credits": "2",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "28/30",
+      "Enrolled_Capacity": "29/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Michael Fritschy",
       "Locations": "Online-asynchronous",
@@ -85815,7 +85815,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Manufacturing Engineering; Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "1/25",
+      "Waitlist_Waitlist_Capacity": "2/25",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336953"
     },
     {
@@ -86427,7 +86427,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Manufacturing Engineering; Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "1/25",
+      "Waitlist_Waitlist_Capacity": "2/25",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336953"
     },
     {
@@ -90135,7 +90135,7 @@
       "Course_Title": "MTE 558 - Plastics",
       "Credits": "2",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "28/30",
+      "Enrolled_Capacity": "29/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Michael Fritschy",
       "Locations": "Online-asynchronous",
@@ -112942,7 +112942,7 @@
       "Course_Title": "SYS 501 - Concepts Of Systems Engineering",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "10/30",
+      "Enrolled_Capacity": "11/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Donald Gelosh",
       "Locations": "Online-asynchronous",
