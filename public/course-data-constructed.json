@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 16, 2025, 6:22 AM",
+  "generated": "Nov 16, 2025, 6:28 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -175324,7 +175324,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seats_available": 0,
-                "actual_waitlist": 0,
+                "actual_waitlist": 1,
                 "max_waitlist": 15,
                 "note": null,
                 "description": "This course introduces students to current developments in nanoscale science and technology. The current advance of materials and devices constituting of building blocks of metals, semiconductors, ceramics or polymers that are nanometer size (1- 100 nm) are reviewed. The profound implications for technology and science of this research field are discussed. The differences of the properties of matter on the nanometer scale from those on the macroscopic scale due to the size confinement, predominance of interfacial phenomena and quantum mechanics are studied. The main issues and techniques relevant to science and technologies on the nanometer scale are considered. New developments in this field and future perspectives are presented. Topics covered include: fabrication of nanoscale structures, characterization at nanoscale, molecular electronics, nanoscale mechanics, new architecture, nano-optics and societal impacts. Recommended background: ES 2001 Introduction to Materials or equivalent.",
@@ -175343,7 +175343,7 @@
                     "room": "Stratton Hall 205",
                     "seats": 30,
                     "seats_available": 0,
-                    "actual_waitlist": 0,
+                    "actual_waitlist": 1,
                     "max_waitlist": 15,
                     "specific_section": "D01",
                     "days": [
