@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 16, 2025, 4:27 AM",
+  "generated": "Nov 16, 2025, 5:33 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -32091,7 +32091,7 @@
                 "crn": 336306,
                 "number": "C02",
                 "seats": 80,
-                "seats_available": 32,
+                "seats_available": 33,
                 "actual_waitlist": 0,
                 "max_waitlist": 20,
                 "note": null,
@@ -32110,7 +32110,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 80,
-                    "seats_available": 32,
+                    "seats_available": 33,
                     "actual_waitlist": 0,
                     "max_waitlist": 20,
                     "specific_section": "C02",
@@ -33069,7 +33069,7 @@
                 "crn": 336121,
                 "number": "C01",
                 "seats": 30,
-                "seats_available": 14,
+                "seats_available": 13,
                 "actual_waitlist": 0,
                 "max_waitlist": 10,
                 "note": null,
@@ -33088,7 +33088,7 @@
                     "building": "",
                     "room": "Atwater Kent 232",
                     "seats": 30,
-                    "seats_available": 14,
+                    "seats_available": 13,
                     "actual_waitlist": 0,
                     "max_waitlist": 10,
                     "specific_section": "C01",
