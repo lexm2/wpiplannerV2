@@ -37,7 +37,7 @@ export interface ScheduleUpdateOptions {
 }
 
 /**
- * Multi-schedule lifecycle management with CRUD operations, validation, and event-driven UI synchronization
+ * Manages multi-schedule lifecycle with CRUD operations, validation, and event-driven UI synchronization
  */
 export class ScheduleManagementService {
     private profileStateManager: ProfileStateManager;

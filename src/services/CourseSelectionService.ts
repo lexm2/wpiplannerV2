@@ -330,13 +330,7 @@ export class CourseSelectionService {
         }
     }
 
-    /**
-     * ═══════════════════════════════════════════════════════════════════════════════
-     * COMPONENT-BASED SELECTION METHODS (NEW HIERARCHICAL STRUCTURE)
-     * ═══════════════════════════════════════════════════════════════════════════════
-     * These methods support the new hierarchical course structure with separate
-     * selections for lectures, discussions, and labs.
-     */
+    // Component-based selection for hierarchical course structure (lectures, discussions, labs)
 
     /**
      * Set selected components (lecture, discussion, lab) for a hierarchical course
@@ -444,13 +438,7 @@ export class CourseSelectionService {
         });
     }
 
-    /**
-     * ═══════════════════════════════════════════════════════════════════════════════
-     * SECTION LOCKING METHODS (NEW)
-     * ═══════════════════════════════════════════════════════════════════════════════
-     * These methods support locking/unlocking individual sections (lecture, discussion, lab)
-     * to prevent auto-scheduler from changing user's manual selections.
-     */
+    // Section locking methods to prevent auto-scheduler from changing manual selections
 
     async lockSection(course: Course, sectionCrn: string): Promise<CourseSelectionResult> {
         await this.ensureInitialized();
