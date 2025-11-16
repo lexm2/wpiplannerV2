@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { PeriodDaysFilter } from '../../../src/core/filters/PeriodDaysFilter';
-import { Period, DayOfWeek } from '../../../src/types/types';
+import { Period, DayOfWeek, PeriodType } from '../../../src/types/types';
 
 describe('PeriodDaysFilter', () => {
     let periodDaysFilter: PeriodDaysFilter;
@@ -21,9 +21,9 @@ describe('PeriodDaysFilter', () => {
 
     describe('isValidCriteria', () => {
         test('should validate correct criteria', () => {
-            expect(periodDaysFilter.isValidCriteria({ days: ['mon', 'wed', 'fri'] })).toBe(true);
+            expect(periodDaysFilter.isValidCriteria({ days: ['m', 'w', 'f'] })).toBe(true);
             expect(periodDaysFilter.isValidCriteria({ days: [] })).toBe(true);
-            expect(periodDaysFilter.isValidCriteria({ days: ['wed'] })).toBe(true);
+            expect(periodDaysFilter.isValidCriteria({ days: ['w'] })).toBe(true);
         });
 
         test('should reject invalid criteria', () => {
@@ -38,13 +38,13 @@ describe('PeriodDaysFilter', () => {
 
     describe('getDisplayValue', () => {
         test('should format single day exclusion', () => {
-            expect(periodDaysFilter.getDisplayValue({ days: ['wed'] })).toBe('Exclude: Wednesday');
-            expect(periodDaysFilter.getDisplayValue({ days: ['mon'] })).toBe('Exclude: Monday');
+            expect(periodDaysFilter.getDisplayValue({ days: ['w'] })).toBe('Exclude: w');
+            expect(periodDaysFilter.getDisplayValue({ days: ['m'] })).toBe('Exclude: m');
         });
 
         test('should format multiple days exclusion', () => {
-            expect(periodDaysFilter.getDisplayValue({ days: ['wed', 'fri'] })).toBe('Exclude: Wednesday, Friday');
-            expect(periodDaysFilter.getDisplayValue({ days: ['mon', 'tue', 'thu'] })).toBe('Exclude: Monday, Tuesday, Thursday');
+            expect(periodDaysFilter.getDisplayValue({ days: ['w', 'f'] })).toBe('Exclude: w, f');
+            expect(periodDaysFilter.getDisplayValue({ days: ['m', 't', 'r'] })).toBe('Exclude: m, t, r');
         });
 
         test('should handle empty exclusion', () => {
@@ -52,17 +52,17 @@ describe('PeriodDaysFilter', () => {
         });
 
         test('should handle case insensitive day names', () => {
-            expect(periodDaysFilter.getDisplayValue({ days: ['WED'] })).toBe('Exclude: Wednesday');
-            expect(periodDaysFilter.getDisplayValue({ days: ['Mon', 'FRI'] })).toBe('Exclude: Monday, Friday');
+            expect(periodDaysFilter.getDisplayValue({ days: ['W'] })).toBe('Exclude: W');
+            expect(periodDaysFilter.getDisplayValue({ days: ['M', 'F'] })).toBe('Exclude: M, F');
         });
     });
 
     describe('applyToPeriods - Exclusion Logic', () => {
-        const createPeriod = (days: string[]): Period => ({
-            type: 'Lecture',
+        const createPeriod = (days: DayOfWeek[]): Period => ({
+            type: PeriodType.LECTURE,
             professor: 'Prof Smith',
-            startTime: { hours: 9, minutes: 0 },
-            endTime: { hours: 10, minutes: 50 },
+            startTime: { hours: 9, minutes: 0, displayTime: '9:00 AM' },
+            endTime: { hours: 10, minutes: 50, displayTime: '10:50 AM' },
             days: new Set(days),
             location: 'SL 123',
             building: 'SL',
@@ -75,25 +75,26 @@ describe('PeriodDaysFilter', () => {
 
         test('should return all periods when no days are excluded', () => {
             const periods = [
-                createPeriod(['mon', 'wed', 'fri']),
-                createPeriod(['tue', 'thu']),
-                createPeriod(['wed'])
+                createPeriod([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY]),
+                createPeriod([DayOfWeek.TUESDAY, DayOfWeek.THURSDAY]),
+                createPeriod([DayOfWeek.WEDNESDAY])
             ];
 
             const result = periodDaysFilter.applyToPeriods(periods, { days: [] });
+
             expect(result).toHaveLength(3);
             expect(result).toEqual(periods);
         });
 
         test('should exclude periods on Wednesday', () => {
-            const mondayPeriod = createPeriod(['mon']);
-            const wednesdayPeriod = createPeriod(['wed']);
-            const mondayWednesdayPeriod = createPeriod(['mon', 'wed', 'fri']);
-            const tuesdayThursdayPeriod = createPeriod(['tue', 'thu']);
+            const mondayPeriod = createPeriod([DayOfWeek.MONDAY]);
+            const wednesdayPeriod = createPeriod([DayOfWeek.WEDNESDAY]);
+            const mondayWednesdayPeriod = createPeriod([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY]);
+            const tuesdayThursdayPeriod = createPeriod([DayOfWeek.TUESDAY, DayOfWeek.THURSDAY]);
 
             const periods = [mondayPeriod, wednesdayPeriod, mondayWednesdayPeriod, tuesdayThursdayPeriod];
 
-            const result = periodDaysFilter.applyToPeriods(periods, { days: ['wed'] });
+            const result = periodDaysFilter.applyToPeriods(periods, { days: ['w'] });
 
             // Should exclude any period that has Wednesday
             expect(result).toHaveLength(2);
@@ -104,15 +105,15 @@ describe('PeriodDaysFilter', () => {
         });
 
         test('should exclude periods on multiple days', () => {
-            const mondayPeriod = createPeriod(['mon']);
-            const wednesdayPeriod = createPeriod(['wed']);
-            const fridayPeriod = createPeriod(['fri']);
-            const tuesdayThursdayPeriod = createPeriod(['tue', 'thu']);
-            const mondayWednesdayPeriod = createPeriod(['mon', 'wed']);
+            const mondayPeriod = createPeriod([DayOfWeek.MONDAY]);
+            const wednesdayPeriod = createPeriod([DayOfWeek.WEDNESDAY]);
+            const fridayPeriod = createPeriod([DayOfWeek.FRIDAY]);
+            const tuesdayThursdayPeriod = createPeriod([DayOfWeek.TUESDAY, DayOfWeek.THURSDAY]);
+            const mondayWednesdayPeriod = createPeriod([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY]);
 
             const periods = [mondayPeriod, wednesdayPeriod, fridayPeriod, tuesdayThursdayPeriod, mondayWednesdayPeriod];
 
-            const result = periodDaysFilter.applyToPeriods(periods, { days: ['wed', 'fri'] });
+            const result = periodDaysFilter.applyToPeriods(periods, { days: ['w', 'f'] });
 
             // Should exclude any period that has Wednesday OR Friday
             expect(result).toHaveLength(2);
@@ -125,22 +126,22 @@ describe('PeriodDaysFilter', () => {
 
         test('should handle case insensitive day matching', () => {
             const periods = [
-                createPeriod(['mon', 'WED', 'fri']),
-                createPeriod(['TUE', 'thu']),
-                createPeriod(['Wed'])
+                createPeriod([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY]),
+                createPeriod([DayOfWeek.TUESDAY, DayOfWeek.THURSDAY]),
+                createPeriod([DayOfWeek.WEDNESDAY])
             ];
 
-            const result = periodDaysFilter.applyToPeriods(periods, { days: ['wed'] });
+            const result = periodDaysFilter.applyToPeriods(periods, { days: ['w'] });
 
-            // Should exclude periods with 'WED', 'Wed' regardless of case
+            // Should exclude periods with 'W' regardless of case
             expect(result).toHaveLength(1);
-            expect(result[0].days).toEqual(new Set(['TUE', 'thu']));
+            expect(result[0].days).toEqual(new Set([DayOfWeek.TUESDAY, DayOfWeek.THURSDAY]));
         });
 
         test('should handle unknown days gracefully', () => {
             const periods = [
-                createPeriod(['mon', 'wed', 'fri']),
-                createPeriod(['tue', 'thu'])
+                createPeriod([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY]),
+                createPeriod([DayOfWeek.TUESDAY, DayOfWeek.THURSDAY])
             ];
 
             const result = periodDaysFilter.applyToPeriods(periods, { days: ['xyz'] });
@@ -152,13 +153,13 @@ describe('PeriodDaysFilter', () => {
 
         test('should exclude all periods when all possible days are excluded', () => {
             const periods = [
-                createPeriod(['mon', 'wed', 'fri']),
-                createPeriod(['tue', 'thu']),
-                createPeriod(['sat', 'sun'])
+                createPeriod([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY]),
+                createPeriod([DayOfWeek.TUESDAY, DayOfWeek.THURSDAY]),
+                createPeriod([DayOfWeek.SATURDAY, DayOfWeek.SUNDAY])
             ];
 
-            const result = periodDaysFilter.applyToPeriods(periods, { 
-                days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] 
+            const result = periodDaysFilter.applyToPeriods(periods, {
+                days: ['m', 't', 'w', 'r', 'f', 's', 'u']
             });
 
             // Should exclude all periods
@@ -170,23 +171,23 @@ describe('PeriodDaysFilter', () => {
         test('should provide correct exclusion behavior for section filtering', () => {
             // Test that the filter logic works correctly when applied to section periods
             const sectionWithWednesday = [
-                { type: 'Lecture', days: new Set(['mon', 'wed', 'fri']) },
-                { type: 'Lab', days: new Set(['tue']) }
+                { type: PeriodType.LECTURE, days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY]) },
+                { type: PeriodType.LAB, days: new Set([DayOfWeek.TUESDAY]) }
             ] as Period[];
 
             const sectionWithoutWednesday = [
-                { type: 'Lecture', days: new Set(['mon', 'fri']) },
-                { type: 'Lab', days: new Set(['tue', 'thu']) }
+                { type: PeriodType.LECTURE, days: new Set([DayOfWeek.MONDAY, DayOfWeek.FRIDAY]) },
+                { type: PeriodType.LAB, days: new Set([DayOfWeek.TUESDAY, DayOfWeek.THURSDAY]) }
             ] as Period[];
 
-            // When filtering section periods, if ANY period is excluded, 
+            // When filtering section periods, if ANY period is excluded,
             // the section should be considered as having excluded content
-            const resultWithWednesday = periodDaysFilter.applyToPeriods(sectionWithWednesday, { days: ['wed'] });
-            const resultWithoutWednesday = periodDaysFilter.applyToPeriods(sectionWithoutWednesday, { days: ['wed'] });
+            const resultWithWednesday = periodDaysFilter.applyToPeriods(sectionWithWednesday, { days: ['w'] });
+            const resultWithoutWednesday = periodDaysFilter.applyToPeriods(sectionWithoutWednesday, { days: ['w'] });
 
             // Section with Wednesday should have some periods filtered out
             expect(resultWithWednesday.length).toBeLessThan(sectionWithWednesday.length);
-            
+
             // Section without Wednesday should have all periods remain
             expect(resultWithoutWednesday.length).toBe(sectionWithoutWednesday.length);
         });

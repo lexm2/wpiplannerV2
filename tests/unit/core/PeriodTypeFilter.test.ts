@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { PeriodTypeFilter } from '../../../src/core/filters/PeriodTypeFilter';
-import { Period, PeriodType } from '../../../src/types/types';
+import { Period, PeriodType, DayOfWeek } from '../../../src/types/types';
 
 describe('PeriodTypeFilter', () => {
     let periodTypeFilter: PeriodTypeFilter;
@@ -106,7 +106,7 @@ describe('PeriodTypeFilter', () => {
             professor: 'Prof Smith',
             startTime: { hours: 9, minutes: 0, displayTime: '9:00 AM' },
             endTime: { hours: 10, minutes: 50, displayTime: '10:50 AM' },
-            days: new Set(['mon', 'wed', 'fri']),
+            days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY]),
             location: 'SL 123',
             building: 'SL',
             room: '123',
@@ -227,13 +227,13 @@ describe('PeriodTypeFilter', () => {
         test('should provide correct exclusion behavior for section filtering', () => {
             // Test that the filter logic works correctly when applied to section periods
             const sectionWithLab = [
-                { type: PeriodType.LECTURE },
-                { type: PeriodType.LAB }
+                { type: PeriodType.LECTURE, days: new Set([DayOfWeek.MONDAY]) },
+                { type: PeriodType.LAB, days: new Set([DayOfWeek.TUESDAY]) }
             ] as Period[];
 
             const sectionWithoutLab = [
-                { type: PeriodType.LECTURE },
-                { type: PeriodType.DISCUSSION }
+                { type: PeriodType.LECTURE, days: new Set([DayOfWeek.MONDAY]) },
+                { type: PeriodType.DISCUSSION, days: new Set([DayOfWeek.WEDNESDAY]) }
             ] as Period[];
 
             // When filtering section periods, if ANY period is excluded,

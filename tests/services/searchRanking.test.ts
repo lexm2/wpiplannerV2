@@ -20,8 +20,8 @@ describe('SearchService Ranking', () => {
                 number: '1020',
                 description: 'Introduction to differential calculus',
                 department: mathDept,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             },
             {
                 id: 'MA-1021',
@@ -29,8 +29,8 @@ describe('SearchService Ranking', () => {
                 number: '1021',
                 description: 'Introduction to integral calculus',
                 department: mathDept,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             },
             {
                 id: 'MA-1022',
@@ -38,8 +38,8 @@ describe('SearchService Ranking', () => {
                 number: '1022',
                 description: 'Multivariable calculus',
                 department: mathDept,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             },
             {
                 id: 'MA-2051',
@@ -47,8 +47,8 @@ describe('SearchService Ranking', () => {
                 number: '2051',
                 description: 'Linear algebra with MA1022 prerequisite',
                 department: mathDept,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             }
         ];
 
@@ -87,8 +87,8 @@ describe('SearchService Ranking', () => {
                 number: '1024',
                 description: 'Advanced multivariable calculus',
                 department: testCourses[0].department,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             };
 
             searchService.setCourseData([{
@@ -216,8 +216,8 @@ describe('SearchService Ranking', () => {
                 number: '2222',
                 description: 'Advanced topics in mathematics',
                 department: testCourses[0].department,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             };
 
             const courseWithDescMatch: Course = {
@@ -226,8 +226,8 @@ describe('SearchService Ranking', () => {
                 number: '9999',
                 description: 'Prerequisites include MA2222',
                 department: testCourses[0].department,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             };
 
             const ranked = searchService.rankCoursesByRelevance(
@@ -246,8 +246,8 @@ describe('SearchService Ranking', () => {
                 number: '3000',
                 description: 'Study of linear algebra',
                 department: testCourses[0].department,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             };
 
             const courseWithDescMatch: Course = {
@@ -256,8 +256,8 @@ describe('SearchService Ranking', () => {
                 number: '3001',
                 description: 'Requires Linear Algebra knowledge',
                 department: testCourses[0].department,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             };
 
             const ranked = searchService.rankCoursesByRelevance(
@@ -276,8 +276,8 @@ describe('SearchService Ranking', () => {
                 number: '1234',
                 description: 'Intro to programming',
                 department: testCourses[0].department,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             };
 
             const fuzzyMatch: Course = {
@@ -286,8 +286,8 @@ describe('SearchService Ranking', () => {
                 number: '123',
                 description: 'CS fundamentals',
                 department: testCourses[0].department,
-                sections: [],
-                credits: '1/3'
+                minCredits: 3,
+                maxCredits: 3
             };
 
             const ranked = searchService.rankCoursesByRelevance(

@@ -271,30 +271,6 @@ describe('ProfileStateManager', () => {
     })
   })
 
-  describe('Data Persistence and Loading', () => {
-    it.skip('should handle save failures gracefully', async () => {
-      // Make a change to trigger unsaved state
-      profileStateManager.selectCourse(mockCourse, false, 'test')
-
-      // Mock storage to fail for ALL subsequent calls
-      const executeSpy = vi.spyOn(mockStorageManager, 'executeTransaction')
-      executeSpy.mockResolvedValue({
-        success: false,
-        transactionId: 'test',
-        error: new Error('Storage failure')
-      })
-
-      const result = await profileStateManager.save()
-      expect(result.success).toBe(false)
-      expect(result.error).toBeTruthy()
-
-      // State should still indicate unsaved changes since save failed
-      expect(profileStateManager.getState().hasUnsavedChanges).toBe(true)
-
-      executeSpy.mockRestore()
-    })
-  })
-
   describe('Event System', () => {
     it('should properly manage event listeners', async () => {
       const events1: StateChangeEvent[] = []
@@ -349,35 +325,6 @@ describe('ProfileStateManager', () => {
       await vi.waitFor(() => {
         expect(normalListener).toHaveBeenCalled()
       })
-    })
-  })
-
-  describe('Debounced Saving', () => {
-    it.skip('should debounce multiple rapid changes', async () => {
-      const freshProfileManager = new ProfileStateManager(mockStorageManager)
-      const defaultSchedule = freshProfileManager.createSchedule('Test Schedule', 'test')
-      freshProfileManager.setActiveSchedule(defaultSchedule.id, 'test')
-
-      // Wait for any pending saves from setup to complete
-      await new Promise(resolve => setTimeout(resolve, 600))
-
-      vi.useFakeTimers()
-
-      try {
-        const saveSpy = vi.spyOn(freshProfileManager, 'save')
-
-        freshProfileManager.selectCourse(mockCourse, false, 'test')
-        freshProfileManager.setSelectedSection(mockCourse, 'A01', 'test')
-        freshProfileManager.updatePreferences({ theme: 'test-theme' }, 'test')
-
-        expect(saveSpy).not.toHaveBeenCalled()
-
-        await vi.advanceTimersByTimeAsync(600)
-
-        expect(saveSpy).toHaveBeenCalledTimes(1)
-      } finally {
-        vi.useRealTimers()
-      }
     })
   })
 

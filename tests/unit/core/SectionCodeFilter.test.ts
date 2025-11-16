@@ -1,5 +1,7 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, beforeEach } from 'vitest';
 import { SectionCodeFilter } from '../../../src/core/filters/SectionCodeFilter';
+import { Section } from '../../../src/types/types';
+import { createMockSection } from '../../helpers/mockData';
 
 describe('SectionCodeFilter', () => {
     let sectionCodeFilter: SectionCodeFilter;
@@ -39,9 +41,24 @@ describe('SectionCodeFilter', () => {
         expect(sectionCodeFilter.getDisplayValue({ codes: ['A01', 'B01', 'C01'] })).toBe('Sections: A01, B01, C01');
     });
 
-    test('apply method should return all courses (section filtering happens elsewhere)', () => {
-        const courses = []; // Empty courses array for testing
-        const result = sectionCodeFilter.apply(courses, { codes: ['AL01'] });
-        expect(result).toEqual(courses);
+    test('apply method should return all sections when no codes are provided', () => {
+        const sections: Section[] = [
+            createMockSection({ number: 'A01' }),
+            createMockSection({ number: 'A02' }),
+            createMockSection({ number: 'B01' })
+        ];
+        const result = sectionCodeFilter.apply(sections, { codes: [] });
+        expect(result).toEqual(sections);
+    });
+
+    test('apply method should filter sections by code', () => {
+        const sections: Section[] = [
+            createMockSection({ number: 'A01' }),
+            createMockSection({ number: 'A02' }),
+            createMockSection({ number: 'B01' })
+        ];
+        const result = sectionCodeFilter.apply(sections, { codes: ['A01'] });
+        expect(result).toHaveLength(1);
+        expect(result[0].number).toBe('A01');
     });
 });

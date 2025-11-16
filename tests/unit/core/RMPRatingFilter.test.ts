@@ -37,51 +37,59 @@ describe('RMPRatingFilter - includeWithoutData functionality', () => {
 
   test('should filter out professors without RMP data when includeWithoutData is false', () => {
     // Create test data - Team and Leadership Fundamentals III taught by Adam Messer
-    const adamMesserCourse = createMockCourse({
-      id: 'MIL-1101',
-      number: '1101',
-      name: 'Team and Leadership Fundamentals III (General Military Course)A',
-      sections: [
-        createMockSection({
-          crn: 10001,
-          number: 'A01',
-          periods: [
-            createMockPeriod({
-              professor: 'Adam Messer'
-            })
-          ]
+    const adamMesserSection = createMockSection({
+      crn: 10001,
+      number: 'A01',
+      periods: [
+        createMockPeriod({
+          professor: 'Adam Messer'
         })
       ]
     })
 
+    const adamMesserCourse = createMockCourse({
+      id: 'MIL-1101',
+      number: '1101',
+      name: 'Team and Leadership Fundamentals III (General Military Course)',
+      lectures: [{
+        section: adamMesserSection,
+        compatibleDiscussions: [],
+        compatibleLabs: []
+      }]
+    })
+
     // Create another course with RMP data
+    const normalSection = createMockSection({
+      crn: 10002,
+      number: 'A01',
+      periods: [
+        createMockPeriod({
+          professor: 'Dr. Test Professor'
+        })
+      ]
+    })
+
     const normalCourse = createMockCourse({
       id: 'CS-1101',
       number: '1101',
       name: 'Introduction to Programming',
-      sections: [
-        createMockSection({
-          crn: 10002,
-          number: 'A01',
-          periods: [
-            createMockPeriod({
-              professor: 'Dr. Test Professor'
-            })
-          ]
-        })
-      ]
+      lectures: [{
+        section: normalSection,
+        compatibleDiscussions: [],
+        compatibleLabs: []
+      }]
     })
 
     // Convert to FilterableSection format
     const filterableSections: FilterableSection[] = [
       {
         course: adamMesserCourse,
-        section: adamMesserCourse.sections[0],
+        section: adamMesserSection,
         sectionType: 'lecture' as const
       },
       {
         course: normalCourse,
-        section: normalCourse.sections[0],
+        section: normalSection,
         sectionType: 'lecture' as const
       }
     ]
@@ -109,16 +117,28 @@ describe('RMPRatingFilter - includeWithoutData functionality', () => {
   })
 
   test('should include professors without RMP data when includeWithoutData is true', () => {
+    const adamMesserSection = createMockSection({
+      periods: [
+        createMockPeriod({
+          professor: 'Adam Messer'
+        })
+      ]
+    })
+
     const adamMesserCourse = createMockCourse({
       id: 'MIL-1101',
-      name: 'Team and Leadership Fundamentals III (General Military Course)A',
-      sections: [
-        createMockSection({
-          periods: [
-            createMockPeriod({
-              professor: 'Adam Messer'
-            })
-          ]
+      name: 'Team and Leadership Fundamentals III (General Military Course)',
+      lectures: [{
+        section: adamMesserSection,
+        compatibleDiscussions: [],
+        compatibleLabs: []
+      }]
+    })
+
+    const normalSection = createMockSection({
+      periods: [
+        createMockPeriod({
+          professor: 'Dr. Test Professor'
         })
       ]
     })
@@ -126,26 +146,22 @@ describe('RMPRatingFilter - includeWithoutData functionality', () => {
     const normalCourse = createMockCourse({
       id: 'CS-1101',
       name: 'Introduction to Programming',
-      sections: [
-        createMockSection({
-          periods: [
-            createMockPeriod({
-              professor: 'Dr. Test Professor'
-            })
-          ]
-        })
-      ]
+      lectures: [{
+        section: normalSection,
+        compatibleDiscussions: [],
+        compatibleLabs: []
+      }]
     })
 
     const filterableSections: FilterableSection[] = [
       {
         course: adamMesserCourse,
-        section: adamMesserCourse.sections[0],
+        section: adamMesserSection,
         sectionType: 'lecture' as const
       },
       {
         course: normalCourse,
-        section: normalCourse.sections[0],
+        section: normalSection,
         sectionType: 'lecture' as const
       }
     ]
@@ -168,24 +184,28 @@ describe('RMPRatingFilter - includeWithoutData functionality', () => {
   })
 
   test('should NOT skip filtering when only includeWithoutData is changed from default', () => {
+    const adamMesserSection = createMockSection({
+      periods: [
+        createMockPeriod({
+          professor: 'Adam Messer'
+        })
+      ]
+    })
+
     const adamMesserCourse = createMockCourse({
       id: 'MIL-1101',
       name: 'Team and Leadership Fundamentals III',
-      sections: [
-        createMockSection({
-          periods: [
-            createMockPeriod({
-              professor: 'Adam Messer'
-            })
-          ]
-        })
-      ]
+      lectures: [{
+        section: adamMesserSection,
+        compatibleDiscussions: [],
+        compatibleLabs: []
+      }]
     })
 
     const filterableSections: FilterableSection[] = [
       {
         course: adamMesserCourse,
-        section: adamMesserCourse.sections[0],
+        section: adamMesserSection,
         sectionType: 'lecture' as const
       }
     ]
@@ -208,23 +228,27 @@ describe('RMPRatingFilter - includeWithoutData functionality', () => {
   })
 
   test('should skip filtering when ALL criteria are at defaults including includeWithoutData', () => {
-    const adamMesserCourse = createMockCourse({
-      id: 'MIL-1101',
-      sections: [
-        createMockSection({
-          periods: [
-            createMockPeriod({
-              professor: 'Adam Messer'
-            })
-          ]
+    const adamMesserSection = createMockSection({
+      periods: [
+        createMockPeriod({
+          professor: 'Adam Messer'
         })
       ]
+    })
+
+    const adamMesserCourse = createMockCourse({
+      id: 'MIL-1101',
+      lectures: [{
+        section: adamMesserSection,
+        compatibleDiscussions: [],
+        compatibleLabs: []
+      }]
     })
 
     const filterableSections: FilterableSection[] = [
       {
         course: adamMesserCourse,
-        section: adamMesserCourse.sections[0],
+        section: adamMesserSection,
         sectionType: 'lecture' as const
       }
     ]

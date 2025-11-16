@@ -9,6 +9,7 @@ import { PeriodConflictFilter } from '../core/filters/PeriodConflictFilter';
 import { SectionCodeFilter } from '../core/filters/SectionCodeFilter';
 import { ConflictDetector } from '../core/ConflictDetector';
 import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter, PeriodConflictFilterCriteria } from '../types/filters';
+import { SectionBasedFilter } from '../core/SectionFilterPipeline';
 import { FilterState } from '../core/FilterState';
 import { RequiredStatusFilter } from '../core/filters/RequiredStatusFilter';
 import { SectionStatusFilter } from '../core/filters/SectionStatusFilter';
@@ -22,6 +23,7 @@ import { ScheduleSearchTextFilter } from '../core/filters/ScheduleSearchTextFilt
 export class ScheduleFilterService {
     private filterState: FilterState;
     private registeredSectionFilters!: Map<string, SectionFilter>;
+    private registeredSectionBasedFilters!: Map<string, SectionBasedFilter>;
     private registeredSelectedCourseFilters!: Map<string, SelectedCourseFilter>;
     private periodConflictFilter: PeriodConflictFilter | null = null;
     private rmpService: RateMyProfessorService | null = null;
@@ -35,12 +37,13 @@ export class ScheduleFilterService {
     
     setConflictDetector(conflictDetector: ConflictDetector): void {
         this.periodConflictFilter = new PeriodConflictFilter(conflictDetector);
-        this.registerSectionFilter(this.periodConflictFilter);
+        this.registerSectionBasedFilter(this.periodConflictFilter);
     }
     
     private initializeFilters(): void {
         // Initialize filter registration Maps
         this.registeredSectionFilters = new Map();
+        this.registeredSectionBasedFilters = new Map();
         this.registeredSelectedCourseFilters = new Map();
 
         // Register SectionFilter implementations using registration methods
@@ -62,11 +65,11 @@ export class ScheduleFilterService {
         this.registerSelectedCourseFilter(new SectionStatusFilter());
     }
 
-    // Section Filter Registration  
+    // Section Filter Registration
     registerSectionFilter(filter: SectionFilter): void {
         this.registeredSectionFilters.set(filter.id, filter);
     }
-    
+
     unregisterSectionFilter(filterId: string): boolean {
         const removed = this.registeredSectionFilters.delete(filterId);
         if (removed) {
@@ -74,13 +77,34 @@ export class ScheduleFilterService {
         }
         return removed;
     }
-    
+
     getSectionFilter(filterId: string): SectionFilter | undefined {
         return this.registeredSectionFilters.get(filterId);
     }
-    
+
     getAvailableSectionFilters(): SectionFilter[] {
         return Array.from(this.registeredSectionFilters.values());
+    }
+
+    // Section-Based Filter Registration
+    registerSectionBasedFilter(filter: SectionBasedFilter): void {
+        this.registeredSectionBasedFilters.set(filter.id, filter);
+    }
+
+    unregisterSectionBasedFilter(filterId: string): boolean {
+        const removed = this.registeredSectionBasedFilters.delete(filterId);
+        if (removed) {
+            this.removeFilter(filterId);
+        }
+        return removed;
+    }
+
+    getSectionBasedFilter(filterId: string): SectionBasedFilter | undefined {
+        return this.registeredSectionBasedFilters.get(filterId);
+    }
+
+    getAvailableSectionBasedFilters(): SectionBasedFilter[] {
+        return Array.from(this.registeredSectionBasedFilters.values());
     }
     
     // SelectedCourse Filter Registration
@@ -105,8 +129,9 @@ export class ScheduleFilterService {
     }
     
     // Unified Filter Lookup
-    private getAnyRegisteredFilter(filterId: string): BaseFilter | undefined {
+    private getAnyRegisteredFilter(filterId: string): BaseFilter | SectionBasedFilter | undefined {
         return this.registeredSectionFilters.get(filterId) ||
+               this.registeredSectionBasedFilters.get(filterId) ||
                this.registeredSelectedCourseFilters.get(filterId);
     }
     

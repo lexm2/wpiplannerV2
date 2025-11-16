@@ -1,14 +1,16 @@
 import { Period, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
 import { ConflictDetector } from '../ConflictDetector';
-import { SectionFilter, PeriodConflictFilterCriteria } from '../../types/filters';
+import { PeriodConflictFilterCriteria } from '../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import { FilterableSection } from '../../types/filterableUnit';
 import { logger } from '../../utils/logger';
 
 export interface PeriodConflictCriteria extends PeriodConflictFilterCriteria {
     selectedCourses?: SelectedCourse[];
 }
 
-export class PeriodConflictFilter implements SectionFilter<PeriodConflictFilterCriteria> {
+export class PeriodConflictFilter implements SectionBasedFilter {
     readonly id = 'periodConflict';
     readonly name = 'Schedule Conflicts';
     readonly description = 'Hide periods that conflict with selected sections';
@@ -34,8 +36,47 @@ export class PeriodConflictFilter implements SectionFilter<PeriodConflictFilterC
         };
     }
 
-    apply(sections: Section[], criteria: PeriodConflictFilterCriteria, _activeFilters?: Map<string, unknown>): Section[] {
-        return this.applyToSections(sections, criteria);
+    apply(sections: FilterableSection[], criteria: any, _activeFilters?: Map<string, any>): FilterableSection[] {
+        return this.applyToFilterableSections(sections, criteria);
+    }
+
+    private applyToFilterableSections(sections: FilterableSection[], criteria: any): FilterableSection[] {
+        if (!criteria.avoidConflicts || !criteria.selectedCourses) {
+            return sections;
+        }
+
+        // Get currently selected sections from lecture/discussion/lab
+        const selectedSections: Section[] = [];
+        for (const selectedCourse of criteria.selectedCourses) {
+            if (selectedCourse.selectedLecture) {
+                selectedSections.push(selectedCourse.selectedLecture);
+            }
+            if (selectedCourse.selectedDiscussion) {
+                selectedSections.push(selectedCourse.selectedDiscussion);
+            }
+            if (selectedCourse.selectedLab) {
+                selectedSections.push(selectedCourse.selectedLab);
+            }
+        }
+
+        if (selectedSections.length === 0) {
+            return sections;
+        }
+
+        const term = selectedSections[0]?.computedTerm || 'A';
+
+        return sections.filter(fs => {
+            for (const currentPeriod of fs.section.periods) {
+                const tempSection = this.createTempSection(currentPeriod, term);
+                const testSections = [...selectedSections, tempSection];
+                const conflicts = this.conflictDetector.detectConflicts(testSections);
+
+                if (conflicts.length > 0) {
+                    return false;
+                }
+            }
+            return true;
+        });
     }
 
     applyToPeriods(periods: Period[], criteria: PeriodConflictCriteria): Period[] {
@@ -307,15 +348,15 @@ export class PeriodConflictFilter implements SectionFilter<PeriodConflictFilterC
     }
 
 
-    isValidCriteria(criteria: unknown): criteria is PeriodConflictFilterCriteria {
+    isValidCriteria(criteria: any): boolean {
         if (!criteria || typeof criteria !== 'object') {
             return false;
         }
         return typeof (criteria as PeriodConflictFilterCriteria).avoidConflicts === 'boolean';
     }
 
-    getDisplayValue(criteria: PeriodConflictFilterCriteria): string {
-        if (criteria.avoidConflicts) {
+    getDisplayValue(criteria: any): string {
+        if (criteria && criteria.avoidConflicts) {
             return 'Avoiding conflicts';
         }
         return 'Conflicts allowed';

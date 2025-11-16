@@ -6,12 +6,12 @@ import { AvailabilityFilter } from '../../../src/core/filters/AvailabilityFilter
 import { SearchTextFilter } from '../../../src/core/filters/SearchTextFilter';
 import { ProfessorFilter } from '../../../src/core/filters/ProfessorFilter';
 import { Course, Department, Section, Period, DayOfWeek } from '../../../src/types/types';
+import { createMockSection } from '../../helpers/mockData';
 
 describe('CourseFilterService', () => {
     let courseFilterService: CourseFilterService;
     let searchService: SearchService;
     let testCourses: Course[];
-    let testDepartments: Department[];
 
     // Helper function to create test courses
     function createTestCourse(
@@ -118,8 +118,8 @@ describe('CourseFilterService', () => {
         // Register common filters
         courseFilterService.registerFilter(new DepartmentFilter());
         courseFilterService.registerFilter(new AvailabilityFilter());
-        courseFilterService.registerFilter(new SearchTextFilter(searchService));
-        courseFilterService.registerFilter(new ProfessorFilter(searchService));
+        courseFilterService.registerFilter(new SearchTextFilter());
+        courseFilterService.registerFilter(new ProfessorFilter());
     });
 
     describe('Basic Functionality', () => {
@@ -336,6 +336,20 @@ describe('CourseFilterService', () => {
 
             const filtered = courseFilterService.filterCourses(testCourses);
             expect(filtered).toEqual(testCourses); // No filters active
+        });
+
+        test('should handle courses with only standaloneLabs', () => {
+            const labSection = createMockSection({ seatsAvailable: 5 });
+            const courseWithLabs = createTestCourse('lab-101', '101', 'Lab Only Course', 'LAB', 'Prof Test', 5);
+            courseWithLabs.lectures = undefined;
+            courseWithLabs.standaloneLabs = [labSection];
+
+            const coursesWithMixed = [...testCourses.slice(0, 2), courseWithLabs];
+
+            courseFilterService.addFilter('availability', { availableOnly: true });
+            const filtered = courseFilterService.filterCourses(coursesWithMixed);
+
+            expect(filtered.some(c => c.id === 'lab-101')).toBe(true);
         });
     });
 });
