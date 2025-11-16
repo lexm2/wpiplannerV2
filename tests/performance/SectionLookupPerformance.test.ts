@@ -56,7 +56,11 @@ function createMockCourseWithSections(numLectures: number, numDiscussions: numbe
         name: 'Large Course',
         number: '1234',
         description: 'A course with many sections',
-        department: 'CS',
+        department: {
+            abbreviation: 'CS',
+            name: 'Computer Science',
+            courses: []
+        },
         credits: 3.0,
         lectures
     }
@@ -101,8 +105,11 @@ describe('Section Lookup Performance', () => {
         const largeCourse = createMockCourseWithSections(10, 5, 3)  // ~90 sections
 
         smallCourse.id = 'CS-100'
+        smallCourse.number = '100'
         mediumCourse.id = 'CS-200'
+        mediumCourse.number = '200'
         largeCourse.id = 'CS-300'
+        largeCourse.number = '300'
 
         await service.selectCourse(smallCourse)
         await service.selectCourse(mediumCourse)

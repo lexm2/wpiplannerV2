@@ -19,7 +19,7 @@ export class PeriodConflictFilter implements SectionFilter<PeriodConflictFilterC
         this.conflictDetector = conflictDetector;
     }
 
-    private createTempSection(period: Period): Section {
+    private createTempSection(period: Period, computedTerm: string = 'A'): Section {
         return {
             crn: Math.floor(Math.random() * 99_999),
             number: 'TEMP',
@@ -29,8 +29,8 @@ export class PeriodConflictFilter implements SectionFilter<PeriodConflictFilterC
             actualWaitlist: 0,
             maxWaitlist: 0,
             description: 'Temporary section for conflict detection',
-            term: 'TEMP',
-            computedTerm: 'TEMP'
+            term: computedTerm,
+            computedTerm: computedTerm
         };
     }
 
@@ -62,9 +62,12 @@ export class PeriodConflictFilter implements SectionFilter<PeriodConflictFilterC
             return periods;
         }
 
+        // Get the term from the first selected section to use for temp sections
+        const term = selectedSections[0]?.computedTerm || 'A';
+
         // Filter out periods that would cause conflicts
         return periods.filter(period => {
-            const tempSection = this.createTempSection(period);
+            const tempSection = this.createTempSection(period, term);
             const testSections = [...selectedSections, tempSection];
             const conflicts = this.conflictDetector.detectConflicts(testSections);
 
@@ -125,7 +128,10 @@ export class PeriodConflictFilter implements SectionFilter<PeriodConflictFilterC
                 return true;
             }
 
-            const tempSection = this.createTempSection(currentPeriod);
+            // Get the term from the first selected section to use for temp sections
+            const term = otherCoursesSelectedSections[0]?.computedTerm || 'A';
+
+            const tempSection = this.createTempSection(currentPeriod, term);
             const testSections = [...otherCoursesSelectedSections, tempSection];
             const conflicts = this.conflictDetector.detectConflicts(testSections);
 
@@ -162,11 +168,14 @@ export class PeriodConflictFilter implements SectionFilter<PeriodConflictFilterC
             return sections;
         }
 
+        // Get the term from the first selected section to use for temp sections
+        const term = selectedSections[0]?.computedTerm || 'A';
+
         // Filter out sections that have ANY period conflicting with selected sections
         return sections.filter(currentSection => {
             // Check if ANY period in the current section conflicts with selected sections
             for (const currentPeriod of currentSection.periods) {
-                const tempSection = this.createTempSection(currentPeriod);
+                const tempSection = this.createTempSection(currentPeriod, term);
                 const testSections = [...selectedSections, tempSection];
                 const conflicts = this.conflictDetector.detectConflicts(testSections);
 
@@ -272,9 +281,12 @@ export class PeriodConflictFilter implements SectionFilter<PeriodConflictFilterC
                 return true;
             }
 
+            // Get the term from the first section to check against
+            const term = sectionsToCheckAgainst[0]?.computedTerm || 'A';
+
             // Check if ANY period in the current section conflicts
             for (const currentPeriod of currentSection.periods) {
-                const tempSection = this.createTempSection(currentPeriod);
+                const tempSection = this.createTempSection(currentPeriod, term);
                 const testSections = [...sectionsToCheckAgainst, tempSection];
                 const conflicts = this.conflictDetector.detectConflicts(testSections);
 

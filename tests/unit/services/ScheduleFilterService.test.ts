@@ -83,11 +83,21 @@ describe('ScheduleFilterService', () => {
         name: 'Intro to Programming',
         number: '101',
         description: 'Basic programming course',
-        credits: '3.0',
         minCredits: 3.0,
         maxCredits: 3.0,
         department: department,
-        sections: [testSection1, testSection2, testSection3]
+        lectures: [
+            {
+                section: testSection1,
+                compatibleDiscussions: [],
+                compatibleLabs: [testSection2]
+            },
+            {
+                section: testSection3,
+                compatibleDiscussions: [],
+                compatibleLabs: []
+            }
+        ]
     };
 
     const selectedCourse: SelectedCourse = {
@@ -331,11 +341,26 @@ describe('ScheduleFilterService', () => {
             name: 'Data Structures',
             number: '102',
             description: 'Data structures course',
-            credits: '3.0',
             minCredits: 3.0,
             maxCredits: 3.0,
             department: department,
-            sections: [testSection1, testSectionBTerm, testSectionCTerm] // A, B, C terms
+            lectures: [
+                {
+                    section: testSection1,
+                    compatibleDiscussions: [],
+                    compatibleLabs: []
+                },
+                {
+                    section: testSectionBTerm,
+                    compatibleDiscussions: [],
+                    compatibleLabs: []
+                },
+                {
+                    section: testSectionCTerm,
+                    compatibleDiscussions: [],
+                    compatibleLabs: []
+                }
+            ]
         };
 
         const selectedCourseWithTerms: SelectedCourse = {
@@ -434,11 +459,26 @@ describe('ScheduleFilterService', () => {
             name: 'Algorithms',
             number: '103',
             description: 'Algorithms course',
-            credits: '3.0',
             minCredits: 3.0,
             maxCredits: 3.0,
             department: department,
-            sections: [testSection1, testSection2, testSection3, testSectionDTerm] // All A term + 1 D term
+            lectures: [
+                {
+                    section: testSection1,
+                    compatibleDiscussions: [],
+                    compatibleLabs: [testSection2]
+                },
+                {
+                    section: testSection3,
+                    compatibleDiscussions: [],
+                    compatibleLabs: []
+                },
+                {
+                    section: testSectionDTerm,
+                    compatibleDiscussions: [],
+                    compatibleLabs: []
+                }
+            ]
         };
 
         const selectedCourseAllTerms: SelectedCourse = {

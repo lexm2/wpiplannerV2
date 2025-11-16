@@ -11,7 +11,9 @@ import { ProfileStateManager } from '../../src/core/ProfileStateManager';
 import { TransactionalStorageManager } from '../../src/core/TransactionalStorageManager';
 import { ScheduleManagementService } from '../../src/services/ScheduleManagementService';
 import { CourseSelectionService } from '../../src/services/CourseSelectionService';
-import type { Course } from '../../src/types/Course';
+import type { Course } from '../../src/types/types';
+import { createMockCourse, createMockSection, createMockPeriod, createMockTime, createMockDepartment } from '../helpers/mockData';
+import { DayOfWeek, PeriodType } from '../../src/types/types';
 
 describe('Storage Persistence Integration Tests', () => {
     let storageManager: TransactionalStorageManager;
@@ -22,7 +24,7 @@ describe('Storage Persistence Integration Tests', () => {
     // Mock localStorage
     const mockLocalStorage: { [key: string]: string } = {};
 
-    beforeEach(() => {
+    beforeEach(async () => {
         // Clear all mocks and storage
         vi.clearAllMocks();
         Object.keys(mockLocalStorage).forEach(key => delete mockLocalStorage[key]);
@@ -43,14 +45,18 @@ describe('Storage Persistence Integration Tests', () => {
             key: vi.fn()
         } as Storage;
 
-        // Initialize services (they're not singletons, just regular classes with dependency injection)
+        // Initialize services
         storageManager = new TransactionalStorageManager();
-        profileStateManager = new ProfileStateManager();
+        profileStateManager = new ProfileStateManager(storageManager);
         courseSelectionService = new CourseSelectionService(profileStateManager);
         scheduleManagementService = new ScheduleManagementService(
             profileStateManager,
             courseSelectionService
         );
+
+        // Initialize the services
+        await courseSelectionService.initialize();
+        await scheduleManagementService.initialize();
     });
 
     afterEach(() => {
@@ -80,7 +86,8 @@ describe('Storage Persistence Integration Tests', () => {
 
             // CRITICAL: Simulate immediate page reload by creating a new ProfileStateManager instance
             // This mimics what happens when the user reloads the page - it reads from localStorage
-            const newProfileStateManager = new ProfileStateManager();
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await newProfileStateManager.loadFromStorage();
 
             // Verify schedule is gone after "reload" - back to initial count
@@ -91,6 +98,10 @@ describe('Storage Persistence Integration Tests', () => {
         });
 
         it('should persist deletion of multiple schedules', async () => {
+            // Get initial schedule count (there's a default "My Schedule")
+            const initialSchedules = profileStateManager.getAllSchedules();
+            const initialCount = initialSchedules.length;
+
             // Create 3 schedules
             const schedule1 = await scheduleManagementService.createNewSchedule('Schedule 1');
             const schedule2 = await scheduleManagementService.createNewSchedule('Schedule 2');
@@ -102,16 +113,26 @@ describe('Storage Persistence Integration Tests', () => {
             await scheduleManagementService.deleteSchedule(schedule2.schedule!.id);
 
             // Simulate reload
-            const newProfileStateManager = new ProfileStateManager();
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await newProfileStateManager.loadFromStorage();
 
-            // Verify only schedules 1 and 3 remain
+            // Verify correct number of schedules remain (initial + 2 new ones)
             const schedules = newProfileStateManager.getAllSchedules();
-            expect(schedules).toHaveLength(2);
-            expect(schedules.map(s => s.name).sort()).toEqual(['Schedule 1', 'Schedule 3']);
+            expect(schedules).toHaveLength(initialCount + 2);
+
+            // Verify Schedule 2 is gone and Schedules 1 and 3 remain
+            const scheduleNames = schedules.map(s => s.name);
+            expect(scheduleNames).not.toContain('Schedule 2');
+            expect(scheduleNames).toContain('Schedule 1');
+            expect(scheduleNames).toContain('Schedule 3');
         });
 
         it('should handle rapid delete operations without data loss', async () => {
+            // Get initial schedule count
+            const initialSchedules = profileStateManager.getAllSchedules();
+            const initialCount = initialSchedules.length;
+
             // Create 5 schedules
             const scheduleIds: string[] = [];
             for (let i = 1; i <= 5; i++) {
@@ -127,113 +148,123 @@ describe('Storage Persistence Integration Tests', () => {
             ]);
 
             // Simulate reload
-            const newProfileStateManager = new ProfileStateManager();
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await newProfileStateManager.loadFromStorage();
 
-            // Verify only schedules 1 and 5 remain
+            // Verify correct number of schedules remain (initial + 2 new ones)
             const schedules = newProfileStateManager.getAllSchedules();
-            expect(schedules).toHaveLength(2);
-            expect(schedules.map(s => s.name).sort()).toEqual(['Schedule 1', 'Schedule 5']);
+            expect(schedules).toHaveLength(initialCount + 2);
+
+            // Verify schedules 2, 3, 4 are gone and 1 and 5 remain
+            const scheduleNames = schedules.map(s => s.name);
+            expect(scheduleNames).not.toContain('Schedule 2');
+            expect(scheduleNames).not.toContain('Schedule 3');
+            expect(scheduleNames).not.toContain('Schedule 4');
+            expect(scheduleNames).toContain('Schedule 1');
+            expect(scheduleNames).toContain('Schedule 5');
         });
     });
 
     describe('Course Selection Persistence', () => {
-        const mockCourse: Course = {
+        const mockSection1 = createMockSection({
+            crn: 12345,
+            number: 'A01',
+            seats: 30,
+            seatsAvailable: 5,
+            periods: [
+                createMockPeriod({
+                    type: PeriodType.LECTURE,
+                    professor: 'Prof. Smith',
+                    startTime: createMockTime(10, 0),
+                    endTime: createMockTime(11, 50),
+                    days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY]),
+                    location: 'FL 320'
+                })
+            ]
+        });
+
+        const mockCourse: Course = createMockCourse({
             id: 'CS-2102',
-            code: 'CS 2102',
-            title: 'Object-Oriented Design Concepts',
+            number: '2102',
+            name: 'Object-Oriented Design Concepts',
             description: 'Introduction to object-oriented design',
-            credits: 3,
-            termsOffered: ['Fall', 'Spring'],
-            prerequisites: [],
-            corequisites: [],
-            sections: [
+            minCredits: 3,
+            maxCredits: 3,
+            lectures: [
                 {
-                    id: 'CS-2102-A01',
-                    courseId: 'CS-2102',
-                    sectionCode: 'A01',
-                    instructor: 'Prof. Smith',
-                    meetings: [
-                        {
-                            days: ['Monday', 'Wednesday'],
-                            startTime: '10:00',
-                            endTime: '11:50',
-                            location: 'FL 320'
-                        }
-                    ],
-                    capacity: 30,
-                    enrolled: 25,
-                    status: 'Open'
+                    section: mockSection1,
+                    compatibleDiscussions: [],
+                    compatibleLabs: []
                 }
             ]
-        };
+        });
 
         it('should persist course selection even with immediate reload', async () => {
-            // Select a course with immediate flush
-            const selectResult = await courseSelectionService.selectCourse(mockCourse, { flushImmediately: true });
+            // Select a course
+            const selectResult = await courseSelectionService.selectCourse(mockCourse);
             expect(selectResult.success).toBe(true);
 
             // Verify course is selected
             let selectedCourses = courseSelectionService.getSelectedCourses();
             expect(selectedCourses).toHaveLength(1);
-            expect(selectedCourses[0].id).toBe(mockCourse.id);
+            expect(selectedCourses[0].course.id).toBe(mockCourse.id);
 
             // Simulate immediate reload
             const newProfileStateManager = new ProfileStateManager();
             await newProfileStateManager.loadFromStorage();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
+            await newCourseSelectionService.initialize();
 
             // Verify course is still selected after "reload"
             selectedCourses = newCourseSelectionService.getSelectedCourses();
             expect(selectedCourses).toHaveLength(1);
-            expect(selectedCourses[0].id).toBe(mockCourse.id);
+            expect(selectedCourses[0].course.id).toBe(mockCourse.id);
         });
 
         it('should persist multiple rapid course selections', async () => {
             const courses: Course[] = [
-                { ...mockCourse, id: 'CS-2102', code: 'CS 2102' },
-                { ...mockCourse, id: 'CS-3431', code: 'CS 3431', title: 'Database Systems' },
-                { ...mockCourse, id: 'CS-4241', code: 'CS 4241', title: 'Webware' }
+                createMockCourse({ id: 'CS-2102', number: '2102', name: 'Object-Oriented Design' }),
+                createMockCourse({ id: 'CS-3431', number: '3431', name: 'Database Systems' }),
+                createMockCourse({ id: 'CS-4241', number: '4241', name: 'Webware' })
             ];
 
             // Rapidly select all courses
             for (const course of courses) {
-                await courseSelectionService.selectCourse(course, {});
+                await courseSelectionService.selectCourse(course);
             }
 
-            // Flush pending operations before reload
-            await courseSelectionService.flushPendingOperations();
-
             // Simulate reload
-            const newProfileStateManager = new ProfileStateManager();
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await newProfileStateManager.loadFromStorage();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
+            await newCourseSelectionService.initialize();
 
             // Verify all courses are still selected
             const selectedCourses = newCourseSelectionService.getSelectedCourses();
             expect(selectedCourses).toHaveLength(3);
-            expect(selectedCourses.map((c: Course) => c.id).sort()).toEqual(['CS-2102', 'CS-3431', 'CS-4241']);
+            expect(selectedCourses.map(sc => sc.course.id).sort()).toEqual(['CS-2102', 'CS-3431', 'CS-4241']);
         });
 
         it('should persist course unselection', async () => {
             // Select a course
-            await courseSelectionService.selectCourse(mockCourse, {});
+            await courseSelectionService.selectCourse(mockCourse);
 
             // Verify selected
             let selectedCourses = courseSelectionService.getSelectedCourses();
             expect(selectedCourses).toHaveLength(1);
 
             // Unselect the course
-            const unselectResult = await courseSelectionService.unselectCourse(mockCourse.id);
+            const unselectResult = await courseSelectionService.unselectCourse(mockCourse);
             expect(unselectResult.success).toBe(true);
 
-            // Flush before reload
-            await courseSelectionService.flushPendingOperations();
-
             // Simulate reload
-            const newProfileStateManager = new ProfileStateManager();
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await newProfileStateManager.loadFromStorage();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
+            await newCourseSelectionService.initialize();
 
             // Verify course is no longer selected
             selectedCourses = newCourseSelectionService.getSelectedCourses();
@@ -242,101 +273,115 @@ describe('Storage Persistence Integration Tests', () => {
     });
 
     describe('Section Selection Persistence', () => {
-        const mockCourse: Course = {
+        const mockSectionA01 = createMockSection({
+            crn: 12345,
+            number: 'A01',
+            seats: 30,
+            seatsAvailable: 5,
+            periods: [
+                createMockPeriod({
+                    type: PeriodType.LECTURE,
+                    professor: 'Prof. Smith',
+                    startTime: createMockTime(10, 0),
+                    endTime: createMockTime(11, 50),
+                    days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY]),
+                    location: 'FL 320'
+                })
+            ]
+        });
+
+        const mockSectionB01 = createMockSection({
+            crn: 12346,
+            number: 'B01',
+            seats: 30,
+            seatsAvailable: 10,
+            periods: [
+                createMockPeriod({
+                    type: PeriodType.LECTURE,
+                    professor: 'Prof. Johnson',
+                    startTime: createMockTime(14, 0),
+                    endTime: createMockTime(15, 50),
+                    days: new Set([DayOfWeek.TUESDAY, DayOfWeek.THURSDAY]),
+                    location: 'FL 221'
+                })
+            ]
+        });
+
+        const mockCourse: Course = createMockCourse({
             id: 'CS-2102',
-            code: 'CS 2102',
-            title: 'Object-Oriented Design Concepts',
+            number: '2102',
+            name: 'Object-Oriented Design Concepts',
             description: 'Introduction to object-oriented design',
-            credits: 3,
-            termsOffered: ['Fall', 'Spring'],
-            prerequisites: [],
-            corequisites: [],
-            sections: [
+            minCredits: 3,
+            maxCredits: 3,
+            lectures: [
                 {
-                    id: 'CS-2102-A01',
-                    courseId: 'CS-2102',
-                    sectionCode: 'A01',
-                    instructor: 'Prof. Smith',
-                    meetings: [
-                        {
-                            days: ['Monday', 'Wednesday'],
-                            startTime: '10:00',
-                            endTime: '11:50',
-                            location: 'FL 320'
-                        }
-                    ],
-                    capacity: 30,
-                    enrolled: 25,
-                    status: 'Open'
+                    section: mockSectionA01,
+                    compatibleDiscussions: [],
+                    compatibleLabs: []
                 },
                 {
-                    id: 'CS-2102-B01',
-                    courseId: 'CS-2102',
-                    sectionCode: 'B01',
-                    instructor: 'Prof. Johnson',
-                    meetings: [
-                        {
-                            days: ['Tuesday', 'Thursday'],
-                            startTime: '14:00',
-                            endTime: '15:50',
-                            location: 'FL 221'
-                        }
-                    ],
-                    capacity: 30,
-                    enrolled: 20,
-                    status: 'Open'
+                    section: mockSectionB01,
+                    compatibleDiscussions: [],
+                    compatibleLabs: []
                 }
             ]
-        };
+        });
 
         it('should persist section selection even with immediate reload', async () => {
             // Select course first
-            await courseSelectionService.selectCourse(mockCourse, {});
+            await courseSelectionService.selectCourse(mockCourse);
 
-            // Select a specific section with immediate flush
-            const sectionResult = await courseSelectionService.setSelectedSection(
+            // Select a specific lecture section using setSelectedComponents
+            const componentsResult = await courseSelectionService.setSelectedComponents(
                 mockCourse,
-                mockCourse.sections[0].id,
-                { flushImmediately: true }
+                mockSectionA01,  // lecture
+                null,            // discussion
+                null             // lab
             );
-            expect(sectionResult.success).toBe(true);
+            expect(componentsResult.success).toBe(true);
 
             // Simulate reload
-            const newProfileStateManager = new ProfileStateManager();
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await newProfileStateManager.loadFromStorage();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
+            await newCourseSelectionService.initialize();
 
-            // Verify section is still selected
+            // Verify section is still selected (check hierarchical field)
             const selectedCourses = newCourseSelectionService.getSelectedCourses();
-            const course = selectedCourses.find((c: Course) => c.id === mockCourse.id);
-            expect(course).toBeDefined();
-            expect(course.selectedSectionId).toBe(mockCourse.sections[0].id);
+            const selectedCourse = selectedCourses.find(sc => sc.course.id === mockCourse.id);
+            expect(selectedCourse).toBeDefined();
+            expect(selectedCourse?.selectedLecture?.number).toBe(mockSectionA01.number);
         });
 
         it('should persist section change', async () => {
             // Select course
-            await courseSelectionService.selectCourse(mockCourse, {});
+            await courseSelectionService.selectCourse(mockCourse);
 
             // Select section A01
-            await courseSelectionService.setSelectedSection(mockCourse, mockCourse.sections[0].id);
+            await courseSelectionService.setSelectedComponents(mockCourse, mockSectionA01, null, null);
 
-            // Change to section B01 with immediate flush
-            const changeResult = await courseSelectionService.setSelectedSection(
+            // Change to section B01
+            const changeResult = await courseSelectionService.setSelectedComponents(
                 mockCourse,
-                mockCourse.sections[1].id,
-                { flushImmediately: true }
+                mockSectionB01,
+                null,
+                null
             );
             expect(changeResult.success).toBe(true);
 
             // Simulate reload
-            const newProfileStateManager = new ProfileStateManager();
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await newProfileStateManager.loadFromStorage();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
+            await newCourseSelectionService.initialize();
 
             // Verify section B01 is selected (not A01)
             const selectedCourses = newCourseSelectionService.getSelectedCourses();
-            const course = selectedCourses.find((c: Course) => c.id === mockCourse.id);
-            expect(course?.selectedSectionId).toBe(mockCourse.sections[1].id);
+            const selectedCourse = selectedCourses.find(sc => sc.course.id === mockCourse.id);
+            expect(selectedCourse?.selectedLecture?.number).toBe(mockSectionB01.number);
         });
     });
 
@@ -359,11 +404,15 @@ describe('Storage Persistence Integration Tests', () => {
             // not waiting for 2.5 second batch interval
             expect(deleteEnd - deleteStart).toBeLessThan(100);
 
-            // Verify persistence
-            const newProfileStateManager = new ProfileStateManager();
+            // Verify persistence - should be back to initial count
+            const initialSchedules = profileStateManager.getAllSchedules();
+            const initialCount = initialSchedules.length;
+
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await newProfileStateManager.loadFromStorage();
             const schedules = newProfileStateManager.getAllSchedules();
-            expect(schedules).toHaveLength(0);
+            expect(schedules).toHaveLength(initialCount);
         });
     });
 
@@ -372,12 +421,15 @@ describe('Storage Persistence Integration Tests', () => {
             // Clear all storage
             localStorage.clear();
 
-            // Load from empty storage
-            const newProfileStateManager = new ProfileStateManager();
+            // Load from empty storage - ProfileStateManager creates a default schedule if none exist
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await newProfileStateManager.loadFromStorage();
 
             const schedules = newProfileStateManager.getAllSchedules();
-            expect(schedules).toHaveLength(0);
+            // Default schedule "My Schedule" is created when loading from empty storage
+            expect(schedules).toHaveLength(1);
+            expect(schedules[0].name).toBe('My Schedule');
         });
 
         it('should handle corrupted storage data', async () => {
@@ -385,48 +437,42 @@ describe('Storage Persistence Integration Tests', () => {
             localStorage.setItem('wpi-planner-schedules', 'invalid{json}');
 
             // Should handle gracefully
-            const newProfileStateManager = new ProfileStateManager();
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await expect(newProfileStateManager.loadFromStorage()).resolves.not.toThrow();
         });
 
         it('should handle concurrent modifications', async () => {
-            const course1: Course = {
+            const course1: Course = createMockCourse({
                 id: 'CS-2102',
-                code: 'CS 2102',
-                title: 'OOD',
-                description: 'Test',
-                credits: 3,
-                termsOffered: ['Fall'],
-                prerequisites: [],
-                corequisites: [],
-                sections: []
-            };
+                number: '2102',
+                name: 'OOD',
+                description: 'Test course 1',
+                minCredits: 3,
+                maxCredits: 3
+            });
 
-            const course2: Course = {
+            const course2: Course = createMockCourse({
                 id: 'CS-3431',
-                code: 'CS 3431',
-                title: 'Database',
-                description: 'Test',
-                credits: 3,
-                termsOffered: ['Fall'],
-                prerequisites: [],
-                corequisites: [],
-                sections: []
-            };
+                number: '3431',
+                name: 'Database',
+                description: 'Test course 2',
+                minCredits: 3,
+                maxCredits: 3
+            });
 
             // Concurrent operations
             await Promise.all([
-                courseSelectionService.selectCourse(course1, {}),
-                courseSelectionService.selectCourse(course2, {})
+                courseSelectionService.selectCourse(course1),
+                courseSelectionService.selectCourse(course2)
             ]);
 
-            // Flush before reload
-            await courseSelectionService.flushPendingOperations();
-
             // Simulate reload
-            const newProfileStateManager = new ProfileStateManager();
+            const newStorageManager = new TransactionalStorageManager();
+            const newProfileStateManager = new ProfileStateManager(newStorageManager);
             await newProfileStateManager.loadFromStorage();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
+            await newCourseSelectionService.initialize();
 
             // Both should be persisted
             const selectedCourses = newCourseSelectionService.getSelectedCourses();

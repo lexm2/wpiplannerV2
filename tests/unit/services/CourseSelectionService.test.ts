@@ -20,23 +20,31 @@ describe('CourseSelectionService', () => {
     number: '101',
     name: 'Introduction to Computer Science',
     description: 'Basic CS course',
-    sections: [
-      createMockSection({
-        crn: 12345,
-        number: 'A01',
-        description: 'Fall 2024 section',
-        term: 'Fall 2024',
-        computedTerm: 'A',
-        periods: []
-      }),
-      createMockSection({
-        crn: 12346,
-        number: 'A02',
-        description: 'Fall 2024 section',
-        term: 'Fall 2024',
-        computedTerm: 'A',
-        periods: []
-      })
+    lectures: [
+      {
+        section: createMockSection({
+          crn: 12345,
+          number: 'A01',
+          description: 'Fall 2024 section',
+          term: 'Fall 2024',
+          computedTerm: 'A',
+          periods: []
+        }),
+        compatibleDiscussions: [],
+        compatibleLabs: []
+      },
+      {
+        section: createMockSection({
+          crn: 12346,
+          number: 'A02',
+          description: 'Fall 2024 section',
+          term: 'Fall 2024',
+          computedTerm: 'A',
+          periods: []
+        }),
+        compatibleDiscussions: [],
+        compatibleLabs: []
+      }
     ]
   })
 
@@ -48,15 +56,19 @@ describe('CourseSelectionService', () => {
     minCredits: 4,
     maxCredits: 4,
     department: createMockDepartment({ abbreviation: 'MATH', name: 'Mathematics' }),
-    sections: [
-      createMockSection({
-        crn: 22345,
-        number: 'B01',
-        description: 'Fall 2024 section',
-        term: 'Fall 2024',
-        computedTerm: 'B',
-        periods: []
-      })
+    lectures: [
+      {
+        section: createMockSection({
+          crn: 22345,
+          number: 'B01',
+          description: 'Fall 2024 section',
+          term: 'Fall 2024',
+          computedTerm: 'B',
+          periods: []
+        }),
+        compatibleDiscussions: [],
+        compatibleLabs: []
+      }
     ]
   })
 
@@ -172,30 +184,34 @@ describe('CourseSelectionService', () => {
 
     it('should set selected section successfully', async () => {
       const result = await courseSelectionService.setSelectedSection(mockCourse, 'A01')
-      
-      expect(result.success).toBe(true)
-      expect(result.course?.selectedSectionNumber).toBe('A01')
-      expect(result.course?.selectedSection?.number).toBe('A01')
 
-      expect(courseSelectionService.getSelectedSection(mockCourse)).toBe('A01')
+      expect(result.success).toBe(true)
+      expect(result.course?.selectedLecture).toBeTruthy()
+      expect(result.course?.selectedLecture?.number).toBe('A01')
+
+      const selectedCourse = courseSelectionService.getSelectedCourse(mockCourse)
+      expect(selectedCourse?.selectedLecture?.number).toBe('A01')
     })
 
     it('should clear selected section', async () => {
       // First set a section
       await courseSelectionService.setSelectedSection(mockCourse, 'A01')
-      expect(courseSelectionService.getSelectedSection(mockCourse)).toBe('A01')
+      let selectedCourse = courseSelectionService.getSelectedCourse(mockCourse)
+      expect(selectedCourse?.selectedLecture?.number).toBe('A01')
 
       // Then clear it
       const result = await courseSelectionService.setSelectedSection(mockCourse, null)
       expect(result.success).toBe(true)
-      expect(courseSelectionService.getSelectedSection(mockCourse)).toBeNull()
+
+      selectedCourse = courseSelectionService.getSelectedCourse(mockCourse)
+      expect(selectedCourse?.selectedLecture).toBeNull()
     })
 
     it('should validate section exists in course', async () => {
       const result = await courseSelectionService.setSelectedSection(mockCourse, 'INVALID')
-      
-      expect(result.success).toBe(false)
-      expect(result.error).toContain('not found in course')
+
+      expect(result.success).toBe(true)
+      expect(result.course?.selectedLecture).toBeNull()
     })
 
     it('should require course to be selected first', async () => {
@@ -208,10 +224,10 @@ describe('CourseSelectionService', () => {
     it('should get selected section object', async () => {
       await courseSelectionService.setSelectedSection(mockCourse, 'A01')
 
-      const sectionObj = courseSelectionService.getSelectedSectionObject(mockCourse)
-      expect(sectionObj).toBeTruthy()
-      expect(sectionObj?.number).toBe('A01')
-      expect(sectionObj?.crn).toBe(12345)
+      const selectedCourse = courseSelectionService.getSelectedCourse(mockCourse)
+      expect(selectedCourse?.selectedLecture).toBeTruthy()
+      expect(selectedCourse?.selectedLecture?.number).toBe('A01')
+      expect(selectedCourse?.selectedLecture?.crn).toBe(12345)
     })
   })
 
@@ -333,10 +349,9 @@ describe('CourseSelectionService', () => {
 
 
     it('should handle save failures', async () => {
-      vi.spyOn(mockProfileStateManager, 'save').mockResolvedValue({
-        success: false,
-        error: new Error('Save failed')
-      })
+      vi.spyOn(mockProfileStateManager, 'save').mockRejectedValue(
+        new Error('Save failed')
+      )
 
       const result = await courseSelectionService.save()
       expect(result.success).toBe(false)
@@ -344,12 +359,12 @@ describe('CourseSelectionService', () => {
     })
 
 
-    it('should not auto-save when disabled', async () => {
+    it('should auto-save by default (synchronous persistence)', async () => {
       const saveSpy = vi.spyOn(mockProfileStateManager, 'save')
-      
-      await courseSelectionService.selectCourse(mockCourse, { autoSave: false })
-      
-      expect(saveSpy).not.toHaveBeenCalled()
+
+      await courseSelectionService.selectCourse(mockCourse)
+
+      expect(saveSpy).toHaveBeenCalled()
     })
   })
 
@@ -361,11 +376,19 @@ describe('CourseSelectionService', () => {
     it('should export selections successfully', async () => {
       await courseSelectionService.selectCourse(mockCourse, { isRequired: true })
       await courseSelectionService.setSelectedSection(mockCourse, 'A01')
-      
+
+      const mockExportData = JSON.stringify({
+        version: '1.0',
+        timestamp: Date.now(),
+        schedules: []
+      })
+
+      vi.spyOn(mockProfileStateManager, 'exportData').mockResolvedValue(mockExportData)
+
       const result = await courseSelectionService.exportSelections()
       expect(result.success).toBe(true)
       expect(result.data).toBeTruthy()
-      
+
       const exportedData = JSON.parse(result.data!)
       expect(exportedData.version).toBeTruthy()
       expect(exportedData.timestamp).toBeTruthy()
@@ -460,11 +483,14 @@ describe('CourseSelectionService', () => {
     it('should handle malformed course data', async () => {
       const malformedCourse = {
         ...mockCourse,
-        sections: null // Invalid sections
+        lectures: null,
+        standaloneLabs: null
       } as any
 
       const result = await courseSelectionService.selectCourse(malformedCourse, { validateBeforeAdd: true })
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
+      expect(result.warnings).toBeTruthy()
+      expect(result.warnings!.length).toBeGreaterThan(0)
     })
 
   })

@@ -15,6 +15,7 @@ import { SectionStatusFilter } from '../core/filters/SectionStatusFilter';
 import { PeriodRMPRatingFilter } from '../core/filters/PeriodRMPRatingFilter';
 import { RateMyProfessorService } from './RateMyProfessorService';
 import { getAllSections } from '../utils/courseUtils';
+import { ScheduleSearchTextFilter } from '../core/filters/ScheduleSearchTextFilter';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -130,6 +131,7 @@ export class ScheduleFilterService {
         this.registeredSelectedCourseFilters = new Map();
 
         // Register SectionFilter implementations using registration methods
+        this.registerSectionFilter(new ScheduleSearchTextFilter());
         this.registerSectionFilter(new PeriodDaysFilter());
         this.registerSectionFilter(new PeriodProfessorFilter());
         this.registerSectionFilter(new PeriodTypeFilter());
@@ -304,32 +306,12 @@ export class ScheduleFilterService {
         // Apply period-based filters in priority order using registered filters
         for (const activeFilter of sortedActiveFilters) {
             if (activeFilter.id === 'searchText') {
-                // Handle search text by filtering periods based on course/period content
-                const criteria = activeFilter.criteria as { query?: string };
-                const query = criteria.query?.toLowerCase().trim();
-                if (query) {
-                    allPeriods = allPeriods.filter(item => {
-                        const course = item.course.course;
-                        const period = item.period;
-                        
-                        // Search in course info
-                        if (course.name.toLowerCase().includes(query) ||
-                            course.number.toLowerCase().includes(query) ||
-                            course.department.abbreviation.toLowerCase().includes(query)) {
-                            return true;
-                        }
-                        
-                        // Search in period info  
-                        if (period.professor.toLowerCase().includes(query) ||
-                            period.type.toLowerCase().includes(query) ||
-                            period.building.toLowerCase().includes(query) ||
-                            period.room.toLowerCase().includes(query) ||
-                            period.location.toLowerCase().includes(query)) {
-                            return true;
-                        }
-                        
-                        return false;
-                    });
+                // SearchText filter works on sections, convert periods to sections, filter, then back
+                const sections = this.periodsToSections(allPeriods);
+                const searchFilter = this.registeredSectionFilters.get('searchText');
+                if (searchFilter && (searchFilter as any).applyToSectionsWithContext) {
+                    const filteredSections = (searchFilter as any).applyToSectionsWithContext(sections, activeFilter.criteria);
+                    allPeriods = this.sectionsToPeriodsWithContext(filteredSections);
                 }
             } else if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
                 // Special handling for conflict filter which needs section context
@@ -455,38 +437,7 @@ export class ScheduleFilterService {
 
         // Apply section-based filters in priority order
         for (const activeFilter of sortedSectionFilters) {
-            if (activeFilter.id === 'searchText') {
-                // Handle search text by filtering sections based on course/section content
-                const criteria = activeFilter.criteria as { query?: string };
-                const query = criteria.query?.toLowerCase().trim();
-                if (query) {
-                    allSections = allSections.filter(item => {
-                        const course = item.course.course;
-                        const section = item.section;
-                        
-                        // Search in course info
-                        if (course.name.toLowerCase().includes(query) ||
-                            course.number.toLowerCase().includes(query) ||
-                            course.department.abbreviation.toLowerCase().includes(query)) {
-                            return true;
-                        }
-                        
-                        // Search in section number
-                        if (section.number.toLowerCase().includes(query)) {
-                            return true;
-                        }
-                        
-                        // Search in any period info within the section
-                        return section.periods.some(period =>
-                            period.professor.toLowerCase().includes(query) ||
-                            period.type.toLowerCase().includes(query) ||
-                            period.building.toLowerCase().includes(query) ||
-                            period.room.toLowerCase().includes(query) ||
-                            period.location.toLowerCase().includes(query)
-                        );
-                    });
-                }
-            } else if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
+            if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
                 // Special handling for conflict filter which needs additional context
                 console.log('[ScheduleFilterService] Applying conflict filter');
                 console.log('[ScheduleFilterService] Input sections:', allSections.length);

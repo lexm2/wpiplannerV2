@@ -704,20 +704,14 @@ export class ScheduleManagementService {
 
             const data = JSON.parse(jsonData);
 
-            // Support both single schedule (old format) and multiple schedules (new format)
-            let schedulesToImport: any[] = [];
-            if (data.schedules && Array.isArray(data.schedules)) {
-                // New format: array of schedules
-                schedulesToImport = data.schedules;
-            } else if (data.schedule) {
-                // Old format: single schedule - convert to array
-                schedulesToImport = [data.schedule];
-            } else {
+            if (!data.schedules || !Array.isArray(data.schedules)) {
                 return {
                     success: false,
-                    error: 'Import data does not contain valid schedule(s)'
+                    error: 'Import data does not contain valid schedules array'
                 };
             }
+
+            const schedulesToImport = data.schedules;
 
             if (schedulesToImport.length === 0) {
                 return {

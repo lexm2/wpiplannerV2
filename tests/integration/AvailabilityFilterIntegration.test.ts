@@ -128,14 +128,20 @@ describe('AvailabilityFilter Integration', () => {
         days: new Set([DayOfWeek.MONDAY])
       })
 
+      const csSection = createMockSection({
+        computedTerm: 'A',
+        periods: [csPeriod],
+        seatsAvailable: 5
+      })
+
       const csCourse = createMockCourse({
         id: 'CS-101',
         department: csDept,
-        sections: [createMockSection({ 
-          computedTerm: 'A',
-          periods: [csPeriod], 
-          seatsAvailable: 5 
-        })]
+        lectures: [{
+          section: csSection,
+          compatibleDiscussions: [],
+          compatibleLabs: []
+        }]
       })
 
       // MA course with Dr. Jones, Term B
@@ -146,14 +152,20 @@ describe('AvailabilityFilter Integration', () => {
         days: new Set([DayOfWeek.TUESDAY])
       })
 
+      const maSection = createMockSection({
+        computedTerm: 'B',
+        periods: [maPeriod],
+        seatsAvailable: 3
+      })
+
       const maCourse = createMockCourse({
         id: 'MA-101',
         department: maDept,
-        sections: [createMockSection({ 
-          computedTerm: 'B',
-          periods: [maPeriod], 
-          seatsAvailable: 3 
-        })]
+        lectures: [{
+          section: maSection,
+          compatibleDiscussions: [],
+          compatibleLabs: []
+        }]
       })
 
       const courses = [csCourse, maCourse]
@@ -286,8 +298,13 @@ describe('AvailabilityFilter Integration', () => {
 
   describe('filter coordination edge cases', () => {
     test('should handle filter removal and re-addition', () => {
+      const section = createMockSection({ seatsAvailable: 5 })
       const course = createMockCourse({
-        sections: [createMockSection({ seatsAvailable: 5 })]
+        lectures: [{
+          section: section,
+          compatibleDiscussions: [],
+          compatibleLabs: []
+        }]
       })
 
       // Add filter
@@ -307,8 +324,13 @@ describe('AvailabilityFilter Integration', () => {
     })
 
     test('should handle concurrent filter modifications', async () => {
+      const section = createMockSection({ seatsAvailable: 5, computedTerm: 'A' })
       const course = createMockCourse({
-        sections: [createMockSection({ seatsAvailable: 5 })]
+        lectures: [{
+          section: section,
+          compatibleDiscussions: [],
+          compatibleLabs: []
+        }]
       })
 
       // Add multiple filters rapidly

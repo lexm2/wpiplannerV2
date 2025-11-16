@@ -47,10 +47,10 @@ export class SearchTextFilter implements SectionBasedFilter {
     }
     
     isValidCriteria(criteria: any): criteria is SearchTextFilterCriteria {
-        return criteria && 
-               typeof criteria === 'object' && 
-               'query' in criteria && 
-               typeof criteria.query === 'string';
+        return !!(criteria &&
+               typeof criteria === 'object' &&
+               'query' in criteria &&
+               typeof criteria.query === 'string');
     }
     
     getDisplayValue(criteria: SearchTextFilterCriteria): string {

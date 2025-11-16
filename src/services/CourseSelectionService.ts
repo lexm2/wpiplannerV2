@@ -7,6 +7,7 @@ import { Validators } from '../utils/validators'
 export interface CourseSelectionOptions {
     isRequired?: boolean;
     validateBeforeAdd?: boolean;
+    autoSave?: boolean;
 }
 
 export interface CourseSelectionResult {
@@ -94,6 +95,8 @@ export class CourseSelectionService {
         } = options;
 
         try {
+            let warnings: string[] | undefined;
+
             // Validate course if requested
             if (validateBeforeAdd) {
                 const validation = this.dataValidator.validateCourse(course);
@@ -103,6 +106,11 @@ export class CourseSelectionService {
                         error: `Invalid course: ${validation.errors.map(e => e.message).join(', ')}`,
                         warnings: validation.warnings.map(w => w.message)
                     };
+                }
+
+                // Capture warnings even if validation passed
+                if (validation.warnings.length > 0) {
+                    warnings = validation.warnings.map(w => w.message);
                 }
             }
 
@@ -122,7 +130,8 @@ export class CourseSelectionService {
 
             return {
                 success: true,
-                course: selectedCourse
+                course: selectedCourse,
+                warnings
             };
 
         } catch (error) {
@@ -750,10 +759,10 @@ export class CourseSelectionService {
             await this.ensureInitialized();
             await this.profileStateManager.save();
             return { success: true };
-        } catch (error) {
+        } catch (error: any) {
             return {
                 success: false,
-                error: `Save failed: ${error}`
+                error: error?.message || `Save failed: ${error}`
             };
         }
     }
@@ -886,6 +895,7 @@ export class CourseSelectionService {
             return false;
         }
     }
+
 
     // Debug methods
     debugState(): void {

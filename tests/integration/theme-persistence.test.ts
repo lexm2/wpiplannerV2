@@ -42,16 +42,16 @@ describe('Theme Persistence Integration', () => {
 
     it('should persist theme selection through the unified storage system', async () => {
         // Initial state should be default theme
-        expect(themeManager.getCurrentThemeId()).toBe('wpi-classic');
+        expect(themeManager.getCurrentThemeId()).toBe('wpi-dark');
 
         // Change theme using ThemeManager directly
-        const success = themeManager.setTheme('wpi-dark');
+        const success = themeManager.setTheme('wpi-light');
         expect(success).toBe(true);
-        expect(themeManager.getCurrentThemeId()).toBe('wpi-dark');
+        expect(themeManager.getCurrentThemeId()).toBe('wpi-light');
 
         // Verify it's saved in ProfileStateManager
         const preferences = profileStateManager.getPreferences();
-        expect(preferences.theme).toBe('wpi-dark');
+        expect(preferences.theme).toBe('wpi-light');
 
         // Simulate reload by creating new instances with same storage
         ThemeManager.resetInstance();
@@ -62,7 +62,7 @@ describe('Theme Persistence Integration', () => {
         newThemeSelector.initializeTheme();
 
         // Theme should be persisted
-        expect(newThemeManager.getCurrentThemeId()).toBe('wpi-dark');
+        expect(newThemeManager.getCurrentThemeId()).toBe('wpi-light');
     });
 
     it('should not have conflicting storage calls between ThemeSelector and ThemeManager', () => {

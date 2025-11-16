@@ -49,7 +49,8 @@ export const createMockDepartment = (overrides: Partial<Department> = {}): Depar
 
 export const createMockCourse = (overrides: Partial<Course> = {}): Course => {
   const department = createMockDepartment()
-  return {
+
+  const defaultCourse: Course = {
     id: 'CS-1101',
     number: '1101',
     name: 'Introduction to Programming Design',
@@ -57,8 +58,9 @@ export const createMockCourse = (overrides: Partial<Course> = {}): Course => {
     department,
     minCredits: 3,
     maxCredits: 3,
-    ...overrides
   }
+
+  return { ...defaultCourse, ...overrides }
 }
 
 export const createMockScheduleDB = (overrides: Partial<ScheduleDB> = {}): ScheduleDB => {
@@ -173,6 +175,21 @@ export const createMockSelectedCourseWithLocks = (
     isRequired: false,
     lockedSections: new Set(lockedCrns)
   }
+}
+
+export const createMockFilterableSection = (overrides: {
+  course?: Partial<Course>;
+  section?: Partial<Section>;
+  sectionType?: 'lecture' | 'standaloneLab' | 'discussion' | 'lab';
+} = {}): import('../../src/types/filterableUnit').FilterableSection => {
+  const course = createMockCourse(overrides.course || {});
+  const section = createMockSection(overrides.section || {});
+
+  return {
+    course,
+    section,
+    sectionType: overrides.sectionType || 'lecture'
+  };
 }
 
 export const createCoursesWithConflicts = (): {
