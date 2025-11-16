@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 16, 2025, 7:14 AM",
+  "generated": "Nov 16, 2025, 7:29 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8228,7 +8228,7 @@
                 "number": "C01",
                 "seats": 100,
                 "seats_available": 0,
-                "actual_waitlist": 13,
+                "actual_waitlist": 14,
                 "max_waitlist": 20,
                 "note": null,
                 "description": "Cat. I This course is designed for students seeking a broad overview of ecological systems and the effect of humans on the ecosystems. It provides an introduction to natural ecosystems, population growth, and the interaction between human populations and our environment. It is conducted in an active style including the use of case studies, class discussion/participation, and classroom polling systems. The major goal of this course is to help students become more informed environmental citizens, skeptical when presented with data in the media, and knowledgeable enough to question and make informed decisions about the environment. It will primarily focus on current topics but areas of discussion likely to be covered include ecosystems, populations, biodiversity, pollution, environmental economics and climate change. This course is intended for non- life science majors. Recommended background: High School Biology",
@@ -8247,7 +8247,7 @@
                     "room": "Unity Hall 500",
                     "seats": 100,
                     "seats_available": 0,
-                    "actual_waitlist": 13,
+                    "actual_waitlist": 14,
                     "max_waitlist": 20,
                     "specific_section": "C01",
                     "days": [
