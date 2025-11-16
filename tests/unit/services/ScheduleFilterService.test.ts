@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach } from 'vitest';
 import { ScheduleFilterService } from '../../../src/services/ScheduleFilterService';
 import { SearchService } from '../../../src/services/searchService';
 import { ConflictDetector } from '../../../src/core/ConflictDetector';
-import { Course, Section, Period, Department } from '../../../src/types/types';
+import { Course, Section, Period, Department, DayOfWeek, PeriodType } from '../../../src/types/types';
 import { SelectedCourse } from '../../../src/types/schedule';
 
 describe('ScheduleFilterService', () => {
@@ -18,25 +18,33 @@ describe('ScheduleFilterService', () => {
     };
 
     const testPeriod1: Period = {
-        type: 'Lecture',
+        type: PeriodType.LECTURE,
         professor: 'Prof Smith',
-        startTime: { hours: 9, minutes: 0 },
-        endTime: { hours: 10, minutes: 50 },
-        days: new Set(['mon', 'wed', 'fri']),
+        startTime: { hours: 9, minutes: 0, displayTime: '9:00 AM' },
+        endTime: { hours: 10, minutes: 50, displayTime: '10:50 AM' },
+        days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY]),
         location: 'SL 123',
         building: 'SL',
-        room: '123'
+        room: '123',
+        seats: 30,
+        seatsAvailable: 5,
+        actualWaitlist: 0,
+        maxWaitlist: 10
     };
 
     const testPeriod2: Period = {
-        type: 'Lab',
+        type: PeriodType.LAB,
         professor: 'Prof Jones',
-        startTime: { hours: 14, minutes: 0 },
-        endTime: { hours: 15, minutes: 50 },
-        days: new Set(['tue']),
+        startTime: { hours: 14, minutes: 0, displayTime: '2:00 PM' },
+        endTime: { hours: 15, minutes: 50, displayTime: '3:50 PM' },
+        days: new Set([DayOfWeek.TUESDAY]),
         location: 'FL 320',
         building: 'FL',
-        room: '320'
+        room: '320',
+        seats: 30,
+        seatsAvailable: 8,
+        actualWaitlist: 0,
+        maxWaitlist: 10
     };
 
     const testSection1: Section = {
@@ -102,10 +110,13 @@ describe('ScheduleFilterService', () => {
 
     const selectedCourse: SelectedCourse = {
         course: testCourse,
+        selectedLecture: null,
+        selectedDiscussion: null,
+        selectedLab: null,
+        selectedSection: null,
         selectedSectionNumber: null,
-        deniedSections: new Set(),
-        preferredSections: new Set(),
-        isRequired: false
+        isRequired: false,
+        lockedSections: new Set()
     };
 
     beforeEach(() => {
@@ -197,7 +208,7 @@ describe('ScheduleFilterService', () => {
 
         test('should exclude sections with periods on Wednesday', () => {
             // Add day exclusion filter for Wednesday
-            scheduleFilterService.addFilter('periodDays', { days: ['wed'] });
+            scheduleFilterService.addFilter('periodDays', { days: [DayOfWeek.WEDNESDAY] });
             
             const result = scheduleFilterService.filterSections([selectedCourse]);
             
@@ -209,7 +220,7 @@ describe('ScheduleFilterService', () => {
 
         test('should exclude sections with periods on Tuesday', () => {
             // Add day exclusion filter for Tuesday
-            scheduleFilterService.addFilter('periodDays', { days: ['tue'] });
+            scheduleFilterService.addFilter('periodDays', { days: [DayOfWeek.TUESDAY] });
             
             const result = scheduleFilterService.filterSections([selectedCourse]);
             
@@ -222,7 +233,7 @@ describe('ScheduleFilterService', () => {
 
         test('should exclude sections with periods on multiple days', () => {
             // Add day exclusion filter for Wednesday and Tuesday
-            scheduleFilterService.addFilter('periodDays', { days: ['wed', 'tue'] });
+            scheduleFilterService.addFilter('periodDays', { days: [DayOfWeek.WEDNESDAY, DayOfWeek.TUESDAY] });
             
             const result = scheduleFilterService.filterSections([selectedCourse]);
             
@@ -232,7 +243,7 @@ describe('ScheduleFilterService', () => {
 
         test('should return all sections when excluding non-existent days', () => {
             // Add day exclusion filter for days not used by any section
-            scheduleFilterService.addFilter('periodDays', { days: ['sat', 'sun'] });
+            scheduleFilterService.addFilter('periodDays', { days: [DayOfWeek.SATURDAY, DayOfWeek.SUNDAY] });
             
             const result = scheduleFilterService.filterSections([selectedCourse]);
             
@@ -365,10 +376,13 @@ describe('ScheduleFilterService', () => {
 
         const selectedCourseWithTerms: SelectedCourse = {
             course: testCourseWithMultipleTerms,
+            selectedLecture: null,
+            selectedDiscussion: null,
+            selectedLab: null,
+            selectedSection: null,
             selectedSectionNumber: null,
-            deniedSections: new Set(),
-            preferredSections: new Set(),
-            isRequired: false
+            isRequired: false,
+            lockedSections: new Set()
         };
 
         test('should return all sections when no term filter is active', () => {
@@ -483,10 +497,13 @@ describe('ScheduleFilterService', () => {
 
         const selectedCourseAllTerms: SelectedCourse = {
             course: testCourseAllTerms,
+            selectedLecture: null,
+            selectedDiscussion: null,
+            selectedLab: null,
+            selectedSection: null,
             selectedSectionNumber: null,
-            deniedSections: new Set(),
-            preferredSections: new Set(),
-            isRequired: false
+            isRequired: false,
+            lockedSections: new Set()
         };
 
         test('should return available terms with proper formatting', () => {

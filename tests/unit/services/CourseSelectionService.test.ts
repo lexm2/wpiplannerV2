@@ -83,12 +83,10 @@ describe('CourseSelectionService', () => {
 
     mockProfileStateManager = new ProfileStateManager()
     mockDataValidator = new DataValidator()
-    mockRetryManager = new RetryManager()
 
     courseSelectionService = new CourseSelectionService(
       mockProfileStateManager,
-      mockDataValidator,
-      mockRetryManager
+      mockDataValidator
     )
   })
 

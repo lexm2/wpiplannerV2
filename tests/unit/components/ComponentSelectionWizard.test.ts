@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { ComponentSelectionWizard } from '../../../src/ui/components/ComponentSelectionWizard';
 import { CourseDataService } from '../../../src/services/courseDataService';
-import { Course, Section, Period, Department } from '../../../src/types/types';
+import { Course, Section, Period, Department, PeriodType, DayOfWeek } from '../../../src/types/types';
 import { SelectedCourse } from '../../../src/types/schedule';
 
 describe('ComponentSelectionWizard', () => {
@@ -16,7 +16,7 @@ describe('ComponentSelectionWizard', () => {
         courses: []
     };
 
-    const createPeriod = (type: string, days: string[]): Period => ({
+    const createPeriod = (type: PeriodType, days: DayOfWeek[]): Period => ({
         type,
         professor: 'Prof Smith',
         startTime: { hours: 9, minutes: 0, displayTime: '9:00 AM' },
@@ -24,10 +24,14 @@ describe('ComponentSelectionWizard', () => {
         days: new Set(days),
         location: 'SL 123',
         building: 'SL',
-        room: '123'
+        room: '123',
+        seats: 30,
+        seatsAvailable: 5,
+        actualWaitlist: 0,
+        maxWaitlist: 10
     });
 
-    const createSection = (crn: number, number: string, type: string = 'Lecture'): Section => ({
+    const createSection = (crn: number, number: string, type: PeriodType = PeriodType.LECTURE): Section => ({
         crn,
         number,
         seats: 30,
@@ -37,7 +41,7 @@ describe('ComponentSelectionWizard', () => {
         description: `${type} section`,
         term: 'A',
         computedTerm: 'A',
-        periods: [createPeriod(type, ['mon', 'wed', 'fri'])]
+        periods: [createPeriod(type, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY])]
     });
 
     const createHierarchicalCourse = (): Course => ({
@@ -45,17 +49,32 @@ describe('ComponentSelectionWizard', () => {
         name: 'Intro to Programming',
         number: '101',
         description: 'Basic programming course',
-        credits: '3.0',
-        minCredits: '3.0',
-        maxCredits: '3.0',
+        minCredits: 3.0,
+        maxCredits: 3.0,
         department: department,
-        sections: [
-            createSection(12345, 'A01', 'Lecture'),
-            createSection(12346, 'A02', 'Lecture'),
-            createSection(12347, 'A11', 'Discussion'),
-            createSection(12348, 'A12', 'Discussion'),
-            createSection(12349, 'A21', 'Lab'),
-            createSection(12350, 'A22', 'Lab')
+        lectures: [
+            {
+                section: createSection(12345, 'A01', PeriodType.LECTURE),
+                compatibleDiscussions: [
+                    createSection(12347, 'A11', PeriodType.DISCUSSION),
+                    createSection(12348, 'A12', PeriodType.DISCUSSION)
+                ],
+                compatibleLabs: [
+                    createSection(12349, 'A21', PeriodType.LAB),
+                    createSection(12350, 'A22', PeriodType.LAB)
+                ]
+            },
+            {
+                section: createSection(12346, 'A02', PeriodType.LECTURE),
+                compatibleDiscussions: [
+                    createSection(12347, 'A11', PeriodType.DISCUSSION),
+                    createSection(12348, 'A12', PeriodType.DISCUSSION)
+                ],
+                compatibleLabs: [
+                    createSection(12349, 'A21', PeriodType.LAB),
+                    createSection(12350, 'A22', PeriodType.LAB)
+                ]
+            }
         ]
     });
 
@@ -64,13 +83,12 @@ describe('ComponentSelectionWizard', () => {
         name: 'Programming Lab',
         number: '102',
         description: 'Lab only course',
-        credits: '1.0',
-        minCredits: '1.0',
-        maxCredits: '1.0',
+        minCredits: 1.0,
+        maxCredits: 1.0,
         department: department,
-        sections: [
-            createSection(12351, 'L01', 'Lab'),
-            createSection(12352, 'L02', 'Lab')
+        standaloneLabs: [
+            createSection(12351, 'L01', PeriodType.LAB),
+            createSection(12352, 'L02', PeriodType.LAB)
         ]
     });
 
@@ -105,7 +123,8 @@ describe('ComponentSelectionWizard', () => {
                 selectedLab: null,
                 selectedSection: null,
                 selectedSectionNumber: null,
-                isRequired: false
+                isRequired: false,
+                lockedSections: new Set()
             };
 
             const wizard = new ComponentSelectionWizard(
@@ -144,7 +163,7 @@ describe('ComponentSelectionWizard', () => {
             vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
             vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
                 {
-                    section: createSection(12345, 'A01', 'Lecture'),
+                    section: createSection(12345, 'A01', PeriodType.LECTURE),
                     compatibleDiscussions: [],
                     compatibleLabs: []
                 }
@@ -169,9 +188,9 @@ describe('ComponentSelectionWizard', () => {
             vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
             vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
                 {
-                    section: createSection(12345, 'A01', 'Lecture'),
-                    compatibleDiscussions: [createSection(12347, 'A11', 'Discussion')],
-                    compatibleLabs: [createSection(12349, 'A21', 'Lab')]
+                    section: createSection(12345, 'A01', PeriodType.LECTURE),
+                    compatibleDiscussions: [createSection(12347, 'A11', PeriodType.DISCUSSION)],
+                    compatibleLabs: [createSection(12349, 'A21', PeriodType.LAB)]
                 }
             ]);
 
@@ -195,7 +214,7 @@ describe('ComponentSelectionWizard', () => {
             vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
             vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
                 {
-                    section: createSection(12345, 'A01', 'Lecture'),
+                    section: createSection(12345, 'A01', PeriodType.LECTURE),
                     compatibleDiscussions: [],
                     compatibleLabs: []
                 }
@@ -241,7 +260,7 @@ describe('ComponentSelectionWizard', () => {
             expect(Array.isArray(options)).toBe(true);
         });
 
-        test('should return empty array for discussion step without lecture selected', () => {
+        test('should return all discussions when no lecture is selected', () => {
             const course = createHierarchicalCourse();
             const wizard = new ComponentSelectionWizard(
                 course,
@@ -251,10 +270,10 @@ describe('ComponentSelectionWizard', () => {
             );
 
             const options = wizard.getOptionsForStep('discussion');
-            expect(options).toEqual([]);
+            expect(options.length).toBeGreaterThan(0);
         });
 
-        test('should return empty array for lab step without lecture selected', () => {
+        test('should return all labs when no lecture is selected', () => {
             const course = createHierarchicalCourse();
             const wizard = new ComponentSelectionWizard(
                 course,
@@ -264,7 +283,7 @@ describe('ComponentSelectionWizard', () => {
             );
 
             const options = wizard.getOptionsForStep('lab');
-            expect(options).toEqual([]);
+            expect(options.length).toBeGreaterThan(0);
         });
     });
 
@@ -297,7 +316,7 @@ describe('ComponentSelectionWizard', () => {
             );
 
             // Select a lab section
-            const labSection = createSection(12351, 'L01', 'Lab');
+            const labSection = createSection(12351, 'L01', PeriodType.LAB);
             wizard['currentStep'] = 'lab';
             wizard.selectSection(labSection);
 
@@ -402,7 +421,7 @@ describe('ComponentSelectionWizard', () => {
             );
 
             wizard['currentStep'] = 'discussion';
-            const discussionSection = createSection(12347, 'A11', 'Discussion');
+            const discussionSection = createSection(12347, 'A11', PeriodType.DISCUSSION);
             wizard.selectSection(discussionSection);
 
             expect(wizard['selections'].discussion).toBe(discussionSection);
@@ -418,7 +437,7 @@ describe('ComponentSelectionWizard', () => {
             );
 
             wizard['currentStep'] = 'lab';
-            const labSection = createSection(12349, 'A21', 'Lab');
+            const labSection = createSection(12349, 'A21', PeriodType.LAB);
             wizard.selectSection(labSection);
 
             expect(wizard['selections'].lab).toBe(labSection);
@@ -429,11 +448,12 @@ describe('ComponentSelectionWizard', () => {
             const existingSelections: SelectedCourse = {
                 course,
                 selectedLecture: createSection(12345, 'A01'),
-                selectedDiscussion: createSection(12347, 'A11', 'Discussion'),
-                selectedLab: createSection(12349, 'A21', 'Lab'),
+                selectedDiscussion: createSection(12347, 'A11', PeriodType.DISCUSSION),
+                selectedLab: createSection(12349, 'A21', PeriodType.LAB),
                 selectedSection: null,
                 selectedSectionNumber: null,
-                isRequired: false
+                isRequired: false,
+                lockedSections: new Set()
             };
 
             const wizard = new ComponentSelectionWizard(
@@ -456,7 +476,7 @@ describe('ComponentSelectionWizard', () => {
         test('should not clear dependent selections when selecting same lecture', () => {
             const course = createHierarchicalCourse();
             const lecture = createSection(12345, 'A01');
-            const discussion = createSection(12347, 'A11', 'Discussion');
+            const discussion = createSection(12347, 'A11', PeriodType.DISCUSSION);
             const existingSelections: SelectedCourse = {
                 course,
                 selectedLecture: lecture,
@@ -464,7 +484,8 @@ describe('ComponentSelectionWizard', () => {
                 selectedLab: null,
                 selectedSection: null,
                 selectedSectionNumber: null,
-                isRequired: false
+                isRequired: false,
+                lockedSections: new Set()
             };
 
             const wizard = new ComponentSelectionWizard(
@@ -494,7 +515,7 @@ describe('ComponentSelectionWizard', () => {
             );
 
             wizard['currentStep'] = 'lab';
-            wizard['selections'].lab = createSection(12351, 'L01', 'Lab');
+            wizard['selections'].lab = createSection(12351, 'L01', PeriodType.LAB);
             wizard['complete']();
 
             expect(mockOnComplete).toHaveBeenCalledWith(wizard['selections']);
@@ -665,7 +686,7 @@ describe('ComponentSelectionWizard', () => {
             );
 
             const section = createSection(12345, 'A01');
-            const card = wizard['renderSectionCard'](section);
+            const card = wizard['renderSectionCard'](section, 0);
 
             expect(card).toContain(section.number);
             expect(card).toContain(section.crn.toString());
@@ -684,7 +705,7 @@ describe('ComponentSelectionWizard', () => {
             wizard['currentStep'] = 'lecture';
             wizard['selections'].lecture = section;
 
-            const card = wizard['renderSectionCard'](section);
+            const card = wizard['renderSectionCard'](section, 0);
             expect(card).toContain('selected'); // Check for 'selected' CSS class
             expect(card).toContain('✓'); // Check for checkmark icon
         });

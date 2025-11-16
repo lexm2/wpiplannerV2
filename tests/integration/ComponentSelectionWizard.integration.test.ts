@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { ComponentSelectionWizard } from '../../src/ui/components/ComponentSelectionWizard';
 import { CourseDataService } from '../../src/services/courseDataService';
 import { CourseSelectionService } from '../../src/services/CourseSelectionService';
-import { Course, Section, Period, Department, PeriodType } from '../../src/types/types';
+import { Course, Section, Period, Department, PeriodType, DayOfWeek } from '../../src/types/types';
 
 describe('ComponentSelectionWizard Integration', () => {
     let courseDataService: CourseDataService;
@@ -19,7 +19,7 @@ describe('ComponentSelectionWizard Integration', () => {
         professor: 'Prof Smith',
         startTime: { hours: 9, minutes: 0, displayTime: '9:00 AM' },
         endTime: { hours: 10, minutes: 50, displayTime: '10:50 AM' },
-        days: new Set(['mon', 'wed', 'fri']),
+        days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY]),
         location: 'SL 123',
         building: 'SL',
         room: '123',
@@ -47,15 +47,20 @@ describe('ComponentSelectionWizard Integration', () => {
         name: 'Intro to Programming',
         number: '101',
         description: 'Basic programming course',
-        credits: '3.0',
-        minCredits: '3.0',
-        maxCredits: '3.0',
+        minCredits: 3,
+        maxCredits: 3,
         department: department,
-        sections: [
-            createSection(12345, 'A01', PeriodType.LECTURE),
-            createSection(12346, 'A02', PeriodType.LECTURE),
-            createSection(12347, 'A11', PeriodType.DISCUSSION),
-            createSection(12348, 'A21', PeriodType.LAB)
+        lectures: [
+            {
+                section: createSection(12345, 'A01', PeriodType.LECTURE),
+                compatibleDiscussions: [createSection(12347, 'A11', PeriodType.DISCUSSION)],
+                compatibleLabs: [createSection(12348, 'A21', PeriodType.LAB)]
+            },
+            {
+                section: createSection(12346, 'A02', PeriodType.LECTURE),
+                compatibleDiscussions: [createSection(12347, 'A11', PeriodType.DISCUSSION)],
+                compatibleLabs: [createSection(12348, 'A21', PeriodType.LAB)]
+            }
         ]
     });
 
@@ -269,7 +274,7 @@ describe('ComponentSelectionWizard Integration', () => {
         test('should handle course with no sections', () => {
             const emptyCourse: Course = {
                 ...createTestCourse(),
-                sections: []
+                lectures: []
             };
 
             const wizard = new ComponentSelectionWizard(

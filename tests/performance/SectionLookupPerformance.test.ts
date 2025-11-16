@@ -11,39 +11,45 @@ function createMockCourseWithSections(numLectures: number, numDiscussions: numbe
 
         for (let j = 0; j < numDiscussions; j++) {
             discussions.push({
-                crn: `D${i}${j}`,
+                crn: 10000 + i * 1000 + j,
                 number: `D0${i}${j}`,
                 periods: [],
+                seats: 20,
                 seatsAvailable: 20,
-                seatsCapacity: 20,
-                waitlistAvailable: 0,
-                waitlistCapacity: 0,
+                actualWaitlist: 0,
+                maxWaitlist: 0,
+                description: 'Discussion',
+                term: 'A',
                 computedTerm: 'A-2024'
             })
         }
 
         for (let k = 0; k < numLabs; k++) {
             labs.push({
-                crn: `L${i}${k}`,
+                crn: 20000 + i * 1000 + k,
                 number: `L0${i}${k}`,
                 periods: [],
+                seats: 20,
                 seatsAvailable: 20,
-                seatsCapacity: 20,
-                waitlistAvailable: 0,
-                waitlistCapacity: 0,
+                actualWaitlist: 0,
+                maxWaitlist: 0,
+                description: 'Lab',
+                term: 'A',
                 computedTerm: 'A-2024'
             })
         }
 
         lectures.push({
             section: {
-                crn: `LEC${i}`,
+                crn: 30000 + i,
                 number: `A0${i}`,
                 periods: [],
+                seats: 100,
                 seatsAvailable: 100,
-                seatsCapacity: 100,
-                waitlistAvailable: 0,
-                waitlistCapacity: 0,
+                actualWaitlist: 0,
+                maxWaitlist: 0,
+                description: 'Lecture',
+                term: 'A',
                 computedTerm: 'A-2024'
             },
             compatibleDiscussions: discussions,
@@ -61,7 +67,8 @@ function createMockCourseWithSections(numLectures: number, numDiscussions: numbe
             name: 'Computer Science',
             courses: []
         },
-        credits: 3.0,
+        minCredits: 3,
+        maxCredits: 3,
         lectures
     }
 }

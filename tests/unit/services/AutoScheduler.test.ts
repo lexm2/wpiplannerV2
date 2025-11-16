@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { AutoScheduler } from '../../../src/services/AutoScheduler'
 import type { SelectedCourse } from '../../../src/types/schedule'
 import type { Course, Section, DayOfWeek } from '../../../src/types/types'
+import { PeriodType } from '../../../src/types/types'
 import {
   createMockCourse,
   createMockSection,
@@ -111,7 +112,7 @@ describe('AutoScheduler - Complement Method', () => {
         crn: 10101,
         number: 'A01',
         periods: [createMockPeriod({
-          type: 'Discussion',
+          type: PeriodType.DISCUSSION,
           startTime: createMockTime(11, 0),
           endTime: createMockTime(11, 50)
         })]
@@ -121,7 +122,7 @@ describe('AutoScheduler - Complement Method', () => {
         crn: 10102,
         number: 'A02',
         periods: [createMockPeriod({
-          type: 'Discussion',
+          type: PeriodType.DISCUSSION,
           startTime: createMockTime(14, 0),
           endTime: createMockTime(14, 50)
         })]
@@ -226,7 +227,7 @@ describe('AutoScheduler - Complement Method', () => {
         crn: 30001,
         number: 'L01',
         periods: [createMockPeriod({
-          type: 'Lab',
+          type: PeriodType.LAB,
           startTime: createMockTime(14, 0),
           endTime: createMockTime(16, 50)
         })]
@@ -236,7 +237,7 @@ describe('AutoScheduler - Complement Method', () => {
         crn: 30002,
         number: 'L02',
         periods: [createMockPeriod({
-          type: 'Lab',
+          type: PeriodType.LAB,
           startTime: createMockTime(18, 0),
           endTime: createMockTime(20, 50)
         })]
@@ -555,7 +556,7 @@ describe('AutoScheduler - Complement Method', () => {
       const lab = createMockSection({
         crn: 90001,
         number: 'L01',
-        periods: [createMockPeriod({ type: 'Lab' })]
+        periods: [createMockPeriod({ type: PeriodType.LAB })]
       })
 
       const course = createMockCourse({
@@ -585,7 +586,7 @@ describe('AutoScheduler - Complement Method', () => {
         crn: 11101,
         number: 'A01',
         periods: [createMockPeriod({
-          type: 'Discussion',
+          type: PeriodType.DISCUSSION,
           startTime: createMockTime(14, 0),
           endTime: createMockTime(14, 50)
         })]

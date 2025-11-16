@@ -4,7 +4,7 @@ import { CourseSelectionService } from '../../../src/services/CourseSelectionSer
 import { ScheduleFilterService } from '../../../src/services/ScheduleFilterService';
 import { SearchService } from '../../../src/services/searchService';
 import { ConflictDetector } from '../../../src/core/ConflictDetector';
-import { Course, Section, Period, Department, DayOfWeek } from '../../../src/types/types';
+import { Course, Section, Period, Department, DayOfWeek, PeriodType } from '../../../src/types/types';
 import { SelectedCourse } from '../../../src/types/schedule';
 import {
     createMockCourse,
@@ -29,14 +29,18 @@ describe('ScheduleController Expansion State', () => {
     };
 
     const testPeriod: Period = {
-        type: 'Lecture',
+        type: PeriodType.LECTURE,
         professor: 'Prof Smith',
-        startTime: { hours: 9, minutes: 0 },
-        endTime: { hours: 10, minutes: 50 },
-        days: new Set(['mon', 'wed', 'fri']),
+        startTime: { hours: 9, minutes: 0, displayTime: '9:00 AM' },
+        endTime: { hours: 10, minutes: 50, displayTime: '10:50 AM' },
+        days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY]),
         location: 'SL 123',
         building: 'SL',
-        room: '123'
+        room: '123',
+        seats: 30,
+        seatsAvailable: 5,
+        actualWaitlist: 0,
+        maxWaitlist: 10
     };
 
     const testSection: Section = {
@@ -57,19 +61,21 @@ describe('ScheduleController Expansion State', () => {
         name: 'Intro to Programming',
         number: '101',
         description: 'Basic programming course',
-        credits: '3.0',
-        minCredits: '3.0',
-        maxCredits: '3.0',
+        minCredits: 3,
+        maxCredits: 3,
         department: department,
-        sections: [testSection]
+        lectures: [{ section: testSection, compatibleDiscussions: [], compatibleLabs: [] }]
     };
 
     const selectedCourse: SelectedCourse = {
         course: testCourse,
+        selectedLecture: null,
+        selectedDiscussion: null,
+        selectedLab: null,
+        selectedSection: null,
         selectedSectionNumber: null,
-        deniedSections: new Set(),
-        preferredSections: new Set(),
-        isRequired: false
+        isRequired: false,
+        lockedSections: new Set()
     };
 
     beforeEach(() => {

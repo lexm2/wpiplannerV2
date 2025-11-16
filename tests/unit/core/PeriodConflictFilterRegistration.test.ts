@@ -3,6 +3,7 @@ import { PeriodConflictFilter } from '../../../src/core/filters/PeriodConflictFi
 import { ConflictDetector } from '../../../src/core/ConflictDetector';
 import { CourseFilterService } from '../../../src/services/CourseFilterService';
 import { SearchService } from '../../../src/services/searchService';
+import { FilterableSection } from '../../../src/types/filterableUnit';
 
 describe('PeriodConflictFilter Registration', () => {
     let conflictDetector: ConflictDetector;
@@ -54,9 +55,9 @@ describe('PeriodConflictFilter Registration', () => {
     });
 
     test('apply method should return all courses (period filtering happens elsewhere)', () => {
-        const courses = []; // Empty courses array for testing
-        const result = periodConflictFilter.apply(courses, { avoidConflicts: true });
-        expect(result).toEqual(courses);
+        const sections: FilterableSection[] = []; // Empty sections array for testing
+        const result = periodConflictFilter.apply(sections, { avoidConflicts: true });
+        expect(result).toEqual(sections);
     });
 
     test('should be able to add and remove filter through FilterService', () => {

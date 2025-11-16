@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { ConflictDetector } from '../../../src/core/ConflictDetector'
 import { ConflictType } from '../../../src/types/schedule'
-import { DayOfWeek } from '../../../src/types/types'
+import { DayOfWeek, PeriodType } from '../../../src/types/types'
 import { createMockSection, createMockPeriod, createMockTime } from '../../helpers/mockData'
 
 describe('ConflictDetector', () => {
@@ -92,13 +92,13 @@ describe('ConflictDetector', () => {
         number: 'A01',
         periods: [
           createMockPeriod({
-            type: 'Lecture',
+            type: PeriodType.LECTURE,
             startTime: createMockTime(9, 0),
             endTime: createMockTime(10, 50),
             days: new Set([DayOfWeek.MONDAY])
           }),
           createMockPeriod({
-            type: 'Lab',
+            type: PeriodType.LAB,
             startTime: createMockTime(14, 0),
             endTime: createMockTime(15, 50),
             days: new Set([DayOfWeek.TUESDAY])
