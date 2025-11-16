@@ -304,10 +304,19 @@ export class CourseFilterService {
             console.log(`Filtering ${courses.length} courses with ${criteriaMap.size} active filters`);
         }
 
-        const filteredCourses = this.sectionPipeline.filterCourses(courses, criteriaMap);
+        let filteredCourses = this.sectionPipeline.filterCourses(courses, criteriaMap);
 
         if (this.debugLogging) {
             console.log(`Filtered result: ${filteredCourses.length} courses`);
+        }
+
+        const searchCriteria = criteriaMap.get('searchText');
+        if (searchCriteria && searchCriteria.query) {
+            filteredCourses = this.searchService.rankCoursesByRelevance(filteredCourses, searchCriteria.query);
+
+            if (this.debugLogging) {
+                console.log(`Ranked search results for query: "${searchCriteria.query}"`);
+            }
         }
 
         return filteredCourses;

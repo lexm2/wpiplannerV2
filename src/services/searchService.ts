@@ -205,28 +205,31 @@ export class SearchService {
 
     private performTextSearch(courses: Course[], query: string): Course[] {
         const queryLower = query.toLowerCase();
-        
-        // Try to use search index first for better performance
-        const indexedResults = this.searchFromIndex(queryLower);
-        if (indexedResults.length > 0) {
-            // Filter indexed results against the current course set
-            return courses.filter(course => indexedResults.includes(course));
-        }
-        
-        // Fallback to original linear search with fuzzy matching
-        return courses.filter(course => {
+
+        // PHASE 1: Search ID/Name/Number only (no descriptions)
+        const phase1Results = courses.filter(course => {
             const courseCode = `${course.department.abbreviation}${course.number}`;
-            const courseText = [
+            const courseTextNoDesc = [
                 course.id,
                 course.name,
-                course.description,
                 course.department.abbreviation,
                 course.department.name,
                 course.number,
                 courseCode
             ].join(' ').toLowerCase();
 
-            return this.fuzzyMatch(courseText, queryLower);
+            return this.fuzzyMatch(courseTextNoDesc, queryLower);
+        });
+
+        // If we found results without searching descriptions, return early
+        if (phase1Results.length > 0) {
+            return phase1Results;
+        }
+
+        // PHASE 2: Fallback to description search only if no ID/name matches
+        return courses.filter(course => {
+            const descriptionText = course.description.toLowerCase();
+            return this.fuzzyMatch(descriptionText, queryLower);
         });
     }
 
@@ -304,11 +307,11 @@ export class SearchService {
         return timeOverlaps && dayOverlaps;
     }
 
-    private rankResults(courses: Course[], query: string): Course[] {
+    public rankCoursesByRelevance(courses: Course[], query: string): Course[] {
         if (!query.trim()) return courses;
 
         const queryLower = query.toLowerCase();
-        
+
         return courses.sort((a, b) => {
             const scoreA = this.calculateRelevanceScore(a, queryLower);
             const scoreB = this.calculateRelevanceScore(b, queryLower);
@@ -316,34 +319,55 @@ export class SearchService {
         });
     }
 
+    private rankResults(courses: Course[], query: string): Course[] {
+        return this.rankCoursesByRelevance(courses, query);
+    }
+
     private calculateRelevanceScore(course: Course, query: string): number {
         let score = 0;
-        const courseCode = `${course.department.abbreviation}${course.number}`.toLowerCase();
 
-        // Exact matches get highest score
-        if (courseCode === query) score += 110; // Highest priority for exact course code match
-        if (course.id.toLowerCase() === query) score += 100;
-        if (course.name.toLowerCase() === query) score += 90;
+        const queryLower = query.toLowerCase();
+        const normalizedQuery = query.replace(/[-\s]/g, '').toLowerCase();
+        const courseCode = `${course.department.abbreviation}${course.number}`.toLowerCase().replace(/[-\s]/g, '');
+        const normalizedId = course.id.toLowerCase().replace(/[-\s]/g, '');
+        const courseName = course.name.toLowerCase();
+        const courseDescription = course.description.toLowerCase();
 
-        // Prefix matches
-        if (courseCode.startsWith(query)) score += 85; // High priority for course code prefix
-        if (course.id.toLowerCase().startsWith(query)) score += 80;
-        if (course.name.toLowerCase().startsWith(query)) score += 70;
-        if (course.department.abbreviation.toLowerCase().startsWith(query)) score += 60;
+        // TIER 1: Exact ID/Code matches (1000+ points)
+        if (courseCode === normalizedQuery) score += 1000;
+        if (normalizedId === normalizedQuery) score += 950;
+        if (course.number.toLowerCase() === normalizedQuery) score += 900;
 
-        // Contains matches
-        if (courseCode.includes(query)) score += 45; // Higher than other contains matches
-        if (course.id.toLowerCase().includes(query)) score += 40;
-        if (course.name.toLowerCase().includes(query)) score += 30;
-        if (course.description.toLowerCase().includes(query)) score += 10;
+        // TIER 2: Exact name matches (800+ points) - check both normalized and original
+        if (courseName === queryLower) score += 850;
+        if (courseName === normalizedQuery) score += 840;
 
-        // Boost popular/available courses
+        // TIER 3: Prefix matches for ID/Code (700+ points)
+        if (courseCode.startsWith(normalizedQuery)) score += 750;
+        if (normalizedId.startsWith(normalizedQuery)) score += 700;
+        if (course.number.toLowerCase().startsWith(normalizedQuery)) score += 650;
+
+        // TIER 4: Prefix matches for name (600+ points)
+        if (courseName.startsWith(queryLower)) score += 600;
+
+        // TIER 5: Contains matches for ID/Code (500+ points)
+        if (courseCode.includes(normalizedQuery)) score += 500;
+        if (normalizedId.includes(normalizedQuery)) score += 450;
+
+        // TIER 6: Contains matches for name (400+ points)
+        if (courseName.includes(queryLower)) score += 400;
+
+        // TIER 7: Department matches (300+ points)
+        if (course.department.abbreviation.toLowerCase() === normalizedQuery) score += 350;
+        if (course.department.abbreviation.toLowerCase().startsWith(normalizedQuery)) score += 300;
+
+        // TIER 8: Description matches (1 point only)
+        if (courseDescription.includes(queryLower)) score += 1;
+
+        // Small boost for availability (doesn't override tier system)
         const sections = getAllSections(course);
-        const totalSeats = sections.reduce((sum, section) => sum + section.seats, 0);
         const availableSeats = sections.reduce((sum, section) => sum + section.seatsAvailable, 0);
-
-        if (availableSeats > 0) score += 5;
-        if (totalSeats > 100) score += 2; // Large courses might be more popular
+        if (availableSeats > 0) score += 0.5;
 
         return score;
     }

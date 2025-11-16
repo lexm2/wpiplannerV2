@@ -423,13 +423,16 @@ export class CourseController {
             return;
         }
 
-        // Sort courses by course number
-        const sortedCourses = courses.sort((a, b) => a.number.localeCompare(b.number));
+        // Only sort by course number when not searching
+        // When searching, preserve relevance ranking from SearchService
+        const displayCourses = (this.filterService && this.filterService.hasFilter('searchText'))
+            ? courses
+            : courses.sort((a, b) => a.number.localeCompare(b.number));
 
         // Use progressive rendering for better performance
         await this.progressiveRenderer.renderCourseList(
-            sortedCourses, 
-            this.courseSelectionService, 
+            displayCourses,
+            this.courseSelectionService,
             courseContainer,
             this.elementToCourseMap,
             cancellationToken,
@@ -449,13 +452,16 @@ export class CourseController {
             return;
         }
 
-        // Sort courses by course number
-        const sortedCourses = courses.sort((a, b) => a.number.localeCompare(b.number));
+        // Only sort by course number when not searching
+        // When searching, preserve relevance ranking from SearchService
+        const displayCourses = (this.filterService && this.filterService.hasFilter('searchText'))
+            ? courses
+            : courses.sort((a, b) => a.number.localeCompare(b.number));
 
         // Use progressive rendering for better performance
         await this.progressiveRenderer.renderCourseGrid(
-            sortedCourses, 
-            this.courseSelectionService, 
+            displayCourses,
+            this.courseSelectionService,
             courseContainer,
             this.elementToCourseMap,
             cancellationToken,
