@@ -62,6 +62,11 @@ export class TimeSlotMap {
     }
 
     hasOverlap(section1: Section, section2: Section): boolean {
+        // Sections in different terms cannot conflict
+        if (section1.computedTerm !== section2.computedTerm) {
+            return false;
+        }
+
         const slots1 = this.getSlotsForSection(String(section1.crn));
         const slots2 = this.getSlotsForSection(String(section2.crn));
 
@@ -82,7 +87,8 @@ export class TimeSlotMap {
             const sectionsInSlot = this.sectionsBySlot.get(slotKey);
             if (sectionsInSlot) {
                 for (const otherSection of sectionsInSlot) {
-                    if (otherSection.crn !== section.crn) {
+                    if (otherSection.crn !== section.crn &&
+                        otherSection.computedTerm === section.computedTerm) {
                         overlapping.add(otherSection);
                     }
                 }

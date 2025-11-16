@@ -80,10 +80,52 @@ export class AutoScheduler {
     let totalCombinations = 1;
 
     for (const selectedCourse of incompleteCourses) {
+      const courseId = `${selectedCourse.course.department.abbreviation}${selectedCourse.course.number}`;
       const candidates = this.getCandidateCombinations(selectedCourse);
 
+      console.log(`[AutoScheduler Debug] Course: ${courseId}`);
+      console.log(`  - Candidates found: ${candidates.length}`);
+
       if (candidates.length === 0) {
-        console.warn(`No valid candidates for ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number}`);
+        const typeInfo = this.detectCourseTypes(selectedCourse.course);
+        console.error(`[AutoScheduler] No valid candidates for ${courseId}. Debugging:`);
+        console.log(`  - Course structure:`, typeInfo);
+        console.log(`  - Has lectures: ${selectedCourse.course.lectures?.length || 0}`);
+        console.log(`  - Has standalone labs: ${selectedCourse.course.standaloneLabs?.length || 0}`);
+
+        if (selectedCourse.course.lectures && selectedCourse.course.lectures.length > 0) {
+          const lectureGroup = selectedCourse.course.lectures[0];
+          const lecture = lectureGroup.section;
+          console.log(`  - First lecture periods:`, lecture.periods?.length || 0);
+          if (lecture.periods && lecture.periods.length > 0) {
+            const period = lecture.periods[0];
+            console.log(`  - First period details:`, {
+              startTime: `${period.startTime.hours}:${period.startTime.minutes}`,
+              endTime: `${period.endTime.hours}:${period.endTime.minutes}`,
+              days: period.days ? Array.from(period.days) : [],
+              daysSize: period.days?.size || 0
+            });
+            console.log(`  - hasValidTimeSlot result: ${this.hasValidTimeSlot(lecture)}`);
+            console.log(`  - sectionPassesFilters result: ${this.sectionPassesFilters(lecture, selectedCourse)}`);
+          }
+        }
+
+        if (typeInfo.isStandaloneLab && selectedCourse.course.standaloneLabs) {
+          const lab = selectedCourse.course.standaloneLabs[0];
+          console.log(`  - First lab periods:`, lab.periods?.length || 0);
+          if (lab.periods && lab.periods.length > 0) {
+            const period = lab.periods[0];
+            console.log(`  - First period details:`, {
+              startTime: `${period.startTime.hours}:${period.startTime.minutes}`,
+              endTime: `${period.endTime.hours}:${period.endTime.minutes}`,
+              days: period.days ? Array.from(period.days) : [],
+              daysSize: period.days?.size || 0
+            });
+            console.log(`  - hasValidTimeSlot result: ${this.hasValidTimeSlot(lab)}`);
+          }
+        }
+
+        console.warn(`No valid candidates for ${courseId}`);
         return [];
       }
 

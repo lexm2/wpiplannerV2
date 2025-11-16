@@ -27,8 +27,13 @@ export class ConflictDetector {
     }
 
     private checkSectionConflicts(section1: Section, section2: Section): TimeConflict[] {
+        // Sections in different terms cannot conflict
+        if (section1.computedTerm !== section2.computedTerm) {
+            return [];
+        }
+
         const conflicts: TimeConflict[] = [];
-        
+
         for (const period1 of section1.periods) {
             for (const period2 of section2.periods) {
                 const conflict = this.checkPeriodConflict(period1, period2, section1, section2);
@@ -37,7 +42,7 @@ export class ConflictDetector {
                 }
             }
         }
-        
+
         return conflicts;
     }
 

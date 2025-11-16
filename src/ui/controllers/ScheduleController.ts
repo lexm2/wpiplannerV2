@@ -1404,7 +1404,8 @@ export class ScheduleController {
 
             if (allSchedules.length === 0) {
                 console.warn('[Auto-Schedule] No valid schedules found');
-                alert('Could not generate a valid schedule. Try adjusting your filters or course selections.');
+                console.warn('[Auto-Schedule] Check the console above for detailed debugging information about which course failed and why.');
+                alert('Could not generate a valid schedule.\n\nPlease check the browser console (F12 → Console tab) for detailed debugging information about which course is causing the issue.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts');
                 this.updateAutoScheduleButtonUI();
                 return;
             }
