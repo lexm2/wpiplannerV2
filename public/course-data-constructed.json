@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 17, 2025, 9:12 PM",
+  "generated": "Nov 17, 2025, 9:14 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -59711,7 +59711,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Sarah Davis",
                     "startTime": "15:00",
                     "endTime": "16:50",
                     "location": "Goddard Hall 227 Classroom",
@@ -222180,7 +222180,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Sarah Davis",
                     "startTime": "15:00",
                     "endTime": "16:50",
                     "location": "Goddard Hall 227 Classroom",
