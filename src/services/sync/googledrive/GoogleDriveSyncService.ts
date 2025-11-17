@@ -26,6 +26,7 @@ export class GoogleDriveSyncService implements ICloudSyncService {
     private isSyncing = false;
     private isOnline = navigator.onLine;
     private isGapiLoaded = false;
+    private hasPulledOnAuth = false;
 
     private constructor() {
         this.authService = GoogleDriveAuthService.getInstance();
@@ -53,15 +54,19 @@ export class GoogleDriveSyncService implements ICloudSyncService {
     }
 
     private async loadGapiClient(): Promise<void> {
+        console.log('[Google Drive] Starting to load API client...');
         return new Promise((resolve) => {
             const checkGapiLoaded = setInterval(() => {
-                if (typeof gapi !== 'undefined' && gapi.client) {
+                if (typeof gapi !== 'undefined') {
                     clearInterval(checkGapiLoaded);
+                    console.log('[Google Drive] gapi found, loading client...');
                     gapi.load('client', async () => {
+                        console.log('[Google Drive] Client loaded, initializing with discovery docs...');
                         await gapi.client.init({
                             discoveryDocs: GOOGLE_DRIVE_CONFIG.discoveryDocs,
                         });
                         this.isGapiLoaded = true;
+                        console.log('[Google Drive] API client loaded successfully');
                         resolve();
                     });
                 }
@@ -70,10 +75,31 @@ export class GoogleDriveSyncService implements ICloudSyncService {
             setTimeout(() => {
                 clearInterval(checkGapiLoaded);
                 if (!this.isGapiLoaded) {
-                    console.warn('Google API client not loaded');
+                    console.warn('[Google Drive] API client not loaded within timeout');
+                    console.warn('[Google Drive] gapi available?', typeof gapi !== 'undefined');
                 }
                 resolve();
             }, 10000);
+        });
+    }
+
+    private async waitForGapiLoad(): Promise<void> {
+        const maxWaitTime = 5000;
+        const checkInterval = 100;
+        const startTime = Date.now();
+
+        return new Promise((resolve) => {
+            const checkLoaded = setInterval(() => {
+                if (this.isGapiLoaded) {
+                    clearInterval(checkLoaded);
+                    console.log('[Google Drive] API client is ready');
+                    resolve();
+                } else if (Date.now() - startTime > maxWaitTime) {
+                    clearInterval(checkLoaded);
+                    console.error('[Google Drive] API client wait timeout exceeded');
+                    resolve();
+                }
+            }, checkInterval);
         });
     }
 
@@ -100,9 +126,29 @@ export class GoogleDriveSyncService implements ICloudSyncService {
     private async handleAuthChange(): Promise<void> {
         if (this.authService.isAuthenticated()) {
             this.updateStatus('idle');
-            await this.pullFromCloud();
+
+            if (this.hasPulledOnAuth) {
+                console.log('[Google Drive] Already pulled data on auth, skipping duplicate pull');
+                return;
+            }
+
+            this.hasPulledOnAuth = true;
+            console.log('[Google Drive] Authentication successful, pulling data from cloud...');
+            const result = await this.pullFromCloud();
+            if (result.success && result.data) {
+                console.log('[Google Drive] Cloud data retrieved successfully');
+                console.log('[Google Drive] Pulled data:', result.data);
+                this.notifyEvent({
+                    type: 'sync-completed',
+                    timestamp: Date.now(),
+                    data: result.data,
+                });
+            } else if (result.status === 'error' && result.message === 'No cloud data found') {
+                console.log('[Google Drive] No existing cloud data found (first time setup)');
+            }
         } else {
             this.updateStatus('not_authenticated');
+            this.hasPulledOnAuth = false;
         }
     }
 
@@ -113,6 +159,18 @@ export class GoogleDriveSyncService implements ICloudSyncService {
                 status: 'not_authenticated',
                 message: 'User not authenticated',
             };
+        }
+
+        if (!this.isGapiLoaded) {
+            console.log('[Google Drive] API not loaded yet, waiting for initialization...');
+            await this.waitForGapiLoad();
+            if (!this.isGapiLoaded) {
+                return {
+                    success: false,
+                    status: 'error',
+                    message: 'Google API client failed to load',
+                };
+            }
         }
 
         if (!this.isOnline) {
@@ -232,6 +290,17 @@ export class GoogleDriveSyncService implements ICloudSyncService {
                 status: 'not_authenticated',
                 message: 'User not authenticated',
             };
+        }
+
+        if (!this.isGapiLoaded) {
+            await this.waitForGapiLoad();
+            if (!this.isGapiLoaded) {
+                return {
+                    success: false,
+                    status: 'error',
+                    message: 'Google API client failed to load',
+                };
+            }
         }
 
         if (!this.isOnline) {

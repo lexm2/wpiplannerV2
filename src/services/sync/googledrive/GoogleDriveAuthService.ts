@@ -154,10 +154,10 @@ export class GoogleDriveAuthService implements ICloudAuthService {
     }
 
     private saveAuthState(): void {
-        if (this.currentUser.isAuthenticated && this.accessToken) {
+        if (this.currentUser.isAuthenticated) {
             localStorage.setItem('google-drive-auth', JSON.stringify({
                 user: this.currentUser,
-                token: this.accessToken,
+                wasAuthenticated: true,
                 timestamp: Date.now(),
             }));
         }
@@ -168,20 +168,44 @@ export class GoogleDriveAuthService implements ICloudAuthService {
         if (stored) {
             try {
                 const data = JSON.parse(stored);
-                const age = Date.now() - data.timestamp;
-
-                if (age < 3600000) {
-                    this.currentUser = data.user;
-                    this.accessToken = data.token;
-                    this.notifyAuthChanged();
-                } else {
-                    this.clearAuthState();
+                if (data.wasAuthenticated) {
+                    console.log('[Google Drive] User was previously authenticated, will attempt silent sign-in on user interaction');
                 }
             } catch (error) {
-                console.error('Failed to load stored auth:', error);
+                console.error('[Google Drive] Failed to load stored auth:', error);
                 this.clearAuthState();
             }
         }
+    }
+
+    async attemptSilentSignIn(): Promise<boolean> {
+        if (!this.tokenClient) {
+            return false;
+        }
+
+        return new Promise((resolve) => {
+            const originalCallback = this.tokenClient.callback;
+            this.tokenClient.callback = (tokenResponse: any) => {
+                this.tokenClient.callback = originalCallback;
+
+                if (tokenResponse.error) {
+                    console.log('[Google Drive] Silent sign-in failed:', tokenResponse.error);
+                    resolve(false);
+                    return;
+                }
+
+                this.accessToken = tokenResponse.access_token;
+                this.updateUserState(tokenResponse);
+                this.saveAuthState();
+                this.notifyAuthChanged();
+                console.log('[Google Drive] Silent sign-in successful');
+                resolve(true);
+
+                originalCallback(tokenResponse);
+            };
+
+            this.tokenClient.requestAccessToken({ prompt: '' });
+        });
     }
 
     private clearAuthState(): void {

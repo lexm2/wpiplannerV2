@@ -57,6 +57,43 @@ export class ProfileStateManager {
         try {
             this.cloudSyncService = GoogleDriveSyncService.getInstance();
             await this.cloudSyncService.initialize();
+
+            this.cloudSyncService.addEventListener(async (event) => {
+                if (event.type === 'sync-completed' && event.data) {
+                    logger.log('[SYNC] Data pulled from cloud, applying...');
+                    const cloudData = event.data as any;
+
+                    if (cloudData.preferences) {
+                        this.storageManager.savePreferences(cloudData.preferences);
+                        this.state.preferences = cloudData.preferences;
+                    }
+
+                    if (cloudData.schedules) {
+                        for (const schedule of cloudData.schedules) {
+                            await this.storageManager.saveSchedule(schedule);
+                        }
+                        this.state.schedules = cloudData.schedules;
+                    }
+
+                    if (cloudData.state?.activeScheduleId) {
+                        this.storageManager.saveActiveScheduleId(cloudData.state.activeScheduleId);
+                        this.state.activeScheduleId = cloudData.state.activeScheduleId;
+
+                        const activeSchedule = this.state.schedules.find(
+                            s => s.id === cloudData.state.activeScheduleId
+                        );
+                        if (activeSchedule) {
+                            this.state.selectedCourses = this.resolveCourseReferences(
+                                activeSchedule.selectedCourses
+                            );
+                        }
+                    }
+
+                    logger.log('[SYNC] Cloud data applied to storage and memory');
+                    this.emitEvent('schedule_changed', { action: 'cloud_sync' }, 'cloud-sync');
+                    this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
+                }
+            });
         } catch (error) {
             logger.warn('Cloud sync initialization failed:', error);
         }
