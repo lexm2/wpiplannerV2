@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 17, 2025, 3:49 AM",
+  "generated": "Nov 17, 2025, 4:19 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4157,7 +4157,7 @@
                 "number": "B02",
                 "seats": 24,
                 "seats_available": 0,
-                "actual_waitlist": 5,
+                "actual_waitlist": 4,
                 "max_waitlist": 12,
                 "note": null,
                 "description": "Cat. I This course focuses on the methods, procedures and techniques of creating and manipulating images through electronic and digital means. Students will develop an understanding of image alteration. Topics may include color theory, displays, modeling, shading, and visual perception. Recommended background: AR 1100.",
@@ -4176,7 +4176,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seats_available": 0,
-                    "actual_waitlist": 5,
+                    "actual_waitlist": 4,
                     "max_waitlist": 12,
                     "specific_section": "B02",
                     "days": [
@@ -4271,7 +4271,7 @@
                 "number": "C03",
                 "seats": 24,
                 "seats_available": 0,
-                "actual_waitlist": 8,
+                "actual_waitlist": 9,
                 "max_waitlist": 10,
                 "note": null,
                 "description": "Cat. I This course focuses on the methods, procedures and techniques of creating and manipulating images through electronic and digital means. Students will develop an understanding of image alteration. Topics may include color theory, displays, modeling, shading, and visual perception. Recommended background: AR 1100.",
@@ -4290,7 +4290,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seats_available": 0,
-                    "actual_waitlist": 8,
+                    "actual_waitlist": 9,
                     "max_waitlist": 10,
                     "specific_section": "C03",
                     "days": [
