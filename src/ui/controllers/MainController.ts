@@ -339,7 +339,148 @@ export class MainController {
             if (target.classList.contains('section-badge')) {
                 target.classList.toggle('selected');
             }
-            
+
+            if (target.classList.contains('term-badge') || target.closest('.term-badge')) {
+                e.stopPropagation();
+                const termBadge = target.classList.contains('term-badge') ? target : target.closest('.term-badge') as HTMLElement;
+                const clickedTerm = termBadge?.dataset.term;
+                const courseSections = termBadge?.closest('.course-sections') as HTMLElement;
+
+                if (!clickedTerm || !courseSections) return;
+
+                const termBadgesContainer = courseSections.querySelector('.term-badges-container') as HTMLElement;
+                const termSectionsContainers = courseSections.querySelectorAll('.term-sections-container') as NodeListOf<HTMLElement>;
+                const clickedTermContainer = courseSections.querySelector(`.term-sections-container[data-term="${clickedTerm}"]`) as HTMLElement;
+
+                // Check if this term is already expanded
+                const isExpanded = clickedTermContainer && clickedTermContainer.style.display !== 'none';
+
+                // Get current height before changes
+                const currentHeight = courseSections.scrollHeight;
+
+                // Set starting height
+                courseSections.style.maxHeight = `${currentHeight}px`;
+
+                if (isExpanded) {
+                    // Collapse: animate badges out in reverse row order, then shrink height
+                    const childBadges = clickedTermContainer.querySelectorAll('.term-badge, .section-badge') as NodeListOf<HTMLElement>;
+
+                    // Group badges by row
+                    const badgesByRow = new Map<number, HTMLElement[]>();
+                    childBadges.forEach((badge) => {
+                        const top = badge.offsetTop;
+                        if (!badgesByRow.has(top)) {
+                            badgesByRow.set(top, []);
+                        }
+                        badgesByRow.get(top)!.push(badge);
+                    });
+
+                    // Animate rows out in reverse order
+                    const rows = Array.from(badgesByRow.values());
+                    const reversedRows = [...rows].reverse();
+
+                    reversedRows.forEach((rowBadges, rowIndex) => {
+                        rowBadges.forEach((badge, badgeIndex) => {
+                            setTimeout(() => {
+                                badge.style.opacity = '0';
+                                badge.style.transform = 'translateX(-10px)';
+                            }, rowIndex * 30 + badgeIndex * 15);
+                        });
+                    });
+
+                    // Calculate when all badges will be hidden
+                    const totalAnimationTime = reversedRows.length * 30 + Math.max(...reversedRows.map(r => r.length)) * 15;
+
+                    // Start height collapse after badges begin animating out
+                    setTimeout(() => {
+                        // Calculate target height
+                        termBadgesContainer.style.display = 'flex';
+                        termBadgesContainer.style.opacity = '0';
+                        const targetHeight = termBadgesContainer.scrollHeight;
+                        termBadgesContainer.style.display = 'none';
+
+                        // Animate to target height
+                        courseSections.style.maxHeight = `${targetHeight}px`;
+                    }, totalAnimationTime);
+
+                    // Swap containers after animations complete
+                    setTimeout(() => {
+                        termSectionsContainers.forEach(container => {
+                            container.style.display = 'none';
+                            container.style.opacity = '0';
+                            container.style.transform = 'translateX(-10px)';
+                        });
+                        if (termBadgesContainer) {
+                            termBadgesContainer.style.display = 'flex';
+                            termBadgesContainer.style.opacity = '0';
+                            termBadgesContainer.style.transform = 'translateX(10px)';
+
+                            requestAnimationFrame(() => {
+                                termBadgesContainer.style.opacity = '1';
+                                termBadgesContainer.style.transform = 'translateX(0)';
+                            });
+                        }
+                    }, totalAnimationTime + 300);
+                } else {
+                    // Expand: fade out term-badges and fade in term-sections
+                    if (termBadgesContainer) {
+                        termBadgesContainer.style.opacity = '0';
+                        termBadgesContainer.style.transform = 'translateX(10px)';
+                    }
+
+                    setTimeout(() => {
+                        if (termBadgesContainer) {
+                            termBadgesContainer.style.display = 'none';
+                        }
+                        termSectionsContainers.forEach(container => {
+                            container.style.display = 'none';
+                        });
+                        if (clickedTermContainer) {
+                            clickedTermContainer.style.display = 'flex';
+                            clickedTermContainer.style.opacity = '0';
+
+                            // Set initial state for all children (term badge and section badges)
+                            const childBadges = clickedTermContainer.querySelectorAll('.term-badge, .section-badge') as NodeListOf<HTMLElement>;
+                            childBadges.forEach((badge, index) => {
+                                badge.style.opacity = '0';
+                                badge.style.transform = 'translateX(-10px)';
+                                badge.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+                            });
+
+                            requestAnimationFrame(() => {
+                                clickedTermContainer.style.opacity = '1';
+
+                                // Animate height change to expanded state
+                                requestAnimationFrame(() => {
+                                    courseSections.style.maxHeight = `${clickedTermContainer.scrollHeight}px`;
+                                });
+
+                                // Group badges by row based on their offsetTop position
+                                const badgesByRow = new Map<number, HTMLElement[]>();
+                                childBadges.forEach((badge) => {
+                                    const top = badge.offsetTop;
+                                    if (!badgesByRow.has(top)) {
+                                        badgesByRow.set(top, []);
+                                    }
+                                    badgesByRow.get(top)!.push(badge);
+                                });
+
+                                // Animate each row with stagger, all items in same row start together
+                                const rows = Array.from(badgesByRow.values());
+                                rows.forEach((rowBadges, rowIndex) => {
+                                    rowBadges.forEach((badge, badgeIndex) => {
+                                        setTimeout(() => {
+                                            badge.style.opacity = '1';
+                                            badge.style.transform = 'translateX(0)';
+                                        }, rowIndex * 30 + badgeIndex * 15); // Rows stagger by 30ms, items within row by 15ms
+                                    });
+                                });
+                            });
+                        }
+                    }, 200);
+                }
+            }
+
             if (target.classList.contains('course-select-btn')) {
                 const courseElement = target.closest('.course-item, .course-card') as HTMLElement;
                 if (courseElement) {
