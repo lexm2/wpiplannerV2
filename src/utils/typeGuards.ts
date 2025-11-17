@@ -59,38 +59,68 @@ export function isValidSelectedCourse(sc: any): sc is SelectedCourse {
 
 /**
  * Validates an array of SelectedCourse objects
+ * Automatically attempts to repair invalid courses when possible
  */
-export function validateSelectedCourses(selectedCourses: any[]): SelectedCourse[] {
+export function validateSelectedCourses(selectedCourses: any[], attemptRepair: boolean = true): SelectedCourse[] {
     if (!Array.isArray(selectedCourses)) {
         console.warn('validateSelectedCourses: Expected array, got:', typeof selectedCourses);
         return [];
     }
-    
+
     const validCourses: SelectedCourse[] = [];
     const invalidCourses: any[] = [];
-    
+    const repairedCourses: SelectedCourse[] = [];
+
     selectedCourses.forEach((sc, index) => {
         if (isValidSelectedCourse(sc)) {
             validCourses.push(sc);
         } else {
-            invalidCourses.push({ index, data: sc });
+            // Try to repair invalid courses
+            if (attemptRepair) {
+                const repaired = repairSelectedCourse(sc);
+                if (repaired && isValidSelectedCourse(repaired)) {
+                    console.log(`validateSelectedCourses: Successfully repaired course at index ${index} (${sc.course?.department?.abbreviation}${sc.course?.number})`);
+                    validCourses.push(repaired);
+                    repairedCourses.push(repaired);
+                } else {
+                    console.warn(`validateSelectedCourses: Failed to repair course at index ${index}`, sc);
+                    invalidCourses.push({ index, data: sc });
+                }
+            } else {
+                invalidCourses.push({ index, data: sc });
+            }
         }
     });
-    
-    if (invalidCourses.length > 0) {
-        console.warn(`validateSelectedCourses: Found ${invalidCourses.length} invalid course(s):`, invalidCourses);
+
+    if (repairedCourses.length > 0) {
+        console.log(`validateSelectedCourses: Successfully repaired ${repairedCourses.length} invalid course(s)`);
     }
-    
+
+    if (invalidCourses.length > 0) {
+        console.warn(`validateSelectedCourses: Found ${invalidCourses.length} unrepairable invalid course(s):`, invalidCourses);
+    }
+
     return validCourses;
 }
 
 /**
  * Attempts to repair a SelectedCourse object by fixing common issues
+ * Uses getAllSections to properly extract sections from hierarchical course structure
  */
 export function repairSelectedCourse(sc: any): SelectedCourse | null {
     if (!sc || typeof sc !== 'object' || !sc.course) return null;
 
-    // Create a repaired version
+    // Import getAllSections dynamically to avoid circular dependencies
+    // This is safe because getAllSections is a pure utility function
+    let getAllSections: any;
+    try {
+        getAllSections = require('./courseUtils').getAllSections;
+    } catch (e) {
+        console.error('repairSelectedCourse: Could not import getAllSections', e);
+        return null;
+    }
+
+    // Create a repaired version with defaults
     const repaired: SelectedCourse = {
         course: sc.course,
         selectedSection: null,
@@ -99,22 +129,46 @@ export function repairSelectedCourse(sc: any): SelectedCourse | null {
         selectedDiscussion: null,
         selectedLab: null,
         isRequired: Boolean(sc.isRequired),
-        lockedSections: new Set()
+        lockedSections: sc.lockedSections instanceof Set ? sc.lockedSections : new Set()
     };
-    
+
     // Try to repair section selection
     if (sc.selectedSectionNumber && typeof sc.selectedSectionNumber === 'string') {
-        // Look for the section in the course
-        const section = sc.course.sections?.find((s: any) => s.number === sc.selectedSectionNumber);
-        
+        // Use getAllSections to properly extract sections from hierarchical structure
+        const allSections = getAllSections(sc.course);
+        const section = allSections.find((s: any) => s.number === sc.selectedSectionNumber);
+
         if (section && isValidSection(section)) {
             repaired.selectedSection = section;
             repaired.selectedSectionNumber = sc.selectedSectionNumber;
+            console.log(`repairSelectedCourse: Repaired section ${sc.selectedSectionNumber} for course ${sc.course.department?.abbreviation}${sc.course.number}`);
         } else {
             console.warn(`repairSelectedCourse: Section ${sc.selectedSectionNumber} not found or invalid for course ${sc.course.department?.abbreviation}${sc.course.number}`);
         }
     }
-    
+
+    // Try to repair hierarchical selections (selectedLecture, selectedDiscussion, selectedLab)
+    if (sc.selectedLecture && !isValidSection(sc.selectedLecture)) {
+        console.warn(`repairSelectedCourse: Invalid selectedLecture, clearing it for course ${sc.course.department?.abbreviation}${sc.course.number}`);
+        repaired.selectedLecture = null;
+    } else if (sc.selectedLecture) {
+        repaired.selectedLecture = sc.selectedLecture;
+    }
+
+    if (sc.selectedDiscussion && !isValidSection(sc.selectedDiscussion)) {
+        console.warn(`repairSelectedCourse: Invalid selectedDiscussion, clearing it for course ${sc.course.department?.abbreviation}${sc.course.number}`);
+        repaired.selectedDiscussion = null;
+    } else if (sc.selectedDiscussion) {
+        repaired.selectedDiscussion = sc.selectedDiscussion;
+    }
+
+    if (sc.selectedLab && !isValidSection(sc.selectedLab)) {
+        console.warn(`repairSelectedCourse: Invalid selectedLab, clearing it for course ${sc.course.department?.abbreviation}${sc.course.number}`);
+        repaired.selectedLab = null;
+    } else if (sc.selectedLab) {
+        repaired.selectedLab = sc.selectedLab;
+    }
+
     return repaired;
 }
 

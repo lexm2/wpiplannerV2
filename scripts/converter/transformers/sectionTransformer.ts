@@ -76,16 +76,16 @@ export function transformSection(
     const periods: PlannerPeriod[] = meetingPatterns.map(pattern => ({
         type: type,
         professor: professor,
-        start_time: pattern.startTime,
-        end_time: pattern.endTime,
+        startTime: pattern.startTime,
+        endTime: pattern.endTime,
         location: pattern.location,
         building: '', // Workday doesn't separate building
         room: pattern.location,
         seats: capacity,
-        seats_available: seatsAvailable,
-        actual_waitlist: waitlistActual,
-        max_waitlist: waitlistMax,
-        specific_section: sectionNumber,
+        seatsAvailable: seatsAvailable,
+        actualWaitlist: waitlistActual,
+        maxWaitlist: waitlistMax,
+        specificSection: sectionNumber,
         days: pattern.days
     }));
 
@@ -93,15 +93,15 @@ export function transformSection(
         crn,
         number: sectionNumber,
         seats: capacity,
-        seats_available: seatsAvailable,
-        actual_waitlist: waitlistActual,
-        max_waitlist: waitlistMax,
+        seatsAvailable: seatsAvailable,
+        actualWaitlist: waitlistActual,
+        maxWaitlist: waitlistMax,
         note,
         description,
         term: '202201', // Fixed term code (legacy)
         computedTerm,
-        is_gps: isGPS,
-        is_interest_list: isInterestList,
+        isGps: isGPS,
+        isInterestList: isInterestList,
         periods
     };
 }

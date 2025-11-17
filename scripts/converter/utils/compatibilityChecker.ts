@@ -42,7 +42,7 @@ function checkClusterCompatibility(section1: PlannerSection, section2: PlannerSe
     const cluster2 = section2.note;
 
     // GPS courses: both MUST have same cluster
-    if (section1.is_gps || section2.is_gps) {
+    if (section1.isGps || section2.isGps) {
         if (!cluster1 || !cluster2) {
             return false; // GPS requires both to have clusters
         }
@@ -83,10 +83,10 @@ function hasTimeConflict(section1: PlannerSection, section2: PlannerSection): bo
 function periodsConflict(period1: PlannerPeriod, period2: PlannerPeriod): boolean {
     // Check if times overlap
     const timeOverlap = timeRangesOverlap(
-        period1.start_time,
-        period1.end_time,
-        period2.start_time,
-        period2.end_time
+        period1.startTime,
+        period1.endTime,
+        period2.startTime,
+        period2.endTime
     );
 
     if (!timeOverlap) {

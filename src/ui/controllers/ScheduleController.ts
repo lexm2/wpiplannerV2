@@ -14,6 +14,7 @@ import { AutoScheduler } from '../../services/AutoScheduler'
 import { ScheduleScorer } from '../../services/ScheduleScorer'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
+import { getAllSections } from '../../utils/courseUtils'
 
 interface WizardSelections {
     lecture: Section | null;
@@ -703,14 +704,18 @@ export class ScheduleController {
         selectedCourses.forEach(sc => {
             // If we have a selectedSectionNumber but no selectedSection object (or invalid object)
             if (sc.selectedSectionNumber && (!sc.selectedSection || !sc.selectedSection.computedTerm)) {
-                // Find the section object in the course
-                const sectionObject = sc.course.sections?.find((s: any) => s.number === sc.selectedSectionNumber);
-                
+                // Get all sections from the course using courseUtils (handles hierarchical structure)
+                const allSections = getAllSections(sc.course);
+                const sectionObject = allSections.find((s: Section) => s.number === sc.selectedSectionNumber);
+
                 if (sectionObject && sectionObject.computedTerm) {
                     sc.selectedSection = sectionObject;
+                    console.log(`[SyncSection] Restored section ${sectionObject.number} for ${sc.course.department.abbreviation}${sc.course.number}, term: ${sectionObject.computedTerm}`);
+                } else {
+                    console.warn(`[SyncSection] Could not find section ${sc.selectedSectionNumber} for ${sc.course.department.abbreviation}${sc.course.number}`);
                 }
             }
-            
+
             // If we have a selectedSection but no selectedSectionNumber, sync the other way
             if (sc.selectedSection && sc.selectedSection.number && !sc.selectedSectionNumber) {
                 sc.selectedSectionNumber = sc.selectedSection.number;

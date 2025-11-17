@@ -17,7 +17,7 @@ export function buildLectureGroups(categorized: CategorizedSections): LectureGro
     for (const lecture of categorized.lectures) {
         // Handle GPS sections without cluster or Interest Lists
         // These cannot be combined with other sections
-        if ((lecture.is_gps && !lecture.note) || lecture.is_interest_list) {
+        if ((lecture.isGps && !lecture.note) || lecture.isInterestList) {
             lectureGroups.push({
                 section: lecture,
                 compatibleDiscussions: [],

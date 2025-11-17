@@ -765,12 +765,25 @@ export class ProfileStateManager {
             const resolveSection = (section: Section | null): Section | null => {
                 if (!section || !liveCourse) return null;
 
-                const allSections = getAllSections(liveCourse);
-                const liveSection = allSections.find((s: Section) => s.crn === section.crn);
-                if (!liveSection) {
-                    logger.warn(`Section CRN ${section.crn} not found for course ${courseId}`);
+                // Validate that section has required CRN field
+                if (typeof section.crn !== 'number') {
+                    logger.warn(`Section missing CRN field, cannot resolve for course ${courseId}`);
                     return null;
                 }
+
+                const allSections = getAllSections(liveCourse);
+                const liveSection = allSections.find((s: Section) => s.crn === section.crn);
+
+                if (!liveSection) {
+                    logger.warn(`Section CRN ${section.crn} not found for course ${courseId}, section may no longer exist`);
+                    return null;
+                }
+
+                // Verify resolved section has all required fields
+                if (typeof liveSection.computedTerm !== 'string' || !['A', 'B', 'C', 'D'].includes(liveSection.computedTerm)) {
+                    logger.error(`Resolved section CRN ${liveSection.crn} has invalid computedTerm: ${liveSection.computedTerm}`);
+                }
+
                 return liveSection;
             };
 
