@@ -77,8 +77,8 @@ export function transformCourse(
         number: courseNumber,
         name: courseName,
         description,
-        min_credits: credits,
-        max_credits: credits,
+        minCredits: credits,
+        maxCredits: credits,
         lectures,
         standaloneLabs
     };

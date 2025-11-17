@@ -23,8 +23,8 @@ export interface PlannerCourse {
     number: string;
     name: string;
     description: string;
-    min_credits: number;
-    max_credits: number;
+    minCredits: number;
+    maxCredits: number;
     lectures: LectureGroup[];          // NEW: Main structure
     standaloneLabs?: PlannerSection[]; // NEW: For lab-only courses
 }
@@ -43,30 +43,30 @@ export interface PlannerSection {
     crn: number;
     number: string;
     seats: number;
-    seats_available: number;
-    actual_waitlist: number;
-    max_waitlist: number;
+    seatsAvailable: number;
+    actualWaitlist: number;
+    maxWaitlist: number;
     note: string | null;
     description: string;
     term: string;
     computedTerm: string;
-    is_gps: boolean;
-    is_interest_list: boolean;
+    isGps: boolean;
+    isInterestList: boolean;
     periods: PlannerPeriod[];
 }
 
 export interface PlannerPeriod {
     type: string;
     professor: string;
-    start_time: string;
-    end_time: string;
+    startTime: string;
+    endTime: string;
     location: string;
     building: string;
     room: string;
     seats: number;
-    seats_available: number;
-    actual_waitlist: number;
-    max_waitlist: number;
-    specific_section: string;
+    seatsAvailable: number;
+    actualWaitlist: number;
+    maxWaitlist: number;
+    specificSection: string;
     days: string[];
 }

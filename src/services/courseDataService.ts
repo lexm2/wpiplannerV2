@@ -109,8 +109,8 @@ export class CourseDataService {
                     department: department,
                     lectures: lectures.length > 0 ? lectures : undefined,
                     standaloneLabs: standaloneLabs,
-                    minCredits: courseData.min_credits || 0,
-                    maxCredits: courseData.max_credits || 0
+                    minCredits: courseData.minCredits || 0,
+                    maxCredits: courseData.maxCredits || 0
                 };
                 return course;
             });
@@ -143,13 +143,14 @@ export class CourseDataService {
                 crn: sectionData.crn || 0,
                 number: sectionNumber,
                 seats: sectionData.seats || 0,
-                seatsAvailable: sectionData.seats_available || 0,
-                actualWaitlist: sectionData.actual_waitlist || 0,
-                maxWaitlist: sectionData.max_waitlist || 0,
+                seatsAvailable: sectionData.seatsAvailable || 0,
+                actualWaitlist: sectionData.actualWaitlist || 0,
+                maxWaitlist: sectionData.maxWaitlist || 0,
                 note: sectionData.note,
                 description: this.stripHtml(sectionData.description || ''),
                 term: rawTerm,
                 computedTerm: computedTerm,
+                isInterestList: sectionData.isInterestList,
                 periods: this.parseConstructedPeriods(sectionData.periods || [])
             };
 
@@ -181,17 +182,17 @@ export class CourseDataService {
                 type: this.parsePeriodType(periodData.type || 'Lecture'),
                 professor: periodData.professor || '',
                 professorEmail: undefined,
-                startTime: this.parseConstructedTime(periodData.start_time),
-                endTime: this.parseConstructedTime(periodData.end_time),
+                startTime: this.parseConstructedTime(periodData.startTime),
+                endTime: this.parseConstructedTime(periodData.endTime),
                 location: periodData.location || '',
                 building: periodData.building || '',
                 room: periodData.room || '',
                 seats: periodData.seats || 0,
-                seatsAvailable: periodData.seats_available || 0,
-                actualWaitlist: periodData.actual_waitlist || 0,
-                maxWaitlist: periodData.max_waitlist || 0,
+                seatsAvailable: periodData.seatsAvailable || 0,
+                actualWaitlist: periodData.actualWaitlist || 0,
+                maxWaitlist: periodData.maxWaitlist || 0,
                 days: this.parseConstructedDays(periodData.days || []),
-                specificSection: periodData.specific_section
+                specificSection: periodData.specificSection
             };
             return period;
         });
