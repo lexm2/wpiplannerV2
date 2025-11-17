@@ -27,6 +27,7 @@ export class ComponentSelectionWizard {
     private onComplete: (selections: WizardSelections) => void;
     private onCancel: () => void;
     private onSelectionChange?: (selections: WizardSelections) => void;
+    private onHoverPreview?: (selections: WizardSelections) => void;
     private container: HTMLElement | null = null;
     private availableSteps: WizardStep[] = [];
     private wizardPanel: HTMLElement | null = null;
@@ -41,13 +42,15 @@ export class ComponentSelectionWizard {
         existingSelections?: SelectedCourse,
         onSelectionChange?: (selections: WizardSelections) => void,
         scheduleFilterService?: ScheduleFilterService,
-        allSelectedCourses?: SelectedCourse[]
+        allSelectedCourses?: SelectedCourse[],
+        onHoverPreview?: (selections: WizardSelections) => void
     ) {
         this.course = course;
         this.courseDataService = courseDataService;
         this.onComplete = onComplete;
         this.onCancel = onCancel;
         this.onSelectionChange = onSelectionChange;
+        this.onHoverPreview = onHoverPreview;
         this.scheduleFilterService = scheduleFilterService || null;
         this.allSelectedCourses = allSelectedCourses || [];
 
@@ -1115,10 +1118,10 @@ export class ComponentSelectionWizard {
     }
 
     /**
-     * Show preview of a section on the schedule grid by using the existing selection callback
+     * Show preview of a section on the schedule grid (hover with dashed borders)
      */
     private showSectionPreview(section: Section): void {
-        if (!this.onSelectionChange) return;
+        if (!this.onHoverPreview) return;
 
         // Create temporary selections with the hovered section
         const tempSelections: WizardSelections = {
@@ -1127,8 +1130,8 @@ export class ComponentSelectionWizard {
             lab: this.currentStep === 'lab' ? section : this.selections.lab
         };
 
-        // Trigger the same preview mechanism used for actual selections
-        this.onSelectionChange(tempSelections);
+        // Trigger hover preview (renders with dashed borders)
+        this.onHoverPreview(tempSelections);
     }
 
     /**
@@ -1137,7 +1140,7 @@ export class ComponentSelectionWizard {
     private clearSectionPreview(): void {
         if (!this.onSelectionChange) return;
 
-        // Restore the actual selections (not the hover preview)
+        // Restore the actual selections (clears hover preview)
         this.onSelectionChange(this.selections);
     }
 }

@@ -34,7 +34,7 @@ export class ScheduleController {
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
     private wizardPreviewSelections: WizardSelections | null = null;
-    private isHoverPreview: boolean = false;
+    private hoverPreviewCourseId: string | null = null;
     private courseColorMap: Map<string, string> = new Map();
     private usedColors: Set<string> = new Set();
     private generatedSchedules: any[][] = [];
@@ -154,7 +154,8 @@ export class ScheduleController {
             existingSelections,
             (selections) => this.onWizardSelectionChange(freshCourse, selections),
             this.scheduleFilterService || undefined,
-            otherSelectedCourses
+            otherSelectedCourses,
+            (selections) => this.onWizardHoverPreview(freshCourse, selections)
         );
 
         this.componentWizard.open();
@@ -231,9 +232,23 @@ export class ScheduleController {
         // Store preview data
         this.wizardPreviewCourse = course;
         this.wizardPreviewSelections = selections;
+        this.hoverPreviewCourseId = null; // Clear hover preview flag
 
         // Re-render calendar with preview
         console.log('[Preview] Calling renderScheduleGrids()');
+        this.renderScheduleGrids();
+    }
+
+    /**
+     * Handle hover preview changes from the wizard (shows dashed preview)
+     */
+    onWizardHoverPreview(course: Course, selections: WizardSelections): void {
+        // Store preview data
+        this.wizardPreviewCourse = course;
+        this.wizardPreviewSelections = selections;
+        this.hoverPreviewCourseId = course.id; // Mark this course as hover preview
+
+        // Re-render calendar with hover preview
         this.renderScheduleGrids();
     }
 
@@ -996,21 +1011,25 @@ export class ScheduleController {
         const heightPercent = (durationMinutes / 60) * 100;
 
 
-        // Build content for the first section in the slot - simplified to show only course name
+        // Build content for the first section in the slot
+        // Check if this specific course is the hover preview (not all courses)
+        const isPreview = this.hoverPreviewCourseId === primarySection.course.course.id;
+        const blockClass = isPreview ? 'section-preview' : 'section-block';
+
         const content = primarySection.isFirstSlot ? `
-            <div class="section-block ${hasConflict ? 'conflict' : ''}"
+            <div class="${blockClass} ${hasConflict ? 'conflict' : ''}"
                  data-course-id="${primarySection.course.course.id}"
                  data-section-number="${primarySection.section.number}"
                  data-selected-course-index="${primarySection.courseIndex || 0}"
                  style="
-                background-color: ${courseColor};
+                ${isPreview ? `border-color: ${courseColor};` : `background-color: ${courseColor};`}
                 height: ${heightPercent}%;
                 width: 100%;
                 position: absolute;
                 top: ${topOffsetPercent}%;
                 left: 0;
-                z-index: 10;
-                border: 1px solid rgba(0,0,0,0.2);
+                z-index: ${isPreview ? '15' : '10'};
+                ${!isPreview ? `border: 1px solid rgba(0,0,0,0.2);` : ''}
                 border-radius: 3px;
                 box-sizing: border-box;
                 display: flex;
@@ -1019,8 +1038,7 @@ export class ScheduleController {
                 text-align: center;
                 font-weight: bold;
                 font-size: 0.8rem;
-                color: white;
-                text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+                ${isPreview ? `color: var(--color-text-primary);` : `color: white; text-shadow: 1px 1px 1px rgba(0,0,0,0.3);`}
                 cursor: pointer;
             ">
                 ${primarySection.course.course.department.abbreviation}${primarySection.course.course.number}
