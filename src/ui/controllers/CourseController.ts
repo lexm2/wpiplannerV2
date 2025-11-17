@@ -27,6 +27,10 @@ export class CourseController {
     private readonly INITIAL_PAGE_SIZE = 100;
     private hasMore: boolean = false;
 
+    // Callbacks
+    private onBatchCallback?: () => void;
+    private onRenderCompleteCallback?: () => void;
+
     constructor(courseSelectionService: CourseSelectionService, courseDataService: CourseDataService) {
         this.courseSelectionService = courseSelectionService;
         this.courseDataService = courseDataService;
@@ -42,15 +46,18 @@ export class CourseController {
             onBatch: (batchIndex, totalBatches, totalCount) => {
                 // Update any progress indicators if needed
                 console.log(`Rendered batch ${batchIndex}/${totalBatches} (${totalCount} total courses)`);
+
+                // Call external batch callback if registered
+                this.onBatchCallback?.();
             },
             onComplete: (totalRendered, totalTime) => {
                 console.log(`Progressive rendering complete: ${totalRendered} courses in ${totalTime.toFixed(2)}ms`);
-                
+
                 // Log performance insights periodically
                 if (Math.random() < 0.1) { // 10% chance to log insights
                     const insights = this.performanceMetrics.getInsights();
                     console.log('Performance insights:', insights.join(', '));
-                    
+
                     // Auto-adjust batch size based on performance
                     const optimalBatchSize = this.performanceMetrics.getOptimalBatchSize(this.progressiveRenderer.getBatchSize());
                     if (optimalBatchSize !== this.progressiveRenderer.getBatchSize()) {
@@ -58,6 +65,9 @@ export class CourseController {
                         this.progressiveRenderer.setBatchSize(optimalBatchSize);
                     }
                 }
+
+                // Call external completion callback if registered
+                this.onRenderCompleteCallback?.();
             }
         };
         
@@ -859,5 +869,17 @@ export class CourseController {
                 loadMoreContainer.remove();
             }
         }
+    }
+
+    isRendering(): boolean {
+        return this.progressiveRenderer.isCurrentlyRendering();
+    }
+
+    setOnBatchCallback(callback: () => void): void {
+        this.onBatchCallback = callback;
+    }
+
+    setOnRenderCompleteCallback(callback: () => void): void {
+        this.onRenderCompleteCallback = callback;
     }
 }
