@@ -221,6 +221,20 @@
   background: var(--color-primary);
   color: var(--color-text-inverse);
   border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.term-badge.full {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
+}
+
+.term-badge.full:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.1);
 }
 
 .term-sections-container {
@@ -228,7 +242,7 @@
   gap: 0.5rem;
   align-items: center;
   flex-wrap: wrap;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .term-badge.active {

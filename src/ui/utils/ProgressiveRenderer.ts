@@ -212,7 +212,9 @@ export class ProgressiveRenderer {
 
                                     // Create term badges container (initial view)
                                     const termBadgesHtml = sortedTerms.map(term => {
-                                        return `<span class="term-badge" data-term="${Validators.escapeHtml(term)}">
+                                        const sections = sectionsByTerm.get(term)!;
+                                        const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
+                                        return `<span class="term-badge ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}">
                                             <span class="term-letter">${Validators.escapeHtml(term)}</span>
                                             ${getInlineSVG('PLUS', 'term-icon')}
                                         </span>`;
@@ -248,8 +250,9 @@ export class ProgressiveRenderer {
                                             return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${escapedSectionNumber}" title="${escapedProfListPlain}: ${escapedSectionNumber}">${profListHtml}: ${escapedSectionNumber}</span>`;
                                         }).join('');
 
+                                        const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
                                         return `<div class="term-sections-container" data-term="${Validators.escapeHtml(term)}" style="display: none;">
-                                            <span class="term-badge active" data-term="${Validators.escapeHtml(term)}">
+                                            <span class="term-badge active ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}">
                                                 <span class="term-letter">${Validators.escapeHtml(term)}</span>
                                                 ${getInlineSVG('PLUS', 'term-icon')}
                                             </span>

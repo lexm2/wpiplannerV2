@@ -386,6 +386,7 @@ export class MainController {
                 if (isExpanded) {
                     // Update state: term is being collapsed
                     this.expandedTerms.delete(courseId);
+
                     // Collapse: animate badges out in reverse row order, then shrink height
                     const childBadges = clickedTermContainer.querySelectorAll('.term-badge, .section-badge') as NodeListOf<HTMLElement>;
 
@@ -432,16 +433,38 @@ export class MainController {
                         termSectionsContainers.forEach(container => {
                             container.style.display = 'none';
                             container.style.opacity = '0';
-                            container.style.transform = 'translateX(-10px)';
                         });
                         if (termBadgesContainer) {
                             termBadgesContainer.style.display = 'flex';
                             termBadgesContainer.style.opacity = '0';
                             termBadgesContainer.style.transform = 'translateX(10px)';
 
+                            // Find the term badge that will appear and set its icon to rotated state
+                            const returningBadge = termBadgesContainer.querySelector(`.term-badge[data-term="${clickedTerm}"]`) as HTMLElement;
+                            if (returningBadge) {
+                                const returningIcon = returningBadge.querySelector('.term-icon') as HTMLElement;
+                                if (returningIcon) {
+                                    returningIcon.style.transform = 'rotate(45deg)';
+                                    returningIcon.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.8, 0.64, 1)';
+                                }
+                            }
+
+                            // Double RAF to ensure initial state is painted before transition
                             requestAnimationFrame(() => {
-                                termBadgesContainer.style.opacity = '1';
-                                termBadgesContainer.style.transform = 'translateX(0)';
+                                requestAnimationFrame(() => {
+                                    termBadgesContainer.style.opacity = '1';
+                                    termBadgesContainer.style.transform = 'translateX(0)';
+
+                                    // Delay rotation to start 150ms after fade begins
+                                    setTimeout(() => {
+                                        if (returningBadge) {
+                                            const returningIcon = returningBadge.querySelector('.term-icon') as HTMLElement;
+                                            if (returningIcon) {
+                                                returningIcon.style.transform = 'rotate(0deg)';
+                                            }
+                                        }
+                                    }, 150);
+                                });
                             });
                         }
                     }, totalAnimationTime + 300);
@@ -449,62 +472,8 @@ export class MainController {
                     // Update state: term is being expanded
                     this.expandedTerms.set(courseId, clickedTerm);
 
-                    // Expand: fade out term-badges and fade in term-sections
-                    if (termBadgesContainer) {
-                        termBadgesContainer.style.opacity = '0';
-                        termBadgesContainer.style.transform = 'translateX(10px)';
-                    }
-
-                    setTimeout(() => {
-                        if (termBadgesContainer) {
-                            termBadgesContainer.style.display = 'none';
-                        }
-                        termSectionsContainers.forEach(container => {
-                            container.style.display = 'none';
-                        });
-                        if (clickedTermContainer) {
-                            clickedTermContainer.style.display = 'flex';
-                            clickedTermContainer.style.opacity = '0';
-
-                            // Set initial state for all children (term badge and section badges)
-                            const childBadges = clickedTermContainer.querySelectorAll('.term-badge, .section-badge') as NodeListOf<HTMLElement>;
-                            childBadges.forEach((badge, index) => {
-                                badge.style.opacity = '0';
-                                badge.style.transform = 'translateX(-10px)';
-                                badge.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-                            });
-
-                            requestAnimationFrame(() => {
-                                clickedTermContainer.style.opacity = '1';
-
-                                // Animate height change to expanded state
-                                requestAnimationFrame(() => {
-                                    courseSections.style.maxHeight = `${clickedTermContainer.scrollHeight}px`;
-                                });
-
-                                // Group badges by row based on their offsetTop position
-                                const badgesByRow = new Map<number, HTMLElement[]>();
-                                childBadges.forEach((badge) => {
-                                    const top = badge.offsetTop;
-                                    if (!badgesByRow.has(top)) {
-                                        badgesByRow.set(top, []);
-                                    }
-                                    badgesByRow.get(top)!.push(badge);
-                                });
-
-                                // Animate each row with stagger, all items in same row start together
-                                const rows = Array.from(badgesByRow.values());
-                                rows.forEach((rowBadges, rowIndex) => {
-                                    rowBadges.forEach((badge, badgeIndex) => {
-                                        setTimeout(() => {
-                                            badge.style.opacity = '1';
-                                            badge.style.transform = 'translateX(0)';
-                                        }, rowIndex * 30 + badgeIndex * 15); // Rows stagger by 30ms, items within row by 15ms
-                                    });
-                                });
-                            });
-                        }
-                    }, 200);
+                    // Use extracted animation function
+                    this.animateTermExpansion(courseSections, termBadgesContainer, termSectionsContainers, clickedTermContainer);
                 }
             }
 
@@ -857,6 +826,103 @@ export class MainController {
         this.updateUndoRedoButtons();
     }
 
+    private groupBadgesByRow(badges: NodeListOf<HTMLElement>): HTMLElement[][] {
+        const badgesByRow = new Map<number, HTMLElement[]>();
+        badges.forEach((badge) => {
+            const top = badge.offsetTop;
+            if (!badgesByRow.has(top)) {
+                badgesByRow.set(top, []);
+            }
+            badgesByRow.get(top)!.push(badge);
+        });
+        return Array.from(badgesByRow.values());
+    }
+
+    private animateTermIconRotation(badge: HTMLElement, fromDeg: number, toDeg: number): void {
+        const termIcon = badge.querySelector('.term-icon') as HTMLElement;
+        if (termIcon) {
+            termIcon.style.transform = `rotate(${fromDeg}deg)`;
+            requestAnimationFrame(() => {
+                termIcon.style.transform = `rotate(${toDeg}deg)`;
+            });
+        }
+    }
+
+    private animateTermExpansion(
+        courseSections: HTMLElement,
+        termBadgesContainer: HTMLElement,
+        termSectionsContainers: NodeListOf<HTMLElement>,
+        clickedTermContainer: HTMLElement,
+        onComplete?: () => void
+    ): void {
+        // Fade out term-badges
+        termBadgesContainer.style.opacity = '0';
+        termBadgesContainer.style.transform = 'translateX(10px)';
+
+        setTimeout(() => {
+            termBadgesContainer.style.display = 'none';
+            termSectionsContainers.forEach(container => {
+                container.style.display = 'none';
+            });
+
+            clickedTermContainer.style.display = 'flex';
+            clickedTermContainer.style.opacity = '0';
+
+            // Set initial state for all children
+            const childBadges = clickedTermContainer.querySelectorAll('.term-badge, .section-badge') as NodeListOf<HTMLElement>;
+            childBadges.forEach((badge) => {
+                badge.style.opacity = '0';
+                badge.style.transform = 'translateX(-10px)';
+                badge.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+            });
+
+            // Prepare term icon for rotation
+            const expandedTermBadge = clickedTermContainer.querySelector('.term-badge.active') as HTMLElement;
+            if (expandedTermBadge) {
+                const termIcon = expandedTermBadge.querySelector('.term-icon') as HTMLElement;
+                if (termIcon) {
+                    termIcon.style.transform = 'rotate(0deg)';
+                    termIcon.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.8, 0.64, 1)';
+                }
+            }
+
+            requestAnimationFrame(() => {
+                clickedTermContainer.style.opacity = '1';
+
+                // Delay rotation to start 150ms after fade begins
+                setTimeout(() => {
+                    if (expandedTermBadge) {
+                        const termIcon = expandedTermBadge.querySelector('.term-icon') as HTMLElement;
+                        if (termIcon) {
+                            termIcon.style.transform = 'rotate(45deg)';
+                        }
+                    }
+                }, 150);
+
+                // Animate height
+                requestAnimationFrame(() => {
+                    courseSections.style.maxHeight = `${clickedTermContainer.scrollHeight}px`;
+                });
+
+                // Animate badges in by row
+                const rows = this.groupBadgesByRow(childBadges);
+                rows.forEach((rowBadges, rowIndex) => {
+                    rowBadges.forEach((badge, badgeIndex) => {
+                        setTimeout(() => {
+                            badge.style.opacity = '1';
+                            badge.style.transform = 'translateX(0)';
+                        }, rowIndex * 30 + badgeIndex * 15);
+                    });
+                });
+
+                if (onComplete) {
+                    const totalTime = rows.length * 30 + Math.max(...rows.map(r => r.length)) * 15 + 200;
+                    setTimeout(onComplete, totalTime);
+                }
+            });
+        }, 200);
+    }
+
     private restoreTermExpansionState(): void {
         // Restore expansion state for all courses that have expanded terms
         this.expandedTerms.forEach((expandedTerm, courseId) => {
@@ -910,66 +976,12 @@ export class MainController {
                 return;
             }
 
-            // Get current height before changes
+            // Get current height and set starting height
             const currentHeight = courseSections.scrollHeight;
-
-            // Set starting height
             courseSections.style.maxHeight = `${currentHeight}px`;
 
-            // Animate: fade out term-badges and fade in term-sections
-            termBadgesContainer.style.opacity = '0';
-            termBadgesContainer.style.transform = 'translateX(10px)';
-
-            setTimeout(() => {
-                termBadgesContainer.style.display = 'none';
-
-                termSectionsContainers.forEach(container => {
-                    container.style.display = 'none';
-                });
-
-                if (clickedTermContainer) {
-                    clickedTermContainer.style.display = 'flex';
-                    clickedTermContainer.style.opacity = '0';
-
-                    // Set initial state for all children (term badge and section badges)
-                    const childBadges = clickedTermContainer.querySelectorAll('.term-badge, .section-badge') as NodeListOf<HTMLElement>;
-                    childBadges.forEach((badge) => {
-                        badge.style.opacity = '0';
-                        badge.style.transform = 'translateX(-10px)';
-                        badge.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-                    });
-
-                    requestAnimationFrame(() => {
-                        clickedTermContainer.style.opacity = '1';
-
-                        // Animate height change to expanded state
-                        requestAnimationFrame(() => {
-                            courseSections.style.maxHeight = `${clickedTermContainer.scrollHeight}px`;
-                        });
-
-                        // Group badges by row based on their offsetTop position
-                        const badgesByRow = new Map<number, HTMLElement[]>();
-                        childBadges.forEach((badge) => {
-                            const top = badge.offsetTop;
-                            if (!badgesByRow.has(top)) {
-                                badgesByRow.set(top, []);
-                            }
-                            badgesByRow.get(top)!.push(badge);
-                        });
-
-                        // Animate each row with stagger, all items in same row start together
-                        const rows = Array.from(badgesByRow.values());
-                        rows.forEach((rowBadges, rowIndex) => {
-                            rowBadges.forEach((badge, badgeIndex) => {
-                                setTimeout(() => {
-                                    badge.style.opacity = '1';
-                                    badge.style.transform = 'translateX(0)';
-                                }, rowIndex * 30 + badgeIndex * 15);
-                            });
-                        });
-                    });
-                }
-            }, 200);
+            // Use extracted animation function
+            this.animateTermExpansion(courseSections, termBadgesContainer, termSectionsContainers, clickedTermContainer);
 
             console.log(`Expanding ${courseId} -> ${term} with animation`);
         });
