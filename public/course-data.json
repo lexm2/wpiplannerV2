@@ -45254,7 +45254,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "19/20",
+      "Waitlist_Waitlist_Capacity": "18/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336371"
     },
     {
@@ -45646,7 +45646,7 @@
       "Course_Title": "ES 3003 - Heat Transfer",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "69/90",
+      "Enrolled_Capacity": "70/90",
       "Instructional_Format": "Discussion",
       "Instructors": "Robert Daniello",
       "Locations": "Olin Hall 107",
@@ -45676,7 +45676,7 @@
       "Course_Title": "ES 3003 - Heat Transfer",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "69/90",
+      "Enrolled_Capacity": "70/90",
       "Instructional_Format": "Lecture",
       "Instructors": "Robert Daniello",
       "Locations": "Olin Hall 107",
@@ -85968,7 +85968,7 @@
       "Course_Title": "ME 591 - Graduate Seminar",
       "Credits": "0",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "51/140",
+      "Enrolled_Capacity": "52/140",
       "Instructional_Format": "Seminar",
       "Instructors": "Mehdi Mortazavi",
       "Locations": "Olin Hall 107",
@@ -85995,7 +85995,7 @@
       "Course_Title": "ME 591 - Graduate Seminar",
       "Credits": "0",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "48/140",
+      "Enrolled_Capacity": "49/140",
       "Instructional_Format": "Seminar",
       "Instructors": "Jiawei Yang",
       "Locations": "Olin Hall 107",
@@ -94052,7 +94052,7 @@
       "Course_Title": "NSE 515 - Radiation Biology",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "3/15",
+      "Enrolled_Capacity": "4/15",
       "Instructional_Format": "Lecture",
       "Instructors": "Snehalata Kadam",
       "Locations": "Washburn 323",
@@ -114319,7 +114319,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336362"
     },
     {
@@ -122650,7 +122650,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Writing",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339293"
     },
     {
