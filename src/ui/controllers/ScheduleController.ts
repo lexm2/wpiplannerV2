@@ -1064,8 +1064,6 @@ export class ScheduleController {
                                            overlapStartMinutes < (TimeUtils.START_HOUR + timeSlot + 1) * 60;
 
             if (overlayStartsInThisSlot) {
-                console.log(`[Conflict] Detected on ${day}: ${conflictInfo}`);
-                console.log(`[Conflict] Overlap time: ${startHours}:${String(startMins).padStart(2, '0')} - ${endHours}:${String(endMins).padStart(2, '0')} (${overlapDurationMinutes} minutes)`);
 
                 contentBlocks += `
                     <div class="conflict-overlay"
