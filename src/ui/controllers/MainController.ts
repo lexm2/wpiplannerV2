@@ -69,6 +69,8 @@ export class MainController {
     private conflictModal: ConflictResolutionModal;
     private oneDriveSyncService: OneDriveSyncService;
     private allDepartments: Department[] = [];
+    private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
+    private pendingExpansions: Array<{courseId: string, term: string}> = [];
 
 
     constructor() {
@@ -120,7 +122,15 @@ export class MainController {
         
         // Connect filter service to course controller
         this.courseController.setFilterService(this.filterService);
-        
+
+        // Register rendering callbacks for term expansion state management
+        this.courseController.setOnBatchCallback(() => {
+            this.restoreTermExpansionState();
+        });
+        this.courseController.setOnRenderCompleteCallback(() => {
+            this.processPendingExpansions();
+        });
+
         // Connect filter service and course data to filter modal
         this.filterModalController.setFilterService(this.filterService);
         
@@ -348,6 +358,18 @@ export class MainController {
 
                 if (!clickedTerm || !courseSections) return;
 
+                // Get courseId from the course-sections container
+                const courseId = courseSections.dataset.courseId;
+                if (!courseId) return;
+
+                // Check if rendering is in progress
+                if (this.courseController.isRendering()) {
+                    // Queue the expansion for later
+                    this.pendingExpansions.push({ courseId, term: clickedTerm });
+                    console.log(`Queued term expansion: ${courseId} -> ${clickedTerm}`);
+                    return;
+                }
+
                 const termBadgesContainer = courseSections.querySelector('.term-badges-container') as HTMLElement;
                 const termSectionsContainers = courseSections.querySelectorAll('.term-sections-container') as NodeListOf<HTMLElement>;
                 const clickedTermContainer = courseSections.querySelector(`.term-sections-container[data-term="${clickedTerm}"]`) as HTMLElement;
@@ -362,6 +384,8 @@ export class MainController {
                 courseSections.style.maxHeight = `${currentHeight}px`;
 
                 if (isExpanded) {
+                    // Update state: term is being collapsed
+                    this.expandedTerms.delete(courseId);
                     // Collapse: animate badges out in reverse row order, then shrink height
                     const childBadges = clickedTermContainer.querySelectorAll('.term-badge, .section-badge') as NodeListOf<HTMLElement>;
 
@@ -422,6 +446,9 @@ export class MainController {
                         }
                     }, totalAnimationTime + 300);
                 } else {
+                    // Update state: term is being expanded
+                    this.expandedTerms.set(courseId, clickedTerm);
+
                     // Expand: fade out term-badges and fade in term-sections
                     if (termBadgesContainer) {
                         termBadgesContainer.style.opacity = '0';
@@ -828,6 +855,127 @@ export class MainController {
 
         // Initial button state update
         this.updateUndoRedoButtons();
+    }
+
+    private restoreTermExpansionState(): void {
+        // Restore expansion state for all courses that have expanded terms
+        this.expandedTerms.forEach((expandedTerm, courseId) => {
+            const courseSections = document.querySelector(`.course-sections[data-course-id="${courseId}"]`) as HTMLElement;
+            if (!courseSections) return;
+
+            const termBadgesContainer = courseSections.querySelector('.term-badges-container') as HTMLElement;
+            const termSectionsContainers = courseSections.querySelectorAll('.term-sections-container') as NodeListOf<HTMLElement>;
+            const expandedTermContainer = courseSections.querySelector(`.term-sections-container[data-term="${expandedTerm}"]`) as HTMLElement;
+
+            if (!expandedTermContainer || !termBadgesContainer) return;
+
+            // Hide term badges container
+            termBadgesContainer.style.display = 'none';
+
+            // Hide all term sections
+            termSectionsContainers.forEach(container => {
+                container.style.display = 'none';
+            });
+
+            // Show the expanded term container
+            expandedTermContainer.style.display = 'flex';
+            expandedTermContainer.style.opacity = '1';
+            expandedTermContainer.style.transform = 'translateX(0)';
+
+            // Set course sections max height
+            courseSections.style.maxHeight = `${expandedTermContainer.scrollHeight}px`;
+        });
+    }
+
+    private processPendingExpansions(): void {
+        // Process all queued term expansions with animations
+        console.log(`Processing ${this.pendingExpansions.length} pending expansions`);
+
+        this.pendingExpansions.forEach(({ courseId, term }) => {
+            const courseSections = document.querySelector(`.course-sections[data-course-id="${courseId}"]`) as HTMLElement;
+            if (!courseSections) {
+                console.warn(`Course sections not found for ${courseId}`);
+                return;
+            }
+
+            // Add to expanded state
+            this.expandedTerms.set(courseId, term);
+
+            const termBadgesContainer = courseSections.querySelector('.term-badges-container') as HTMLElement;
+            const termSectionsContainers = courseSections.querySelectorAll('.term-sections-container') as NodeListOf<HTMLElement>;
+            const clickedTermContainer = courseSections.querySelector(`.term-sections-container[data-term="${term}"]`) as HTMLElement;
+
+            if (!clickedTermContainer || !termBadgesContainer) {
+                console.warn(`Term container not found for ${courseId} term ${term}`);
+                return;
+            }
+
+            // Get current height before changes
+            const currentHeight = courseSections.scrollHeight;
+
+            // Set starting height
+            courseSections.style.maxHeight = `${currentHeight}px`;
+
+            // Animate: fade out term-badges and fade in term-sections
+            termBadgesContainer.style.opacity = '0';
+            termBadgesContainer.style.transform = 'translateX(10px)';
+
+            setTimeout(() => {
+                termBadgesContainer.style.display = 'none';
+
+                termSectionsContainers.forEach(container => {
+                    container.style.display = 'none';
+                });
+
+                if (clickedTermContainer) {
+                    clickedTermContainer.style.display = 'flex';
+                    clickedTermContainer.style.opacity = '0';
+
+                    // Set initial state for all children (term badge and section badges)
+                    const childBadges = clickedTermContainer.querySelectorAll('.term-badge, .section-badge') as NodeListOf<HTMLElement>;
+                    childBadges.forEach((badge) => {
+                        badge.style.opacity = '0';
+                        badge.style.transform = 'translateX(-10px)';
+                        badge.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+                    });
+
+                    requestAnimationFrame(() => {
+                        clickedTermContainer.style.opacity = '1';
+
+                        // Animate height change to expanded state
+                        requestAnimationFrame(() => {
+                            courseSections.style.maxHeight = `${clickedTermContainer.scrollHeight}px`;
+                        });
+
+                        // Group badges by row based on their offsetTop position
+                        const badgesByRow = new Map<number, HTMLElement[]>();
+                        childBadges.forEach((badge) => {
+                            const top = badge.offsetTop;
+                            if (!badgesByRow.has(top)) {
+                                badgesByRow.set(top, []);
+                            }
+                            badgesByRow.get(top)!.push(badge);
+                        });
+
+                        // Animate each row with stagger, all items in same row start together
+                        const rows = Array.from(badgesByRow.values());
+                        rows.forEach((rowBadges, rowIndex) => {
+                            rowBadges.forEach((badge, badgeIndex) => {
+                                setTimeout(() => {
+                                    badge.style.opacity = '1';
+                                    badge.style.transform = 'translateX(0)';
+                                }, rowIndex * 30 + badgeIndex * 15);
+                            });
+                        });
+                    });
+                }
+            }, 200);
+
+            console.log(`Expanding ${courseId} -> ${term} with animation`);
+        });
+
+        // Clear the queue
+        this.pendingExpansions = [];
     }
 
     private refreshCurrentView(): void {
