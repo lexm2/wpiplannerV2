@@ -330,7 +330,7 @@ export class ComponentSelectionWizard {
 
         // Verify RMP data is loaded (should be loaded by MainController during app init)
         if (!rateMyProfessorService.isLoaded()) {
-            logger.warn('[Wizard] ⚠️ WARNING: RMP data is not loaded! RMP filters will not work properly.');
+            logger.warn('[Wizard] WARNING: RMP data is not loaded! RMP filters will not work properly.');
             logger.warn('[Wizard] This may indicate a race condition - RMP data should be loaded during app initialization');
         }
 

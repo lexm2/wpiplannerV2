@@ -242,7 +242,7 @@ export class ScheduleController {
         const countElement = document.getElementById('schedule-selected-count');
 
         if (!selectedCoursesContainer) {
-            console.log('❌ Missing DOM element - selectedCoursesContainer not found');
+            console.log('ERROR: Missing DOM element - selectedCoursesContainer not found');
             return;
         }
 
@@ -255,7 +255,7 @@ export class ScheduleController {
         if (this.scheduleFilterService && !this.scheduleFilterService.isEmpty()) {
             filteredSections = this.scheduleFilterService.filterSections(selectedCourses);
             hasActiveFilters = true;
-            console.log(`🔎 Filters active: ${filteredSections.length} sections match filters`);
+            console.log(`FILTER: ${filteredSections.length} sections match active filters`);
         }
         
         if (selectedCourses.length === 0) {
@@ -1490,7 +1490,7 @@ export class ScheduleController {
             await this.applyScheduleAtIndex(0);
             this.updateAutoScheduleButtonUI();
 
-            console.log(`[Auto-Schedule] ✓ Generated ${this.generatedSchedules.length} schedules. Showing 1/${this.generatedSchedules.length}`);
+            console.log(`[Auto-Schedule] SUCCESS: Generated ${this.generatedSchedules.length} schedules. Showing 1/${this.generatedSchedules.length}`);
 
         } catch (error) {
             console.error('[Auto-Schedule] Error generating schedules:', error);
@@ -1543,7 +1543,7 @@ export class ScheduleController {
                 autoFilledCount++;
             }
 
-            console.log(`[Auto-Schedule] ✓ Complete: ${autoFilledCount} auto-filled, ${lockedCount} locked`);
+            console.log(`[Auto-Schedule] COMPLETE: ${autoFilledCount} auto-filled, ${lockedCount} locked`);
 
             this.displayScheduleSelectedCourses();
             this.renderScheduleGrids();

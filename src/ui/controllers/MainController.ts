@@ -247,7 +247,7 @@ export class MainController {
             localStorage.removeItem(key);
         });
 
-        console.log('✅ Cleared legacy localStorage schedule keys');
+        console.log('Cleared legacy localStorage schedule keys');
     }
 
     private async loadCourseData(): Promise<void> {
