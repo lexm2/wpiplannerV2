@@ -30,10 +30,10 @@ import { ThemeManager } from '../../themes/ThemeManager'
 import { DataUpdateService } from '../../services/DataUpdateService'
 import type { DataUpdateAvailableEvent } from '../../types/worker'
 import { getInlineSVG } from '../../utils/iconPaths'
-import { OneDriveSignIn } from '../components/OneDriveSignIn'
+import { GoogleDriveSignIn } from '../components/GoogleDriveSignIn'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
-import { OneDriveSyncService } from '../../services/OneDriveSyncService'
-import type { SyncEvent, ConflictData, CloudStateData } from '../../services/OneDriveSyncTypes'
+import { GoogleDriveSyncService } from '../../services/sync/googledrive/GoogleDriveSyncService'
+import type { SyncEvent, ConflictData, CloudStateData } from '../../services/sync/CloudSyncTypes'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -65,9 +65,9 @@ export class MainController {
     private departmentSyncService: DepartmentSyncService;
     private scheduleManagementService: ScheduleManagementService;
     private dataUpdateService: DataUpdateService;
-    private oneDriveSignIn: OneDriveSignIn;
+    private googleDriveSignIn: GoogleDriveSignIn;
     private conflictModal: ConflictResolutionModal;
-    private oneDriveSyncService: OneDriveSyncService;
+    private googleDriveSyncService: GoogleDriveSyncService;
     private allDepartments: Department[] = [];
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
     private pendingExpansions: Array<{courseId: string, term: string}> = [];
@@ -107,10 +107,10 @@ export class MainController {
         // Initialize data update service
         this.dataUpdateService = new DataUpdateService();
 
-        // Initialize OneDrive sync components
-        this.oneDriveSignIn = new OneDriveSignIn();
+        // Initialize Google Drive sync components
+        this.googleDriveSignIn = new GoogleDriveSignIn();
         this.conflictModal = new ConflictResolutionModal();
-        this.oneDriveSyncService = OneDriveSyncService.getInstance();
+        this.googleDriveSyncService = GoogleDriveSyncService.getInstance();
 
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
@@ -216,8 +216,8 @@ export class MainController {
             
             this.setupEventListeners();
             this.setupSaveIndicatorListener();
-            this.setupOneDriveSyncListeners();
-            this.oneDriveSignIn.render('onedrive-signin-container');
+            this.setupGoogleDriveSyncListeners();
+            this.googleDriveSignIn.render('onedrive-signin-container');
             this.setupCourseSelectionListener();
             this.setupScheduleChangeListener();
             this.scheduleController.setupAutoScheduleButton();
@@ -1160,8 +1160,8 @@ export class MainController {
         });
     }
 
-    private setupOneDriveSyncListeners(): void {
-        this.oneDriveSyncService.addEventListener((event: SyncEvent) => {
+    private setupGoogleDriveSyncListeners(): void {
+        this.googleDriveSyncService.addEventListener((event: SyncEvent) => {
             this.handleSyncEvent(event);
         });
     }
@@ -1218,7 +1218,7 @@ export class MainController {
                 return;
             }
 
-            const result = await this.oneDriveSyncService.resolveConflict(
+            const result = await this.googleDriveSyncService.resolveConflict(
                 resolution,
                 conflictData.local,
                 conflictData.cloud

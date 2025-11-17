@@ -73,7 +73,7 @@
                     <div class="status-indicator-container">
                         <div id="optimistic-ui-status" class="optimistic-status idle">No changes</div>
                     </div>
-                    <!-- <div id="onedrive-signin-container"></div> -->
+                    <div id="onedrive-signin-container"></div>
                     <div class="undo-redo-controls">
                         <button id="undo-btn" class="btn btn-icon" title="Undo (Ctrl+Z)" disabled></button>
                         <button id="redo-btn" class="btn btn-icon" title="Redo (Ctrl+Y)" disabled></button>
@@ -220,6 +220,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Google API Scripts for Cloud Sync -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
 
     <script type="module" src="/src/main.ts"></script>
 </body>

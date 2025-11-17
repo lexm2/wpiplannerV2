@@ -4,9 +4,9 @@ import { TransactionalStorageManager, TransactionResult } from './TransactionalS
 import { getAllSections } from '../utils/courseUtils'
 import { UndoRedoManager } from './UndoRedoManager'
 import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
-import { OneDriveSyncService } from '../services/OneDriveSyncService'
-import { ONEDRIVE_CONFIG } from '../config/onedrive.config'
-import type { CloudStateData } from '../services/OneDriveSyncTypes'
+import { GoogleDriveSyncService } from '../services/sync/googledrive/GoogleDriveSyncService'
+import { GOOGLE_DRIVE_CONFIG } from '../config/googledrive.config'
+import type { CloudStateData } from '../services/sync/CloudSyncTypes'
 import { logger } from '../utils/logger'
 
 export interface StateChangeEvent {
@@ -41,7 +41,7 @@ export class ProfileStateManager {
     private allDepartments: Department[] = [];
     private undoRedoManager: UndoRedoManager;
     private isRestoringState = false;
-    private cloudSyncService: OneDriveSyncService | null = null;
+    private cloudSyncService: GoogleDriveSyncService | null = null;
     private pendingSavePromises = new Set<Promise<void>>();
     private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
 
@@ -55,7 +55,7 @@ export class ProfileStateManager {
 
     private async initializeCloudSync(): Promise<void> {
         try {
-            this.cloudSyncService = OneDriveSyncService.getInstance();
+            this.cloudSyncService = GoogleDriveSyncService.getInstance();
             await this.cloudSyncService.initialize();
         } catch (error) {
             logger.warn('Cloud sync initialization failed:', error);
@@ -555,7 +555,7 @@ export class ProfileStateManager {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
             }
 
-            if (ONEDRIVE_CONFIG.autoSyncEnabled && this.cloudSyncService?.isAuthenticated()) {
+            if (GOOGLE_DRIVE_CONFIG.autoSyncEnabled && this.cloudSyncService?.isAuthenticated()) {
                 this.syncToCloud();
             }
         } catch (error) {
@@ -720,7 +720,7 @@ export class ProfileStateManager {
         }
     }
 
-    getCloudSyncService(): OneDriveSyncService | null {
+    getCloudSyncService(): GoogleDriveSyncService | null {
         return this.cloudSyncService;
     }
 

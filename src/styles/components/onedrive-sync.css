@@ -1,11 +1,13 @@
-/* OneDrive Authentication Component */
-.onedrive-auth-container {
+/* Cloud Sync Authentication Components */
+.onedrive-auth-container,
+.googledrive-auth-container {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
-.onedrive-btn {
+.onedrive-btn,
+.googledrive-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -20,19 +22,43 @@
     transition: all 0.2s ease;
 }
 
-.onedrive-btn:hover {
+.onedrive-btn:hover,
+.googledrive-btn:hover {
     background: var(--bg-hover);
     border-color: var(--primary-color);
 }
 
-.onedrive-btn:active {
+.onedrive-btn:active,
+.googledrive-btn:active {
     transform: scale(0.98);
 }
 
-.onedrive-btn.authenticated {
+.onedrive-btn.authenticated,
+.googledrive-btn.authenticated {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
+}
+
+.googledrive-btn {
+    background: #4285F4;
+    color: white;
+    border-color: #4285F4;
+}
+
+.googledrive-btn:hover {
+    background: #357ae8;
+    border-color: #357ae8;
+}
+
+.googledrive-btn.authenticated {
+    background: #34A853;
+    border-color: #34A853;
+}
+
+.googledrive-btn.authenticated:hover {
+    background: #2d904a;
+    border-color: #2d904a;
 }
 
 .onedrive-btn.authenticated:hover {
@@ -41,18 +67,22 @@
 }
 
 .onedrive-btn:disabled,
-.onedrive-btn.loading {
+.onedrive-btn.loading,
+.googledrive-btn:disabled,
+.googledrive-btn.loading {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
-.onedrive-icon {
+.onedrive-icon,
+.googledrive-icon {
     width: 20px;
     height: 20px;
     flex-shrink: 0;
 }
 
-.onedrive-btn .btn-text {
+.onedrive-btn .btn-text,
+.googledrive-btn .btn-text {
     white-space: nowrap;
 }
 

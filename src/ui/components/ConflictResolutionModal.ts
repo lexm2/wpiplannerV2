@@ -1,4 +1,4 @@
-import type { ConflictData, CloudStateData } from '../../services/OneDriveSyncTypes';
+import type { ConflictData, CloudStateData } from '../../services/sync/CloudSyncTypes';
 
 export type ConflictResolution = 'keep-local' | 'keep-cloud' | 'cancel';
 export type ConflictResolveCallback = (resolution: ConflictResolution) => void;

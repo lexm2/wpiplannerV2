@@ -1,7 +1,7 @@
 import { Client } from '@microsoft/microsoft-graph-client';
 import { OneDriveAuthService } from './OneDriveAuthService';
-import { ONEDRIVE_CONFIG, ONEDRIVE_APP_FOLDER_ENDPOINT } from '../config/onedrive.config';
-import {
+import { ONEDRIVE_CONFIG, ONEDRIVE_APP_FOLDER_ENDPOINT } from '../../../config/onedrive.config';
+import type {
     SyncStatus,
     CloudStateData,
     SyncResult,
@@ -10,10 +10,11 @@ import {
     SyncEventListener,
     SyncQueueItem,
     SyncMetadata,
-    OneDriveFile,
-} from './OneDriveSyncTypes';
+} from '../CloudSyncTypes';
+import type { ICloudSyncService } from '../interfaces/ICloudSyncService';
+import type { ICloudAuthService } from '../interfaces/ICloudAuthService';
 
-export class OneDriveSyncService {
+export class OneDriveSyncService implements ICloudSyncService {
     private static instance: OneDriveSyncService;
     private authService: OneDriveAuthService;
     private graphClient: Client | null = null;
@@ -437,7 +438,7 @@ export class OneDriveSyncService {
         return this.authService.isAuthenticated();
     }
 
-    getAuthService(): OneDriveAuthService {
+    getAuthService(): ICloudAuthService {
         return this.authService;
     }
 }
