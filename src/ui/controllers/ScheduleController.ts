@@ -34,6 +34,7 @@ export class ScheduleController {
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
     private wizardPreviewSelections: WizardSelections | null = null;
+    private isHoverPreview: boolean = false;
     private courseColorMap: Map<string, string> = new Map();
     private usedColors: Set<string> = new Set();
     private generatedSchedules: any[][] = [];
@@ -153,10 +154,7 @@ export class ScheduleController {
             existingSelections,
             (selections) => this.onWizardSelectionChange(freshCourse, selections),
             this.scheduleFilterService || undefined,
-            otherSelectedCourses,
-            this, // Pass ScheduleController as preview handler
-            this.conflictDetector || undefined,
-            this.courseColorMap
+            otherSelectedCourses
         );
 
         this.componentWizard.open();
@@ -1189,71 +1187,6 @@ export class ScheduleController {
 
         // Show modal using the dedicated controller
         this.sectionInfoModalController.show(sectionData);
-    }
-
-    /**
-     * Render preview blocks for a section on the schedule grid (hover preview)
-     */
-    public renderPreviewBlocks(section: Section, courseCode: string, courseColor: string, hasConflict: boolean = false): void {
-        this.clearPreviewBlocks();
-
-        const term = section.computedTerm;
-        if (!term) return;
-
-        const scheduleGrid = document.querySelector(`.schedule-grid[data-term="${term}"]`);
-        if (!scheduleGrid) return;
-
-        // Render preview block for each period
-        for (const period of section.periods) {
-            for (const day of period.days) {
-                const startSlot = TimeUtils.timeToGridRowStart(period.startTime);
-                const endSlot = TimeUtils.timeToGridRowEnd(period.endTime);
-
-                const startMinutes = period.startTime.hours * 60 + period.startTime.minutes;
-                const endMinutes = period.endTime.hours * 60 + period.endTime.minutes;
-                const durationMinutes = endMinutes - startMinutes;
-                const startOffsetMinutes = startMinutes - (TimeUtils.START_HOUR * 60);
-                const slotStartMinutes = startSlot * 60;
-                const topOffsetPercent = ((startOffsetMinutes - slotStartMinutes) / 60) * 100;
-                const heightPercent = (durationMinutes / 60) * 100;
-
-                const dayIndex = this.getDayIndex(day);
-                if (dayIndex === -1) continue;
-
-                const firstCell = scheduleGrid.querySelector(
-                    `.schedule-cell[data-day="${dayIndex}"][data-time-slot="${startSlot}"]`
-                );
-
-                if (firstCell) {
-                    const previewBlock = document.createElement('div');
-                    previewBlock.className = `section-preview ${hasConflict ? 'conflict' : ''}`;
-                    previewBlock.dataset.preview = 'true';
-                    previewBlock.style.cssText = `
-                        border-color: ${courseColor};
-                        height: ${heightPercent}%;
-                        width: 100%;
-                        position: absolute;
-                        top: ${topOffsetPercent}%;
-                        left: 0;
-                    `;
-                    previewBlock.innerHTML = `<span class="section-code">${courseCode}</span>`;
-                    firstCell.appendChild(previewBlock);
-                }
-            }
-        }
-    }
-
-    /**
-     * Clear all preview blocks from the schedule grid
-     */
-    public clearPreviewBlocks(): void {
-        const previewBlocks = document.querySelectorAll('.section-preview');
-        previewBlocks.forEach(block => block.remove());
-    }
-
-    private getDayIndex(day: DayOfWeek): number {
-        const weekdays = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY];
-        return weekdays.indexOf(day);
     }
 
     private setupTermFocusHandlers(): void {

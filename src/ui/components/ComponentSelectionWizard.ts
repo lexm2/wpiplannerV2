@@ -9,7 +9,6 @@ import { rateMyProfessorService } from '../../services/RateMyProfessorService';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
 import { Validators } from '../../utils/validators';
-import { ConflictDetector } from '../../core/ConflictDetector';
 
 type WizardStep = 'lecture' | 'discussion' | 'lab';
 
@@ -17,11 +16,6 @@ interface WizardSelections {
     lecture: Section | null;
     discussion: Section | null;
     lab: Section | null;
-}
-
-export interface SchedulePreviewHandler {
-    renderPreviewBlocks(section: Section, courseCode: string, courseColor: string, hasConflict: boolean): void;
-    clearPreviewBlocks(): void;
 }
 
 export class ComponentSelectionWizard {
@@ -38,9 +32,6 @@ export class ComponentSelectionWizard {
     private wizardPanel: HTMLElement | null = null;
     private filterChangeHandler: (() => void) | null = null;
     private allSelectedCourses: SelectedCourse[] = [];
-    private schedulePreviewHandler: SchedulePreviewHandler | null = null;
-    private conflictDetector: ConflictDetector | null = null;
-    private courseColorMap: Map<string, string> = new Map();
 
     constructor(
         course: Course,
@@ -50,10 +41,7 @@ export class ComponentSelectionWizard {
         existingSelections?: SelectedCourse,
         onSelectionChange?: (selections: WizardSelections) => void,
         scheduleFilterService?: ScheduleFilterService,
-        allSelectedCourses?: SelectedCourse[],
-        schedulePreviewHandler?: SchedulePreviewHandler,
-        conflictDetector?: ConflictDetector,
-        courseColorMap?: Map<string, string>
+        allSelectedCourses?: SelectedCourse[]
     ) {
         this.course = course;
         this.courseDataService = courseDataService;
@@ -62,9 +50,6 @@ export class ComponentSelectionWizard {
         this.onSelectionChange = onSelectionChange;
         this.scheduleFilterService = scheduleFilterService || null;
         this.allSelectedCourses = allSelectedCourses || [];
-        this.schedulePreviewHandler = schedulePreviewHandler || null;
-        this.conflictDetector = conflictDetector || null;
-        this.courseColorMap = courseColorMap || new Map();
 
         logger.log('[Wizard] Constructor called');
         logger.log('[Wizard] Has onSelectionChange callback:', !!this.onSelectionChange);
@@ -1114,73 +1099,45 @@ export class ComponentSelectionWizard {
             });
 
             // Add hover preview for section cards
-            if (this.schedulePreviewHandler) {
-                card.addEventListener('mouseenter', (e) => {
-                    const crn = parseInt((e.currentTarget as HTMLElement).dataset.crn || '0');
-                    const options = this.getOptionsForStep(this.currentStep);
-                    const section = options.find(s => s.crn === crn);
-                    if (section) {
-                        this.showSectionPreview(section);
-                    }
-                });
+            card.addEventListener('mouseenter', (e) => {
+                const crn = parseInt((e.currentTarget as HTMLElement).dataset.crn || '0');
+                const options = this.getOptionsForStep(this.currentStep);
+                const section = options.find(s => s.crn === crn);
+                if (section) {
+                    this.showSectionPreview(section);
+                }
+            });
 
-                card.addEventListener('mouseleave', () => {
-                    this.clearSectionPreview();
-                });
-            }
+            card.addEventListener('mouseleave', () => {
+                this.clearSectionPreview();
+            });
         });
     }
 
     /**
-     * Show preview of a section on the schedule grid
+     * Show preview of a section on the schedule grid by using the existing selection callback
      */
     private showSectionPreview(section: Section): void {
-        if (!this.schedulePreviewHandler || !this.conflictDetector) return;
+        if (!this.onSelectionChange) return;
 
-        const courseCode = `${this.course.department.abbreviation}${this.course.number}`;
-        const courseColor = this.courseColorMap.get(this.course.id) || '#2563eb';
+        // Create temporary selections with the hovered section
+        const tempSelections: WizardSelections = {
+            lecture: this.currentStep === 'lecture' ? section : this.selections.lecture,
+            discussion: this.currentStep === 'discussion' ? section : this.selections.discussion,
+            lab: this.currentStep === 'lab' ? section : this.selections.lab
+        };
 
-        // Check for conflicts with already selected courses
-        const hasConflict = this.checkSectionConflict(section);
-
-        this.schedulePreviewHandler.renderPreviewBlocks(section, courseCode, courseColor, hasConflict);
+        // Trigger the same preview mechanism used for actual selections
+        this.onSelectionChange(tempSelections);
     }
 
     /**
-     * Clear preview from the schedule grid
+     * Clear preview by restoring actual selections
      */
     private clearSectionPreview(): void {
-        if (!this.schedulePreviewHandler) return;
-        this.schedulePreviewHandler.clearPreviewBlocks();
-    }
+        if (!this.onSelectionChange) return;
 
-    /**
-     * Check if a section conflicts with already selected courses
-     */
-    private checkSectionConflict(section: Section): boolean {
-        if (!this.conflictDetector || this.allSelectedCourses.length === 0) {
-            return false;
-        }
-
-        // Get all sections from already selected courses
-        const allSelectedSections: Section[] = [];
-        for (const selectedCourse of this.allSelectedCourses) {
-            if (selectedCourse.selectedLecture) {
-                allSelectedSections.push(selectedCourse.selectedLecture);
-            }
-            if (selectedCourse.selectedDiscussion) {
-                allSelectedSections.push(selectedCourse.selectedDiscussion);
-            }
-            if (selectedCourse.selectedLab) {
-                allSelectedSections.push(selectedCourse.selectedLab);
-            }
-        }
-
-        // Check for conflicts between this section and all selected sections
-        const sectionsToCheck = [...allSelectedSections, section];
-        const conflicts = this.conflictDetector.detectConflicts(sectionsToCheck);
-
-        // If there are any conflicts, this section conflicts
-        return conflicts.length > 0;
+        // Restore the actual selections (not the hover preview)
+        this.onSelectionChange(this.selections);
     }
 }
