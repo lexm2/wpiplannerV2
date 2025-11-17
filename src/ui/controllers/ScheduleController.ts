@@ -34,7 +34,7 @@ export class ScheduleController {
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
     private wizardPreviewSelections: WizardSelections | null = null;
-    private hoverPreviewCourseId: string | null = null;
+    private hoverPreviewSections: Set<number> = new Set(); // Track CRNs of sections being previewed
     private courseColorMap: Map<string, string> = new Map();
     private usedColors: Set<string> = new Set();
     private generatedSchedules: any[][] = [];
@@ -232,7 +232,7 @@ export class ScheduleController {
         // Store preview data
         this.wizardPreviewCourse = course;
         this.wizardPreviewSelections = selections;
-        this.hoverPreviewCourseId = null; // Clear hover preview flag
+        this.hoverPreviewSections.clear(); // Clear hover preview sections
 
         // Re-render calendar with preview
         console.log('[Preview] Calling renderScheduleGrids()');
@@ -246,7 +246,25 @@ export class ScheduleController {
         // Store preview data
         this.wizardPreviewCourse = course;
         this.wizardPreviewSelections = selections;
-        this.hoverPreviewCourseId = course.id; // Mark this course as hover preview
+
+        // Track which specific sections are hover previews (by CRN)
+        // Only mark sections as preview if they're different from existing selections
+        this.hoverPreviewSections.clear();
+
+        // Get existing selected course to compare
+        const existingCourse = this.courseSelectionService.getSelectedCourses()
+            .find(sc => sc.course.id === course.id);
+
+        // Only mark as preview if this section is NEW (different from existing)
+        if (selections.lecture && selections.lecture.crn !== existingCourse?.selectedLecture?.crn) {
+            this.hoverPreviewSections.add(selections.lecture.crn);
+        }
+        if (selections.discussion && selections.discussion.crn !== existingCourse?.selectedDiscussion?.crn) {
+            this.hoverPreviewSections.add(selections.discussion.crn);
+        }
+        if (selections.lab && selections.lab.crn !== existingCourse?.selectedLab?.crn) {
+            this.hoverPreviewSections.add(selections.lab.crn);
+        }
 
         // Re-render calendar with hover preview
         this.renderScheduleGrids();
@@ -1012,8 +1030,8 @@ export class ScheduleController {
 
 
         // Build content for the first section in the slot
-        // Check if this specific course is the hover preview (not all courses)
-        const isPreview = this.hoverPreviewCourseId === primarySection.course.course.id;
+        // Check if this specific section (by CRN) is the hover preview
+        const isPreview = this.hoverPreviewSections.has(primarySection.section.crn);
         const blockClass = isPreview ? 'section-preview' : 'section-block';
 
         const content = primarySection.isFirstSlot ? `

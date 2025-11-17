@@ -1123,14 +1123,15 @@ export class ComponentSelectionWizard {
     private showSectionPreview(section: Section): void {
         if (!this.onHoverPreview) return;
 
-        // Create temporary selections with the hovered section
+        // Create temporary selections including existing selections AND the hovered section
+        // This ensures all components are visible, but only the new hover is marked as preview
         const tempSelections: WizardSelections = {
             lecture: this.currentStep === 'lecture' ? section : this.selections.lecture,
             discussion: this.currentStep === 'discussion' ? section : this.selections.discussion,
             lab: this.currentStep === 'lab' ? section : this.selections.lab
         };
 
-        // Trigger hover preview (renders with dashed borders)
+        // Trigger hover preview (renders with dashed borders for only the new section)
         this.onHoverPreview(tempSelections);
     }
 
