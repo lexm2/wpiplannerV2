@@ -352,7 +352,7 @@ export class CourseDataService {
             return [];
         }
 
-        console.log(`[CourseDataService] ✓ Found lecture group "${lectureGroup.section.number}", has ${lectureGroup.compatibleDiscussions.length} discussions`);
+        console.log(`[CourseDataService] Found lecture group "${lectureGroup.section.number}", has ${lectureGroup.compatibleDiscussions.length} discussions`);
         return lectureGroup.compatibleDiscussions || [];
     }
 
@@ -384,7 +384,7 @@ export class CourseDataService {
             return [];
         }
 
-        console.log(`[CourseDataService] ✓ Found lecture group "${lectureGroup.section.number}", has ${lectureGroup.compatibleLabs.length} labs`);
+        console.log(`[CourseDataService] Found lecture group "${lectureGroup.section.number}", has ${lectureGroup.compatibleLabs.length} labs`);
         return lectureGroup.compatibleLabs || [];
     }
 

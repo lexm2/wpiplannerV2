@@ -27,6 +27,7 @@ export class ComponentSelectionWizard {
     private onComplete: (selections: WizardSelections) => void;
     private onCancel: () => void;
     private onSelectionChange?: (selections: WizardSelections) => void;
+    private onHoverPreview?: (selections: WizardSelections) => void;
     private container: HTMLElement | null = null;
     private availableSteps: WizardStep[] = [];
     private wizardPanel: HTMLElement | null = null;
@@ -41,31 +42,18 @@ export class ComponentSelectionWizard {
         existingSelections?: SelectedCourse,
         onSelectionChange?: (selections: WizardSelections) => void,
         scheduleFilterService?: ScheduleFilterService,
-        allSelectedCourses?: SelectedCourse[]
+        allSelectedCourses?: SelectedCourse[],
+        onHoverPreview?: (selections: WizardSelections) => void
     ) {
         this.course = course;
         this.courseDataService = courseDataService;
         this.onComplete = onComplete;
         this.onCancel = onCancel;
         this.onSelectionChange = onSelectionChange;
+        this.onHoverPreview = onHoverPreview;
         this.scheduleFilterService = scheduleFilterService || null;
         this.allSelectedCourses = allSelectedCourses || [];
 
-        logger.log('[Wizard] Constructor called');
-        logger.log('[Wizard] Has onSelectionChange callback:', !!this.onSelectionChange);
-        logger.log('[Wizard] Has scheduleFilterService:', !!this.scheduleFilterService);
-        logger.log('[Wizard] Course:', course.department.abbreviation + course.number);
-        logger.log('[Wizard] All selected courses count:', this.allSelectedCourses.length);
-        if (this.allSelectedCourses.length > 0) {
-            logger.log('[Wizard] Selected courses for conflict context:');
-            this.allSelectedCourses.forEach(sc => {
-                logger.log(`  - ${sc.course.department.abbreviation}${sc.course.number}:`, {
-                    lecture: sc.selectedLecture?.number,
-                    discussion: sc.selectedDiscussion?.number,
-                    lab: sc.selectedLab?.number
-                });
-            });
-        }
 
         // Initialize selections from existing if editing
         this.selections = {
@@ -129,7 +117,6 @@ export class ComponentSelectionWizard {
             }
         }
 
-        logger.log(`[Wizard] Available steps with valid options: ${steps.join(', ')}`);
         return steps;
     }
 
@@ -165,14 +152,6 @@ export class ComponentSelectionWizard {
      * Get available sections for a specific step
      */
     getOptionsForStep(step: WizardStep): Section[] {
-        logger.log(`[Wizard] getOptionsForStep(${step})`);
-        logger.log(`[Wizard] Current selections:`, {
-            lecture: this.selections.lecture?.number || null,
-            discussion: this.selections.discussion?.number || null,
-            lab: this.selections.lab?.number || null
-        });
-        logger.log(`[Wizard] Course has ${this.course.lectures?.length || 0} lecture groups`);
-
         let sections: Section[] = [];
 
         if (step === 'lecture') {
@@ -180,35 +159,26 @@ export class ComponentSelectionWizard {
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
                 const labs = this.courseDataService.getStandaloneLabs(this.course);
                 const validLabs = labs.filter(lab => this.hasValidTimeSlot(lab));
-                logger.log(`[Wizard] Lab-only course: ${labs.length} total, ${validLabs.length} with valid time slots`);
                 sections = validLabs;
             } else {
                 // Regular hierarchical course
                 const lectureGroups = this.courseDataService.getLecturesForCourse(this.course);
-                logger.log(`[Wizard] Found ${lectureGroups.length} lecture groups`);
 
                 // Filter out placeholder sections (those with start_time === end_time like 12:00-12:00)
                 const validLectures = lectureGroups.filter(lg => this.hasValidTimeSlot(lg.section));
-                logger.log(`[Wizard] After filtering placeholders: ${validLectures.length} lectures with valid time slots`);
 
                 sections = validLectures.map(lg => lg.section);
-
-                logger.log(`[Wizard] Before filters: ${sections.length} lecture sections`);
             }
         } else if (step === 'discussion') {
             if (!this.selections.lecture) {
                 // No lecture selected - show ALL discussions from all lecture groups
-                logger.log(`[Wizard] No lecture selected, showing all discussions from all lecture groups`);
                 sections = this.getAllDiscussionsForCourse();
-                logger.log(`[Wizard] Found ${sections.length} total discussions across all lecture groups`);
             } else {
                 // Lecture selected - show only compatible discussions
-                logger.log(`[Wizard] Getting discussions for lecture ${this.selections.lecture.number} (CRN: ${this.selections.lecture.crn})`);
                 const discussions = this.courseDataService.getDiscussionsForLecture(this.course, this.selections.lecture);
 
                 // Filter out placeholder discussions
                 const validDiscussions = discussions.filter(d => this.hasValidTimeSlot(d));
-                logger.log(`[Wizard] Before filters: ${discussions.length} discussions, ${validDiscussions.length} with valid time slots`);
                 sections = validDiscussions;
             }
         } else if (step === 'lab') {
@@ -216,23 +186,18 @@ export class ComponentSelectionWizard {
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
                 const labs = this.courseDataService.getStandaloneLabs(this.course);
                 const validLabs = labs.filter(lab => this.hasValidTimeSlot(lab));
-                logger.log(`[Wizard] Lab-only course: ${labs.length} total, ${validLabs.length} with valid time slots`);
                 sections = validLabs;
             } else {
                 // Regular course
                 if (!this.selections.lecture) {
                     // No lecture selected - show ALL labs from all lecture groups
-                    logger.log(`[Wizard] No lecture selected, showing all labs from all lecture groups`);
                     sections = this.getAllLabsForCourse();
-                    logger.log(`[Wizard] Found ${sections.length} total labs across all lecture groups`);
                 } else {
                     // Lecture selected - show only compatible labs
-                    logger.log(`[Wizard] Getting labs for lecture ${this.selections.lecture.number} (CRN: ${this.selections.lecture.crn})`);
                     const labs = this.courseDataService.getLabsForLecture(this.course, this.selections.lecture);
 
                     // Filter out placeholder labs
                     const validLabs = labs.filter(l => this.hasValidTimeSlot(l));
-                    logger.log(`[Wizard] Before filters: ${labs.length} labs, ${validLabs.length} with valid time slots`);
                     sections = validLabs;
                 }
             }
@@ -243,14 +208,12 @@ export class ComponentSelectionWizard {
         // NEVER filter lectures - users must be able to select any term freely
         if (step !== 'lecture' && this.selections.lecture && sections.length > 0) {
             const lectureTerm = this.selections.lecture.computedTerm;
-            logger.log(`[Wizard] Filtering ${step} by lecture's term: ${lectureTerm}`);
             sections = this.filterSectionsByTerm(sections, lectureTerm);
         }
 
         // Apply schedule filters if available
         if (this.scheduleFilterService && sections.length > 0) {
             const filteredSections = this.applyScheduleFilters(sections, step);
-            logger.log(`[Wizard] After filters: ${filteredSections.length} sections`);
             return filteredSections;
         }
 
@@ -264,9 +227,7 @@ export class ComponentSelectionWizard {
      * @returns Filtered sections matching the term
      */
     private filterSectionsByTerm(sections: Section[], term: string): Section[] {
-        logger.log(`[Wizard] Filtering ${sections.length} sections by term: ${term}`);
         const filtered = sections.filter(section => section.computedTerm === term);
-        logger.log(`[Wizard] After term filtering: ${filtered.length} sections remain`);
         return filtered;
     }
 
@@ -277,24 +238,12 @@ export class ComponentSelectionWizard {
         if (!this.scheduleFilterService) return sections;
 
         const activeFilters = this.scheduleFilterService.getActiveFilters();
-        logger.log(`[Wizard Filter] Filtering ${sections.length} ${step} sections`);
-        logger.log(`[Wizard Filter] Active filters (${activeFilters.length}):`, activeFilters);
 
         // Check for RMP filter specifically
         const rmpFilter = activeFilters.find(f => f.id === 'periodRmpRating');
-        if (rmpFilter) {
-            logger.log(`[Wizard Filter] ✓ RMP filter is ACTIVE with criteria:`, rmpFilter.criteria);
-            logger.log(`[Wizard Filter] RMP service loaded:`, rateMyProfessorService.isLoaded());
-        } else {
-            logger.log(`[Wizard Filter] ℹ RMP filter is NOT active`);
-        }
 
         // Check for conflict filter specifically
         const conflictFilter = activeFilters.find(f => f.id === 'periodConflict');
-        if (conflictFilter) {
-            logger.log(`[Wizard Filter] ✓ Conflict filter is ACTIVE`);
-            logger.log(`[Wizard Filter] All selected courses for context:`, this.allSelectedCourses.length);
-        }
 
         // Filter sections individually through the schedule filter service
         const filteredSections = sections.filter(section => {
@@ -316,17 +265,9 @@ export class ComponentSelectionWizard {
                 lockedSections: new Set()
             };
 
-            logger.log(`[Wizard Filter] Testing section ${section.number} (CRN: ${section.crn}, Term: ${section.computedTerm})`);
-            logger.log(`[Wizard Filter] Temp course structure:`, {
-                lecture: tempSelectedCourse.selectedLecture?.number,
-                discussion: tempSelectedCourse.selectedDiscussion?.number,
-                lab: tempSelectedCourse.selectedLab?.number
-            });
-
             // Combine the temp selected course with all other selected courses for context
             // This allows conflict detection to check against OTHER courses
             const allCoursesForFiltering = [tempSelectedCourse, ...this.allSelectedCourses];
-            logger.log(`[Wizard Filter] Passing ${allCoursesForFiltering.length} courses to filterSections (1 temp + ${this.allSelectedCourses.length} others)`);
 
             // Test if this section passes the filters
             const filtered = this.scheduleFilterService?.filterSections(allCoursesForFiltering);
@@ -335,15 +276,9 @@ export class ComponentSelectionWizard {
                 item.course.course.id === this.course.id
             ) : true;
 
-            logger.log(`[Wizard Filter] Section ${section.number} ${passes ? 'PASSES' : 'FAILS'} filters (filtered: ${filtered?.length ?? 0})`);
-            if (!passes && conflictFilter) {
-                logger.log(`[Wizard Filter] Section ${section.number} was FILTERED OUT by conflict detection`);
-            }
-
             return passes;
         });
 
-        logger.log(`[Wizard Filter] Result: ${filteredSections.length}/${sections.length} sections passed filters`);
         return filteredSections;
     }
 
@@ -395,10 +330,8 @@ export class ComponentSelectionWizard {
 
         // Verify RMP data is loaded (should be loaded by MainController during app init)
         if (!rateMyProfessorService.isLoaded()) {
-            logger.warn('[Wizard] ⚠️ WARNING: RMP data is not loaded! RMP filters will not work properly.');
+            logger.warn('[Wizard] WARNING: RMP data is not loaded! RMP filters will not work properly.');
             logger.warn('[Wizard] This may indicate a race condition - RMP data should be loaded during app initialization');
-        } else {
-            logger.log('[Wizard] ✓ RMP data is loaded and ready');
         }
 
         this.container = sidebarContainer;
@@ -490,7 +423,6 @@ export class ComponentSelectionWizard {
      * Handle filter changes - refresh current step
      */
     private onFilterChange(): void {
-        logger.log('[Wizard] Filter changed, refreshing current step');
         if (!this.wizardPanel) return;
 
         // Re-render the current step with filtered sections
@@ -513,13 +445,11 @@ export class ComponentSelectionWizard {
     selectSection(section: Section): void {
         // Get previous selection to check if we need to clear dependent selections
         const previousSelection = this.selections[this.currentStep];
-        logger.log(`[Wizard] selectSection() - step: ${this.currentStep}, section: ${section.number}, previousSelection: ${previousSelection?.number || 'none'}`);
 
         // Store selection
         if (this.currentStep === 'lecture') {
             // Clear dependent selections if changing to a different lecture
             if (previousSelection && previousSelection.crn !== section.crn) {
-                logger.log(`[Wizard] Clearing dependent selections (discussion/lab) due to lecture change`);
                 this.selections.discussion = null;
                 this.selections.lab = null;
             }
@@ -606,9 +536,7 @@ export class ComponentSelectionWizard {
         }
 
         // Trigger live preview callback
-        logger.log('[Wizard] About to call onSelectionChange, exists:', !!this.onSelectionChange);
         if (this.onSelectionChange) {
-            logger.log('[Wizard] Calling onSelectionChange with selections:', this.selections);
             this.onSelectionChange(this.selections);
         } else {
             logger.warn('[Wizard] onSelectionChange is undefined! Cannot trigger preview.');
@@ -620,17 +548,14 @@ export class ComponentSelectionWizard {
      */
     nextStep(): void {
         const currentIndex = this.availableSteps.indexOf(this.currentStep);
-        logger.log(`[Wizard] nextStep() called - current: ${this.currentStep}, index: ${currentIndex}`);
 
         if (currentIndex < this.availableSteps.length - 1) {
             // Move to next step
             const nextStep = this.availableSteps[currentIndex + 1];
-            logger.log(`[Wizard] Moving forward to: ${nextStep}`);
             this.currentStep = nextStep;  // Update state BEFORE rendering
             this.transitionToStep(nextStep, 'forward');
         } else {
             // Completed all steps
-            logger.log(`[Wizard] Completing wizard`);
             this.complete();
         }
     }
@@ -640,15 +565,11 @@ export class ComponentSelectionWizard {
      */
     prevStep(): void {
         const currentIndex = this.availableSteps.indexOf(this.currentStep);
-        logger.log(`[Wizard] prevStep() called - current: ${this.currentStep}, index: ${currentIndex}`);
 
         if (currentIndex > 0) {
             const prevStep = this.availableSteps[currentIndex - 1];
-            logger.log(`[Wizard] Moving backward to: ${prevStep}`);
             this.currentStep = prevStep;  // Update state BEFORE rendering
             this.transitionToStep(prevStep, 'backward');
-        } else {
-            logger.log(`[Wizard] Already at first step, cannot go back`);
         }
     }
 
@@ -951,9 +872,7 @@ export class ComponentSelectionWizard {
             : `Full (${section.actualWaitlist}/${section.maxWaitlist} waitlist)`;
 
         // Get Rate My Professor data for this professor
-        logger.log('[Wizard] Rendering card - Professor:', professor, '| RMP loaded:', rateMyProfessorService.isLoaded());
         const rmpData = professor !== 'Not Assigned' ? rateMyProfessorService.getRatingDisplay(professor) : null;
-        logger.log('[Wizard] RMP data result:', rmpData ? `Rating: ${rmpData.rating}` : 'null');
         const rmpUrl = professor !== 'Not Assigned' ? rateMyProfessorService.getProfessorRMPUrl(professor) : null;
 
         const escapedProfessor = Validators.escapeHtml(professor);
@@ -1097,6 +1016,48 @@ export class ComponentSelectionWizard {
                     this.selectSection(section);
                 }
             });
+
+            // Add hover preview for section cards
+            card.addEventListener('mouseenter', (e) => {
+                const crn = parseInt((e.currentTarget as HTMLElement).dataset.crn || '0');
+                const options = this.getOptionsForStep(this.currentStep);
+                const section = options.find(s => s.crn === crn);
+                if (section) {
+                    this.showSectionPreview(section);
+                }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                this.clearSectionPreview();
+            });
         });
+    }
+
+    /**
+     * Show preview of a section on the schedule grid (hover with dashed borders)
+     */
+    private showSectionPreview(section: Section): void {
+        if (!this.onHoverPreview) return;
+
+        // Create temporary selections including existing selections AND the hovered section
+        // This ensures all components are visible, but only the new hover is marked as preview
+        const tempSelections: WizardSelections = {
+            lecture: this.currentStep === 'lecture' ? section : this.selections.lecture,
+            discussion: this.currentStep === 'discussion' ? section : this.selections.discussion,
+            lab: this.currentStep === 'lab' ? section : this.selections.lab
+        };
+
+        // Trigger hover preview (renders with dashed borders for only the new section)
+        this.onHoverPreview(tempSelections);
+    }
+
+    /**
+     * Clear preview by restoring actual selections
+     */
+    private clearSectionPreview(): void {
+        if (!this.onSelectionChange) return;
+
+        // Restore the actual selections (clears hover preview)
+        this.onSelectionChange(this.selections);
     }
 }

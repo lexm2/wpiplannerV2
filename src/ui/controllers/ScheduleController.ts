@@ -34,6 +34,7 @@ export class ScheduleController {
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
     private wizardPreviewSelections: WizardSelections | null = null;
+    private hoverPreviewSections: Set<number> = new Set(); // Track CRNs of sections being previewed
     private courseColorMap: Map<string, string> = new Map();
     private usedColors: Set<string> = new Set();
     private generatedSchedules: any[][] = [];
@@ -127,22 +128,10 @@ export class ScheduleController {
 
         // Get all currently selected courses for conflict detection context
         const allSelectedCourses = this.courseSelectionService.getSelectedCourses();
-        console.log('[ScheduleController] All selected courses:', allSelectedCourses.length);
-        allSelectedCourses.forEach(sc => {
-            console.log(`  - ${sc.course.department.abbreviation}${sc.course.number}:`, {
-                lecture: sc.selectedLecture?.number,
-                discussion: sc.selectedDiscussion?.number,
-                lab: sc.selectedLab?.number,
-                lecturePeriods: sc.selectedLecture?.periods.length,
-                discussionPeriods: sc.selectedDiscussion?.periods.length,
-                labPeriods: sc.selectedLab?.periods.length
-            });
-        });
 
         // Filter out the current course being edited from the context
         // This prevents the wizard from checking conflicts against itself
         const otherSelectedCourses = allSelectedCourses.filter(sc => sc.course.id !== freshCourse.id);
-        console.log('[ScheduleController] Other selected courses for conflict checking:', otherSelectedCourses.length);
 
         // Create new wizard with fresh course data
         this.componentWizard = new ComponentSelectionWizard(
@@ -153,7 +142,8 @@ export class ScheduleController {
             existingSelections,
             (selections) => this.onWizardSelectionChange(freshCourse, selections),
             this.scheduleFilterService || undefined,
-            otherSelectedCourses
+            otherSelectedCourses,
+            (selections) => this.onWizardHoverPreview(freshCourse, selections)
         );
 
         this.componentWizard.open();
@@ -209,30 +199,40 @@ export class ScheduleController {
      * Handle wizard selection changes - update calendar preview
      */
     private onWizardSelectionChange(course: Course, selections: WizardSelections): void {
-        console.log('[Preview] onWizardSelectionChange called');
-        console.log('[Preview] Course:', course.department.abbreviation + course.number);
-        console.log('[Preview] Selections:', {
-            lecture: selections.lecture?.number || null,
-            discussion: selections.discussion?.number || null,
-            lab: selections.lab?.number || null
-        });
+        this.wizardPreviewCourse = course;
+        this.wizardPreviewSelections = selections;
+        this.hoverPreviewSections.clear();
+        this.renderScheduleGrids();
+    }
 
-        // Debug: Check if lecture has periods with days
-        if (selections.lecture) {
-            console.log('[Preview] Lecture section:', selections.lecture.number);
-            console.log('[Preview] Lecture periods:', selections.lecture.periods?.length);
-            if (selections.lecture.periods && selections.lecture.periods.length > 0) {
-                const firstPeriod = selections.lecture.periods[0];
-                console.log('[Preview] First period days:', Array.from(firstPeriod.days || []));
-            }
-        }
-
+    /**
+     * Handle hover preview changes from the wizard (shows dashed preview)
+     */
+    onWizardHoverPreview(course: Course, selections: WizardSelections): void {
         // Store preview data
         this.wizardPreviewCourse = course;
         this.wizardPreviewSelections = selections;
 
-        // Re-render calendar with preview
-        console.log('[Preview] Calling renderScheduleGrids()');
+        // Track which specific sections are hover previews (by CRN)
+        // Only mark sections as preview if they're different from existing selections
+        this.hoverPreviewSections.clear();
+
+        // Get existing selected course to compare
+        const existingCourse = this.courseSelectionService.getSelectedCourses()
+            .find(sc => sc.course.id === course.id);
+
+        // Only mark as preview if this section is NEW (different from existing)
+        if (selections.lecture && selections.lecture.crn !== existingCourse?.selectedLecture?.crn) {
+            this.hoverPreviewSections.add(selections.lecture.crn);
+        }
+        if (selections.discussion && selections.discussion.crn !== existingCourse?.selectedDiscussion?.crn) {
+            this.hoverPreviewSections.add(selections.discussion.crn);
+        }
+        if (selections.lab && selections.lab.crn !== existingCourse?.selectedLab?.crn) {
+            this.hoverPreviewSections.add(selections.lab.crn);
+        }
+
+        // Re-render calendar with hover preview
         this.renderScheduleGrids();
     }
 
@@ -242,7 +242,7 @@ export class ScheduleController {
         const countElement = document.getElementById('schedule-selected-count');
 
         if (!selectedCoursesContainer) {
-            console.log('❌ Missing DOM element - selectedCoursesContainer not found');
+            console.log('ERROR: Missing DOM element - selectedCoursesContainer not found');
             return;
         }
 
@@ -255,7 +255,7 @@ export class ScheduleController {
         if (this.scheduleFilterService && !this.scheduleFilterService.isEmpty()) {
             filteredSections = this.scheduleFilterService.filterSections(selectedCourses);
             hasActiveFilters = true;
-            console.log(`🔎 Filters active: ${filteredSections.length} sections match filters`);
+            console.log(`FILTER: ${filteredSections.length} sections match active filters`);
         }
         
         if (selectedCourses.length === 0) {
@@ -727,29 +727,17 @@ export class ScheduleController {
      * Apply wizard preview overlay to selected courses
      */
     private applyPreviewOverlay(courses: SelectedCourse[]): SelectedCourse[] {
-        console.log('[Preview] applyPreviewOverlay called');
-        console.log('[Preview] wizardPreviewCourse:', this.wizardPreviewCourse?.id || 'null');
-        console.log('[Preview] wizardPreviewSelections:', this.wizardPreviewSelections);
-
         if (!this.wizardPreviewCourse || !this.wizardPreviewSelections) {
-            console.log('[Preview] No preview data, returning original courses');
             return courses;
         }
 
-        // Create a copy of courses array to avoid mutating original
         const previewCourses = courses.map(sc => ({...sc}));
 
-        // Find the course being previewed
         const previewIndex = previewCourses.findIndex(
             sc => sc.course.id === this.wizardPreviewCourse!.id
         );
 
-        console.log('[Preview] Preview index:', previewIndex);
-        console.log('[Preview] Total courses:', previewCourses.length);
-
         if (previewIndex >= 0) {
-            console.log('[Preview] Updating existing course at index', previewIndex);
-            // Update existing course with preview selections
             previewCourses[previewIndex] = {
                 ...previewCourses[previewIndex],
                 selectedLecture: this.wizardPreviewSelections.lecture,
@@ -757,8 +745,6 @@ export class ScheduleController {
                 selectedLab: this.wizardPreviewSelections.lab
             };
         } else {
-            console.log('[Preview] Adding new preview course');
-            // Course not yet selected - add temporary preview entry
             previewCourses.push({
                 course: this.wizardPreviewCourse,
                 selectedLecture: this.wizardPreviewSelections.lecture,
@@ -771,22 +757,14 @@ export class ScheduleController {
             });
         }
 
-        console.log('[Preview] Returning', previewCourses.length, 'courses');
         return previewCourses;
     }
 
     renderScheduleGrids(): void {
-        console.log('[Preview] renderScheduleGrids() called');
         let rawSelectedCourses = this.courseSelectionService.getSelectedCourses();
-        console.log('[Preview] Raw selected courses:', rawSelectedCourses.length);
 
-        // Apply preview overlay if wizard is open
         if (this.wizardPreviewCourse && this.wizardPreviewSelections) {
-            console.log('[Preview] Applying preview overlay');
             rawSelectedCourses = this.applyPreviewOverlay(rawSelectedCourses);
-            console.log('[Preview] After overlay:', rawSelectedCourses.length, 'courses');
-        } else {
-            console.log('[Preview] No preview to apply');
         }
 
         // Sync section objects with section numbers before validation
@@ -980,58 +958,134 @@ export class ScheduleController {
         if (occupyingSections.length === 0) {
             return { content: '', classes: '' };
         }
-        
-        // Check for conflicts
-        const hasConflict = occupyingSections.length > 1;
-        const primarySection = occupyingSections[0];
-        const courseColor = this.getCourseColor(primarySection.course.course.id);
 
-        // Calculate precise height based on actual duration in minutes
-        // Each hourly slot represents 60 minutes
-        const durationMinutes = primarySection.endMinutes - primarySection.startMinutes;
-        const startOffsetMinutes = primarySection.startMinutes - (TimeUtils.START_HOUR * 60);
-        const slotStartMinutes = timeSlot * 60; // Minutes from START_HOUR for this slot
-        const topOffsetPercent = ((startOffsetMinutes - slotStartMinutes) / 60) * 100;
-        const heightPercent = (durationMinutes / 60) * 100;
+        // Check for conflicts using ConflictDetector for accurate minute-level detection
+        let hasConflict = false;
+        let allConflictingSections: Section[] = [];
 
+        if (occupyingSections.length > 1) {
+            if (this.conflictDetector) {
+                const sections = occupyingSections.map(os => os.section);
 
-        // Build content for the first section in the slot - simplified to show only course name
-        const content = primarySection.isFirstSlot ? `
-            <div class="section-block ${hasConflict ? 'conflict' : ''}"
-                 data-course-id="${primarySection.course.course.id}"
-                 data-section-number="${primarySection.section.number}"
-                 data-selected-course-index="${primarySection.courseIndex || 0}"
-                 style="
-                background-color: ${courseColor};
-                height: ${heightPercent}%;
-                width: 100%;
-                position: absolute;
-                top: ${topOffsetPercent}%;
-                left: 0;
-                z-index: 10;
-                border: 1px solid rgba(0,0,0,0.2);
-                border-radius: 3px;
-                box-sizing: border-box;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                font-weight: bold;
-                font-size: 0.8rem;
-                color: white;
-                text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
-                cursor: pointer;
-            ">
-                ${primarySection.course.course.department.abbreviation}${primarySection.course.course.number}
-            </div>
-        ` : ``; // Empty for continuation slots - the spanning block covers them
-        
-        // Only add classes for the first slot (where content actually appears)
-        const classes = primarySection.isFirstSlot ? 
+                for (let i = 0; i < sections.length; i++) {
+                    for (let j = i + 1; j < sections.length; j++) {
+                        const conflicts = this.conflictDetector.detectConflicts([sections[i], sections[j]]);
+
+                        if (conflicts.length > 0) {
+                            hasConflict = true;
+                            if (!allConflictingSections.includes(sections[i])) {
+                                allConflictingSections.push(sections[i]);
+                            }
+                            if (!allConflictingSections.includes(sections[j])) {
+                                allConflictingSections.push(sections[j]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Build content for ALL occupying sections
+        let contentBlocks = '';
+
+        for (const occupyingSection of occupyingSections) {
+            if (!occupyingSection.isFirstSlot) {
+                continue; // Skip continuation slots
+            }
+
+            const courseColor = this.getCourseColor(occupyingSection.course.course.id);
+            const isPreview = this.hoverPreviewSections.has(occupyingSection.section.crn);
+            const blockClass = isPreview ? 'section-preview' : 'section-block';
+
+            const durationMinutes = occupyingSection.endMinutes - occupyingSection.startMinutes;
+            const startOffsetMinutes = occupyingSection.startMinutes - (TimeUtils.START_HOUR * 60);
+            const slotStartMinutes = timeSlot * 60;
+            const topOffsetPercent = ((startOffsetMinutes - slotStartMinutes) / 60) * 100;
+            const heightPercent = (durationMinutes / 60) * 100;
+
+            contentBlocks += `
+                <div class="${blockClass}"
+                     data-course-id="${occupyingSection.course.course.id}"
+                     data-section-number="${occupyingSection.section.number}"
+                     data-section-crn="${occupyingSection.section.crn}"
+                     data-selected-course-index="${occupyingSection.courseIndex || 0}"
+                     style="
+                    ${isPreview ? `border-color: ${courseColor};` : `background-color: ${courseColor};`}
+                    height: ${heightPercent}%;
+                    width: 100%;
+                    position: absolute;
+                    top: ${topOffsetPercent}%;
+                    left: 0;
+                    z-index: ${isPreview ? '15' : '10'};
+                    ${!isPreview ? `border: 1px solid rgba(0,0,0,0.2);` : ''}
+                    border-radius: 3px;
+                    box-sizing: border-box;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 0.8rem;
+                    ${isPreview ? `color: var(--color-text-primary);` : `color: white; text-shadow: 1px 1px 1px rgba(0,0,0,0.3);`}
+                    cursor: pointer;
+                ">
+                    ${occupyingSection.course.course.department.abbreviation}${occupyingSection.course.course.number}
+                </div>
+            `;
+        }
+
+        // Add conflict overlay if conflicts exist and this is the first slot
+        if (hasConflict && occupyingSections.some(os => os.isFirstSlot)) {
+            // Calculate overlapping time range
+            let overlapStartMinutes = Math.max(...occupyingSections.map(os => os.startMinutes));
+            let overlapEndMinutes = Math.min(...occupyingSections.map(os => os.endMinutes));
+
+            const overlapDurationMinutes = overlapEndMinutes - overlapStartMinutes;
+            const overlapStartOffsetMinutes = overlapStartMinutes - (TimeUtils.START_HOUR * 60);
+            const slotStartMinutes = timeSlot * 60;
+            const overlapTopOffsetPercent = ((overlapStartOffsetMinutes - slotStartMinutes) / 60) * 100;
+            const overlapHeightPercent = (overlapDurationMinutes / 60) * 100;
+
+            // Build conflict information
+            const conflictInfo = allConflictingSections.map(s => {
+                const conflictCourse = occupyingSections.find(os => os.section.crn === s.crn)?.course.course;
+                return conflictCourse ? `${conflictCourse.department.abbreviation}${conflictCourse.number} ${s.number}` : '';
+            }).filter(info => info).join(', ');
+
+            // Log conflict details (moved outside overlayStartsInThisSlot to always log)
+            const startHours = Math.floor(overlapStartMinutes / 60);
+            const startMins = overlapStartMinutes % 60;
+            const endHours = Math.floor(overlapEndMinutes / 60);
+            const endMins = overlapEndMinutes % 60;
+
+            // Only add overlay if it starts in this slot
+            // timeSlot is 0-indexed grid row, need to add START_HOUR to get actual hour
+            const overlayStartsInThisSlot = overlapStartMinutes >= (TimeUtils.START_HOUR + timeSlot) * 60 &&
+                                           overlapStartMinutes < (TimeUtils.START_HOUR + timeSlot + 1) * 60;
+
+            if (overlayStartsInThisSlot) {
+
+                contentBlocks += `
+                    <div class="conflict-overlay"
+                         title="Conflict: ${conflictInfo}"
+                         data-conflicts-with="${conflictInfo}"
+                         style="
+                        height: ${overlapHeightPercent}%;
+                        width: 100%;
+                        top: ${overlapTopOffsetPercent}%;
+                        left: 0;
+                    ">
+                    </div>
+                `;
+            }
+        }
+
+        const hasAnyFirstSlot = occupyingSections.some(os => os.isFirstSlot);
+        const classes = hasAnyFirstSlot ?
             `occupied section-start ${hasConflict ? 'has-conflict' : ''}` :
-            ''; // No classes for continuation slots - they should be invisible
-        
-        return { content, classes };
+            '';
+
+        return { content: contentBlocks, classes };
     }
 
     private getCourseColor(courseId: string): string {
@@ -1434,7 +1488,7 @@ export class ScheduleController {
             await this.applyScheduleAtIndex(0);
             this.updateAutoScheduleButtonUI();
 
-            console.log(`[Auto-Schedule] ✓ Generated ${this.generatedSchedules.length} schedules. Showing 1/${this.generatedSchedules.length}`);
+            console.log(`[Auto-Schedule] SUCCESS: Generated ${this.generatedSchedules.length} schedules. Showing 1/${this.generatedSchedules.length}`);
 
         } catch (error) {
             console.error('[Auto-Schedule] Error generating schedules:', error);
@@ -1487,7 +1541,7 @@ export class ScheduleController {
                 autoFilledCount++;
             }
 
-            console.log(`[Auto-Schedule] ✓ Complete: ${autoFilledCount} auto-filled, ${lockedCount} locked`);
+            console.log(`[Auto-Schedule] COMPLETE: ${autoFilledCount} auto-filled, ${lockedCount} locked`);
 
             this.displayScheduleSelectedCourses();
             this.renderScheduleGrids();

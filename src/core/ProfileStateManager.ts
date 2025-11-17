@@ -85,7 +85,7 @@ export class ProfileStateManager {
 
     setCourseData(departments: Department[]): void {
         this.allDepartments = departments;
-        logger.log(`📚 Course catalog set with ${departments.length} departments`);
+        logger.log(`[CATALOG] Course catalog set with ${departments.length} departments`);
     }
 
     // Public API for state access
@@ -566,13 +566,13 @@ export class ProfileStateManager {
     async loadFromStorage(): Promise<boolean> {
         // Prevent concurrent calls - if already loading, skip this call
         if (this.isLoadingFlag) {
-            logger.log('⏭Already loading from storage, skipping duplicate call');
+            logger.log('[SKIP] Already loading from storage, skipping duplicate call');
             return false;
         }
 
         // Skip if already loaded with schedules (redundant call prevention)
         if (this.state.schedules.length > 0 && !this.state.isLoading) {
-            logger.log('⏭Already loaded with schedules, skipping redundant call');
+            logger.log('[SKIP] Already loaded with schedules, skipping redundant call');
             return true;
         }
 

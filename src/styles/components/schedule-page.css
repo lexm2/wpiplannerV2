@@ -669,6 +669,40 @@
   box-shadow: var(--effect-shadow-hover);
 }
 
+/* Preview blocks for hover interaction */
+.section-preview {
+  background: transparent;
+  border: 2px dashed var(--color-primary);
+  border-radius: 3px;
+  padding: 3px 6px;
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  text-align: left;
+  line-height: 1.2;
+  pointer-events: none;
+  position: absolute;
+  z-index: 15;
+  overflow: hidden;
+  opacity: 0.8;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.section-preview.conflict {
+  border-color: #ff9800;
+  border-width: 3px;
+  background: rgba(255, 152, 0, 0.1);
+}
+
+.section-preview .section-code {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+  opacity: 0.7;
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -852,42 +886,31 @@
 .course-block.course-7 { background: #84cc16; border-color: #84cc16; }
 .course-block.course-8 { background: #f97316; border-color: #f97316; }
 
-/* Conflict highlighting with yellow border + diagonal stripes */
-.section-block.conflict,
-.course-block.conflict {
-  border: 3px solid #FFEB3B !important;
-  position: relative;
-  overflow: hidden;
-}
-
-.section-block.conflict::before,
-.course-block.conflict::before {
-  content: '';
+/* Conflict overlay - displayed on top of conflicting sections */
+.conflict-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  border: 3px solid #FFEB3B;
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 20;
   background: repeating-linear-gradient(
     45deg,
-    rgba(255, 235, 59, 0.15),
-    rgba(255, 235, 59, 0.15) 10px,
-    rgba(0, 0, 0, 0.1) 10px,
-    rgba(0, 0, 0, 0.1) 20px
+    rgba(255, 235, 59, 0.2),
+    rgba(255, 235, 59, 0.2) 10px,
+    rgba(255, 152, 0, 0.15) 10px,
+    rgba(255, 152, 0, 0.15) 20px
   );
-  pointer-events: none;
-  z-index: 1;
+  box-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
 }
 
-.section-block.conflict > *,
-.course-block.conflict > * {
-  position: relative;
-  z-index: 2;
-}
-
-.section-continuation.conflict,
-.course-continuation.conflict {
-  border-left: 3px solid #FFEB3B !important;
+.conflict-overlay:hover {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 235, 59, 0.3),
+    rgba(255, 235, 59, 0.3) 10px,
+    rgba(255, 152, 0, 0.25) 10px,
+    rgba(255, 152, 0, 0.25) 20px
+  );
 }
 
 /* Empty grid state */
