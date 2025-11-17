@@ -128,22 +128,10 @@ export class ScheduleController {
 
         // Get all currently selected courses for conflict detection context
         const allSelectedCourses = this.courseSelectionService.getSelectedCourses();
-        console.log('[ScheduleController] All selected courses:', allSelectedCourses.length);
-        allSelectedCourses.forEach(sc => {
-            console.log(`  - ${sc.course.department.abbreviation}${sc.course.number}:`, {
-                lecture: sc.selectedLecture?.number,
-                discussion: sc.selectedDiscussion?.number,
-                lab: sc.selectedLab?.number,
-                lecturePeriods: sc.selectedLecture?.periods.length,
-                discussionPeriods: sc.selectedDiscussion?.periods.length,
-                labPeriods: sc.selectedLab?.periods.length
-            });
-        });
 
         // Filter out the current course being edited from the context
         // This prevents the wizard from checking conflicts against itself
         const otherSelectedCourses = allSelectedCourses.filter(sc => sc.course.id !== freshCourse.id);
-        console.log('[ScheduleController] Other selected courses for conflict checking:', otherSelectedCourses.length);
 
         // Create new wizard with fresh course data
         this.componentWizard = new ComponentSelectionWizard(
@@ -976,15 +964,12 @@ export class ScheduleController {
         let allConflictingSections: Section[] = [];
 
         if (occupyingSections.length > 1) {
-            console.log('[Debug] Multiple sections in same slot, checking conflicts. ConflictDetector exists:', !!this.conflictDetector);
-
             if (this.conflictDetector) {
                 const sections = occupyingSections.map(os => os.section);
 
                 for (let i = 0; i < sections.length; i++) {
                     for (let j = i + 1; j < sections.length; j++) {
                         const conflicts = this.conflictDetector.detectConflicts([sections[i], sections[j]]);
-                        console.log(`[Debug] Checking conflict between ${sections[i].number} and ${sections[j].number}: ${conflicts.length} conflicts found`);
 
                         if (conflicts.length > 0) {
                             hasConflict = true;
@@ -1051,8 +1036,6 @@ export class ScheduleController {
 
         // Add conflict overlay if conflicts exist and this is the first slot
         if (hasConflict && occupyingSections.some(os => os.isFirstSlot)) {
-            console.log('[Debug] Conflict detected, preparing overlay');
-
             // Calculate overlapping time range
             let overlapStartMinutes = Math.max(...occupyingSections.map(os => os.startMinutes));
             let overlapEndMinutes = Math.min(...occupyingSections.map(os => os.endMinutes));
@@ -1080,9 +1063,6 @@ export class ScheduleController {
             const overlayStartsInThisSlot = overlapStartMinutes >= (TimeUtils.START_HOUR + timeSlot) * 60 &&
                                            overlapStartMinutes < (TimeUtils.START_HOUR + timeSlot + 1) * 60;
 
-            console.log(`[Debug] Overlay timing - timeSlot: ${timeSlot}, overlapStartMinutes: ${overlapStartMinutes}, slotActualHour: ${TimeUtils.START_HOUR + timeSlot}, overlayStartsInThisSlot: ${overlayStartsInThisSlot}`);
-
-            // Always log conflict when detected (not just when overlay renders)
             if (overlayStartsInThisSlot) {
                 console.log(`[Conflict] Detected on ${day}: ${conflictInfo}`);
                 console.log(`[Conflict] Overlap time: ${startHours}:${String(startMins).padStart(2, '0')} - ${endHours}:${String(endMins).padStart(2, '0')} (${overlapDurationMinutes} minutes)`);
@@ -1099,8 +1079,6 @@ export class ScheduleController {
                     ">
                     </div>
                 `;
-            } else {
-                console.log(`[Debug] Conflict exists but overlay doesn't start in this slot. Sections: ${conflictInfo}`);
             }
         }
 
