@@ -1,8 +1,10 @@
 import type { Section } from '../types/types';
+import { DateUtils } from '../utils/dateUtils';
 
 export class TimeSlotMap {
-    private readonly MIN_HOUR = 7;
-    private readonly MAX_HOUR = 18;
+    private readonly MIN_MINUTE = 420;
+    private readonly MAX_MINUTE = 1080;
+    private readonly SLOT_GRANULARITY = 5;
     private sectionsBySlot: Map<string, Set<Section>>;
     private slotsBySection: Map<string, Set<string>>;
 
@@ -24,20 +26,20 @@ export class TimeSlotMap {
                 continue;
             }
 
-            const startHour = period.startTime.hours;
-            const endHour = period.endTime.hours;
-            const hasMinutes = period.endTime.minutes > 0;
+            const startMinutes = DateUtils.timeToMinutes(period.startTime);
+            const endMinutes = DateUtils.timeToMinutes(period.endTime);
 
-            if (startHour === endHour && !hasMinutes) {
+            if (startMinutes === endMinutes) {
                 continue;
             }
 
-            const actualEndHour = hasMinutes ? endHour + 1 : endHour;
+            const startSlot = this.roundToSlot(startMinutes);
+            const endSlot = this.roundToSlot(endMinutes);
 
             for (const day of period.days) {
-                for (let hour = startHour; hour < actualEndHour && hour < this.MAX_HOUR; hour++) {
-                    if (hour >= this.MIN_HOUR) {
-                        const slotKey = this.getSlotKey(day, hour);
+                for (let slotMinute = startSlot; slotMinute < endSlot && slotMinute < this.MAX_MINUTE; slotMinute += this.SLOT_GRANULARITY) {
+                    if (slotMinute >= this.MIN_MINUTE) {
+                        const slotKey = this.getSlotKey(day, slotMinute);
                         slotsForThisSection.add(slotKey);
 
                         if (!this.sectionsBySlot.has(slotKey)) {
@@ -55,8 +57,9 @@ export class TimeSlotMap {
         this.slotsBySection.set(sectionKey, slotsForThisSection);
     }
 
-    getSectionsInSlot(day: string, hour: number): Set<Section> {
-        const slotKey = this.getSlotKey(day, hour);
+    getSectionsInSlot(day: string, minute: number): Set<Section> {
+        const slotMinute = this.roundToSlot(minute);
+        const slotKey = this.getSlotKey(day, slotMinute);
         return this.sectionsBySlot.get(slotKey) || new Set();
     }
 
@@ -106,8 +109,12 @@ export class TimeSlotMap {
         this.slotsBySection.clear();
     }
 
-    private getSlotKey(day: string, hour: number): string {
-        return `${day}-${hour}`;
+    private roundToSlot(minutes: number): number {
+        return Math.floor(minutes / this.SLOT_GRANULARITY) * this.SLOT_GRANULARITY;
+    }
+
+    private getSlotKey(day: string, slotMinute: number): string {
+        return `${day}-${slotMinute}`;
     }
 
     debugPrint(): void {
