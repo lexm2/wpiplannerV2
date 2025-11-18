@@ -22,14 +22,14 @@ export class CourseConflictModal {
         modal.innerHTML = `
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">Resolve Conflicts</h2>
+                    <div class="conflict-modal-header">
+                        <h2 class="conflict-modal-title">Resolve Conflicts</h2>
                         <button class="modal-close" aria-label="Close">&times;</button>
                     </div>
                     <div class="modal-body" id="schedule-conflict-body">
                         <!-- Content will be populated by updateContent() -->
                     </div>
-                    <div class="modal-footer schedule-conflict-footer">
+                    <div class="modal-footer conflict-modal-footer">
                         <div class="conflict-navigation">
                             <button id="conflict-prev" class="modal-btn btn-secondary">← Previous</button>
                             <span id="conflict-counter" class="conflict-counter">1 / 1</span>
@@ -120,53 +120,54 @@ export class CourseConflictModal {
 
     private createConflictCard(conflict: ScheduleConflict): HTMLElement {
         const card = document.createElement('div');
-        card.className = 'course-conflict-card';
+        card.className = 'conflict-card';
 
         const isLocalSelected = this.resolutions.get(conflict.scheduleName) === 'keep-local';
-        const isCloudSelected = this.resolutions.get(conflict.scheduleName) === 'keep-cloud';
+        const toggleId = `conflict-toggle-${conflict.scheduleName.replace(/\s+/g, '-')}`;
 
         card.innerHTML = `
-            <h3 class="conflict-schedule-name">${conflict.scheduleName}</h3>
-            <div class="conflict-options">
-                <button class="conflict-option ${isLocalSelected ? 'selected' : ''}"
-                        data-schedule="${conflict.scheduleName}"
-                        data-resolution="keep-local">
-                    <div class="option-radio">${isLocalSelected ? '●' : '○'}</div>
-                    <div class="option-content">
-                        <div class="option-label">Local</div>
-                        <div class="option-info">${conflict.local.selectedCourses.length} courses</div>
-                    </div>
-                </button>
-                <button class="conflict-option ${isCloudSelected ? 'selected' : ''}"
-                        data-schedule="${conflict.scheduleName}"
-                        data-resolution="keep-cloud">
-                    <div class="option-radio">${isCloudSelected ? '●' : '○'}</div>
-                    <div class="option-content">
-                        <div class="option-label">Cloud</div>
-                        <div class="option-info">${conflict.cloud.selectedCourses.length} courses</div>
-                    </div>
-                </button>
+            <h3 class="conflict-card-schedule-name">${conflict.scheduleName}</h3>
+            <div class="conflict-toggle-container">
+                <span class="conflict-toggle-label-left">Local</span>
+                <input
+                    id="${toggleId}"
+                    class="conflict-toggle"
+                    type="checkbox"
+                    role="switch"
+                    name="conflict-toggle"
+                    ${!isLocalSelected ? 'checked' : ''}
+                    data-schedule="${conflict.scheduleName}"
+                    aria-checked="${!isLocalSelected}">
+                <span class="conflict-toggle-label-right">Cloud</span>
             </div>
-            <div class="course-list-comparison">
-                <div class="course-column">
-                    <div class="course-column-header">Local Courses</div>
+            <div class="conflict-course-container">
+                <div class="conflict-course-indicator ${!isLocalSelected ? 'cloud-selected' : ''}"></div>
+                <div class="conflict-course-column" data-view="local">
+                    <div class="conflict-course-column-header">Local Courses (${conflict.local.selectedCourses.length})</div>
                     ${this.renderCourseList(conflict.local.selectedCourses)}
                 </div>
-                <div class="course-column">
-                    <div class="course-column-header">Cloud Courses</div>
+                <div class="conflict-course-column" data-view="cloud">
+                    <div class="conflict-course-column-header">Cloud Courses (${conflict.cloud.selectedCourses.length})</div>
                     ${this.renderCourseList(conflict.cloud.selectedCourses)}
                 </div>
             </div>
         `;
 
-        const buttons = card.querySelectorAll('button[data-resolution]');
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                const scheduleName = button.getAttribute('data-schedule')!;
-                const resolution = button.getAttribute('data-resolution') as ScheduleConflictResolution;
-                this.setResolution(scheduleName, resolution);
-                this.updateContent();
-            });
+        const toggle = card.querySelector('.conflict-toggle') as HTMLInputElement;
+        const indicator = card.querySelector('.conflict-course-indicator');
+
+        toggle?.addEventListener('change', () => {
+            const scheduleName = toggle.getAttribute('data-schedule')!;
+            const resolution = toggle.checked ? 'keep-cloud' : 'keep-local';
+            this.setResolution(scheduleName, resolution);
+
+            if (toggle.checked) {
+                indicator?.classList.add('cloud-selected');
+            } else {
+                indicator?.classList.remove('cloud-selected');
+            }
+
+            toggle.setAttribute('aria-checked', toggle.checked.toString());
         });
 
         return card;
@@ -174,17 +175,17 @@ export class CourseConflictModal {
 
     private renderCourseList(courses: SelectedCourse[]): string {
         if (courses.length === 0) {
-            return '<div class="course-item">No courses</div>';
+            return '<div class="conflict-course-item">No courses</div>';
         }
 
         return courses.map(sc => {
             const course = sc.course;
             const section = sc.selectedSectionNumber || '';
-            const sectionText = section ? `<span class="course-section">(${section})</span>` : '';
+            const sectionText = section ? `<span class="conflict-course-section">(${section})</span>` : '';
 
             return `
-                <div class="course-item">
-                    <span class="course-number">${course.department.abbreviation} ${course.number}</span>
+                <div class="conflict-course-item">
+                    <span class="conflict-course-number">${course.department.abbreviation} ${course.number}</span>
                     ${sectionText}
                 </div>
             `;
