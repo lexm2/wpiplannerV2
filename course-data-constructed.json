@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 18, 2025, 7:48 AM",
+  "generated": "Nov 18, 2025, 8:22 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5511,7 +5511,7 @@
                 "crn": 337366,
                 "number": "D01 - Topics In Studio Art: Contemporary Miniature Painting",
                 "seats": 24,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -5530,7 +5530,7 @@
                     "building": "",
                     "room": "Salisbury Labs 406",
                     "seats": 24,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01 - Topics In Studio Art: Contemporary Miniature Painting",
@@ -243238,7 +243238,7 @@
                 "number": "D02",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "WPE 1612 Introductory Yoga Cat. I (1/12 unit) This yoga class focuses on connecting the mind, body, and spirit through an awareness of breath. Participating in yoga can improve core strength, flexibility, balance, mindfulness, and relaxation and decrease stress. Those with any level of yoga experience (including first timers) are welcome.",
@@ -243257,7 +243257,7 @@
                     "room": "Recreation Center Dance",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
