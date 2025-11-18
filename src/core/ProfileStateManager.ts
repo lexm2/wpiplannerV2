@@ -68,30 +68,36 @@ export class ProfileStateManager {
                         this.state.preferences = cloudData.preferences;
                     }
 
-                    if (cloudData.schedules) {
+                    if (cloudData.schedules && cloudData.schedules.length > 0) {
                         for (const schedule of cloudData.schedules) {
                             await this.storageManager.saveSchedule(schedule);
                         }
                         this.state.schedules = cloudData.schedules;
-                    }
 
-                    if (cloudData.state?.activeScheduleId) {
-                        this.storageManager.saveActiveScheduleId(cloudData.state.activeScheduleId);
-                        this.state.activeScheduleId = cloudData.state.activeScheduleId;
+                        let activeScheduleId = cloudData.state?.activeScheduleId;
 
-                        const activeSchedule = this.state.schedules.find(
-                            s => s.id === cloudData.state.activeScheduleId
-                        );
-                        if (activeSchedule) {
-                            this.state.selectedCourses = this.resolveCourseReferences(
-                                activeSchedule.selectedCourses
-                            );
+                        if (!activeScheduleId && cloudData.schedules.length > 0) {
+                            activeScheduleId = cloudData.schedules[0].id;
+                        }
+
+                        if (activeScheduleId) {
+                            this.storageManager.saveActiveScheduleId(activeScheduleId);
+                            this.state.activeScheduleId = activeScheduleId;
+
+                            const activeSchedule = this.state.schedules.find(s => s.id === activeScheduleId);
+                            if (activeSchedule) {
+                                this.state.selectedCourses = this.resolveCourseReferences(
+                                    activeSchedule.selectedCourses
+                                );
+                                logger.log('[SYNC] Loaded schedule:', activeSchedule.name, 'with', this.state.selectedCourses.length, 'courses');
+                            }
                         }
                     }
 
                     logger.log('[SYNC] Cloud data applied to storage and memory');
-                    this.emitEvent('schedule_changed', { action: 'cloud_sync' }, 'cloud-sync');
+                    this.emitEvent('schedule_changed', { action: 'cloud_sync', schedules: this.state.schedules }, 'cloud-sync');
                     this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
+                    this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');
                 }
             });
         } catch (error) {

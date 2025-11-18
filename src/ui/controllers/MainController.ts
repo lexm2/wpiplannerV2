@@ -1176,6 +1176,7 @@ export class MainController {
                 indicator.className = 'optimistic-status syncing';
                 break;
             case 'sync-completed':
+            case 'sync-uploaded':
                 indicator.textContent = 'Synced to cloud';
                 indicator.className = 'optimistic-status synced';
                 setTimeout(() => {

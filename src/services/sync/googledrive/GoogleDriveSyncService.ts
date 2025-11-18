@@ -249,7 +249,7 @@ export class GoogleDriveSyncService implements ICloudSyncService {
             console.log('[Google Drive] Upload successful');
 
             this.updateStatus('synced');
-            this.notifyEvent({ type: 'sync-completed', timestamp: Date.now(), data: enrichedData });
+            this.notifyEvent({ type: 'sync-uploaded', timestamp: Date.now(), data: enrichedData });
 
             setTimeout(() => {
                 if (this.status === 'synced') {

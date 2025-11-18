@@ -55,6 +55,7 @@ export interface SyncConfig {
 export type SyncEventType =
     | 'sync-started'
     | 'sync-completed'
+    | 'sync-uploaded'
     | 'sync-failed'
     | 'sync-conflict'
     | 'auth-changed'
