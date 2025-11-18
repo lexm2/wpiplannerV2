@@ -1,4 +1,7 @@
 import type { ScheduleConflict, ScheduleConflictResolution, SelectedCourse } from '../../types/schedule';
+import type { Section, Period } from '../../types/types';
+import { getInlineSVG } from '../../utils/iconPaths';
+import { TimeUtils } from '../utils/timeUtils';
 
 export class CourseConflictModal {
     private modalElement: HTMLElement | null = null;
@@ -23,7 +26,7 @@ export class CourseConflictModal {
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="conflict-modal-header">
-                        <h2 class="conflict-modal-title">Resolve Conflicts</h2>
+                        <h2 class="conflict-modal-title">${getInlineSVG('ALERT_CIRCLE', 'conflict-title-icon')}Resolve Conflicts</h2>
                         <button class="modal-close" aria-label="Close">&times;</button>
                     </div>
                     <div class="modal-body" id="schedule-conflict-body">
@@ -31,9 +34,9 @@ export class CourseConflictModal {
                     </div>
                     <div class="modal-footer conflict-modal-footer">
                         <div class="conflict-navigation">
-                            <button id="conflict-prev" class="modal-btn btn-secondary">← Previous</button>
+                            <button id="conflict-prev" class="modal-btn btn-secondary conflict-nav-btn">${getInlineSVG('ARROW_BAR_LEFT', 'nav-icon')}</button>
                             <span id="conflict-counter" class="conflict-counter">1 / 1</span>
-                            <button id="conflict-next" class="modal-btn btn-secondary">Next →</button>
+                            <button id="conflict-next" class="modal-btn btn-secondary conflict-nav-btn">${getInlineSVG('ARROW_BAR_RIGHT', 'nav-icon')}</button>
                         </div>
                         <div class="conflict-actions">
                             <button id="conflict-cancel" class="modal-btn btn-secondary">Cancel</button>
@@ -178,15 +181,59 @@ export class CourseConflictModal {
             return '<div class="conflict-course-item">No courses</div>';
         }
 
-        return courses.map(sc => {
+        return courses.map((sc, index) => {
             const course = sc.course;
-            const section = sc.selectedSectionNumber || '';
-            const sectionText = section ? `<span class="conflict-course-section">(${section})</span>` : '';
 
             return `
-                <div class="conflict-course-item">
-                    <span class="conflict-course-number">${course.department.abbreviation} ${course.number}</span>
-                    ${sectionText}
+                <div class="conflict-course-item-wrapper">
+                    <div class="conflict-course-item">
+                        <div class="conflict-course-header">
+                            <span class="conflict-course-number">${course.department.abbreviation} ${course.number}</span>
+                        </div>
+                        <div class="conflict-course-details">
+                            ${this.renderSectionDetails(sc)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    private renderSectionDetails(sc: SelectedCourse): string {
+        const sections: { name: string; section: Section | null }[] = [
+            { name: 'Lecture', section: sc.selectedLecture },
+            { name: 'Discussion', section: sc.selectedDiscussion },
+            { name: 'Lab', section: sc.selectedLab },
+            { name: 'Section', section: sc.selectedSection }
+        ];
+
+        const activeSections = sections.filter(s => s.section !== null);
+
+        if (activeSections.length === 0) {
+            return '<div class="conflict-no-sections">No sections selected</div>';
+        }
+
+        return activeSections.map(({ name, section }) => {
+            if (!section) return '';
+
+            const periodsHtml = section.periods.map(period => {
+                const days = Array.from(period.days).join('');
+                const timeRange = `${TimeUtils.formatTime(period.startTime)} - ${TimeUtils.formatTime(period.endTime)}`;
+
+                return `
+                    <div class="conflict-period-info">
+                        <span class="conflict-period-days">${days}</span>
+                        <span class="conflict-period-time">${timeRange}</span>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="conflict-section-block">
+                    <div class="conflict-section-name">${name}: ${section.number}</div>
+                    <div class="conflict-section-periods">
+                        ${periodsHtml || '<div class="conflict-no-periods">No time info</div>'}
+                    </div>
                 </div>
             `;
         }).join('');

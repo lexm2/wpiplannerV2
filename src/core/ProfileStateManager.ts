@@ -193,6 +193,9 @@ export class ProfileStateManager {
                 this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
                 this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');
 
+                await this.syncToCloud();
+                logger.log('[SYNC] Resolved data synced back to cloud');
+
                 resolve();
             });
         });

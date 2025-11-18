@@ -26,7 +26,6 @@ export class GoogleDriveSyncService implements ICloudSyncService {
     private isSyncing = false;
     private isOnline = navigator.onLine;
     private isGapiLoaded = false;
-    private hasPulledOnAuth = false;
 
     private constructor() {
         this.authService = GoogleDriveAuthService.getInstance();
@@ -127,12 +126,7 @@ export class GoogleDriveSyncService implements ICloudSyncService {
         if (this.authService.isAuthenticated()) {
             this.updateStatus('idle');
 
-            if (this.hasPulledOnAuth) {
-                console.log('[Google Drive] Already pulled data on auth, skipping duplicate pull');
-                return;
-            }
 
-            this.hasPulledOnAuth = true;
             console.log('[Google Drive] Authentication successful, pulling data from cloud...');
             const result = await this.pullFromCloud();
             if (result.success && result.data) {
@@ -148,7 +142,6 @@ export class GoogleDriveSyncService implements ICloudSyncService {
             }
         } else {
             this.updateStatus('not_authenticated');
-            this.hasPulledOnAuth = false;
         }
     }
 
