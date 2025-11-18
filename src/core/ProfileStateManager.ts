@@ -8,6 +8,8 @@ import { GoogleDriveSyncService } from '../services/sync/googledrive/GoogleDrive
 import { GOOGLE_DRIVE_CONFIG } from '../config/googledrive.config'
 import type { CloudStateData } from '../services/sync/CloudSyncTypes'
 import { logger } from '../utils/logger'
+import type { ScheduleConflict, ScheduleConflictResolution } from '../types/schedule'
+import { CourseConflictModal } from '../ui/components/CourseConflictModal'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -69,13 +71,23 @@ export class ProfileStateManager {
                     }
 
                     if (cloudData.schedules && cloudData.schedules.length > 0) {
+                        const conflicts = this.detectScheduleConflicts(
+                            this.state.schedules,
+                            cloudData.schedules
+                        );
+
+                        if (conflicts.length > 0) {
+                            logger.log('[SYNC] Detected', conflicts.length, 'schedule conflicts');
+                            await this.handleScheduleConflicts(conflicts, cloudData);
+                            return;
+                        }
+
                         for (const schedule of cloudData.schedules) {
                             await this.storageManager.saveSchedule(schedule);
                         }
                         this.state.schedules = cloudData.schedules;
 
                         let activeScheduleId = cloudData.state?.activeScheduleId;
-
                         if (!activeScheduleId && cloudData.schedules.length > 0) {
                             activeScheduleId = cloudData.schedules[0].id;
                         }
@@ -103,6 +115,87 @@ export class ProfileStateManager {
         } catch (error) {
             logger.warn('Cloud sync initialization failed:', error);
         }
+    }
+
+    private detectScheduleConflicts(localSchedules: Schedule[], cloudSchedules: any[]): ScheduleConflict[] {
+        const conflicts: ScheduleConflict[] = [];
+
+        for (const cloudSchedule of cloudSchedules) {
+            const localSchedule = localSchedules.find(ls => ls.name === cloudSchedule.name);
+
+            if (localSchedule && !this.schedulesAreEqual(localSchedule, cloudSchedule)) {
+                conflicts.push({
+                    scheduleName: cloudSchedule.name,
+                    local: localSchedule,
+                    cloud: cloudSchedule
+                });
+            }
+        }
+
+        return conflicts;
+    }
+
+    private schedulesAreEqual(schedule1: Schedule, schedule2: any): boolean {
+        if (schedule1.selectedCourses.length !== schedule2.selectedCourses.length) {
+            return false;
+        }
+
+        const s1Json = JSON.stringify(schedule1, createJSONReplacer());
+        const s2Json = JSON.stringify(schedule2, createJSONReplacer());
+
+        return s1Json === s2Json;
+    }
+
+    private async handleScheduleConflicts(conflicts: ScheduleConflict[], cloudData: any): Promise<void> {
+        return new Promise((resolve) => {
+            const modal = new CourseConflictModal();
+
+            modal.show(conflicts, async (resolutions: Map<string, ScheduleConflictResolution>) => {
+                logger.log('[SYNC] User resolved', resolutions.size, 'schedule conflicts');
+
+                const finalSchedules = [...cloudData.schedules];
+
+                resolutions.forEach((resolution, scheduleName) => {
+                    if (resolution === 'keep-local') {
+                        const localSchedule = this.state.schedules.find(s => s.name === scheduleName);
+                        const cloudIndex = finalSchedules.findIndex((s: any) => s.name === scheduleName);
+
+                        if (localSchedule && cloudIndex !== -1) {
+                            finalSchedules[cloudIndex] = localSchedule;
+                            logger.log('[SYNC] Keeping local version of schedule:', scheduleName);
+                        }
+                    }
+                });
+
+                for (const schedule of finalSchedules) {
+                    await this.storageManager.saveSchedule(schedule);
+                }
+                this.state.schedules = finalSchedules;
+
+                let activeScheduleId = cloudData.state?.activeScheduleId;
+                if (!activeScheduleId && finalSchedules.length > 0) {
+                    activeScheduleId = finalSchedules[0].id;
+                }
+
+                if (activeScheduleId) {
+                    this.storageManager.saveActiveScheduleId(activeScheduleId);
+                    this.state.activeScheduleId = activeScheduleId;
+
+                    const activeSchedule = this.state.schedules.find(s => s.id === activeScheduleId);
+                    if (activeSchedule) {
+                        this.state.selectedCourses = this.resolveCourseReferences(activeSchedule.selectedCourses);
+                        logger.log('[SYNC] Loaded schedule:', activeSchedule.name, 'with', this.state.selectedCourses.length, 'courses');
+                    }
+                }
+
+                logger.log('[SYNC] Cloud data applied to storage and memory with conflict resolutions');
+                this.emitEvent('schedule_changed', { action: 'cloud_sync', schedules: this.state.schedules }, 'cloud-sync');
+                this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
+                this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');
+
+                resolve();
+            });
+        });
     }
 
     private setupBeforeUnloadHandler(): void {

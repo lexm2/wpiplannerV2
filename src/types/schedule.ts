@@ -11,6 +11,23 @@ export interface SelectedCourse {
     lockedSections: Set<string>;
 }
 
+export interface CourseConflict {
+    courseId: string;
+    courseName: string;
+    local: SelectedCourse;
+    cloud: SelectedCourse;
+}
+
+export type CourseConflictResolution = 'keep-local' | 'keep-cloud';
+
+export interface ScheduleConflict {
+    scheduleName: string;
+    local: Schedule;
+    cloud: Schedule;
+}
+
+export type ScheduleConflictResolution = 'keep-local' | 'keep-cloud';
+
 export interface Schedule {
     id: string;
     name: string;
