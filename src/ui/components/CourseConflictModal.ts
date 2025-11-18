@@ -128,8 +128,11 @@ export class CourseConflictModal {
         const isLocalSelected = this.resolutions.get(conflict.scheduleName) === 'keep-local';
         const toggleId = `conflict-toggle-${conflict.scheduleName.replace(/\s+/g, '-')}`;
 
+        const diffSummary = this.renderDiffSummary(conflict);
+
         card.innerHTML = `
             <h3 class="conflict-card-schedule-name">${conflict.scheduleName}</h3>
+            ${diffSummary}
             <div class="conflict-toggle-container">
                 <span class="conflict-toggle-label-left">Local</span>
                 <input
@@ -147,11 +150,11 @@ export class CourseConflictModal {
                 <div class="conflict-course-indicator ${!isLocalSelected ? 'cloud-selected' : ''}"></div>
                 <div class="conflict-course-column" data-view="local">
                     <div class="conflict-course-column-header">Local Courses (${conflict.local.selectedCourses.length})</div>
-                    ${this.renderCourseList(conflict.local.selectedCourses)}
+                    ${this.renderCourseList(conflict.local.selectedCourses, conflict, 'local')}
                 </div>
                 <div class="conflict-course-column" data-view="cloud">
                     <div class="conflict-course-column-header">Cloud Courses (${conflict.cloud.selectedCourses.length})</div>
-                    ${this.renderCourseList(conflict.cloud.selectedCourses)}
+                    ${this.renderCourseList(conflict.cloud.selectedCourses, conflict, 'cloud')}
                 </div>
             </div>
         `;
@@ -176,22 +179,69 @@ export class CourseConflictModal {
         return card;
     }
 
-    private renderCourseList(courses: SelectedCourse[]): string {
+    private renderDiffSummary(conflict: ScheduleConflict): string {
+        if (!conflict.diff) return '';
+
+        const diff = conflict.diff;
+        const parts: string[] = [];
+
+        if (diff.coursesOnlyInLocal.length > 0) {
+            parts.push(`<span class="diff-badge diff-local-only">${diff.coursesOnlyInLocal.length} course${diff.coursesOnlyInLocal.length > 1 ? 's' : ''} only in Local</span>`);
+        }
+
+        if (diff.coursesOnlyInCloud.length > 0) {
+            parts.push(`<span class="diff-badge diff-cloud-only">${diff.coursesOnlyInCloud.length} course${diff.coursesOnlyInCloud.length > 1 ? 's' : ''} only in Cloud</span>`);
+        }
+
+        if (diff.coursesWithDifferentSections.length > 0) {
+            parts.push(`<span class="diff-badge diff-section-diff">${diff.coursesWithDifferentSections.length} course${diff.coursesWithDifferentSections.length > 1 ? 's' : ''} with different sections</span>`);
+        }
+
+        if (parts.length === 0) return '';
+
+        return `<div class="conflict-diff-summary">${parts.join('')}</div>`;
+    }
+
+    private renderCourseList(courses: SelectedCourse[], conflict: ScheduleConflict, view: 'local' | 'cloud'): string {
         if (courses.length === 0) {
             return '<div class="conflict-course-item">No courses</div>';
         }
 
         return courses.map((sc, index) => {
             const course = sc.course;
+            const courseId = course.id;
+            const diff = conflict.diff;
+
+            let highlightClass = '';
+            let diffLabel = '';
+            let sectionDiffs: { lecture: boolean; discussion: boolean; lab: boolean; section: boolean } | undefined;
+
+            if (diff) {
+                if (view === 'local' && diff.coursesOnlyInLocal.some(c => c.course.id === courseId)) {
+                    highlightClass = 'highlight-local-only';
+                    diffLabel = '<span class="diff-label diff-label-local">Local Only</span>';
+                } else if (view === 'cloud' && diff.coursesOnlyInCloud.some(c => c.course.id === courseId)) {
+                    highlightClass = 'highlight-cloud-only';
+                    diffLabel = '<span class="diff-label diff-label-cloud">Cloud Only</span>';
+                } else {
+                    const sectionDiff = diff.coursesWithDifferentSections.find(d => d.courseId === courseId);
+                    if (sectionDiff && sectionDiff.sectionDifferences) {
+                        highlightClass = 'highlight-section-diff';
+                        diffLabel = '<span class="diff-label diff-label-section">Different Sections</span>';
+                        sectionDiffs = sectionDiff.sectionDifferences;
+                    }
+                }
+            }
 
             return `
-                <div class="conflict-course-item-wrapper">
+                <div class="conflict-course-item-wrapper ${highlightClass}">
                     <div class="conflict-course-item">
                         <div class="conflict-course-header">
                             <span class="conflict-course-number">${course.department.abbreviation} ${course.number}</span>
+                            ${diffLabel}
                         </div>
                         <div class="conflict-course-details">
-                            ${this.renderSectionDetails(sc)}
+                            ${this.renderSectionDetails(sc, sectionDiffs)}
                         </div>
                     </div>
                 </div>
@@ -199,12 +249,12 @@ export class CourseConflictModal {
         }).join('');
     }
 
-    private renderSectionDetails(sc: SelectedCourse): string {
-        const sections: { name: string; section: Section | null }[] = [
-            { name: 'Lecture', section: sc.selectedLecture },
-            { name: 'Discussion', section: sc.selectedDiscussion },
-            { name: 'Lab', section: sc.selectedLab },
-            { name: 'Section', section: sc.selectedSection }
+    private renderSectionDetails(sc: SelectedCourse, sectionDiffs?: { lecture: boolean; discussion: boolean; lab: boolean; section: boolean }): string {
+        const sections: { name: string; section: Section | null; key: 'lecture' | 'discussion' | 'lab' | 'section' }[] = [
+            { name: 'Lecture', section: sc.selectedLecture, key: 'lecture' },
+            { name: 'Discussion', section: sc.selectedDiscussion, key: 'discussion' },
+            { name: 'Lab', section: sc.selectedLab, key: 'lab' },
+            { name: 'Section', section: sc.selectedSection, key: 'section' }
         ];
 
         const activeSections = sections.filter(s => s.section !== null);
@@ -213,8 +263,11 @@ export class CourseConflictModal {
             return '<div class="conflict-no-sections">No sections selected</div>';
         }
 
-        return activeSections.map(({ name, section }) => {
+        return activeSections.map(({ name, section, key }) => {
             if (!section) return '';
+
+            const isDifferent = sectionDiffs && sectionDiffs[key];
+            const highlightClass = isDifferent ? 'section-highlight' : '';
 
             const periodsHtml = section.periods.map(period => {
                 const days = Array.from(period.days).join('');
@@ -229,7 +282,7 @@ export class CourseConflictModal {
             }).join('');
 
             return `
-                <div class="conflict-section-block">
+                <div class="conflict-section-block ${highlightClass}">
                     <div class="conflict-section-name">${name}: ${section.number}</div>
                     <div class="conflict-section-periods">
                         ${periodsHtml || '<div class="conflict-no-periods">No time info</div>'}

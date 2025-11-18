@@ -99,11 +99,53 @@
 }
 
 .conflict-card-schedule-name {
-    margin: 0 0 1.5rem 0;
+    margin: 0 0 1rem 0;
     font-size: 1rem;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     text-align: center;
+}
+
+/* Diff Summary Badges */
+.conflict-diff-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem;
+    background: var(--color-surface);
+    border-radius: var(--effect-border-radius);
+    border: 1px solid var(--color-border);
+}
+
+.diff-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--effect-border-radius);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.diff-badge.diff-local-only {
+    background: rgba(59, 130, 246, 0.15);
+    color: rgb(59, 130, 246);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.diff-badge.diff-cloud-only {
+    background: rgba(139, 92, 246, 0.15);
+    color: rgb(139, 92, 246);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.diff-badge.diff-section-diff {
+    background: rgba(251, 191, 36, 0.15);
+    color: rgb(251, 191, 36);
+    border: 1px solid rgba(251, 191, 36, 0.3);
 }
 
 /* Toggle Switch Container */
@@ -247,6 +289,27 @@
     margin-bottom: 0.75rem;
 }
 
+.conflict-course-item-wrapper.highlight-local-only {
+    border-left: 3px solid rgb(59, 130, 246);
+    padding-left: 0.5rem;
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: var(--effect-border-radius);
+}
+
+.conflict-course-item-wrapper.highlight-cloud-only {
+    border-left: 3px solid rgb(139, 92, 246);
+    padding-left: 0.5rem;
+    background: rgba(139, 92, 246, 0.05);
+    border-radius: var(--effect-border-radius);
+}
+
+.conflict-course-item-wrapper.highlight-section-diff {
+    border-left: 3px solid rgb(251, 191, 36);
+    padding-left: 0.5rem;
+    background: rgba(251, 191, 36, 0.05);
+    border-radius: var(--effect-border-radius);
+}
+
 .conflict-course-item {
     background: var(--color-surface);
     color: var(--color-text);
@@ -260,6 +323,9 @@
 }
 
 .conflict-course-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--color-border);
@@ -270,12 +336,50 @@
     color: var(--color-text);
 }
 
+.diff-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--effect-border-radius);
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.diff-label-local {
+    background: rgba(59, 130, 246, 0.15);
+    color: rgb(59, 130, 246);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.diff-label-cloud {
+    background: rgba(139, 92, 246, 0.15);
+    color: rgb(139, 92, 246);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.diff-label-section {
+    background: rgba(251, 191, 36, 0.15);
+    color: rgb(251, 191, 36);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
 .conflict-course-details {
     display: block;
 }
 
 .conflict-section-block {
     margin-bottom: 0.75rem;
+    padding: 0.5rem;
+    border-radius: var(--effect-border-radius);
+    transition: var(--effect-transition);
+}
+
+.conflict-section-block.section-highlight {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    padding: 0.5rem;
 }
 
 .conflict-section-block:last-child {
@@ -287,6 +391,11 @@
     color: var(--color-text);
     font-size: 0.875rem;
     margin-bottom: 0.5rem;
+}
+
+.conflict-section-block.section-highlight .conflict-section-name {
+    color: rgb(251, 191, 36);
+    font-weight: var(--font-weight-bold);
 }
 
 .conflict-section-periods {

@@ -20,10 +20,31 @@ export interface CourseConflict {
 
 export type CourseConflictResolution = 'keep-local' | 'keep-cloud';
 
+export interface CourseDifference {
+    courseId: string;
+    courseName: string;
+    differenceType: 'section-only' | 'course-missing';
+    local: SelectedCourse | null;
+    cloud: SelectedCourse | null;
+    sectionDifferences?: {
+        lecture: boolean;
+        discussion: boolean;
+        lab: boolean;
+        section: boolean;
+    };
+}
+
+export interface ScheduleDiff {
+    coursesOnlyInLocal: SelectedCourse[];
+    coursesOnlyInCloud: SelectedCourse[];
+    coursesWithDifferentSections: CourseDifference[];
+}
+
 export interface ScheduleConflict {
     scheduleName: string;
     local: Schedule;
     cloud: Schedule;
+    diff?: ScheduleDiff;
 }
 
 export type ScheduleConflictResolution = 'keep-local' | 'keep-cloud';

@@ -8,13 +8,13 @@ import { logger } from '../../utils/logger';
  * Button states in priority order (highest to lowest)
  */
 type ButtonState =
-    | 'error'               // Error occurred (highest priority)
+    | 'error'               // Error occurred 
     | 'local-saving'        // Saving to localStorage
     | 'cloud-syncing'       // Syncing to cloud
     | 'local-saved'         // Saved to localStorage (transient)
     | 'cloud-synced'        // Synced to cloud (transient)
     | 'authenticated-idle'  // Signed in, no operations
-    | 'unauthenticated';    // Not signed in (lowest priority)
+    | 'unauthenticated';    // Not signed in
 
 interface StateConfig {
     text: string;

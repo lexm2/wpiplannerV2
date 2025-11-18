@@ -8,7 +8,7 @@ import { GoogleDriveSyncService } from '../services/sync/googledrive/GoogleDrive
 import { GOOGLE_DRIVE_CONFIG } from '../config/googledrive.config'
 import type { CloudStateData } from '../services/sync/CloudSyncTypes'
 import { logger } from '../utils/logger'
-import type { ScheduleConflict, ScheduleConflictResolution } from '../types/schedule'
+import type { ScheduleConflict, ScheduleConflictResolution, ScheduleDiff, CourseDifference } from '../types/schedule'
 import { CourseConflictModal } from '../ui/components/CourseConflictModal'
 
 export interface StateChangeEvent {
@@ -123,27 +123,101 @@ export class ProfileStateManager {
         for (const cloudSchedule of cloudSchedules) {
             const localSchedule = localSchedules.find(ls => ls.name === cloudSchedule.name);
 
-            if (localSchedule && !this.schedulesAreEqual(localSchedule, cloudSchedule)) {
-                conflicts.push({
-                    scheduleName: cloudSchedule.name,
-                    local: localSchedule,
-                    cloud: cloudSchedule
-                });
+            if (localSchedule) {
+                const diff = this.compareSchedules(localSchedule, cloudSchedule);
+
+                if (diff) {
+                    conflicts.push({
+                        scheduleName: cloudSchedule.name,
+                        local: localSchedule,
+                        cloud: cloudSchedule,
+                        diff
+                    });
+                }
             }
         }
 
         return conflicts;
     }
 
-    private schedulesAreEqual(schedule1: Schedule, schedule2: any): boolean {
-        if (schedule1.selectedCourses.length !== schedule2.selectedCourses.length) {
-            return false;
+    private compareSchedules(local: Schedule, cloud: any): ScheduleDiff | null {
+        const localCourseMap = new Map<string, SelectedCourse>(
+            local.selectedCourses.map(sc => [sc.course.id, sc])
+        );
+        const cloudCourseMap = new Map<string, any>(
+            cloud.selectedCourses.map((sc: any) => [sc.course.id, sc])
+        );
+
+        const coursesOnlyInLocal: SelectedCourse[] = [];
+        const coursesOnlyInCloud: SelectedCourse[] = [];
+        const coursesWithDifferentSections: CourseDifference[] = [];
+
+        for (const [courseId, localCourse] of localCourseMap) {
+            if (!cloudCourseMap.has(courseId)) {
+                coursesOnlyInLocal.push(localCourse);
+            } else {
+                const cloudCourse = cloudCourseMap.get(courseId)!;
+                const sectionDiff = this.compareSections(localCourse, cloudCourse);
+
+                if (sectionDiff) {
+                    coursesWithDifferentSections.push({
+                        courseId,
+                        courseName: `${localCourse.course.department.abbreviation}${localCourse.course.number}`,
+                        differenceType: 'section-only',
+                        local: localCourse,
+                        cloud: cloudCourse as SelectedCourse,
+                        sectionDifferences: sectionDiff
+                    });
+                }
+            }
         }
 
-        const s1Json = JSON.stringify(schedule1, createJSONReplacer());
-        const s2Json = JSON.stringify(schedule2, createJSONReplacer());
+        for (const [courseId, cloudCourse] of cloudCourseMap) {
+            if (!localCourseMap.has(courseId)) {
+                coursesOnlyInCloud.push(cloudCourse as SelectedCourse);
+            }
+        }
 
-        return s1Json === s2Json;
+        if (coursesOnlyInLocal.length === 0 &&
+            coursesOnlyInCloud.length === 0 &&
+            coursesWithDifferentSections.length === 0) {
+            return null;
+        }
+
+        return {
+            coursesOnlyInLocal,
+            coursesOnlyInCloud,
+            coursesWithDifferentSections
+        };
+    }
+
+    private compareSections(local: SelectedCourse, cloud: any): {
+        lecture: boolean;
+        discussion: boolean;
+        lab: boolean;
+        section: boolean;
+    } | null {
+        const lectureDiff = this.sectionsAreDifferent(local.selectedLecture, cloud.selectedLecture);
+        const discussionDiff = this.sectionsAreDifferent(local.selectedDiscussion, cloud.selectedDiscussion);
+        const labDiff = this.sectionsAreDifferent(local.selectedLab, cloud.selectedLab);
+        const sectionDiff = this.sectionsAreDifferent(local.selectedSection, cloud.selectedSection);
+
+        if (!lectureDiff && !discussionDiff && !labDiff && !sectionDiff) {
+            return null;
+        }
+
+        return {
+            lecture: lectureDiff,
+            discussion: discussionDiff,
+            lab: labDiff,
+            section: sectionDiff
+        };
+    }
+
+    private sectionsAreDifferent(section1: Section | null, section2: any): boolean {
+        if (section1 === null && section2 === null) return false;
+        if (section1 === null || section2 === null) return true;
+        return section1.crn !== section2.crn;
     }
 
     private async handleScheduleConflicts(conflicts: ScheduleConflict[], cloudData: any): Promise<void> {
