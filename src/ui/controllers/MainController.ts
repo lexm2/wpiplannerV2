@@ -119,7 +119,7 @@ export class MainController {
             name: 'Google Drive',
             authService: GoogleDriveAuthService.getInstance(),
             syncService: this.googleDriveSyncService,
-            icon: 'CALENDAR_UP',
+            icon: 'BRAND_GOOGLE_DRIVE',
             brandColor: '#4285F4'
         });
 

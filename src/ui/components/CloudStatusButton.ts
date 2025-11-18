@@ -1,7 +1,7 @@
 import { CloudProviderRegistry, type ICloudProvider } from '../../services/sync/CloudProviderRegistry';
 import type { SyncEvent } from '../../services/sync/CloudSyncTypes';
 import type { StateChangeEvent, ProfileState } from '../../core/ProfileStateManager';
-import { getInlineSVG } from '../../utils/iconPaths';
+import { getInlineSVG, type IconName } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
 
 /**
@@ -19,7 +19,7 @@ type ButtonState =
 interface StateConfig {
     text: string;
     className: string;
-    icon?: string;
+    icon?: IconName;
     timeout?: number;  // Auto-transition timeout in ms
 }
 
@@ -44,8 +44,8 @@ export class CloudStatusButton {
     private transitionTimer: number | null = null;
     private pendingState: ButtonState | null = null;
 
-    // State configurations
-    private readonly stateConfigs: Record<ButtonState, StateConfig> = {
+    // Base state configurations (will be updated with provider-specific values)
+    private stateConfigs: Record<ButtonState, StateConfig> = {
         'error': {
             text: 'Sync error',
             className: 'cloud-status-error',
@@ -80,7 +80,7 @@ export class CloudStatusButton {
             icon: 'CALENDAR_UP'
         },
         'unauthenticated': {
-            text: 'Sign in with Google',
+            text: 'Sync with cloud',
             className: 'cloud-status-signin',
             icon: 'CALENDAR_UP'
         }
@@ -88,8 +88,30 @@ export class CloudStatusButton {
 
     constructor(containerId: string) {
         this.provider = CloudProviderRegistry.getActiveProvider();
+        this.updateStateConfigsForProvider();
         this.render(containerId);
         this.setupEventListeners();
+    }
+
+    /**
+     * Update state configurations with provider-specific values
+     */
+    private updateStateConfigsForProvider(): void {
+        if (!this.provider || !this.provider.icon) return;
+
+        // Update authenticated-idle state with provider's icon and name
+        this.stateConfigs['authenticated-idle'] = {
+            text: 'Connected',
+            className: 'cloud-status-connected',
+            icon: this.provider.icon as IconName
+        };
+
+        // Update unauthenticated state with provider's icon
+        this.stateConfigs['unauthenticated'] = {
+            text: 'Sync with cloud',
+            className: 'cloud-status-signin',
+            icon: this.provider.icon as IconName
+        };
     }
 
     private render(containerId: string): void {
@@ -326,6 +348,7 @@ export class CloudStatusButton {
         }
 
         this.provider = provider;
+        this.updateStateConfigsForProvider();
         this.setupEventListeners();
         this.transitionToIdleState();
     }

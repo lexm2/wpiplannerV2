@@ -1,5 +1,6 @@
 import type { ICloudSyncService } from './interfaces/ICloudSyncService';
 import type { ICloudAuthService } from './interfaces/ICloudAuthService';
+import type { IconName } from '../../utils/iconPaths';
 
 /**
  * Cloud Provider Configuration
@@ -20,8 +21,8 @@ export interface ICloudProvider {
     /** Sync service implementing ICloudSyncService */
     syncService: ICloudSyncService;
 
-    /** Icon identifier or inline SVG for UI display */
-    icon?: string;
+    /** Icon identifier from iconPaths.ts (e.g., 'BRAND_GOOGLE_DRIVE') */
+    icon?: IconName;
 
     /** Primary brand color for UI theming (e.g., '#4285F4' for Google) */
     brandColor?: string;
