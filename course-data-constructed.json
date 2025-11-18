@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 18, 2025, 2:16 PM",
+  "generated": "Nov 18, 2025, 2:43 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -168612,7 +168612,7 @@
                 "number": "C01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "(2 credits) This course will provide an integrated overview of the design, selection and use of synthetic plastics. The basic chemistry associated with polymerization and the structure of commercial plastics will be described. Various aspects of polymer crystallization and glass transition will be outlined. Salient aspects of fluid flow and heat transfer during the processing of plastics will be highlighted. Fundamentals of the diverse processing operations used to shape plastics and the resulting structures that develop after processing will be discussed. The mechanical behavior of plastics including elastic deformation, rubber elasticity, yielding, viscoelasticity, fracture and creep will be discussed. Plastic 164 Mechanical Engineering Return to Table of Contents Mechanical Engineering 165 degradation and environmental issues associated with recycling and disposal of plastics will be examined. Typical techniques used in the analysis and testing of plastics will be described and a working knowledge of various terminologies used in commercial practice will be provided. Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MTE 594A).",
@@ -168631,7 +168631,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": []
@@ -172250,51 +172250,6 @@
               "compatibleLabs": []
             }
           ]
-        },
-        {
-          "id": "MKT-569",
-          "number": "569",
-          "name": "Product Management",
-          "description": "The conversion of technology into new products requires an understanding of how to develop a meaningful value proposition and integrate the development of a product with a marketing strategy that creates brand equity. This course will focus on the management of products, the implications of other marketing decisions on product and brand management, the management of product lines within the organization, including introduction, growth, and market exit. (Prerequisite: MKT 500 or equivalent content, or consent of instructor.)",
-          "minCredits": 3,
-          "maxCredits": 3,
-          "lectures": [
-            {
-              "section": {
-                "crn": 337881,
-                "number": "S01",
-                "seats": 50,
-                "seatsAvailable": 46,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "description": "The conversion of technology into new products requires an understanding of how to develop a meaningful value proposition and integrate the development of a product with a marketing strategy that creates brand equity. This course will focus on the management of products, the implications of other marketing decisions on product and brand management, the management of product lines within the organization, including introduction, growth, and market exit. (Prerequisite: MKT 500 or equivalent content, or consent of instructor.)",
-                "term": "202201",
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Purvi Shah",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 50,
-                    "seatsAvailable": 46,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "S01",
-                    "days": []
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
         }
       ]
     },
@@ -175252,7 +175207,7 @@
                 "number": "C01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "(2 credits) This course will provide an integrated overview of the design, selection and use of synthetic plastics. The basic chemistry associated with polymerization and the structure of commercial plastics will be described. Various aspects of polymer crystallization and glass transition will be outlined. Salient aspects of fluid flow and heat transfer during the processing of plastics will be highlighted. Fundamentals of the diverse processing operations used to shape plastics and the resulting structures that develop after processing will be discussed. The mechanical behavior of plastics including elastic deformation, rubber elasticity, yielding, viscoelasticity, fracture and creep will be discussed. Plastic 164 Mechanical Engineering Return to Table of Contents Mechanical Engineering 165 degradation and environmental issues associated with recycling and disposal of plastics will be examined. Typical techniques used in the analysis and testing of plastics will be described and a working knowledge of various terminologies used in commercial practice will be provided. Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MTE 594A).",
@@ -175271,7 +175226,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": []
