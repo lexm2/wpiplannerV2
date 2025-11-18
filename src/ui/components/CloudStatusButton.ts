@@ -86,7 +86,7 @@ export class CloudStatusButton {
         'local-saved': {
             text: 'Saved',
             className: 'cloud-status-saved',
-            icon: 'CHECK',
+            icon: 'DOWNLOAD',
             timeout: 500
         },
         'cloud-uploaded': {
