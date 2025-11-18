@@ -69,6 +69,8 @@ jobs:
           git push
 
       - name: Build TypeScript application
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: npm run build
       
       - name: Copy course data to build output
