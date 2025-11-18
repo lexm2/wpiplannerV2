@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 18, 2025, 5:15 PM",
+  "generated": "Nov 18, 2025, 5:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -35243,7 +35243,7 @@
                 "crn": 338641,
                 "number": "C01",
                 "seats": 40,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -35262,7 +35262,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 40,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -220333,7 +220333,7 @@
                 "crn": 336158,
                 "number": "C01",
                 "seats": 42,
-                "seatsAvailable": 7,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -220352,7 +220352,7 @@
                     "building": "",
                     "room": "Atwater Kent 233",
                     "seats": 42,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
