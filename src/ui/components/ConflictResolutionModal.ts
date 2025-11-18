@@ -9,7 +9,6 @@ export class ConflictResolutionModal {
     private conflictData: ConflictData | null = null;
 
     constructor() {
-        this.createModal();
     }
 
     private createModal(): void {
@@ -105,6 +104,11 @@ export class ConflictResolutionModal {
     show(conflictData: ConflictData, callback: ConflictResolveCallback): void {
         this.conflictData = conflictData;
         this.callback = callback;
+
+        if (!this.modalElement) {
+            this.createModal();
+        }
+
         this.updateContent();
         this.modalElement?.classList.add('visible');
         document.body.style.overflow = 'hidden';
@@ -112,9 +116,13 @@ export class ConflictResolutionModal {
 
     hide(): void {
         this.modalElement?.classList.remove('visible');
-        document.body.style.overflow = '';
-        this.callback = null;
-        this.conflictData = null;
+        setTimeout(() => {
+            this.modalElement?.remove();
+            this.modalElement = null;
+            document.body.style.overflow = '';
+            this.callback = null;
+            this.conflictData = null;
+        }, 200);
     }
 
     private updateContent(): void {
