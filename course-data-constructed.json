@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 18, 2025, 9:51 AM",
+  "generated": "Nov 18, 2025, 10:19 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -3978,7 +3978,7 @@
                 "number": "D01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course provides an introduction to the basic principles of two and three-dimensionalvisual organization. The course focuses on graphic expression, ideadevelopment, and visual literacy. Students will be expected to master basicrendering skills, perspective drawing, concept art, and storyboarding throughtraditional and/or computer-based tools.",
@@ -3997,7 +3997,7 @@
                     "room": "Riley Commons",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -47206,7 +47206,7 @@
                 "number": "D01",
                 "seats": 95,
                 "seatsAvailable": 0,
-                "actualWaitlist": 11,
+                "actualWaitlist": 10,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course provides an introduction to modern cryptography and communication security. It focuses on how cryptographic algorithms and protocols work and how to use them. The course covers the concepts of block ciphers and message authentication codes, public key encryption, digital signatures, and key establishment, as well as common examples and uses of such schemes, including the AES, RSA-OAEP, and the Digital Signature Algorithm. Basic cryptanalytic techniques and examples of practical security solutions are explored to understand how to design and evaluate modern security solutions. The course is suited for students interested in cryptography or other security related fields such as trusted computing, network and OS security, or general IT security. Recommended background: Experience in expressing algorithms in a modern programming language (e.g., ECE 2049 or CS 2301). Suggested background: Discrete mathematics (CS 2022/MA 2201 or equivalent).",
@@ -47225,7 +47225,7 @@
                     "room": "Unity Hall 500",
                     "seats": 95,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 11,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -57225,7 +57225,7 @@
                 "number": "D01",
                 "seats": 95,
                 "seatsAvailable": 0,
-                "actualWaitlist": 11,
+                "actualWaitlist": 10,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course provides an introduction to modern cryptography and communication security. It focuses on how cryptographic algorithms and protocols work and how to use them. The course covers the concepts of block ciphers and message authentication codes, public key encryption, digital signatures, and key establishment, as well as common examples and uses of such schemes, including the AES, RSA-OAEP, and the Digital Signature Algorithm. Basic cryptanalytic techniques and examples of practical security solutions are explored to understand how to design and evaluate modern security solutions. The course is suited for students interested in cryptography or other security related fields such as trusted computing, network and OS security, or general IT security. Recommended background: Experience in expressing algorithms in a modern programming language (e.g., ECE 2049 or CS 2301). Suggested background: Discrete mathematics (CS 2022/MA 2201 or equivalent).",
@@ -57244,7 +57244,7 @@
                     "room": "Unity Hall 500",
                     "seats": 95,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 11,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -234367,7 +234367,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 15,
+                "actualWaitlist": 14,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I This course will teach basic walking techniques and principles with the goal for students to develop and implement an individualized conditioning program for themselves.",
@@ -234386,7 +234386,7 @@
                     "room": "Recreation Center Track",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 15,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
                     "days": [
