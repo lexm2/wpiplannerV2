@@ -111,9 +111,50 @@ export class ProfileStateManager {
                     this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
                     this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');
                 }
+
+                if (event.type === 'auth-changed' && event.data?.isAuthenticated) {
+                    await this.handleFirstTimeAuth();
+                }
             });
         } catch (error) {
             logger.warn('Cloud sync initialization failed:', error);
+        }
+    }
+
+    private async handleFirstTimeAuth(): Promise<void> {
+        if (!this.cloudSyncService) return;
+
+        const hasCompletedInitialSync = localStorage.getItem('google-drive-initial-sync-completed');
+        if (hasCompletedInitialSync) {
+            logger.log('[SYNC] Initial sync already completed, skipping');
+            return;
+        }
+
+        try {
+            logger.log('[SYNC] First time authentication detected, checking cloud storage...');
+            const pullResult = await this.cloudSyncService.pullFromCloud();
+
+            if (!pullResult.success || !pullResult.data) {
+                logger.log('[SYNC] Cloud storage is empty, syncing local data...');
+                const localState = await this.getCurrentCloudState();
+
+                if (localState) {
+                    await this.cloudSyncService.syncToCloud(localState, true);
+                    logger.log('[SYNC] Local data synced to cloud successfully');
+                } else {
+                    logger.log('[SYNC] No local data to sync, creating empty cloud state');
+                    const emptyState = await this.getCurrentCloudState();
+                    if (emptyState) {
+                        await this.cloudSyncService.syncToCloud(emptyState, true);
+                    }
+                }
+            } else {
+                logger.log('[SYNC] Cloud storage already has data, skipping initial sync');
+            }
+
+            localStorage.setItem('google-drive-initial-sync-completed', 'true');
+        } catch (error) {
+            logger.error('[SYNC] First time auth sync failed:', error);
         }
     }
 
@@ -886,6 +927,18 @@ export class ProfileStateManager {
     async exportData(): Promise<string | null> {
         const exportResult = await this.storageManager.exportData();
         return exportResult.valid ? exportResult.data : null;
+    }
+
+    async getCurrentCloudState(): Promise<CloudStateData | null> {
+        const exportedData = await this.exportData();
+        if (!exportedData) return null;
+
+        try {
+            return JSON.parse(exportedData) as CloudStateData;
+        } catch (error) {
+            logger.error('Failed to parse current state as CloudStateData:', error);
+            return null;
+        }
     }
 
     async importData(jsonData: string): Promise<TransactionResult> {
