@@ -48,8 +48,8 @@
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
     <link rel="shortcut icon" href="./favicon.ico">
-  <script type="module" crossorigin src="/wpiplannerV2/assets/index-DhJjheeo.js"></script>
-  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-DzzVgou4.css">
+  <script type="module" crossorigin src="/wpiplannerV2/assets/index-DXiQsEE_.js"></script>
+  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-BU91aix4.css">
 </head>
 <body>
     <div id="app">
@@ -72,10 +72,7 @@
                 </nav>
                 <div class="header-controls">
                     <button id="settings-menu-btn" class="btn btn-icon settings-menu-btn" title="Settings" aria-label="Settings menu"></button>
-                    <div class="status-indicator-container">
-                        <div id="optimistic-ui-status" class="optimistic-status idle">No changes</div>
-                    </div>
-                    <!-- <div id="onedrive-signin-container"></div> -->
+                    <div id="cloud-status-button-container"></div>
                     <div class="undo-redo-controls">
                         <button id="undo-btn" class="btn btn-icon" title="Undo (Ctrl+Z)" disabled></button>
                         <button id="redo-btn" class="btn btn-icon" title="Redo (Ctrl+Y)" disabled></button>
@@ -222,6 +219,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Google API Scripts for Cloud Sync -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
 
 </body>
 </html>
