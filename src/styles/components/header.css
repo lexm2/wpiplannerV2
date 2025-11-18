@@ -165,12 +165,11 @@
   opacity: 1;
 }
 
-.status-indicator-container {
+#cloud-status-button-container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 160px;
-  height: 1.5rem;
 }
 
 .undo-redo-controls {
@@ -314,8 +313,8 @@
     display: none;
   }
 
-  #optimistic-ui-status {
-    display: none;
+  #cloud-status-button-container {
+    min-width: 140px;
   }
 }
 

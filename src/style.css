@@ -20,7 +20,8 @@
 @import url('./styles/components/component-wizard.css');
 @import url('./styles/components/buttons.css');
 @import url('./styles/components/states.css');
-@import url('./styles/optimistic-ui.css'); /* Optimistic UI feedback styles */
-@import url('./styles/components/onedrive-sync.css'); /* OneDrive cloud sync styles */
+@import url('./styles/components/cloud-status-button.css'); /* Unified cloud status and auth button */
+@import url('./styles/components/conflict-modal.css'); /* Schedule conflict resolution modal */
+@import url('./styles/components/sync-modals.css'); /* Cloud sync conflict modals */
 @import url('./styles/components/responsive.css');
 @import url('./styles/components/theme-overrides.css');

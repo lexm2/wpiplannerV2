@@ -193,7 +193,7 @@ export class ProfileStateManager {
                 this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
                 this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');
 
-                await this.syncToCloud();
+                await this.syncToCloud(true);
                 logger.log('[SYNC] Resolved data synced back to cloud');
 
                 resolve();
@@ -824,7 +824,7 @@ export class ProfileStateManager {
         return result;
     }
 
-    private async syncToCloud(): Promise<void> {
+    private async syncToCloud(immediate = false): Promise<void> {
         if (!this.cloudSyncService) return;
 
         try {
@@ -832,7 +832,7 @@ export class ProfileStateManager {
             if (!exportedData) return;
 
             const cloudData: CloudStateData = JSON.parse(exportedData);
-            await this.cloudSyncService.syncToCloud(cloudData);
+            await this.cloudSyncService.syncToCloud(cloudData, immediate);
         } catch (error) {
             logger.error('Cloud sync failed:', error);
         }

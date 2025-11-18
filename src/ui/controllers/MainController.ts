@@ -30,9 +30,11 @@ import { ThemeManager } from '../../themes/ThemeManager'
 import { DataUpdateService } from '../../services/DataUpdateService'
 import type { DataUpdateAvailableEvent } from '../../types/worker'
 import { getInlineSVG } from '../../utils/iconPaths'
-import { GoogleDriveSignIn } from '../components/GoogleDriveSignIn'
+import { CloudStatusButton } from '../components/CloudStatusButton'
+import { CloudProviderRegistry } from '../../services/sync/CloudProviderRegistry'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
 import { GoogleDriveSyncService } from '../../services/sync/googledrive/GoogleDriveSyncService'
+import { GoogleDriveAuthService } from '../../services/sync/googledrive/GoogleDriveAuthService'
 import type { SyncEvent, ConflictData, CloudStateData } from '../../services/sync/CloudSyncTypes'
 
 /**
@@ -65,7 +67,7 @@ export class MainController {
     private departmentSyncService: DepartmentSyncService;
     private scheduleManagementService: ScheduleManagementService;
     private dataUpdateService: DataUpdateService;
-    private googleDriveSignIn: GoogleDriveSignIn;
+    private cloudStatusButton: CloudStatusButton;
     private conflictModal: ConflictResolutionModal;
     private googleDriveSyncService: GoogleDriveSyncService;
     private allDepartments: Department[] = [];
@@ -107,10 +109,22 @@ export class MainController {
         // Initialize data update service
         this.dataUpdateService = new DataUpdateService();
 
-        // Initialize Google Drive sync components
-        this.googleDriveSignIn = new GoogleDriveSignIn();
+        // Initialize Google Drive sync components and register provider
         this.conflictModal = new ConflictResolutionModal();
         this.googleDriveSyncService = GoogleDriveSyncService.getInstance();
+
+        // Register Google Drive provider in the registry
+        CloudProviderRegistry.register({
+            id: 'googledrive',
+            name: 'Google Drive',
+            authService: GoogleDriveAuthService.getInstance(),
+            syncService: this.googleDriveSyncService,
+            icon: 'CALENDAR_UP',
+            brandColor: '#4285F4'
+        });
+
+        // Initialize unified cloud status button
+        this.cloudStatusButton = new CloudStatusButton('cloud-status-button-container');
 
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
@@ -215,9 +229,7 @@ export class MainController {
             this.initializeDefaultDepartmentView();
             
             this.setupEventListeners();
-            this.setupSaveIndicatorListener();
-            this.setupGoogleDriveSyncListeners();
-            this.googleDriveSignIn.render('onedrive-signin-container');
+            this.setupCloudStatusButtonListener();
             this.setupCourseSelectionListener();
             this.setupScheduleChangeListener();
             this.scheduleController.setupAutoScheduleButton();
@@ -1151,71 +1163,21 @@ export class MainController {
     private previousSelectedCoursesCount = 0;
     private previousSelectedCoursesMap = new Map<string, string | null>();
 
-    private setupSaveIndicatorListener(): void {
-        // Listen for save state changes from ProfileStateManager
-        this.profileStateManager.addListener((event) => {
-            if (event.type === 'save_state_changed') {
-                this.updateSaveIndicator(event.data.hasUnsavedChanges);
+    private setupCloudStatusButtonListener(): void {
+        this.profileStateManager.addListener((event, state) => {
+            this.cloudStatusButton.onStateChange(event, state);
+        });
+
+        this.googleDriveSyncService.addEventListener((event: SyncEvent) => {
+            if (event.type === 'sync-conflict') {
+                this.handleSyncConflict(event.data as ConflictData);
             }
         });
-    }
-
-    private setupGoogleDriveSyncListeners(): void {
-        this.googleDriveSyncService.addEventListener((event: SyncEvent) => {
-            this.handleSyncEvent(event);
-        });
-    }
-
-    private handleSyncEvent(event: SyncEvent): void {
-        const indicator = document.getElementById('optimistic-ui-status');
-        if (!indicator) return;
-
-        switch (event.type) {
-            case 'sync-started':
-                indicator.textContent = 'Syncing to cloud...';
-                indicator.className = 'optimistic-status syncing';
-                break;
-            case 'sync-completed':
-            case 'sync-uploaded':
-                indicator.textContent = 'Synced to cloud';
-                indicator.className = 'optimistic-status synced';
-                setTimeout(() => {
-                    indicator.textContent = 'No changes';
-                    indicator.className = 'optimistic-status idle';
-                }, 1500);
-                break;
-            case 'sync-failed':
-                indicator.textContent = 'Sync error';
-                indicator.className = 'optimistic-status error';
-                setTimeout(() => {
-                    indicator.textContent = 'No changes';
-                    indicator.className = 'optimistic-status idle';
-                }, 3000);
-                break;
-            case 'sync-conflict':
-                indicator.textContent = 'Sync conflict';
-                indicator.className = 'optimistic-status conflict';
-                this.handleSyncConflict(event.data as ConflictData);
-                break;
-            case 'offline-mode':
-                indicator.textContent = 'Offline mode';
-                indicator.className = 'optimistic-status offline';
-                break;
-            case 'online-mode':
-                indicator.textContent = 'No changes';
-                indicator.className = 'optimistic-status idle';
-                break;
-        }
     }
 
     private handleSyncConflict(conflictData: ConflictData): void {
         this.conflictModal.show(conflictData, async (resolution) => {
             if (resolution === 'cancel') {
-                const indicator = document.getElementById('optimistic-ui-status');
-                if (indicator) {
-                    indicator.textContent = 'No changes';
-                    indicator.className = 'optimistic-status idle';
-                }
                 return;
             }
 
@@ -1231,25 +1193,6 @@ export class MainController {
                 }
             }
         });
-    }
-
-    private updateSaveIndicator(hasUnsavedChanges: boolean): void {
-        const indicator = document.getElementById('optimistic-ui-status');
-        if (!indicator) return;
-
-        if (hasUnsavedChanges) {
-            indicator.textContent = 'Saving...';
-            indicator.className = 'optimistic-status saving';
-        } else {
-            indicator.textContent = 'Saved';
-            indicator.className = 'optimistic-status saved';
-
-            // Return to "No changes" after 1.5 seconds
-            setTimeout(() => {
-                indicator.textContent = 'No changes';
-                indicator.className = 'optimistic-status idle';
-            }, 1500);
-        }
     }
 
     private setupScheduleChangeListener(): void {
