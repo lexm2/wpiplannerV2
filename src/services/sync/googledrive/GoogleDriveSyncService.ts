@@ -264,9 +264,13 @@ export class GoogleDriveSyncService implements ICloudSyncService {
             };
         } catch (error: any) {
             if (error.status === 401) {
-                console.log('[Google Drive] Token expired, refreshing...');
-                this.authService.refreshAccessToken();
-                return this.performSync(data);
+                console.error('[Google Drive] Authentication expired, please sign in again');
+                this.updateStatus('not_authenticated');
+                return {
+                    success: false,
+                    status: 'not_authenticated',
+                    message: 'Authentication expired, please sign in again',
+                };
             }
 
             console.error('[Google Drive] Sync failed:', error);
@@ -328,8 +332,13 @@ export class GoogleDriveSyncService implements ICloudSyncService {
             };
         } catch (error: any) {
             if (error.status === 401) {
-                this.authService.refreshAccessToken();
-                return this.pullFromCloud();
+                console.error('[Google Drive] Authentication expired, please sign in again');
+                this.updateStatus('not_authenticated');
+                return {
+                    success: false,
+                    status: 'not_authenticated',
+                    message: 'Authentication expired, please sign in again',
+                };
             }
 
             return {

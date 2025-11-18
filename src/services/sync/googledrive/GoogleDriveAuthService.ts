@@ -211,10 +211,4 @@ export class GoogleDriveAuthService implements ICloudAuthService {
     private clearAuthState(): void {
         localStorage.removeItem('google-drive-auth');
     }
-
-    refreshAccessToken(): void {
-        if (this.tokenClient && this.currentUser.isAuthenticated) {
-            this.tokenClient.requestAccessToken({ prompt: '' });
-        }
-    }
 }
