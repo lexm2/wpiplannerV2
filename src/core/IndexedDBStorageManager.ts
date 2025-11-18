@@ -3,7 +3,7 @@
  */
 
 import { Schedule } from '../types/schedule';
-import { safeStringify } from '../utils/jsonSerializer';
+import { safeStringify, safeParse } from '../utils/jsonSerializer';
 
 interface StorageResult<T> {
     success: boolean;
@@ -96,7 +96,14 @@ export class IndexedDBStorageManager {
                     timestamp: Date.now()
                 };
 
-                const request = store.put(scheduleWithTimestamp);
+                const serialized = safeStringify(scheduleWithTimestamp);
+                const dataToStore = {
+                    id: schedule.id,
+                    serializedData: serialized,
+                    timestamp: scheduleWithTimestamp.timestamp
+                };
+
+                const request = store.put(dataToStore);
 
                 request.onsuccess = () => {
                     resolve({ success: true });
@@ -132,7 +139,13 @@ export class IndexedDBStorageManager {
 
                 request.onsuccess = () => {
                     if (request.result) {
-                        resolve({ success: true, data: request.result });
+                        const stored = request.result;
+                        if (stored.serializedData) {
+                            const deserialized = safeParse(stored.serializedData);
+                            resolve({ success: true, data: deserialized });
+                        } else {
+                            resolve({ success: true, data: stored });
+                        }
                     } else {
                         resolve({ success: false, error: 'Schedule not found' });
                     }
@@ -167,7 +180,14 @@ export class IndexedDBStorageManager {
                 const request = store.getAll();
 
                 request.onsuccess = () => {
-                    resolve({ success: true, data: request.result || [] });
+                    const results = request.result || [];
+                    const deserialized = results.map((stored: any) => {
+                        if (stored.serializedData) {
+                            return safeParse(stored.serializedData);
+                        }
+                        return stored;
+                    });
+                    resolve({ success: true, data: deserialized });
                 };
 
                 request.onerror = () => {

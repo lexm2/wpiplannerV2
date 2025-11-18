@@ -342,6 +342,13 @@
   min-width: 90px;
 }
 
+.schedule-picker-modal-dialog .modal-footer-buttons .modal-footer-icon {
+  width: 18px;
+  height: 18px;
+  transform: translateY(3px);
+  display: inline-block;
+}
+
 /* Focus States for Accessibility */
 .schedule-picker-modal-dialog .switch-btn:focus-visible,
 .schedule-picker-modal-dialog .menu-btn:focus-visible,

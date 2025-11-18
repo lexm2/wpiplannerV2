@@ -1,7 +1,7 @@
 import { Client } from '@microsoft/microsoft-graph-client';
 import { OneDriveAuthService } from './OneDriveAuthService';
-import { ONEDRIVE_CONFIG, ONEDRIVE_APP_FOLDER_ENDPOINT } from '../config/onedrive.config';
-import {
+import { ONEDRIVE_CONFIG, ONEDRIVE_APP_FOLDER_ENDPOINT } from '../../../config/onedrive.config';
+import type {
     SyncStatus,
     CloudStateData,
     SyncResult,
@@ -10,10 +10,11 @@ import {
     SyncEventListener,
     SyncQueueItem,
     SyncMetadata,
-    OneDriveFile,
-} from './OneDriveSyncTypes';
+} from '../CloudSyncTypes';
+import type { ICloudSyncService } from '../interfaces/ICloudSyncService';
+import type { ICloudAuthService } from '../interfaces/ICloudAuthService';
 
-export class OneDriveSyncService {
+export class OneDriveSyncService implements ICloudSyncService {
     private static instance: OneDriveSyncService;
     private authService: OneDriveAuthService;
     private graphClient: Client | null = null;
@@ -86,11 +87,26 @@ export class OneDriveSyncService {
         if (this.authService.isAuthenticated()) {
             await this.initializeGraphClient();
             this.updateStatus('idle');
-            await this.pullFromCloud();
         } else {
+            this.cancelPendingSync();
             this.graphClient = null;
             this.updateStatus('not_authenticated');
         }
+    }
+
+    cancelPendingSync(): void {
+        if (this.syncDebounceTimer !== null) {
+            console.log('[OneDrive] Canceling pending sync operation');
+            clearTimeout(this.syncDebounceTimer);
+            this.syncDebounceTimer = null;
+        }
+
+        if (this.isSyncing) {
+            console.log('[OneDrive] Sync in progress, flagging for cancellation');
+            this.isSyncing = false;
+        }
+
+        this.updateStatus('not_authenticated');
     }
 
     async syncToCloud(data: CloudStateData, immediate = false): Promise<SyncResult> {
@@ -128,6 +144,15 @@ export class OneDriveSyncService {
     }
 
     private async performSync(data: CloudStateData): Promise<SyncResult> {
+        if (!this.authService.isAuthenticated()) {
+            console.log('[OneDrive] User not authenticated, aborting sync');
+            return {
+                success: false,
+                status: 'not_authenticated',
+                message: 'User not authenticated',
+            };
+        }
+
         if (this.isSyncing) {
             return {
                 success: false,
@@ -168,6 +193,16 @@ export class OneDriveSyncService {
             }
 
             await this.uploadToOneDrive(enrichedData);
+
+            if (!this.authService.isAuthenticated()) {
+                console.log('[OneDrive] User signed out during sync, not emitting success event');
+                this.isSyncing = false;
+                return {
+                    success: false,
+                    status: 'not_authenticated',
+                    message: 'User signed out during sync',
+                };
+            }
 
             this.updateStatus('synced');
             this.notifyEvent({ type: 'sync-completed', timestamp: Date.now(), data: enrichedData });
@@ -437,7 +472,7 @@ export class OneDriveSyncService {
         return this.authService.isAuthenticated();
     }
 
-    getAuthService(): OneDriveAuthService {
+    getAuthService(): ICloudAuthService {
         return this.authService;
     }
 }

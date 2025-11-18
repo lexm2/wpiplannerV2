@@ -6,10 +6,11 @@ import {
     SilentRequest,
     PopupRequest,
 } from '@azure/msal-browser';
-import { ONEDRIVE_CONFIG } from '../config/onedrive.config';
-import { AuthState, SyncEvent } from './OneDriveSyncTypes';
+import { ONEDRIVE_CONFIG } from '../../../config/onedrive.config';
+import type { SyncEvent } from '../CloudSyncTypes';
+import type { ICloudAuthService, AuthState, AuthResult } from '../interfaces/ICloudAuthService';
 
-export class OneDriveAuthService {
+export class OneDriveAuthService implements ICloudAuthService {
     private static instance: OneDriveAuthService;
     private msalInstance: PublicClientApplication;
     private currentAccount: AccountInfo | null = null;
@@ -37,7 +38,7 @@ export class OneDriveAuthService {
         }
     }
 
-    async signIn(): Promise<AuthenticationResult> {
+    async signIn(): Promise<AuthResult> {
         const loginRequest: PopupRequest = {
             scopes: ONEDRIVE_CONFIG.scopes,
         };
@@ -46,7 +47,13 @@ export class OneDriveAuthService {
             const response = await this.msalInstance.loginPopup(loginRequest);
             this.currentAccount = response.account;
             this.notifyAuthChanged();
-            return response;
+            return {
+                account: {
+                    username: response.account.username,
+                    homeAccountId: response.account.homeAccountId,
+                },
+                accessToken: response.accessToken,
+            };
         } catch (error) {
             console.error('Sign-in error:', error);
             throw error;
@@ -59,6 +66,7 @@ export class OneDriveAuthService {
                 account: this.currentAccount,
             });
             this.currentAccount = null;
+            console.log('[OneDrive] User signed out');
             this.notifyAuthChanged();
         }
     }

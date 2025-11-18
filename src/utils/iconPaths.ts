@@ -12,10 +12,17 @@ import adjustmentsAltIcon from '../assets/icons/adjustments-alt.svg?url';
 import alertCircleIcon from '../assets/icons/alert-circle.svg?url';
 import alertSquareRoundedIcon from '../assets/icons/alert-square-rounded.svg?url';
 import arrowBackUpIcon from '../assets/icons/arrow-back-up.svg?url';
+import arrowBarLeftIcon from '../assets/icons/arrow-bar-left.svg?url';
 import arrowBarRightIcon from '../assets/icons/arrow-bar-right.svg?url';
 import arrowForwardUpIcon from '../assets/icons/arrow-forward-up.svg?url';
+import brandAppleIcon from '../assets/icons/brand-apple.svg?url';
+import brandGoogleDriveIcon from '../assets/icons/brand-google-drive.svg?url';
+import brandOnedriveIcon from '../assets/icons/brand-onedrive.svg?url';
 import brightnessIcon from '../assets/icons/brightness.svg?url';
+import calendarDownIcon from '../assets/icons/calendar-down.svg?url';
+import calendarPlusIcon from '../assets/icons/calendar-plus.svg?url';
 import calendarRepeatIcon from '../assets/icons/calendar-repeat.svg?url';
+import calendarShareIcon from '../assets/icons/calendar-share.svg?url';
 import calendarUpIcon from '../assets/icons/calendar-up.svg?url';
 import checkIcon from '../assets/icons/check.svg?url';
 import chevronDownIcon from '../assets/icons/chevron-down.svg?url';
@@ -31,6 +38,8 @@ import minusIcon from '../assets/icons/minus.svg?url';
 import plusIcon from '../assets/icons/plus.svg?url';
 import settingsIcon from '../assets/icons/settings.svg?url';
 import trashIcon from '../assets/icons/trash.svg?url';
+import userCheckIcon from '../assets/icons/user-check.svg?url';
+import userXIcon from '../assets/icons/user-x.svg?url';
 import wandIcon from '../assets/icons/wand.svg?url';
 import xIcon from '../assets/icons/x.svg?url';
 
@@ -39,10 +48,17 @@ export type IconName =
   | 'ALERT_CIRCLE'
   | 'ALERT_SQUARE_ROUNDED'
   | 'ARROW_BACK_UP'
+  | 'ARROW_BAR_LEFT'
   | 'ARROW_BAR_RIGHT'
   | 'ARROW_FORWARD_UP'
+  | 'BRAND_APPLE'
+  | 'BRAND_GOOGLE_DRIVE'
+  | 'BRAND_ONEDRIVE'
   | 'BRIGHTNESS'
+  | 'CALENDAR_DOWN'
+  | 'CALENDAR_PLUS'
   | 'CALENDAR_REPEAT'
+  | 'CALENDAR_SHARE'
   | 'CALENDAR_UP'
   | 'CHECK'
   | 'CHEVRON_DOWN'
@@ -58,6 +74,8 @@ export type IconName =
   | 'PLUS'
   | 'SETTINGS'
   | 'TRASH'
+  | 'USER_CHECK'
+  | 'USER_X'
   | 'WAND'
   | 'X';
 
@@ -69,10 +87,17 @@ export type IconName =
  * - ALERT_CIRCLE: alert-circle.svg
  * - ALERT_SQUARE_ROUNDED: alert-square-rounded.svg
  * - ARROW_BACK_UP: arrow-back-up.svg
+ * - ARROW_BAR_LEFT: arrow-bar-left.svg
  * - ARROW_BAR_RIGHT: arrow-bar-right.svg
  * - ARROW_FORWARD_UP: arrow-forward-up.svg
+ * - BRAND_APPLE: brand-apple.svg
+ * - BRAND_GOOGLE_DRIVE: brand-google-drive.svg
+ * - BRAND_ONEDRIVE: brand-onedrive.svg
  * - BRIGHTNESS: brightness.svg
+ * - CALENDAR_DOWN: calendar-down.svg
+ * - CALENDAR_PLUS: calendar-plus.svg
  * - CALENDAR_REPEAT: calendar-repeat.svg
+ * - CALENDAR_SHARE: calendar-share.svg
  * - CALENDAR_UP: calendar-up.svg
  * - CHECK: check.svg
  * - CHEVRON_DOWN: chevron-down.svg
@@ -88,6 +113,8 @@ export type IconName =
  * - PLUS: plus.svg
  * - SETTINGS: settings.svg
  * - TRASH: trash.svg
+ * - USER_CHECK: user-check.svg
+ * - USER_X: user-x.svg
  * - WAND: wand.svg
  * - X: x.svg
  */
@@ -96,10 +123,17 @@ export const ICONS: Record<IconName, string> = {
   ALERT_CIRCLE: alertCircleIcon,
   ALERT_SQUARE_ROUNDED: alertSquareRoundedIcon,
   ARROW_BACK_UP: arrowBackUpIcon,
+  ARROW_BAR_LEFT: arrowBarLeftIcon,
   ARROW_BAR_RIGHT: arrowBarRightIcon,
   ARROW_FORWARD_UP: arrowForwardUpIcon,
+  BRAND_APPLE: brandAppleIcon,
+  BRAND_GOOGLE_DRIVE: brandGoogleDriveIcon,
+  BRAND_ONEDRIVE: brandOnedriveIcon,
   BRIGHTNESS: brightnessIcon,
+  CALENDAR_DOWN: calendarDownIcon,
+  CALENDAR_PLUS: calendarPlusIcon,
   CALENDAR_REPEAT: calendarRepeatIcon,
+  CALENDAR_SHARE: calendarShareIcon,
   CALENDAR_UP: calendarUpIcon,
   CHECK: checkIcon,
   CHEVRON_DOWN: chevronDownIcon,
@@ -115,6 +149,8 @@ export const ICONS: Record<IconName, string> = {
   PLUS: plusIcon,
   SETTINGS: settingsIcon,
   TRASH: trashIcon,
+  USER_CHECK: userCheckIcon,
+  USER_X: userXIcon,
   WAND: wandIcon,
   X: xIcon,
 } as const;
@@ -128,10 +164,17 @@ export const INLINE_SVGS: Record<IconName, string> = {
   ALERT_CIRCLE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" /></svg>`,
   ALERT_SQUARE_ROUNDED: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2l.642 .005l.616 .017l.299 .013l.579 .034l.553 .046c4.687 .455 6.65 2.333 7.166 6.906l.03 .29l.046 .553l.041 .727l.006 .15l.017 .617l.005 .642l-.005 .642l-.017 .616l-.013 .299l-.034 .579l-.046 .553c-.455 4.687 -2.333 6.65 -6.906 7.166l-.29 .03l-.553 .046l-.727 .041l-.15 .006l-.617 .017l-.642 .005l-.642 -.005l-.616 -.017l-.299 -.013l-.579 -.034l-.553 -.046c-4.687 -.455 -6.65 -2.333 -7.166 -6.906l-.03 -.29l-.046 -.553l-.041 -.727l-.006 -.15l-.017 -.617l-.004 -.318v-.648l.004 -.318l.017 -.616l.013 -.299l.034 -.579l.046 -.553c.455 -4.687 2.333 -6.65 6.906 -7.166l.29 -.03l.553 -.046l.727 -.041l.15 -.006l.617 -.017c.21 -.003 .424 -.005 .642 -.005zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" /></svg>`,
   ARROW_BACK_UP: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" /></svg>`,
+  ARROW_BAR_LEFT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 12l10 0" /><path d="M4 12l4 4" /><path d="M4 12l4 -4" /><path d="M20 4l0 16" /></svg>`,
   ARROW_BAR_RIGHT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 12l-10 0" /><path d="M20 12l-4 4" /><path d="M20 12l-4 -4" /><path d="M4 4l0 16" /></svg>`,
   ARROW_FORWARD_UP: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 14l4 -4l-4 -4" /><path d="M19 10h-11a4 4 0 1 0 0 8h1" /></svg>`,
+  BRAND_APPLE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15.079 5.999l.239 .012c1.43 .097 3.434 1.013 4.508 2.586a1 1 0 0 1 -.344 1.44c-.05 .028 -.372 .158 -.497 .217a4.15 4.15 0 0 0 -.722 .431c-.614 .461 -.948 1.009 -.942 1.694c.01 .885 .339 1.454 .907 1.846c.208 .143 .436 .253 .666 .33c.126 .043 .426 .116 .444 .122a1 1 0 0 1 .662 .942c0 2.621 -3.04 6.381 -5.286 6.381c-.79 0 -1.272 -.091 -1.983 -.315l-.098 -.031c-.463 -.146 -.702 -.192 -1.133 -.192c-.52 0 -.863 .06 -1.518 .237l-.197 .053c-.575 .153 -.964 .226 -1.5 .248c-2.749 0 -5.285 -5.093 -5.285 -9.072c0 -3.87 1.786 -6.92 5.286 -6.92c.297 0 .598 .045 .909 .128c.403 .107 .774 .26 1.296 .508c.787 .374 .948 .44 1.009 .44h.016c.03 -.003 .128 -.047 1.056 -.457c1.061 -.467 1.864 -.685 2.746 -.616l-.24 -.012z" /><path d="M14 1a1 1 0 0 1 1 1a3 3 0 0 1 -3 3a1 1 0 0 1 -1 -1a3 3 0 0 1 3 -3z" /></svg>`,
+  BRAND_GOOGLE_DRIVE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 10l-6 10l-3 -5l6 -10z" /><path d="M9 15h12l-3 5h-12" /><path d="M15 15l-6 -10h6l6 10z" /></svg>`,
+  BRAND_ONEDRIVE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18.456 10.45a6.45 6.45 0 0 0 -12 -2.151a4.857 4.857 0 0 0 -4.44 5.241a4.856 4.856 0 0 0 5.236 4.444h10.751a3.771 3.771 0 0 0 3.99 -3.54a3.772 3.772 0 0 0 -3.538 -3.992z" /></svg>`,
   BRIGHTNESS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -15 8.66l.005 -.324a10 10 0 0 1 14.995 -8.336m-9 1.732a8 8 0 0 0 4.001 14.928l-.001 -16a8 8 0 0 0 -4 1.072" /></svg>`,
+  CALENDAR_DOWN: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" /><path d="M19 16v6" /><path d="M22 19l-3 3l-3 -3" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /></svg>`,
+  CALENDAR_PLUS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M16 19h6" /><path d="M19 16v6" /></svg>`,
   CALENDAR_REPEAT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v3" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h12" /><path d="M20 14l2 2h-3" /><path d="M20 18l2 -2" /><path d="M19 16a3 3 0 1 0 2 5.236" /></svg>`,
+  CALENDAR_SHARE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 21h-6a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v6" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M16 22l5 -5" /><path d="M21 21.5v-4.5h-4.5" /></svg>`,
   CALENDAR_UP: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M19 22v-6" /><path d="M22 19l-3 -3l-3 3" /></svg>`,
   CHECK: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>`,
   CHEVRON_DOWN: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg>`,
@@ -147,6 +190,8 @@ export const INLINE_SVGS: Record<IconName, string> = {
   PLUS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>`,
   SETTINGS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" /><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>`,
   TRASH: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>`,
+  USER_CHECK: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M6 21v-2a4 4 0 0 1 4 -4h4" /><path d="M15 19l2 2l4 -4" /></svg>`,
+  USER_X: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" /><path d="M22 22l-5 -5" /><path d="M17 22l5 -5" /></svg>`,
   WAND: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 21l15 -15l-3 -3l-15 15l3 3" /><path d="M15 6l3 3" /><path d="M9 3a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" /><path d="M19 13a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" /></svg>`,
   X: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>`,
 } as const;
