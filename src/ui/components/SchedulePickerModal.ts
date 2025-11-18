@@ -1,6 +1,7 @@
 import { ScheduleManagementService } from '../../services/ScheduleManagementService';
 import { ModalService } from '../../services/ModalService';
 import { Schedule } from '../../types/schedule';
+import { getInlineSVG } from '../../utils/iconPaths';
 
 export class SchedulePickerModal {
     private static readonly MENU_WIDTH = 120;
@@ -70,10 +71,10 @@ export class SchedulePickerModal {
                             </div>
                         </div>
                         <div class="modal-footer-buttons">
-                            <button class="btn btn-primary" id="new-schedule-btn-modal">+ New Schedule</button>
-                            <button class="btn btn-secondary" id="import-schedule-btn-modal">Import</button>
-                            <button class="btn btn-secondary" id="export-schedule-btn-modal">Export All</button>
-                            <button class="btn btn-secondary" id="export-ics-btn-modal">Export ICS</button>
+                            <button class="btn btn-primary" id="new-schedule-btn-modal">${getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')} New Schedule</button>
+                            <button class="btn btn-secondary" id="import-schedule-btn-modal">${getInlineSVG('CALENDAR_DOWN', 'modal-footer-icon')} Import</button>
+                            <button class="btn btn-secondary" id="export-schedule-btn-modal">${getInlineSVG('CALENDAR_UP', 'modal-footer-icon')} Export All</button>
+                            <button class="btn btn-secondary" id="export-ics-btn-modal">${getInlineSVG('CALENDAR_SHARE', 'modal-footer-icon')} Export ICS</button>
                         </div>
                     </div>
                 </div>

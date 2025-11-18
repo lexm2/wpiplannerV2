@@ -20,6 +20,7 @@ import brandGoogleDriveIcon from '../assets/icons/brand-google-drive.svg?url';
 import brandOnedriveIcon from '../assets/icons/brand-onedrive.svg?url';
 import brightnessIcon from '../assets/icons/brightness.svg?url';
 import calendarDownIcon from '../assets/icons/calendar-down.svg?url';
+import calendarPlusIcon from '../assets/icons/calendar-plus.svg?url';
 import calendarRepeatIcon from '../assets/icons/calendar-repeat.svg?url';
 import calendarShareIcon from '../assets/icons/calendar-share.svg?url';
 import calendarUpIcon from '../assets/icons/calendar-up.svg?url';
@@ -55,6 +56,7 @@ export type IconName =
   | 'BRAND_ONEDRIVE'
   | 'BRIGHTNESS'
   | 'CALENDAR_DOWN'
+  | 'CALENDAR_PLUS'
   | 'CALENDAR_REPEAT'
   | 'CALENDAR_SHARE'
   | 'CALENDAR_UP'
@@ -93,6 +95,7 @@ export type IconName =
  * - BRAND_ONEDRIVE: brand-onedrive.svg
  * - BRIGHTNESS: brightness.svg
  * - CALENDAR_DOWN: calendar-down.svg
+ * - CALENDAR_PLUS: calendar-plus.svg
  * - CALENDAR_REPEAT: calendar-repeat.svg
  * - CALENDAR_SHARE: calendar-share.svg
  * - CALENDAR_UP: calendar-up.svg
@@ -128,6 +131,7 @@ export const ICONS: Record<IconName, string> = {
   BRAND_ONEDRIVE: brandOnedriveIcon,
   BRIGHTNESS: brightnessIcon,
   CALENDAR_DOWN: calendarDownIcon,
+  CALENDAR_PLUS: calendarPlusIcon,
   CALENDAR_REPEAT: calendarRepeatIcon,
   CALENDAR_SHARE: calendarShareIcon,
   CALENDAR_UP: calendarUpIcon,
@@ -168,6 +172,7 @@ export const INLINE_SVGS: Record<IconName, string> = {
   BRAND_ONEDRIVE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18.456 10.45a6.45 6.45 0 0 0 -12 -2.151a4.857 4.857 0 0 0 -4.44 5.241a4.856 4.856 0 0 0 5.236 4.444h10.751a3.771 3.771 0 0 0 3.99 -3.54a3.772 3.772 0 0 0 -3.538 -3.992z" /></svg>`,
   BRIGHTNESS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -15 8.66l.005 -.324a10 10 0 0 1 14.995 -8.336m-9 1.732a8 8 0 0 0 4.001 14.928l-.001 -16a8 8 0 0 0 -4 1.072" /></svg>`,
   CALENDAR_DOWN: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" /><path d="M19 16v6" /><path d="M22 19l-3 3l-3 -3" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /></svg>`,
+  CALENDAR_PLUS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M16 19h6" /><path d="M19 16v6" /></svg>`,
   CALENDAR_REPEAT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v3" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h12" /><path d="M20 14l2 2h-3" /><path d="M20 18l2 -2" /><path d="M19 16a3 3 0 1 0 2 5.236" /></svg>`,
   CALENDAR_SHARE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 21h-6a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v6" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M16 22l5 -5" /><path d="M21 21.5v-4.5h-4.5" /></svg>`,
   CALENDAR_UP: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M19 22v-6" /><path d="M22 19l-3 -3l-3 3" /></svg>`,
