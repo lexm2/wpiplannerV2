@@ -480,16 +480,17 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-bottom: 2rem;
 }
 
 .conflict-toggle-label-left,
 .conflict-toggle-label-right {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     transition: color 0.25s ease;
+    user-select: none;
 }
 
 .conflict-toggle:not(:checked) ~ .conflict-toggle-label-left,
@@ -499,43 +500,41 @@
 }
 
 .conflict-toggle {
-    border-radius: 0.75em;
-    box-shadow: 0 0 0 0.1em var(--color-border) inset;
-    cursor: pointer;
     position: relative;
-    width: 3em;
-    height: 1.5em;
-    background-color: transparent;
-    transition: background-color 0.25s ease-in;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+    width: 50px;
+    height: 24px;
     appearance: none;
-    -webkit-tap-highlight-color: transparent;
+    background: var(--color-border);
+    border-radius: 12px;
+    outline: none;
+    cursor: pointer;
+    transition: var(--effect-transition);
+    margin: 0;
+}
+
+.conflict-toggle:checked {
+    background: var(--color-primary);
+}
+
+.conflict-toggle::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    transition: var(--effect-transition);
+}
+
+.conflict-toggle:checked::before {
+    transform: translateX(26px);
 }
 
 .conflict-toggle:focus {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
-}
-
-.conflict-toggle:before {
-    background: var(--color-text);
-    border-radius: 50%;
-    content: "";
-    position: absolute;
-    top: 0.2em;
-    left: 0.2em;
-    width: 1.1em;
-    height: 1.1em;
-    transition: transform 0.25s cubic-bezier(0.6, 0.2, 0.4, 1.5);
-}
-
-.conflict-toggle:checked {
-    background-color: var(--color-primary);
-}
-
-.conflict-toggle:checked:before {
-    transform: translateX(1.5em);
 }
 
 /* Disabled navigation buttons */
@@ -614,19 +613,25 @@
 }
 
 .conflict-course-item {
-    padding: 0.625rem 0.875rem;
     background: var(--color-secondary);
-    border-radius: var(--effect-border-radius);
-    font-size: 0.875rem;
-    border: 1px solid transparent;
-    transition: all 0.2s ease;
+    color: var(--color-text);
+    padding: 0.25rem 0.5rem;
+    border-radius: calc(var(--effect-border-radius) / 2);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-medium);
     cursor: default;
+    transition: var(--effect-transition);
+    border: 1px solid var(--color-border);
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
 }
 
 .conflict-course-item:hover {
-    background: var(--color-surface-hover);
-    border-color: var(--color-border);
-    transform: translateX(2px);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .conflict-course-number {
