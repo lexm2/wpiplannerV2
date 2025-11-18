@@ -87,11 +87,26 @@ export class OneDriveSyncService implements ICloudSyncService {
         if (this.authService.isAuthenticated()) {
             await this.initializeGraphClient();
             this.updateStatus('idle');
-            await this.pullFromCloud();
         } else {
+            this.cancelPendingSync();
             this.graphClient = null;
             this.updateStatus('not_authenticated');
         }
+    }
+
+    cancelPendingSync(): void {
+        if (this.syncDebounceTimer !== null) {
+            console.log('[OneDrive] Canceling pending sync operation');
+            clearTimeout(this.syncDebounceTimer);
+            this.syncDebounceTimer = null;
+        }
+
+        if (this.isSyncing) {
+            console.log('[OneDrive] Sync in progress, flagging for cancellation');
+            this.isSyncing = false;
+        }
+
+        this.updateStatus('not_authenticated');
     }
 
     async syncToCloud(data: CloudStateData, immediate = false): Promise<SyncResult> {
@@ -129,6 +144,15 @@ export class OneDriveSyncService implements ICloudSyncService {
     }
 
     private async performSync(data: CloudStateData): Promise<SyncResult> {
+        if (!this.authService.isAuthenticated()) {
+            console.log('[OneDrive] User not authenticated, aborting sync');
+            return {
+                success: false,
+                status: 'not_authenticated',
+                message: 'User not authenticated',
+            };
+        }
+
         if (this.isSyncing) {
             return {
                 success: false,
@@ -169,6 +193,16 @@ export class OneDriveSyncService implements ICloudSyncService {
             }
 
             await this.uploadToOneDrive(enrichedData);
+
+            if (!this.authService.isAuthenticated()) {
+                console.log('[OneDrive] User signed out during sync, not emitting success event');
+                this.isSyncing = false;
+                return {
+                    success: false,
+                    status: 'not_authenticated',
+                    message: 'User signed out during sync',
+                };
+            }
 
             this.updateStatus('synced');
             this.notifyEvent({ type: 'sync-completed', timestamp: Date.now(), data: enrichedData });

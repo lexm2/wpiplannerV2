@@ -125,24 +125,25 @@ export class GoogleDriveSyncService implements ICloudSyncService {
     private async handleAuthChange(): Promise<void> {
         if (this.authService.isAuthenticated()) {
             this.updateStatus('idle');
-
-
-            console.log('[Google Drive] Authentication successful, pulling data from cloud...');
-            const result = await this.pullFromCloud();
-            if (result.success && result.data) {
-                console.log('[Google Drive] Cloud data retrieved successfully');
-                console.log('[Google Drive] Pulled data:', result.data);
-                this.notifyEvent({
-                    type: 'sync-completed',
-                    timestamp: Date.now(),
-                    data: result.data,
-                });
-            } else if (result.status === 'error' && result.message === 'No cloud data found') {
-                console.log('[Google Drive] No existing cloud data found (first time setup)');
-            }
         } else {
+            this.cancelPendingSync();
             this.updateStatus('not_authenticated');
         }
+    }
+
+    cancelPendingSync(): void {
+        if (this.syncDebounceTimer !== null) {
+            console.log('[Google Drive] Canceling pending sync operation');
+            clearTimeout(this.syncDebounceTimer);
+            this.syncDebounceTimer = null;
+        }
+
+        if (this.isSyncing) {
+            console.log('[Google Drive] Sync in progress, flagging for cancellation');
+            this.isSyncing = false;
+        }
+
+        this.updateStatus('not_authenticated');
     }
 
     async syncToCloud(data: CloudStateData, immediate = false): Promise<SyncResult> {
@@ -192,6 +193,15 @@ export class GoogleDriveSyncService implements ICloudSyncService {
     }
 
     private async performSync(data: CloudStateData): Promise<SyncResult> {
+        if (!this.authService.isAuthenticated()) {
+            console.log('[Google Drive] User not authenticated, aborting sync');
+            return {
+                success: false,
+                status: 'not_authenticated',
+                message: 'User not authenticated',
+            };
+        }
+
         if (this.isSyncing) {
             console.log('[Google Drive] Sync already in progress');
             return {
@@ -240,6 +250,16 @@ export class GoogleDriveSyncService implements ICloudSyncService {
             console.log('[Google Drive] Uploading data...');
             await this.uploadToGoogleDrive(enrichedData);
             console.log('[Google Drive] Upload successful');
+
+            if (!this.authService.isAuthenticated()) {
+                console.log('[Google Drive] User signed out during sync, not emitting success event');
+                this.isSyncing = false;
+                return {
+                    success: false,
+                    status: 'not_authenticated',
+                    message: 'User signed out during sync',
+                };
+            }
 
             this.updateStatus('synced');
             this.notifyEvent({ type: 'sync-uploaded', timestamp: Date.now(), data: enrichedData });

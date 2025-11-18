@@ -66,6 +66,7 @@ export class OneDriveAuthService implements ICloudAuthService {
                 account: this.currentAccount,
             });
             this.currentAccount = null;
+            console.log('[OneDrive] User signed out');
             this.notifyAuthChanged();
         }
     }

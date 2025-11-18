@@ -8,9 +8,11 @@ import { logger } from '../../utils/logger';
  * Button states in priority order (highest to lowest)
  */
 type ButtonState =
-    | 'error'               // Error occurred 
+    | 'error'               // Error occurred
     | 'local-saving'        // Saving to localStorage
     | 'cloud-syncing'       // Syncing to cloud
+    | 'signed-out'          // Just signed out (transient)
+    | 'signed-in'           // Just signed in (transient)
     | 'local-saved'         // Saved to localStorage (transient)
     | 'cloud-synced'        // Synced to cloud (transient)
     | 'authenticated-idle'  // Signed in, no operations
@@ -61,6 +63,18 @@ export class CloudStatusButton {
             text: 'Syncing...',
             className: 'cloud-status-syncing',
             icon: 'CALENDAR_UP'
+        },
+        'signed-out': {
+            text: 'Signed out',
+            className: 'cloud-status-signed-out',
+            icon: 'CHECK',
+            timeout: 1500
+        },
+        'signed-in': {
+            text: 'Signed in',
+            className: 'cloud-status-signed-in',
+            icon: 'CHECK',
+            timeout: 1500
         },
         'local-saved': {
             text: 'Saved',
@@ -142,7 +156,13 @@ export class CloudStatusButton {
         this.provider.authService.addEventListener((event: SyncEvent) => {
             if (event.type === 'auth-changed') {
                 logger.log('[CloudStatusButton] Auth state changed');
-                this.transitionToIdleState();
+                const isAuthenticated = this.provider?.authService.isAuthenticated() ?? false;
+
+                if (isAuthenticated) {
+                    this.setStateImmediate('signed-in');
+                } else {
+                    this.setStateImmediate('signed-out');
+                }
             }
         });
 
@@ -166,6 +186,12 @@ export class CloudStatusButton {
 
     private handleSyncEvent(event: SyncEvent): void {
         logger.log('[CloudStatusButton] Received sync event:', event.type);
+
+        if (this.currentState === 'signed-out' || this.currentState === 'signed-in') {
+            logger.log('[CloudStatusButton] Ignoring sync event during auth transition');
+            return;
+        }
+
         switch (event.type) {
             case 'sync-started':
                 this.setState('cloud-syncing');
@@ -217,6 +243,29 @@ export class CloudStatusButton {
                 logger.error('[CloudStatusButton] Sign in failed:', error);
                 this.setState('error');
             }
+        }
+    }
+
+    /**
+     * Set state immediately, overriding any current state (used for auth changes)
+     */
+    private setStateImmediate(newState: ButtonState): void {
+        logger.log('[CloudStatusButton] setStateImmediate called:', newState);
+
+        if (this.transitionTimer !== null) {
+            clearTimeout(this.transitionTimer);
+            this.transitionTimer = null;
+        }
+
+        this.pendingState = null;
+        this.currentState = newState;
+        this.updateUI();
+
+        const config = this.stateConfigs[newState];
+        if (config.timeout) {
+            this.transitionTimer = window.setTimeout(() => {
+                this.transitionToIdleState();
+            }, config.timeout);
         }
     }
 
@@ -288,6 +337,8 @@ export class CloudStatusButton {
             'error': 100,
             'cloud-syncing': 80,
             'local-saving': 70,
+            'signed-out': 65,
+            'signed-in': 65,
             'cloud-synced': 60,
             'local-saved': 50,
             'authenticated-idle': 20,

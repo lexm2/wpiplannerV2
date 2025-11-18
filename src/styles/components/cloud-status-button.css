@@ -145,6 +145,40 @@
     color: #155724;
 }
 
+/* Signed Out State */
+.cloud-status-signed-out {
+    background: #e2e3e5;
+    color: #383d41;
+    border-color: #6c757d;
+    cursor: pointer;
+}
+
+.cloud-status-signed-out:hover {
+    background: #d6d8db;
+    border-color: #545b62;
+}
+
+.cloud-status-signed-out .cloud-status-icon {
+    color: #383d41;
+}
+
+/* Signed In State */
+.cloud-status-signed-in {
+    background: #d4edda;
+    color: #155724;
+    border-color: #28a745;
+    cursor: pointer;
+}
+
+.cloud-status-signed-in:hover {
+    background: #c3e6cb;
+    border-color: #28a745;
+}
+
+.cloud-status-signed-in .cloud-status-icon {
+    color: #155724;
+}
+
 /* Error State */
 .cloud-status-error {
     background: #f8d7da;
@@ -236,6 +270,8 @@
     .cloud-status-saved,
     .cloud-status-syncing,
     .cloud-status-synced,
+    .cloud-status-signed-out,
+    .cloud-status-signed-in,
     .cloud-status-error {
         font-weight: var(--font-weight-bold);
     }

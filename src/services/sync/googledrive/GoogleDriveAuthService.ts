@@ -101,13 +101,15 @@ export class GoogleDriveAuthService implements ICloudAuthService {
     async signOut(): Promise<void> {
         if (this.accessToken && typeof google !== 'undefined' && google.accounts?.oauth2) {
             google.accounts.oauth2.revoke(this.accessToken, () => {
-                console.log('Access token revoked');
+                console.log('[Google Drive] Access token revoked');
             });
         }
 
         this.accessToken = null;
         this.currentUser = { isAuthenticated: false };
         this.clearAuthState();
+
+        console.log('[Google Drive] User signed out');
         this.notifyAuthChanged();
     }
 
