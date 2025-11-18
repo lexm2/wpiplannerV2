@@ -18,20 +18,21 @@ export class CourseConflictModal {
 
         const modal = document.createElement('div');
         modal.id = 'schedule-conflict-modal';
-        modal.className = 'modal';
+        modal.className = 'modal-backdrop';
         modal.innerHTML = `
-            <div class="modal-backdrop"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Schedule Sync Conflicts</h2>
-                    <button class="modal-close" aria-label="Close">&times;</button>
-                </div>
-                <div class="modal-body" id="schedule-conflict-body">
-                    <!-- Content will be populated by updateContent() -->
-                </div>
-                <div class="modal-footer">
-                    <button id="conflict-cancel" class="btn btn-secondary">Cancel</button>
-                    <button id="conflict-apply" class="btn btn-primary">Apply Changes</button>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Resolve Conflicts</h2>
+                        <button class="modal-close" aria-label="Close">&times;</button>
+                    </div>
+                    <div class="modal-body" id="schedule-conflict-body">
+                        <!-- Content will be populated by updateContent() -->
+                    </div>
+                    <div class="modal-footer">
+                        <button id="conflict-cancel" class="modal-btn btn-secondary">Cancel</button>
+                        <button id="conflict-apply" class="modal-btn btn-primary">Apply Changes</button>
+                    </div>
                 </div>
             </div>
         `;
@@ -44,12 +45,21 @@ export class CourseConflictModal {
     private attachEventListeners(): void {
         if (!this.modalElement) return;
 
-        const backdrop = this.modalElement.querySelector('.modal-backdrop');
         const closeBtn = this.modalElement.querySelector('.modal-close');
         const cancelBtn = this.modalElement.querySelector('#conflict-cancel');
         const applyBtn = this.modalElement.querySelector('#conflict-apply');
+        const dialog = this.modalElement.querySelector('.modal-dialog');
 
-        backdrop?.addEventListener('click', () => this.hide());
+        this.modalElement.addEventListener('click', (e) => {
+            if (e.target === this.modalElement) {
+                this.hide();
+            }
+        });
+
+        dialog?.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
         closeBtn?.addEventListener('click', () => this.hide());
         cancelBtn?.addEventListener('click', () => this.hide());
         applyBtn?.addEventListener('click', () => this.handleApply());
@@ -65,25 +75,23 @@ export class CourseConflictModal {
         });
 
         this.updateContent();
-        this.modalElement?.classList.add('visible');
+        this.modalElement?.classList.add('show');
         document.body.style.overflow = 'hidden';
     }
 
     hide(): void {
-        this.modalElement?.classList.remove('visible');
-        document.body.style.overflow = '';
+        this.modalElement?.classList.add('hide');
+        setTimeout(() => {
+            this.modalElement?.classList.remove('show', 'hide');
+            document.body.style.overflow = '';
+        }, 200);
     }
 
     private updateContent(): void {
         const body = document.getElementById('schedule-conflict-body');
         if (!body) return;
 
-        const message = document.createElement('p');
-        message.className = 'conflict-message';
-        message.textContent = `The following schedules exist in both locations with different content. Choose which version to keep for each schedule:`;
-
         body.innerHTML = '';
-        body.appendChild(message);
 
         this.conflicts.forEach(conflict => {
             const conflictCard = this.createConflictCard(conflict);
@@ -94,33 +102,31 @@ export class CourseConflictModal {
     private createConflictCard(conflict: ScheduleConflict): HTMLElement {
         const card = document.createElement('div');
         card.className = 'course-conflict-card';
+
+        const isLocalSelected = this.resolutions.get(conflict.scheduleName) === 'keep-local';
+        const isCloudSelected = this.resolutions.get(conflict.scheduleName) === 'keep-cloud';
+
         card.innerHTML = `
-            <div class="conflict-course-header">
-                <h3>${conflict.scheduleName}</h3>
-            </div>
-            <div class="conflict-comparison">
-                <div class="version-card local-version">
-                    <h4>Local Version</h4>
-                    <div class="version-details">
-                        <p>${conflict.local.selectedCourses.length} courses selected</p>
+            <h3 class="conflict-schedule-name">${conflict.scheduleName}</h3>
+            <div class="conflict-options">
+                <button class="conflict-option ${isLocalSelected ? 'selected' : ''}"
+                        data-schedule="${conflict.scheduleName}"
+                        data-resolution="keep-local">
+                    <div class="option-radio">${isLocalSelected ? '●' : '○'}</div>
+                    <div class="option-content">
+                        <div class="option-label">Local</div>
+                        <div class="option-info">${conflict.local.selectedCourses.length} courses</div>
                     </div>
-                    <button class="btn btn-sm ${this.resolutions.get(conflict.scheduleName) === 'keep-local' ? 'btn-primary' : 'btn-secondary'}"
-                            data-schedule="${conflict.scheduleName}"
-                            data-resolution="keep-local">
-                        ${this.resolutions.get(conflict.scheduleName) === 'keep-local' ? '✓ ' : ''}Keep Local
-                    </button>
-                </div>
-                <div class="version-card cloud-version">
-                    <h4>Cloud Version</h4>
-                    <div class="version-details">
-                        <p>${conflict.cloud.selectedCourses.length} courses selected</p>
+                </button>
+                <button class="conflict-option ${isCloudSelected ? 'selected' : ''}"
+                        data-schedule="${conflict.scheduleName}"
+                        data-resolution="keep-cloud">
+                    <div class="option-radio">${isCloudSelected ? '●' : '○'}</div>
+                    <div class="option-content">
+                        <div class="option-label">Cloud</div>
+                        <div class="option-info">${conflict.cloud.selectedCourses.length} courses</div>
                     </div>
-                    <button class="btn btn-sm ${this.resolutions.get(conflict.scheduleName) === 'keep-cloud' ? 'btn-primary' : 'btn-secondary'}"
-                            data-schedule="${conflict.scheduleName}"
-                            data-resolution="keep-cloud">
-                        ${this.resolutions.get(conflict.scheduleName) === 'keep-cloud' ? '✓ ' : ''}Keep Cloud
-                    </button>
-                </div>
+                </button>
             </div>
         `;
 

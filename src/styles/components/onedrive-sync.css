@@ -124,7 +124,7 @@
     color: #0c5460;
 }
 
-/* Conflict Resolution Modal */
+/* Conflict Resolution Modal - Using Correct CSS Variables */
 #conflict-resolution-modal.modal,
 #schedule-conflict-modal.modal {
     position: fixed;
@@ -150,17 +150,17 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(2px);
 }
 
 #conflict-resolution-modal .modal-content,
 #schedule-conflict-modal .modal-content {
     position: relative;
-    background: var(--bg-primary);
-    border-radius: 12px;
+    background: var(--color-surface);
+    border-radius: var(--effect-border-radius-large);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    max-width: 600px;
+    max-width: 500px;
     width: 90%;
     max-height: 90vh;
     overflow: hidden;
@@ -174,14 +174,15 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
 }
 
 #conflict-resolution-modal .modal-header h2,
 #schedule-conflict-modal .modal-header h2 {
     margin: 0;
     font-size: 1.5rem;
-    color: var(--text-primary);
+    color: var(--color-text);
 }
 
 #conflict-resolution-modal .modal-close,
@@ -189,7 +190,7 @@
     background: none;
     border: none;
     font-size: 2rem;
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
     cursor: pointer;
     padding: 0;
     width: 32px;
@@ -197,14 +198,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+    border-radius: var(--effect-border-radius);
+    transition: var(--effect-transition);
 }
 
 #conflict-resolution-modal .modal-close:hover,
 #schedule-conflict-modal .modal-close:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
+    background: var(--color-secondary);
+    color: var(--color-text);
 }
 
 #conflict-resolution-modal .modal-body,
@@ -212,12 +213,13 @@
     padding: 1.5rem;
     overflow-y: auto;
     flex: 1;
+    background: var(--color-surface);
 }
 
 .conflict-message {
     margin: 0 0 1.5rem 0;
     font-size: 1rem;
-    color: var(--text-primary);
+    color: var(--color-text);
     line-height: 1.6;
 }
 
@@ -229,21 +231,21 @@
 }
 
 .version-card {
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    border-radius: var(--effect-border-radius-large);
     padding: 1rem;
-    background: var(--bg-secondary);
+    background: var(--color-secondary);
 }
 
 .version-card h3 {
     margin: 0 0 1rem 0;
     font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
 }
 
 .version-card.local-version {
-    border-color: var(--primary-color);
+    border-color: var(--color-primary);
 }
 
 .version-card.cloud-version {
@@ -265,8 +267,8 @@
 }
 
 .version-info .label {
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -291,32 +293,34 @@
     display: flex;
     gap: 0.75rem;
     padding: 1.5rem;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--color-border);
     justify-content: flex-end;
+    background: var(--color-surface-elevated);
 }
 
 #conflict-resolution-modal .btn,
 #schedule-conflict-modal .btn {
     padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
+    border: 1px solid;
+    border-radius: var(--effect-border-radius);
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--effect-transition);
 }
 
 #conflict-resolution-modal .btn-primary,
 #schedule-conflict-modal .btn-primary {
-    background: var(--primary-color);
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border-color: var(--color-primary);
 }
 
 #conflict-resolution-modal .btn-primary:hover,
 #schedule-conflict-modal .btn-primary:hover {
-    background: var(--primary-hover);
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 #conflict-resolution-modal .btn-primary:active,
@@ -326,15 +330,16 @@
 
 #conflict-resolution-modal .btn-secondary,
 #schedule-conflict-modal .btn-secondary {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    background: var(--color-secondary);
+    color: var(--color-text);
+    border-color: var(--color-border);
 }
 
 #conflict-resolution-modal .btn-secondary:hover,
 #schedule-conflict-modal .btn-secondary:hover {
-    background: var(--bg-hover);
-    border-color: var(--border-hover);
+    background: var(--color-secondary-hover);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
 }
 
 /* Responsive adjustments */
@@ -366,62 +371,86 @@
     }
 }
 
-/* Course Conflict Modal */
+/* Schedule Conflict Modal - Compact Design */
 .course-conflict-card {
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: var(--bg-secondary);
+    margin-bottom: 1.25rem;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
 }
 
-.conflict-course-header {
-    margin-bottom: 1rem;
+.course-conflict-card:last-child {
+    margin-bottom: 0;
 }
 
-.conflict-course-header h3 {
-    margin: 0;
-    font-size: 1.125rem;
-    color: var(--text-primary);
-}
-
-.course-conflict-card .conflict-comparison {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.course-conflict-card .version-card {
-    border: 2px solid var(--border-color);
-    border-radius: 6px;
-    padding: 1rem;
-}
-
-.course-conflict-card .version-card h4 {
+.conflict-schedule-name {
     margin: 0 0 0.75rem 0;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 1rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.course-conflict-card .version-details p {
-    margin: 0 0 1rem 0;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    line-height: 1.5;
+.conflict-options {
+    display: flex;
+    gap: 0.75rem;
 }
 
-.course-conflict-card .btn-sm {
-    width: 100%;
-    padding: 0.5rem 1rem;
+.conflict-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--color-secondary);
+    border: 2px solid var(--color-border);
+    border-radius: var(--effect-border-radius-large);
+    cursor: pointer;
+    transition: var(--effect-transition);
+    text-align: left;
+}
+
+.conflict-option:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+.conflict-option.selected {
+    background: var(--color-secondary);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.option-radio {
+    font-size: 1.25rem;
+    line-height: 1;
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.option-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.option-label {
     font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
+    margin-bottom: 0.25rem;
+}
+
+.option-info {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
 }
 
 @media (max-width: 768px) {
-    .course-conflict-card .conflict-comparison {
-        grid-template-columns: 1fr;
+    .conflict-options {
+        flex-direction: column;
     }
 }
