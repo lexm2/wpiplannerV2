@@ -156,7 +156,7 @@ describe('CloudStatusButton - State Transitions', () => {
             expect(getButtonClass()).toContain('cloud-status-signin');
         });
 
-        it('should handle sign-out during cloud-syncing without getting stuck', () => {
+        it('should handle sign-out during cloud-uploading without getting stuck', () => {
             emitSyncEvent('sync-started');
             expect(getButtonClass()).toContain('cloud-status-syncing');
 
@@ -229,11 +229,19 @@ describe('CloudStatusButton - State Transitions', () => {
             expect(getButtonClass()).toContain('cloud-status-signin');
         });
 
-        it('should handle cloud sync flow: start -> upload -> idle', () => {
+        it('should handle cloud upload flow: start -> upload -> idle', () => {
             emitSyncEvent('sync-started');
             expect(getButtonClass()).toContain('cloud-status-syncing');
 
             emitSyncEvent('sync-uploaded');
+            expect(getButtonClass()).toContain('cloud-status-synced');
+
+            vi.advanceTimersByTime(1000);
+            expect(getButtonClass()).toContain('cloud-status-signin');
+        });
+
+        it('should handle cloud download flow: complete -> idle', () => {
+            emitSyncEvent('sync-completed');
             expect(getButtonClass()).toContain('cloud-status-synced');
 
             vi.advanceTimersByTime(1000);
@@ -349,9 +357,14 @@ describe('CloudStatusButton - State Transitions', () => {
             expect(text === 'Cloud connected' || text === 'Connected').toBe(true);
         });
 
-        it('shows correct text for syncing', () => {
+        it('shows correct text for uploading', () => {
             emitSyncEvent('sync-started');
-            expect(getButtonText()).toBe('Syncing...');
+            expect(getButtonText()).toBe('Uploading...');
+        });
+
+        it('shows correct text for downloading', () => {
+            emitSyncEvent('sync-completed');
+            expect(getButtonText()).toBe('Downloaded');
         });
 
         it('shows correct text for saving', () => {

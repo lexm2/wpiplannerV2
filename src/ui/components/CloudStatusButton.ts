@@ -8,15 +8,17 @@ import { logger } from '../../utils/logger';
  * Button states in priority order (highest to lowest)
  */
 type ButtonState =
-    | 'error'               // Error occurred
-    | 'local-saving'        // Saving to localStorage
-    | 'cloud-syncing'       // Syncing to cloud
-    | 'signed-out'          // Just signed out (transient)
-    | 'signed-in'           // Just signed in (transient)
-    | 'local-saved'         // Saved to localStorage (transient)
-    | 'cloud-synced'        // Synced to cloud (transient)
-    | 'authenticated-idle'  // Signed in, no operations
-    | 'unauthenticated';    // Not signed in
+    | 'error'                    // Error occurred
+    | 'local-saving'             // Saving to localStorage
+    | 'cloud-uploading'          // Uploading to cloud
+    | 'cloud-downloading'        // Downloading from cloud
+    | 'signed-out'               // Just signed out (transient)
+    | 'signed-in'                // Just signed in (transient)
+    | 'local-saved'              // Saved to localStorage (transient)
+    | 'cloud-uploaded'           // Uploaded to cloud (transient)
+    | 'cloud-downloaded'         // Downloaded from cloud (transient)
+    | 'authenticated-idle'       // Signed in, no operations
+    | 'unauthenticated';         // Not signed in
 
 interface StateConfig {
     text: string;
@@ -59,21 +61,26 @@ export class CloudStatusButton {
             className: 'cloud-status-saving',
             icon: 'DOWNLOAD'
         },
-        'cloud-syncing': {
-            text: 'Syncing...',
+        'cloud-uploading': {
+            text: 'Uploading...',
             className: 'cloud-status-syncing',
             icon: 'CALENDAR_UP'
+        },
+        'cloud-downloading': {
+            text: 'Downloading...',
+            className: 'cloud-status-syncing',
+            icon: 'CALENDAR_DOWN'
         },
         'signed-out': {
             text: 'Signed out',
             className: 'cloud-status-signed-out',
-            icon: 'CHECK',
+            icon: 'USER_X',
             timeout: 1500
         },
         'signed-in': {
             text: 'Signed in',
             className: 'cloud-status-signed-in',
-            icon: 'CHECK',
+            icon: 'USER_CHECK',
             timeout: 1500
         },
         'local-saved': {
@@ -82,10 +89,16 @@ export class CloudStatusButton {
             icon: 'CHECK',
             timeout: 500
         },
-        'cloud-synced': {
-            text: 'Synced',
+        'cloud-uploaded': {
+            text: 'Uploaded',
             className: 'cloud-status-synced',
-            icon: 'CHECK',
+            icon: 'CALENDAR_UP',
+            timeout: 1000
+        },
+        'cloud-downloaded': {
+            text: 'Downloaded',
+            className: 'cloud-status-synced',
+            icon: 'CALENDAR_DOWN',
             timeout: 1000
         },
         'authenticated-idle': {
@@ -194,12 +207,15 @@ export class CloudStatusButton {
 
         switch (event.type) {
             case 'sync-started':
-                this.setState('cloud-syncing');
+                this.setState('cloud-uploading');
                 break;
 
             case 'sync-completed':
+                this.setState('cloud-downloaded');
+                break;
+
             case 'sync-uploaded':
-                this.setState('cloud-synced');
+                this.setState('cloud-uploaded');
                 break;
 
             case 'sync-failed':
@@ -318,8 +334,11 @@ export class CloudStatusButton {
      * Check if we can transition directly between states (same operation flow)
      */
     private canTransitionDirectly(from: ButtonState, to: ButtonState): boolean {
-        // Cloud operation flow: syncing -> synced
-        if (from === 'cloud-syncing' && to === 'cloud-synced') return true;
+        // Cloud upload flow: uploading -> uploaded
+        if (from === 'cloud-uploading' && to === 'cloud-uploaded') return true;
+
+        // Cloud download flow: downloading -> downloaded
+        if (from === 'cloud-downloading' && to === 'cloud-downloaded') return true;
 
         // Local operation flow: saving -> saved
         if (from === 'local-saving' && to === 'local-saved') return true;
@@ -335,11 +354,13 @@ export class CloudStatusButton {
     private getStatePriority(state: ButtonState): number {
         const priorities: Record<ButtonState, number> = {
             'error': 100,
-            'cloud-syncing': 80,
+            'cloud-uploading': 80,
+            'cloud-downloading': 80,
             'local-saving': 70,
             'signed-out': 65,
             'signed-in': 65,
-            'cloud-synced': 60,
+            'cloud-uploaded': 60,
+            'cloud-downloaded': 60,
             'local-saved': 50,
             'authenticated-idle': 20,
             'unauthenticated': 10
