@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 19, 2025, 12:34 PM",
+  "generated": "Nov 19, 2025, 1:20 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -55092,7 +55092,7 @@
                 "number": "C01",
                 "seats": 66,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I The object of this course is a comprehensive treatment of electromagnetic engineering principles covering the entire application spectrum from static to dynamic field phenomena. The starting point will be the basic electric and magnetic field definitions of Coulomb and Biot-Savart leading to Gauss’s and Ampere’s laws. They form the foundation of electro- and magnetostatics fields. Students will examine capacitive and inductive systems and relate them to lumped element circuit models. By introducing temporal and spatial magnetic flux variations, Faraday’s law is established. The engineering implications of this law are investigated in terms of transformer and motor actions. Incorporation of the displacement current density into Ampere’s law and combining it with Faraday’s law will then culminate in the complete set of Maxwell’s field equations. As a result of these equations, students will develop the concept of wave propagation in the time and frequency domain with practical applications such as wireless communication, radar, Global Positioning Systems, and microwave circuits. Recommended background: ECE 2019.",
@@ -55111,7 +55111,7 @@
                     "room": "Atwater Kent 233",
                     "seats": 66,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
@@ -225412,7 +225412,7 @@
                 "number": "DL01",
                 "seats": 72,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 5,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4456",
                 "description": "Cat. IFourth of a four-course sequence introducing foundational theory and practiceof robotics engineering from the fields of computer science, electrical engineeringand mechanical engineering. The focus of this course is navigation, positionestimation and communications. Concepts of dead reckoning, landmarkupdates, inertial sensors, and radio location will be explored. Control systems asapplied to navigation will be presented. Communication, remote control andremote sensing for mobile robots and tele-robotic systems will be introduced.Wireless communications including wireless networks and typical local and widearea networking protocols will be discussed. Considerations will be discussedregarding operation in difficult environments such as underwater, aerospace,hazardous, etc. Laboratory sessions will be directed towards the solution of anopen-ended problem over the course of the entire term.Recommended background: RBE 3001, ES 3011, MA 2621, or MA 2631.",
@@ -225431,7 +225431,7 @@
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "seats": 72,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 5,
                     "specificSection": "DL01",
                     "days": [
@@ -225449,7 +225449,7 @@
                   "crn": 337183,
                   "number": "DX01",
                   "seats": 36,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4456",
@@ -225468,7 +225468,7 @@
                       "building": "",
                       "room": "Atwater Kent 120D Robotics Lab",
                       "seats": 36,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
