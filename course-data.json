@@ -6232,7 +6232,7 @@
       "Course_Title": "BB 1801 - Foundations of Biology and Biotechnology Laboratory",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/20",
+      "Enrolled_Capacity": "19/20",
       "Instructional_Format": "Laboratory",
       "Instructors": "Louis Roberts",
       "Locations": "Goddard Hall 206 BB Lab",
@@ -6240,7 +6240,7 @@
       "Meeting_Patterns": "M-R | 1:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Goddard Hall 206 BB Lab | M-R | 1:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
       "Waitlist_Waitlist_Capacity": "0/10",
@@ -6588,7 +6588,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "0/20",
+      "Waitlist_Waitlist_Capacity": "1/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336179"
     },
     {
@@ -9718,7 +9718,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: BME 1004 - Introduction To Programming In Matlab ()",
       "Subject": "Biomedical Engineering",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336940"
     },
     {
@@ -9766,7 +9766,7 @@
       "Course_Title": "BME 1004 - Introduction To Programming In Matlab",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "27/30",
+      "Enrolled_Capacity": "28/30",
       "Instructional_Format": "Laboratory",
       "Instructors": "Songbai Ji",
       "Locations": "Atwater Kent 013 Computer Lab",
@@ -20548,7 +20548,7 @@
       "Delivery_Mode": "In-Person",
       "Enrolled_Capacity": "40/40",
       "Instructional_Format": "Lecture",
-      "Instructors": "John MacDonald; Ivan Mardilovich; Raul Orduna Picon",
+      "Instructors": "John MacDonald; Ivan Mardilovich",
       "Locations": "Salisbury Labs 406",
       "Meeting_Day_Patterns": "T",
       "Meeting_Patterns": "T | 10:00 AM - 10:50 AM",
@@ -45342,7 +45342,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "5/20",
+      "Waitlist_Waitlist_Capacity": "4/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337577"
     },
     {
@@ -72548,7 +72548,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: MA 2051 - Ordinary Differential Equations ()",
       "Subject": "Mathematical Sciences",
-      "Waitlist_Waitlist_Capacity": "5/999",
+      "Waitlist_Waitlist_Capacity": "6/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337101"
     },
     {
@@ -72813,7 +72813,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: MA 2051 - Ordinary Differential Equations ()",
       "Subject": "Mathematical Sciences",
-      "Waitlist_Waitlist_Capacity": "5/999",
+      "Waitlist_Waitlist_Capacity": "6/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337347"
     },
     {
@@ -113278,30 +113278,6 @@
       "Subject": "Systems Engineering",
       "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-335881"
-    },
-    {
-      "Academic_Level": "Graduate",
-      "Academic_Units": "Electrical and Computer Engineering Department",
-      "Academic_Year": "2026 - 2027 Academic Year",
-      "Course_Section": "SYS 579-FXX - ST: Complex Decision Making",
-      "Course_Section_Description": "<p>One of the biggest ways that you can influence the quality of your life is by improving the quality of your decisions. Complex Decision Making is intended for professionals in management positions and/ or those individuals, regardless of industry, who seek to enhance both their career potential and their overall quality of life. Based on logical principles, and informed by what we know about the limitations of human judgment and decision-making in complex situations, the course trains managers how to think about and structure decisions. These decisions incorporate both their everyday decisions as well as the tough, complex decisions that involve uncertainty, risk, several possible perspectives, and multiple competing objectives, thus improving the quality of the resulting decisions. In addition to teaching formal decision theory and application, we will explore cognitive biases that prevent us from being completely rational in our thinking and deciding. Exit this course able to define the right decision problem, clearly specify your objectives, create imaginative alternatives, understand consequences, grapple with trade-offs, clarify uncertainties, and think hard about your individual values and risk tolerance.</p>",
-      "Course_Section_End_Date": "2026-12-11",
-      "Course_Section_Owner": "Electrical and Computer Engineering Department",
-      "Course_Section_Start_Date": "2026-08-20",
-      "Course_Tags": "Graduate Studies Online :: Online Grad Course; Course Type :: Special Topic",
-      "Course_Title": "SYS 579 - Special Topics",
-      "Credits": "3",
-      "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "0/20",
-      "Instructional_Format": "Lecture",
-      "Locations": "Online-asynchronous",
-      "Offering_Period": "2026 Fall Semester",
-      "Section_Details": "Online-asynchronous |",
-      "Section_Status": "Canceled: Preliminary",
-      "Starting_Academic_Period_Type": "Fall",
-      "Subject": "Systems Engineering",
-      "Waitlist_Waitlist_Capacity": "0/10",
-      "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-350428"
     },
     {
       "Academic_Level": "Graduate",
