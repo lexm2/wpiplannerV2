@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 19, 2025, 9:26 PM",
+  "generated": "Nov 19, 2025, 9:37 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -24349,7 +24349,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 49,
+                "actualWaitlist": 48,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I The CH1010 course is an introduction to chemistry using the fundamental structures of atoms as a starting point. Emphasis is placed on discussing how all properties of matter as well as bonding mechanisms arise from atomic structure. Lewis structures and molecular orbitals are used to understand bonding, and the intermolecular forces present in chemicals systems are used as a prelude to reactivity patterns covered in future courses.",
@@ -24368,7 +24368,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 49,
+                    "actualWaitlist": 48,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": []
@@ -222953,7 +222953,7 @@
                 "number": "C01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 8,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course provides an overview of key concepts, methods and authors in both fields. These introduce the student to the types of reasoning required for the pursuit of in-depth analysis in each discipline.Emphasis on topics and authors varies with the particular instructor.",
@@ -222972,7 +222972,7 @@
                     "room": "Atwater Kent 232",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -228213,7 +228213,7 @@
                 "number": "C01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 8,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course provides an overview of key concepts, methods and authors in both fields. These introduce the student to the types of reasoning required for the pursuit of in-depth analysis in each discipline.Emphasis on topics and authors varies with the particular instructor.",
@@ -228232,7 +228232,7 @@
                     "room": "Atwater Kent 232",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
