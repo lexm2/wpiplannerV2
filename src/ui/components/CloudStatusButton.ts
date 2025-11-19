@@ -426,6 +426,43 @@ export class CloudStatusButton {
     }
 
     /**
+     * Get the current button text
+     */
+    getCurrentText(): string {
+        const config = this.stateConfigs[this.currentState];
+        return config.text;
+    }
+
+    /**
+     * Get the current button icon
+     */
+    getCurrentIcon(): IconName | undefined {
+        const config = this.stateConfigs[this.currentState];
+        return config.icon;
+    }
+
+    /**
+     * Get the current button state
+     */
+    getCurrentState(): ButtonState {
+        return this.currentState;
+    }
+
+    /**
+     * Check if user is authenticated
+     */
+    isAuthenticated(): boolean {
+        return this.provider?.authService.isAuthenticated() ?? false;
+    }
+
+    /**
+     * Trigger the button click action (for external use)
+     */
+    async triggerClick(): Promise<void> {
+        await this.handleClick();
+    }
+
+    /**
      * Clean up resources
      */
     destroy(): void {

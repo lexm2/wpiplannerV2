@@ -318,7 +318,7 @@
   }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1200px) {
   .header-left {
     display: none;
   }
@@ -332,6 +332,10 @@
   }
 
   #schedule-picker-btn {
+    display: none;
+  }
+
+  #cloud-status-button-container {
     display: none;
   }
 
