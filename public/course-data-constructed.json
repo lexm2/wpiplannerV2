@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 19, 2025, 9:51 AM",
+  "generated": "Nov 19, 2025, 10:18 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -55092,7 +55092,7 @@
                 "number": "C01",
                 "seats": 66,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I The object of this course is a comprehensive treatment of electromagnetic engineering principles covering the entire application spectrum from static to dynamic field phenomena. The starting point will be the basic electric and magnetic field definitions of Coulomb and Biot-Savart leading to Gauss’s and Ampere’s laws. They form the foundation of electro- and magnetostatics fields. Students will examine capacitive and inductive systems and relate them to lumped element circuit models. By introducing temporal and spatial magnetic flux variations, Faraday’s law is established. The engineering implications of this law are investigated in terms of transformer and motor actions. Incorporation of the displacement current density into Ampere’s law and combining it with Faraday’s law will then culminate in the complete set of Maxwell’s field equations. As a result of these equations, students will develop the concept of wave propagation in the time and frequency domain with practical applications such as wireless communication, radar, Global Positioning Systems, and microwave circuits. Recommended background: ECE 2019.",
@@ -55111,7 +55111,7 @@
                     "room": "Atwater Kent 233",
                     "seats": 66,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
