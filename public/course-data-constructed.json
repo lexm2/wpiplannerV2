@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 19, 2025, 2:43 PM",
+  "generated": "Nov 19, 2025, 2:55 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -12765,6 +12765,23 @@
                       "days": [
                         "T"
                       ]
+                    },
+                    {
+                      "type": "Lab",
+                      "professor": "Songbai Ji",
+                      "startTime": "09:00",
+                      "endTime": "09:50",
+                      "location": "Atwater Kent 013 Computer Lab",
+                      "building": "",
+                      "room": "Atwater Kent 013 Computer Lab",
+                      "seats": 25,
+                      "seatsAvailable": 0,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "DX01",
+                      "days": [
+                        "T"
+                      ]
                     }
                   ]
                 },
@@ -12790,6 +12807,23 @@
                       "location": "Kaven Hall 203 CARS Computer Lab",
                       "building": "",
                       "room": "Kaven Hall 203 CARS Computer Lab",
+                      "seats": 25,
+                      "seatsAvailable": 0,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "DX02",
+                      "days": [
+                        "T"
+                      ]
+                    },
+                    {
+                      "type": "Lab",
+                      "professor": "Songbai Ji",
+                      "startTime": "10:00",
+                      "endTime": "10:50",
+                      "location": "Atwater Kent 013 Computer Lab",
+                      "building": "",
+                      "room": "Atwater Kent 013 Computer Lab",
                       "seats": 25,
                       "seatsAvailable": 0,
                       "actualWaitlist": 0,
