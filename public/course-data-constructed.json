@@ -74,6 +74,7 @@
   "generated": "Nov 20, 2025, 8:40 PM",
   "generated": "Nov 20, 2025, 8:49 PM",
   "generated": "Nov 20, 2025, 9:15 PM",
+  "generated": "Nov 20, 2025, 9:30 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -79026,7 +79027,7 @@
             {
               "section": {
                 "crn": 337947,
-                "number": "C05 - SOC SCI RES-IQP- Cuenca (WI)",
+                "number": "C05 - SOC SCI RES-IQP- Paxton/MWROC/WCPC  (WI)",
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
@@ -79040,7 +79041,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Corey Dehner",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Innovation Studio 205 Active Learning Classroom North",
@@ -79050,7 +79051,7 @@
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "C05 - SOC SCI RES-IQP- Cuenca (WI)",
+                    "specificSection": "C05 - SOC SCI RES-IQP- Paxton/MWROC/WCPC  (WI)",
                     "days": [
                       "M",
                       "R"
