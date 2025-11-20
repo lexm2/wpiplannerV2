@@ -82,6 +82,7 @@
   "generated": "Nov 20, 2025, 10:49 PM",
   "generated": "Nov 20, 2025, 11:15 PM",
   "generated": "Nov 20, 2025, 11:31 PM",
+  "generated": "Nov 20, 2025, 11:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -224620,7 +224621,7 @@
                 "crn": 336840,
                 "number": "C01",
                 "seats": 35,
-                "seatsAvailable": 12,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -224639,7 +224640,7 @@
                     "building": "",
                     "room": "Salisbury Labs 407",
                     "seats": 35,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -234090,7 +234091,7 @@
                 "number": "D02",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "Cat. I This course is designed for students who wish to work intensively on their writing . The course will emphasize the processes of composing and revising, the rhetorical strategies of written exposition and argumentation, and the reading and citation practices central to academic inquiry . In a workshop setting, students will write a sequence of short papers and complete one longer writing project based on multiple source texts; learn to read critically and respond helpfully to each other’s writing; and make oral presentations from written texts . Where applicable, the topical theme of the class will be provided via the Registrar’s office .",
@@ -234109,7 +234110,7 @@
                     "room": "Higgins Labs 114",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 5,
                     "specificSection": "D02",
                     "days": [
