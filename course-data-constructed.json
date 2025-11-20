@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 20, 2025, 1:45 PM",
+  "generated": "Nov 20, 2025, 2:16 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -231483,7 +231483,7 @@
                     "type": "Lecture",
                     "professor": "Donald Gelosh; Shamsnaz Bhada",
                     "startTime": "18:00",
-                    "endTime": "20:00",
+                    "endTime": "19:50",
                     "location": "Online-synchronous",
                     "building": "",
                     "room": "Online-synchronous",
@@ -231493,7 +231493,7 @@
                     "maxWaitlist": 0,
                     "specificSection": "S01",
                     "days": [
-                      "T"
+                      "R"
                     ]
                   }
                 ]
