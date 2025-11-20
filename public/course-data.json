@@ -2966,10 +2966,10 @@
       "Meeting_Patterns": "M-R | 12:00 PM - 1:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Riley Commons | M-R | 12:00 PM - 1:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336726"
     },
     {
@@ -13371,10 +13371,10 @@
       "Instructional_Format": "Lecture",
       "Instructors": "Dirk Albrecht",
       "Locations": "Gateway Park 1 Room 4104; Online-synchronous",
-      "Meeting_Day_Patterns": "M; T-F",
-      "Meeting_Patterns": "T-F | 4:00 PM - 5:20 PM; M | 4:00 PM - 5:20 PM",
+      "Meeting_Day_Patterns": "W; M",
+      "Meeting_Patterns": "W | 4:00 PM - 5:20 PM; M | 4:00 PM - 5:20 PM",
       "Offering_Period": "2026 Spring Semester",
-      "Section_Details": "Online-synchronous | M | 4:00 PM - 5:20 PM; Gateway Park 1 Room 4104 | T-F | 4:00 PM - 5:20 PM",
+      "Section_Details": "Gateway Park 1 Room 4104 | W | 4:00 PM - 5:20 PM; Online-synchronous | M | 4:00 PM - 5:20 PM",
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Biomedical Engineering",
@@ -43740,7 +43740,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "2/5",
+      "Waitlist_Waitlist_Capacity": "1/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336428"
     },
     {
