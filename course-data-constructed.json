@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 20, 2025, 7:38 PM",
+  "generated": "Nov 20, 2025, 7:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -31957,7 +31957,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I We will examine the nature of molecular motions and their interaction with electromagnetic radiation, which provides us with all our structural information about molecules. In addition, students will be introduced to to important techniques such as the fundamentals of infrared (I.R.), nuclear magnetic resonance (N.M.R.), UV-Vis absorption and fluorescence spectroscopies, and electrochemistry. The concepts of these techniques will be discussed in the context of structural organic chemistry and polymer characterization.",
@@ -31976,7 +31976,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": []
