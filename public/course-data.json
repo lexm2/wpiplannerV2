@@ -6106,7 +6106,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "14/20",
+      "Waitlist_Waitlist_Capacity": "13/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336819"
     },
     {
@@ -13353,6 +13353,33 @@
       "Subject": "Robotics Engineering; Biomedical Engineering",
       "Waitlist_Waitlist_Capacity": "0/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337390"
+    },
+    {
+      "Academic_Level": "Graduate",
+      "Academic_Units": "Biomedical Engineering Department",
+      "Academic_Year": "2025 - 2026 Academic Year",
+      "Course_Description": "<p>This course introduces fundamental principles of biomedical imaging focused on quantitative microscopy. Topics include physical basis of light microscopy, fluorescence microscopy, live cell imaging and computer vision algorithms. Advanced topics include 3D imaging (confocal, light sheet, 2-photon), super-resolution, sample preparation, and equipment considerations. Selected topics in medical imaging (CT, MRI, ultrasound) may be included, with hands-on instruction on commercial and student-built systems.<br />NOTE: Students who received credit for BME 581 in Spring 2016 may not also receive credit for BME 583.</p>",
+      "Course_Section": "BME 583-S01 - Biomedical Microscopy And Quantitative Imaging",
+      "Course_Section_Description": "<p>This course introduces fundamental principles of biomedical imaging focused on quantitative microscopy. Topics include physical basis of light microscopy, fluorescence microscopy, live cell imaging and computer vision algorithms. Advanced topics include 3D imaging (confocal, light sheet, 2-photon), super-resolution, sample preparation, and equipment considerations. Selected topics in medical imaging (CT, MRI, ultrasound) may be included, with hands-on instruction on commercial and student-built systems.<br />NOTE: Students who received credit for BME 581 in Spring 2016 may not also receive credit for BME 583.</p>",
+      "Course_Section_End_Date": "2026-05-06",
+      "Course_Section_Owner": "Biomedical Engineering Department",
+      "Course_Section_Start_Date": "2026-01-14",
+      "Course_Title": "BME 583 - Biomedical Microscopy And Quantitative Imaging",
+      "Credits": "3",
+      "Delivery_Mode": "In-Person",
+      "Enrolled_Capacity": "0/20",
+      "Instructional_Format": "Lecture",
+      "Instructors": "Dirk Albrecht",
+      "Locations": "Kaven Hall 115",
+      "Meeting_Day_Patterns": "W",
+      "Meeting_Patterns": "W | 6:00 PM - 8:50 PM",
+      "Offering_Period": "2026 Spring Semester",
+      "Section_Details": "Kaven Hall 115 | W | 6:00 PM - 8:50 PM",
+      "Section_Status": "Open",
+      "Starting_Academic_Period_Type": "Spring",
+      "Subject": "Biomedical Engineering",
+      "Waitlist_Waitlist_Capacity": "0/5",
+      "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-354566"
     },
     {
       "Academic_Level": "Graduate",
