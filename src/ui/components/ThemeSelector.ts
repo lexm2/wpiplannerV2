@@ -17,7 +17,7 @@ export class ThemeSelector {
 
     constructor(profileStateManager?: ProfileStateManager) {
         this.themeManager = ThemeManager.getInstance();
-        this.profileStateManager = profileStateManager || new ProfileStateManager();
+        this.profileStateManager = profileStateManager || ProfileStateManager.getInstance();
 
         this.boundDocumentClick = this.closeDropdown.bind(this);
         this.boundOptionsClick = (e: Event) => e.stopPropagation();

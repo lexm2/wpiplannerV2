@@ -75,7 +75,7 @@ export class MainController {
 
     constructor() {
         // Initialize core storage and state management first
-        this.profileStateManager = new ProfileStateManager();
+        this.profileStateManager = ProfileStateManager.getInstance();
         this.storageService = StorageService.getInstance(this.profileStateManager);
         
         // Connect ThemeManager to use our unified storage
@@ -88,6 +88,7 @@ export class MainController {
         this.courseSelectionService = new CourseSelectionService(this.profileStateManager);
         this.conflictDetector = new ConflictDetector();
         this.modalService = new ModalService();
+        this.profileStateManager.setModalService(this.modalService);
         this.departmentController = new DepartmentController();
         
         // Initialize search and filter services

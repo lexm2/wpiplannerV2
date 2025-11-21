@@ -35,6 +35,7 @@ export type StateChangeListener = (event: StateChangeEvent, state: ProfileState)
  * Single source of truth for application state with synchronous persistence and event-driven updates
  */
 export class ProfileStateManager {
+    private static instance: ProfileStateManager | null = null;
     private state: ProfileState;
     private listeners = new Set<StateChangeListener>();
     private storageManager: TransactionalStorageManager;
@@ -48,13 +49,21 @@ export class ProfileStateManager {
     private pendingSavePromises = new Set<Promise<void>>();
     private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
     private modalService: ModalService | null = null;
+    private isResolvingConflicts = false;
 
-    constructor(storageManager?: TransactionalStorageManager) {
+    private constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
         this.state = this.createInitialState();
         this.undoRedoManager = new UndoRedoManager();
         this.initializeCloudSync();
         this.setupBeforeUnloadHandler();
+    }
+
+    public static getInstance(): ProfileStateManager {
+        if (!ProfileStateManager.instance) {
+            ProfileStateManager.instance = new ProfileStateManager();
+        }
+        return ProfileStateManager.instance;
     }
 
     setModalService(modalService: ModalService): void {
@@ -77,15 +86,18 @@ export class ProfileStateManager {
                     }
 
                     if (cloudData.schedules && cloudData.schedules.length > 0) {
-                        const conflicts = this.detectScheduleConflicts(
-                            this.state.schedules,
-                            cloudData.schedules
-                        );
+                        // Skip conflict detection if we're currently resolving conflicts
+                        if (!this.isResolvingConflicts) {
+                            const conflicts = this.detectScheduleConflicts(
+                                this.state.schedules,
+                                cloudData.schedules
+                            );
 
-                        if (conflicts.length > 0) {
-                            logger.log('[SYNC] Detected', conflicts.length, 'schedule conflicts');
-                            await this.handleScheduleConflicts(conflicts, cloudData);
-                            return;
+                            if (conflicts.length > 0) {
+                                logger.log('[SYNC] Detected', conflicts.length, 'schedule conflicts');
+                                await this.handleScheduleConflicts(conflicts, cloudData);
+                                return;
+                            }
                         }
 
                         for (const schedule of cloudData.schedules) {
@@ -237,6 +249,7 @@ export class ProfileStateManager {
         }
 
         return new Promise((resolve) => {
+            this.isResolvingConflicts = true;
             const modal = new CourseConflictModal(this.modalService!);
 
             modal.show(conflicts, async (resolutions: Map<string, ScheduleConflictResolution>) => {
@@ -283,6 +296,7 @@ export class ProfileStateManager {
                 this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');
 
                 await this.syncToCloud(true);
+                this.isResolvingConflicts = false;
                 logger.log('[SYNC] Resolved data synced back to cloud');
 
                 resolve();

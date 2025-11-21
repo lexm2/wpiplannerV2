@@ -11,7 +11,7 @@ export class StorageService implements ThemeStorage {
     private isInitialized = false;
 
     private constructor(profileStateManager?: ProfileStateManager) {
-        this.profileStateManager = profileStateManager || new ProfileStateManager();
+        this.profileStateManager = profileStateManager || ProfileStateManager.getInstance();
     }
 
     static getInstance(profileStateManager?: ProfileStateManager): StorageService {

@@ -20,22 +20,24 @@ export class CourseConflictModal extends BaseModal {
         backdrop.className = 'modal-backdrop schedule-conflict-modal';
         backdrop.innerHTML = `
             <div class="modal-dialog">
-                <div class="conflict-modal-header">
-                    <h2 class="conflict-modal-title">${getInlineSVG('ALERT_CIRCLE', 'conflict-title-icon')}Resolve Conflicts</h2>
-                    <button class="modal-close" aria-label="Close">&times;</button>
-                </div>
-                <div class="modal-body" id="schedule-conflict-body">
-                    <!-- Content will be populated by updateContent() -->
-                </div>
-                <div class="modal-footer conflict-modal-footer">
-                    <div class="conflict-navigation">
-                        <button id="conflict-prev" class="modal-btn btn-secondary conflict-nav-btn">${getInlineSVG('ARROW_BAR_LEFT', 'nav-icon')}</button>
-                        <span id="conflict-counter" class="conflict-counter">1 / 1</span>
-                        <button id="conflict-next" class="modal-btn btn-secondary conflict-nav-btn">${getInlineSVG('ARROW_BAR_RIGHT', 'nav-icon')}</button>
+                <div class="modal-content">
+                    <div class="conflict-modal-header">
+                        <h2 class="conflict-modal-title">${getInlineSVG('ALERT_CIRCLE', 'conflict-title-icon')}Resolve Conflicts</h2>
+                        <button class="modal-close" aria-label="Close">&times;</button>
                     </div>
-                    <div class="conflict-actions">
-                        <button id="conflict-cancel" class="modal-btn btn-secondary">Cancel</button>
-                        <button id="conflict-apply" class="modal-btn btn-primary">Apply Changes</button>
+                    <div class="modal-body" id="schedule-conflict-body">
+                        <!-- Content will be populated by updateContent() -->
+                    </div>
+                    <div class="modal-footer conflict-modal-footer">
+                        <div class="conflict-navigation">
+                            <button id="conflict-prev" class="modal-btn btn-secondary conflict-nav-btn">${getInlineSVG('ARROW_BAR_LEFT', 'nav-icon')}</button>
+                            <span id="conflict-counter" class="conflict-counter">1 / 1</span>
+                            <button id="conflict-next" class="modal-btn btn-secondary conflict-nav-btn">${getInlineSVG('ARROW_BAR_RIGHT', 'nav-icon')}</button>
+                        </div>
+                        <div class="conflict-actions">
+                            <button id="conflict-cancel" class="modal-btn btn-secondary">Cancel</button>
+                            <button id="conflict-apply" class="modal-btn btn-primary">Apply Changes</button>
+                        </div>
                     </div>
                 </div>
             </div>

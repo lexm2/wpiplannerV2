@@ -42,7 +42,7 @@ export class CourseSelectionService {
         profileStateManager?: ProfileStateManager,
         dataValidator?: DataValidator
     ) {
-        this.profileStateManager = profileStateManager || new ProfileStateManager();
+        this.profileStateManager = profileStateManager || ProfileStateManager.getInstance();
         this.dataValidator = dataValidator || new DataValidator();
 
         this.setupStateManagerListeners();

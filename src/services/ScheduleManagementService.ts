@@ -54,7 +54,7 @@ export class ScheduleManagementService {
         dataValidator?: DataValidator,
         retryManager?: RetryManager
     ) {
-        this.profileStateManager = profileStateManager || new ProfileStateManager();
+        this.profileStateManager = profileStateManager || ProfileStateManager.getInstance();
         this.courseSelectionService = courseSelectionService || new CourseSelectionService(this.profileStateManager);
         this.dataValidator = dataValidator || new DataValidator();
         this.retryManager = retryManager || RetryManager.createStorageRetryManager();
