@@ -15,6 +15,7 @@ export interface Course {
     standaloneLabs?: Section[];
     minCredits: number;
     maxCredits: number;
+    isGraduate?: boolean;
 }
 
 export interface Department {

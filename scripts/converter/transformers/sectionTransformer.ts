@@ -16,12 +16,13 @@ export interface CategorizedSections {
 }
 
 /**
- * Transforms a Workday section into a PlannerSection
+ * Transforms a Workday section into PlannerSection(s)
+ * Returns array because graduate courses with F/S terms are duplicated for A+B or C+D
  */
 export function transformSection(
     workdaySection: WorkdaySection,
     config: ConverterConfig
-): PlannerSection | null {
+): PlannerSection[] {
     // Extract basic section information
     const courseSectionFull = workdaySection.Course_Section;
     const instructionalFormat = workdaySection.Instructional_Format;
@@ -56,8 +57,12 @@ export function transformSection(
     // Get description (section-specific)
     const description = sanitizeHTML(workdaySection.Course_Section_Description);
 
+    // Determine if graduate course
+    const isGraduate = workdaySection.Academic_Level === 'Graduate';
+
     // Compute term from section number
-    const computedTerm = extractTermLetter(sectionNumber);
+    // Graduate courses keep F/S, undergraduate use A/B/C/D
+    const computedTerm = extractTermLetter(sectionNumber, isGraduate);
 
     // Parse meeting patterns
     const sectionDetails = workdaySection.Section_Details || '';
@@ -89,7 +94,7 @@ export function transformSection(
         days: pattern.days
     }));
 
-    return {
+    return [{
         crn,
         number: sectionNumber,
         seats: capacity,
@@ -103,7 +108,7 @@ export function transformSection(
         isGps: isGPS,
         isInterestList: isInterestList,
         periods
-    };
+    }];
 }
 
 /**
@@ -183,12 +188,21 @@ function isSpecialSection(
 }
 
 /**
- * Extracts academic term letter (A, B, C, D) from section number
- * Examples: "A01" → "A", "DL08/DD08/DX10" → "D"
+ * Extracts academic term letter from section number
+ * For undergraduate: "A01" → "A", "DL08" → "D"
+ * For graduate: "F01" → "F" (Fall), "S01" → "S" (Spring)
  */
-function extractTermLetter(sectionNumber: string): string {
-    const match = sectionNumber.match(/^([ABCD])/i);
-    return match ? match[1].toUpperCase() : 'A';
+function extractTermLetter(sectionNumber: string, isGraduate: boolean): string {
+    const match = sectionNumber.match(/^([ABCDFS])/i);
+    const termLetter = match ? match[1].toUpperCase() : 'A';
+
+    // Graduate courses keep F/S terms, UI handles display as A+B or C+D
+    if (isGraduate && (termLetter === 'F' || termLetter === 'S')) {
+        return termLetter;
+    }
+
+    // Standard undergraduate terms (A/B/C/D)
+    return termLetter;
 }
 
 /**

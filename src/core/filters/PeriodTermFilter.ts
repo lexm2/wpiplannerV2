@@ -1,6 +1,7 @@
 import { Section } from '../../types/types';
 import { SectionFilter, PeriodTermFilterCriteria } from '../../types/filters';
 import { SelectedCourse } from '../../types/schedule';
+import { getDisplayTerms } from '../../utils/typeGuards';
 
 export class PeriodTermFilter implements SectionFilter {
     readonly id = 'periodTerm';
@@ -22,8 +23,9 @@ export class PeriodTermFilter implements SectionFilter {
         );
         
         return sections.filter(section => {
-            const normalizedTerm = this.normalizeTerm(section.computedTerm);
-            return selectedTerms.has(normalizedTerm);
+            // Map F→[A,B], S→[C,D] for graduate courses
+            const displayTerms = getDisplayTerms(section.computedTerm);
+            return displayTerms.some(t => selectedTerms.has(this.normalizeTerm(t)));
         });
     }
     
@@ -37,8 +39,9 @@ export class PeriodTermFilter implements SectionFilter {
         );
         
         return sectionsWithContext.filter(item => {
-            const normalizedTerm = this.normalizeTerm(item.section.computedTerm);
-            return selectedTerms.has(normalizedTerm);
+            // Map F→[A,B], S→[C,D] for graduate courses
+            const displayTerms = getDisplayTerms(item.section.computedTerm);
+            return displayTerms.some(t => selectedTerms.has(this.normalizeTerm(t)));
         });
     }
     

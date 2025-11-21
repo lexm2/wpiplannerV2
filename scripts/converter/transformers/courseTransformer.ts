@@ -52,10 +52,11 @@ export function transformCourse(
     // Parse credits
     const credits = parseFloat(firstSection.Credits);
 
-    // Transform all sections
-    const plannerSections = workdaySections
-        .map(ws => transformSection(ws, config))
-        .filter((s): s is NonNullable<typeof s> => s !== null);
+    // Determine if graduate course
+    const isGraduate = firstSection.Academic_Level === 'Graduate';
+
+    // Transform all sections (flatMap because graduate F/S terms expand to multiple sections)
+    const plannerSections = workdaySections.flatMap(ws => transformSection(ws, config));
 
     // Categorize sections by type
     const categorized = categorizeSections(plannerSections);
@@ -79,6 +80,7 @@ export function transformCourse(
         description,
         minCredits: credits,
         maxCredits: credits,
+        isGraduate,
         lectures,
         standaloneLabs
     };

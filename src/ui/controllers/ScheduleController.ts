@@ -9,7 +9,7 @@ import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
 import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/ConflictDetector'
-import { getComputedTerm, validateSelectedCourses } from '../../utils/typeGuards'
+import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../../utils/typeGuards'
 import { AutoScheduler } from '../../services/AutoScheduler'
 import { ScheduleScorer } from '../../services/ScheduleScorer'
 import { getInlineSVG } from '../../utils/iconPaths'
@@ -777,19 +777,22 @@ export class ScheduleController {
         grids.forEach(term => {
             const gridContainer = document.getElementById(`schedule-grid-${term}`);
             if (!gridContainer) return;
-            
+
             // Filter courses for this term - use direct Section object access
+            // Graduate courses with F/S terms are mapped to A+B/C+D
             const termCourses = selectedCourses.filter(sc => {
                 const computedTerm = getComputedTerm(sc);
-                
+
                 if (!computedTerm) {
                     if (sc.selectedSection) {
                         console.warn(`Course ${sc.course.department.abbreviation}${sc.course.number} has invalid section data:`, sc.selectedSection);
                     }
                     return false;
                 }
-                
-                return computedTerm === term;
+
+                // Map F→[A,B], S→[C,D], otherwise [term]
+                const displayTerms = getDisplayTerms(computedTerm);
+                return displayTerms.includes(term);
             });
             
             if (termCourses.length === 0) {

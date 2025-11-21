@@ -21,7 +21,7 @@ export function isValidSection(section: any): section is Section {
         typeof section.description === 'string' &&
         typeof section.term === 'string' &&
         typeof section.computedTerm === 'string' &&
-        ['A', 'B', 'C', 'D'].includes(section.computedTerm)
+        ['A', 'B', 'C', 'D', 'F', 'S'].includes(section.computedTerm)
     );
 }
 
@@ -218,5 +218,20 @@ export function getComputedTerm(sc: SelectedCourse): string | null {
  * Validates that a computed term is valid
  */
 export function isValidComputedTerm(term: any): term is string {
-    return typeof term === 'string' && ['A', 'B', 'C', 'D'].includes(term);
+    return typeof term === 'string' && ['A', 'B', 'C', 'D', 'F', 'S'].includes(term);
+}
+
+/**
+ * Maps a computed term to display terms
+ * F (Fall graduate) → ['A', 'B']
+ * S (Spring graduate) → ['C', 'D']
+ * A/B/C/D → [term]
+ */
+export function getDisplayTerms(computedTerm: string): string[] {
+    if (computedTerm === 'F') {
+        return ['A', 'B'];
+    } else if (computedTerm === 'S') {
+        return ['C', 'D'];
+    }
+    return [computedTerm];
 }

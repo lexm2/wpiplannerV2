@@ -110,7 +110,8 @@ export class CourseDataService {
                     lectures: lectures.length > 0 ? lectures : undefined,
                     standaloneLabs: standaloneLabs,
                     minCredits: courseData.minCredits || 0,
-                    maxCredits: courseData.maxCredits || 0
+                    maxCredits: courseData.maxCredits || 0,
+                    isGraduate: courseData.isGraduate || false
                 };
                 return course;
             });

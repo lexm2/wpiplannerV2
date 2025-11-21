@@ -25,6 +25,7 @@ export interface PlannerCourse {
     description: string;
     minCredits: number;
     maxCredits: number;
+    isGraduate: boolean;
     lectures: LectureGroup[];          // NEW: Main structure
     standaloneLabs?: PlannerSection[]; // NEW: For lab-only courses
 }
