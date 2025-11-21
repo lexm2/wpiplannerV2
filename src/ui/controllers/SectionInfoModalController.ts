@@ -2,6 +2,7 @@ import { ModalService } from '../../services/ModalService';
 import { rateMyProfessorService } from '../../services/RateMyProfessorService';
 import { PeriodType } from '../../types/types';
 import { BaseModal } from '../components/BaseModal';
+import { getInlineSVG } from '../../utils/iconPaths';
 
 export interface SectionData {
     courseCode: string;
@@ -23,6 +24,7 @@ export interface SectionData {
             building: string;
             room: string;
             location: string;
+            isAsync?: boolean;
         }>;
     };
     course: {
@@ -96,6 +98,25 @@ export class SectionInfoModalController extends BaseModal {
             : 'TBA';
 
         const meetingTimes = data.section.periods.map(period => {
+            // Check if async: either via isAsync flag or by detecting 12:00-12:00 times
+            const isAsync = period.isAsync || (
+                period.startTime.displayTime === '12:00 PM' &&
+                period.endTime.displayTime === '12:00 PM');
+
+            if (isAsync) {
+                return `
+                    <div class="period-info">
+                        <div class="period-type">${this.getPeriodTypeLabel(period.type)}</div>
+                        <div class="period-schedule">
+                            <div class="section-card-async-badge">
+                                ${getInlineSVG('CLOCK', 'async-icon')}
+                                Asynchronous
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             const daysArray = Array.from(period.days).sort();
             const daysStr = daysArray.join(', ').toUpperCase();
             const timeStr = `${period.startTime.displayTime} - ${period.endTime.displayTime}`;

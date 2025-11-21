@@ -70,4 +70,5 @@ export interface PlannerPeriod {
     maxWaitlist: number;
     specificSection: string;
     days: string[];
+    isAsync: boolean;
 }

@@ -86,34 +86,30 @@ export class ComponentSelectionWizard {
         const isLabOnly = this.courseDataService.isLabOnlyCourse(this.course);
 
         if (isLabOnly) {
-            // Lab-only course - check if any labs have valid time slots
+            // Lab-only course
             const labs = this.courseDataService.getStandaloneLabs(this.course);
-            const hasValidLabs = labs.some(lab => this.hasValidTimeSlot(lab));
-            if (hasValidLabs) {
+            if (labs.length > 0) {
                 steps.push('lab');
             }
         } else if (isHierarchical) {
-            // Hierarchical course - check what's available with valid time slots
+            // Hierarchical course
             const lectures = this.courseDataService.getLecturesForCourse(this.course);
 
-            // Check if any lectures have valid time slots
-            const validLectures = lectures.filter(lg => this.hasValidTimeSlot(lg.section));
-
-            if (validLectures.length > 0) {
+            if (lectures.length > 0) {
                 steps.push('lecture');
 
-                // Check if any lecture has discussions with valid time slots
-                const hasValidDiscussions = lectures.some(lg =>
-                    lg.compatibleDiscussions.some(d => this.hasValidTimeSlot(d))
+                // Check if any lecture has discussions
+                const hasDiscussions = lectures.some(lg =>
+                    lg.compatibleDiscussions.length > 0
                 );
 
-                // Check if any lecture has labs with valid time slots
-                const hasValidLabs = lectures.some(lg =>
-                    lg.compatibleLabs.some(l => this.hasValidTimeSlot(l))
+                // Check if any lecture has labs
+                const hasLabs = lectures.some(lg =>
+                    lg.compatibleLabs.length > 0
                 );
 
-                if (hasValidDiscussions) steps.push('discussion');
-                if (hasValidLabs) steps.push('lab');
+                if (hasDiscussions) steps.push('discussion');
+                if (hasLabs) steps.push('lab');
             }
         }
 
@@ -129,10 +125,14 @@ export class ComponentSelectionWizard {
 
     /**
      * Check if a section has at least one period with a valid time slot
-     * Placeholder sections have start_time === end_time (e.g., "12:00" to "12:00")
+     * Async sections are valid even with 12:00-12:00 times
      */
     private hasValidTimeSlot(section: Section): boolean {
         return section.periods.some(period => {
+            // Async periods are always valid
+            if (period.isAsync) {
+                return true;
+            }
             // Compare actual time values, not object references
             // A valid time slot has different start and end times
             return period.startTime.hours !== period.endTime.hours ||
@@ -157,17 +157,11 @@ export class ComponentSelectionWizard {
         if (step === 'lecture') {
             // Lab-only course
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
-                const labs = this.courseDataService.getStandaloneLabs(this.course);
-                const validLabs = labs.filter(lab => this.hasValidTimeSlot(lab));
-                sections = validLabs;
+                sections = this.courseDataService.getStandaloneLabs(this.course);
             } else {
                 // Regular hierarchical course
                 const lectureGroups = this.courseDataService.getLecturesForCourse(this.course);
-
-                // Filter out placeholder sections (those with start_time === end_time like 12:00-12:00)
-                const validLectures = lectureGroups.filter(lg => this.hasValidTimeSlot(lg.section));
-
-                sections = validLectures.map(lg => lg.section);
+                sections = lectureGroups.map(lg => lg.section);
             }
         } else if (step === 'discussion') {
             if (!this.selections.lecture) {
@@ -175,18 +169,12 @@ export class ComponentSelectionWizard {
                 sections = this.getAllDiscussionsForCourse();
             } else {
                 // Lecture selected - show only compatible discussions
-                const discussions = this.courseDataService.getDiscussionsForLecture(this.course, this.selections.lecture);
-
-                // Filter out placeholder discussions
-                const validDiscussions = discussions.filter(d => this.hasValidTimeSlot(d));
-                sections = validDiscussions;
+                sections = this.courseDataService.getDiscussionsForLecture(this.course, this.selections.lecture);
             }
         } else if (step === 'lab') {
             // Lab-only course
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
-                const labs = this.courseDataService.getStandaloneLabs(this.course);
-                const validLabs = labs.filter(lab => this.hasValidTimeSlot(lab));
-                sections = validLabs;
+                sections = this.courseDataService.getStandaloneLabs(this.course);
             } else {
                 // Regular course
                 if (!this.selections.lecture) {
@@ -194,11 +182,7 @@ export class ComponentSelectionWizard {
                     sections = this.getAllLabsForCourse();
                 } else {
                     // Lecture selected - show only compatible labs
-                    const labs = this.courseDataService.getLabsForLecture(this.course, this.selections.lecture);
-
-                    // Filter out placeholder labs
-                    const validLabs = labs.filter(l => this.hasValidTimeSlot(l));
-                    sections = validLabs;
+                    sections = this.courseDataService.getLabsForLecture(this.course, this.selections.lecture);
                 }
             }
         }
@@ -291,9 +275,7 @@ export class ComponentSelectionWizard {
 
         for (const lectureGroup of lectureGroups) {
             for (const discussion of lectureGroup.compatibleDiscussions) {
-                if (this.hasValidTimeSlot(discussion)) {
-                    allDiscussions.set(discussion.crn, discussion);
-                }
+                allDiscussions.set(discussion.crn, discussion);
             }
         }
 
@@ -309,9 +291,7 @@ export class ComponentSelectionWizard {
 
         for (const lectureGroup of lectureGroups) {
             for (const lab of lectureGroup.compatibleLabs) {
-                if (this.hasValidTimeSlot(lab)) {
-                    allLabs.set(lab.crn, lab);
-                }
+                allLabs.set(lab.crn, lab);
             }
         }
 
@@ -861,9 +841,12 @@ export class ComponentSelectionWizard {
      */
     private renderSectionCard(section: Section, cardIndex: number): string {
         const period = section.periods[0];
-        const days = period ? Array.from(period.days).join('') : 'TBA';
-        const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
-        const location = period?.location || 'TBA';
+
+        // Check if async: either via isAsync flag or by detecting 12:00-12:00 times
+        const isAsync = period?.isAsync || (period &&
+            period.startTime.hours === 12 && period.startTime.minutes === 0 &&
+            period.endTime.hours === 12 && period.endTime.minutes === 0);
+
         const professor = period?.professor || 'Not Assigned';
 
         const isSelected = this.selections[this.currentStep]?.crn === section.crn;
@@ -876,6 +859,28 @@ export class ComponentSelectionWizard {
         const rmpUrl = professor !== 'Not Assigned' ? rateMyProfessorService.getProfessorRMPUrl(professor) : null;
 
         const escapedProfessor = Validators.escapeHtml(professor);
+
+        // Build time/location content based on async status
+        let timeLocationContent: string;
+        if (isAsync) {
+            timeLocationContent = `
+                <div class="section-card-async-badge">
+                    ${getInlineSVG('CLOCK', 'async-icon')}
+                    Asynchronous
+                </div>
+            `;
+        } else {
+            const days = period ? Array.from(period.days).join('') : 'TBA';
+            const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
+            const location = period?.location || 'TBA';
+            timeLocationContent = `
+                <div class="section-card-time">
+                    <strong>${Validators.escapeHtml(days)}</strong> ${Validators.escapeHtml(time)}
+                </div>
+                <div class="section-card-location">${Validators.escapeHtml(location)}</div>
+            `;
+        }
+
         return `
             <div
                 class="wizard-section-card ${isSelected ? 'selected' : ''}"
@@ -885,10 +890,7 @@ export class ComponentSelectionWizard {
                 <div class="section-card-header">
                     <span class="section-card-number">${Validators.escapeHtml(section.number)}</span>
                 </div>
-                <div class="section-card-time">
-                    <strong>${Validators.escapeHtml(days)}</strong> ${Validators.escapeHtml(time)}
-                </div>
-                <div class="section-card-location">${Validators.escapeHtml(location)}</div>
+                ${timeLocationContent}
                 <div class="section-card-professor">
                     ${rmpUrl ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProfessor}</a>` : escapedProfessor}
                     ${rmpData ? this.renderRMPBadge(rmpData) : ''}

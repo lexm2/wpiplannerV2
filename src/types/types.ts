@@ -67,6 +67,7 @@ export interface Period {
     maxWaitlist: number;
     days: Set<DayOfWeek>;
     specificSection?: string;
+    isAsync?: boolean;
 }
 
 export interface Time {

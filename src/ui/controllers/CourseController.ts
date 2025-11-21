@@ -676,13 +676,38 @@ export class CourseController {
 
     private renderSectionCard(section: Section, type: string): string {
         const period = section.periods[0];
-        const days = period ? Array.from(period.days).join(', ').toUpperCase() : 'TBA';
-        const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
-        const location = period?.location || 'TBA';
+
+        // Check if async: either via isAsync flag or by detecting 12:00-12:00 times
+        const isAsync = period?.isAsync || (period &&
+            period.startTime.hours === 12 && period.startTime.minutes === 0 &&
+            period.endTime.hours === 12 && period.endTime.minutes === 0);
+
         const professor = period?.professor || 'Not Assigned';
         const rmpUrl = professor !== 'Not Assigned' ? rateMyProfessorService.getProfessorRMPUrl(professor) : null;
 
         const escapedProfessor = Validators.escapeHtml(professor);
+
+        // Build time/location content based on async status
+        let timeLocationContent: string;
+        if (isAsync) {
+            timeLocationContent = `
+                <div class="section-card-async-badge">
+                    ${getInlineSVG('CLOCK', 'async-icon')}
+                    Asynchronous
+                </div>
+            `;
+        } else {
+            const days = period ? Array.from(period.days).join(', ').toUpperCase() : 'TBA';
+            const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
+            const location = period?.location || 'TBA';
+            timeLocationContent = `
+                <div class="section-time">
+                    <strong>${Validators.escapeHtml(days)}</strong> ${Validators.escapeHtml(time)}
+                </div>
+                <div class="section-location">${Validators.escapeHtml(location)}</div>
+            `;
+        }
+
         return `
             <div class="section-card">
                 <div class="section-header">
@@ -691,10 +716,7 @@ export class CourseController {
                     <span class="section-crn">CRN: ${section.crn}</span>
                 </div>
                 <div class="section-details">
-                    <div class="section-time">
-                        <strong>${Validators.escapeHtml(days)}</strong> ${Validators.escapeHtml(time)}
-                    </div>
-                    <div class="section-location">${Validators.escapeHtml(location)}</div>
+                    ${timeLocationContent}
                     <div class="section-professor">${rmpUrl ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProfessor}</a>` : escapedProfessor}</div>
                     <div class="section-seats">
                         Seats: ${section.seatsAvailable}/${section.seats}

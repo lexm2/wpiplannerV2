@@ -193,7 +193,8 @@ export class CourseDataService {
                 actualWaitlist: periodData.actualWaitlist || 0,
                 maxWaitlist: periodData.maxWaitlist || 0,
                 days: this.parseConstructedDays(periodData.days || []),
-                specificSection: periodData.specificSection
+                specificSection: periodData.specificSection,
+                isAsync: periodData.isAsync || false
             };
             return period;
         });

@@ -78,21 +78,25 @@ export function transformSection(
     const type = instructionalFormat === 'Laboratory' ? 'Lab' : instructionalFormat;
 
     // Create periods from meeting patterns
-    const periods: PlannerPeriod[] = meetingPatterns.map(pattern => ({
-        type: type,
-        professor: professor,
-        startTime: pattern.startTime,
-        endTime: pattern.endTime,
-        location: pattern.location,
-        building: '', // Workday doesn't separate building
-        room: pattern.location,
-        seats: capacity,
-        seatsAvailable: seatsAvailable,
-        actualWaitlist: waitlistActual,
-        maxWaitlist: waitlistMax,
-        specificSection: sectionNumber,
-        days: pattern.days
-    }));
+    const periods: PlannerPeriod[] = meetingPatterns.map(pattern => {
+        const isAsync = pattern.startTime === '12:00' && pattern.endTime === '12:00';
+        return {
+            type: type,
+            professor: professor,
+            startTime: pattern.startTime,
+            endTime: pattern.endTime,
+            location: pattern.location,
+            building: '', // Workday doesn't separate building
+            room: pattern.location,
+            seats: capacity,
+            seatsAvailable: seatsAvailable,
+            actualWaitlist: waitlistActual,
+            maxWaitlist: waitlistMax,
+            specificSection: sectionNumber,
+            days: pattern.days,
+            isAsync
+        };
+    });
 
     return [{
         crn,

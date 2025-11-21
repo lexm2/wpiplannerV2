@@ -436,11 +436,14 @@ export class ScheduleController {
 
     /**
      * Check if a section has at least one period with a valid time slot
-     * Placeholder sections have start_time === end_time (e.g., "12:00" to "12:00")
-     * This matches the wizard's hasValidTimeSlot logic
+     * Async sections are valid even with 12:00-12:00 times
      */
     private hasValidTimeSlot(section: any): boolean {
         return section.periods.some((period: any) => {
+            // Async periods are always valid
+            if (period.isAsync) {
+                return true;
+            }
             // Compare actual time values, not object references
             // A valid time slot has different start and end times
             return period.startTime.hours !== period.endTime.hours ||
