@@ -239,23 +239,17 @@ export class GoogleDriveSyncService implements ICloudSyncService {
                 console.log('[Google Drive] Found existing data in cloud');
                 const conflict = this.detectConflict(enrichedData, cloudData);
                 if (conflict) {
-                    console.warn('[Google Drive] Conflict detected between local and cloud data');
-                    this.updateStatus('conflict');
-                    const conflictData: ConflictData = {
-                        local: enrichedData,
-                        cloud: cloudData,
-                        conflictType: 'timestamp',
-                    };
+                    console.warn('[Google Drive] Conflict detected, triggering merge flow');
+                    this.updateStatus('idle');
                     this.notifyEvent({
-                        type: 'sync-conflict',
+                        type: 'sync-completed',
                         timestamp: Date.now(),
-                        data: conflictData,
+                        data: cloudData,
                     });
                     return {
                         success: false,
                         status: 'conflict',
-                        message: 'Conflict detected',
-                        conflict: conflictData,
+                        message: 'Conflict detected, merge required',
                     };
                 }
             } else {

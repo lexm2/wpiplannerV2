@@ -32,10 +32,9 @@ import type { DataUpdateAvailableEvent } from '../../types/worker'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { CloudStatusButton } from '../components/CloudStatusButton'
 import { CloudProviderRegistry } from '../../services/sync/CloudProviderRegistry'
-import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
 import { GoogleDriveSyncService } from '../../services/sync/googledrive/GoogleDriveSyncService'
 import { GoogleDriveAuthService } from '../../services/sync/googledrive/GoogleDriveAuthService'
-import type { SyncEvent, ConflictData, CloudStateData } from '../../services/sync/CloudSyncTypes'
+import type { CloudStateData } from '../../services/sync/CloudSyncTypes'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -68,7 +67,6 @@ export class MainController {
     private scheduleManagementService: ScheduleManagementService;
     private dataUpdateService: DataUpdateService;
     private cloudStatusButton: CloudStatusButton;
-    private conflictModal: ConflictResolutionModal;
     private googleDriveSyncService: GoogleDriveSyncService;
     private allDepartments: Department[] = [];
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
@@ -110,7 +108,6 @@ export class MainController {
         this.dataUpdateService = new DataUpdateService();
 
         // Initialize Google Drive sync components and register provider
-        this.conflictModal = new ConflictResolutionModal();
         this.googleDriveSyncService = GoogleDriveSyncService.getInstance();
 
         // Register Google Drive provider in the registry
@@ -1166,32 +1163,6 @@ export class MainController {
     private setupCloudStatusButtonListener(): void {
         this.profileStateManager.addListener((event, state) => {
             this.cloudStatusButton.onStateChange(event, state);
-        });
-
-        this.googleDriveSyncService.addEventListener((event: SyncEvent) => {
-            if (event.type === 'sync-conflict') {
-                this.handleSyncConflict(event.data as ConflictData);
-            }
-        });
-    }
-
-    private handleSyncConflict(conflictData: ConflictData): void {
-        this.conflictModal.show(conflictData, async (resolution) => {
-            if (resolution === 'cancel') {
-                return;
-            }
-
-            const result = await this.googleDriveSyncService.resolveConflict(
-                resolution,
-                conflictData.local,
-                conflictData.cloud
-            );
-
-            if (result.success) {
-                if (resolution === 'keep-cloud') {
-                    await this.profileStateManager.pullFromCloudAndMerge();
-                }
-            }
         });
     }
 
