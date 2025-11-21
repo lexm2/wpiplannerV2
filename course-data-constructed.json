@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 21, 2025, 4:46 AM",
+  "generated": "Nov 21, 2025, 5:17 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -234585,7 +234585,7 @@
                 "crn": 336314,
                 "number": "C03",
                 "seats": 30,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -234604,7 +234604,7 @@
                     "building": "",
                     "room": "Recreation Center Track",
                     "seats": 30,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "C03",
@@ -237210,7 +237210,7 @@
                 "crn": 337337,
                 "number": "D01 - Healthy Alternative: Zumba",
                 "seats": 30,
-                "seatsAvailable": 8,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -237229,7 +237229,7 @@
                     "building": "",
                     "room": "Recreation Center Dance",
                     "seats": 30,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01 - Healthy Alternative: Zumba",
