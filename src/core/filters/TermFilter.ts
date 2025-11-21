@@ -1,7 +1,6 @@
 import { TermFilterCriteria } from '../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../types/filterableUnit';
-import { getDisplayTerms } from '../../utils/typeGuards';
 
 export class TermFilter implements SectionBasedFilter {
     readonly id = 'term';
@@ -19,9 +18,7 @@ export class TermFilter implements SectionBasedFilter {
         );
 
         return sections.filter(fs => {
-            // Map F→[A,B], S→[C,D] for graduate courses
-            const displayTerms = getDisplayTerms(fs.section.computedTerm);
-            return displayTerms.some(t => termSet.has(t));
+            return termSet.has(fs.section.computedTerm.toUpperCase());
         });
     }
     

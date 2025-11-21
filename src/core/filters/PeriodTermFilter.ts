@@ -1,7 +1,6 @@
 import { Section } from '../../types/types';
 import { SectionFilter, PeriodTermFilterCriteria } from '../../types/filters';
 import { SelectedCourse } from '../../types/schedule';
-import { getDisplayTerms } from '../../utils/typeGuards';
 
 export class PeriodTermFilter implements SectionFilter {
     readonly id = 'periodTerm';
@@ -23,9 +22,7 @@ export class PeriodTermFilter implements SectionFilter {
         );
         
         return sections.filter(section => {
-            // Map F→[A,B], S→[C,D] for graduate courses
-            const displayTerms = getDisplayTerms(section.computedTerm);
-            return displayTerms.some(t => selectedTerms.has(this.normalizeTerm(t)));
+            return selectedTerms.has(this.normalizeTerm(section.computedTerm));
         });
     }
     
@@ -39,9 +36,7 @@ export class PeriodTermFilter implements SectionFilter {
         );
         
         return sectionsWithContext.filter(item => {
-            // Map F→[A,B], S→[C,D] for graduate courses
-            const displayTerms = getDisplayTerms(item.section.computedTerm);
-            return displayTerms.some(t => selectedTerms.has(this.normalizeTerm(t)));
+            return selectedTerms.has(this.normalizeTerm(item.section.computedTerm));
         });
     }
     
@@ -76,11 +71,13 @@ export class PeriodTermFilter implements SectionFilter {
         
         const termMap: { [key: string]: string } = {
             'A': 'A Term',
-            'B': 'B Term', 
+            'B': 'B Term',
             'C': 'C Term',
-            'D': 'D Term'
+            'D': 'D Term',
+            'F': 'Fall',
+            'S': 'Spring'
         };
-        
+
         return termMap[normalized] || term.toUpperCase();
     }
 }
