@@ -1,19 +1,18 @@
 import { ModalService } from '../../services/ModalService';
 import { ScheduleFilterService } from '../../services/ScheduleFilterService';
 import { SelectedCourse } from '../../types/schedule';
+import { BaseModal } from '../components/BaseModal';
 import { getAllSections } from '../../utils/courseUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
 import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTypeFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria } from '../../types/filters';
 
-export class ScheduleFilterModalController {
-    private modalService: ModalService;
+export class ScheduleFilterModalController extends BaseModal {
     private scheduleFilterService: ScheduleFilterService | null = null;
     private selectedCourses: SelectedCourse[] = [];
-    private currentModalId: string | null = null;
 
     constructor(modalService: ModalService) {
-        this.modalService = modalService;
+        super(modalService);
     }
 
     setScheduleFilterService(scheduleFilterService: ScheduleFilterService): void {
@@ -30,12 +29,8 @@ export class ScheduleFilterModalController {
             return '';
         }
 
-        const id = this.modalService.generateId();
-        this.currentModalId = id;
-        const modalElement = this.createModalElement(id);
-        
-        this.modalService.showModal(id, modalElement);
-        this.modalService.setupModalBehavior(modalElement, id, { closeOnBackdrop: true, closeOnEscape: true });
+        const modalElement = this.createModalElement();
+        const id = this.showModal(modalElement, { closeOnBackdrop: true, closeOnEscape: true });
 
         // Set up event listeners after modal is shown
         setTimeout(() => {
@@ -46,20 +41,11 @@ export class ScheduleFilterModalController {
         return id;
     }
 
-    hide(): void {
-        if (this.currentModalId) {
-            this.modalService.hideModal(this.currentModalId);
-            this.currentModalId = null;
-        }
-    }
-
-    private createModalElement(id: string): HTMLElement {
+    private createModalElement(): HTMLElement {
         const backdrop = document.createElement('div');
         backdrop.className = 'modal-backdrop filter-modal';
-        backdrop.id = id;
 
         const activeFiltersCount = this.scheduleFilterService?.getFilterCount() || 0;
-
         const sectionCount = this.scheduleFilterService ? this.scheduleFilterService.filterSections(this.selectedCourses).length : 0;
 
         backdrop.innerHTML = `
@@ -70,7 +56,7 @@ export class ScheduleFilterModalController {
                             Filter Sections
                             <span id="filter-count" class="filter-count">${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}</span>
                         </h3>
-                        <button class="modal-close" onclick="document.getElementById('${id}').click()">×</button>
+                        <button class="modal-close" data-modal-close>×</button>
                     </div>
                     <div class="modal-body filter-modal-body">
                         ${this.createFilterModalContent()}
@@ -94,6 +80,8 @@ export class ScheduleFilterModalController {
                 event.stopPropagation();
             });
         }
+
+        backdrop.querySelector('[data-modal-close]')?.addEventListener('click', () => this.hide());
 
         return backdrop;
     }
@@ -253,11 +241,6 @@ export class ScheduleFilterModalController {
         });
     }
 
-    private escapeHtml(text: string): string {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
 
     private getActiveProfessors(): string[] {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodProfessor');
@@ -291,9 +274,9 @@ export class ScheduleFilterModalController {
     }
 
     private setupFilterModalEventListeners(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
+        if (!this.modalId) return;
+
+        const modalElement = document.getElementById(this.modalId);
         if (!modalElement) return;
 
         // Search text filter
@@ -362,9 +345,9 @@ export class ScheduleFilterModalController {
 
 
     private updatePeriodTypeFilter(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
+        if (!this.modalId) return;
+
+        const modalElement = document.getElementById(this.modalId);
         if (modalElement) {
             const checkedTypes = Array.from(modalElement.querySelectorAll('input[name="periodType"]:checked'))
                 .map(cb => (cb as HTMLInputElement).value);
@@ -378,9 +361,9 @@ export class ScheduleFilterModalController {
     }
 
     private updateTermFilter(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
+        if (!this.modalId) return;
+
+        const modalElement = document.getElementById(this.modalId);
         if (modalElement) {
             const checkedTerms = Array.from(modalElement.querySelectorAll('input[name="periodTerm"]:checked'))
                 .map(cb => (cb as HTMLInputElement).value);
@@ -394,9 +377,9 @@ export class ScheduleFilterModalController {
     }
 
     private updateAvailabilityFilter(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
+        if (!this.modalId) return;
+
+        const modalElement = document.getElementById(this.modalId);
         if (modalElement) {
             const availableOnly = (modalElement.querySelector('#available-only-filter') as HTMLInputElement)?.checked || false;
             const minSeatsValue = (modalElement.querySelector('#min-seats-filter') as HTMLInputElement)?.value;
@@ -415,9 +398,9 @@ export class ScheduleFilterModalController {
     }
 
     private updateConflictFilter(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
+        if (!this.modalId) return;
+
+        const modalElement = document.getElementById(this.modalId);
         if (modalElement) {
             const avoidConflicts = (modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement)?.checked || false;
 
@@ -430,9 +413,9 @@ export class ScheduleFilterModalController {
     }
 
     private initializeFormState(): void {
-        if (!this.currentModalId) return;
-        
-        const modalElement = document.getElementById(this.currentModalId);
+        if (!this.modalId) return;
+
+        const modalElement = document.getElementById(this.modalId);
         if (!modalElement) return;
 
         // Initialize availability filter states
@@ -626,8 +609,8 @@ export class ScheduleFilterModalController {
 
 
     syncSearchInputFromMain(query: string): void {
-        if (this.currentModalId) {
-            const modalElement = document.getElementById(this.currentModalId);
+        if (this.modalId) {
+            const modalElement = document.getElementById(this.modalId);
             if (modalElement) {
                 const searchInput = modalElement.querySelector('#modal-search-input') as HTMLInputElement;
                 if (searchInput && searchInput.value !== query) {

@@ -1,21 +1,20 @@
 import { ModalService } from '../../services/ModalService';
 import { CourseFilterService } from '../../services/CourseFilterService';
 import { Course, Department } from '../../types/types';
+import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
 import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria } from '../../types/filters';
 
-export class FilterModalController {
-    private modalService: ModalService;
+export class FilterModalController extends BaseModal {
     private filterService: CourseFilterService | null = null;
     private allCourses: Course[] = [];
-    private currentModalId: string | null = null;
     private isCategoryMode: boolean = false;
     private isUpdatingFilter: boolean = false;
 
     constructor(modalService: ModalService) {
-        this.modalService = modalService;
+        super(modalService);
     }
 
     setFilterService(filterService: CourseFilterService): void {
@@ -31,8 +30,8 @@ export class FilterModalController {
 
     // Method to sync search input from main controller
     syncSearchInputFromMain(query: string): void {
-        if (this.currentModalId) {
-            const modalElement = document.getElementById(this.currentModalId);
+        if (this.modalId) {
+            const modalElement = document.getElementById(this.modalId);
             if (modalElement) {
                 const searchInput = modalElement.querySelector('.search-text-input') as HTMLInputElement;
                 if (searchInput && searchInput.value !== query) {
@@ -48,9 +47,9 @@ export class FilterModalController {
         if (this.isUpdatingFilter) {
             return;
         }
-        
-        if (this.currentModalId) {
-            const modalElement = document.getElementById(this.currentModalId);
+
+        if (this.modalId) {
+            const modalElement = document.getElementById(this.modalId);
             if (modalElement) {
                 this.updateDepartmentCheckboxes(modalElement);
             }
@@ -102,12 +101,8 @@ export class FilterModalController {
             return '';
         }
 
-        const id = this.modalService.generateId();
-        this.currentModalId = id;
-        const modalElement = this.createModalElement(id);
-        
-        this.modalService.showModal(id, modalElement);
-        this.modalService.setupModalBehavior(modalElement, id, { closeOnBackdrop: true, closeOnEscape: true });
+        const modalElement = this.createModalElement();
+        const id = this.showModal(modalElement, { closeOnBackdrop: true, closeOnEscape: true });
 
         // Set up filter UI after modal is shown
         setTimeout(() => this.initializeFilterUI(modalElement), 50);
@@ -115,10 +110,9 @@ export class FilterModalController {
         return id;
     }
 
-    private createModalElement(id: string): HTMLElement {
+    private createModalElement(): HTMLElement {
         const backdrop = document.createElement('div');
         backdrop.className = 'modal-backdrop filter-modal';
-        backdrop.id = id;
 
         const activeFiltersCount = this.filterService?.getFilterCount() || 0;
         const courseCount = this.filterService ? this.filterService.filterCourses(this.allCourses).length : this.allCourses.length;
@@ -128,10 +122,10 @@ export class FilterModalController {
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="modal-title">
-                            Filter Courses 
+                            Filter Courses
                             <span id="filter-count" class="filter-count">${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}</span>
                         </h3>
-                        <button class="modal-close" onclick="document.getElementById('${id}').click()">×</button>
+                        <button class="modal-close" data-modal-close>×</button>
                     </div>
                     <div class="modal-body filter-modal-body">
                         ${this.createFilterSections()}
@@ -142,7 +136,7 @@ export class FilterModalController {
                         </div>
                         <div class="filter-actions">
                             <button class="modal-btn btn-secondary" id="clear-all-filters">Clear All</button>
-                            <button class="modal-btn btn-primary" onclick="document.getElementById('${id}').click()">Apply</button>
+                            <button class="modal-btn btn-primary" data-modal-close>Apply</button>
                         </div>
                     </div>
                 </div>
@@ -155,6 +149,11 @@ export class FilterModalController {
                 event.stopPropagation();
             });
         }
+
+        // Setup close button handlers
+        backdrop.querySelectorAll('[data-modal-close]').forEach(btn => {
+            btn.addEventListener('click', () => this.hide());
+        });
 
         return backdrop;
     }
@@ -847,9 +846,4 @@ export class FilterModalController {
         }
     }
 
-    private escapeHtml(text: string): string {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
 }

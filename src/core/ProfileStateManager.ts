@@ -10,6 +10,7 @@ import type { CloudStateData } from '../services/sync/CloudSyncTypes'
 import { logger } from '../utils/logger'
 import type { ScheduleConflict, ScheduleConflictResolution, ScheduleDiff, CourseDifference } from '../types/schedule'
 import { CourseConflictModal } from '../ui/components/CourseConflictModal'
+import { ModalService } from '../services/ModalService'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -46,6 +47,7 @@ export class ProfileStateManager {
     private cloudSyncService: GoogleDriveSyncService | null = null;
     private pendingSavePromises = new Set<Promise<void>>();
     private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
+    private modalService: ModalService | null = null;
 
     constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
@@ -53,6 +55,10 @@ export class ProfileStateManager {
         this.undoRedoManager = new UndoRedoManager();
         this.initializeCloudSync();
         this.setupBeforeUnloadHandler();
+    }
+
+    setModalService(modalService: ModalService): void {
+        this.modalService = modalService;
     }
 
     private async initializeCloudSync(): Promise<void> {
@@ -221,8 +227,17 @@ export class ProfileStateManager {
     }
 
     private async handleScheduleConflicts(conflicts: ScheduleConflict[], cloudData: any): Promise<void> {
+        if (!this.modalService) {
+            logger.log('[SYNC] ModalService not available, auto-resolving conflicts to keep cloud');
+            this.state.schedules = cloudData.schedules;
+            for (const schedule of this.state.schedules) {
+                this.storageManager.saveSchedule(schedule);
+            }
+            return;
+        }
+
         return new Promise((resolve) => {
-            const modal = new CourseConflictModal();
+            const modal = new CourseConflictModal(this.modalService!);
 
             modal.show(conflicts, async (resolutions: Map<string, ScheduleConflictResolution>) => {
                 logger.log('[SYNC] User resolved', resolutions.size, 'schedule conflicts');

@@ -1,24 +1,19 @@
 /* Cloud Sync Conflict Resolution Modals */
+/* Uses standard modal structure from modal.css */
 
-/* Conflict Resolution Modal (for profile state conflicts) */
-#conflict-resolution-modal.modal,
-#schedule-conflict-modal.modal {
+/* Container - matches .modal-container */
+#conflict-resolution-modal,
+#schedule-conflict-modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    pointer-events: none;
     z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
 }
 
-#conflict-resolution-modal.modal.visible,
-#schedule-conflict-modal.modal.visible {
-    display: flex;
-}
-
+/* Backdrop - matches .modal-backdrop */
 #conflict-resolution-modal .modal-backdrop,
 #schedule-conflict-modal .modal-backdrop {
     position: fixed;
@@ -26,22 +21,45 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(2px);
-    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    pointer-events: auto;
+    transition: opacity 0.2s ease-in-out;
 }
 
-#conflict-resolution-modal .modal-content,
-#schedule-conflict-modal .modal-content {
-    position: relative;
-    z-index: 50;
+#conflict-resolution-modal .modal-backdrop.show,
+#schedule-conflict-modal .modal-backdrop.show {
+    opacity: 1;
+}
+
+#conflict-resolution-modal .modal-backdrop.hide,
+#schedule-conflict-modal .modal-backdrop.hide {
+    opacity: 0;
+}
+
+/* Dialog - matches .modal-dialog */
+#conflict-resolution-modal .modal-dialog,
+#schedule-conflict-modal .modal-dialog {
     background: var(--color-surface);
     border-radius: var(--effect-border-radius-large);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 100%;
     max-height: 90vh;
     overflow: hidden;
+    transform: scale(0.9);
+    transition: transform 0.2s ease-in-out;
     display: flex;
     flex-direction: column;
+}
+
+#conflict-resolution-modal .modal-backdrop.show .modal-dialog,
+#schedule-conflict-modal .modal-backdrop.show .modal-dialog {
+    transform: scale(1);
 }
 
 #conflict-resolution-modal .modal-header,
@@ -225,8 +243,8 @@
         grid-template-columns: 1fr;
     }
 
-    #conflict-resolution-modal .modal-content,
-    #schedule-conflict-modal .modal-content {
+    #conflict-resolution-modal .modal-dialog,
+    #schedule-conflict-modal .modal-dialog {
         max-width: 95%;
     }
 

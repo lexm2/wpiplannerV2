@@ -1,17 +1,15 @@
 import { ScheduleManagementService } from '../../services/ScheduleManagementService';
 import { ModalService } from '../../services/ModalService';
 import { Schedule } from '../../types/schedule';
+import { BaseModal } from './BaseModal';
 import { getInlineSVG } from '../../utils/iconPaths';
 
-export class SchedulePickerModal {
+export class SchedulePickerModal extends BaseModal {
     private static readonly MENU_WIDTH = 120;
     private static readonly MENU_HEIGHT = 160;
     private static readonly MENU_OFFSET = 4;
     private static readonly VIEWPORT_PADDING = 8;
-    private modalService: ModalService;
     private scheduleManagementService: ScheduleManagementService;
-    private modalId: string;
-    private modalElement: HTMLElement | null = null;
     private scheduleListClickHandler: ((e: Event) => void) | null = null;
     private scheduleListDblClickHandler: ((e: Event) => void) | null = null;
 
@@ -19,9 +17,8 @@ export class SchedulePickerModal {
         modalService: ModalService,
         scheduleManagementService: ScheduleManagementService
     ) {
-        this.modalService = modalService;
+        super(modalService);
         this.scheduleManagementService = scheduleManagementService;
-        this.modalId = this.modalService.generateId();
 
         this.scheduleManagementService.onActiveScheduleChange(() => {
             if (this.modalElement) {
@@ -34,9 +31,13 @@ export class SchedulePickerModal {
     async show(): Promise<void> {
         await this.scheduleManagementService.initialize();
 
-        this.modalElement = this.createModalElement();
-        this.modalService.showModal(this.modalId, this.modalElement);
-        this.modalService.setupModalBehavior(this.modalElement, this.modalId, {
+        // Generate ID first so createModalElement can use it
+        this.modalId = this.modalService.generateId();
+
+        const element = this.createModalElement();
+        this.modalElement = element;
+        this.modalService.showModal(this.modalId, element);
+        this.modalService.setupModalBehavior(element, this.modalId, {
             closeOnBackdrop: true,
             closeOnEscape: true
         });
@@ -186,7 +187,7 @@ export class SchedulePickerModal {
         importBtn?.addEventListener('click', () => this.importSchedule());
         exportBtn?.addEventListener('click', () => this.exportActiveSchedule());
         exportIcsBtn?.addEventListener('click', () => this.exportActiveScheduleICS());
-        closeBtn?.addEventListener('click', () => this.modalService.hideModal(this.modalId));
+        closeBtn?.addEventListener('click', () => this.hide());
 
         document.addEventListener('click', (e) => {
             if (modal.contains(e.target as Node)) {
@@ -521,11 +522,5 @@ export class SchedulePickerModal {
                 this.updateScheduleList();
             }
         });
-    }
-
-    private escapeHtml(text: string): string {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 }

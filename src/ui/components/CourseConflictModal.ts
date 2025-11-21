@@ -1,82 +1,62 @@
 import type { ScheduleConflict, ScheduleConflictResolution, SelectedCourse } from '../../types/schedule';
-import type { Section, Period } from '../../types/types';
+import type { Section } from '../../types/types';
+import { BaseModal } from './BaseModal';
+import { ModalService } from '../../services/ModalService';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { TimeUtils } from '../utils/timeUtils';
 
-export class CourseConflictModal {
-    private modalElement: HTMLElement | null = null;
+export class CourseConflictModal extends BaseModal {
     private conflicts: ScheduleConflict[] = [];
     private resolutions: Map<string, ScheduleConflictResolution> = new Map();
     private callback: ((resolutions: Map<string, ScheduleConflictResolution>) => void) | null = null;
     private currentConflictIndex: number = 0;
 
-    constructor() {
+    constructor(modalService: ModalService) {
+        super(modalService);
     }
 
-    private createModal(): void {
-        const existingModal = document.getElementById('schedule-conflict-modal');
-        if (existingModal) {
-            existingModal.remove();
-        }
-
-        const modal = document.createElement('div');
-        modal.id = 'schedule-conflict-modal';
-        modal.className = 'modal-backdrop schedule-conflict-modal';
-        modal.innerHTML = `
+    private createModalElement(): HTMLElement {
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop schedule-conflict-modal';
+        backdrop.innerHTML = `
             <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="conflict-modal-header">
-                        <h2 class="conflict-modal-title">${getInlineSVG('ALERT_CIRCLE', 'conflict-title-icon')}Resolve Conflicts</h2>
-                        <button class="modal-close" aria-label="Close">&times;</button>
+                <div class="conflict-modal-header">
+                    <h2 class="conflict-modal-title">${getInlineSVG('ALERT_CIRCLE', 'conflict-title-icon')}Resolve Conflicts</h2>
+                    <button class="modal-close" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body" id="schedule-conflict-body">
+                    <!-- Content will be populated by updateContent() -->
+                </div>
+                <div class="modal-footer conflict-modal-footer">
+                    <div class="conflict-navigation">
+                        <button id="conflict-prev" class="modal-btn btn-secondary conflict-nav-btn">${getInlineSVG('ARROW_BAR_LEFT', 'nav-icon')}</button>
+                        <span id="conflict-counter" class="conflict-counter">1 / 1</span>
+                        <button id="conflict-next" class="modal-btn btn-secondary conflict-nav-btn">${getInlineSVG('ARROW_BAR_RIGHT', 'nav-icon')}</button>
                     </div>
-                    <div class="modal-body" id="schedule-conflict-body">
-                        <!-- Content will be populated by updateContent() -->
-                    </div>
-                    <div class="modal-footer conflict-modal-footer">
-                        <div class="conflict-navigation">
-                            <button id="conflict-prev" class="modal-btn btn-secondary conflict-nav-btn">${getInlineSVG('ARROW_BAR_LEFT', 'nav-icon')}</button>
-                            <span id="conflict-counter" class="conflict-counter">1 / 1</span>
-                            <button id="conflict-next" class="modal-btn btn-secondary conflict-nav-btn">${getInlineSVG('ARROW_BAR_RIGHT', 'nav-icon')}</button>
-                        </div>
-                        <div class="conflict-actions">
-                            <button id="conflict-cancel" class="modal-btn btn-secondary">Cancel</button>
-                            <button id="conflict-apply" class="modal-btn btn-primary">Apply Changes</button>
-                        </div>
+                    <div class="conflict-actions">
+                        <button id="conflict-cancel" class="modal-btn btn-secondary">Cancel</button>
+                        <button id="conflict-apply" class="modal-btn btn-primary">Apply Changes</button>
                     </div>
                 </div>
             </div>
         `;
 
-        document.body.appendChild(modal);
-        this.modalElement = modal;
-        this.attachEventListeners();
-    }
+        // Setup event listeners
+        const dialog = backdrop.querySelector('.modal-dialog') as HTMLElement;
+        const closeBtn = backdrop.querySelector('.modal-close');
+        const cancelBtn = backdrop.querySelector('#conflict-cancel');
+        const applyBtn = backdrop.querySelector('#conflict-apply');
+        const prevBtn = backdrop.querySelector('#conflict-prev');
+        const nextBtn = backdrop.querySelector('#conflict-next');
 
-    private attachEventListeners(): void {
-        if (!this.modalElement) return;
-
-        const closeBtn = this.modalElement.querySelector('.modal-close');
-        const cancelBtn = this.modalElement.querySelector('#conflict-cancel');
-        const applyBtn = this.modalElement.querySelector('#conflict-apply');
-        const prevBtn = this.modalElement.querySelector('#conflict-prev');
-        const nextBtn = this.modalElement.querySelector('#conflict-next');
-        const dialog = this.modalElement.querySelector('.modal-dialog');
-
-        this.modalElement.addEventListener('click', (e) => {
-            if (e.target === this.modalElement) {
-                this.hide();
-            }
-        });
-
-        dialog?.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
+        dialog?.addEventListener('click', (e) => e.stopPropagation());
         closeBtn?.addEventListener('click', () => this.hide());
         cancelBtn?.addEventListener('click', () => this.hide());
         applyBtn?.addEventListener('click', () => this.handleApply());
         prevBtn?.addEventListener('click', () => this.previousConflict());
         nextBtn?.addEventListener('click', () => this.nextConflict());
+
+        return backdrop;
     }
 
     show(conflicts: ScheduleConflict[], callback: (resolutions: Map<string, ScheduleConflictResolution>) => void): void {
@@ -89,23 +69,14 @@ export class CourseConflictModal {
             this.resolutions.set(conflict.scheduleName, 'keep-local');
         });
 
-        if (!this.modalElement) {
-            this.createModal();
-        }
+        const element = this.createModalElement();
+        this.showModal(element);
 
-        this.updateContent();
-        this.updateNavigation();
-        this.modalElement?.classList.add('show');
-        document.body.style.overflow = 'hidden';
-    }
-
-    hide(): void {
-        this.modalElement?.classList.add('hide');
+        // Update content after modal is shown
         setTimeout(() => {
-            this.modalElement?.remove();
-            this.modalElement = null;
-            document.body.style.overflow = '';
-        }, 200);
+            this.updateContent();
+            this.updateNavigation();
+        }, 0);
     }
 
     private updateContent(): void {
