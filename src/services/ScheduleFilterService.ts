@@ -13,6 +13,7 @@ import { SectionBasedFilter } from '../core/SectionFilterPipeline';
 import { FilterState } from '../core/FilterState';
 import { RequiredStatusFilter } from '../core/filters/RequiredStatusFilter';
 import { SectionStatusFilter } from '../core/filters/SectionStatusFilter';
+import { GraduateLevelFilter } from '../core/filters/GraduateLevelFilter';
 import { PeriodRMPRatingFilter } from '../core/filters/PeriodRMPRatingFilter';
 import { RateMyProfessorService } from './RateMyProfessorService';
 import { getAllSections } from '../utils/courseUtils';
@@ -63,6 +64,7 @@ export class ScheduleFilterService {
         // Register SelectedCourseFilter implementations using registration methods
         this.registerSelectedCourseFilter(new RequiredStatusFilter());
         this.registerSelectedCourseFilter(new SectionStatusFilter());
+        this.registerSelectedCourseFilter(new GraduateLevelFilter());
     }
 
     // Section Filter Registration

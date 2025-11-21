@@ -5,7 +5,7 @@ import { BaseModal } from '../components/BaseModal';
 import { getAllSections } from '../../utils/courseUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
-import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTypeFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria } from '../../types/filters';
+import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTypeFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria, GraduateLevelFilterCriteria } from '../../types/filters';
 
 export class ScheduleFilterModalController extends BaseModal {
     private scheduleFilterService: ScheduleFilterService | null = null;
@@ -94,8 +94,32 @@ export class ScheduleFilterModalController extends BaseModal {
                 ${this.createRMPRatingFilter()}
                 ${this.createPeriodTypeFilter()}
                 ${this.createTermFilter()}
+                ${this.createGraduateLevelFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createConflictFilter()}
+            </div>
+        `;
+    }
+
+    private createGraduateLevelFilter(): string {
+        if (!this.scheduleFilterService) return '';
+
+        const activeFilter = this.scheduleFilterService.getActiveFilters().find(f => f.id === 'graduateLevel');
+        const criteria = activeFilter?.criteria as GraduateLevelFilterCriteria | undefined;
+        const currentLevel = criteria?.level || 'all';
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Course Level</h4>
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-segmented-control" id="graduate-level-filter">
+                        <button class="segmented-btn ${currentLevel === 'all' ? 'active' : ''}" data-level="all">All</button>
+                        <button class="segmented-btn ${currentLevel === 'undergraduate' ? 'active' : ''}" data-level="undergraduate">Undergrad</button>
+                        <button class="segmented-btn ${currentLevel === 'graduate' ? 'active' : ''}" data-level="graduate">Graduate</button>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -300,6 +324,24 @@ export class ScheduleFilterModalController extends BaseModal {
             });
         });
 
+        // Graduate level filter (3-position segmented control)
+        const graduateLevelControl = modalElement.querySelector('#graduate-level-filter');
+        if (graduateLevelControl) {
+            graduateLevelControl.querySelectorAll('.segmented-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const target = e.target as HTMLElement;
+                    const level = target.dataset.level as 'all' | 'undergraduate' | 'graduate';
+
+                    // Update active state
+                    graduateLevelControl.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active'));
+                    target.classList.add('active');
+
+                    this.updateGraduateLevelFilter(level);
+                    this.updatePreview(modalElement);
+                });
+            });
+        }
+
         // Availability filter
         SharedFilterSetup.setupAvailabilityFilter({
             modalElement,
@@ -405,6 +447,14 @@ export class ScheduleFilterModalController extends BaseModal {
             } else {
                 this.scheduleFilterService!.removeFilter('periodConflict');
             }
+        }
+    }
+
+    private updateGraduateLevelFilter(level: 'all' | 'undergraduate' | 'graduate'): void {
+        if (level === 'all') {
+            this.scheduleFilterService!.removeFilter('graduateLevel');
+        } else {
+            this.scheduleFilterService!.addFilter('graduateLevel', { level });
         }
     }
 

@@ -105,6 +105,10 @@ export interface RequiredStatusFilterCriteria {
     status: 'required' | 'optional' | 'all';
 }
 
+export interface GraduateLevelFilterCriteria {
+    level: 'all' | 'undergraduate' | 'graduate';
+}
+
 // Period-based filter criteria
 export interface CourseSelectionFilterCriteria {
     selectedCourseIds: string[];

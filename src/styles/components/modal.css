@@ -1413,3 +1413,36 @@
   text-align: center;
 }
 
+/* ===== Segmented Control (3-position switch) ===== */
+.filter-segmented-control {
+  display: flex;
+  background: var(--color-border);
+  border-radius: var(--effect-border-radius);
+  padding: 3px;
+  gap: 3px;
+}
+
+.segmented-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: calc(var(--effect-border-radius) - 2px);
+  transition: all 0.2s ease;
+}
+
+.segmented-btn:hover:not(.active) {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.segmented-btn.active {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+

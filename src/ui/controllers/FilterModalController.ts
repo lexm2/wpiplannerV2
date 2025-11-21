@@ -5,7 +5,7 @@ import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
-import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria } from '../../types/filters';
+import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria } from '../../types/filters';
 
 export class FilterModalController extends BaseModal {
     private filterService: CourseFilterService | null = null;
@@ -169,6 +169,30 @@ export class FilterModalController extends BaseModal {
                 ${this.createConflictFilter()}
                 ${this.createCreditRangeFilter()}
                 ${this.createTermFilter()}
+                ${this.createGraduateLevelFilter()}
+            </div>
+        `;
+    }
+
+    private createGraduateLevelFilter(): string {
+        if (!this.filterService) return '';
+
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'graduateLevel');
+        const criteria = activeFilter?.criteria as GraduateLevelFilterCriteria | undefined;
+        const currentLevel = criteria?.level || 'all';
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Course Level</h4>
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-segmented-control" id="graduate-level-filter">
+                        <button class="segmented-btn ${currentLevel === 'all' ? 'active' : ''}" data-level="all">All</button>
+                        <button class="segmented-btn ${currentLevel === 'undergraduate' ? 'active' : ''}" data-level="undergraduate">Undergrad</button>
+                        <button class="segmented-btn ${currentLevel === 'graduate' ? 'active' : ''}" data-level="graduate">Graduate</button>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -377,8 +401,36 @@ export class FilterModalController extends BaseModal {
         this.setupConflictFilter(modalElement);
         this.setupCreditRangeFilter(modalElement);
         this.setupTermFilter(modalElement);
+        this.setupGraduateLevelFilter(modalElement);
         this.setupClearAllButton(modalElement);
         this.setupFilterSearch(modalElement);
+    }
+
+    private setupGraduateLevelFilter(modalElement: HTMLElement): void {
+        const graduateLevelControl = modalElement.querySelector('#graduate-level-filter');
+        if (graduateLevelControl) {
+            graduateLevelControl.querySelectorAll('.segmented-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const target = e.target as HTMLElement;
+                    const level = target.dataset.level as 'all' | 'undergraduate' | 'graduate';
+
+                    // Update active state
+                    graduateLevelControl.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active'));
+                    target.classList.add('active');
+
+                    this.updateGraduateLevelFilter(level, modalElement);
+                });
+            });
+        }
+    }
+
+    private updateGraduateLevelFilter(level: 'all' | 'undergraduate' | 'graduate', modalElement: HTMLElement): void {
+        if (level === 'all') {
+            this.filterService?.removeFilter('graduateLevel');
+        } else {
+            this.filterService?.addFilter('graduateLevel', { level });
+        }
+        this.updatePreview(modalElement);
     }
 
     private setupSearchTextFilter(modalElement: HTMLElement): void {

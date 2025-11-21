@@ -46,17 +46,29 @@ export class CourseFilterService {
     
     // Filter Management
     addFilter(filterId: string, criteria: any): boolean {
+        // Special handling for course-level filters that don't use section pipeline
+        if (filterId === 'graduateLevel') {
+            const levelNames: Record<string, string> = {
+                'all': 'All Levels',
+                'undergraduate': 'Undergraduate Only',
+                'graduate': 'Graduate Only'
+            };
+            const displayValue = levelNames[criteria.level] || 'Unknown Level';
+            this.filterState.addFilter(filterId, 'Course Level', criteria, displayValue);
+            return true;
+        }
+
         const filter = this.registeredFilters.get(filterId);
         if (!filter) {
             console.error(`Filter '${filterId}' is not registered`);
             return false;
         }
-        
+
         if (!filter.isValidCriteria(criteria)) {
             console.error(`Invalid criteria for filter '${filterId}'`);
             return false;
         }
-        
+
         const displayValue = filter.getDisplayValue(criteria);
         this.filterState.addFilter(filterId, filter.name, criteria, displayValue);
         return true;
@@ -143,6 +155,24 @@ export class CourseFilterService {
 
         if (this.debugLogging) {
             console.log(`Filtered result: ${filteredCourses.length} courses`);
+        }
+
+        // Apply graduate level filter at course level
+        const graduateLevelCriteria = criteriaMap.get('graduateLevel');
+        if (graduateLevelCriteria && graduateLevelCriteria.level && graduateLevelCriteria.level !== 'all') {
+            filteredCourses = filteredCourses.filter(course => {
+                const isGraduate = course.isGraduate ?? false;
+                if (graduateLevelCriteria.level === 'graduate') {
+                    return isGraduate;
+                } else if (graduateLevelCriteria.level === 'undergraduate') {
+                    return !isGraduate;
+                }
+                return true;
+            });
+
+            if (this.debugLogging) {
+                console.log(`Filtered by graduate level: ${filteredCourses.length} courses`);
+            }
         }
 
         const searchCriteria = criteriaMap.get('searchText');
