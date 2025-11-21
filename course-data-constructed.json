@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 21, 2025, 5:49 PM",
+  "generated": "Nov 21, 2025, 6:21 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -24413,7 +24413,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 45,
+                "actualWaitlist": 44,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I The CH1010 course is an introduction to chemistry using the fundamental structures of atoms as a starting point. Emphasis is placed on discussing how all properties of matter as well as bonding mechanisms arise from atomic structure. Lewis structures and molecular orbitals are used to understand bonding, and the intermolecular forces present in chemicals systems are used as a prelude to reactivity patterns covered in future courses.",
@@ -24432,7 +24432,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 45,
+                    "actualWaitlist": 44,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": []
@@ -58366,7 +58366,7 @@
                 "crn": 337763,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -58385,7 +58385,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -58591,7 +58591,7 @@
                 "crn": 337864,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 18,
+                "seatsAvailable": 17,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -58610,7 +58610,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 18,
+                    "seatsAvailable": 17,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -67316,7 +67316,7 @@
                 "number": "D01",
                 "seats": 28,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course teaches students of different technical disciplines the fundamentals of fire protection engineering including combustion chemistry, fire behavior, compartment fire dynamics, toxicity, human behavior in fire, and fire modelling. Students have an opportunity to conduct and view fire experiments in both the WPI Fire Safety Engineering and the WPI Fire Fundamentals laboratories. Fire models are used to aid in use of the scientific method to determine cause and origin of a fire. This course is intended for both majors and non-majors as an introduction into Fire Protection Engineering (FPE) and how engineering knowledge can be used to save lives and property around the world.",
@@ -67335,7 +67335,7 @@
                     "room": "Gateway Park 2 Room 1226",
                     "seats": 28,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -78095,7 +78095,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Michele Femc-Bagwell",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Innovation Studio 105 Active Learning Classroom",
@@ -78133,7 +78133,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Derren Rosbach",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Innovation Studio 203 Active Learning Classroom South",
@@ -78171,7 +78171,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Mallory Bagwell",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Salisbury Labs 402",
@@ -78209,7 +78209,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Seth Tuler",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Salisbury Labs 305",
@@ -78285,7 +78285,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Corey Dehner",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Salisbury Labs 411",
@@ -78323,7 +78323,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Dominic Golding",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Olin Hall 126",
@@ -78361,7 +78361,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Alex Sphar",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Fuller Labs 320",
@@ -78399,7 +78399,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Lorraine Higgins",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Stratton Hall 207 (new)",
@@ -78475,7 +78475,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Sarah Molinari",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Salisbury Labs 406",
@@ -78551,7 +78551,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Melissa Butler",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Salisbury Labs 407",
@@ -78589,7 +78589,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Corey Dehner",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Salisbury Labs 104",
@@ -78627,7 +78627,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Amanda Wittman",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Olin Hall 218",
@@ -78703,7 +78703,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Zoe Eddy",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Unity Hall 420",
@@ -78741,7 +78741,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Mohammed El Hamzaoui",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Unity Hall 500",
