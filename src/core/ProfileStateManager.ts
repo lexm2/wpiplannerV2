@@ -106,8 +106,9 @@ export class ProfileStateManager {
                         this.state.schedules = cloudData.schedules;
 
                         let activeScheduleId = cloudData.state?.activeScheduleId;
-                        if (!activeScheduleId && cloudData.schedules.length > 0) {
-                            activeScheduleId = cloudData.schedules[0].id;
+                        if (!activeScheduleId) {
+                            // Preserve current local selection, or fall back to first schedule
+                            activeScheduleId = this.state.activeScheduleId || (cloudData.schedules.length > 0 ? cloudData.schedules[0].id : undefined);
                         }
 
                         if (activeScheduleId) {
@@ -275,8 +276,9 @@ export class ProfileStateManager {
                 this.state.schedules = finalSchedules;
 
                 let activeScheduleId = cloudData.state?.activeScheduleId;
-                if (!activeScheduleId && finalSchedules.length > 0) {
-                    activeScheduleId = finalSchedules[0].id;
+                if (!activeScheduleId) {
+                    // Preserve current local selection, or fall back to first schedule
+                    activeScheduleId = this.state.activeScheduleId || (finalSchedules.length > 0 ? finalSchedules[0].id : undefined);
                 }
 
                 if (activeScheduleId) {
