@@ -125,6 +125,15 @@ export class GoogleDriveSyncService implements ICloudSyncService {
     private async handleAuthChange(): Promise<void> {
         if (this.authService.isAuthenticated()) {
             this.updateStatus('idle');
+            // Trigger initial pull from cloud after sign-in
+            const result = await this.pullFromCloud();
+            if (result.success && result.data) {
+                this.notifyEvent({
+                    type: 'sync-completed',
+                    timestamp: Date.now(),
+                    data: result.data
+                });
+            }
         } else {
             this.cancelPendingSync();
             this.updateStatus('not_authenticated');
@@ -219,6 +228,12 @@ export class GoogleDriveSyncService implements ICloudSyncService {
         try {
             const enrichedData = this.enrichWithSyncMetadata(data);
             const cloudData = await this.getCloudData();
+
+            console.log('[Google Drive] === DATA COMPARISON ===');
+            console.log('[Google Drive] Local data:', JSON.stringify(enrichedData, null, 2));
+            console.log('[Google Drive] Cloud data:', cloudData ? JSON.stringify(cloudData, null, 2) : 'No cloud data');
+            console.log('[Google Drive] Are they different?', JSON.stringify(enrichedData) !== JSON.stringify(cloudData));
+            console.log('[Google Drive] === END COMPARISON ===');
 
             if (cloudData) {
                 console.log('[Google Drive] Found existing data in cloud');

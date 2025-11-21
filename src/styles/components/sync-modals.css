@@ -33,6 +33,7 @@
 #conflict-resolution-modal .modal-content,
 #schedule-conflict-modal .modal-content {
     position: relative;
+    z-index: 50;
     background: var(--color-surface);
     border-radius: var(--effect-border-radius-large);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
