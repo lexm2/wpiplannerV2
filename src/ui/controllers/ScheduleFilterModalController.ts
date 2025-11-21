@@ -34,8 +34,8 @@ export class ScheduleFilterModalController extends BaseModal {
 
         // Set up event listeners after modal is shown
         setTimeout(() => {
-            this.setupFilterModalEventListeners();
-            this.initializeFormState();
+            this.setupFilterModalEventListeners(modalElement);
+            this.initializeFormState(modalElement);
         }, 50);
 
         return id;
@@ -273,11 +273,7 @@ export class ScheduleFilterModalController extends BaseModal {
         return criteria || { avoidConflicts: false };
     }
 
-    private setupFilterModalEventListeners(): void {
-        if (!this.modalId) return;
-
-        const modalElement = document.getElementById(this.modalId);
-        if (!modalElement) return;
+    private setupFilterModalEventListeners(modalElement: HTMLElement): void {
 
         // Search text filter
         this.setupSearchTextFilter(modalElement);
@@ -332,7 +328,7 @@ export class ScheduleFilterModalController extends BaseModal {
             const modalBody = modalElement.querySelector('.modal-body');
             if (modalBody) {
                 modalBody.innerHTML = this.createFilterModalContent();
-                this.setupFilterModalEventListeners();
+                this.setupFilterModalEventListeners(modalElement);
             }
         });
 
@@ -412,11 +408,7 @@ export class ScheduleFilterModalController extends BaseModal {
         }
     }
 
-    private initializeFormState(): void {
-        if (!this.modalId) return;
-
-        const modalElement = document.getElementById(this.modalId);
-        if (!modalElement) return;
+    private initializeFormState(modalElement: HTMLElement): void {
 
         // Initialize availability filter states
         const activeAvailability = this.getActiveAvailability();

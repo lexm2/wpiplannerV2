@@ -39,6 +39,7 @@ export class SharedFilterComponents {
 
     static createRMPRatingFilter(options: RMPFilterOptions): string {
         const { idPrefix, activeFilter } = options;
+        const prefix = idPrefix ? `${idPrefix}-` : '';
 
         const filterObj = activeFilter && typeof activeFilter === 'object' ? activeFilter as Record<string, unknown> : null;
         const criteria = filterObj?.criteria && typeof filterObj.criteria === 'object' ? filterObj.criteria as Record<string, unknown> : null;
@@ -60,36 +61,36 @@ export class SharedFilterComponents {
                         <div class="filter-slider-group">
                             <label>Rating</label>
                             <div class="filter-slider-values">
-                                <span id="${idPrefix}-rmp-rating-min-value">${minRating.toFixed(1)}</span>
+                                <span id="${prefix}rmp-rating-min-value">${minRating.toFixed(1)}</span>
                                 <span>-</span>
-                                <span id="${idPrefix}-rmp-rating-max-value">${maxRating.toFixed(1)}</span>
+                                <span id="${prefix}rmp-rating-max-value">${maxRating.toFixed(1)}</span>
                                 <span class="filter-input-hint">stars</span>
                             </div>
-                            <div id="${idPrefix}-rmp-rating-slider-container"></div>
+                            <div id="${prefix}rmp-rating-slider-container"></div>
                         </div>
                         <div class="filter-slider-group">
                             <label>Difficulty</label>
                             <div class="filter-slider-values">
-                                <span id="${idPrefix}-rmp-difficulty-min-value">${minDifficulty.toFixed(1)}</span>
+                                <span id="${prefix}rmp-difficulty-min-value">${minDifficulty.toFixed(1)}</span>
                                 <span>-</span>
-                                <span id="${idPrefix}-rmp-difficulty-max-value">${maxDifficulty.toFixed(1)}</span>
+                                <span id="${prefix}rmp-difficulty-max-value">${maxDifficulty.toFixed(1)}</span>
                                 <span class="filter-input-hint">scale</span>
                             </div>
-                            <div id="${idPrefix}-rmp-difficulty-slider-container"></div>
+                            <div id="${prefix}rmp-difficulty-slider-container"></div>
                         </div>
                         <div class="filter-slider-group">
                             <label>Would Take Again</label>
                             <div class="filter-slider-values">
-                                <span id="${idPrefix}-rmp-retake-min-value">${minWouldTakeAgain}</span>
+                                <span id="${prefix}rmp-retake-min-value">${minWouldTakeAgain}</span>
                                 <span>-</span>
-                                <span id="${idPrefix}-rmp-retake-max-value">${maxWouldTakeAgain}</span>
+                                <span id="${prefix}rmp-retake-max-value">${maxWouldTakeAgain}</span>
                                 <span class="filter-input-hint">%</span>
                             </div>
-                            <div id="${idPrefix}-rmp-retake-slider-container"></div>
+                            <div id="${prefix}rmp-retake-slider-container"></div>
                         </div>
                     </div>
                     <label class="filter-toggle-label" style="margin-top: 0.75rem;">
-                        <input type="checkbox" class="filter-toggle" id="${idPrefix}-rmp-include-without-data" checked>
+                        <input type="checkbox" class="filter-toggle" id="${prefix}rmp-include-without-data" checked>
                         <span class="filter-toggle-text">Include professors without RMP data</span>
                     </label>
                     <div class="filter-hint">

@@ -49,6 +49,7 @@ export class SharedFilterSetup {
         sliderRefs: { rating?: DualRangeSlider, difficulty?: DualRangeSlider, retake?: DualRangeSlider }
     ): void {
         const { modalElement, filterService, idPrefix, filterId, updatePreview } = options;
+        const prefix = idPrefix ? `${idPrefix}-` : '';
 
         // Get current filter values
         const activeFilterRaw = filterService.getActiveFilters?.().find((f: unknown) => {
@@ -65,16 +66,16 @@ export class SharedFilterSetup {
         const minRetake = typeof criteria?.minWouldTakeAgain === 'number' ? criteria.minWouldTakeAgain : 0;
         const maxRetake = typeof criteria?.maxWouldTakeAgain === 'number' ? criteria.maxWouldTakeAgain : 100;
 
-        const ratingMinValue = modalElement.querySelector(`#${idPrefix}-rmp-rating-min-value`);
-        const ratingMaxValue = modalElement.querySelector(`#${idPrefix}-rmp-rating-max-value`);
-        const difficultyMinValue = modalElement.querySelector(`#${idPrefix}-rmp-difficulty-min-value`);
-        const difficultyMaxValue = modalElement.querySelector(`#${idPrefix}-rmp-difficulty-max-value`);
-        const retakeMinValue = modalElement.querySelector(`#${idPrefix}-rmp-retake-min-value`);
-        const retakeMaxValue = modalElement.querySelector(`#${idPrefix}-rmp-retake-max-value`);
+        const ratingMinValue = modalElement.querySelector(`#${prefix}rmp-rating-min-value`);
+        const ratingMaxValue = modalElement.querySelector(`#${prefix}rmp-rating-max-value`);
+        const difficultyMinValue = modalElement.querySelector(`#${prefix}rmp-difficulty-min-value`);
+        const difficultyMaxValue = modalElement.querySelector(`#${prefix}rmp-difficulty-max-value`);
+        const retakeMinValue = modalElement.querySelector(`#${prefix}rmp-retake-min-value`);
+        const retakeMaxValue = modalElement.querySelector(`#${prefix}rmp-retake-max-value`);
 
-        const ratingContainer = modalElement.querySelector(`#${idPrefix}-rmp-rating-slider-container`);
-        const difficultyContainer = modalElement.querySelector(`#${idPrefix}-rmp-difficulty-slider-container`);
-        const retakeContainer = modalElement.querySelector(`#${idPrefix}-rmp-retake-slider-container`);
+        const ratingContainer = modalElement.querySelector(`#${prefix}rmp-rating-slider-container`);
+        const difficultyContainer = modalElement.querySelector(`#${prefix}rmp-difficulty-slider-container`);
+        const retakeContainer = modalElement.querySelector(`#${prefix}rmp-retake-slider-container`);
 
         let debounceTimer: number | undefined;
 
@@ -87,7 +88,7 @@ export class SharedFilterSetup {
             const maxDifficulty = sliderRefs.difficulty.getMaxValue();
             const minRetake = sliderRefs.retake.getMinValue();
             const maxRetake = sliderRefs.retake.getMaxValue();
-            const includeCheckbox = modalElement.querySelector(`#${idPrefix}-rmp-include-without-data`) as HTMLInputElement;
+            const includeCheckbox = modalElement.querySelector(`#${prefix}rmp-include-without-data`) as HTMLInputElement;
             const includeWithoutData = includeCheckbox?.checked ?? true;
 
             const isDefaultRating = minRating === 0 && maxRating === 5;
@@ -175,7 +176,7 @@ export class SharedFilterSetup {
             retakeContainer.appendChild(sliderRefs.retake.getElement());
         }
 
-        const includeCheckbox = modalElement.querySelector(`#${idPrefix}-rmp-include-without-data`) as HTMLInputElement;
+        const includeCheckbox = modalElement.querySelector(`#${prefix}rmp-include-without-data`) as HTMLInputElement;
         includeCheckbox?.addEventListener('change', () => {
             debouncedUpdateFilter();
         });
