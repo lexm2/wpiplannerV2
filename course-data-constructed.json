@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 21, 2025, 3:41 AM",
+  "generated": "Nov 21, 2025, 3:58 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -2783,7 +2783,7 @@
                 "crn": 336166,
                 "number": "C01",
                 "seats": 35,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -2802,7 +2802,7 @@
                     "building": "",
                     "room": "Higgins Labs 202",
                     "seats": 35,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
