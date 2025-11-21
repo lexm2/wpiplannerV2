@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 21, 2025, 6:21 PM",
+  "generated": "Nov 21, 2025, 6:45 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -34169,7 +34169,7 @@
                 "crn": 341235,
                 "number": "C01",
                 "seats": 20,
-                "seatsAvailable": 15,
+                "seatsAvailable": 14,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -34188,7 +34188,7 @@
                     "building": "",
                     "room": "Olin Hall 126",
                     "seats": 20,
-                    "seatsAvailable": 15,
+                    "seatsAvailable": 14,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
@@ -34205,7 +34205,7 @@
                     "building": "",
                     "room": "Olin Hall 126",
                     "seats": 20,
-                    "seatsAvailable": 15,
+                    "seatsAvailable": 14,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
@@ -76465,7 +76465,7 @@
                 "crn": 337558,
                 "number": "D05 - PRAC IN HUA: Cinematic Production",
                 "seats": 12,
-                "seatsAvailable": -3,
+                "seatsAvailable": -4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -76484,7 +76484,7 @@
                     "building": "",
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 12,
-                    "seatsAvailable": -3,
+                    "seatsAvailable": -4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D05 - PRAC IN HUA: Cinematic Production",
@@ -78817,7 +78817,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Corey Dehner",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Higgins Labs 202",
@@ -78855,7 +78855,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Ingrid Shockey",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Stratton Hall 313",
@@ -78893,7 +78893,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Caitlin Ferrarini",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Olin Hall 223",
@@ -78931,7 +78931,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Caitlin Ferrarini",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Olin Hall 109",
@@ -78969,7 +78969,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Alex Sphar",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Atwater Kent 232",
