@@ -141,7 +141,7 @@ export class IndexedDBStorageManager {
                     if (request.result) {
                         const stored = request.result;
                         if (stored.serializedData) {
-                            const deserialized = safeParse(stored.serializedData);
+                            const deserialized = safeParse(stored.serializedData) as Schedule;
                             resolve({ success: true, data: deserialized });
                         } else {
                             resolve({ success: true, data: stored });

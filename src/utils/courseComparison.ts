@@ -24,16 +24,16 @@ export function formatSectionInfo(course: SelectedCourse): string {
     const parts: string[] = [];
 
     if (course.selectedLecture) {
-        parts.push(`Lecture: ${course.selectedLecture.sectionNumber} (CRN: ${course.selectedLecture.crn})`);
+        parts.push(`Lecture: ${course.selectedLecture.number} (CRN: ${course.selectedLecture.crn})`);
     }
     if (course.selectedDiscussion) {
-        parts.push(`Discussion: ${course.selectedDiscussion.sectionNumber} (CRN: ${course.selectedDiscussion.crn})`);
+        parts.push(`Discussion: ${course.selectedDiscussion.number} (CRN: ${course.selectedDiscussion.crn})`);
     }
     if (course.selectedLab) {
-        parts.push(`Lab: ${course.selectedLab.sectionNumber} (CRN: ${course.selectedLab.crn})`);
+        parts.push(`Lab: ${course.selectedLab.number} (CRN: ${course.selectedLab.crn})`);
     }
     if (course.selectedSection) {
-        parts.push(`Section: ${course.selectedSection.sectionNumber} (CRN: ${course.selectedSection.crn})`);
+        parts.push(`Section: ${course.selectedSection.number} (CRN: ${course.selectedSection.crn})`);
     }
 
     if (parts.length === 0) {
