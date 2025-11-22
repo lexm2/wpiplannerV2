@@ -77,6 +77,7 @@ export class ProfileStateManager {
 
             this.cloudSyncService.addEventListener(async (event) => {
                 if (event.type === 'sync-completed' && event.data) {
+                    await this.loadFromStorage();
                     logger.log('[SYNC] Data pulled from cloud, applying...');
                     const cloudData = event.data as any;
 
@@ -130,9 +131,99 @@ export class ProfileStateManager {
                     this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
                     this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');
                 }
+
+                if (event.type === 'auth-changed' && event.data?.isAuthenticated) {
+                    await this.handleFirstTimeAuth();
+                }
             });
         } catch (error) {
             logger.warn('Cloud sync initialization failed:', error);
+        }
+    }
+
+    private async handleFirstTimeAuth(): Promise<void> {
+        if (!this.cloudSyncService) return;
+
+        await this.loadFromStorage();
+
+        try {
+            logger.log('[SYNC] Authentication detected, pulling data from cloud...');
+            const pullResult = await this.cloudSyncService.pullFromCloud();
+
+            if (!pullResult.success || !pullResult.data) {
+                logger.log('[SYNC] Cloud storage is empty');
+
+                const hasCompletedInitialSync = localStorage.getItem('google-drive-initial-sync-completed');
+                if (!hasCompletedInitialSync) {
+                    logger.log('[SYNC] First time setup - syncing local data to cloud...');
+                    const localState = await this.getCurrentCloudState();
+
+                    if (localState) {
+                        await this.cloudSyncService.syncToCloud(localState, true);
+                        logger.log('[SYNC] Local data synced to cloud successfully');
+                    } else {
+                        logger.log('[SYNC] No local data to sync, creating empty cloud state');
+                        const emptyState = await this.getCurrentCloudState();
+                        if (emptyState) {
+                            await this.cloudSyncService.syncToCloud(emptyState, true);
+                        }
+                    }
+                    localStorage.setItem('google-drive-initial-sync-completed', 'true');
+                } else {
+                    logger.log('[SYNC] No cloud data found, but initial sync already done. Skipping auto-push.');
+                }
+            } else {
+                logger.log('[SYNC] Cloud data found, applying...');
+                const cloudData = pullResult.data;
+
+                if (cloudData.preferences) {
+                    this.storageManager.savePreferences(cloudData.preferences);
+                    this.state.preferences = cloudData.preferences;
+                }
+
+                if (cloudData.schedules && cloudData.schedules.length > 0) {
+                    const conflicts = this.detectScheduleConflicts(
+                        this.state.schedules,
+                        cloudData.schedules
+                    );
+
+                    if (conflicts.length > 0) {
+                        logger.log('[SYNC] Detected', conflicts.length, 'schedule conflicts');
+                        await this.handleScheduleConflicts(conflicts, cloudData);
+                        return;
+                    }
+
+                    for (const schedule of cloudData.schedules) {
+                        await this.storageManager.saveSchedule(schedule);
+                    }
+                    this.state.schedules = cloudData.schedules;
+
+                    let activeScheduleId = cloudData.state?.activeScheduleId;
+                    if (!activeScheduleId && cloudData.schedules.length > 0) {
+                        activeScheduleId = cloudData.schedules[0].id;
+                    }
+
+                    if (activeScheduleId) {
+                        this.storageManager.saveActiveScheduleId(activeScheduleId);
+                        this.state.activeScheduleId = activeScheduleId;
+
+                        const activeSchedule = this.state.schedules.find(s => s.id === activeScheduleId);
+                        if (activeSchedule) {
+                            this.state.selectedCourses = this.resolveCourseReferences(
+                                activeSchedule.selectedCourses
+                            );
+                            logger.log('[SYNC] Loaded schedule:', activeSchedule.name, 'with', this.state.selectedCourses.length, 'courses');
+                        }
+                    }
+                }
+
+                logger.log('[SYNC] Cloud data applied to storage and memory');
+                this.emitEvent('schedule_changed', { action: 'cloud_sync', schedules: this.state.schedules }, 'cloud-sync');
+                this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
+                this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');
+            }
+        } catch (error) {
+            logger.error('[SYNC] Auth sync failed:', error);
         }
     }
 
@@ -917,6 +1008,18 @@ export class ProfileStateManager {
     async exportData(): Promise<string | null> {
         const exportResult = await this.storageManager.exportData();
         return exportResult.valid ? exportResult.data : null;
+    }
+
+    async getCurrentCloudState(): Promise<CloudStateData | null> {
+        const exportedData = await this.exportData();
+        if (!exportedData) return null;
+
+        try {
+            return JSON.parse(exportedData) as CloudStateData;
+        } catch (error) {
+            logger.error('Failed to parse current state as CloudStateData:', error);
+            return null;
+        }
     }
 
     async importData(jsonData: string): Promise<TransactionResult> {

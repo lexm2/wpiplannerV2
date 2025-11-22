@@ -125,15 +125,11 @@ export class GoogleDriveSyncService implements ICloudSyncService {
     private async handleAuthChange(): Promise<void> {
         if (this.authService.isAuthenticated()) {
             this.updateStatus('idle');
-            // Trigger initial pull from cloud after sign-in
-            const result = await this.pullFromCloud();
-            if (result.success && result.data) {
-                this.notifyEvent({
-                    type: 'sync-completed',
-                    timestamp: Date.now(),
-                    data: result.data
-                });
-            }
+            this.notifyEvent({
+                type: 'auth-changed',
+                timestamp: Date.now(),
+                data: this.authService.getAuthState()
+            });
         } else {
             this.cancelPendingSync();
             this.updateStatus('not_authenticated');

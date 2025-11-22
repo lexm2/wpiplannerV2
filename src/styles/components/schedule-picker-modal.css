@@ -570,7 +570,7 @@
 }
 
 /* Width-based breakpoint for mobile footer */
-@media (max-width: 1000px) {
+@media (max-width: 1200px) {
   .schedule-picker-modal-dialog .modal-footer {
     display: none;
   }

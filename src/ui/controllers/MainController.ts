@@ -68,6 +68,7 @@ export class MainController {
     private dataUpdateService: DataUpdateService;
     private cloudStatusButton: CloudStatusButton;
     private googleDriveSyncService: GoogleDriveSyncService;
+    private cloudSyncMenuItem: HTMLButtonElement | null = null;
     private allDepartments: Department[] = [];
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
     private pendingExpansions: Array<{courseId: string, term: string}> = [];
@@ -1164,7 +1165,26 @@ export class MainController {
     private setupCloudStatusButtonListener(): void {
         this.profileStateManager.addListener((event, state) => {
             this.cloudStatusButton.onStateChange(event, state);
+            this.updateCloudSyncMenuItem();
         });
+    }
+
+    private updateCloudSyncMenuItem(): void {
+        if (!this.cloudSyncMenuItem) return;
+
+        const icon = this.cloudStatusButton.getCurrentIcon() || 'CALENDAR_UP';
+        const text = this.cloudStatusButton.getCurrentText();
+
+        const iconElement = this.cloudSyncMenuItem.querySelector('.menu-item-icon');
+        const textElement = this.cloudSyncMenuItem.querySelector('span');
+
+        if (iconElement) {
+            iconElement.outerHTML = getInlineSVG(icon, 'menu-item-icon');
+        }
+
+        if (textElement) {
+            textElement.textContent = text;
+        }
     }
 
     private setupScheduleChangeListener(): void {
@@ -1522,6 +1542,16 @@ export class MainController {
                     this.closeSettingsMenu();
                 },
                 checkDisabled: () => !this.profileStateManager.canRedo()
+            },
+            {
+                icon: this.cloudStatusButton.getCurrentIcon() || 'CALENDAR_UP',
+                label: this.cloudStatusButton.getCurrentText(),
+                id: 'settings-cloud-sync-btn',
+                action: async () => {
+                    await this.cloudStatusButton.triggerClick();
+                    this.closeSettingsMenu();
+                },
+                isCloudSync: true
             }
         ];
 
@@ -1541,6 +1571,11 @@ export class MainController {
             // Check if should be disabled
             if (item.checkDisabled && item.checkDisabled()) {
                 menuItem.disabled = true;
+            }
+
+            // Store reference to cloud sync menu item
+            if ((item as any).isCloudSync) {
+                this.cloudSyncMenuItem = menuItem;
             }
 
             // Add click handler
