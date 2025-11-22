@@ -12,6 +12,7 @@ import type {
 } from '../CloudSyncTypes';
 import type { ICloudSyncService } from '../interfaces/ICloudSyncService';
 import type { ICloudAuthService } from '../interfaces/ICloudAuthService';
+import { syncEventBus } from '../SyncEventBus';
 
 declare const gapi: any;
 
@@ -119,6 +120,17 @@ export class GoogleDriveSyncService implements ICloudSyncService {
             this.isOnline = false;
             this.updateStatus('offline');
             this.notifyEvent({ type: 'offline-mode', timestamp: Date.now() });
+        });
+
+        // Listen for local save events to trigger sync
+        syncEventBus.on('local-save-completed', async () => {
+            if (GOOGLE_DRIVE_CONFIG.autoSyncEnabled && this.isAuthenticated()) {
+                // Get data from ProfileStateManager and sync
+                const { ProfileStateManager } = await import('../../../core/ProfileStateManager');
+                const stateManager = ProfileStateManager.getInstance();
+                const cloudData = stateManager.exportData();
+                await this.syncToCloud(cloudData);
+            }
         });
     }
 

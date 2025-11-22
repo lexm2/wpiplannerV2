@@ -805,10 +805,10 @@ export class ProfileStateManager {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
             }
 
-            // Sync to cloud if authenticated
-            if (this.cloudSyncService?.isAuthenticated()) {
-                this.syncToCloud();
-            }
+            // Emit event for sync service to handle
+            syncEventBus.emitEvent('local-save-completed', {
+                timestamp: Date.now()
+            });
         } catch (error) {
             logger.error('Save failed:', error);
         }
