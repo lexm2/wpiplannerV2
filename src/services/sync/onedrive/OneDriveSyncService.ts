@@ -11,10 +11,10 @@ import type {
     SyncQueueItem,
     SyncMetadata,
 } from '../CloudSyncTypes';
-import type { ICloudSyncService } from '../interfaces/ICloudSyncService';
-import type { ICloudAuthService } from '../interfaces/ICloudAuthService';
+import type { CloudSyncService } from '../interfaces/CloudSyncService';
+import type { CloudAuthService } from '../interfaces/CloudAuthService';
 
-export class OneDriveSyncService implements ICloudSyncService {
+export class OneDriveSyncService implements CloudSyncService {
     private static instance: OneDriveSyncService;
     private authService: OneDriveAuthService;
     private graphClient: Client | null = null;
@@ -472,7 +472,7 @@ export class OneDriveSyncService implements ICloudSyncService {
         return this.authService.isAuthenticated();
     }
 
-    getAuthService(): ICloudAuthService {
+    getAuthService(): CloudAuthService {
         return this.authService;
     }
 }

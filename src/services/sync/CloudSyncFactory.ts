@@ -1,6 +1,6 @@
 import type { CloudProvider } from './CloudSyncTypes';
-import type { ICloudAuthService } from './interfaces/ICloudAuthService';
-import type { ICloudSyncService } from './interfaces/ICloudSyncService';
+import type { CloudAuthService } from './interfaces/CloudAuthService';
+import type { CloudSyncService } from './interfaces/CloudSyncService';
 import { OneDriveAuthService } from './onedrive/OneDriveAuthService';
 import { OneDriveSyncService } from './onedrive/OneDriveSyncService';
 import { GoogleDriveAuthService } from './googledrive/GoogleDriveAuthService';
@@ -11,8 +11,8 @@ const PROVIDER_STORAGE_KEY = 'wpi-planner-cloud-provider';
 export class CloudSyncFactory {
     private static instance: CloudSyncFactory;
     private currentProvider: CloudProvider;
-    private authServiceCache: Map<CloudProvider, ICloudAuthService> = new Map();
-    private syncServiceCache: Map<CloudProvider, ICloudSyncService> = new Map();
+    private authServiceCache: Map<CloudProvider, CloudAuthService> = new Map();
+    private syncServiceCache: Map<CloudProvider, CloudSyncService> = new Map();
 
     private constructor() {
         this.currentProvider = this.loadProviderPreference();
@@ -25,7 +25,7 @@ export class CloudSyncFactory {
         return CloudSyncFactory.instance;
     }
 
-    getAuthService(provider?: CloudProvider): ICloudAuthService | null {
+    getAuthService(provider?: CloudProvider): CloudAuthService | null {
         const targetProvider = provider || this.currentProvider;
 
         if (targetProvider === 'none') {
@@ -43,7 +43,7 @@ export class CloudSyncFactory {
         return service;
     }
 
-    getSyncService(provider?: CloudProvider): ICloudSyncService | null {
+    getSyncService(provider?: CloudProvider): CloudSyncService | null {
         const targetProvider = provider || this.currentProvider;
 
         if (targetProvider === 'none') {
@@ -70,7 +70,7 @@ export class CloudSyncFactory {
         this.saveProviderPreference(provider);
     }
 
-    private createAuthService(provider: CloudProvider): ICloudAuthService | null {
+    private createAuthService(provider: CloudProvider): CloudAuthService | null {
         switch (provider) {
             case 'onedrive':
                 return OneDriveAuthService.getInstance();
@@ -83,7 +83,7 @@ export class CloudSyncFactory {
         }
     }
 
-    private createSyncService(provider: CloudProvider): ICloudSyncService | null {
+    private createSyncService(provider: CloudProvider): CloudSyncService | null {
         switch (provider) {
             case 'onedrive':
                 return OneDriveSyncService.getInstance();

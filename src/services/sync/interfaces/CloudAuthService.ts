@@ -25,6 +25,3 @@ export interface CloudAuthService {
     addEventListener(listener: (event: SyncEvent) => void): void;
     removeEventListener(listener: (event: SyncEvent) => void): void;
 }
-
-// Backwards compatibility alias
-export type ICloudAuthService = CloudAuthService;

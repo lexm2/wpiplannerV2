@@ -4,7 +4,7 @@ import { TransactionalStorageManager, TransactionResult } from './TransactionalS
 import { getAllSections } from '../utils/courseUtils'
 import { UndoRedoManager } from './UndoRedoManager'
 import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
-import type { CloudSyncService } from '../services/sync/interfaces/ICloudSyncService'
+import type { CloudSyncService } from '../services/sync/interfaces/CloudSyncService'
 import { CloudProviderRegistry } from '../services/sync/CloudProviderRegistry'
 import type { CloudStateData } from '../services/sync/CloudSyncTypes'
 import { syncEventBus } from '../services/sync/SyncEventBus'

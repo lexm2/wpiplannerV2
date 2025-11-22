@@ -17,6 +17,3 @@ export interface CloudSyncService {
     addEventListener(listener: (event: SyncEvent) => void): void;
     removeEventListener(listener: (event: SyncEvent) => void): void;
 }
-
-// Backwards compatibility alias
-export type ICloudSyncService = CloudSyncService;

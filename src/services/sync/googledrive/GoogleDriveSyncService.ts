@@ -10,13 +10,13 @@ import type {
     SyncQueueItem,
     SyncMetadata,
 } from '../CloudSyncTypes';
-import type { ICloudSyncService } from '../interfaces/ICloudSyncService';
-import type { ICloudAuthService } from '../interfaces/ICloudAuthService';
+import type { CloudSyncService } from '../interfaces/CloudSyncService';
+import type { CloudAuthService } from '../interfaces/CloudAuthService';
 import { syncEventBus } from '../SyncEventBus';
 
 declare const gapi: any;
 
-export class GoogleDriveSyncService implements ICloudSyncService {
+export class GoogleDriveSyncService implements CloudSyncService {
     private static instance: GoogleDriveSyncService;
     private authService: GoogleDriveAuthService;
     private status: SyncStatus = 'not_authenticated';
@@ -626,7 +626,7 @@ export class GoogleDriveSyncService implements ICloudSyncService {
         return this.authService.isAuthenticated();
     }
 
-    getAuthService(): ICloudAuthService {
+    getAuthService(): CloudAuthService {
         return this.authService;
     }
 }

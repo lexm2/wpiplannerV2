@@ -8,9 +8,9 @@ import {
 } from '@azure/msal-browser';
 import { ONEDRIVE_CONFIG } from '../../../config/onedrive.config';
 import type { SyncEvent } from '../CloudSyncTypes';
-import type { ICloudAuthService, AuthState, AuthResult } from '../interfaces/ICloudAuthService';
+import type { CloudAuthService, AuthState, AuthResult } from '../interfaces/CloudAuthService';
 
-export class OneDriveAuthService implements ICloudAuthService {
+export class OneDriveAuthService implements CloudAuthService {
     private static instance: OneDriveAuthService;
     private msalInstance: PublicClientApplication;
     private currentAccount: AccountInfo | null = null;

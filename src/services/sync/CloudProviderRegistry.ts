@@ -1,5 +1,5 @@
-import type { ICloudSyncService } from './interfaces/ICloudSyncService';
-import type { ICloudAuthService } from './interfaces/ICloudAuthService';
+import type { CloudSyncService } from './interfaces/CloudSyncService';
+import type { CloudAuthService } from './interfaces/CloudAuthService';
 import type { IconName } from '../../utils/iconPaths';
 
 /**
@@ -15,11 +15,11 @@ export interface ICloudProvider {
     /** Display name shown to users (e.g., 'Google Drive', 'OneDrive') */
     name: string;
 
-    /** Authentication service implementing ICloudAuthService */
-    authService: ICloudAuthService;
+    /** Authentication service implementing CloudAuthService */
+    authService: CloudAuthService;
 
-    /** Sync service implementing ICloudSyncService */
-    syncService: ICloudSyncService;
+    /** Sync service implementing CloudSyncService */
+    syncService: CloudSyncService;
 
     /** Icon identifier from iconPaths.ts (e.g., 'BRAND_GOOGLE_DRIVE') */
     icon?: IconName;
@@ -74,8 +74,8 @@ export interface ICloudProvider {
  * ### Step 1: Create Auth Service
  * ```typescript
  * // src/services/sync/dropbox/DropboxAuthService.ts
- * export class DropboxAuthService implements ICloudAuthService {
- *     // Implement all ICloudAuthService methods:
+ * export class DropboxAuthService implements CloudAuthService {
+ *     // Implement all CloudAuthService methods:
  *     // - initialize()
  *     // - signIn()
  *     // - signOut()
@@ -90,8 +90,8 @@ export interface ICloudProvider {
  * ### Step 2: Create Sync Service
  * ```typescript
  * // src/services/sync/dropbox/DropboxSyncService.ts
- * export class DropboxSyncService implements ICloudSyncService {
- *     // Implement all ICloudSyncService methods:
+ * export class DropboxSyncService implements CloudSyncService {
+ *     // Implement all CloudSyncService methods:
  *     // - initialize()
  *     // - syncToCloud()
  *     // - pullFromCloud()

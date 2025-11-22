@@ -1,11 +1,11 @@
 import { GOOGLE_DRIVE_CONFIG } from '../../../config/googledrive.config';
 import type { SyncEvent } from '../CloudSyncTypes';
-import type { ICloudAuthService, AuthState, AuthResult } from '../interfaces/ICloudAuthService';
+import type { CloudAuthService, AuthState, AuthResult } from '../interfaces/CloudAuthService';
 import { syncEventBus } from '../SyncEventBus';
 
 declare const google: any;
 
-export class GoogleDriveAuthService implements ICloudAuthService {
+export class GoogleDriveAuthService implements CloudAuthService {
     private static instance: GoogleDriveAuthService;
     private tokenClient: any = null;
     private accessToken: string | null = null;
