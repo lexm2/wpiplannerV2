@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 22, 2025, 9:39 PM",
+  "generated": "Nov 22, 2025, 9:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -74507,7 +74507,7 @@
                 "crn": 336284,
                 "number": "C01 - Topics In The History Of American Science And Technology",
                 "seats": 35,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -74526,7 +74526,7 @@
                     "building": "",
                     "room": "Washburn 323",
                     "seats": 35,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01 - Topics In The History Of American Science And Technology",
