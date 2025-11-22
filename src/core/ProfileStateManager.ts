@@ -4,9 +4,10 @@ import { TransactionalStorageManager, TransactionResult } from './TransactionalS
 import { getAllSections } from '../utils/courseUtils'
 import { UndoRedoManager } from './UndoRedoManager'
 import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
-import { GoogleDriveSyncService } from '../services/sync/googledrive/GoogleDriveSyncService'
-import { GOOGLE_DRIVE_CONFIG } from '../config/googledrive.config'
+import type { ICloudSyncService } from '../services/sync/interfaces/ICloudSyncService'
+import { CloudProviderRegistry } from '../services/sync/CloudProviderRegistry'
 import type { CloudStateData } from '../services/sync/CloudSyncTypes'
+import { syncEventBus } from '../services/sync/SyncEventBus'
 import { logger } from '../utils/logger'
 import type { ScheduleConflict, ScheduleConflictResolution, ScheduleDiff, CourseDifference } from '../types/schedule'
 import { CourseConflictModal } from '../ui/components/CourseConflictModal'
@@ -45,7 +46,7 @@ export class ProfileStateManager {
     private allDepartments: Department[] = [];
     private undoRedoManager: UndoRedoManager;
     private isRestoringState = false;
-    private cloudSyncService: GoogleDriveSyncService | null = null;
+    private cloudSyncService: ICloudSyncService | null = null;
     private pendingSavePromises = new Set<Promise<void>>();
     private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
     private modalService: ModalService | null = null;
@@ -72,7 +73,14 @@ export class ProfileStateManager {
 
     private async initializeCloudSync(): Promise<void> {
         try {
-            this.cloudSyncService = GoogleDriveSyncService.getInstance();
+            // Get the active provider from the registry
+            const provider = CloudProviderRegistry.getActiveProvider();
+            if (!provider) {
+                logger.log('[SYNC] No cloud provider configured');
+                return;
+            }
+
+            this.cloudSyncService = provider.syncService;
             await this.cloudSyncService.initialize();
 
             this.cloudSyncService.addEventListener(async (event) => {
@@ -258,8 +266,8 @@ export class ProfileStateManager {
                     // User cancelled - abort sync completely
                     logger.log('[SYNC] User cancelled sync, aborting');
                     this.isResolvingConflicts = false;
-                    // Emit event to update UI status
-                    this.emitEvent('sync_cancelled', {}, 'cloud-sync');
+                    // Emit event to update UI status via SyncEventBus
+                    syncEventBus.emitEvent('sync-cancelled');
                     resolve();
                     return;
                 }
@@ -797,7 +805,8 @@ export class ProfileStateManager {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
             }
 
-            if (GOOGLE_DRIVE_CONFIG.autoSyncEnabled && this.cloudSyncService?.isAuthenticated()) {
+            // Sync to cloud if authenticated
+            if (this.cloudSyncService?.isAuthenticated()) {
                 this.syncToCloud();
             }
         } catch (error) {
@@ -962,7 +971,7 @@ export class ProfileStateManager {
         }
     }
 
-    getCloudSyncService(): GoogleDriveSyncService | null {
+    getCloudSyncService(): ICloudSyncService | null {
         return this.cloudSyncService;
     }
 
