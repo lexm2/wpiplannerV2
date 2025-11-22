@@ -1,7 +1,7 @@
 import type { CloudStateData, SyncResult, SyncStatus, SyncEvent } from '../CloudSyncTypes';
-import type { ICloudAuthService } from './ICloudAuthService';
+import type { CloudAuthService } from './ICloudAuthService';
 
-export interface ICloudSyncService {
+export interface CloudSyncService {
     initialize(): Promise<void>;
     syncToCloud(data: CloudStateData, immediate?: boolean): Promise<SyncResult>;
     pullFromCloud(): Promise<SyncResult>;
@@ -13,7 +13,10 @@ export interface ICloudSyncService {
     getStatus(): SyncStatus;
     getDeviceId(): string;
     isAuthenticated(): boolean;
-    getAuthService(): ICloudAuthService;
+    getAuthService(): CloudAuthService;
     addEventListener(listener: (event: SyncEvent) => void): void;
     removeEventListener(listener: (event: SyncEvent) => void): void;
 }
+
+// Backwards compatibility alias
+export type ICloudSyncService = CloudSyncService;

@@ -4,7 +4,7 @@ import { TransactionalStorageManager, TransactionResult } from './TransactionalS
 import { getAllSections } from '../utils/courseUtils'
 import { UndoRedoManager } from './UndoRedoManager'
 import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
-import type { ICloudSyncService } from '../services/sync/interfaces/ICloudSyncService'
+import type { CloudSyncService } from '../services/sync/interfaces/ICloudSyncService'
 import { CloudProviderRegistry } from '../services/sync/CloudProviderRegistry'
 import type { CloudStateData } from '../services/sync/CloudSyncTypes'
 import { syncEventBus } from '../services/sync/SyncEventBus'
@@ -46,7 +46,7 @@ export class ProfileStateManager {
     private allDepartments: Department[] = [];
     private undoRedoManager: UndoRedoManager;
     private isRestoringState = false;
-    private cloudSyncService: ICloudSyncService | null = null;
+    private cloudSyncService: CloudSyncService | null = null;
     private pendingSavePromises = new Set<Promise<void>>();
     private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
     private modalService: ModalService | null = null;
@@ -971,7 +971,7 @@ export class ProfileStateManager {
         }
     }
 
-    getCloudSyncService(): ICloudSyncService | null {
+    getCloudSyncService(): CloudSyncService | null {
         return this.cloudSyncService;
     }
 

@@ -15,7 +15,7 @@ export interface AuthResult {
     accessToken: string;
 }
 
-export interface ICloudAuthService {
+export interface CloudAuthService {
     initialize(): Promise<void>;
     signIn(): Promise<AuthResult>;
     signOut(): Promise<void>;
@@ -25,3 +25,6 @@ export interface ICloudAuthService {
     addEventListener(listener: (event: SyncEvent) => void): void;
     removeEventListener(listener: (event: SyncEvent) => void): void;
 }
+
+// Backwards compatibility alias
+export type ICloudAuthService = CloudAuthService;
