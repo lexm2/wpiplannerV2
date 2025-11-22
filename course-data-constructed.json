@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 22, 2025, 5:12 PM",
+  "generated": "Nov 22, 2025, 5:29 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -48423,7 +48423,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 7,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. IThis course provides an introduction to the pitfalls and practices of building secure software applications. Topics will include threat modeling, secure software development, defensive programming, web security, and the interaction between security and usability. The course focuses on the application level with minor attention to operating-system level security; network-level security is not covered. Assignments involve designing and implementing secure software, evaluating designs and systems for security-related flaws, and presentations on security issues or tools. All students will be required to sign a pledge of responsible conduct at the start of the course.Recommended Background: CS3013 and CS3733. The course assumes nontrivial experience with C and Unix, familiarity with operating systems, filesystems, and databases, and experience with technologies for building web applications (from CS4241 or personal experience).",
@@ -48442,7 +48442,7 @@
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
@@ -49005,7 +49005,7 @@
                 "number": "D01",
                 "seats": 95,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 8,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course provides an introduction to modern cryptography and communication security. It focuses on how cryptographic algorithms and protocols work and how to use them. The course covers the concepts of block ciphers and message authentication codes, public key encryption, digital signatures, and key establishment, as well as common examples and uses of such schemes, including the AES, RSA-OAEP, and the Digital Signature Algorithm. Basic cryptanalytic techniques and examples of practical security solutions are explored to understand how to design and evaluate modern security solutions. The course is suited for students interested in cryptography or other security related fields such as trusted computing, network and OS security, or general IT security. Recommended background: Experience in expressing algorithms in a modern programming language (e.g., ECE 2049 or CS 2301). Suggested background: Discrete mathematics (CS 2022/MA 2201 or equivalent).",
@@ -49024,7 +49024,7 @@
                     "room": "Unity Hall 500",
                     "seats": 95,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -59375,7 +59375,7 @@
                 "number": "D01",
                 "seats": 95,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 8,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course provides an introduction to modern cryptography and communication security. It focuses on how cryptographic algorithms and protocols work and how to use them. The course covers the concepts of block ciphers and message authentication codes, public key encryption, digital signatures, and key establishment, as well as common examples and uses of such schemes, including the AES, RSA-OAEP, and the Digital Signature Algorithm. Basic cryptanalytic techniques and examples of practical security solutions are explored to understand how to design and evaluate modern security solutions. The course is suited for students interested in cryptography or other security related fields such as trusted computing, network and OS security, or general IT security. Recommended background: Experience in expressing algorithms in a modern programming language (e.g., ECE 2049 or CS 2301). Suggested background: Discrete mathematics (CS 2022/MA 2201 or equivalent).",
@@ -59394,7 +59394,7 @@
                     "room": "Unity Hall 500",
                     "seats": 95,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
