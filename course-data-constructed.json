@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 22, 2025, 11:30 PM",
+  "generated": "Nov 22, 2025, 11:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -66878,7 +66878,7 @@
                 "number": "C01",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 17,
+                "actualWaitlist": 18,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course emphasizes system and control volume modeling using conservation of mass and the First and Second Laws of Thermodynamics. Topics include an introduction to heat, work, energy, and power, properties of simple substances, and cycle analysis for power production and refrigeration. Recommended background: basic physics, (PH 1110, PH 1111) elementary differential and integral calculus (MA 1021, MA 1022) or equivalents.",
@@ -66897,7 +66897,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 17,
+                    "actualWaitlist": 18,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
@@ -66920,7 +66920,7 @@
                 "number": "D01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course emphasizes system and control volume modeling using conservation of mass and the First and Second Laws of Thermodynamics. Topics include an introduction to heat, work, energy, and power, properties of simple substances, and cycle analysis for power production and refrigeration. Recommended background: basic physics, (PH 1110, PH 1111) elementary differential and integral calculus (MA 1021, MA 1022) or equivalents.",
@@ -66939,7 +66939,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -171039,7 +171039,7 @@
                 "number": "C01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 8,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I A course designed to develop analytical and experimental skills in modern engineering measurement methods, based on electronic instrumentation and computer-based data acquisition systems. The lectures are concerned with the engineering analysis and design as well as the principles of instrumentation, whereas the laboratory periods afford the student an opportunity to use modern devices in actual experiments. Lecture topics include: review of engineering fundamentals and, among others, discussions of standards, measurement and sensing devices, experiment planning, data acquisition, analysis of experimental data, and report writing. Laboratory experiments address both mechanical and thermal systems and instrumentation in either traditional mechanical engineering (heat transfer, flow measurement/visualization, force/torque/strain measurement, motion/vibration measurement) or materials engineering (temperature and pressure measurements in materials processing, measurement of strain and position in mechanical testing of materials). Each year students will be notified which type of experiments will be used in each term offering. Students may also consult with their academic advisor or the Mechanical Engineering department office. Recommended background: mathematics (MA 2051), thermo-fluids (ES 3001, ES 3003, ES 3004), mechanics (ES 2501, ES 2502, ES 2503), materials (ES 2001).",
@@ -171058,7 +171058,7 @@
                     "room": "Higgins Labs 031 ME Computer Lab",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -171078,7 +171078,7 @@
                 "number": "C02",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I A course designed to develop analytical and experimental skills in modern engineering measurement methods, based on electronic instrumentation and computer-based data acquisition systems. The lectures are concerned with the engineering analysis and design as well as the principles of instrumentation, whereas the laboratory periods afford the student an opportunity to use modern devices in actual experiments. Lecture topics include: review of engineering fundamentals and, among others, discussions of standards, measurement and sensing devices, experiment planning, data acquisition, analysis of experimental data, and report writing. Laboratory experiments address both mechanical and thermal systems and instrumentation in either traditional mechanical engineering (heat transfer, flow measurement/visualization, force/torque/strain measurement, motion/vibration measurement) or materials engineering (temperature and pressure measurements in materials processing, measurement of strain and position in mechanical testing of materials). Each year students will be notified which type of experiments will be used in each term offering. Students may also consult with their academic advisor or the Mechanical Engineering department office. Recommended background: mathematics (MA 2051), thermo-fluids (ES 3001, ES 3003, ES 3004), mechanics (ES 2501, ES 2502, ES 2503), materials (ES 2001).",
@@ -171097,7 +171097,7 @@
                     "room": "Higgins Labs 031 ME Computer Lab",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
