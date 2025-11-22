@@ -1,6 +1,7 @@
 import { GOOGLE_DRIVE_CONFIG } from '../../../config/googledrive.config';
 import type { SyncEvent } from '../CloudSyncTypes';
 import type { ICloudAuthService, AuthState, AuthResult } from '../interfaces/ICloudAuthService';
+import { syncEventBus } from '../SyncEventBus';
 
 declare const google: any;
 
@@ -152,7 +153,10 @@ export class GoogleDriveAuthService implements ICloudAuthService {
             timestamp: Date.now(),
             data: this.getAuthState(),
         };
+        // Notify local listeners
         this.listeners.forEach((listener) => listener(event));
+        // Also emit to centralized event bus
+        syncEventBus.emit(event);
     }
 
     private saveAuthState(): void {

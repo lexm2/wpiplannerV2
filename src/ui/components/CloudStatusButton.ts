@@ -3,6 +3,7 @@ import type { SyncEvent } from '../../services/sync/CloudSyncTypes';
 import type { StateChangeEvent, ProfileState } from '../../core/ProfileStateManager';
 import { getInlineSVG, type IconName } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
+import { syncEventBus } from '../../services/sync/SyncEventBus';
 
 /**
  * Button states in priority order (highest to lowest)
@@ -161,25 +162,8 @@ export class CloudStatusButton {
     }
 
     private setupEventListeners(): void {
-        if (!this.provider) {
-            logger.warn('[CloudStatusButton] No provider registered');
-            return;
-        }
-
-        this.provider.authService.addEventListener((event: SyncEvent) => {
-            if (event.type === 'auth-changed') {
-                logger.log('[CloudStatusButton] Auth state changed');
-                const isAuthenticated = this.provider?.authService.isAuthenticated() ?? false;
-
-                if (isAuthenticated) {
-                    this.setStateImmediate('signed-in');
-                } else {
-                    this.setStateImmediate('signed-out');
-                }
-            }
-        });
-
-        this.provider.syncService.addEventListener((event: SyncEvent) => {
+        // Use centralized SyncEventBus for all sync events
+        syncEventBus.on('*', (event: SyncEvent) => {
             this.handleSyncEvent(event);
         });
     }
@@ -200,22 +184,32 @@ export class CloudStatusButton {
     private handleSyncEvent(event: SyncEvent): void {
         logger.log('[CloudStatusButton] Received sync event:', event.type);
 
-        if (this.currentState === 'signed-out' || this.currentState === 'signed-in') {
-            logger.log('[CloudStatusButton] Ignoring sync event during auth transition');
-            return;
-        }
-
         switch (event.type) {
+            case 'auth-changed':
+                const isAuthenticated = this.provider?.authService.isAuthenticated() ?? false;
+                if (isAuthenticated) {
+                    this.setStateImmediate('signed-in');
+                } else {
+                    this.setStateImmediate('signed-out');
+                }
+                break;
+
             case 'sync-started':
-                this.setState('cloud-uploading');
+                if (this.currentState !== 'signed-out' && this.currentState !== 'signed-in') {
+                    this.setState('cloud-uploading');
+                }
                 break;
 
             case 'sync-completed':
-                this.setState('cloud-downloaded');
+                if (this.currentState !== 'signed-out' && this.currentState !== 'signed-in') {
+                    this.setState('cloud-downloaded');
+                }
                 break;
 
             case 'sync-uploaded':
-                this.setState('cloud-uploaded');
+                if (this.currentState !== 'signed-out' && this.currentState !== 'signed-in') {
+                    this.setState('cloud-uploaded');
+                }
                 break;
 
             case 'sync-failed':
@@ -226,7 +220,7 @@ export class CloudStatusButton {
                 this.setState('error');
                 break;
 
-            case 'auth-changed':
+            case 'sync-cancelled':
                 this.transitionToIdleState();
                 break;
 
@@ -414,14 +408,8 @@ export class CloudStatusButton {
      * Set the active cloud provider
      */
     setProvider(provider: ICloudProvider): void {
-        if (this.provider) {
-            this.provider.authService.removeEventListener(this.handleSyncEvent);
-            this.provider.syncService.removeEventListener(this.handleSyncEvent);
-        }
-
         this.provider = provider;
         this.updateStateConfigsForProvider();
-        this.setupEventListeners();
         this.transitionToIdleState();
     }
 

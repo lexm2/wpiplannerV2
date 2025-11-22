@@ -616,7 +616,10 @@ export class GoogleDriveSyncService implements ICloudSyncService {
     }
 
     private notifyEvent(event: SyncEvent): void {
+        // Notify local listeners
         this.listeners.forEach((listener) => listener(event));
+        // Also emit to centralized event bus
+        syncEventBus.emit(event);
     }
 
     isAuthenticated(): boolean {
