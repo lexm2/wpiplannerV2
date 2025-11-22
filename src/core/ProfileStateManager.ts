@@ -253,22 +253,20 @@ export class ProfileStateManager {
             this.isResolvingConflicts = true;
             const modal = new CourseConflictModal(this.modalService!);
 
-            modal.show(conflicts, async (resolutions: Map<string, ScheduleConflictResolution>) => {
-                logger.log('[SYNC] User resolved', resolutions.size, 'schedule conflicts');
+            modal.show(conflicts, async (resolutions: Map<string, ScheduleConflictResolution> | null) => {
+                if (resolutions === null) {
+                    // User cancelled - abort sync completely
+                    logger.log('[SYNC] User cancelled sync, aborting');
+                    this.isResolvingConflicts = false;
+                    // Emit event to update UI status
+                    this.emitEvent('sync_cancelled', {}, 'cloud-sync');
+                    resolve();
+                    return;
+                }
+
+                logger.log('[SYNC] User chose to overwrite local with cloud data');
 
                 const finalSchedules = [...cloudData.schedules];
-
-                resolutions.forEach((resolution, scheduleName) => {
-                    if (resolution === 'keep-local') {
-                        const localSchedule = this.state.schedules.find(s => s.name === scheduleName);
-                        const cloudIndex = finalSchedules.findIndex((s: any) => s.name === scheduleName);
-
-                        if (localSchedule && cloudIndex !== -1) {
-                            finalSchedules[cloudIndex] = localSchedule;
-                            logger.log('[SYNC] Keeping local version of schedule:', scheduleName);
-                        }
-                    }
-                });
 
                 for (const schedule of finalSchedules) {
                     await this.storageManager.saveSchedule(schedule);
@@ -292,7 +290,7 @@ export class ProfileStateManager {
                     }
                 }
 
-                logger.log('[SYNC] Cloud data applied to storage and memory with conflict resolutions');
+                logger.log('[SYNC] Cloud data applied to storage and memory');
                 this.emitEvent('schedule_changed', { action: 'cloud_sync', schedules: this.state.schedules }, 'cloud-sync');
                 this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
                 this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');

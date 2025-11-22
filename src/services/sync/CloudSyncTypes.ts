@@ -58,9 +58,13 @@ export type SyncEventType =
     | 'sync-uploaded'
     | 'sync-failed'
     | 'sync-conflict'
+    | 'sync-conflict-resolved'
+    | 'sync-cancelled'
     | 'auth-changed'
     | 'offline-mode'
-    | 'online-mode';
+    | 'online-mode'
+    | 'local-save-completed'
+    | 'provider-changed';
 
 export interface SyncEvent {
     type: SyncEventType;
