@@ -115363,10 +115363,10 @@
       "Meeting_Patterns": "T-R | 1:00 PM - 1:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Recreation Center Track | T-R | 1:00 PM - 1:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "14/15",
+      "Waitlist_Waitlist_Capacity": "15/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336275"
     },
     {
@@ -115391,10 +115391,10 @@
       "Meeting_Patterns": "M-W | 1:00 PM - 1:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Recreation Center Track | M-W | 1:00 PM - 1:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "14/15",
+      "Waitlist_Waitlist_Capacity": "15/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336343"
     },
     {
@@ -115447,10 +115447,10 @@
       "Meeting_Patterns": "M-W | 2:00 PM - 2:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Recreation Center Track | M-W | 2:00 PM - 2:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "10/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-340268"
     },
     {
@@ -116868,7 +116868,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336267"
     },
     {
@@ -116941,7 +116941,7 @@
       "Course_Title": "WPE 1055 - Physical Conditioning",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "16/25",
+      "Enrolled_Capacity": "17/25",
       "Instructional_Format": "Workshop",
       "Instructors": "Taylor Browning",
       "Locations": "Recreation Center All Courts 4",
@@ -120760,10 +120760,10 @@
       "Meeting_Patterns": "W | 3:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Daniels Hall 102E | W | 3:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "10/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336273"
     },
     {
@@ -120791,7 +120791,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "4/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336271"
     },
     {
@@ -120847,7 +120847,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-340236"
     },
     {
