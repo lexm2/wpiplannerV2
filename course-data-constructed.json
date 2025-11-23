@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 23, 2025, 4:52 PM",
+  "generated": "Nov 23, 2025, 5:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -241771,7 +241771,7 @@
                 "number": "C01",
                 "seats": 18,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course will teach basic rowing training techniques and principles with the goal for students to develop and implement an individualized conditioning program for themselves. All classes will be conducted on-campus through the use of rowing machines located in the Sports and Recreation Center.",
@@ -241790,7 +241790,7 @@
                     "room": "Recreation Center Crew",
                     "seats": 18,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
