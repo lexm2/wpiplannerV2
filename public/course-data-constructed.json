@@ -284,6 +284,7 @@
   "generated": "Nov 24, 2025, 1:19 AM",
   "generated": "Nov 24, 2025, 3:08 AM",
   "generated": "Nov 24, 2025, 4:03 AM",
+  "generated": "Nov 24, 2025, 4:46 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -240428,7 +240429,7 @@
                 "crn": 336232,
                 "number": "C01",
                 "seats": 20,
-                "seatsAvailable": 2,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -240447,7 +240448,7 @@
                     "building": "",
                     "room": "Stratton Hall 311",
                     "seats": 20,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
