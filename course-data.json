@@ -2994,10 +2994,10 @@
       "Meeting_Patterns": "T-F | 2:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Riley Commons | T-F | 2:00 PM - 3:50 PM",
-      "Section_Status": "Open",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "4/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337479"
     },
     {
@@ -5887,7 +5887,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "17/20",
+      "Waitlist_Waitlist_Capacity": "18/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339594"
     },
     {
@@ -5966,7 +5966,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "16/20",
+      "Waitlist_Waitlist_Capacity": "17/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336860"
     },
     {
@@ -31019,7 +31019,7 @@
       "Course_Title": "CS 4341 - Introduction To Artificial Intelligence",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "65/70",
+      "Enrolled_Capacity": "66/70",
       "Instructional_Format": "Lecture",
       "Instructors": "Dachun Sun",
       "Locations": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -42667,7 +42667,7 @@
       "Course_Title": "ENV 2201 - Planning For Sustainable Communities",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "26/35",
+      "Enrolled_Capacity": "25/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Derren Rosbach",
       "Locations": "Innovation Studio 105 Active Learning Classroom",
@@ -44523,11 +44523,11 @@
       "Meeting_Patterns": "M-T-R-F | 11:00 AM - 11:50 AM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Salisbury Labs 115 Kinnicutt Hall | M-T-R-F | 11:00 AM - 11:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ES 2501 - Introduction To Static Systems ()",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "19/20",
+      "Waitlist_Waitlist_Capacity": "20/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337370"
     },
     {
@@ -52345,7 +52345,7 @@
       "Course_Title": "HU 1500 - Introduction To Gender, Sexuality & Women's Studies",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "24/25",
+      "Enrolled_Capacity": "25/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Lindsay Davis",
       "Locations": "Kaven Hall 115",
@@ -52353,7 +52353,7 @@
       "Meeting_Patterns": "M-T-R-F | 10:00 AM - 10:50 AM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Kaven Hall 115 | M-T-R-F | 10:00 AM - 10:50 AM",
-      "Section_Status": "Open",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Humanities",
       "Waitlist_Waitlist_Capacity": "0/10",
@@ -82521,7 +82521,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ME 1800 - Manufacturing Science, Prototyping, And Computer-Controlled Machining ()",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "13/15",
+      "Waitlist_Waitlist_Capacity": "14/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337340"
     },
     {
@@ -85998,10 +85998,10 @@
       "Meeting_Patterns": "M-R | 3:00 PM - 4:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Higgins Labs 202 | M-R | 3:00 PM - 4:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "10/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337120"
     },
     {
@@ -86385,10 +86385,10 @@
       "Meeting_Patterns": "M | 5:00 PM - 7:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Higgins Labs 116 | M | 5:00 PM - 7:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Manufacturing Engineering; Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "19/20",
+      "Waitlist_Waitlist_Capacity": "20/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337352"
     },
     {
@@ -86997,10 +86997,10 @@
       "Meeting_Patterns": "M | 5:00 PM - 7:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Higgins Labs 116 | M | 5:00 PM - 7:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Manufacturing Engineering; Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "19/20",
+      "Waitlist_Waitlist_Capacity": "20/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337352"
     },
     {
@@ -90741,10 +90741,10 @@
       "Meeting_Patterns": "M-R | 3:00 PM - 4:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Higgins Labs 202 | M-R | 3:00 PM - 4:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "10/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337120"
     },
     {
@@ -110479,7 +110479,7 @@
       "Course_Title": "RBE 511 - Swarm Intelligence",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "25/30",
+      "Enrolled_Capacity": "24/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Carlo Pinciroli",
       "Locations": "Salisbury Labs 305",
@@ -122497,7 +122497,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Writing",
-      "Waitlist_Waitlist_Capacity": "0/5",
+      "Waitlist_Waitlist_Capacity": "1/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336290"
     },
     {
@@ -122829,7 +122829,7 @@
       "Course_Title": "WR 1020 - Introduction To Rhetoric",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "19/20",
+      "Enrolled_Capacity": "18/20",
       "Instructional_Format": "Lecture",
       "Instructors": "Lerie M. Gabriel",
       "Locations": "Kaven Hall 204",
