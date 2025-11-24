@@ -64,6 +64,7 @@ export type SyncEventType =
     | 'offline-mode'
     | 'online-mode'
     | 'local-save-completed'
+    | 'cloud-data-applied'
     | 'provider-changed';
 
 export interface SyncEvent {

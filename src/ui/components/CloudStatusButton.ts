@@ -1,5 +1,6 @@
-import { CloudProviderRegistry, type ICloudProvider } from '../../services/sync/CloudProviderRegistry';
-import type { SyncEvent } from '../../services/sync/CloudSyncTypes';
+import { syncManager } from '../../services/sync/SyncManager';
+import { providerRegistry } from '../../services/sync/ProviderRegistry';
+import type { SyncEvent } from '../../services/sync/types';
 import type { StateChangeEvent, ProfileState } from '../../core/ProfileStateManager';
 import { getInlineSVG, type IconName } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
@@ -45,11 +46,10 @@ interface StateConfig {
 export class CloudStatusButton {
     private buttonElement: HTMLButtonElement | null = null;
     private currentState: ButtonState = 'unauthenticated';
-    private provider: ICloudProvider | undefined;
     private transitionTimer: number | null = null;
     private pendingState: ButtonState | null = null;
 
-    // Base state configurations (will be updated with provider-specific values)
+    // Base state configurations
     private stateConfigs: Record<ButtonState, StateConfig> = {
         'error': {
             text: 'Sync error',
@@ -105,7 +105,7 @@ export class CloudStatusButton {
         'authenticated-idle': {
             text: 'Cloud connected',
             className: 'cloud-status-connected',
-            icon: 'CALENDAR_UP'
+            icon: 'BRAND_GOOGLE_DRIVE'
         },
         'unauthenticated': {
             text: 'Sync with cloud',
@@ -115,7 +115,6 @@ export class CloudStatusButton {
     };
 
     constructor(containerId: string) {
-        this.provider = CloudProviderRegistry.getActiveProvider();
         this.updateStateConfigsForProvider();
         this.render(containerId);
         this.setupEventListeners();
@@ -125,20 +124,21 @@ export class CloudStatusButton {
      * Update state configurations with provider-specific values
      */
     private updateStateConfigsForProvider(): void {
-        if (!this.provider || !this.provider.icon) return;
+        const provider = syncManager.getCurrentProvider();
+        if (!provider || !provider.icon) return;
 
         // Update authenticated-idle state with provider's icon and name
         this.stateConfigs['authenticated-idle'] = {
             text: 'Connected',
             className: 'cloud-status-connected',
-            icon: this.provider.icon as IconName
+            icon: provider.icon as IconName
         };
 
         // Update unauthenticated state with provider's icon
         this.stateConfigs['unauthenticated'] = {
             text: 'Sync with cloud',
             className: 'cloud-status-signin',
-            icon: this.provider.icon as IconName
+            icon: provider.icon as IconName
         };
     }
 
@@ -185,28 +185,18 @@ export class CloudStatusButton {
         logger.log('[CloudStatusButton] Received sync event:', event.type);
 
         switch (event.type) {
-            case 'auth-changed':
-                const isAuthenticated = this.provider?.authService.isAuthenticated() ?? false;
+            case 'auth-changed': {
+                const data = event.data as { authenticated: boolean } | undefined;
+                const isAuthenticated = data?.authenticated ?? syncManager.isAuthenticated();
                 if (isAuthenticated) {
                     this.setStateImmediate('signed-in');
                 } else {
                     this.setStateImmediate('signed-out');
                 }
                 break;
+            }
 
-            case 'sync-started':
-                if (this.currentState !== 'signed-out' && this.currentState !== 'signed-in') {
-                    this.setState('cloud-uploading');
-                }
-                break;
-
-            case 'sync-completed':
-                if (this.currentState !== 'signed-out' && this.currentState !== 'signed-in') {
-                    this.setState('cloud-downloaded');
-                }
-                break;
-
-            case 'sync-uploaded':
+            case 'sync-pushed':
                 if (this.currentState !== 'signed-out' && this.currentState !== 'signed-in') {
                     this.setState('cloud-uploaded');
                 }
@@ -220,26 +210,22 @@ export class CloudStatusButton {
                 this.setState('error');
                 break;
 
-            case 'sync-cancelled':
-                this.transitionToIdleState();
-                break;
-
-            case 'online-mode':
-            case 'offline-mode':
+            case 'sync-resolved':
                 this.transitionToIdleState();
                 break;
         }
     }
 
     private async handleClick(): Promise<void> {
-        if (!this.provider) {
+        const provider = syncManager.getCurrentProvider();
+        if (!provider) {
             logger.warn('[CloudStatusButton] No provider available');
             return;
         }
 
-        if (this.provider.authService.isAuthenticated()) {
+        if (syncManager.isAuthenticated()) {
             try {
-                await this.provider.authService.signOut();
+                await syncManager.signOut();
                 logger.log('[CloudStatusButton] Signed out successfully');
             } catch (error) {
                 logger.error('[CloudStatusButton] Sign out failed:', error);
@@ -247,8 +233,26 @@ export class CloudStatusButton {
             }
         } else {
             try {
-                await this.provider.authService.signIn();
-                logger.log('[CloudStatusButton] Signed in successfully');
+                // Get local data for initial sync/conflict check
+                const { ProfileStateManager } = await import('../../core/ProfileStateManager');
+                const stateManager = ProfileStateManager.getInstance();
+                const exportedData = await stateManager.exportData();
+
+                if (exportedData) {
+                    const data = JSON.parse(exportedData);
+                    // Convert to SyncData format
+                    const syncData = {
+                        version: data.version || '1.0',
+                        timestamp: Date.now(),
+                        checksum: data.checksum || '',
+                        activeScheduleId: data.activeScheduleId || null,
+                        schedules: data.schedules || [],
+                        preferences: data.preferences,
+                    };
+
+                    await syncManager.handleSignIn(syncData);
+                    logger.log('[CloudStatusButton] Signed in successfully');
+                }
             } catch (error) {
                 logger.error('[CloudStatusButton] Sign in failed:', error);
                 this.setState('error');
@@ -378,7 +382,7 @@ export class CloudStatusButton {
             return;
         }
 
-        const isAuthenticated = this.provider?.authService.isAuthenticated() ?? false;
+        const isAuthenticated = syncManager.isAuthenticated();
         this.currentState = isAuthenticated ? 'authenticated-idle' : 'unauthenticated';
         logger.log('[CloudStatusButton] Transitioning to idle:', this.currentState);
         this.updateUI();
@@ -397,20 +401,10 @@ export class CloudStatusButton {
         if (this.currentState === 'unauthenticated') {
             this.buttonElement.setAttribute('aria-label', 'Sign in to enable cloud sync');
         } else if (this.currentState === 'authenticated-idle') {
-            const email = this.provider?.authService.getAuthState().email || 'cloud service';
-            this.buttonElement.setAttribute('aria-label', `Connected to ${email}. Click to sign out.`);
+            this.buttonElement.setAttribute('aria-label', 'Connected to cloud. Click to sign out.');
         } else {
             this.buttonElement.setAttribute('aria-label', config.text);
         }
-    }
-
-    /**
-     * Set the active cloud provider
-     */
-    setProvider(provider: ICloudProvider): void {
-        this.provider = provider;
-        this.updateStateConfigsForProvider();
-        this.transitionToIdleState();
     }
 
     /**
@@ -427,20 +421,6 @@ export class CloudStatusButton {
     getCurrentIcon(): IconName | undefined {
         const config = this.stateConfigs[this.currentState];
         return config.icon;
-    }
-
-    /**
-     * Get the current button state
-     */
-    getCurrentState(): ButtonState {
-        return this.currentState;
-    }
-
-    /**
-     * Check if user is authenticated
-     */
-    isAuthenticated(): boolean {
-        return this.provider?.authService.isAuthenticated() ?? false;
     }
 
     /**

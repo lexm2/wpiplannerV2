@@ -122,30 +122,113 @@ export class GoogleDriveSyncService implements CloudSyncService {
             this.notifyEvent({ type: 'offline-mode', timestamp: Date.now() });
         });
 
-        // Listen for local save events to trigger sync
+        // Listen for local save events to push to cloud (no conflict detection)
         syncEventBus.on('local-save-completed', async () => {
             if (GOOGLE_DRIVE_CONFIG.autoSyncEnabled && this.isAuthenticated()) {
-                // Get data from ProfileStateManager and sync
+                // Get data from ProfileStateManager and push directly
                 const { ProfileStateManager } = await import('../../../core/ProfileStateManager');
                 const stateManager = ProfileStateManager.getInstance();
-                const cloudData = stateManager.exportData();
-                await this.syncToCloud(cloudData);
+                const exportedData = await stateManager.exportData();
+                if (exportedData) {
+                    const cloudData: CloudStateData = JSON.parse(exportedData);
+                    await this.pushToCloud(cloudData);
+                }
             }
         });
+    }
+
+    /**
+     * Push data to cloud without conflict detection.
+     * Use this after local changes when we know local is authoritative.
+     */
+    async pushToCloud(data: CloudStateData): Promise<SyncResult> {
+        if (!this.authService.isAuthenticated()) {
+            return {
+                success: false,
+                status: 'not_authenticated',
+                message: 'User not authenticated',
+            };
+        }
+
+        if (!this.isGapiLoaded) {
+            await this.waitForGapiLoad();
+            if (!this.isGapiLoaded) {
+                return {
+                    success: false,
+                    status: 'error',
+                    message: 'Google API client failed to load',
+                };
+            }
+        }
+
+        if (!this.isOnline) {
+            this.addToOfflineQueue(data);
+            return {
+                success: false,
+                status: 'offline',
+                message: 'Queued for sync when online',
+            };
+        }
+
+        console.log('[Google Drive] Pushing data to cloud (no conflict check)');
+        this.updateStatus('syncing');
+        this.notifyEvent({ type: 'sync-started', timestamp: Date.now(), data });
+
+        try {
+            const enrichedData = this.enrichWithSyncMetadata(data);
+            await this.uploadToGoogleDrive(enrichedData);
+            console.log('[Google Drive] Push successful');
+
+            this.updateStatus('synced');
+            this.notifyEvent({ type: 'sync-uploaded', timestamp: Date.now(), data: enrichedData });
+
+            setTimeout(() => {
+                if (this.status === 'synced') {
+                    this.updateStatus('idle');
+                }
+            }, 1500);
+
+            return {
+                success: true,
+                status: 'synced',
+                message: 'Push completed successfully',
+            };
+        } catch (error: any) {
+            console.error('[Google Drive] Push failed:', error);
+            this.updateStatus('error');
+            this.notifyEvent({
+                type: 'sync-failed',
+                timestamp: Date.now(),
+                error: error as Error,
+            });
+
+            return {
+                success: false,
+                status: 'error',
+                message: (error as Error).message,
+                error: error as Error,
+            };
+        }
     }
 
     private async handleAuthChange(): Promise<void> {
         if (this.authService.isAuthenticated()) {
             this.updateStatus('idle');
-            // Trigger initial pull from cloud after sign-in
-            const result = await this.pullFromCloud();
-            if (result.success && result.data) {
-                this.notifyEvent({
-                    type: 'sync-completed',
-                    timestamp: Date.now(),
-                    data: result.data
-                });
+            // Trigger initial sync after sign-in to check for conflicts
+            const { ProfileStateManager } = await import('../../../core/ProfileStateManager');
+            const stateManager = ProfileStateManager.getInstance();
+            const exportedData = await stateManager.exportData();
+
+            if (!exportedData) {
+                console.warn('[Google Drive] No local data to sync');
+                return;
             }
+
+            const localData: CloudStateData = JSON.parse(exportedData);
+            console.log('[Google Drive] Local data for sync:', localData);
+
+            // Sync local data to cloud (this will detect conflicts if any)
+            await this.syncToCloud(localData, true);
         } else {
             this.cancelPendingSync();
             this.updateStatus('not_authenticated');
@@ -252,16 +335,22 @@ export class GoogleDriveSyncService implements CloudSyncService {
                 const conflict = this.detectConflict(enrichedData, cloudData);
                 if (conflict) {
                     console.warn('[Google Drive] Conflict detected, triggering merge flow');
-                    this.updateStatus('idle');
+                    this.updateStatus('conflict');
+                    const conflictData: ConflictData = {
+                        local: enrichedData,
+                        cloud: cloudData,
+                        conflictType: 'timestamp',
+                    };
                     this.notifyEvent({
-                        type: 'sync-completed',
+                        type: 'sync-conflict',
                         timestamp: Date.now(),
-                        data: cloudData,
+                        data: conflictData,
                     });
                     return {
                         success: false,
                         status: 'conflict',
-                        message: 'Conflict detected, merge required',
+                        message: 'Conflict detected',
+                        conflict: conflictData,
                     };
                 }
             } else {
@@ -389,12 +478,21 @@ export class GoogleDriveSyncService implements CloudSyncService {
         localData: CloudStateData,
         cloudData: CloudStateData
     ): Promise<SyncResult> {
+        console.log(`[Google Drive] Resolving conflict with: ${resolution}`);
         const dataToSync = resolution === 'keep-local' ? localData : cloudData;
         const enrichedData = this.enrichWithSyncMetadata(dataToSync);
 
         try {
+            console.log('[Google Drive] Uploading resolved data to cloud...');
             await this.uploadToGoogleDrive(enrichedData);
+            console.log('[Google Drive] Conflict resolution upload successful');
             this.updateStatus('synced');
+
+            this.notifyEvent({
+                type: 'sync-uploaded',
+                timestamp: Date.now(),
+                data: enrichedData,
+            });
 
             setTimeout(() => {
                 if (this.status === 'synced') {
@@ -409,6 +507,7 @@ export class GoogleDriveSyncService implements CloudSyncService {
                 data: enrichedData,
             };
         } catch (error) {
+            console.error('[Google Drive] Conflict resolution upload failed:', error);
             this.updateStatus('error');
             return {
                 success: false,
@@ -501,25 +600,53 @@ export class GoogleDriveSyncService implements CloudSyncService {
     }
 
     private detectConflict(localData: CloudStateData, cloudData: CloudStateData): boolean {
+        console.log('[Google Drive] detectConflict called');
+        console.log('[Google Drive] Conflict resolution strategy:', GOOGLE_DRIVE_CONFIG.conflictResolutionStrategy);
+
         if (GOOGLE_DRIVE_CONFIG.conflictResolutionStrategy === 'last-write-wins') {
+            console.log('[Google Drive] Using last-write-wins strategy, no conflict');
             return false;
         }
 
-        const localTimestamp = localData.syncMetadata.lastSyncTimestamp;
-        const cloudTimestamp = cloudData.syncMetadata.lastSyncTimestamp;
-        const localDevice = localData.syncMetadata.deviceId;
-        const cloudDevice = cloudData.syncMetadata.deviceId;
+        // Compare content hashes (checksum field or compute from content)
+        const localHash = localData.checksum || this.computeContentHash(localData);
+        const cloudHash = cloudData.checksum || this.computeContentHash(cloudData);
 
-        if (localDevice === cloudDevice) {
-            return false;
-        }
+        // Log detailed comparison data
+        console.log('[Google Drive] === CONFLICT DETECTION ===');
+        console.log('[Google Drive] Local checksum (from data):', localData.checksum);
+        console.log('[Google Drive] Local computed hash:', this.computeContentHash(localData));
+        console.log('[Google Drive] Local hash used:', localHash);
+        console.log('[Google Drive] Cloud checksum (from data):', cloudData.checksum);
+        console.log('[Google Drive] Cloud computed hash:', this.computeContentHash(cloudData));
+        console.log('[Google Drive] Cloud hash used:', cloudHash);
+        console.log('[Google Drive] Local data:', JSON.stringify(localData, null, 2));
+        console.log('[Google Drive] Cloud data:', JSON.stringify(cloudData, null, 2));
+        console.log('[Google Drive] === END CONFLICT DETECTION ===');
 
-        const timeDiff = Math.abs(localTimestamp - cloudTimestamp);
-        if (timeDiff < 5000) {
+        if (localHash !== cloudHash) {
+            console.log(`[Google Drive] Content hash mismatch - conflict detected`);
             return true;
         }
 
-        return localTimestamp < cloudTimestamp;
+        console.log('[Google Drive] No conflict detected');
+        return false;
+    }
+
+    private computeContentHash(data: CloudStateData): string {
+        const content = {
+            schedules: data.schedules,
+            state: data.state,
+        };
+        // Simple hash for comparison - not cryptographic
+        const str = JSON.stringify(content);
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return Math.abs(hash).toString(16).padStart(8, '0');
     }
 
     private enrichWithSyncMetadata(data: CloudStateData): CloudStateData {

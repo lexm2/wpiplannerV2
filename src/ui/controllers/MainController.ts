@@ -31,10 +31,12 @@ import { DataUpdateService } from '../../services/DataUpdateService'
 import type { DataUpdateAvailableEvent } from '../../types/worker'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { CloudStatusButton } from '../components/CloudStatusButton'
-import { CloudProviderRegistry } from '../../services/sync/CloudProviderRegistry'
-import { GoogleDriveSyncService } from '../../services/sync/googledrive/GoogleDriveSyncService'
-import { GoogleDriveAuthService } from '../../services/sync/googledrive/GoogleDriveAuthService'
-import type { CloudStateData } from '../../services/sync/CloudSyncTypes'
+import { syncManager } from '../../services/sync/SyncManager'
+import { providerRegistry } from '../../services/sync/ProviderRegistry'
+import { GoogleDriveProvider } from '../../services/sync/providers/googledrive/GoogleDriveProvider'
+import { syncEventBus } from '../../services/sync/SyncEventBus'
+import type { ConflictInfo, SyncData } from '../../services/sync/types'
+import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -67,7 +69,8 @@ export class MainController {
     private scheduleManagementService: ScheduleManagementService;
     private dataUpdateService: DataUpdateService;
     private cloudStatusButton: CloudStatusButton;
-    private googleDriveSyncService: GoogleDriveSyncService;
+    private googleDriveProvider: GoogleDriveProvider;
+    private conflictResolutionModal: ConflictResolutionModal;
     private cloudSyncMenuItem: HTMLButtonElement | null = null;
     private allDepartments: Department[] = [];
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
@@ -109,21 +112,67 @@ export class MainController {
         // Initialize data update service
         this.dataUpdateService = new DataUpdateService();
 
-        // Initialize Google Drive sync components and register provider
-        this.googleDriveSyncService = GoogleDriveSyncService.getInstance();
+        // Initialize new sync system
+        this.googleDriveProvider = new GoogleDriveProvider();
+        providerRegistry.register(this.googleDriveProvider);
+        syncManager.setProvider('googledrive');
 
-        // Register Google Drive provider in the registry
-        CloudProviderRegistry.register({
-            id: 'googledrive',
-            name: 'Google Drive',
-            authService: GoogleDriveAuthService.getInstance(),
-            syncService: this.googleDriveSyncService,
-            icon: 'BRAND_GOOGLE_DRIVE',
-            brandColor: '#4285F4'
+        // Initialize Google Drive provider (loads GIS token client)
+        this.googleDriveProvider.initialize().catch(error => {
+            console.warn('[MainController] Google Drive initialization failed:', error);
         });
 
         // Initialize unified cloud status button
         this.cloudStatusButton = new CloudStatusButton('cloud-status-button-container');
+
+        // Initialize conflict resolution modal
+        this.conflictResolutionModal = new ConflictResolutionModal(this.modalService);
+
+        // Listen for sync conflicts to show resolution modal
+        syncEventBus.on('sync-conflict', (event) => {
+            console.log('[MainController] Received sync-conflict event', event);
+            const conflictInfo = event.data as ConflictInfo;
+            this.conflictResolutionModal.show(conflictInfo, async (resolution) => {
+                console.log('[MainController] Conflict resolution:', resolution);
+
+                await syncManager.resolveConflict(resolution, (cloudData: SyncData) => {
+                    // Apply cloud data to local state
+                    // SyncData format matches ProfileStateManager's expected format
+                    const importData = {
+                        version: cloudData.version,
+                        timestamp: new Date(cloudData.timestamp).toISOString(),
+                        checksum: cloudData.checksum,
+                        activeScheduleId: cloudData.activeScheduleId,
+                        schedules: cloudData.schedules,
+                        preferences: cloudData.preferences || {},
+                    };
+                    this.profileStateManager.importData(JSON.stringify(importData));
+                });
+            });
+        });
+
+        // Listen for sync resolved to reload UI from storage when cloud data was chosen
+        syncEventBus.on('sync-resolved', async (event) => {
+            const resolution = (event.data as { resolution: string })?.resolution;
+            if (resolution === 'cloud') {
+                console.log('[MainController] Cloud data applied, reloading from storage');
+                // Reload state from storage
+                await this.profileStateManager.loadFromStorage();
+                // Reconstruct section references
+                this.courseSelectionService.reconstructSectionObjects();
+                // Log selected courses after reload
+                const selectedCourses = this.courseSelectionService.getSelectedCourses();
+                console.log('[MainController] Selected courses after reload:', selectedCourses);
+                // Full UI refresh
+                this.courseController.displaySelectedCourses();
+                this.scheduleController.displayScheduleSelectedCourses();
+                if (this.uiStateManager.currentPage === 'schedule') {
+                    this.scheduleController.renderScheduleGrids();
+                } else {
+                    this.refreshCurrentView();
+                }
+            }
+        });
 
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
@@ -1275,7 +1324,7 @@ export class MainController {
 
     private handleUndo(): void {
         this.profileStateManager.undo().then(() => {
-            this.refreshUIAfterUndoRedo();
+            this.refreshUI();
         }).catch(error => {
             console.error('Undo failed:', error);
             this.uiStateManager.showErrorMessage('Failed to undo. Please try again.');
@@ -1284,14 +1333,14 @@ export class MainController {
 
     private handleRedo(): void {
         this.profileStateManager.redo().then(() => {
-            this.refreshUIAfterUndoRedo();
+            this.refreshUI();
         }).catch(error => {
             console.error('Redo failed:', error);
             this.uiStateManager.showErrorMessage('Failed to redo. Please try again.');
         });
     }
 
-    private refreshUIAfterUndoRedo(): void {
+    private refreshUI(): void {
         this.courseController.displaySelectedCourses();
         this.scheduleController.displayScheduleSelectedCourses();
 

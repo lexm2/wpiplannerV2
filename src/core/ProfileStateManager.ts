@@ -4,13 +4,8 @@ import { TransactionalStorageManager, TransactionResult } from './TransactionalS
 import { getAllSections } from '../utils/courseUtils'
 import { UndoRedoManager } from './UndoRedoManager'
 import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
-import type { CloudSyncService } from '../services/sync/interfaces/CloudSyncService'
-import { CloudProviderRegistry } from '../services/sync/CloudProviderRegistry'
-import type { CloudStateData } from '../services/sync/CloudSyncTypes'
 import { syncEventBus } from '../services/sync/SyncEventBus'
 import { logger } from '../utils/logger'
-import type { ScheduleConflict, ScheduleConflictResolution, ScheduleDiff, CourseDifference } from '../types/schedule'
-import { CourseConflictModal } from '../ui/components/CourseConflictModal'
 import { ModalService } from '../services/ModalService'
 
 export interface StateChangeEvent {
@@ -46,17 +41,14 @@ export class ProfileStateManager {
     private allDepartments: Department[] = [];
     private undoRedoManager: UndoRedoManager;
     private isRestoringState = false;
-    private cloudSyncService: CloudSyncService | null = null;
     private pendingSavePromises = new Set<Promise<void>>();
     private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
     private modalService: ModalService | null = null;
-    private isResolvingConflicts = false;
 
     private constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
         this.state = this.createInitialState();
         this.undoRedoManager = new UndoRedoManager();
-        this.initializeCloudSync();
         this.setupBeforeUnloadHandler();
     }
 
@@ -69,247 +61,6 @@ export class ProfileStateManager {
 
     setModalService(modalService: ModalService): void {
         this.modalService = modalService;
-    }
-
-    private async initializeCloudSync(): Promise<void> {
-        try {
-            // Get the active provider from the registry
-            const provider = CloudProviderRegistry.getActiveProvider();
-            if (!provider) {
-                logger.log('[SYNC] No cloud provider configured');
-                return;
-            }
-
-            this.cloudSyncService = provider.syncService;
-            await this.cloudSyncService.initialize();
-
-            this.cloudSyncService.addEventListener(async (event) => {
-                if (event.type === 'sync-completed' && event.data) {
-                    logger.log('[SYNC] Data pulled from cloud, applying...');
-                    const cloudData = event.data as any;
-
-                    if (cloudData.preferences) {
-                        this.storageManager.savePreferences(cloudData.preferences);
-                        this.state.preferences = cloudData.preferences;
-                    }
-
-                    if (cloudData.schedules && cloudData.schedules.length > 0) {
-                        // Skip conflict detection if we're currently resolving conflicts
-                        if (!this.isResolvingConflicts) {
-                            const conflicts = this.detectScheduleConflicts(
-                                this.state.schedules,
-                                cloudData.schedules
-                            );
-
-                            if (conflicts.length > 0) {
-                                logger.log('[SYNC] Detected', conflicts.length, 'schedule conflicts');
-                                await this.handleScheduleConflicts(conflicts, cloudData);
-                                return;
-                            }
-                        }
-
-                        for (const schedule of cloudData.schedules) {
-                            await this.storageManager.saveSchedule(schedule);
-                        }
-                        this.state.schedules = cloudData.schedules;
-
-                        let activeScheduleId = cloudData.state?.activeScheduleId;
-                        if (!activeScheduleId) {
-                            // Preserve current local selection, or fall back to first schedule
-                            activeScheduleId = this.state.activeScheduleId || (cloudData.schedules.length > 0 ? cloudData.schedules[0].id : undefined);
-                        }
-
-                        if (activeScheduleId) {
-                            this.storageManager.saveActiveScheduleId(activeScheduleId);
-                            this.state.activeScheduleId = activeScheduleId;
-
-                            const activeSchedule = this.state.schedules.find(s => s.id === activeScheduleId);
-                            if (activeSchedule) {
-                                this.state.selectedCourses = this.resolveCourseReferences(
-                                    activeSchedule.selectedCourses
-                                );
-                                logger.log('[SYNC] Loaded schedule:', activeSchedule.name, 'with', this.state.selectedCourses.length, 'courses');
-                            }
-                        }
-                    }
-
-                    logger.log('[SYNC] Cloud data applied to storage and memory');
-                    this.emitEvent('schedule_changed', { action: 'cloud_sync', schedules: this.state.schedules }, 'cloud-sync');
-                    this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
-                    this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');
-                }
-            });
-        } catch (error) {
-            logger.warn('Cloud sync initialization failed:', error);
-        }
-    }
-
-    private detectScheduleConflicts(localSchedules: Schedule[], cloudSchedules: any[]): ScheduleConflict[] {
-        const conflicts: ScheduleConflict[] = [];
-
-        for (const cloudSchedule of cloudSchedules) {
-            const localSchedule = localSchedules.find(ls => ls.name === cloudSchedule.name);
-
-            if (localSchedule) {
-                const diff = this.compareSchedules(localSchedule, cloudSchedule);
-
-                if (diff) {
-                    conflicts.push({
-                        scheduleName: cloudSchedule.name,
-                        local: localSchedule,
-                        cloud: cloudSchedule,
-                        diff
-                    });
-                }
-            }
-        }
-
-        return conflicts;
-    }
-
-    private compareSchedules(local: Schedule, cloud: any): ScheduleDiff | null {
-        const localCourseMap = new Map<string, SelectedCourse>(
-            local.selectedCourses.map(sc => [sc.course.id, sc])
-        );
-        const cloudCourseMap = new Map<string, any>(
-            cloud.selectedCourses.map((sc: any) => [sc.course.id, sc])
-        );
-
-        const coursesOnlyInLocal: SelectedCourse[] = [];
-        const coursesOnlyInCloud: SelectedCourse[] = [];
-        const coursesWithDifferentSections: CourseDifference[] = [];
-
-        for (const [courseId, localCourse] of localCourseMap) {
-            if (!cloudCourseMap.has(courseId)) {
-                coursesOnlyInLocal.push(localCourse);
-            } else {
-                const cloudCourse = cloudCourseMap.get(courseId)!;
-                const sectionDiff = this.compareSections(localCourse, cloudCourse);
-
-                if (sectionDiff) {
-                    coursesWithDifferentSections.push({
-                        courseId,
-                        courseName: `${localCourse.course.department.abbreviation}${localCourse.course.number}`,
-                        differenceType: 'section-only',
-                        local: localCourse,
-                        cloud: cloudCourse as SelectedCourse,
-                        sectionDifferences: sectionDiff
-                    });
-                }
-            }
-        }
-
-        for (const [courseId, cloudCourse] of cloudCourseMap) {
-            if (!localCourseMap.has(courseId)) {
-                coursesOnlyInCloud.push(cloudCourse as SelectedCourse);
-            }
-        }
-
-        if (coursesOnlyInLocal.length === 0 &&
-            coursesOnlyInCloud.length === 0 &&
-            coursesWithDifferentSections.length === 0) {
-            return null;
-        }
-
-        return {
-            coursesOnlyInLocal,
-            coursesOnlyInCloud,
-            coursesWithDifferentSections
-        };
-    }
-
-    private compareSections(local: SelectedCourse, cloud: any): {
-        lecture: boolean;
-        discussion: boolean;
-        lab: boolean;
-        section: boolean;
-    } | null {
-        const lectureDiff = this.sectionsAreDifferent(local.selectedLecture, cloud.selectedLecture);
-        const discussionDiff = this.sectionsAreDifferent(local.selectedDiscussion, cloud.selectedDiscussion);
-        const labDiff = this.sectionsAreDifferent(local.selectedLab, cloud.selectedLab);
-        const sectionDiff = this.sectionsAreDifferent(local.selectedSection, cloud.selectedSection);
-
-        if (!lectureDiff && !discussionDiff && !labDiff && !sectionDiff) {
-            return null;
-        }
-
-        return {
-            lecture: lectureDiff,
-            discussion: discussionDiff,
-            lab: labDiff,
-            section: sectionDiff
-        };
-    }
-
-    private sectionsAreDifferent(section1: Section | null, section2: any): boolean {
-        if (section1 === null && section2 === null) return false;
-        if (section1 === null || section2 === null) return true;
-        return section1.crn !== section2.crn;
-    }
-
-    private async handleScheduleConflicts(conflicts: ScheduleConflict[], cloudData: any): Promise<void> {
-        if (!this.modalService) {
-            logger.log('[SYNC] ModalService not available, auto-resolving conflicts to keep cloud');
-            this.state.schedules = cloudData.schedules;
-            for (const schedule of this.state.schedules) {
-                this.storageManager.saveSchedule(schedule);
-            }
-            return;
-        }
-
-        return new Promise((resolve) => {
-            this.isResolvingConflicts = true;
-            const modal = new CourseConflictModal(this.modalService!);
-
-            modal.show(conflicts, async (resolutions: Map<string, ScheduleConflictResolution> | null) => {
-                if (resolutions === null) {
-                    // User cancelled - abort sync completely
-                    logger.log('[SYNC] User cancelled sync, aborting');
-                    this.isResolvingConflicts = false;
-                    // Emit event to update UI status via SyncEventBus
-                    syncEventBus.emitEvent('sync-cancelled');
-                    resolve();
-                    return;
-                }
-
-                logger.log('[SYNC] User chose to overwrite local with cloud data');
-
-                const finalSchedules = [...cloudData.schedules];
-
-                for (const schedule of finalSchedules) {
-                    await this.storageManager.saveSchedule(schedule);
-                }
-                this.state.schedules = finalSchedules;
-
-                let activeScheduleId = cloudData.state?.activeScheduleId;
-                if (!activeScheduleId) {
-                    // Preserve current local selection, or fall back to first schedule
-                    activeScheduleId = this.state.activeScheduleId || (finalSchedules.length > 0 ? finalSchedules[0].id : undefined);
-                }
-
-                if (activeScheduleId) {
-                    this.storageManager.saveActiveScheduleId(activeScheduleId);
-                    this.state.activeScheduleId = activeScheduleId;
-
-                    const activeSchedule = this.state.schedules.find(s => s.id === activeScheduleId);
-                    if (activeSchedule) {
-                        this.state.selectedCourses = this.resolveCourseReferences(activeSchedule.selectedCourses);
-                        logger.log('[SYNC] Loaded schedule:', activeSchedule.name, 'with', this.state.selectedCourses.length, 'courses');
-                    }
-                }
-
-                logger.log('[SYNC] Cloud data applied to storage and memory');
-                this.emitEvent('schedule_changed', { action: 'cloud_sync', schedules: this.state.schedules }, 'cloud-sync');
-                this.emitEvent('preferences_changed', { preferences: this.state.preferences }, 'cloud-sync');
-                this.emitEvent('active_schedule_changed', { scheduleId: this.state.activeScheduleId }, 'cloud-sync');
-
-                await this.syncToCloud(true);
-                this.isResolvingConflicts = false;
-                logger.log('[SYNC] Resolved data synced back to cloud');
-
-                resolve();
-            });
-        });
     }
 
     private setupBeforeUnloadHandler(): void {
@@ -934,45 +685,6 @@ export class ProfileStateManager {
             this.emitEvent('schedule_changed', { action: 'imported' }, 'system');
         }
         return result;
-    }
-
-    private async syncToCloud(immediate = false): Promise<void> {
-        if (!this.cloudSyncService) return;
-
-        try {
-            const exportedData = await this.exportData();
-            if (!exportedData) return;
-
-            const cloudData: CloudStateData = JSON.parse(exportedData);
-            await this.cloudSyncService.syncToCloud(cloudData, immediate);
-        } catch (error) {
-            logger.error('Cloud sync failed:', error);
-        }
-    }
-
-    async pullFromCloudAndMerge(): Promise<boolean> {
-        if (!this.cloudSyncService?.isAuthenticated()) {
-            logger.warn('Not authenticated with OneDrive');
-            return false;
-        }
-
-        try {
-            const result = await this.cloudSyncService.pullFromCloud();
-            if (result.success && result.data) {
-                const cloudData = result.data as CloudStateData;
-                const jsonData = JSON.stringify(cloudData);
-                const importResult = await this.importData(jsonData);
-                return importResult.success;
-            }
-            return false;
-        } catch (error) {
-            logger.error('Failed to pull from cloud:', error);
-            return false;
-        }
-    }
-
-    getCloudSyncService(): CloudSyncService | null {
-        return this.cloudSyncService;
     }
 
     // Health check

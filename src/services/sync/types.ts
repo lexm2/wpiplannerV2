@@ -1,0 +1,189 @@
+// =============================================================================
+// Cloud Sync Types - Simplified Architecture
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Sync Status & Events
+// -----------------------------------------------------------------------------
+
+export type SyncStatus =
+    | 'idle'
+    | 'syncing'
+    | 'conflict'
+    | 'error'
+    | 'not_authenticated';
+
+export type SyncEventType =
+    | 'auth-changed'
+    | 'sync-conflict'
+    | 'sync-resolved'
+    | 'sync-pushed'
+    | 'sync-failed'
+    | 'local-save-completed';
+
+export interface SyncEvent {
+    type: SyncEventType;
+    timestamp: number;
+    data?: unknown;
+    error?: Error;
+}
+
+export type SyncEventListener = (event: SyncEvent) => void;
+
+// -----------------------------------------------------------------------------
+// Sync Data
+// -----------------------------------------------------------------------------
+
+export interface SyncData {
+    version: string;
+    timestamp: number;
+    checksum: string;
+    activeScheduleId: string | null;
+    schedules: ScheduleData[];
+    preferences?: unknown;
+}
+
+export interface ScheduleData {
+    id: string;
+    name: string;
+    selectedCourses: SelectedCourseData[];
+}
+
+export interface SelectedCourseData {
+    courseId: string;
+    courseName: string;
+    selectedSection: unknown;
+    selectedLecture?: unknown;
+    selectedDiscussion?: unknown;
+    selectedLab?: unknown;
+    isRequired: boolean;
+}
+
+export interface CourseData {
+    id: string;
+    subject: string;
+    courseNumber: string;
+    title: string;
+    sections: SectionData[];
+}
+
+export interface SectionData {
+    crn: string;
+    section: string;
+    instructor: string;
+    meetings: MeetingData[];
+}
+
+export interface MeetingData {
+    days: string;
+    startTime: string;
+    endTime: string;
+    location: string;
+}
+
+// -----------------------------------------------------------------------------
+// Conflict Resolution
+// -----------------------------------------------------------------------------
+
+export interface ConflictInfo {
+    hasConflict: boolean;
+    localData: SyncData;
+    cloudData: SyncData;
+    differences: {
+        courses: boolean;
+        sections: boolean;
+    };
+}
+
+export type ConflictResolution = 'local' | 'cloud' | 'cancel';
+
+// -----------------------------------------------------------------------------
+// Provider Interface
+// -----------------------------------------------------------------------------
+
+export interface CloudProvider {
+    readonly id: string;
+    readonly displayName: string;
+    readonly icon?: string;
+
+    // Lifecycle
+    initialize(): Promise<void>;
+    dispose(): void;
+
+    // Authentication
+    signIn(): Promise<void>;
+    signOut(): Promise<void>;
+    isAuthenticated(): boolean;
+
+    // Data operations
+    pushData(data: SyncData): Promise<void>;
+    pullData(): Promise<SyncData | null>;
+}
+
+export interface ProviderInfo {
+    id: string;
+    displayName: string;
+    icon?: string;
+    isAuthenticated: boolean;
+}
+
+// -----------------------------------------------------------------------------
+// Legacy compatibility - CloudStateData mapping
+// -----------------------------------------------------------------------------
+
+/**
+ * Maps the old CloudStateData format to the new SyncData format.
+ * Used during migration and for ProfileStateManager compatibility.
+ */
+export interface LegacyCloudStateData {
+    version: string;
+    timestamp: string;
+    checksum: string;
+    state: {
+        selectedSections?: string[];
+        [key: string]: unknown;
+    };
+    schedules: unknown[];
+    preferences: unknown;
+    syncMetadata?: {
+        deviceId: string;
+        lastSyncTimestamp: number;
+        syncVersion: string;
+        deviceName?: string;
+    };
+}
+
+/**
+ * Convert legacy CloudStateData to new SyncData format
+ */
+export function fromLegacyData(legacy: LegacyCloudStateData, courses: CourseData[]): SyncData {
+    return {
+        version: legacy.version,
+        timestamp: new Date(legacy.timestamp).getTime(),
+        checksum: legacy.checksum,
+        courses,
+        selectedSections: legacy.state?.selectedSections || [],
+        preferences: legacy.preferences,
+    };
+}
+
+/**
+ * Convert new SyncData format to legacy CloudStateData
+ */
+export function toLegacyData(data: SyncData, deviceId: string): LegacyCloudStateData {
+    return {
+        version: data.version,
+        timestamp: new Date(data.timestamp).toISOString(),
+        checksum: data.checksum,
+        state: {
+            selectedSections: data.selectedSections,
+        },
+        schedules: [], // Schedules are derived from selectedSections
+        preferences: data.preferences || {},
+        syncMetadata: {
+            deviceId,
+            lastSyncTimestamp: data.timestamp,
+            syncVersion: '2.0',
+        },
+    };
+}

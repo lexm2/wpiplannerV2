@@ -92,7 +92,7 @@ export class GoogleDriveAuthService implements CloudAuthService {
                     accessToken: tokenResponse.access_token,
                 });
 
-                originalCallback(tokenResponse);
+                // Note: Don't call originalCallback here as it would trigger notifyAuthChanged again
             };
 
             this.tokenClient.requestAccessToken({ prompt: 'consent' });

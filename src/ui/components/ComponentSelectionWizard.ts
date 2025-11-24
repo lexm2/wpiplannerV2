@@ -195,6 +195,9 @@ export class ComponentSelectionWizard {
             sections = this.filterSectionsByTerm(sections, lectureTerm);
         }
 
+        // Filter out interest list placeholder sections
+        sections = sections.filter(section => !section.isInterestList);
+
         // Apply schedule filters if available
         if (this.scheduleFilterService && sections.length > 0) {
             const filteredSections = this.applyScheduleFilters(sections, step);
