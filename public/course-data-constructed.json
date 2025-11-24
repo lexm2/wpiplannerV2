@@ -328,6 +328,7 @@
   "generated": "Nov 24, 2025, 8:19 PM",
   "generated": "Nov 24, 2025, 8:40 PM",
   "generated": "Nov 24, 2025, 8:50 PM",
+  "generated": "Nov 24, 2025, 9:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4743,7 +4744,7 @@
                 "number": "C03",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course focuses on the methods, procedures and techniques of creating and manipulating images through electronic and digital means. Students will develop an understanding of image alteration. Topics may include color theory, displays, modeling, shading, and visual perception. Recommended background: AR 1100.",
@@ -4762,7 +4763,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C03",
                     "days": [
@@ -243622,7 +243623,7 @@
                 "number": "D02",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 6,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -243641,7 +243642,7 @@
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
                     "days": [
