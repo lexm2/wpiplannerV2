@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 24, 2025, 6:51 PM",
+  "generated": "Nov 24, 2025, 7:11 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -77649,7 +77649,7 @@
                 "crn": 337543,
                 "number": "D07 - INQ SEM: Native American History",
                 "seats": 12,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -77668,7 +77668,7 @@
                     "building": "",
                     "room": "Salisbury Labs 226 HUA Seminar Room",
                     "seats": 12,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D07 - INQ SEM: Native American History",
