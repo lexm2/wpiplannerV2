@@ -346,6 +346,7 @@
   "generated": "Nov 25, 2025, 5:42 AM",
   "generated": "Nov 25, 2025, 5:51 AM",
   "generated": "Nov 25, 2025, 6:26 AM",
+  "generated": "Nov 25, 2025, 6:53 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -6781,7 +6782,7 @@
                 "crn": 337028,
                 "number": "DL01",
                 "seats": 40,
-                "seatsAvailable": 18,
+                "seatsAvailable": 17,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -6800,7 +6801,7 @@
                     "building": "",
                     "room": "Unity Hall 420",
                     "seats": 40,
-                    "seatsAvailable": 18,
+                    "seatsAvailable": 17,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "DL01",
