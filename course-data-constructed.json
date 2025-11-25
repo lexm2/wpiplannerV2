@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 25, 2025, 6:25 PM",
+  "generated": "Nov 25, 2025, 6:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -650,7 +650,7 @@
                 "crn": 343251,
                 "number": "C01",
                 "seats": 50,
-                "seatsAvailable": 6,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -669,7 +669,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 50,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -14349,7 +14349,7 @@
                 "number": "DL01",
                 "seats": 12,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4865",
                 "description": "In this laboratory course, students will conduct hands-on experiments to become familiar with clinical tools. Working with ultrasound, electrocardiogram, otoscope, spirometry, and other devices as available, students will design experiments to measure, model, and provide mathematical descriptions of biomedical activity. We will discuss appropriate equipment for assessing specific disease states or conditions and use computational modeling to interpret data. This course is appropriate for students with an interest in pursuing a clinical career or working in a clinical setting, or as a clinical engineer. Recommended Background: B asic knowledge of human physiology (e.g., BME 3112 or equivalent) and computer programming (e.g., BME 1004 or equivalent).",
@@ -14368,7 +14368,7 @@
                     "room": "Goddard Hall 306 CH Lab",
                     "seats": 12,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
                     "days": [
