@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 25, 2025, 7:30 PM",
+  "generated": "Nov 25, 2025, 7:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -72913,7 +72913,7 @@
                 "crn": 337185,
                 "number": "D01",
                 "seats": 34,
-                "seatsAvailable": 14,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -72932,7 +72932,7 @@
                     "building": "",
                     "room": "Olin Hall 126",
                     "seats": 34,
-                    "seatsAvailable": 14,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -170530,7 +170530,7 @@
                 "crn": 339208,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -170549,7 +170549,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 30,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
