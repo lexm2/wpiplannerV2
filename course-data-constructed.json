@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 25, 2025, 5:42 AM",
+  "generated": "Nov 25, 2025, 5:51 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -184183,7 +184183,7 @@
                 "crn": 337694,
                 "number": "S01",
                 "seats": 999,
-                "seatsAvailable": 994,
+                "seatsAvailable": 993,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -184202,7 +184202,7 @@
                     "building": "",
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 999,
-                    "seatsAvailable": 994,
+                    "seatsAvailable": 993,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S01",
@@ -184221,7 +184221,7 @@
                 "crn": 337714,
                 "number": "S02",
                 "seats": 999,
-                "seatsAvailable": 994,
+                "seatsAvailable": 993,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -184240,7 +184240,7 @@
                     "building": "",
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 999,
-                    "seatsAvailable": 994,
+                    "seatsAvailable": 993,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S02",
