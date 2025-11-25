@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 25, 2025, 3:43 PM",
+  "generated": "Nov 25, 2025, 3:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -74586,7 +74586,7 @@
                 "number": "D01 - Topics In The History Of Science: Biology/Anthropology",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course surveys the major developments, research enterprise, controversies and cultural contexts of particular scientific fields while also engaging students in examining the questions, methods and sources that inform the history of science. Sections will vary in topic, focusing on the history of a subset selected from among the following fields: astronomy, cosmology, mathematics, biology, medicine, ecology, evolutionary ideas, the earth sciences, chemistry, physics, or the human sciences. This course may be repeated for different topics. No prior coursework or background in the history of science is required.",
@@ -74605,7 +74605,7 @@
                     "room": "Salisbury Labs 411",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D01 - Topics In The History Of Science: Biology/Anthropology",
                     "days": [
