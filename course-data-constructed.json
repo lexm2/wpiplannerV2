@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 25, 2025, 5:51 AM",
+  "generated": "Nov 25, 2025, 6:26 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -166014,7 +166014,7 @@
                 "crn": 336334,
                 "number": "CL01",
                 "seats": 25,
-                "seatsAvailable": 5,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4425",
@@ -166033,7 +166033,7 @@
                     "building": "",
                     "room": "Washburn 323",
                     "seats": 25,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "CL01",
@@ -166052,7 +166052,7 @@
                   "crn": 336774,
                   "number": "CD01",
                   "seats": 25,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 6,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4425",
@@ -166071,7 +166071,7 @@
                       "building": "",
                       "room": "Higgins Labs 114",
                       "seats": 25,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 6,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD01",
