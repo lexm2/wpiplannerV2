@@ -394,6 +394,7 @@
   "generated": "Nov 25, 2025, 11:49 PM",
   "generated": "Nov 26, 2025, 1:15 AM",
   "generated": "Nov 26, 2025, 2:56 AM",
+  "generated": "Nov 26, 2025, 3:47 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -156422,7 +156423,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I, This course develops techniques for solving ordinary differential equations. Topics covered include: introduction to modeling using first-order differential equations, solution methods for linear higher-order equations, qualitative behavior of nonlinear first-order equations, oscillatory phenomena including spring-mass system and RLC-circuits and Laplace transform. Additional topics may be chosen from power series method, methods for solving systems of equations and numerical methods for solving ordinary differential equations. Recommended background: MA 1024.",
@@ -156441,7 +156442,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": [],
