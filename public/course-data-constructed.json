@@ -410,6 +410,7 @@
   "generated": "Nov 26, 2025, 9:19 AM",
   "generated": "Nov 26, 2025, 9:43 AM",
   "generated": "Nov 26, 2025, 9:54 AM",
+  "generated": "Nov 26, 2025, 10:18 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -174685,7 +174686,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "(2 credits) The failure and wear-out mechanisms for a variety of materials (metals, ceramics, polymers, composites and microelectronics) and applications will be presented and discussed. Multi-axial failure theories and fracture mechanics will be discussed. The methodology and techniques for reliability analysis will also be presented and discussed. A materials systems approach will be used. (Prerequisites: ES 2502 and ME 3023 or equivalent, and senior or graduate standing in engineering or science.) Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MTE 593C/MTE 594C).",
@@ -174704,7 +174705,7 @@
                     "room": "Higgins Labs 202",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -181528,7 +181529,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "(2 credits) The failure and wear-out mechanisms for a variety of materials (metals, ceramics, polymers, composites and microelectronics) and applications will be presented and discussed. Multi-axial failure theories and fracture mechanics will be discussed. The methodology and techniques for reliability analysis will also be presented and discussed. A materials systems approach will be used. (Prerequisites: ES 2502 and ME 3023 or equivalent, and senior or graduate standing in engineering or science.) Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MTE 593C/MTE 594C).",
@@ -181547,7 +181548,7 @@
                     "room": "Higgins Labs 202",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
