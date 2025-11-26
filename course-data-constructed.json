@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 26, 2025, 6:20 PM",
+  "generated": "Nov 26, 2025, 6:46 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -165203,7 +165203,7 @@
                 "crn": 337061,
                 "number": "DL01",
                 "seats": 35,
-                "seatsAvailable": 4,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4519",
@@ -165222,7 +165222,7 @@
                     "building": "",
                     "room": "Stratton Hall 201",
                     "seats": 35,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
@@ -165241,7 +165241,7 @@
                   "crn": 337074,
                   "number": "DD01",
                   "seats": 35,
-                  "seatsAvailable": 4,
+                  "seatsAvailable": 5,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4519",
@@ -165260,7 +165260,7 @@
                       "building": "",
                       "room": "Stratton Hall 205",
                       "seats": 35,
-                      "seatsAvailable": 4,
+                      "seatsAvailable": 5,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
