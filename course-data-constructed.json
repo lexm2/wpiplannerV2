@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 26, 2025, 4:45 AM",
+  "generated": "Nov 26, 2025, 5:16 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -39435,7 +39435,7 @@
                 "number": "CL01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 5,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4937",
                 "description": "This course introduces students to the fundamental principles of programming as it applies to engineering and robotic applications. Topics include data structures, control flow, modularization, state machines, and event-based input/output. Students will be expected to implement, test, and debug programs and apply them to control devices and microcontrollers. Special focus will be given to writing efficient and reusable code. This course provides appropriate programming background for RBE 1001. Undergraduate credit may not be earned for both this course and CS 1004. Undergraduate credit may not be earned for both this course and RBE 100X.",
@@ -39454,7 +39454,7 @@
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 5,
                     "specificSection": "CL01",
                     "days": [
