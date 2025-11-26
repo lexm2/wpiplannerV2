@@ -115,9 +115,7 @@ export class GoogleDriveProvider implements CloudProvider {
             throw new Error('Google API client not loaded');
         }
 
-        console.log('[GoogleDriveProvider] Pulling data from cloud...');
         const data = await this.getCloudData();
-        console.log('[GoogleDriveProvider] Pulled data:', data);
         return data;
     }
 

@@ -96,19 +96,18 @@ export class SyncManager {
             this.updateStatus();
 
             // Pull cloud data to check for conflicts
-            console.log('[SyncManager] Pulling cloud data...');
             const cloudData = await provider.pullData();
             console.log('[SyncManager] Pulled cloud data:', cloudData);
 
-            // Treat null or empty cloud data as "no data" - just push local
-            if (!cloudData || this.isEmptyData(cloudData)) {
-                console.log('[SyncManager] No cloud data or empty, pushing local');
+            // If no cloud file exists (first time), just push local
+            if (!cloudData) {
+                console.log('[SyncManager] No cloud file found, pushing local for first time');
                 await provider.pushData(localData);
                 syncEventBus.emitEvent('sync-pushed', { source: 'initial' });
                 return null;
             }
 
-            // Check for conflicts
+            // Cloud file exists - always check for conflicts (even if empty)
             const conflictInfo = this.detectConflict(localData, cloudData);
 
             if (conflictInfo.hasConflict) {
@@ -323,18 +322,6 @@ export class SyncManager {
             if (a[i] !== b[i]) return false;
         }
         return true;
-    }
-
-    /**
-     * Check if sync data is empty (no schedules or empty schedules)
-     */
-    private isEmptyData(data: SyncData): boolean {
-        if (!data.schedules || data.schedules.length === 0) {
-            return true;
-        }
-        // Check if all schedules are empty
-        const hasAnyCourses = data.schedules.some(s => s.selectedCourses && s.selectedCourses.length > 0);
-        return !hasAnyCourses;
     }
 
     /**
