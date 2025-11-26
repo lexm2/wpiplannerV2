@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 26, 2025, 6:46 PM",
+  "generated": "Nov 26, 2025, 7:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -164786,7 +164786,7 @@
                 "crn": 337114,
                 "number": "DL01",
                 "seats": 70,
-                "seatsAvailable": 31,
+                "seatsAvailable": 30,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4472",
@@ -164805,7 +164805,7 @@
                     "building": "",
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "seats": 70,
-                    "seatsAvailable": 31,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL01",
@@ -164824,7 +164824,7 @@
                   "crn": 337118,
                   "number": "DD01",
                   "seats": 35,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4472",
@@ -164843,7 +164843,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 35,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
