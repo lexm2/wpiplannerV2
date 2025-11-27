@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 27, 2025, 5:51 AM",
+  "generated": "Nov 27, 2025, 6:26 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -64090,7 +64090,7 @@
                 "crn": 338714,
                 "number": "D01",
                 "seats": 35,
-                "seatsAvailable": 19,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -64109,7 +64109,7 @@
                     "building": "",
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 35,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -65278,7 +65278,7 @@
                 "number": "DL01",
                 "seats": 100,
                 "seatsAvailable": 0,
-                "actualWaitlist": 17,
+                "actualWaitlist": 18,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4511",
                 "description": "Cat. I This beginning course provides important background for all science and engineering disciplines regarding the capabilities and limitations of materials in our everyday lives. Students are introduced to the fundamental theme of materials science-- structure-property-processing relationships—in metals, ceramics, and plastics. Aspects of material structure range from the atomic to microstructural and macroscopic scales. In turn, these structural features determine the properties of materials. In particular, this course investigates connections between structure and mechanical properties, and how working and thermal treatments may transform structure and thus alter material properties. This knowledge is then applied to material selection decisions. Recommended background: prior knowledge of college-level chemistry.",
@@ -65297,7 +65297,7 @@
                     "room": "Unity Hall 500",
                     "seats": 100,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 17,
+                    "actualWaitlist": 18,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
                     "days": [
@@ -186794,7 +186794,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seatsAvailable": 9,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I Leadership is a critical role in any global, technological organization. This course explores how the concepts of creativity, entrepreneurial and critical thinking, emotional and self-awareness, passion, diversity, communication, and ethics inform and affect leadership practice. The course considers a variety of contemporary leadership challenges including how leaders work effectively across cultural, technological, and disciplinary boundaries, how leaders foster new ideas and bring them to fruition, how they communicate effectively and persuasively to diverse stakeholders, and how they make decisions that are both ethical and effective. The course is designed to 1) increase students’ awareness of their own leadership styles, 2) examine the responsibilities of leadership, and 3) determine best practices in leadership. Students cannot receive credit for both BUS 1010 and OBC 1010.",
@@ -186813,7 +186813,7 @@
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
                     "seatsAvailable": 9,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
