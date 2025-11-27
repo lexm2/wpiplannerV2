@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 27, 2025, 2:49 AM",
+  "generated": "Nov 27, 2025, 3:42 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -65239,7 +65239,7 @@
                   "crn": 336537,
                   "number": "CD01",
                   "seats": 95,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4334",
@@ -65258,7 +65258,7 @@
                       "building": "",
                       "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                       "seats": 95,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD01",
@@ -65278,7 +65278,7 @@
                 "number": "DL01",
                 "seats": 100,
                 "seatsAvailable": 0,
-                "actualWaitlist": 18,
+                "actualWaitlist": 17,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4511",
                 "description": "Cat. I This beginning course provides important background for all science and engineering disciplines regarding the capabilities and limitations of materials in our everyday lives. Students are introduced to the fundamental theme of materials science-- structure-property-processing relationships—in metals, ceramics, and plastics. Aspects of material structure range from the atomic to microstructural and macroscopic scales. In turn, these structural features determine the properties of materials. In particular, this course investigates connections between structure and mechanical properties, and how working and thermal treatments may transform structure and thus alter material properties. This knowledge is then applied to material selection decisions. Recommended background: prior knowledge of college-level chemistry.",
@@ -65297,7 +65297,7 @@
                     "room": "Unity Hall 500",
                     "seats": 100,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 18,
+                    "actualWaitlist": 17,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
                     "days": [
