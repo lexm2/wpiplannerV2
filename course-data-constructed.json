@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 27, 2025, 4:00 AM",
+  "generated": "Nov 27, 2025, 4:37 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -52369,7 +52369,7 @@
                 "crn": 341759,
                 "number": "S01",
                 "seats": 35,
-                "seatsAvailable": 23,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -52388,7 +52388,7 @@
                     "building": "",
                     "room": "Stratton Hall 205",
                     "seats": 35,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -61199,7 +61199,7 @@
                 "crn": 341759,
                 "number": "S01",
                 "seats": 35,
-                "seatsAvailable": 23,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -61218,7 +61218,7 @@
                     "building": "",
                     "room": "Stratton Hall 205",
                     "seats": 35,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
