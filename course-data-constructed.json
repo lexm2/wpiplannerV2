@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 27, 2025, 2:53 PM",
+  "generated": "Nov 27, 2025, 3:16 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -241582,7 +241582,7 @@
                 "number": "C01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to the sports through skill development and play.",
@@ -241601,7 +241601,7 @@
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
