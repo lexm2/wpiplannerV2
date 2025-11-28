@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 28, 2025, 5:49 PM",
+  "generated": "Nov 28, 2025, 6:23 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -251146,7 +251146,7 @@
                 "crn": 354240,
                 "number": "C04",
                 "seats": 25,
-                "seatsAvailable": 6,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -251165,7 +251165,7 @@
                     "building": "",
                     "room": "Recreation Center Dance",
                     "seats": 25,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C04",
