@@ -163,6 +163,24 @@ export class CloudStatusButton {
 
     private setupEventListeners(): void {
         // Use centralized SyncEventBus for all sync events
+
+        // Explicit listeners for clarity (plus wildcard for comprehensive monitoring)
+        syncEventBus.on('sync-started', () => {
+            // Could show syncing indicator
+            logger.log('[CloudStatusButton] Sync started');
+        });
+
+        syncEventBus.on('offline-mode', () => {
+            logger.log('[CloudStatusButton] Browser went offline');
+            // Could show offline indicator in UI
+        });
+
+        syncEventBus.on('online-mode', () => {
+            logger.log('[CloudStatusButton] Browser back online');
+            // Could hide offline indicator
+        });
+
+        // Wildcard listener handles all events for state management
         syncEventBus.on('*', (event: SyncEvent) => {
             this.handleSyncEvent(event);
         });

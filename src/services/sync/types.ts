@@ -13,22 +13,22 @@ export type SyncStatus =
     | 'error'
     | 'not_authenticated';
 
+/**
+ * Optimized event types (9 core events).
+ * Removed unused events: sync-completed, sync-uploaded (duplicate),
+ * sync-conflict-resolved (use sync-resolved), sync-cancelled,
+ * cloud-data-applied, provider-changed
+ */
 export type SyncEventType =
-    | 'auth-changed'
-    | 'sync-conflict'
-    | 'sync-resolved'
-    | 'sync-pushed'
-    | 'sync-failed'
-    | 'sync-started'
-    | 'sync-completed'
-    | 'sync-uploaded'
-    | 'sync-conflict-resolved'
-    | 'sync-cancelled'
-    | 'offline-mode'
-    | 'online-mode'
-    | 'local-save-completed'
-    | 'cloud-data-applied'
-    | 'provider-changed';
+    | 'auth-changed'           // Authentication status changed
+    | 'sync-conflict'          // Conflict detected during sign-in
+    | 'sync-resolved'          // User resolved a conflict
+    | 'sync-pushed'            // Data pushed to cloud successfully
+    | 'sync-failed'            // Sync operation failed
+    | 'sync-started'           // Sync operation started
+    | 'local-save-completed'   // Local save completed (triggers cloud sync)
+    | 'offline-mode'           // Browser went offline
+    | 'online-mode';           // Browser came back online
 
 export interface SyncEvent {
     type: SyncEventType;

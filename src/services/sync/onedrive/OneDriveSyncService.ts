@@ -205,7 +205,7 @@ export class OneDriveSyncService implements CloudSyncService {
             }
 
             this.updateStatus('synced');
-            this.notifyEvent({ type: 'sync-completed', timestamp: Date.now(), data: enrichedData });
+            this.notifyEvent({ type: 'sync-pushed', timestamp: Date.now(), data: enrichedData });
 
             setTimeout(() => {
                 if (this.status === 'synced') {

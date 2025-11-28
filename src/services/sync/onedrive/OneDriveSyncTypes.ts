@@ -67,20 +67,5 @@ export interface SyncConfig {
     offlineQueueSize: number;
 }
 
-export type SyncEventType =
-    | 'sync-started'
-    | 'sync-completed'
-    | 'sync-failed'
-    | 'sync-conflict'
-    | 'auth-changed'
-    | 'offline-mode'
-    | 'online-mode';
-
-export interface SyncEvent {
-    type: SyncEventType;
-    timestamp: number;
-    data?: any;
-    error?: Error;
-}
-
-export type SyncEventListener = (event: SyncEvent) => void;
+// Re-export from canonical types file (single source of truth)
+export type { SyncEventType, SyncEvent, SyncEventListener } from '../types';

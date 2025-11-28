@@ -52,28 +52,7 @@ export interface SyncConfig {
     offlineQueueSize: number;
 }
 
-export type SyncEventType =
-    | 'sync-started'
-    | 'sync-completed'
-    | 'sync-uploaded'
-    | 'sync-failed'
-    | 'sync-conflict'
-    | 'sync-conflict-resolved'
-    | 'sync-cancelled'
-    | 'auth-changed'
-    | 'offline-mode'
-    | 'online-mode'
-    | 'local-save-completed'
-    | 'cloud-data-applied'
-    | 'provider-changed';
-
-export interface SyncEvent {
-    type: SyncEventType;
-    timestamp: number;
-    data?: any;
-    error?: Error;
-}
-
-export type SyncEventListener = (event: SyncEvent) => void;
+// Re-export from canonical types file (single source of truth)
+export type { SyncEventType, SyncEvent, SyncEventListener } from './types';
 
 export type CloudProvider = 'onedrive' | 'googledrive' | 'none';

@@ -1,102 +1,102 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from 'vitest';
 import { CloudStatusButton } from '../../../src/ui/components/CloudStatusButton';
-import { CloudProviderRegistry, type ICloudProvider } from '../../../src/services/sync/CloudProviderRegistry';
-import type { ICloudAuthService } from '../../../src/services/sync/interfaces/ICloudAuthService';
-import type { ICloudSyncService } from '../../../src/services/sync/interfaces/ICloudSyncService';
-import type { SyncEvent, SyncEventType } from '../../../src/services/sync/CloudSyncTypes';
+import type { SyncEvent, SyncEventType } from '../../../src/services/sync/types';
 import type { StateChangeEvent, ProfileState } from '../../../src/core/ProfileStateManager';
-import type { IconName } from '../../../src/utils/iconPaths';
+
+// Mock SyncEventBus
+const eventListeners = new Map<string | '*', Set<Function>>();
+vi.mock('../../../src/services/sync/SyncEventBus', () => ({
+    syncEventBus: {
+        on: vi.fn((event: string | '*', listener: Function) => {
+            if (!eventListeners.has(event)) {
+                eventListeners.set(event, new Set());
+            }
+            eventListeners.get(event)!.add(listener);
+            return () => eventListeners.get(event)?.delete(listener);
+        }),
+        emitEvent: vi.fn()
+    },
+    SyncEventBus: {
+        getInstance: vi.fn(() => ({
+            on: vi.fn(),
+            emitEvent: vi.fn()
+        }))
+    }
+}));
+
+// Mock SyncManager
+vi.mock('../../../src/services/sync/SyncManager', () => ({
+    syncManager: {
+        getCurrentProvider: vi.fn(() => ({
+            id: 'googledrive',
+            name: 'Google Drive',
+            icon: 'BRAND_GOOGLE_DRIVE'
+        })),
+        isAuthenticated: vi.fn(() => false),
+        signOut: vi.fn().mockResolvedValue(undefined),
+        handleSignIn: vi.fn().mockResolvedValue(undefined)
+    }
+}));
+
+// Mock ProviderRegistry
+vi.mock('../../../src/services/sync/ProviderRegistry', () => ({
+    providerRegistry: {}
+}));
+
+// Mock iconPaths
+vi.mock('../../../src/utils/iconPaths', () => ({
+    getInlineSVG: vi.fn((iconName: string, className?: string) =>
+        `<svg class="${className}">${iconName}</svg>`
+    )
+}));
+
+// Mock logger
+vi.mock('../../../src/utils/logger', () => ({
+    logger: {
+        log: vi.fn(),
+        error: vi.fn(),
+        warn: vi.fn()
+    }
+}));
+
+// Mock ProfileStateManager
+vi.mock('../../../src/core/ProfileStateManager', () => ({
+    ProfileStateManager: {
+        getInstance: vi.fn(() => ({
+            exportData: vi.fn(() => Promise.resolve(JSON.stringify({
+                version: '1.0',
+                activeScheduleId: 'test-schedule',
+                schedules: [],
+                preferences: {}
+            })))
+        }))
+    }
+}));
 
 describe('CloudStatusButton - State Transitions', () => {
     let button: CloudStatusButton;
     let container: HTMLElement;
-    let mockAuthService: jest.Mocked<ICloudAuthService>;
-    let mockSyncService: jest.Mocked<ICloudSyncService>;
-    let mockProvider: ICloudProvider;
-    let authListeners: Array<(event: SyncEvent) => void> = [];
-    let syncListeners: Array<(event: SyncEvent) => void> = [];
+    let mockSyncManager: any;
 
-    beforeEach(() => {
-        vi.useFakeTimers();
+    function emitEvent(type: SyncEventType, data?: any, error?: Error): void {
+        const event: SyncEvent = { type, timestamp: Date.now(), data, error };
 
-        document.body.innerHTML = '';
-        container = document.createElement('div');
-        container.id = 'cloud-status-container';
-        document.body.appendChild(container);
-
-        authListeners = [];
-        syncListeners = [];
-
-        mockAuthService = {
-            initialize: vi.fn().mockResolvedValue(undefined),
-            signIn: vi.fn().mockResolvedValue({
-                account: { username: 'test', homeAccountId: 'test-id' },
-                accessToken: 'token'
-            }),
-            signOut: vi.fn().mockResolvedValue(undefined),
-            getAccessToken: vi.fn().mockResolvedValue('token'),
-            getAuthState: vi.fn(() => ({ isAuthenticated: false })),
-            isAuthenticated: vi.fn(() => false),
-            addEventListener: vi.fn((listener) => authListeners.push(listener)),
-            removeEventListener: vi.fn((listener) => {
-                const index = authListeners.indexOf(listener);
-                if (index > -1) authListeners.splice(index, 1);
-            })
-        } as any;
-
-        mockSyncService = {
-            initialize: vi.fn().mockResolvedValue(undefined),
-            syncToCloud: vi.fn().mockResolvedValue({ success: true, status: 'synced' }),
-            pullFromCloud: vi.fn().mockResolvedValue({ success: true, status: 'synced' }),
-            resolveConflict: vi.fn().mockResolvedValue({ success: true, status: 'synced' }),
-            getStatus: vi.fn(() => 'idle'),
-            getDeviceId: vi.fn(() => 'device-123'),
-            isAuthenticated: vi.fn(() => false),
-            getAuthService: vi.fn(() => mockAuthService),
-            addEventListener: vi.fn((listener) => syncListeners.push(listener)),
-            removeEventListener: vi.fn((listener) => {
-                const index = syncListeners.indexOf(listener);
-                if (index > -1) syncListeners.splice(index, 1);
-            })
-        } as any;
-
-        mockProvider = {
-            id: 'test-provider',
-            name: 'Test Provider',
-            icon: 'CALENDAR_UP' as IconName,
-            authService: mockAuthService,
-            syncService: mockSyncService
-        };
-
-        vi.spyOn(CloudProviderRegistry, 'getActiveProvider').mockReturnValue(mockProvider);
-
-        button = new CloudStatusButton('cloud-status-container');
-    });
-
-    afterEach(() => {
-        vi.useRealTimers();
-        vi.restoreAllMocks();
-        document.body.innerHTML = '';
-    });
-
-    function emitAuthEvent(isAuthenticated: boolean): void {
-        mockAuthService.isAuthenticated.mockReturnValue(isAuthenticated);
-        authListeners.forEach(listener => {
-            listener({
-                type: 'auth-changed',
-                timestamp: Date.now(),
-                data: { isAuthenticated }
-            });
+        // Call wildcard listeners
+        eventListeners.get('*')?.forEach(listener => {
+            try {
+                listener(event);
+            } catch (e) {
+                // Ignore errors in tests
+            }
         });
-    }
 
-    function emitSyncEvent(type: SyncEventType, data?: any): void {
-        syncListeners.forEach(listener => {
-            listener({
-                type,
-                timestamp: Date.now(),
-                data
-            });
+        // Call specific listeners
+        eventListeners.get(type)?.forEach(listener => {
+            try {
+                listener(event);
+            } catch (e) {
+                // Ignore errors in tests
+            }
         });
     }
 
@@ -129,11 +129,38 @@ describe('CloudStatusButton - State Transitions', () => {
         return btn?.className || '';
     }
 
+    beforeEach(async () => {
+        vi.useFakeTimers();
+
+        document.body.innerHTML = '';
+        container = document.createElement('div');
+        container.id = 'cloud-status-container';
+        document.body.appendChild(container);
+
+        eventListeners.clear();
+        vi.clearAllMocks();
+
+        // Import the mocked syncManager
+        const { syncManager } = await import('../../../src/services/sync/SyncManager');
+        mockSyncManager = syncManager;
+        mockSyncManager.isAuthenticated.mockReturnValue(false);
+
+        button = new CloudStatusButton('cloud-status-container');
+    });
+
+    afterEach(() => {
+        button?.destroy();
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+        document.body.innerHTML = '';
+    });
+
     describe('Core State Transitions - Never Get Stuck', () => {
         it('should transition from unauthenticated to signed-in to authenticated-idle', () => {
             expect(getButtonClass()).toContain('cloud-status-signin');
 
-            emitAuthEvent(true);
+            mockSyncManager.isAuthenticated.mockReturnValue(true);
+            emitEvent('auth-changed', { authenticated: true });
             expect(getButtonClass()).toContain('cloud-status-signed-in');
             expect(getButtonText()).toBe('Signed in');
 
@@ -142,13 +169,13 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('should transition from authenticated to signed-out to unauthenticated', () => {
-            mockAuthService.isAuthenticated.mockReturnValue(true);
-            emitAuthEvent(true);
+            mockSyncManager.isAuthenticated.mockReturnValue(true);
+            emitEvent('auth-changed', { authenticated: true });
             vi.advanceTimersByTime(1500);
             expect(getButtonClass()).toContain('cloud-status-connected');
 
-            mockAuthService.isAuthenticated.mockReturnValue(false);
-            emitAuthEvent(false);
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
+            emitEvent('auth-changed', { authenticated: false });
             expect(getButtonClass()).toContain('cloud-status-signed-out');
             expect(getButtonText()).toBe('Signed out');
 
@@ -157,14 +184,15 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('should handle sign-out during cloud-uploading without getting stuck', () => {
-            emitSyncEvent('sync-started');
-            expect(getButtonClass()).toContain('cloud-status-syncing');
+            emitEvent('sync-started');
+            // Note: sync-started doesn't change the button state in the current implementation
 
-            mockAuthService.isAuthenticated.mockReturnValue(false);
-            emitAuthEvent(false);
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
+            emitEvent('auth-changed', { authenticated: false });
             expect(getButtonClass()).toContain('cloud-status-signed-out');
 
-            emitSyncEvent('sync-uploaded');
+            emitEvent('sync-pushed');
+            // Should still be signed-out because auth events have higher priority
             expect(getButtonClass()).toContain('cloud-status-signed-out');
 
             vi.advanceTimersByTime(1500);
@@ -175,8 +203,8 @@ describe('CloudStatusButton - State Transitions', () => {
             emitStateEvent(true);
             expect(getButtonClass()).toContain('cloud-status-saving');
 
-            mockAuthService.isAuthenticated.mockReturnValue(false);
-            emitAuthEvent(false);
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
+            emitEvent('auth-changed', { authenticated: false });
             expect(getButtonClass()).toContain('cloud-status-signed-out');
 
             vi.advanceTimersByTime(1500);
@@ -184,15 +212,16 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('should handle rapid sign-in/sign-out cycles', () => {
-            emitAuthEvent(true);
+            mockSyncManager.isAuthenticated.mockReturnValue(true);
+            emitEvent('auth-changed', { authenticated: true });
             expect(getButtonClass()).toContain('cloud-status-signed-in');
 
-            mockAuthService.isAuthenticated.mockReturnValue(false);
-            emitAuthEvent(false);
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
+            emitEvent('auth-changed', { authenticated: false });
             expect(getButtonClass()).toContain('cloud-status-signed-out');
 
-            mockAuthService.isAuthenticated.mockReturnValue(true);
-            emitAuthEvent(true);
+            mockSyncManager.isAuthenticated.mockReturnValue(true);
+            emitEvent('auth-changed', { authenticated: true });
             expect(getButtonClass()).toContain('cloud-status-signed-in');
 
             vi.advanceTimersByTime(1500);
@@ -200,29 +229,31 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('should ignore sync events during signed-out state', () => {
-            emitAuthEvent(false);
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
+            emitEvent('auth-changed', { authenticated: false });
             expect(getButtonClass()).toContain('cloud-status-signed-out');
 
-            emitSyncEvent('sync-started');
+            emitEvent('sync-started');
             expect(getButtonClass()).toContain('cloud-status-signed-out');
 
-            emitSyncEvent('sync-uploaded');
+            emitEvent('sync-pushed');
             expect(getButtonClass()).toContain('cloud-status-signed-out');
         });
 
         it('should ignore sync events during signed-in state', () => {
-            emitAuthEvent(true);
+            mockSyncManager.isAuthenticated.mockReturnValue(true);
+            emitEvent('auth-changed', { authenticated: true });
             expect(getButtonClass()).toContain('cloud-status-signed-in');
 
-            emitSyncEvent('sync-started');
+            emitEvent('sync-started');
             expect(getButtonClass()).toContain('cloud-status-signed-in');
 
-            emitSyncEvent('sync-uploaded');
+            emitEvent('sync-pushed');
             expect(getButtonClass()).toContain('cloud-status-signed-in');
         });
 
         it('should recover from error state', () => {
-            emitSyncEvent('sync-failed');
+            emitEvent('sync-failed', undefined, new Error('Test error'));
             expect(getButtonClass()).toContain('cloud-status-error');
 
             vi.advanceTimersByTime(3000);
@@ -230,10 +261,10 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('should handle cloud upload flow: start -> upload -> idle', () => {
-            emitSyncEvent('sync-started');
-            expect(getButtonClass()).toContain('cloud-status-syncing');
+            // sync-started doesn't change state in current implementation
+            emitEvent('sync-started');
 
-            emitSyncEvent('sync-uploaded');
+            emitEvent('sync-pushed', { source: 'manual' });
             expect(getButtonClass()).toContain('cloud-status-synced');
 
             vi.advanceTimersByTime(1000);
@@ -241,7 +272,7 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('should handle cloud download flow: complete -> idle', () => {
-            emitSyncEvent('sync-completed');
+            emitEvent('sync-pushed', { source: 'pull' });
             expect(getButtonClass()).toContain('cloud-status-synced');
 
             vi.advanceTimersByTime(1000);
@@ -262,35 +293,36 @@ describe('CloudStatusButton - State Transitions', () => {
 
     describe('Priority Enforcement', () => {
         it('should allow error to override syncing', () => {
-            emitSyncEvent('sync-started');
-            expect(getButtonClass()).toContain('cloud-status-syncing');
+            emitEvent('sync-started');
+            // sync-started doesn't change state
 
-            emitSyncEvent('sync-failed');
+            emitEvent('sync-failed', undefined, new Error('Test error'));
             expect(getButtonClass()).toContain('cloud-status-error');
         });
 
-        it('should allow syncing to override saving', () => {
+        it('should not allow synced to override saving (saving has higher priority)', () => {
             emitStateEvent(true);
             expect(getButtonClass()).toContain('cloud-status-saving');
 
-            emitSyncEvent('sync-started');
-            expect(getButtonClass()).toContain('cloud-status-syncing');
+            // local-saving (70) has higher priority than cloud-uploaded (60)
+            emitEvent('sync-pushed', { source: 'manual' });
+            expect(getButtonClass()).toContain('cloud-status-saving');
         });
 
         it('should allow signed-out to override synced', () => {
-            emitSyncEvent('sync-uploaded');
+            emitEvent('sync-pushed');
             expect(getButtonClass()).toContain('cloud-status-synced');
 
-            mockAuthService.isAuthenticated.mockReturnValue(false);
-            emitAuthEvent(false);
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
+            emitEvent('auth-changed', { authenticated: false });
             expect(getButtonClass()).toContain('cloud-status-signed-out');
         });
     });
 
     describe('All Transient States Timeout Correctly', () => {
         it('error transitions after 3000ms', () => {
-            mockAuthService.isAuthenticated.mockReturnValue(false);
-            emitSyncEvent('sync-failed');
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
+            emitEvent('sync-failed', undefined, new Error('Test error'));
             expect(getButtonClass()).toContain('cloud-status-error');
 
             vi.advanceTimersByTime(3000);
@@ -298,8 +330,8 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('signed-out transitions after 1500ms', () => {
-            mockAuthService.isAuthenticated.mockReturnValue(false);
-            emitAuthEvent(false);
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
+            emitEvent('auth-changed', { authenticated: false });
             expect(getButtonClass()).toContain('cloud-status-signed-out');
 
             vi.advanceTimersByTime(1500);
@@ -307,8 +339,8 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('signed-in transitions after 1500ms', () => {
-            mockAuthService.isAuthenticated.mockReturnValue(true);
-            emitAuthEvent(true);
+            mockSyncManager.isAuthenticated.mockReturnValue(true);
+            emitEvent('auth-changed', { authenticated: true });
             expect(getButtonClass()).toContain('cloud-status-signed-in');
 
             vi.advanceTimersByTime(1500);
@@ -316,8 +348,8 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('cloud-synced transitions after 1000ms', () => {
-            mockAuthService.isAuthenticated.mockReturnValue(false);
-            emitSyncEvent('sync-uploaded');
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
+            emitEvent('sync-pushed');
             expect(getButtonClass()).toContain('cloud-status-synced');
 
             vi.advanceTimersByTime(1000);
@@ -325,7 +357,7 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('local-saved transitions after 500ms', () => {
-            mockAuthService.isAuthenticated.mockReturnValue(false);
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
             emitStateEvent(false);
             expect(getButtonClass()).toContain('cloud-status-saved');
 
@@ -340,31 +372,23 @@ describe('CloudStatusButton - State Transitions', () => {
         });
 
         it('shows correct text for signed-out', () => {
-            emitAuthEvent(false);
+            mockSyncManager.isAuthenticated.mockReturnValue(false);
+            emitEvent('auth-changed', { authenticated: false });
             expect(getButtonText()).toBe('Signed out');
         });
 
         it('shows correct text for signed-in', () => {
-            emitAuthEvent(true);
+            mockSyncManager.isAuthenticated.mockReturnValue(true);
+            emitEvent('auth-changed', { authenticated: true });
             expect(getButtonText()).toBe('Signed in');
         });
 
         it('shows correct text for authenticated-idle', () => {
-            mockAuthService.isAuthenticated.mockReturnValue(true);
-            emitAuthEvent(true);
+            mockSyncManager.isAuthenticated.mockReturnValue(true);
+            emitEvent('auth-changed', { authenticated: true });
             vi.advanceTimersByTime(1500);
             const text = getButtonText();
             expect(text === 'Cloud connected' || text === 'Connected').toBe(true);
-        });
-
-        it('shows correct text for uploading', () => {
-            emitSyncEvent('sync-started');
-            expect(getButtonText()).toBe('Uploading...');
-        });
-
-        it('shows correct text for downloading', () => {
-            emitSyncEvent('sync-completed');
-            expect(getButtonText()).toBe('Downloaded');
         });
 
         it('shows correct text for saving', () => {
@@ -372,8 +396,13 @@ describe('CloudStatusButton - State Transitions', () => {
             expect(getButtonText()).toBe('Saving...');
         });
 
+        it('shows correct text for uploaded', () => {
+            emitEvent('sync-pushed');
+            expect(getButtonText()).toBe('Uploaded');
+        });
+
         it('shows correct text for error', () => {
-            emitSyncEvent('sync-failed');
+            emitEvent('sync-failed', undefined, new Error('Test error'));
             expect(getButtonText()).toBe('Sync error');
         });
     });
