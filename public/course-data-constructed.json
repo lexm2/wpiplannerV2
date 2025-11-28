@@ -506,6 +506,7 @@
   "generated": "Nov 27, 2025, 11:30 PM",
   "generated": "Nov 27, 2025, 11:49 PM",
   "generated": "Nov 28, 2025, 1:13 AM",
+  "generated": "Nov 28, 2025, 2:48 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4598,7 +4599,7 @@
                 "number": "D01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course provides an introduction to the basic principles of two and three-dimensionalvisual organization. The course focuses on graphic expression, ideadevelopment, and visual literacy. Students will be expected to master basicrendering skills, perspective drawing, concept art, and storyboarding throughtraditional and/or computer-based tools.",
@@ -4617,7 +4618,7 @@
                     "room": "Riley Commons",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -231195,7 +231196,7 @@
                 "crn": 337309,
                 "number": "D01",
                 "seats": 35,
-                "seatsAvailable": 6,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -231214,7 +231215,7 @@
                     "building": "",
                     "room": "Fuller Labs 311",
                     "seats": 35,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",

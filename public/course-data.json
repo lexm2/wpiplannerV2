@@ -2997,7 +2997,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337479"
     },
     {
@@ -107702,7 +107702,7 @@
       "Course_Title": "PY 2718 - Existentialism And Phenomenology",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "29/35",
+      "Enrolled_Capacity": "28/35",
       "Instructional_Format": "Lecture",
       "Instructors": "John Sanbonmatsu",
       "Locations": "Fuller Labs 311",
