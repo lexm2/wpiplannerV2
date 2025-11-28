@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 28, 2025, 4:00 AM",
+  "generated": "Nov 28, 2025, 4:37 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -37987,7 +37987,7 @@
                 "crn": 337389,
                 "number": "D01 - ST: Biomaterials for Women's Health",
                 "seats": 25,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -38006,7 +38006,7 @@
                     "building": "",
                     "room": "Stratton Hall 202 (new)",
                     "seats": 25,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01 - ST: Biomaterials for Women's Health",
