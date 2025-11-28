@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 28, 2025, 6:52 AM",
+  "generated": "Nov 28, 2025, 7:16 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5600,7 +5600,7 @@
                 "number": "C01 - Topics In Studio Art: Art in the Makerspace",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course is a hands-on workshop in creating digitally fabricated art using laser cutters and 3D printers. Students will design a series of objects using 2D and 3D software tools, then execute them as physical objects made of paper, plastic, wood, and/or leather. Students will learn to use tools in the Innovation Studio’s Makerspace and Prototyping Lab. Suggested background: Experience with 2D vector art and 3D modeling (AR1101 or equivalent).",
@@ -5619,7 +5619,7 @@
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "C01 - Topics In Studio Art: Art in the Makerspace",
                     "days": [
