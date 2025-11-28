@@ -79,17 +79,40 @@ export class CourseDataService {
                 // Check for duplicate ID
                 if (seenIds.has(courseId)) {
                     duplicateIds.add(courseId);
-                    const fallbackId = `${department.abbreviation}-${courseData.number}`;
-                    console.warn(`Duplicate course ID detected: "${courseId}" for ${department.abbreviation}${courseData.number}`);
-                    console.warn(`   Using fallback ID: "${fallbackId}"`);
-                    courseId = fallbackId;
-                    duplicatesFixed++;
-                    
-                    // If fallback is also duplicate, add a counter
-                    let counter = 2;
-                    while (seenIds.has(courseId)) {
-                        courseId = `${fallbackId}-${counter}`;
-                        counter++;
+
+                    // Strict validation in development mode
+                    const STRICT_VALIDATION = import.meta.env.DEV || import.meta.env.MODE === 'development';
+
+                    if (STRICT_VALIDATION) {
+                        // FAIL HARD in development - forces fixing bad data at source
+                        throw new Error(
+                            `CRITICAL DATA ERROR: Duplicate course ID "${courseId}" detected.\n` +
+                            `This indicates a data quality issue in course-data-constructed.json.\n` +
+                            `Please fix the backend data generation process.\n` +
+                            `Duplicate IDs found so far: ${Array.from(duplicateIds).join(', ')}`
+                        );
+                    } else {
+                        // Production fallback (for backward compatibility)
+                        const fallbackId = `${department.abbreviation}-${courseData.number}`;
+                        console.error(`DUPLICATE ID: "${courseId}" for ${department.abbreviation}${courseData.number}`);
+                        console.error(`   Using fallback ID: "${fallbackId}"`);
+                        courseId = fallbackId;
+                        duplicatesFixed++;
+
+                        // If fallback is also duplicate, add a counter
+                        let counter = 2;
+                        while (seenIds.has(courseId)) {
+                            courseId = `${fallbackId}-${counter}`;
+                            counter++;
+                        }
+
+                        // Report data quality issue
+                        console.error('[Data Quality Issue]', {
+                            type: 'duplicate_course_id',
+                            originalId: courseId,
+                            fallbackId: courseId,
+                            timestamp: Date.now()
+                        });
                     }
                 }
                 
