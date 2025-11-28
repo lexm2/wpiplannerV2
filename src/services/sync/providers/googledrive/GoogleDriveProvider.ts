@@ -278,9 +278,21 @@ export class GoogleDriveProvider implements CloudProvider {
     }
 
     private computeChecksum(data: SyncData): string {
+        // Hash the actual data structure: schedules with their selected courses and components
         const content = {
-            courses: data.courses,
-            selectedSections: data.selectedSections,
+            activeScheduleId: data.activeScheduleId,
+            schedules: data.schedules.map(schedule => ({
+                id: schedule.id,
+                selectedCourses: schedule.selectedCourses.map(course => ({
+                    courseId: course.courseId,
+                    selectedSection: course.selectedSection,
+                    selectedLecture: course.selectedLecture,
+                    selectedDiscussion: course.selectedDiscussion,
+                    selectedLab: course.selectedLab,
+                    isRequired: course.isRequired,
+                })),
+            })),
+            preferences: data.preferences,
         };
         const str = JSON.stringify(content);
         let hash = 0;

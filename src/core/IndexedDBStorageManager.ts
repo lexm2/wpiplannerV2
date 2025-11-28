@@ -4,6 +4,7 @@
 
 import { Schedule } from '../types/schedule';
 import { safeStringify, safeParse } from '../utils/jsonSerializer';
+import LZString from 'lz-string';
 
 interface StorageResult<T> {
     success: boolean;
@@ -97,10 +98,12 @@ export class IndexedDBStorageManager {
                 };
 
                 const serialized = safeStringify(scheduleWithTimestamp);
+                const compressed = LZString.compress(serialized);
                 const dataToStore = {
                     id: schedule.id,
-                    serializedData: serialized,
-                    timestamp: scheduleWithTimestamp.timestamp
+                    serializedData: compressed,
+                    timestamp: scheduleWithTimestamp.timestamp,
+                    compressed: true
                 };
 
                 const request = store.put(dataToStore);
@@ -141,7 +144,20 @@ export class IndexedDBStorageManager {
                     if (request.result) {
                         const stored = request.result;
                         if (stored.serializedData) {
-                            const deserialized = safeParse(stored.serializedData) as Schedule;
+                            // Handle both compressed and legacy uncompressed data
+                            const json = stored.compressed
+                                ? LZString.decompress(stored.serializedData)
+                                : stored.serializedData;
+
+                            if (!json) {
+                                resolve({
+                                    success: false,
+                                    error: 'Failed to decompress schedule data'
+                                });
+                                return;
+                            }
+
+                            const deserialized = safeParse(json) as Schedule;
                             resolve({ success: true, data: deserialized });
                         } else {
                             resolve({ success: true, data: stored });
@@ -183,7 +199,12 @@ export class IndexedDBStorageManager {
                     const results = request.result || [];
                     const deserialized = results.map((stored: any) => {
                         if (stored.serializedData) {
-                            return safeParse(stored.serializedData);
+                            // Handle both compressed and legacy uncompressed data
+                            const json = stored.compressed
+                                ? LZString.decompress(stored.serializedData)
+                                : stored.serializedData;
+
+                            return safeParse(json || stored.serializedData);
                         }
                         return stored;
                     });
