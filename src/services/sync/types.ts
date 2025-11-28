@@ -50,13 +50,11 @@ export interface ScheduleData {
 }
 
 export interface SelectedCourseData {
-    courseId: string;
-    courseName: string;
-    selectedSection: unknown;
-    selectedLecture?: unknown;
-    selectedDiscussion?: unknown;
-    selectedLab?: unknown;
+    courseId: string;               // Course ID only (not full object)
+    selectedSectionCrn?: string;   // Just the CRN, not full section
+    lockedSectionCrn?: string;      // Locked section CRN if any
     isRequired: boolean;
+    timestamp?: number;             // When selection was made (for merge conflicts)
 }
 
 export interface CourseData {
