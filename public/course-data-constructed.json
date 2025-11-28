@@ -553,6 +553,7 @@
   "generated": "Nov 28, 2025, 8:17 PM",
   "generated": "Nov 28, 2025, 8:39 PM",
   "generated": "Nov 28, 2025, 8:49 PM",
+  "generated": "Nov 28, 2025, 9:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -71126,7 +71127,7 @@
                 "crn": 337767,
                 "number": "S01 - SP: Combustion",
                 "seats": 30,
-                "seatsAvailable": 29,
+                "seatsAvailable": 28,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -71145,7 +71146,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 28,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01 - SP: Combustion",
