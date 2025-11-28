@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 28, 2025, 4:45 PM",
+  "generated": "Nov 28, 2025, 5:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -37372,7 +37372,7 @@
                 "crn": 337741,
                 "number": "S01",
                 "seats": 64,
-                "seatsAvailable": 50,
+                "seatsAvailable": 49,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -37391,7 +37391,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 64,
-                    "seatsAvailable": 50,
+                    "seatsAvailable": 49,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
@@ -37459,7 +37459,7 @@
                 "crn": 337849,
                 "number": "S01",
                 "seats": 64,
-                "seatsAvailable": 50,
+                "seatsAvailable": 49,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -37478,7 +37478,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 64,
-                    "seatsAvailable": 50,
+                    "seatsAvailable": 49,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
