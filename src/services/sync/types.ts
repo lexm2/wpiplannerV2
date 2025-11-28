@@ -19,7 +19,16 @@ export type SyncEventType =
     | 'sync-resolved'
     | 'sync-pushed'
     | 'sync-failed'
-    | 'local-save-completed';
+    | 'sync-started'
+    | 'sync-completed'
+    | 'sync-uploaded'
+    | 'sync-conflict-resolved'
+    | 'sync-cancelled'
+    | 'offline-mode'
+    | 'online-mode'
+    | 'local-save-completed'
+    | 'cloud-data-applied'
+    | 'provider-changed';
 
 export interface SyncEvent {
     type: SyncEventType;
@@ -154,13 +163,13 @@ export interface LegacyCloudStateData {
 /**
  * Convert legacy CloudStateData to new SyncData format
  */
-export function fromLegacyData(legacy: LegacyCloudStateData, courses: CourseData[]): SyncData {
+export function fromLegacyData(legacy: LegacyCloudStateData): SyncData {
     return {
         version: legacy.version,
         timestamp: new Date(legacy.timestamp).getTime(),
         checksum: legacy.checksum,
-        courses,
-        selectedSections: legacy.state?.selectedSections || [],
+        activeScheduleId: null,
+        schedules: legacy.schedules as ScheduleData[] || [],
         preferences: legacy.preferences,
     };
 }
@@ -174,9 +183,9 @@ export function toLegacyData(data: SyncData, deviceId: string): LegacyCloudState
         timestamp: new Date(data.timestamp).toISOString(),
         checksum: data.checksum,
         state: {
-            selectedSections: data.selectedSections,
+            selectedSections: [],
         },
-        schedules: [], // Schedules are derived from selectedSections
+        schedules: data.schedules,
         preferences: data.preferences || {},
         syncMetadata: {
             deviceId,

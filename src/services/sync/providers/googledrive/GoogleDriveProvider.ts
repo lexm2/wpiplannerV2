@@ -283,13 +283,13 @@ export class GoogleDriveProvider implements CloudProvider {
             activeScheduleId: data.activeScheduleId,
             schedules: data.schedules.map(schedule => ({
                 id: schedule.id,
+                name: schedule.name,
                 selectedCourses: schedule.selectedCourses.map(course => ({
                     courseId: course.courseId,
-                    selectedSection: course.selectedSection,
-                    selectedLecture: course.selectedLecture,
-                    selectedDiscussion: course.selectedDiscussion,
-                    selectedLab: course.selectedLab,
+                    selectedSectionCrn: course.selectedSectionCrn,
+                    lockedSectionCrn: course.lockedSectionCrn,
                     isRequired: course.isRequired,
+                    timestamp: course.timestamp,
                 })),
             })),
             preferences: data.preferences,

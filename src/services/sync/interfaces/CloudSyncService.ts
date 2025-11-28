@@ -1,5 +1,5 @@
 import type { CloudStateData, SyncResult, SyncStatus, SyncEvent } from '../CloudSyncTypes';
-import type { CloudAuthService } from './ICloudAuthService';
+import type { CloudAuthService } from './CloudAuthService';
 
 export interface CloudSyncService {
     initialize(): Promise<void>;

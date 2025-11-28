@@ -292,8 +292,8 @@ export class SyncManager {
                 const cloudCourse = cloudSchedule.selectedCourses.find(c => c.courseId === localCourse.courseId);
                 if (cloudCourse) {
                     // Check if sections differ
-                    const localSection = JSON.stringify(localCourse.selectedSection);
-                    const cloudSection = JSON.stringify(cloudCourse.selectedSection);
+                    const localSection = localCourse.selectedSectionCrn;
+                    const cloudSection = cloudCourse.selectedSectionCrn;
                     if (localSection !== cloudSection) {
                         sectionsDiffer = true;
                         break;
