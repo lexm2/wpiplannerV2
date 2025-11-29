@@ -4,8 +4,8 @@
 import { Schedule, UserScheduleState, SchedulePreferences } from '../types/schedule'
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
 import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
-import type { SyncData, ScheduleData, SelectedCourseData } from '../services/sync/types'
-import { checksumCalculator } from '../services/sync/checksum'
+import { ScheduleState } from '../types/ScheduleState'
+import { ApplicationState } from '../types/ApplicationState'
 
 export interface StorageTransaction {
     id: string;
@@ -261,42 +261,18 @@ export class TransactionalStorageManager {
             const activeScheduleIdResult = this.loadActiveScheduleId();
             const activeScheduleId = activeScheduleIdResult.data;
 
-            // Convert full Schedule objects to ScheduleData (IDs only)
-            const schedules: ScheduleData[] = fullSchedules.map(schedule => ({
-                id: schedule.id,
-                name: schedule.name,
-                selectedCourses: schedule.selectedCourses.map(selectedCourse => {
-                    const courseData: SelectedCourseData = {
-                        courseId: selectedCourse.course.id,
-                        selectedSectionCrn: selectedCourse.selectedSection?.crn.toString(),
-                        lockedSectionCrn: selectedCourse.lockedSections.size > 0
-                            ? Array.from(selectedCourse.lockedSections)[0]
-                            : undefined,
-                        isRequired: selectedCourse.isRequired,
-                        timestamp: Date.now()
-                    };
-                    return courseData;
-                }),
-                timestamp: schedule.timestamp
-            }));
+            // Convert legacy Schedule objects to ScheduleState
+            const scheduleStates = fullSchedules.map(s => ScheduleState.fromLegacySchedule(s));
 
-            // Build SyncData structure
-            const syncData: SyncData = {
-                version: '3.0',
-                timestamp: Date.now(),
-                checksum: '',
+            // Create ApplicationState (with full objects)
+            const appState = new ApplicationState(
                 activeScheduleId,
-                schedules,
+                scheduleStates,
                 preferences
-            };
+            );
 
-            // Calculate checksum using unified calculator
-            syncData.checksum = await checksumCalculator.calculateChecksum({
-                version: syncData.version,
-                activeScheduleId: syncData.activeScheduleId,
-                schedules: syncData.schedules,
-                preferences: syncData.preferences
-            });
+            // Convert to cloud format (IDs only) with checksum
+            const syncData = await appState.toCloudFormatWithChecksum();
 
             console.log('[TransactionalStorageManager] Exported SyncData:', {
                 version: syncData.version,
