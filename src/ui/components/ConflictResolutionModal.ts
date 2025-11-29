@@ -115,26 +115,17 @@ export class ConflictResolutionModal extends BaseModal {
     private updateContent(element: HTMLElement): void {
         if (!this.conflictInfo) return;
 
-        const { localData, cloudData, differences } = this.conflictInfo;
+        const { localData, cloudData } = this.conflictInfo;
 
-        // Show what differs
+        // Show simple message that data differs
         const detailsEl = element.querySelector('#conflict-details');
         if (detailsEl) {
-            const diffItems: string[] = [];
-            if (differences.courses) {
-                diffItems.push('Different courses selected');
-            }
-            if (differences.sections) {
-                diffItems.push('Different sections selected');
-            }
-
-            if (diffItems.length > 0) {
-                detailsEl.innerHTML = `
-                    <ul class="difference-list">
-                        ${diffItems.map(item => `<li>${item}</li>`).join('')}
-                    </ul>
-                `;
-            }
+            detailsEl.innerHTML = `
+                <p class="conflict-explanation">
+                    Your local data and cloud data are different.
+                    Compare the details below to decide which version to keep.
+                </p>
+            `;
         }
 
         // Helper to count total courses across schedules

@@ -107,19 +107,22 @@ export class SyncManager {
                 return null;
             }
 
-            // Cloud file exists - always check for conflicts (even if empty)
+            // Cloud file exists - check if checksums differ
             const conflictInfo = this.detectConflict(localData, cloudData);
 
             if (conflictInfo.hasConflict) {
+                // Checksums differ - show conflict modal
                 this.status = 'conflict';
                 this.pendingConflict = conflictInfo;
                 syncEventBus.emitEvent('sync-conflict', conflictInfo);
                 return conflictInfo;
             }
 
-            // No conflict - push local (merge strategy: local wins if no conflict)
-            await provider.pushData(localData);
-            syncEventBus.emitEvent('sync-pushed', { source: 'initial' });
+            // Checksums match - data is identical, already synced
+            // No need to push, just update status
+            console.log('[SyncManager] Checksums match, data already synced');
+            this.status = 'idle';
+            syncEventBus.emitEvent('sync-pushed', { source: 'already-synced', skipped: true });
             return null;
 
         } catch (error) {
@@ -134,7 +137,7 @@ export class SyncManager {
      */
     async resolveConflict(
         resolution: ConflictResolution,
-        onApplyCloudData?: (data: SyncData) => void
+        onApplyCloudData?: (data: SyncData) => Promise<void>
     ): Promise<void> {
         const provider = this.getCurrentProvider();
         if (!provider) {
@@ -165,14 +168,13 @@ export class SyncManager {
                     break;
 
                 case 'cloud':
-                    // Apply cloud data locally, then push to confirm
+                    // Apply cloud data locally - no push needed, cloud already has correct data
+                    // Await callback to ensure data is saved before emitting resolved event
                     if (onApplyCloudData) {
-                        onApplyCloudData(cloudData);
+                        await onApplyCloudData(cloudData);
                     }
-                    await provider.pushData(cloudData);
                     this.status = 'idle';
                     syncEventBus.emitEvent('sync-resolved', { resolution: 'cloud' });
-                    syncEventBus.emitEvent('sync-pushed', { source: 'conflict-cloud' });
                     break;
             }
 
@@ -274,42 +276,15 @@ export class SyncManager {
 
     /**
      * Detect if there's a conflict between local and cloud data
+     * Simple checksum comparison - if checksums differ, data is different
      */
     private detectConflict(local: SyncData, cloud: SyncData): ConflictInfo {
-        // Get active schedules
-        const localSchedule = local.schedules.find(s => s.id === local.activeScheduleId);
-        const cloudSchedule = cloud.schedules.find(s => s.id === cloud.activeScheduleId);
-
-        // Compare course IDs in active schedules
-        const localCourseIds = (localSchedule?.selectedCourses || []).map(c => c.courseId).sort();
-        const cloudCourseIds = (cloudSchedule?.selectedCourses || []).map(c => c.courseId).sort();
-        const coursesDiffer = !this.arraysEqual(localCourseIds, cloudCourseIds);
-
-        // Compare selected sections (by checking if section selections differ)
-        let sectionsDiffer = false;
-        if (!coursesDiffer && localSchedule && cloudSchedule) {
-            for (const localCourse of localSchedule.selectedCourses) {
-                const cloudCourse = cloudSchedule.selectedCourses.find(c => c.courseId === localCourse.courseId);
-                if (cloudCourse) {
-                    // Check if sections differ
-                    const localSection = localCourse.selectedSectionCrn;
-                    const cloudSection = cloudCourse.selectedSectionCrn;
-                    if (localSection !== cloudSection) {
-                        sectionsDiffer = true;
-                        break;
-                    }
-                }
-            }
-        }
+        const hasConflict = local.checksum !== cloud.checksum;
 
         return {
-            hasConflict: coursesDiffer || sectionsDiffer,
+            hasConflict,
             localData: local,
             cloudData: cloud,
-            differences: {
-                courses: coursesDiffer,
-                sections: sectionsDiffer,
-            },
         };
     }
 

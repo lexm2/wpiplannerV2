@@ -5,6 +5,15 @@
 
 This document catalogs all identified architectural issues, design problems, inefficiencies, and areas for improvement in the WPI Planner V2 codebase. Issues are organized by severity and category.
 
+## Recent Improvements (2025-11-27)
+
+**Event System Optimization** ✅
+- Reduced event types from 15 to 9 core events
+- Consolidated duplicate type definitions into single source of truth
+- Added comprehensive test coverage (50 tests)
+- Removed unused events: `sync-completed`, `sync-uploaded`, `sync-conflict-resolved`, `sync-cancelled`, `cloud-data-applied`, `provider-changed`
+- See `docs/services/sync/event-bus.md` for updated event documentation
+
 ---
 
 ## Table of Contents

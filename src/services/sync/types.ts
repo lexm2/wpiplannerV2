@@ -96,10 +96,6 @@ export interface ConflictInfo {
     hasConflict: boolean;
     localData: SyncData;
     cloudData: SyncData;
-    differences: {
-        courses: boolean;
-        sections: boolean;
-    };
 }
 
 export type ConflictResolution = 'local' | 'cloud' | 'cancel';

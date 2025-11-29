@@ -30,6 +30,7 @@ import { ThemeManager } from '../../themes/ThemeManager'
 import { DataUpdateService } from '../../services/DataUpdateService'
 import type { DataUpdateAvailableEvent } from '../../types/worker'
 import { getInlineSVG } from '../../utils/iconPaths'
+import { CourseDataCoordinator } from '../../services/CourseDataCoordinator'
 import { CloudStatusButton } from '../components/CloudStatusButton'
 import { syncManager } from '../../services/sync/SyncManager'
 import { providerRegistry } from '../../services/sync/ProviderRegistry'
@@ -68,6 +69,7 @@ export class MainController {
     private departmentSyncService: DepartmentSyncService;
     private scheduleManagementService: ScheduleManagementService;
     private dataUpdateService: DataUpdateService;
+    private courseDataCoordinator: CourseDataCoordinator;
     private cloudStatusButton: CloudStatusButton;
     private googleDriveProvider: GoogleDriveProvider;
     private conflictResolutionModal: ConflictResolutionModal;
@@ -135,7 +137,7 @@ export class MainController {
             this.conflictResolutionModal.show(conflictInfo, async (resolution) => {
                 console.log('[MainController] Conflict resolution:', resolution);
 
-                await syncManager.resolveConflict(resolution, (cloudData: SyncData) => {
+                await syncManager.resolveConflict(resolution, async (cloudData: SyncData) => {
                     // Apply cloud data to local state
                     // SyncData format matches ProfileStateManager's expected format
                     const importData = {
@@ -146,33 +148,16 @@ export class MainController {
                         schedules: cloudData.schedules,
                         preferences: cloudData.preferences || {},
                     };
-                    this.profileStateManager.importData(JSON.stringify(importData));
+                    // Await importData to ensure cloud data is saved before proceeding
+                    await this.profileStateManager.importData(JSON.stringify(importData));
+                    console.log('[MainController] Cloud data imported and saved');
                 });
             });
         });
 
-        // Listen for sync resolved to reload UI from storage when cloud data was chosen
-        syncEventBus.on('sync-resolved', async (event) => {
-            const resolution = (event.data as { resolution: string })?.resolution;
-            if (resolution === 'cloud') {
-                console.log('[MainController] Cloud data applied, reloading from storage');
-                // Reload state from storage
-                await this.profileStateManager.loadFromStorage();
-                // Reconstruct section references
-                this.courseSelectionService.reconstructSectionObjects();
-                // Log selected courses after reload
-                const selectedCourses = this.courseSelectionService.getSelectedCourses();
-                console.log('[MainController] Selected courses after reload:', selectedCourses);
-                // Full UI refresh
-                this.courseController.displaySelectedCourses();
-                this.scheduleController.displayScheduleSelectedCourses();
-                if (this.uiStateManager.currentPage === 'schedule') {
-                    this.scheduleController.renderScheduleGrids();
-                } else {
-                    this.refreshCurrentView();
-                }
-            }
-        });
+        // Note: sync-resolved listener removed - importData() already handles
+        // reloading from storage and emitting 'schedule_changed' event
+        // UI updates happen through normal event-driven flow
 
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
@@ -212,6 +197,17 @@ export class MainController {
         this.departmentController.setDepartmentSyncService(this.departmentSyncService);
         this.departmentSyncService.setFilterModalController(this.filterModalController);
 
+        // Initialize course data coordinator
+        this.courseDataCoordinator = new CourseDataCoordinator(
+            this.courseDataService,
+            this.timestampManager,
+            this.courseSelectionService,
+            this.scheduleManagementService
+        );
+
+        // Register course data consumers
+        this.registerCourseDataConsumers();
+
         // Initialize tracking for course changes
         const initialSelectedCourses = this.courseSelectionService.getSelectedCourses();
         this.previousSelectedCoursesCount = initialSelectedCourses.length;
@@ -224,6 +220,34 @@ export class MainController {
         this.initializeFilters();
         
         this.init();
+    }
+
+    /**
+     * Register all consumers that need course data
+     * Called during construction to set up data distribution
+     */
+    private registerCourseDataConsumers(): void {
+        // Register department consumers (services that need full department array)
+        this.courseDataCoordinator.registerDepartmentConsumer(
+            (depts) => this.departmentController.setAllDepartments(depts)
+        );
+        this.courseDataCoordinator.registerDepartmentConsumer(
+            (depts) => this.courseController.setAllDepartments(depts)
+        );
+        this.courseDataCoordinator.registerDepartmentConsumer(
+            (depts) => this.courseSelectionService.setAllDepartments(depts)
+        );
+
+        // Register catalog consumers (services that need catalog for indexing/search)
+        this.courseDataCoordinator.registerCatalogConsumer(
+            (depts) => this.profileStateManager.setCourseData(depts)
+        );
+        this.courseDataCoordinator.registerCatalogConsumer(
+            (depts) => this.searchService.setCourseData(depts)
+        );
+        this.courseDataCoordinator.registerCatalogConsumer(
+            (depts) => this.filterModalController.setCourseData(depts)
+        );
     }
 
     private initializeFilters(): void {
@@ -257,9 +281,6 @@ export class MainController {
         this.uiStateManager.showLoadingState();
 
         try {
-            // Clear legacy localStorage schedule data (now using IndexedDB)
-            this.clearLegacyLocalStorage();
-
             // Initialize StorageService and load persisted data
             await this.storageService.initialize();
             this._themeSelector.initializeTheme();
@@ -293,53 +314,21 @@ export class MainController {
         }
     }
 
-    /**
-     * Clears legacy localStorage keys that contain schedule data.
-     * All schedule data now stored in IndexedDB, localStorage only used for small data.
-     */
-    private clearLegacyLocalStorage(): void {
-        const keysToRemove = [
-            'wpi-planner-schedules',
-            'wpi-planner-user-state'
-        ];
-
-        keysToRemove.forEach(key => {
-            localStorage.removeItem(key);
-        });
-
-        console.log('Cleared legacy localStorage schedule keys');
-    }
-
     private async loadCourseData(): Promise<void> {
         try {
-            const scheduleDB = await this.courseDataService.loadCourseData();
-            this.allDepartments = scheduleDB.departments;
-            this.departmentController.setAllDepartments(this.allDepartments);
-            this.courseController.setAllDepartments(this.allDepartments);
-            this.courseSelectionService.setAllDepartments(this.allDepartments);
+            // Use the coordinator to load and distribute course data
+            const result = await this.courseDataCoordinator.loadAndDistribute();
 
-            // Set course catalog in ProfileStateManager for section reference resolution
-            this.profileStateManager.setCourseData(this.allDepartments);
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to load course data');
+            }
 
-            // Initialize search service with course data
-            this.searchService.setCourseData(this.allDepartments);
-
-            // Initialize filter modal with course data
-            this.filterModalController.setCourseData(this.allDepartments);
-            
-            // IMPORTANT: Reconstruct Section objects after course data is loaded
-            // This must happen after course data is loaded but service is already initialized
-            this.courseSelectionService.reconstructSectionObjects();
-            
-            // Initialize default schedule if needed (await to ensure it completes)
-            await this.scheduleManagementService.initializeDefaultScheduleIfNeeded();
-
-            this.timestampManager.updateClientTimestamp();
-            const serverTimestamp = await this.timestampManager.loadServerTimestamp();
+            // Store reference for later use
+            this.allDepartments = result.departments!;
 
             // Initialize data update service (worker will start when tab becomes unfocused)
-            if (serverTimestamp) {
-                this.dataUpdateService.updateLastLoadedTimestamp(serverTimestamp);
+            if (result.serverTimestamp) {
+                this.dataUpdateService.updateLastLoadedTimestamp(result.serverTimestamp);
             }
             this.setupDataUpdateListener();
             
