@@ -132,3 +132,40 @@ export class ChecksumCalculator {
  * Singleton instance for application-wide use
  */
 export const checksumCalculator = new ChecksumCalculator();
+
+/**
+ * Helper: Calculate checksum for SyncData object
+ *
+ * Convenient wrapper for working directly with SyncData objects.
+ *
+ * @param syncData - SyncData object to calculate checksum for
+ * @returns 64-character SHA-256 hex string
+ */
+export async function calculateSyncDataChecksum(syncData: ValidatedSyncData): Promise<string> {
+    return checksumCalculator.calculateChecksum({
+        version: syncData.version,
+        activeScheduleId: syncData.activeScheduleId,
+        schedules: syncData.schedules,
+        preferences: syncData.preferences
+    });
+}
+
+/**
+ * Helper: Verify SyncData checksum
+ *
+ * Convenient wrapper for verifying SyncData objects.
+ *
+ * @param syncData - SyncData object to verify
+ * @returns Verification result
+ */
+export async function verifySyncDataChecksum(syncData: ValidatedSyncData): Promise<ChecksumVerificationResult> {
+    return checksumCalculator.verifyChecksum(
+        {
+            version: syncData.version,
+            activeScheduleId: syncData.activeScheduleId,
+            schedules: syncData.schedules,
+            preferences: syncData.preferences
+        },
+        syncData.checksum
+    );
+}
