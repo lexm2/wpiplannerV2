@@ -172,6 +172,47 @@ export class CourseDataCoordinator {
     }
 
     /**
+     * Redistribute catalog to all registered consumers
+     *
+     * Use Cases:
+     * - After cloud sync data import
+     * - After manual data refresh
+     * - When ensuring all consumers are synchronized
+     *
+     * This method calls all registered consumers (both department and catalog)
+     * with the current in-memory department data, ensuring consistency across
+     * all services.
+     *
+     * @example
+     * ```typescript
+     * // After cloud import
+     * await profileStateManager.importData(cloudData);
+     * courseDataCoordinator.redistributeToConsumers();
+     * ```
+     */
+    redistributeToConsumers(): void {
+        if (!this.loaded) {
+            console.warn('[CourseDataCoordinator] Cannot redistribute - data not loaded yet');
+            return;
+        }
+
+        console.log('[CourseDataCoordinator] Redistributing to all consumers...');
+
+        // Distribute to department consumers
+        for (const consumer of this.departmentConsumers) {
+            consumer(this.allDepartments);
+        }
+
+        // Distribute to catalog consumers
+        for (const consumer of this.catalogConsumers) {
+            consumer(this.allDepartments);
+        }
+
+        const totalConsumers = this.departmentConsumers.length + this.catalogConsumers.length;
+        console.log(`[CourseDataCoordinator] Redistributed to ${totalConsumers} consumers`);
+    }
+
+    /**
      * Get the loaded departments
      */
     getDepartments(): Department[] {
