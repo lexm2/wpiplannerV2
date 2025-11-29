@@ -7,8 +7,9 @@ import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
 import { syncEventBus } from '../services/sync/SyncEventBus'
 import { logger } from '../utils/logger'
 import { ModalService } from '../services/ModalService'
-import type { SyncData, ScheduleData, SelectedCourseData } from '../services/sync/types'
+import type { SyncData } from '../services/sync/types'
 import { parseSyncData } from '../services/sync/schemas'
+import { ApplicationState } from '../types/ApplicationState'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -717,40 +718,22 @@ export class ProfileStateManager {
                 activeScheduleId: syncData.activeScheduleId
             });
 
-            // Convert ScheduleData (IDs) to Schedule (full objects)
-            const fullSchedules: Schedule[] = [];
-            const conversionErrors: string[] = [];
+            // Convert to ApplicationState (IDs → full objects)
+            const appState = ApplicationState.fromCloudFormat(syncData, this.allDepartments);
 
-            for (const scheduleData of syncData.schedules) {
-                try {
-                    const fullSchedule = this.convertScheduleDataToSchedule(scheduleData);
-                    fullSchedules.push(fullSchedule);
-                } catch (error) {
-                    const errorMsg = `Failed to convert schedule "${scheduleData.name}": ${error}`;
-                    console.error('[ProfileStateManager]', errorMsg);
-                    conversionErrors.push(errorMsg);
-                }
-            }
-
-            if (conversionErrors.length > 0) {
-                console.warn('[ProfileStateManager] Some courses could not be converted:', conversionErrors);
-            }
-
-            console.log('[ProfileStateManager] Converted schedules:', {
-                total: fullSchedules.length,
-                errors: conversionErrors.length,
-                schedules: fullSchedules.map(s => ({
-                    id: s.id,
-                    name: s.name,
-                    courses: s.selectedCourses.length
-                }))
+            console.log('[ProfileStateManager] Converted to ApplicationState:', {
+                scheduleCount: appState.schedules.length,
+                totalCourses: appState.schedules.reduce((sum, s) => sum + s.selectedCourses.length, 0)
             });
 
-            // Import full schedules to storage
+            // Convert to legacy Schedule objects for storage
+            const legacySchedules = appState.schedules.map(s => s.toLegacySchedule());
+
+            // Import to storage
             const result = await this.storageManager.importData(
-                fullSchedules,
-                syncData.activeScheduleId,
-                syncData.preferences as SchedulePreferences | undefined
+                legacySchedules,
+                appState.activeScheduleId,
+                appState.preferences
             );
 
             console.log('[ProfileStateManager] storageManager.importData() result:', {
@@ -788,101 +771,6 @@ export class ProfileStateManager {
                 error: error as Error
             };
         }
-    }
-
-    /**
-     * Convert ScheduleData (IDs only) to Schedule (full objects)
-     *
-     * @param scheduleData - Schedule data with course IDs
-     * @returns Full Schedule with resolved Course and Section objects
-     */
-    private convertScheduleDataToSchedule(scheduleData: ScheduleData): Schedule {
-        const selectedCourses: SelectedCourse[] = [];
-
-        for (const courseData of scheduleData.selectedCourses) {
-            const selectedCourse = this.convertSelectedCourseData(courseData);
-            selectedCourses.push(selectedCourse);
-        }
-
-        return {
-            id: scheduleData.id,
-            name: scheduleData.name,
-            selectedCourses,
-            generatedSchedules: [],
-            timestamp: scheduleData.timestamp || Date.now()
-        };
-    }
-
-    /**
-     * Convert SelectedCourseData (IDs) to SelectedCourse (full objects)
-     *
-     * @param courseData - Course data with IDs
-     * @returns Full SelectedCourse with resolved references
-     * @throws Error if course or section not found
-     */
-    private convertSelectedCourseData(courseData: SelectedCourseData): SelectedCourse {
-        // Find course by ID
-        const course = this.findCourseById(courseData.courseId);
-        if (!course) {
-            throw new Error(
-                `Course ${courseData.courseId} not found in catalog. ` +
-                `The course may have been removed or the catalog needs updating.`
-            );
-        }
-
-        // Resolve section if CRN provided
-        let section: Section | null = null;
-        if (courseData.selectedSectionCrn) {
-            section = this.findSectionByCRN(course, courseData.selectedSectionCrn);
-            if (!section) {
-                throw new Error(
-                    `Section CRN ${courseData.selectedSectionCrn} not found for course ${courseData.courseId}. ` +
-                    `The section may no longer be offered.`
-                );
-            }
-        }
-
-        // Handle locked sections
-        const lockedSections = courseData.lockedSectionCrn
-            ? new Set([courseData.lockedSectionCrn])
-            : new Set<string>();
-
-        return {
-            course,
-            selectedLecture: null,
-            selectedDiscussion: null,
-            selectedLab: null,
-            selectedSection: section,
-            selectedSectionNumber: section?.number || null,
-            isRequired: courseData.isRequired,
-            lockedSections
-        };
-    }
-
-    /**
-     * Find course by ID in all departments
-     *
-     * @param courseId - Course ID to find
-     * @returns Course object or null
-     */
-    private findCourseById(courseId: string): Course | null {
-        for (const dept of this.allDepartments) {
-            const course = dept.courses.find(c => c.id === courseId);
-            if (course) return course;
-        }
-        return null;
-    }
-
-    /**
-     * Find section by CRN in course
-     *
-     * @param course - Course to search
-     * @param crn - Section CRN
-     * @returns Section object or null
-     */
-    private findSectionByCRN(course: Course, crn: string): Section | null {
-        const allSections = getAllSections(course);
-        return allSections.find(s => s.crn.toString() === crn) || null;
     }
 
     // Health check
