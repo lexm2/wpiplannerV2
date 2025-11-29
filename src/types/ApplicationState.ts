@@ -189,4 +189,122 @@ export class ApplicationState {
             Date.now()
         );
     }
+
+    // =========================================================================
+    // Schedule Query Methods
+    // =========================================================================
+
+    /**
+     * Get total number of schedules
+     *
+     * @returns Schedule count
+     */
+    getScheduleCount(): number {
+        return this.schedules.length;
+    }
+
+    /**
+     * Check if schedule exists
+     *
+     * @param scheduleId - Schedule ID to check
+     * @returns True if schedule exists
+     */
+    hasSchedule(scheduleId: string): boolean {
+        return this.schedules.some(s => s.id === scheduleId);
+    }
+
+    /**
+     * Find schedule by name
+     *
+     * @param name - Schedule name to find
+     * @returns Schedule or null if not found
+     */
+    findScheduleByName(name: string): ScheduleState | null {
+        return this.schedules.find(s => s.name === name) || null;
+    }
+
+    /**
+     * Get all schedule names
+     *
+     * @returns Array of schedule names
+     */
+    getAllScheduleNames(): string[]  {
+        return this.schedules.map(s => s.name);
+    }
+
+    // =========================================================================
+    // Validation & Naming Utilities
+    // =========================================================================
+
+    /**
+     * Check if a schedule name is unique
+     *
+     * @param name - Name to check
+     * @param excludeId - Optional schedule ID to exclude from check (for renames)
+     * @returns True if name is unique
+     */
+    hasUniqueScheduleName(name: string, excludeId?: string): boolean {
+        return !this.schedules.some(s => s.name === name && s.id !== excludeId);
+    }
+
+    /**
+     * Generate a unique schedule name by appending numbers
+     *
+     * @param baseName - Base name to start with
+     * @returns Unique name (e.g., "My Schedule (1)" if "My Schedule" exists)
+     */
+    generateUniqueScheduleName(baseName: string): string {
+        if (this.hasUniqueScheduleName(baseName)) {
+            return baseName;
+        }
+
+        let counter = 1;
+        let candidateName: string;
+        do {
+            candidateName = `${baseName} (${counter})`;
+            counter++;
+        } while (!this.hasUniqueScheduleName(candidateName));
+
+        return candidateName;
+    }
+
+    // =========================================================================
+    // Statistics & Analytics
+    // =========================================================================
+
+    /**
+     * Get total number of courses across all schedules
+     *
+     * @returns Total course count
+     */
+    getTotalCourseCount(): number {
+        return this.schedules.reduce((sum, schedule) => sum + schedule.getCourseCount(), 0);
+    }
+
+    /**
+     * Get schedules sorted by name (alphabetically)
+     *
+     * @returns Sorted array of schedules
+     */
+    getSchedulesSortedByName(): ScheduleState[] {
+        return [...this.schedules].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    /**
+     * Get schedules sorted by timestamp (most recent first)
+     *
+     * @returns Sorted array of schedules
+     */
+    getSchedulesSortedByTimestamp(): ScheduleState[] {
+        return [...this.schedules].sort((a, b) => b.timestamp - a.timestamp);
+    }
+
+    /**
+     * Get schedules that are empty (no courses)
+     *
+     * @returns Array of empty schedules
+     */
+    getEmptySchedules(): ScheduleState[] {
+        return this.schedules.filter(s => s.isEmpty());
+    }
 }
