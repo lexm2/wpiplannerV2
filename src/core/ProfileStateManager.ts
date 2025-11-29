@@ -7,6 +7,8 @@ import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
 import { syncEventBus } from '../services/sync/SyncEventBus'
 import { logger } from '../utils/logger'
 import { ModalService } from '../services/ModalService'
+import type { SyncData, ScheduleData, SelectedCourseData } from '../services/sync/types'
+import { parseSyncData } from '../services/sync/schemas'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -566,15 +568,25 @@ export class ProfileStateManager {
     }
 
     async loadFromStorage(): Promise<boolean> {
+        console.log('[ProfileStateManager] 🔵 loadFromStorage() called');
+        console.log('[ProfileStateManager] 🔵 Current state before load:', {
+            scheduleCount: this.state.schedules.length,
+            activeScheduleId: this.state.activeScheduleId,
+            isLoading: this.state.isLoading,
+            currentSchedules: this.state.schedules.map(s => ({ id: s.id, name: s.name }))
+        });
+
         // Prevent concurrent calls - if already loading, skip this call
         if (this.isLoadingFlag) {
             logger.log('[SKIP] Already loading from storage, skipping duplicate call');
+            console.log('[ProfileStateManager] 🔵 SKIPPED: Already loading');
             return false;
         }
 
         // Skip if already loaded with schedules (redundant call prevention)
         if (this.state.schedules.length > 0 && !this.state.isLoading) {
             logger.log('[SKIP] Already loaded with schedules, skipping redundant call');
+            console.log('[ProfileStateManager] 🔵 SKIPPED: Already has schedules');
             return true;
         }
 
@@ -591,7 +603,14 @@ export class ProfileStateManager {
             }
 
             // Load all schedules
+            console.log('[ProfileStateManager] 🔵 Loading schedules from IndexedDB...');
             const schedulesResult = await this.storageManager.loadAllSchedules();
+            console.log('[ProfileStateManager] 🔵 loadAllSchedules() returned:', {
+                valid: schedulesResult.valid,
+                scheduleCount: schedulesResult.data?.length || 0,
+                schedules: schedulesResult.data?.map(s => ({ id: s.id, name: s.name, courses: s.selectedCourses.length })) || []
+            });
+
             if (schedulesResult.valid && schedulesResult.data) {
                 this.state.schedules = schedulesResult.data;
 
@@ -677,14 +696,193 @@ export class ProfileStateManager {
         return exportResult.valid ? exportResult.data : null;
     }
 
+    /**
+     * Import cloud data and convert to full Schedule objects
+     *
+     * This is the conversion boundary between cloud sync (IDs only) and
+     * application state (full objects).
+     *
+     * @param jsonData - JSON string containing SyncData (with SelectedCourseData)
+     */
     async importData(jsonData: string): Promise<TransactionResult> {
-        const result = await this.storageManager.importData(jsonData);
-        if (result.success) {
-            // Reload state from storage after successful import
-            await this.loadFromStorage();
-            this.emitEvent('schedule_changed', { action: 'imported' }, 'system');
+        console.log('[ProfileStateManager] importData() called');
+
+        try {
+            // Parse and validate as SyncData (with IDs only)
+            const syncData: SyncData = parseSyncData(JSON.parse(jsonData), 'ProfileStateManager.importData');
+
+            console.log('[ProfileStateManager] Validated SyncData:', {
+                version: syncData.version,
+                scheduleCount: syncData.schedules.length,
+                activeScheduleId: syncData.activeScheduleId
+            });
+
+            // Convert ScheduleData (IDs) to Schedule (full objects)
+            const fullSchedules: Schedule[] = [];
+            const conversionErrors: string[] = [];
+
+            for (const scheduleData of syncData.schedules) {
+                try {
+                    const fullSchedule = this.convertScheduleDataToSchedule(scheduleData);
+                    fullSchedules.push(fullSchedule);
+                } catch (error) {
+                    const errorMsg = `Failed to convert schedule "${scheduleData.name}": ${error}`;
+                    console.error('[ProfileStateManager]', errorMsg);
+                    conversionErrors.push(errorMsg);
+                }
+            }
+
+            if (conversionErrors.length > 0) {
+                console.warn('[ProfileStateManager] Some courses could not be converted:', conversionErrors);
+            }
+
+            console.log('[ProfileStateManager] Converted schedules:', {
+                total: fullSchedules.length,
+                errors: conversionErrors.length,
+                schedules: fullSchedules.map(s => ({
+                    id: s.id,
+                    name: s.name,
+                    courses: s.selectedCourses.length
+                }))
+            });
+
+            // Import full schedules to storage
+            const result = await this.storageManager.importData(
+                fullSchedules,
+                syncData.activeScheduleId,
+                syncData.preferences as SchedulePreferences | undefined
+            );
+
+            console.log('[ProfileStateManager] storageManager.importData() result:', {
+                success: result.success,
+                error: result.error
+            });
+
+            if (result.success) {
+                console.log('[ProfileStateManager] Import successful, reloading...');
+
+                // Clear in-memory state to force reload
+                this.state.schedules = [];
+                this.state.selectedCourses = [];
+                this.state.activeScheduleId = null;
+
+                // Reload from storage
+                await this.loadFromStorage();
+
+                console.log('[ProfileStateManager] ✓ State reloaded after import:', {
+                    scheduleCount: this.state.schedules.length,
+                    activeScheduleId: this.state.activeScheduleId
+                });
+
+                this.emitEvent('schedule_changed', { action: 'imported' }, 'system');
+            } else {
+                console.error('[ProfileStateManager] ❌ Import failed:', result.error);
+            }
+
+            return result;
+        } catch (error) {
+            console.error('[ProfileStateManager] ❌ importData() failed:', error);
+            return {
+                success: false,
+                transactionId: `import-${Date.now()}`,
+                error: error as Error
+            };
         }
-        return result;
+    }
+
+    /**
+     * Convert ScheduleData (IDs only) to Schedule (full objects)
+     *
+     * @param scheduleData - Schedule data with course IDs
+     * @returns Full Schedule with resolved Course and Section objects
+     */
+    private convertScheduleDataToSchedule(scheduleData: ScheduleData): Schedule {
+        const selectedCourses: SelectedCourse[] = [];
+
+        for (const courseData of scheduleData.selectedCourses) {
+            const selectedCourse = this.convertSelectedCourseData(courseData);
+            selectedCourses.push(selectedCourse);
+        }
+
+        return {
+            id: scheduleData.id,
+            name: scheduleData.name,
+            selectedCourses,
+            generatedSchedules: [],
+            timestamp: scheduleData.timestamp || Date.now()
+        };
+    }
+
+    /**
+     * Convert SelectedCourseData (IDs) to SelectedCourse (full objects)
+     *
+     * @param courseData - Course data with IDs
+     * @returns Full SelectedCourse with resolved references
+     * @throws Error if course or section not found
+     */
+    private convertSelectedCourseData(courseData: SelectedCourseData): SelectedCourse {
+        // Find course by ID
+        const course = this.findCourseById(courseData.courseId);
+        if (!course) {
+            throw new Error(
+                `Course ${courseData.courseId} not found in catalog. ` +
+                `The course may have been removed or the catalog needs updating.`
+            );
+        }
+
+        // Resolve section if CRN provided
+        let section: Section | null = null;
+        if (courseData.selectedSectionCrn) {
+            section = this.findSectionByCRN(course, courseData.selectedSectionCrn);
+            if (!section) {
+                throw new Error(
+                    `Section CRN ${courseData.selectedSectionCrn} not found for course ${courseData.courseId}. ` +
+                    `The section may no longer be offered.`
+                );
+            }
+        }
+
+        // Handle locked sections
+        const lockedSections = courseData.lockedSectionCrn
+            ? new Set([courseData.lockedSectionCrn])
+            : new Set<string>();
+
+        return {
+            course,
+            selectedLecture: null,
+            selectedDiscussion: null,
+            selectedLab: null,
+            selectedSection: section,
+            selectedSectionNumber: section?.number || null,
+            isRequired: courseData.isRequired,
+            lockedSections
+        };
+    }
+
+    /**
+     * Find course by ID in all departments
+     *
+     * @param courseId - Course ID to find
+     * @returns Course object or null
+     */
+    private findCourseById(courseId: string): Course | null {
+        for (const dept of this.allDepartments) {
+            const course = dept.courses.find(c => c.id === courseId);
+            if (course) return course;
+        }
+        return null;
+    }
+
+    /**
+     * Find section by CRN in course
+     *
+     * @param course - Course to search
+     * @param crn - Section CRN
+     * @returns Section object or null
+     */
+    private findSectionByCRN(course: Course, crn: string): Section | null {
+        const allSections = getAllSections(course);
+        return allSections.find(s => s.crn.toString() === crn) || null;
     }
 
     // Health check
