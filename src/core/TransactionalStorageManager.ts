@@ -4,6 +4,8 @@
 import { Schedule, UserScheduleState, SchedulePreferences } from '../types/schedule'
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
 import { createJSONReplacer, createJSONReviver } from '../utils/jsonSerializer'
+import type { SyncData, ScheduleData, SelectedCourseData } from '../services/sync/types'
+import { checksumCalculator } from '../services/sync/checksum'
 
 export interface StorageTransaction {
     id: string;
@@ -253,32 +255,64 @@ export class TransactionalStorageManager {
 
     async exportData(): Promise<{ data: string | null; valid: boolean; error?: string }> {
         try {
-            const state = this.loadUserState().data;
             const schedulesResult = await this.loadAllSchedules();
-            const schedules = schedulesResult.data ?? [];
+            const fullSchedules = schedulesResult.data ?? [];
             const preferences = this.loadPreferences().data;
+            const activeScheduleIdResult = this.loadActiveScheduleId();
+            const activeScheduleId = activeScheduleIdResult.data;
 
-            const exportData = {
+            // Convert full Schedule objects to ScheduleData (IDs only)
+            const schedules: ScheduleData[] = fullSchedules.map(schedule => ({
+                id: schedule.id,
+                name: schedule.name,
+                selectedCourses: schedule.selectedCourses.map(selectedCourse => {
+                    const courseData: SelectedCourseData = {
+                        courseId: selectedCourse.course.id,
+                        selectedSectionCrn: selectedCourse.selectedSection?.crn.toString(),
+                        lockedSectionCrn: selectedCourse.lockedSections.size > 0
+                            ? Array.from(selectedCourse.lockedSections)[0]
+                            : undefined,
+                        isRequired: selectedCourse.isRequired,
+                        timestamp: Date.now()
+                    };
+                    return courseData;
+                }),
+                timestamp: schedule.timestamp
+            }));
+
+            // Build SyncData structure
+            const syncData: SyncData = {
                 version: '3.0',
-                timestamp: new Date().toISOString(),
+                timestamp: Date.now(),
                 checksum: '',
-                state,
+                activeScheduleId,
                 schedules,
                 preferences
             };
 
-            const dataString = this.safeStringify({
-                state: exportData.state,
-                schedules: exportData.schedules,
-                preferences: exportData.preferences
+            // Calculate checksum using unified calculator
+            syncData.checksum = await checksumCalculator.calculateChecksum({
+                version: syncData.version,
+                activeScheduleId: syncData.activeScheduleId,
+                schedules: syncData.schedules,
+                preferences: syncData.preferences
             });
-            exportData.checksum = await this.generateChecksum(dataString);
+
+            console.log('[TransactionalStorageManager] Exported SyncData:', {
+                version: syncData.version,
+                timestamp: syncData.timestamp,
+                checksum: syncData.checksum.substring(0, 16) + '...',
+                activeScheduleId: syncData.activeScheduleId,
+                scheduleCount: syncData.schedules.length,
+                totalCourses: syncData.schedules.reduce((sum, s) => sum + s.selectedCourses.length, 0)
+            });
 
             return {
-                data: JSON.stringify(exportData, this.replacer, 2),
+                data: JSON.stringify(syncData, this.replacer, 2),
                 valid: true
             };
         } catch (error) {
+            console.error('[TransactionalStorageManager] Export failed:', error);
             return {
                 data: null,
                 valid: false,
@@ -287,41 +321,62 @@ export class TransactionalStorageManager {
         }
     }
 
-    async importData(jsonData: string): Promise<TransactionResult> {
+    /**
+     * Import data with full Schedule objects (not IDs)
+     *
+     * NOTE: This method expects full Schedule objects with Course/Section references.
+     * The caller (ProfileStateManager) is responsible for converting from SyncData
+     * (IDs only) to full objects before calling this method.
+     *
+     * @param schedules - Full Schedule objects to import
+     * @param activeScheduleId - ID of active schedule
+     * @param preferences - Optional preferences
+     */
+    async importData(
+        schedules: Schedule[],
+        activeScheduleId: string | null,
+        preferences?: SchedulePreferences
+    ): Promise<TransactionResult> {
         try {
-            const data = JSON.parse(jsonData, this.reviver);
+            console.log('[TransactionalStorageManager] importData() called');
+            console.log('[TransactionalStorageManager]   Schedules:', schedules.length);
+            console.log('[TransactionalStorageManager]   ActiveScheduleId:', activeScheduleId);
+            console.log('[TransactionalStorageManager]   Preferences:', !!preferences);
 
-            if (data.checksum) {
-                const verifyData = {
-                    state: data.state,
-                    schedules: data.schedules,
-                    preferences: data.preferences
-                };
-                const calculatedChecksum = await this.generateChecksum(this.safeStringify(verifyData));
-                if (calculatedChecksum !== data.checksum) {
-                    throw new Error('Data integrity check failed - checksum mismatch');
-                }
+            // Save preferences if provided
+            if (preferences) {
+                localStorage.setItem(
+                    TransactionalStorageManager.STORAGE_KEYS.PREFERENCES,
+                    this.safeStringify(preferences)
+                );
+                console.log('[TransactionalStorageManager] ✓ Saved preferences');
             }
 
-            if (data.state) {
-                localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.USER_STATE, this.safeStringify(data.state));
-            }
-            if (data.preferences) {
-                localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.PREFERENCES, this.safeStringify(data.preferences));
-            }
-            if (data.schedules) {
-                // Import schedules to IndexedDB (await each save)
+            // Save schedules to IndexedDB
+            if (schedules.length > 0) {
                 await this.ensureInitialized();
-                for (const schedule of data.schedules) {
+                console.log('[TransactionalStorageManager] Saving', schedules.length, 'schedules...');
+                for (const schedule of schedules) {
+                    console.log('[TransactionalStorageManager]   → Saving:', schedule.id, schedule.name);
                     await this.saveSchedule(schedule);
                 }
+                console.log('[TransactionalStorageManager] ✓ All schedules saved');
             }
+
+            // Save active schedule ID
+            if (activeScheduleId !== undefined) {
+                this.saveActiveScheduleId(activeScheduleId);
+                console.log('[TransactionalStorageManager] ✓ Saved activeScheduleId:', activeScheduleId);
+            }
+
+            console.log('[TransactionalStorageManager] ✓ Import completed successfully');
 
             return {
                 success: true,
                 transactionId: `import-${Date.now()}`
             };
         } catch (error) {
+            console.error('[TransactionalStorageManager] ❌ importData() failed:', error);
             return {
                 success: false,
                 transactionId: `import-${Date.now()}`,
