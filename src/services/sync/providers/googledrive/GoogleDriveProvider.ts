@@ -1,6 +1,9 @@
 import { GOOGLE_DRIVE_CONFIG } from '../../../../config/googledrive.config';
 import type { CloudProvider, SyncData } from '../../types';
 import { syncEventBus } from '../../SyncEventBus';
+import { parseSyncData } from '../../schemas';
+import { checksumCalculator } from '../../checksum';
+import { createValidationLogger } from '../../validation-logger';
 
 declare const google: any;
 declare const gapi: any;
@@ -100,10 +103,36 @@ export class GoogleDriveProvider implements CloudProvider {
             throw new Error('Google API client not loaded');
         }
 
-        const enrichedData = this.enrichWithMetadata(data);
-        console.log('[GoogleDriveProvider] Pushing data to cloud:', enrichedData);
-        await this.uploadToGoogleDrive(enrichedData);
-        console.log('[GoogleDriveProvider] Data pushed to cloud');
+        const logger = createValidationLogger('GoogleDriveProvider', 'push');
+        logger.logStart();
+
+        try {
+            // Validate data before push
+            const validated = parseSyncData(data, 'GoogleDriveProvider.pushData');
+
+            // Update timestamp and recalculate checksum
+            validated.timestamp = Date.now();
+            validated.checksum = await checksumCalculator.calculateChecksum({
+                version: validated.version,
+                activeScheduleId: validated.activeScheduleId,
+                schedules: validated.schedules,
+                preferences: validated.preferences
+            });
+
+            console.log('[GoogleDriveProvider] Pushing data to cloud:', {
+                version: validated.version,
+                timestamp: validated.timestamp,
+                checksum: validated.checksum.substring(0, 16) + '...',
+                scheduleCount: validated.schedules.length
+            });
+
+            await this.uploadToGoogleDrive(validated);
+            logger.logSuccess({ schedules: validated.schedules.length });
+            console.log('[GoogleDriveProvider] Data pushed to cloud');
+        } catch (error) {
+            logger.logFailure(error as Error);
+            throw error;
+        }
     }
 
     async pullData(): Promise<SyncData | null> {
@@ -115,8 +144,59 @@ export class GoogleDriveProvider implements CloudProvider {
             throw new Error('Google API client not loaded');
         }
 
-        const data = await this.getCloudData();
-        return data;
+        const logger = createValidationLogger('GoogleDriveProvider', 'pull');
+        logger.logStart();
+
+        try {
+            const rawData = await this.getCloudData();
+
+            if (!rawData) {
+                logger.logInfo('No cloud data found');
+                return null;
+            }
+
+            // Validate data from cloud
+            const validated = parseSyncData(rawData, 'GoogleDriveProvider.pullData');
+
+            // Verify checksum
+            const verification = await checksumCalculator.verifyChecksum(
+                {
+                    version: validated.version,
+                    activeScheduleId: validated.activeScheduleId,
+                    schedules: validated.schedules,
+                    preferences: validated.preferences
+                },
+                validated.checksum
+            );
+
+            if (!verification.valid) {
+                if (verification.error === 'INVALID_FORMAT') {
+                    logger.logWarning('Checksum format invalid, data may be from old version', {
+                        checksum: validated.checksum,
+                        length: validated.checksum.length
+                    });
+                } else {
+                    logger.logChecksumError(
+                        verification.expected!,
+                        verification.calculated,
+                        verification.error
+                    );
+                    throw new Error(verification.message);
+                }
+            } else {
+                logger.logInfo('Checksum verified');
+            }
+
+            logger.logSuccess({
+                version: validated.version,
+                schedules: validated.schedules.length
+            });
+
+            return validated;
+        } catch (error) {
+            logger.logFailure(error as Error);
+            throw error;
+        }
     }
 
     // =========================================================================
@@ -269,40 +349,6 @@ export class GoogleDriveProvider implements CloudProvider {
         return files && files.length > 0 ? files[0].id : null;
     }
 
-    private enrichWithMetadata(data: SyncData): SyncData {
-        return {
-            ...data,
-            timestamp: Date.now(),
-            checksum: this.computeChecksum(data),
-        };
-    }
-
-    private computeChecksum(data: SyncData): string {
-        // Hash the actual data structure: schedules with their selected courses and components
-        const content = {
-            activeScheduleId: data.activeScheduleId,
-            schedules: data.schedules.map(schedule => ({
-                id: schedule.id,
-                name: schedule.name,
-                selectedCourses: schedule.selectedCourses.map(course => ({
-                    courseId: course.courseId,
-                    selectedSectionCrn: course.selectedSectionCrn,
-                    lockedSectionCrn: course.lockedSectionCrn,
-                    isRequired: course.isRequired,
-                    timestamp: course.timestamp,
-                })),
-            })),
-            preferences: data.preferences,
-        };
-        const str = JSON.stringify(content);
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-        return Math.abs(hash).toString(16).padStart(8, '0');
-    }
 
     private getOrCreateDeviceId(): string {
         const key = 'wpi-planner-device-id';
