@@ -1,22 +1,27 @@
 import { z } from 'zod';
+import type { SyncData, ScheduleData, SelectedCourseData } from './types';
 
 /**
  * Cloud Sync Validation Schemas
  *
- * These Zod schemas provide runtime validation for all cloud sync data.
- * They ensure type safety at the boundaries between cloud storage and application logic.
+ * These Zod schemas provide runtime validation for cloud sync data types.
+ * They validate the types defined in types.ts, ensuring type safety at runtime.
+ *
+ * IMPORTANT: These schemas validate the existing types from types.ts.
+ * Do NOT create duplicate type definitions - use the schemas to validate
+ * the canonical types defined in types.ts.
  *
  * Validation occurs at:
  * 1. Provider Pull - When downloading from cloud
- * 2. Before Import - Before writing to local storage
- * 3. After Export - Before uploading to cloud
+ * 2. Before Push - Before uploading to cloud
+ * 3. Import/Export - At the conversion boundary
  */
 
 /**
- * SelectedCourseData Schema (Cloud Format)
+ * SelectedCourseData Schema
  *
- * Minimal representation storing only IDs and CRNs.
- * This is what gets synced to cloud storage.
+ * Validates types.SelectedCourseData - minimal representation with IDs only.
+ * This is the format used throughout the entire cloud sync system.
  */
 export const SelectedCourseDataSchema = z.object({
     courseId: z.string().min(1, 'Course ID required'),
@@ -24,29 +29,31 @@ export const SelectedCourseDataSchema = z.object({
     lockedSectionCrn: z.string().optional(),
     isRequired: z.boolean(),
     timestamp: z.number().optional(),
-});
+}) satisfies z.ZodType<SelectedCourseData>;
 
 /**
- * ScheduleData Schema (Cloud Format)
+ * ScheduleData Schema
  *
- * Represents a single schedule with minimal course data.
+ * Validates types.ScheduleData - a schedule with minimal course data (IDs only).
  */
 export const ScheduleDataSchema = z.object({
     id: z.string().min(1, 'Schedule ID required'),
     name: z.string().min(1, 'Schedule name required'),
     selectedCourses: z.array(SelectedCourseDataSchema),
     timestamp: z.number().optional(),
-});
+}) satisfies z.ZodType<ScheduleData>;
 
 /**
- * SyncData Schema (Cloud Format)
+ * SyncData Schema
  *
- * Complete sync data structure with strict validation:
+ * Validates types.SyncData - complete sync data structure.
+ *
+ * Strict validation rules:
  * - version: Must be a string (e.g., "3.0")
  * - timestamp: Must be a number (milliseconds since epoch)
  * - checksum: Must be 64-character SHA-256 hex string
  * - activeScheduleId: Schedule ID or null
- * - schedules: Array of schedule data
+ * - schedules: Array of schedule data (with IDs only)
  * - preferences: Optional user preferences (unknown type)
  */
 export const SyncDataSchema = z.object({
@@ -56,17 +63,7 @@ export const SyncDataSchema = z.object({
     activeScheduleId: z.string().nullable(),
     schedules: z.array(ScheduleDataSchema),
     preferences: z.unknown().optional(),
-});
-
-/**
- * Type Inference from Schemas
- *
- * These types are inferred from the Zod schemas, ensuring perfect alignment
- * between runtime validation and compile-time types.
- */
-export type ValidatedSyncData = z.infer<typeof SyncDataSchema>;
-export type ValidatedScheduleData = z.infer<typeof ScheduleDataSchema>;
-export type ValidatedSelectedCourseData = z.infer<typeof SelectedCourseDataSchema>;
+}) satisfies z.ZodType<SyncData>;
 
 /**
  * Validation Error Type
@@ -79,8 +76,9 @@ export type ValidationError = z.ZodError;
  * Helper: Safe Parse with Logging
  *
  * Wraps Zod parse with detailed logging for debugging.
+ * Returns the validated SyncData from types.ts.
  */
-export function parseSyncData(data: unknown, source: string): ValidatedSyncData {
+export function parseSyncData(data: unknown, source: string): SyncData {
     console.log(`[Validation] Validating SyncData from ${source}...`);
 
     try {
@@ -110,9 +108,10 @@ export function parseSyncData(data: unknown, source: string): ValidatedSyncData 
  * Helper: Safe Parse (No Throw)
  *
  * Returns success/failure result instead of throwing.
+ * Returns the validated SyncData from types.ts on success.
  */
 export function safeParseSyncData(data: unknown):
-    { success: true; data: ValidatedSyncData } |
+    { success: true; data: SyncData } |
     { success: false; error: ValidationError } {
     const result = SyncDataSchema.safeParse(data);
     return result;
