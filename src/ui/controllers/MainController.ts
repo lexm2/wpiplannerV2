@@ -450,24 +450,14 @@ export class MainController {
                                 }];
                             }
 
-                            // Calculate proper checksum for cloud data using the same method as TransactionalStorageManager
-                            // The checksum is based on state, schedules, and preferences (not version/timestamp)
-                            const { createJSONReplacer } = await import('../../utils/jsonSerializer');
-                            const cloudVerifyData: any = {
+                            // Calculate proper checksum using checksumCalculator
+                            const { checksumCalculator } = await import('../../services/sync/checksum');
+                            const calculatedCloudChecksum = await checksumCalculator.calculateChecksum({
+                                version: cloudData.version,
+                                activeScheduleId: cloudData.activeScheduleId,
                                 schedules: cloudData.schedules,
                                 preferences: cloudData.preferences
-                            };
-                            // Only include state if it exists (undefined gets omitted by JSON.stringify)
-                            if (cloudData.state !== undefined && cloudData.state !== null) {
-                                cloudVerifyData.state = cloudData.state;
-                            }
-                            const cloudDataString = JSON.stringify(cloudVerifyData, createJSONReplacer());
-                            console.log('[DebugCloudSync] Stringified cloud data for checksum:', cloudDataString.substring(0, 500) + '...');
-                            const encoder = new TextEncoder();
-                            const dataBuffer = encoder.encode(cloudDataString);
-                            const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-                            const hashArray = Array.from(new Uint8Array(hashBuffer));
-                            const calculatedCloudChecksum = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                            });
                             cloudData.checksum = calculatedCloudChecksum;
 
                             console.log('[DebugCloudSync] Calculated cloud checksum:', calculatedCloudChecksum);
