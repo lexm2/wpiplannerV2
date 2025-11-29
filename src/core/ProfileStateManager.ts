@@ -362,7 +362,10 @@ export class ProfileStateManager {
             if (scheduleIndex < 0) return false;
 
             // Don't allow deleting if it's the only schedule
-            if (this.state.schedules.length <= 1) return false;
+            if (this.state.schedules.length <= 1) {
+                logger.warn('Cannot delete the only remaining schedule');
+                return false;
+            }
 
             const deletedSchedule = this.state.schedules[scheduleIndex];
             this.state.schedules.splice(scheduleIndex, 1);
@@ -722,8 +725,8 @@ export class ProfileStateManager {
             const appState = ApplicationState.fromCloudFormat(syncData, this.allDepartments);
 
             console.log('[ProfileStateManager] Converted to ApplicationState:', {
-                scheduleCount: appState.schedules.length,
-                totalCourses: appState.schedules.reduce((sum, s) => sum + s.selectedCourses.length, 0)
+                scheduleCount: appState.getScheduleCount(),
+                totalCourses: appState.getTotalCourseCount()
             });
 
             // Convert to legacy Schedule objects for storage
@@ -978,11 +981,18 @@ export class ProfileStateManager {
     debugState(): void {
         logger.log('=== PROFILE STATE DEBUG ===');
         logger.log('Active Schedule ID:', this.state.activeScheduleId);
-        logger.log('Schedules:', this.state.schedules.map(s => ({
+
+        // Convert to ScheduleState for debugging with utility methods
+        const scheduleStates = this.state.schedules.map(s => ({
             id: s.id,
             name: s.name,
-            courseCount: s.selectedCourses.length
-        })));
+            courseCount: s.selectedCourses.length,
+            isEmpty: s.selectedCourses.length === 0,
+            requiredCount: s.selectedCourses.filter(sc => sc.isRequired).length,
+            electiveCount: s.selectedCourses.filter(sc => !sc.isRequired).length
+        }));
+
+        logger.log('Schedules:', scheduleStates);
         logger.log('Selected Courses:', this.state.selectedCourses.length);
         logger.log('Has Unsaved Changes:', this.state.hasUnsavedChanges);
         logger.log('Last Saved:', new Date(this.state.lastSaved).toISOString());

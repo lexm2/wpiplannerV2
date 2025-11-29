@@ -3,6 +3,7 @@ import type { SchedulePreferences } from './schedule';
 import type { SyncData } from '../services/sync/types';
 import { ScheduleState } from './ScheduleState';
 import { checksumCalculator } from '../services/sync/checksum';
+import LZString from 'lz-string';
 
 /**
  * Application-level state containing multiple schedules and preferences
@@ -306,5 +307,77 @@ export class ApplicationState {
      */
     getEmptySchedules(): ScheduleState[] {
         return this.schedules.filter(s => s.isEmpty());
+    }
+
+    // =========================================================================
+    // Compression & Storage Optimization
+    // =========================================================================
+
+    /**
+     * Serialize to compressed JSON string for efficient storage
+     *
+     * Uses LZ-String compression to reduce storage size by ~70%
+     *
+     * @returns Compressed string suitable for IndexedDB storage
+     */
+    toCompressedJSON(): string {
+        const syncData = this.toCloudFormat();
+        const json = JSON.stringify(syncData);
+        return LZString.compress(json);
+    }
+
+    /**
+     * Serialize to compressed JSON string with checksum
+     *
+     * @returns Compressed string with checksum included
+     */
+    async toCompressedJSONWithChecksum(): Promise<string> {
+        const syncData = await this.toCloudFormatWithChecksum();
+        const json = JSON.stringify(syncData);
+        return LZString.compress(json);
+    }
+
+    /**
+     * Deserialize from compressed JSON string
+     *
+     * Handles both compressed and uncompressed formats for backward compatibility
+     *
+     * @param compressedData - Compressed or uncompressed JSON string
+     * @param courseCatalog - Department catalog for hydration
+     * @returns ApplicationState instance
+     */
+    static fromCompressedJSON(
+        compressedData: string,
+        courseCatalog: Department[]
+    ): ApplicationState {
+        // Try to decompress (will return null if not LZ-compressed)
+        const decompressed = LZString.decompress(compressedData);
+
+        // If decompression returns null, assume it's uncompressed JSON
+        const json = decompressed || compressedData;
+
+        const syncData: SyncData = JSON.parse(json);
+        return ApplicationState.fromCloudFormat(syncData, courseCatalog);
+    }
+
+    /**
+     * Calculate compression ratio for monitoring
+     *
+     * @returns Object with original size, compressed size, and ratio
+     */
+    getCompressionStats(): { originalBytes: number; compressedBytes: number; ratio: number } {
+        const syncData = this.toCloudFormat();
+        const json = JSON.stringify(syncData);
+        const compressed = LZString.compress(json);
+
+        const originalBytes = new Blob([json]).size;
+        const compressedBytes = new Blob([compressed]).size;
+        const ratio = compressedBytes / originalBytes;
+
+        return {
+            originalBytes,
+            compressedBytes,
+            ratio
+        };
     }
 }
