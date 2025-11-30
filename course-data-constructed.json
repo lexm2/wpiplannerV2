@@ -1,5 +1,5 @@
 {
-  "generated": "Nov 30, 2025, 6:46 PM",
+  "generated": "Nov 30, 2025, 7:12 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -35939,7 +35939,7 @@
                 "crn": 353526,
                 "number": "S03 - AT: Cannabis Chemistry",
                 "seats": 30,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
@@ -35958,7 +35958,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "S03 - AT: Cannabis Chemistry",
