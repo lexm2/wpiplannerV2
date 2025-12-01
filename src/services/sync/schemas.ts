@@ -91,14 +91,19 @@ export function parseSyncData(data: unknown, source: string): SyncData {
     } catch (error) {
         if (error instanceof z.ZodError) {
             console.error(`[Validation] ✗ ${source} validation failed`);
-            error.errors.forEach((err, index) => {
-                console.error(`[Validation]   Error ${index + 1}:`, {
-                    path: err.path.join('.'),
-                    message: err.message,
-                    code: err.code,
-                    received: 'received' in err ? err.received : undefined
+            // Defensive check: error.errors should always exist, but guard against edge cases
+            if (error.errors && Array.isArray(error.errors)) {
+                error.errors.forEach((err, index) => {
+                    console.error(`[Validation]   Error ${index + 1}:`, {
+                        path: err.path.join('.'),
+                        message: err.message,
+                        code: err.code,
+                        received: 'received' in err ? err.received : undefined
+                    });
                 });
-            });
+            } else {
+                console.error('[Validation] ZodError object missing errors array:', error);
+            }
         }
         throw error;
     }

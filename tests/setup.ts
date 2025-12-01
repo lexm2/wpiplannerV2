@@ -1,4 +1,5 @@
 import { beforeEach, afterEach, vi } from 'vitest'
+import { installMockIndexedDB } from './mocks/MockIndexedDB'
 
 // Setup DOM environment
 beforeEach(() => {
@@ -21,114 +22,33 @@ beforeEach(() => {
     writable: true
   })
 
-  // Mock IndexedDB
-  const indexedDBStorage = new Map<string, any>();
+  // Mock IndexedDB with enhanced mock that supports compression
+  const mockDB = installMockIndexedDB({
+    useCompression: true, // Match IndexedDBStorageManager behavior
+    operationDelay: 0, // Fast for tests
+  });
 
-  const mockIDBRequest = (result?: any): IDBRequest => {
-    const request: any = {
-      result,
-      error: null,
-      source: null,
-      transaction: null,
-      readyState: 'done',
-      onsuccess: null,
-      onerror: null,
-      addEventListener: vi.fn((event: string, handler: any) => {
-        if (event === 'success') request.onsuccess = handler;
-        if (event === 'error') request.onerror = handler;
-      }),
-      removeEventListener: vi.fn()
-    };
-
-    setTimeout(() => {
-      if (request.onsuccess) {
-        request.onsuccess({ target: request });
-      }
-    }, 0);
-
-    return request as IDBRequest;
-  };
-
-  const mockObjectStore: any = {
-    add: vi.fn((value: any, key?: any) => {
-      const storeKey = key || value.id;
-      indexedDBStorage.set(storeKey, value);
-      return mockIDBRequest(storeKey);
-    }),
-    put: vi.fn((value: any, key?: any) => {
-      const storeKey = key || value.id;
-      indexedDBStorage.set(storeKey, value);
-      return mockIDBRequest(storeKey);
-    }),
-    get: vi.fn((key: any) => {
-      const value = indexedDBStorage.get(key);
-      return mockIDBRequest(value);
-    }),
-    delete: vi.fn((key: any) => {
-      indexedDBStorage.delete(key);
-      return mockIDBRequest(undefined);
-    }),
-    clear: vi.fn(() => {
-      indexedDBStorage.clear();
-      return mockIDBRequest(undefined);
-    }),
-    getAll: vi.fn(() => {
-      const values = Array.from(indexedDBStorage.values());
-      return mockIDBRequest(values);
-    }),
-    getAllKeys: vi.fn(() => {
-      const keys = Array.from(indexedDBStorage.keys());
-      return mockIDBRequest(keys);
-    })
-  };
-
-  const mockTransaction: any = {
-    objectStore: vi.fn(() => mockObjectStore),
-    oncomplete: null,
-    onerror: null,
-    onabort: null,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn()
-  };
-
-  const mockDB: any = {
-    transaction: vi.fn(() => mockTransaction),
-    close: vi.fn(),
-    createObjectStore: vi.fn(() => mockObjectStore),
-    deleteObjectStore: vi.fn(),
-    objectStoreNames: { contains: vi.fn(() => true) }
-  };
-
-  const mockOpenDBRequest: any = mockIDBRequest(mockDB);
-  mockOpenDBRequest.onupgradeneeded = null;
-
-  const mockIndexedDB = {
-    open: vi.fn(() => {
-      setTimeout(() => {
-        if (mockOpenDBRequest.onupgradeneeded) {
-          mockOpenDBRequest.onupgradeneeded({ target: mockOpenDBRequest });
-        }
-        if (mockOpenDBRequest.onsuccess) {
-          mockOpenDBRequest.onsuccess({ target: mockOpenDBRequest });
-        }
-      }, 0);
-      return mockOpenDBRequest;
-    }),
-    deleteDatabase: vi.fn(() => mockIDBRequest(undefined)),
-    databases: vi.fn(async () => []),
-    cmp: vi.fn((a: any, b: any) => (a < b ? -1 : a > b ? 1 : 0))
-  };
+  // Store reference for test access
+  (global as any).__mockIndexedDB__ = mockDB;
 
   Object.defineProperty(window, 'indexedDB', {
-    value: mockIndexedDB,
+    value: global.indexedDB,
     writable: true,
     configurable: true
   });
 
-  global.indexedDB = mockIndexedDB as any;
-
   // Mock fetch
   global.fetch = vi.fn()
+
+  // Mock Web Crypto API for checksum tests
+  if (!global.crypto || !global.crypto.subtle) {
+    const { webcrypto } = require('node:crypto')
+    Object.defineProperty(global, 'crypto', {
+      value: webcrypto,
+      writable: true,
+      configurable: true
+    })
+  }
 })
 
 // Clean up after each test

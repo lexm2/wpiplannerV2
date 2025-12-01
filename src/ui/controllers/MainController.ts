@@ -153,23 +153,15 @@ export class MainController {
 
                     // Apply cloud data to local state
                     // SyncData format matches ProfileStateManager's expected format
-                    const importData = {
-                        version: cloudData.version,
-                        timestamp: new Date(cloudData.timestamp).toISOString(),
-                        checksum: cloudData.checksum,
-                        activeScheduleId: cloudData.activeScheduleId,
-                        schedules: cloudData.schedules,
-                        preferences: cloudData.preferences || {},
-                    };
-
+                    // Pass cloudData directly without transformation - it's already in the correct format
                     console.log('[MainController] 🟢 About to import data:', {
-                        scheduleCount: importData.schedules.length,
-                        activeScheduleId: importData.activeScheduleId,
-                        firstScheduleName: importData.schedules[0]?.name
+                        scheduleCount: cloudData.schedules.length,
+                        activeScheduleId: cloudData.activeScheduleId,
+                        firstScheduleName: cloudData.schedules[0]?.name
                     });
 
                     // Await importData to ensure cloud data is saved before proceeding
-                    await this.profileStateManager.importData(JSON.stringify(importData));
+                    await this.profileStateManager.importData(JSON.stringify(cloudData));
                     console.log('[MainController] 🟢 Cloud data imported and saved');
 
                     // Redistribute to ensure all consumers are synchronized
