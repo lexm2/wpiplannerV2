@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 1, 2025, 10:14 PM",
+  "generated": "Dec 1, 2025, 10:35 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -241789,7 +241789,7 @@
                 "crn": 336362,
                 "number": "C01",
                 "seats": 18,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
@@ -241808,7 +241808,7 @@
                     "building": "",
                     "room": "Recreation Center Crew",
                     "seats": 18,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
