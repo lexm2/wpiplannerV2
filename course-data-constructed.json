@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 1, 2025, 9:13 PM",
+  "generated": "Dec 1, 2025, 9:28 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -66856,7 +66856,7 @@
                 "number": "C01",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 14,
+                "actualWaitlist": 15,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course emphasizes system and control volume modeling using conservation of mass and the First and Second Laws of Thermodynamics. Topics include an introduction to heat, work, energy, and power, properties of simple substances, and cycle analysis for power production and refrigeration. Recommended background: basic physics, (PH 1110, PH 1111) elementary differential and integral calculus (MA 1021, MA 1022) or equivalents.",
@@ -66875,7 +66875,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 14,
+                    "actualWaitlist": 15,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
