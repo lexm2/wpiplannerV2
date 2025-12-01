@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 1, 2025, 10:35 PM",
+  "generated": "Dec 1, 2025, 10:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -242756,7 +242756,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -242775,7 +242775,7 @@
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
