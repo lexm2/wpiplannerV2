@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 1, 2025, 8:26 AM",
+  "generated": "Dec 1, 2025, 8:52 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -45177,7 +45177,7 @@
                 "crn": 336447,
                 "number": "CL01",
                 "seats": 140,
-                "seatsAvailable": 65,
+                "seatsAvailable": 64,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4356",
@@ -45196,7 +45196,7 @@
                     "building": "",
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "seats": 140,
-                    "seatsAvailable": 65,
+                    "seatsAvailable": 64,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL01",
@@ -45352,7 +45352,7 @@
                   "crn": 336652,
                   "number": "CX12",
                   "seats": 25,
-                  "seatsAvailable": 7,
+                  "seatsAvailable": 6,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4356",
@@ -45371,7 +45371,7 @@
                       "building": "",
                       "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                       "seats": 25,
-                      "seatsAvailable": 7,
+                      "seatsAvailable": 6,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX12",
