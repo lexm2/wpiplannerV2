@@ -781,6 +781,7 @@
   "generated": "Dec 2, 2025, 8:43 PM",
   "generated": "Dec 2, 2025, 8:54 PM",
   "generated": "Dec 2, 2025, 9:16 PM",
+  "generated": "Dec 2, 2025, 9:37 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -69327,7 +69328,7 @@
                 "crn": 337469,
                 "number": "D01",
                 "seats": 50,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -69346,7 +69347,7 @@
                     "building": "",
                     "room": "Salisbury Labs 411",
                     "seats": 50,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -172400,7 +172401,7 @@
                 "number": "CL01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4374",
                 "description": "Cat. IThis course integrates students’ background in ME in a one-term designproject that is usually taken from a local company. Students must organizethemselves and the project to successfully realize a product that meets customerneeds. Activities include problem definition, design analysis, mathematicalmodelling, CAD modelling, manufacturing, testing, liaison to vendors,customer relations, marketing, technical management, purchasing, reportwriting, and oral presentations.Recommended background: mechanisms (ME 3310, ME 3311), stressanalysis (ES 3502), design (ME 3320), thermo-fluids (ES 3001, ES 3003,ES 3004), materials (ES 2001), manufacturing (ME 1800).",
@@ -172419,7 +172420,7 @@
                     "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "CL01",
                     "days": [
