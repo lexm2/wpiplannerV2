@@ -768,6 +768,7 @@
   "generated": "Dec 2, 2025, 3:44 PM",
   "generated": "Dec 2, 2025, 3:57 PM",
   "generated": "Dec 2, 2025, 4:30 PM",
+  "generated": "Dec 2, 2025, 4:55 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -66669,7 +66670,7 @@
                 "number": "DL02",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 18,
+                "actualWaitlist": 19,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4527",
                 "description": "Cat. I This is an introductory course in the engineering mechanics sequence that serves as a foundation for other courses in mechanical engineering. The course covers general two- and three-dimensional force and couple systems, distributed loads, resultant forces, moments of forces, free body diagrams, equilibrium of particles and finite sized bodies. Specific topics include friction, trusses, shear forces, bodies subjected to distributed loads, bending moments in beams, and first and second moments of plane areas. Recommended background: Differential (MA 1021) and integral (MA 1022) calculus, vector algebra (MA 1023), and double and triple integration (MA 1024).",
@@ -66688,7 +66689,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 18,
+                    "actualWaitlist": 19,
                     "maxWaitlist": 20,
                     "specificSection": "DL02",
                     "days": [
@@ -74559,7 +74560,7 @@
                 "number": "C01 - Topics In Urban History",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 13,
+                "actualWaitlist": 14,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I This course surveys the interplay of social, economic, demographic, political and cultural forces in shaping the growth, decline and occasional rebirth of urban spaces. Emphasis is placed upon building chronological narratives while attending to the themes, approaches, and sources historians use to reconstruct the tangled infrastructures, stratified economies, segregated spaces and political/administrative structures of cities. Geographies will vary across sections and topics may include Industrializing Cities, Race and Urban Space, Post-Industrial Cities, Urban Technological Infrastructures, or Social Justice in the City. Students can receive credit only once for HI 2310.",
@@ -74578,7 +74579,7 @@
                     "room": "Stratton Hall 301",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 13,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 15,
                     "specificSection": "C01 - Topics In Urban History",
                     "days": [
