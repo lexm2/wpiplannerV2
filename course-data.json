@@ -13904,7 +13904,7 @@
       "Course_Title": "BUS 2080 - Data Analysis For Decision Making",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "29/50",
+      "Enrolled_Capacity": "30/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Marco Bonilla",
       "Locations": "Salisbury Labs 411",
@@ -45281,7 +45281,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ES 2503 - Introduction To Dynamic Systems ()",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336077"
     },
     {
@@ -46918,7 +46918,7 @@
       "Course_Title": "ETR 1100 - Engineering Innovation And Entrepreneurship",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "50/50",
+      "Enrolled_Capacity": "49/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Ernesto Martinez Villalpando",
       "Locations": "Washburn 229",
@@ -46926,7 +46926,7 @@
       "Meeting_Patterns": "M-R | 10:00 AM - 11:50 AM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Washburn 229 | M-R | 10:00 AM - 11:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Entrepreneurship",
       "Waitlist_Waitlist_Capacity": "2/10",
@@ -82787,7 +82787,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ME 1800 - Manufacturing Science, Prototyping, And Computer-Controlled Machining ()",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "11/15",
+      "Waitlist_Waitlist_Capacity": "12/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336705"
     },
     {
@@ -123928,7 +123928,7 @@
       "Course_Title": "WR 1020 - Introduction To Rhetoric",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "18/20",
+      "Enrolled_Capacity": "17/20",
       "Instructional_Format": "Lecture",
       "Instructors": "Lerie M. Gabriel",
       "Locations": "Kaven Hall 204",
