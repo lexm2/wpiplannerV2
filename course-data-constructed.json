@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 2, 2025, 5:42 AM",
+  "generated": "Dec 2, 2025, 5:51 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -3377,7 +3377,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course is an introductory graduate level course. Fundamental topics will be chosen from the following: three-dimensional states of stress; measures of strain; plane stress and plane strain; thermoelasticity; Airy stress function; and energy methods. Applied topics will be chosen from the following: bending and shear stresses on unsymmetric cross-sections; bending of composite beams; bending of curved beams; torsion of thin-walled noncircular cross sections; and failure criteria. Students cannot receive credit for this course if they have taken AE/ME 5380 “Foundations of Elasticity” or AE/ME 5381 “Applied Elasticity”.",
@@ -3396,7 +3396,7 @@
                     "room": "Higgins Labs 154",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
