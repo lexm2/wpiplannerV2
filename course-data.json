@@ -1623,7 +1623,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Aerospace Engineering",
-      "Waitlist_Waitlist_Capacity": "2/15",
+      "Waitlist_Waitlist_Capacity": "1/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336513"
     },
     {
@@ -14941,7 +14941,7 @@
       "Course_Title": "CE 303X - Virtual Design and Construction (VDC)",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "12/25",
+      "Enrolled_Capacity": "13/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Jessica Rosewitz",
       "Locations": "Kaven Hall 202 Stats Computer Lab",
@@ -39427,7 +39427,7 @@
       "Course_Title": "ECE 5204 - Analog Circuits And Intuition",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "19/30",
+      "Enrolled_Capacity": "20/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Fred Floru",
       "Locations": "Online-asynchronous",
