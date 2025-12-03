@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 3, 2025, 7:51 AM",
+  "generated": "Dec 3, 2025, 8:23 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -6282,7 +6282,7 @@
                 "crn": 337024,
                 "number": "D01",
                 "seats": 60,
-                "seatsAvailable": 14,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -6301,7 +6301,7 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 60,
-                    "seatsAvailable": 14,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -246512,7 +246512,7 @@
                 "crn": 337607,
                 "number": "S07",
                 "seats": 60,
-                "seatsAvailable": 31,
+                "seatsAvailable": 30,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -246531,7 +246531,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seatsAvailable": 31,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "S07",
