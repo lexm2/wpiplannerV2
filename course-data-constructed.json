@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 3, 2025, 8:44 PM",
+  "generated": "Dec 3, 2025, 8:55 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -13432,7 +13432,7 @@
                 "crn": 336576,
                 "number": "CL01",
                 "seats": 50,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 25,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4660",
@@ -13451,7 +13451,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 50,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 25,
                     "specificSection": "CL01",
@@ -13471,7 +13471,7 @@
                   "crn": 339798,
                   "number": "CX01",
                   "seats": 50,
-                  "seatsAvailable": 16,
+                  "seatsAvailable": 15,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4660",
@@ -13490,7 +13490,7 @@
                       "building": "",
                       "room": "Salisbury Labs 305",
                       "seats": 50,
-                      "seatsAvailable": 16,
+                      "seatsAvailable": 15,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX01",
