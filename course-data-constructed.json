@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 3, 2025, 12:35 PM",
+  "generated": "Dec 3, 2025, 1:23 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -48828,7 +48828,7 @@
                 "crn": 339885,
                 "number": "C01",
                 "seats": 70,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -48847,7 +48847,7 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 70,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -48880,7 +48880,7 @@
                 "crn": 336391,
                 "number": "C01",
                 "seats": 75,
-                "seatsAvailable": 16,
+                "seatsAvailable": 17,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -48899,7 +48899,7 @@
                     "building": "",
                     "room": "Atwater Kent 219",
                     "seats": 75,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 17,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
