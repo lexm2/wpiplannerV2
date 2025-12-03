@@ -840,6 +840,7 @@
   "generated": "Dec 3, 2025, 10:51 PM",
   "generated": "Dec 3, 2025, 11:13 PM",
   "generated": "Dec 3, 2025, 11:30 PM",
+  "generated": "Dec 3, 2025, 11:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -36958,7 +36959,7 @@
                 "crn": 337888,
                 "number": "S01",
                 "seats": 16,
-                "seatsAvailable": 12,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -36977,7 +36978,7 @@
                     "building": "",
                     "room": "Gateway Park 1 Room 4104",
                     "seats": 16,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
