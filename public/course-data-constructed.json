@@ -796,6 +796,7 @@
   "generated": "Dec 3, 2025, 4:48 AM",
   "generated": "Dec 3, 2025, 5:16 AM",
   "generated": "Dec 3, 2025, 5:42 AM",
+  "generated": "Dec 3, 2025, 5:51 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -188833,7 +188834,7 @@
                 "crn": 337742,
                 "number": "S01",
                 "seats": 60,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -188852,7 +188853,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
