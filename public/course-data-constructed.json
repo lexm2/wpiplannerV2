@@ -877,6 +877,7 @@
   "generated": "Dec 4, 2025, 4:54 PM",
   "generated": "Dec 4, 2025, 5:19 PM",
   "generated": "Dec 4, 2025, 5:44 PM",
+  "generated": "Dec 4, 2025, 5:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -46773,7 +46774,7 @@
                 "crn": 347119,
                 "number": "C01",
                 "seats": 50,
-                "seatsAvailable": 42,
+                "seatsAvailable": 43,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -46792,7 +46793,7 @@
                     "building": "",
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 50,
-                    "seatsAvailable": 42,
+                    "seatsAvailable": 43,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
