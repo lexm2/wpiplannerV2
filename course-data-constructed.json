@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 4, 2025, 6:55 PM",
+  "generated": "Dec 4, 2025, 7:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -237250,7 +237250,7 @@
                 "crn": 337493,
                 "number": "D02",
                 "seats": 20,
-                "seatsAvailable": 8,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -237269,7 +237269,7 @@
                     "building": "",
                     "room": "Atwater Kent 232",
                     "seats": 20,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
@@ -237291,7 +237291,7 @@
                 "crn": 337494,
                 "number": "D03",
                 "seats": 20,
-                "seatsAvailable": 8,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -237310,7 +237310,7 @@
                     "building": "",
                     "room": "Stratton Hall 205",
                     "seats": 20,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D03",
