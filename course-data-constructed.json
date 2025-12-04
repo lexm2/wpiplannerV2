@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 4, 2025, 10:34 PM",
+  "generated": "Dec 4, 2025, 10:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -16439,7 +16439,7 @@
                 "crn": 337136,
                 "number": "DL01",
                 "seats": 20,
-                "seatsAvailable": 13,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4479",
@@ -16458,7 +16458,7 @@
                     "building": "",
                     "room": "Salisbury Labs 219 BB Lab",
                     "seats": 20,
-                    "seatsAvailable": 13,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "DL01",
@@ -16475,7 +16475,7 @@
                   "crn": 336948,
                   "number": "DX01",
                   "seats": 20,
-                  "seatsAvailable": 13,
+                  "seatsAvailable": 12,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4479",
@@ -16494,7 +16494,7 @@
                       "building": "",
                       "room": "Salisbury Labs 219 BB Lab",
                       "seats": 20,
-                      "seatsAvailable": 13,
+                      "seatsAvailable": 12,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
