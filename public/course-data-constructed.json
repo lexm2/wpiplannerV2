@@ -888,6 +888,7 @@
   "generated": "Dec 4, 2025, 8:55 PM",
   "generated": "Dec 4, 2025, 9:15 PM",
   "generated": "Dec 4, 2025, 9:39 PM",
+  "generated": "Dec 4, 2025, 9:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -171418,7 +171419,7 @@
                 "crn": 339208,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": 10,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -171437,7 +171438,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 30,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
