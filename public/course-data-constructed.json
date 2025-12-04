@@ -860,6 +860,7 @@
   "generated": "Dec 4, 2025, 9:20 AM",
   "generated": "Dec 4, 2025, 9:45 AM",
   "generated": "Dec 4, 2025, 9:55 AM",
+  "generated": "Dec 4, 2025, 10:20 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -245202,8 +245203,8 @@
                 "crn": 337289,
                 "number": "D01",
                 "seats": 25,
-                "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "seatsAvailable": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) This course will teach basic strength training principles and techniques. Students will develop and implement an individualized conditioning program.",
@@ -245221,8 +245222,8 @@
                     "building": "",
                     "room": "Recreation Center Fitness Area",
                     "seats": 25,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "seatsAvailable": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
