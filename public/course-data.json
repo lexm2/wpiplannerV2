@@ -33076,7 +33076,7 @@
       "Course_Title": "CS 549 - Computer Vision",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "13/30",
+      "Enrolled_Capacity": "14/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Alexandros Lioulemes",
       "Locations": "Online-asynchronous",
@@ -43547,7 +43547,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ES 1310 - Introduction To Computer Aided Design ()",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "8/999",
+      "Waitlist_Waitlist_Capacity": "9/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336790"
     },
     {
@@ -43632,7 +43632,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ES 1310 - Introduction To Computer Aided Design ()",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "7/999",
+      "Waitlist_Waitlist_Capacity": "8/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336781"
     },
     {
@@ -92082,10 +92082,10 @@
       "Meeting_Patterns": "M-T-R-F | 10:00 AM - 10:50 AM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Alden Hall B06 Janet Earle Room | M-T-R-F | 10:00 AM - 10:50 AM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336310"
     },
     {
@@ -111719,7 +111719,7 @@
       "Course_Title": "RBE 549 - Computer Vision",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "13/30",
+      "Enrolled_Capacity": "14/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Alexandros Lioulemes",
       "Locations": "Online-asynchronous",
