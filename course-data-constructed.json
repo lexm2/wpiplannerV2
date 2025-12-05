@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 5, 2025, 2:17 PM",
+  "generated": "Dec 5, 2025, 2:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -36645,7 +36645,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Susan Roberts",
+                    "professor": "Not Assigned",
                     "startTime": "10:00",
                     "endTime": "10:50",
                     "location": "Salisbury Labs 105",
@@ -63367,7 +63367,7 @@
                 "crn": 354000,
                 "number": "C01",
                 "seats": 35,
-                "seatsAvailable": 29,
+                "seatsAvailable": 28,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -63386,7 +63386,7 @@
                     "building": "",
                     "room": "Fuller Labs 311",
                     "seats": 35,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 28,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -73646,7 +73646,7 @@
                 "number": "B01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 12,
                 "note": null,
                 "description": "Cat. I This introductory course reviews the history and legacies of Atlantic systems such a colonialism and migration that have connected Africa, the Americas, and Europe from the sixteenth century to the recent past. Taking a transregional approach to historical inquiry, the course places the Atlantic Ocean at its geographic center and explores the diverse people, cultures, ideologies, institutions, economies, and other phenomena that have traversed this ocean basin and connected the regions that line its shores. The course pays special attention to the technological, social, and political innovations, the systemic inequalities, and the heterogeneous notions of belonging that have emerged from transatlantic interactions and exchanges. The course can provide students with preparation for HUA depth in Global History and International and Global Studies as well as work at overseas project centers in regions often incorporated into Atlantic Worlds. No prior background is required. Recommended background: None.",
@@ -73665,7 +73665,7 @@
                     "room": "Salisbury Labs 105",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 12,
                     "specificSection": "B01",
                     "days": [
@@ -175423,7 +175423,7 @@
                 "crn": 354726,
                 "number": "C02 - ST: Artificial Intelligence in Manufacturing",
                 "seats": 18,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -175442,7 +175442,7 @@
                     "building": "",
                     "room": "Other",
                     "seats": 18,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C02 - ST: Artificial Intelligence in Manufacturing",
