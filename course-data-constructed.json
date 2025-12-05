@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 5, 2025, 1:20 PM",
+  "generated": "Dec 5, 2025, 1:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -186675,7 +186675,7 @@
               "crn": 354500,
               "number": "S01",
               "seats": 12,
-              "seatsAvailable": 9,
+              "seatsAvailable": 8,
               "actualWaitlist": 0,
               "maxWaitlist": 3,
               "note": null,
@@ -186694,7 +186694,7 @@
                   "building": "",
                   "room": "Olin Hall 026",
                   "seats": 12,
-                  "seatsAvailable": 9,
+                  "seatsAvailable": 8,
                   "actualWaitlist": 0,
                   "maxWaitlist": 3,
                   "specificSection": "S01",
@@ -186712,7 +186712,7 @@
                   "building": "",
                   "room": "Olin Hall 026",
                   "seats": 12,
-                  "seatsAvailable": 9,
+                  "seatsAvailable": 8,
                   "actualWaitlist": 0,
                   "maxWaitlist": 3,
                   "specificSection": "S01",
