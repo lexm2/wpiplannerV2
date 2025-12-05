@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 5, 2025, 9:38 PM",
+  "generated": "Dec 5, 2025, 9:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -49264,7 +49264,7 @@
                 "crn": 337660,
                 "number": "S01",
                 "seats": 40,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -49283,7 +49283,7 @@
                     "building": "",
                     "room": "Fuller Labs 311",
                     "seats": 40,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "S01",
