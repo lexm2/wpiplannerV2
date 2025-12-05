@@ -903,6 +903,7 @@
   "generated": "Dec 5, 2025, 5:16 AM",
   "generated": "Dec 5, 2025, 5:42 AM",
   "generated": "Dec 5, 2025, 5:52 AM",
+  "generated": "Dec 5, 2025, 6:26 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -245168,7 +245169,7 @@
                 "number": "C02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I (1/12 unit) This course will teach basic strength training principles and techniques. Students will develop and implement an individualized conditioning program.",
@@ -245187,7 +245188,7 @@
                     "room": "Harrington Auditorium 102",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
