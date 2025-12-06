@@ -1012,6 +1012,7 @@
   "generated": "Dec 6, 2025, 10:14 PM",
   "generated": "Dec 6, 2025, 10:34 PM",
   "generated": "Dec 6, 2025, 10:49 PM",
+  "generated": "Dec 6, 2025, 11:14 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -62345,7 +62346,7 @@
                 "number": "C01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 11,
+                "actualWaitlist": 12,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I The course focuses upon the implications of reliance upon markets for the allocation of resources in a society, at the household, firm, and community level. Outcomes of current market systems are examined in terms of the efficient use of natural and other economic resources, as well as their impact upon the environment, fairness, and social welfare. of special interest in these analyses is the role of prices in the determination of what commodities are produced, their means of production, and distribution among households. In cases where current market outcomes have features subject to widespread criticism, such as the presence of excessive pollution, risk, discrimination, and poverty, the analysis is extended to suggest economic solutions. There are no prerequisites for the course.",
@@ -62364,7 +62365,7 @@
                     "room": "Salisbury Labs 104",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 11,
+                    "actualWaitlist": 12,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
