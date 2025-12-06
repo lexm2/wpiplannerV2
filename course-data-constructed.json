@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 6, 2025, 5:30 PM",
+  "generated": "Dec 6, 2025, 5:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -157695,7 +157695,7 @@
                 "crn": 336237,
                 "number": "CL01",
                 "seats": 90,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4426",
@@ -157714,7 +157714,7 @@
                     "building": "",
                     "room": "Olin Hall 107",
                     "seats": 90,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL01",
@@ -157801,7 +157801,7 @@
                   "crn": 336250,
                   "number": "CD03",
                   "seats": 30,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4426",
@@ -157820,7 +157820,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 30,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD03",
