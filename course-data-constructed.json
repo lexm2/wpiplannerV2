@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 7, 2025, 11:26 AM",
+  "generated": "Dec 7, 2025, 11:36 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -9514,7 +9514,7 @@
                 "crn": 336803,
                 "number": "CL01",
                 "seats": 80,
-                "seatsAvailable": 18,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4377",
@@ -9533,7 +9533,7 @@
                     "building": "",
                     "room": "Olin Hall 107",
                     "seats": 80,
-                    "seatsAvailable": 18,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "CL01",
@@ -9584,7 +9584,7 @@
                   "crn": 336806,
                   "number": "CX02",
                   "seats": 20,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 2,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4377",
@@ -9603,7 +9603,7 @@
                       "building": "",
                       "room": "Goddard Hall 206 BB Lab",
                       "seats": 20,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 2,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX02",
