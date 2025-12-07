@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 7, 2025, 6:46 PM",
+  "generated": "Dec 7, 2025, 7:12 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -158273,7 +158273,7 @@
                 "crn": 337021,
                 "number": "DL02",
                 "seats": 120,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4502",
@@ -158292,7 +158292,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 120,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL02",
@@ -158345,7 +158345,7 @@
                   "crn": 337522,
                   "number": "DD08",
                   "seats": 30,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4502",
@@ -158364,7 +158364,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 30,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD08",
