@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 7, 2025, 3:30 PM",
+  "generated": "Dec 7, 2025, 3:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -164857,7 +164857,7 @@
                 "crn": 337310,
                 "number": "DL02",
                 "seats": 70,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4474",
@@ -164876,7 +164876,7 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 70,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL02",
@@ -164895,7 +164895,7 @@
                   "crn": 337306,
                   "number": "DD04",
                   "seats": 35,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4474",
@@ -164914,7 +164914,7 @@
                       "building": "",
                       "room": "Stratton Hall 301",
                       "seats": 35,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD04",
