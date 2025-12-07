@@ -1075,6 +1075,7 @@
   "generated": "Dec 7, 2025, 9:49 PM",
   "generated": "Dec 7, 2025, 10:14 PM",
   "generated": "Dec 7, 2025, 10:33 PM",
+  "generated": "Dec 7, 2025, 10:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -50389,7 +50390,7 @@
                 "crn": 337690,
                 "number": "S01",
                 "seats": 40,
-                "seatsAvailable": 2,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -50408,7 +50409,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 40,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
