@@ -1071,6 +1071,7 @@
   "generated": "Dec 7, 2025, 8:49 PM",
   "generated": "Dec 7, 2025, 9:13 PM",
   "generated": "Dec 7, 2025, 9:28 PM",
+  "generated": "Dec 7, 2025, 9:38 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -72854,7 +72855,7 @@
                 "crn": 336336,
                 "number": "C01",
                 "seats": 30,
-                "seatsAvailable": 28,
+                "seatsAvailable": 27,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -72873,7 +72874,7 @@
                     "building": "",
                     "room": "Unity Hall",
                     "seats": 30,
-                    "seatsAvailable": 28,
+                    "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "C01",
