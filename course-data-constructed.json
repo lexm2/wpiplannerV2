@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 7, 2025, 6:23 AM",
+  "generated": "Dec 7, 2025, 6:47 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -75829,7 +75829,7 @@
                 "crn": 342589,
                 "number": "D02",
                 "seats": 20,
-                "seatsAvailable": 10,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -75848,7 +75848,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 20,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "D02",
@@ -82900,7 +82900,7 @@
                 "crn": 337049,
                 "number": "D03",
                 "seats": 24,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -82919,7 +82919,7 @@
                     "building": "",
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 24,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D03",
