@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 7, 2025, 11:36 AM",
+  "generated": "Dec 7, 2025, 11:49 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4376,7 +4376,7 @@
                 "number": "C02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course focuses on the methods, procedures and techniques of creating and manipulating images through electronic and digital means. Students will develop an understanding of image alteration. Topics may include color theory, displays, modeling, shading, and visual perception. Recommended background: AR 1100.",
@@ -4395,7 +4395,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
@@ -8522,7 +8522,7 @@
                 "number": "C01",
                 "seats": 100,
                 "seatsAvailable": 0,
-                "actualWaitlist": 17,
+                "actualWaitlist": 18,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course is designed for students seeking a broad overview of ecological systems and the effect of humans on the ecosystems. It provides an introduction to natural ecosystems, population growth, and the interaction between human populations and our environment. It is conducted in an active style including the use of case studies, class discussion/participation, and classroom polling systems. The major goal of this course is to help students become more informed environmental citizens, skeptical when presented with data in the media, and knowledgeable enough to question and make informed decisions about the environment. It will primarily focus on current topics but areas of discussion likely to be covered include ecosystems, populations, biodiversity, pollution, environmental economics and climate change. This course is intended for non- life science majors. Recommended background: High School Biology",
@@ -8541,7 +8541,7 @@
                     "room": "Unity Hall 500",
                     "seats": 100,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 17,
+                    "actualWaitlist": 18,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
