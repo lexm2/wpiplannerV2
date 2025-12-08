@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 8, 2025, 10:42 PM",
+  "generated": "Dec 8, 2025, 10:51 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -15810,7 +15810,7 @@
                 "crn": 338956,
                 "number": "DL01",
                 "seats": 36,
-                "seatsAvailable": 6,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4570",
@@ -15829,7 +15829,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 36,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
@@ -15880,7 +15880,7 @@
                   "crn": 338949,
                   "number": "DX02",
                   "seats": 12,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4570",
@@ -15899,7 +15899,7 @@
                       "building": "",
                       "room": "Goddard Hall 007 BME Lab",
                       "seats": 12,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX02",
