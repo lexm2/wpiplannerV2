@@ -3254,10 +3254,10 @@
       "Meeting_Patterns": "M-R | 10:00 AM - 11:50 AM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Fuller Labs 222 IMGD Computer Lab | M-R | 10:00 AM - 11:50 AM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336502"
     },
     {
@@ -7186,7 +7186,7 @@
       "Course_Title": "BB 2920 - Genetics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "60/60",
+      "Enrolled_Capacity": "59/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Inna Nechipurenko",
       "Locations": "Unity Hall 520",
@@ -7194,11 +7194,11 @@
       "Meeting_Patterns": "M-T-R-F | 3:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Unity Hall 520 | M-T-R-F | 3:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: BB 2920 - Genetics ()",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "1/15",
+      "Waitlist_Waitlist_Capacity": "0/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336181"
     },
     {
@@ -28398,7 +28398,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "2/15",
+      "Waitlist_Waitlist_Capacity": "1/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336930"
     },
     {
@@ -30573,7 +30573,7 @@
       "Course_Title": "CS 4032 - Numerical Methods For Linear And Nonlinear Systems",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "29/35",
+      "Enrolled_Capacity": "28/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Binan Gu",
       "Locations": "Higgins Labs 114",
@@ -30585,7 +30585,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Computer Science; Mathematical Sciences",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336585"
     },
     {
@@ -37190,7 +37190,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ECE 2039 - Computational Engineering ()",
       "Subject": "Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "3/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336265"
     },
     {
@@ -40445,7 +40445,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Economics",
-      "Waitlist_Waitlist_Capacity": "12/20",
+      "Waitlist_Waitlist_Capacity": "11/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336858"
     },
     {
@@ -46589,7 +46589,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "6/20",
+      "Waitlist_Waitlist_Capacity": "5/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336472"
     },
     {
@@ -49628,7 +49628,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Geology",
-      "Waitlist_Waitlist_Capacity": "15/20",
+      "Waitlist_Waitlist_Capacity": "13/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336372"
     },
     {
@@ -80425,7 +80425,7 @@
       "Course_Title": "MA 3257 - Numerical Methods For Linear And Nonlinear Systems",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "29/35",
+      "Enrolled_Capacity": "28/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Binan Gu",
       "Locations": "Higgins Labs 114",
@@ -80437,7 +80437,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Computer Science; Mathematical Sciences",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336585"
     },
     {
@@ -83155,7 +83155,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ME 1800 - Manufacturing Science, Prototyping, And Computer-Controlled Machining ()",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "13/15",
+      "Waitlist_Waitlist_Capacity": "12/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336705"
     },
     {
@@ -83684,11 +83684,11 @@
       "Meeting_Patterns": "M-T-F | 11:00 AM - 11:50 AM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Higgins Labs 230 Geom Modeling Computer Lab | M-T-F | 11:00 AM - 11:50 AM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ME 2300 - Introduction To Engineering Design ()",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337401"
     },
     {
@@ -85640,7 +85640,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "4/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337408"
     },
     {
@@ -93227,10 +93227,10 @@
       "Meeting_Patterns": "W | 11:00 AM - 12:50 PM; T-R | 11:00 AM - 11:50 AM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Alden Hall B30 Music Technology Lab | W | 11:00 AM - 12:50 PM; Alden Hall B30 Music Technology Lab | T-R | 11:00 AM - 11:50 AM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337485"
     },
     {
@@ -107304,7 +107304,7 @@
       "Course_Title": "PSY 1504 - Strategies For Improving Cognitive Skills",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "55/55",
+      "Enrolled_Capacity": "54/55",
       "Instructional_Format": "Lecture",
       "Instructors": "Jim Doyle",
       "Locations": "Salisbury Labs 104",
@@ -107312,10 +107312,10 @@
       "Meeting_Patterns": "M-R | 1:00 PM - 2:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Salisbury Labs 104 | M-R | 1:00 PM - 2:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Psychology",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338521"
     },
     {
@@ -118793,7 +118793,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336274"
     },
     {
