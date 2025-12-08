@@ -1092,6 +1092,7 @@
   "generated": "Dec 8, 2025, 7:25 AM",
   "generated": "Dec 8, 2025, 7:43 AM",
   "generated": "Dec 8, 2025, 7:52 AM",
+  "generated": "Dec 8, 2025, 8:26 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -51400,7 +51401,7 @@
                 "number": "S01",
                 "seats": 60,
                 "seatsAvailable": 7,
-                "actualWaitlist": 13,
+                "actualWaitlist": 14,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "This course will offer a mathematical and practical perspective on artificial neural networks for machine learning. Students will learn about the most prominent network architectures including multilayer feedforward neural networks, convolutional neural networks (CNNs), auto-encoders, recurrent neural networks (RNNs), and generative-adversarial networks (GANs). This course will also teach students optimization and regularization techniques used to train them -- such as back-propagation, stochastic gradient descent, dropout, pooling, and batch normalization. Connections to related machine learning techniques and algorithms, such as probabilistic graphical models, will be explored. In addition to understanding the mathematics behind deep learning, students will also engage in hands-on course projects. Students will have the opportunity to train neural networks for a wide range of applications, such as object detection, facial expression recognition, handwriting analysis, and natural language processing. Prerequisite: Machine Learning (CS 539), and knowledge of Linear Algebra (such as MA 2071) and Algorithms (such as CS 2223).",
@@ -51419,7 +51420,7 @@
                     "room": "Unity Hall 520",
                     "seats": 60,
                     "seatsAvailable": 7,
-                    "actualWaitlist": 13,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [
@@ -55063,7 +55064,7 @@
                 "number": "S01",
                 "seats": 60,
                 "seatsAvailable": 7,
-                "actualWaitlist": 13,
+                "actualWaitlist": 14,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "This course will offer a mathematical and practical perspective on artificial neural networks for machine learning. Students will learn about the most prominent network architectures including multilayer feedforward neural networks, convolutional neural networks (CNNs), auto-encoders, recurrent neural networks (RNNs), and generative-adversarial networks (GANs). This course will also teach students optimization and regularization techniques used to train them -- such as back-propagation, stochastic gradient descent, dropout, pooling, and batch normalization. Connections to related machine learning techniques and algorithms, such as probabilistic graphical models, will be explored. In addition to understanding the mathematics behind deep learning, students will also engage in hands-on course projects. Students will have the opportunity to train neural networks for a wide range of applications, such as object detection, facial expression recognition, handwriting analysis, and natural language processing. Prerequisite: Machine Learning (CS 539), and knowledge of Linear Algebra (such as MA 2071) and Algorithms (such as CS 2223).",
@@ -55082,7 +55083,7 @@
                     "room": "Unity Hall 520",
                     "seats": 60,
                     "seatsAvailable": 7,
-                    "actualWaitlist": 13,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [
