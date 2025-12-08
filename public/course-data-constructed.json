@@ -1117,6 +1117,7 @@
   "generated": "Dec 8, 2025, 6:25 PM",
   "generated": "Dec 8, 2025, 6:51 PM",
   "generated": "Dec 8, 2025, 7:14 PM",
+  "generated": "Dec 8, 2025, 7:30 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -34465,7 +34466,7 @@
                 "crn": 336116,
                 "number": "C01",
                 "seats": 110,
-                "seatsAvailable": 8,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -34484,7 +34485,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 110,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
