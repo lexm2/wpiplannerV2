@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 8, 2025, 12:35 PM",
+  "generated": "Dec 8, 2025, 1:22 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -173229,7 +173229,7 @@
                 "crn": 336161,
                 "number": "C01",
                 "seats": 30,
-                "seatsAvailable": 9,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -173248,7 +173248,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 30,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -174467,7 +174467,7 @@
                 "crn": 339206,
                 "number": "C01",
                 "seats": 40,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -174486,7 +174486,7 @@
                     "building": "",
                     "room": "Stratton Hall 201",
                     "seats": 40,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
