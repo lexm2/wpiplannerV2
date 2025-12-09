@@ -24285,7 +24285,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Chinese",
-      "Waitlist_Waitlist_Capacity": "2/5",
+      "Waitlist_Waitlist_Capacity": "3/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336748"
     },
     {
@@ -36736,7 +36736,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ECE 2019 - Sensors, Circuits, And Systems ()",
       "Subject": "Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "0/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336410"
     },
     {
@@ -36784,7 +36784,7 @@
       "Course_Title": "ECE 2019 - Sensors, Circuits, And Systems",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/21",
+      "Enrolled_Capacity": "21/21",
       "Instructional_Format": "Laboratory",
       "Instructors": "Gregory Noetscher",
       "Locations": "Atwater Kent 317 ECE Lab",
@@ -36792,7 +36792,7 @@
       "Meeting_Patterns": "F | 2:00 PM - 4:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Atwater Kent 317 ECE Lab | F | 2:00 PM - 4:50 PM",
-      "Section_Status": "Open",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ECE 2019 - Sensors, Circuits, And Systems ()",
       "Subject": "Electrical and Computer Engineering",
@@ -37636,7 +37636,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ECE 2201 - Microelectronic Circuits I (a)",
       "Subject": "Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "0/15",
+      "Waitlist_Waitlist_Capacity": "1/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336414"
     },
     {
@@ -49628,7 +49628,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Geology",
-      "Waitlist_Waitlist_Capacity": "12/20",
+      "Waitlist_Waitlist_Capacity": "13/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336372"
     },
     {
@@ -82716,7 +82716,7 @@
       "Course_Title": "ME 1520 - The Technology Of Alpine Skiing",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "17/25",
+      "Enrolled_Capacity": "18/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Christopher Brown",
       "Locations": "Kaven Hall 115; Salisbury Labs 407",
@@ -83155,7 +83155,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ME 1800 - Manufacturing Science, Prototyping, And Computer-Controlled Machining ()",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "12/15",
+      "Waitlist_Waitlist_Capacity": "11/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336705"
     },
     {
@@ -118980,7 +118980,7 @@
       "Course_Title": "WPE 1099 - Healthy Alternative",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "11/30",
+      "Enrolled_Capacity": "10/30",
       "Instructional_Format": "Workshop",
       "Instructors": "Linda Bullock",
       "Locations": "Recreation Center Dance",
@@ -119206,7 +119206,7 @@
       "Course_Title": "WPE 1201 - Club Sport - Alpine Ski Team",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "12/30",
+      "Enrolled_Capacity": "13/30",
       "Instructional_Format": "Workshop",
       "Instructors": "Ann McCarron",
       "Offering_Period": "2026 Spring C Term",
@@ -123466,7 +123466,7 @@
       "Course_Title": "WPE 1699 - Special Topics in Holistic Well-Being",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "4/12",
+      "Enrolled_Capacity": "5/12",
       "Instructional_Format": "Workshop",
       "Instructors": "Amy Curran",
       "Locations": "Salisbury Labs 305",
