@@ -1160,6 +1160,7 @@
   "generated": "Dec 9, 2025, 1:23 PM",
   "generated": "Dec 9, 2025, 1:52 PM",
   "generated": "Dec 9, 2025, 2:18 PM",
+  "generated": "Dec 9, 2025, 2:47 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -47362,7 +47363,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Michelle Borowski",
                     "startTime": "16:00",
                     "endTime": "17:50",
                     "location": "Unity Hall 420",
@@ -47557,7 +47558,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Michelle Borowski",
                     "startTime": "13:00",
                     "endTime": "14:50",
                     "location": "Salisbury Labs 406",
@@ -68625,7 +68626,7 @@
                 "number": "DL01",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4436",
                 "description": "Cat. I This course presents the fundamentals of heat transfer in the three modes of conduction, convection, and radiation. Topics include steady-state and transient heat conduction, forced external and internal convection, natural convection, heat exchanger analysis, radiation properties, and radiative exchange between surfaces. Recommended background: knowledge of thermodynamics, fluid mechanics, and ordinary differential equations (ES 3001, ES 3004, and MA 2051) or equivalents.",
@@ -68644,7 +68645,7 @@
                     "room": "Unity Hall 500",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
                     "days": [
@@ -68660,7 +68661,7 @@
                   "crn": 337457,
                   "number": "DD01",
                   "seats": 90,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4436",
@@ -68679,7 +68680,7 @@
                       "building": "",
                       "room": "Unity Hall 400",
                       "seats": 90,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
@@ -239126,7 +239127,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Michelle Borowski",
                     "startTime": "16:00",
                     "endTime": "17:50",
                     "location": "Unity Hall 420",
@@ -239321,7 +239322,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Michelle Borowski",
                     "startTime": "13:00",
                     "endTime": "14:50",
                     "location": "Salisbury Labs 406",
