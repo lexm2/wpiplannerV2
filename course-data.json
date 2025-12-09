@@ -44083,7 +44083,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ES 1310 - Introduction To Computer Aided Design ()",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "5/15",
+      "Waitlist_Waitlist_Capacity": "6/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337540"
     },
     {
@@ -110844,7 +110844,7 @@
       "Course_Title": "RBE 2020 - Embedded Systems for Robotics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "27/60",
+      "Enrolled_Capacity": "28/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Jennifer Stander",
       "Locations": "Atwater Kent 233",
@@ -110902,7 +110902,7 @@
       "Course_Title": "RBE 2020 - Embedded Systems for Robotics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "12/30",
+      "Enrolled_Capacity": "13/30",
       "Instructional_Format": "Laboratory",
       "Instructors": "Jennifer Stander",
       "Locations": "Atwater Kent 227 Lab Restricted Access",
