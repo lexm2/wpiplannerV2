@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 9, 2025, 9:31 PM",
+  "generated": "Dec 9, 2025, 9:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -11434,6 +11434,53 @@
           ]
         },
         {
+          "id": "BB-4260",
+          "number": "4260",
+          "name": "Synthetic Biology",
+          "description": "Cat.II Do we yet have the technology to engineer life? Can we control gene expression to create organisms that function in useful ways? Do we understand the tenets of genetic regulation as well as we think we do? These important questions and more are investigated by the emerging field of Synthetic Biology. In this course, students will explore this exciting new realm of biology through in-depth analysis and discussion of primary literature. Topics to be covered include the design and construction of synthetic gene circuits, synthesis of new genes and genomes, logic gate regulation of gene expression, and the latest applications of synthetic biology to advances in medicine, information processing, and the environment. Recommended Background: Students should have a strong foundational knowledge of cell biology, molecular biology, and genetics, as would be obtained from BB2550, BB2920, and BB3950. This course will be offered in 2020-21, and in alternating years thereafter.",
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "lectures": [
+            {
+              "section": {
+                "crn": 336809,
+                "number": "",
+                "seats": 0,
+                "seatsAvailable": 0,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "description": "Cat.II Do we yet have the technology to engineer life? Can we control gene expression to create organisms that function in useful ways? Do we understand the tenets of genetic regulation as well as we think we do? These important questions and more are investigated by the emerging field of Synthetic Biology. In this course, students will explore this exciting new realm of biology through in-depth analysis and discussion of primary literature. Topics to be covered include the design and construction of synthetic gene circuits, synthesis of new genes and genomes, logic gate regulation of gene expression, and the latest applications of synthetic biology to advances in medicine, information processing, and the environment. Recommended Background: Students should have a strong foundational knowledge of cell biology, molecular biology, and genetics, as would be obtained from BB2550, BB2920, and BB3950. This course will be offered in 2020-21, and in alternating years thereafter.",
+                "term": "202201",
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Not Assigned",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 0,
+                    "seatsAvailable": 0,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "BB-4900",
           "number": "4900",
           "name": "Advanced Topics in Biology and Biotechnology",
@@ -11772,56 +11819,6 @@
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "id": "BB-526",
-          "number": "526",
-          "name": "Synthetic Biology",
-          "description": "BB 526 Synthetic Biology Do we yet have the technology to engineer life? Can we control gene expression to create organisms that function in useful ways? Do we understand the tenets of genetic regulation as well as we think we do? These important questions and more are investigated by the emerging field of Synthetic Biology. In this course, students will explore this exciting new realm of biology through in-depth analysis and discussion of primary literature. Topics to be covered include the design and construction of synthetic gene circuits, synthesis of new genes and genomes, logic gate regulation of gene expression, and the latest applications of synthetic biology to advances in medicine, information processing, and the environment. Credits 2",
-          "minCredits": 2,
-          "maxCredits": 2,
-          "isGraduate": true,
-          "lectures": [
-            {
-              "section": {
-                "crn": 336822,
-                "number": "C01",
-                "seats": 35,
-                "seatsAvailable": 26,
-                "actualWaitlist": 0,
-                "maxWaitlist": 5,
-                "note": null,
-                "description": "BB 526 Synthetic Biology Do we yet have the technology to engineer life? Can we control gene expression to create organisms that function in useful ways? Do we understand the tenets of genetic regulation as well as we think we do? These important questions and more are investigated by the emerging field of Synthetic Biology. In this course, students will explore this exciting new realm of biology through in-depth analysis and discussion of primary literature. Topics to be covered include the design and construction of synthetic gene circuits, synthesis of new genes and genomes, logic gate regulation of gene expression, and the latest applications of synthetic biology to advances in medicine, information processing, and the environment. Credits 2",
-                "term": "202201",
-                "computedTerm": "C",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "15:00",
-                    "endTime": "16:50",
-                    "location": "Salisbury Labs 411",
-                    "building": "",
-                    "room": "Salisbury Labs 411",
-                    "seats": 35,
-                    "seatsAvailable": 26,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 5,
-                    "specificSection": "C01",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
             }
           ]
         },
@@ -67685,7 +67682,7 @@
                 "number": "C02",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I A study of the fundamental laws of statics, kinematics, and dynamics applied to fluid mechanics. The course will include fluid properties, conservation of mass, momentum, and energy as applied to real and ideal fluids. Laminar and turbulent flows, fluid resistance, and basic boundary layer theory will also be considered. Recommended background: basic physics, basic differential equations, and vectors.",
@@ -67704,7 +67701,7 @@
                     "room": "Kaven Hall 116",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "C02",
                     "days": [
@@ -74107,7 +74104,7 @@
                 "number": "D02",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat I. This course surveys the major political, social, and economic changes of American history from 1920 to the present. Emphasis will be placed on the Great Depression, the New Deal, suburbanization, McCarthyism, the persistence of poverty,the domestic effects of the Vietnam war, and recent demographic trends.",
@@ -74126,7 +74123,7 @@
                     "room": "Olin Hall 109",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
