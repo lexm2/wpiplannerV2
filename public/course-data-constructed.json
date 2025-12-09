@@ -1164,6 +1164,7 @@
   "generated": "Dec 9, 2025, 3:19 PM",
   "generated": "Dec 9, 2025, 3:42 PM",
   "generated": "Dec 9, 2025, 3:53 PM",
+  "generated": "Dec 9, 2025, 4:22 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -57307,7 +57308,7 @@
                   "crn": 336400,
                   "number": "CX02",
                   "seats": 21,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4348",
@@ -57326,7 +57327,7 @@
                       "building": "",
                       "room": "Atwater Kent 317 ECE Lab",
                       "seats": 21,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX02",
@@ -65279,56 +65280,6 @@
                     "days": [
                       "M",
                       "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "ENV-2700",
-          "number": "2700",
-          "name": "Social Media, Social Movements, And The Environment",
-          "description": "Cat. II Social media platforms are changing the world of social movements, giving rise to a new generation of social activism. Social media can enable local actors to link with others from across the globe to incite social and environmental change. Social media has enabled people to document and share injustices (e.g., violence; dumping of toxic waste) in places where freedom of the press is limited or non-existent, and it has enabled people across different social groups (race, class, etc.) to engage with one another on issues of shared concern. Social media has also allowed people to share resources (financial, expertise, and organizational) with other social actors across the globe, empowering communities in novel ways. This course introduces students to the phenomena of social and environmental movements, theories on why they succeed and fail, and how social media has changed the landscape of social mobilization. This course will draw on interdisciplinary readings, concepts, and case studies from the social sciences, with emphasis on geography, public policy, sociology, and media studies. Course work will include small group projects, analyses of current social movement cases, and a final project. The final project will consist of interviewing members of a current social movement (potentially using social media), evaluating whether particular social media applications have helped to enable social mobilization, and designing new or revised social media tools to further enhance social mobilization. Recommended background: introductory environmental studies (ENV1100 or equivalent).",
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "lectures": [
-            {
-              "section": {
-                "crn": 338714,
-                "number": "D01",
-                "seats": 35,
-                "seatsAvailable": 19,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "description": "Cat. II Social media platforms are changing the world of social movements, giving rise to a new generation of social activism. Social media can enable local actors to link with others from across the globe to incite social and environmental change. Social media has enabled people to document and share injustices (e.g., violence; dumping of toxic waste) in places where freedom of the press is limited or non-existent, and it has enabled people across different social groups (race, class, etc.) to engage with one another on issues of shared concern. Social media has also allowed people to share resources (financial, expertise, and organizational) with other social actors across the globe, empowering communities in novel ways. This course introduces students to the phenomena of social and environmental movements, theories on why they succeed and fail, and how social media has changed the landscape of social mobilization. This course will draw on interdisciplinary readings, concepts, and case studies from the social sciences, with emphasis on geography, public policy, sociology, and media studies. Course work will include small group projects, analyses of current social movement cases, and a final project. The final project will consist of interviewing members of a current social movement (potentially using social media), evaluating whether particular social media applications have helped to enable social mobilization, and designing new or revised social media tools to further enhance social mobilization. Recommended background: introductory environmental studies (ENV1100 or equivalent).",
-                "term": "202201",
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Grant Burrier",
-                    "startTime": "13:00",
-                    "endTime": "14:50",
-                    "location": "Innovation Studio 205 Active Learning Classroom North",
-                    "building": "",
-                    "room": "Innovation Studio 205 Active Learning Classroom North",
-                    "seats": 35,
-                    "seatsAvailable": 19,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "D01",
-                    "days": [
-                      "T",
-                      "F"
                     ],
                     "isAsync": false
                   }
