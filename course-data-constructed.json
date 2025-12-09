@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 9, 2025, 9:15 PM",
+  "generated": "Dec 9, 2025, 9:31 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -25339,7 +25339,7 @@
                 "crn": 336587,
                 "number": "CL01",
                 "seats": 140,
-                "seatsAvailable": 13,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4376",
@@ -25358,7 +25358,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 140,
-                    "seatsAvailable": 13,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL01",
@@ -27526,7 +27526,7 @@
                 "crn": 336588,
                 "number": "CL03",
                 "seats": 140,
-                "seatsAvailable": 12,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4376",
@@ -27545,7 +27545,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 140,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL03",
