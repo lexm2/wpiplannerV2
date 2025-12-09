@@ -1152,6 +1152,7 @@
   "generated": "Dec 9, 2025, 9:44 AM",
   "generated": "Dec 9, 2025, 9:55 AM",
   "generated": "Dec 9, 2025, 10:20 AM",
+  "generated": "Dec 9, 2025, 10:47 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -229587,7 +229588,7 @@
                 "crn": 337842,
                 "number": "S01",
                 "seats": 20,
-                "seatsAvailable": 20,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -229606,7 +229607,7 @@
                     "building": "",
                     "room": "Olin Hall 109",
                     "seats": 20,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
