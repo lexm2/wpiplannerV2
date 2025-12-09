@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 9, 2025, 5:43 PM",
+  "generated": "Dec 9, 2025, 5:53 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4064,7 +4064,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Nick Carter",
+                    "professor": "Robyn Thomas",
                     "startTime": "12:00",
                     "endTime": "13:50",
                     "location": "Riley Commons",
@@ -51246,7 +51246,7 @@
                 "number": "S01",
                 "seats": 45,
                 "seatsAvailable": 14,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "CS 553 / DS 553: Machine Learning Development and Operations (MLOps) (3 credits) This course teaches students the computational skills required in the fields of Artificial Intelligence (AI) and Data Science. As data-driven decision-making and AI applications continue to transform industries, proficiency in programming and machine learning tools is important. In this course, you will develop a strong foundation in programming languages commonly used in AI and Data Science (such as Python). This course will cover the development, debugging, deployment, and subsequent monitoring phases of models in end-to-end pipelines core to machine learning systems. You will also familiarize yourself with popular libraries, frameworks and debugging on IDEs, such as PyCharm, PyTorch, scikit-learn, and/or pandas. Possible topics may include practice code development with a copilot as well as deployment of models on a cloud computing environment The student will engage in hands-on projects to practice their programming skills to solve realworld AI and Data Science problems. Recommended Background: Basic understanding of programming concepts, and preferably some python knowledge.",
@@ -51265,7 +51265,7 @@
                     "room": "Salisbury Labs 105",
                     "seats": 45,
                     "seatsAvailable": 14,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
@@ -54331,7 +54331,7 @@
                 "number": "S01",
                 "seats": 45,
                 "seatsAvailable": 14,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "CS 553 / DS 553: Machine Learning Development and Operations (MLOps) (3 credits) This course teaches students the computational skills required in the fields of Artificial Intelligence (AI) and Data Science. As data-driven decision-making and AI applications continue to transform industries, proficiency in programming and machine learning tools is important. In this course, you will develop a strong foundation in programming languages commonly used in AI and Data Science (such as Python). This course will cover the development, debugging, deployment, and subsequent monitoring phases of models in end-to-end pipelines core to machine learning systems. You will also familiarize yourself with popular libraries, frameworks and debugging on IDEs, such as PyCharm, PyTorch, scikit-learn, and/or pandas. Possible topics may include practice code development with a copilot as well as deployment of models on a cloud computing environment The student will engage in hands-on projects to practice their programming skills to solve realworld AI and Data Science problems. Recommended Background: Basic understanding of programming concepts, and preferably some python knowledge.",
@@ -54350,7 +54350,7 @@
                     "room": "Salisbury Labs 105",
                     "seats": 45,
                     "seatsAvailable": 14,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
