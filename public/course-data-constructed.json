@@ -1204,6 +1204,7 @@
   "generated": "Dec 10, 2025, 9:20 AM",
   "generated": "Dec 10, 2025, 9:45 AM",
   "generated": "Dec 10, 2025, 9:56 AM",
+  "generated": "Dec 10, 2025, 10:23 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -53271,7 +53272,7 @@
                 "number": "S01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Big Data Analytics addresses the obstacle that innovation and discoveries are no longer hindered by the ability to collect data, but by the ability to summarize, analyze, and discover knowledge from the collected data in a scalable fashion. This course covers computational techniques and algorithms for analyzing and mining patterns in large-scale datasets. Techniques studied address data analysis issues related to data volume (scalable and distributed analysis), data velocity (high-speed data streams), data variety (complex, heterogeneous, or unstructured data), and data veracity (data uncertainty). Techniques include mining and machine learning techniques for complex data types, and scale-up and scale-out strategies that leverage big data infrastructures. Real-world applications using these techniques, for instance social media analysis and scientific data mining, are selectively discussed. Students are expected to engage in hands-on projects using one or more of these technologies. Prerequisites: A beginning course in databases and a beginning course in data mining, or equivalent knowledge, and programming experience.",
@@ -53290,7 +53291,7 @@
                     "room": "Higgins Labs 154",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 15,
                     "specificSection": "S01",
                     "days": [
@@ -55133,7 +55134,7 @@
                 "number": "S01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Big Data Analytics addresses the obstacle that innovation and discoveries are no longer hindered by the ability to collect data, but by the ability to summarize, analyze, and discover knowledge from the collected data in a scalable fashion. This course covers computational techniques and algorithms for analyzing and mining patterns in large-scale datasets. Techniques studied address data analysis issues related to data volume (scalable and distributed analysis), data velocity (high-speed data streams), data variety (complex, heterogeneous, or unstructured data), and data veracity (data uncertainty). Techniques include mining and machine learning techniques for complex data types, and scale-up and scale-out strategies that leverage big data infrastructures. Real-world applications using these techniques, for instance social media analysis and scientific data mining, are selectively discussed. Students are expected to engage in hands-on projects using one or more of these technologies. Prerequisites: A beginning course in databases and a beginning course in data mining, or equivalent knowledge, and programming experience.",
@@ -55152,7 +55153,7 @@
                     "room": "Higgins Labs 154",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 15,
                     "specificSection": "S01",
                     "days": [
@@ -170732,7 +170733,7 @@
                 "number": "DL01",
                 "seats": 72,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 8,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4493",
                 "description": "Cat. IThis course introduces students to manufacturing science and engineering andprototype part production. It emphasizes CNC (computer-controlled)machining. Students will learn how to go from a solid (CAD, computer-aideddesign) model to a machined part, using CAM software (computer-aidedmanufacturing) and CNC machining. They will also be exposed to associatedissues in manufacturing process analysis, engineering design, material science,and in dimensional and surface metrology. Using machining as an example, thescience of manufacturing processes is developed in a combination of class workand laboratory experience. The laboratory experience includes an experimentalcomponent that relates process variables in machining with performance andmachined part quality. Students whose project work will necessitate fabricationof parts and those who want a background in manufacturing process science andengineering should take this course.",
@@ -170751,7 +170752,7 @@
                     "room": "Washburn 229",
                     "seats": 72,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 15,
                     "specificSection": "DL01",
                     "days": [
