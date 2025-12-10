@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 10, 2025, 10:17 PM",
+  "generated": "Dec 10, 2025, 10:43 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -11104,7 +11104,7 @@
                 "crn": 336937,
                 "number": "D01",
                 "seats": 40,
-                "seatsAvailable": 12,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -11123,7 +11123,7 @@
                     "building": "",
                     "room": "Unity Hall 405",
                     "seats": 40,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
