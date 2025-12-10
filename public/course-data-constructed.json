@@ -1225,6 +1225,7 @@
   "generated": "Dec 10, 2025, 6:51 PM",
   "generated": "Dec 10, 2025, 7:15 PM",
   "generated": "Dec 10, 2025, 7:31 PM",
+  "generated": "Dec 10, 2025, 7:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -243462,7 +243463,7 @@
                 "number": "C04",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course will teach basic walking techniques and principles with the goal for students to develop and implement an individualized conditioning program for themselves.",
@@ -243481,7 +243482,7 @@
                     "room": "Recreation Center Track",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C04",
                     "days": [
@@ -245497,7 +245498,7 @@
                 "number": "C02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I (1/12 unit) This course will teach basic strength training principles and techniques. Students will develop and implement an individualized conditioning program.",
@@ -245516,7 +245517,7 @@
                     "room": "Harrington Auditorium 102",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
