@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 10, 2025, 4:46 AM",
+  "generated": "Dec 10, 2025, 5:18 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -251838,7 +251838,7 @@
                 "crn": 353573,
                 "number": "S01 - ST Holistic Well-Being: Strategies for College Learning and Productivity",
                 "seats": 12,
-                "seatsAvailable": 7,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -251857,7 +251857,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 12,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S01 - ST Holistic Well-Being: Strategies for College Learning and Productivity",
