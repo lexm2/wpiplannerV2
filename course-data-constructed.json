@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 11, 2025, 1:55 PM",
+  "generated": "Dec 11, 2025, 2:19 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -11008,7 +11008,7 @@
               "crn": 336826,
               "number": "CX01",
               "seats": 16,
-              "seatsAvailable": 8,
+              "seatsAvailable": 9,
               "actualWaitlist": 0,
               "maxWaitlist": 5,
               "note": null,
@@ -11027,7 +11027,7 @@
                   "building": "",
                   "room": "Goddard Hall 205 BB Lab",
                   "seats": 16,
-                  "seatsAvailable": 8,
+                  "seatsAvailable": 9,
                   "actualWaitlist": 0,
                   "maxWaitlist": 5,
                   "specificSection": "CX01",
