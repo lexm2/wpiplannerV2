@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 11, 2025, 4:47 AM",
+  "generated": "Dec 11, 2025, 5:19 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -55841,7 +55841,7 @@
                   "crn": 337216,
                   "number": "DX05",
                   "seats": 30,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4437",
@@ -55860,7 +55860,7 @@
                       "building": "",
                       "room": "Atwater Kent 113 Semi-Conductor Lab",
                       "seats": 30,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX05",
@@ -55875,7 +55875,7 @@
                   "crn": 337217,
                   "number": "DX06",
                   "seats": 30,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4437",
@@ -55894,7 +55894,7 @@
                       "building": "",
                       "room": "Atwater Kent 113 Semi-Conductor Lab",
                       "seats": 30,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX06",
