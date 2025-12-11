@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 11, 2025, 7:53 AM",
+  "generated": "Dec 11, 2025, 8:24 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -46811,7 +46811,7 @@
                 "crn": 336387,
                 "number": "C01",
                 "seats": 75,
-                "seatsAvailable": 41,
+                "seatsAvailable": 40,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -46830,7 +46830,7 @@
                     "building": "",
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 75,
-                    "seatsAvailable": 41,
+                    "seatsAvailable": 40,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
@@ -55595,7 +55595,7 @@
                   "crn": 336408,
                   "number": "CX04",
                   "seats": 36,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4347",
@@ -55614,7 +55614,7 @@
                       "building": "",
                       "room": "Atwater Kent 113 Semi-Conductor Lab",
                       "seats": 36,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX04",
