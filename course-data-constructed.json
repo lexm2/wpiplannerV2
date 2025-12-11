@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 11, 2025, 10:16 PM",
+  "generated": "Dec 11, 2025, 10:43 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -186283,7 +186283,7 @@
                 "crn": 336602,
                 "number": "C01 - Topics In Interactive Programming",
                 "seats": 20,
-                "seatsAvailable": 13,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -186302,7 +186302,7 @@
                     "building": "",
                     "room": "Alden Hall B30 Music Technology Lab",
                     "seats": 20,
-                    "seatsAvailable": 13,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "C01 - Topics In Interactive Programming",
@@ -242723,7 +242723,7 @@
                 "crn": 336745,
                 "number": "C03",
                 "seats": 30,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -242742,7 +242742,7 @@
                     "building": "",
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C03",
