@@ -1254,6 +1254,7 @@
   "generated": "Dec 11, 2025, 9:22 AM",
   "generated": "Dec 11, 2025, 9:46 AM",
   "generated": "Dec 11, 2025, 10:20 AM",
+  "generated": "Dec 11, 2025, 10:48 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5630,7 +5631,7 @@
                 "number": "C02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course focuses on the methods, procedures and techniques of creating and manipulating images through electronic and digital means. Students will develop an understanding of image alteration. Topics may include color theory, displays, modeling, shading, and visual perception. Recommended background: AR 1100.",
@@ -5649,7 +5650,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
