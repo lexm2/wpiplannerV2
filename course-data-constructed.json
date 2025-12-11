@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 11, 2025, 11:15 AM",
+  "generated": "Dec 11, 2025, 11:40 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -12260,7 +12260,7 @@
                 "crn": 341614,
                 "number": "S02 - ST: Advanced Topics in Biotechnology",
                 "seats": 30,
-                "seatsAvailable": 19,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -12279,7 +12279,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S02 - ST: Advanced Topics in Biotechnology",
