@@ -1263,6 +1263,7 @@
   "generated": "Dec 11, 2025, 1:55 PM",
   "generated": "Dec 11, 2025, 2:19 PM",
   "generated": "Dec 11, 2025, 2:44 PM",
+  "generated": "Dec 11, 2025, 2:56 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -85051,7 +85052,7 @@
                 "number": "B01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "IMGD/WR 2450: Narrative Design for Interactive Media and Games Course description: This course will introduce key narrative concepts and skills necessary to craft linear and branching experiences in games and interactive media. These lessons can be of fundamental value to all interactive media and any development role. Topics covered may include world-building, writing within intellectual property, lore creation, environmental storytelling, and quest design. Students will work in small groups throughout the course to provide feedback and practice reciprocal creative roles in narrative creation. Recommended background: design and development fundamentals. Students may not receive credit for both 2450 and IMGD/WR 3400.",
@@ -85070,7 +85071,7 @@
                     "room": "Kaven Hall 115",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [
@@ -242352,7 +242353,7 @@
                 "number": "B01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "IMGD/WR 2450: Narrative Design for Interactive Media and Games Course description: This course will introduce key narrative concepts and skills necessary to craft linear and branching experiences in games and interactive media. These lessons can be of fundamental value to all interactive media and any development role. Topics covered may include world-building, writing within intellectual property, lore creation, environmental storytelling, and quest design. Students will work in small groups throughout the course to provide feedback and practice reciprocal creative roles in narrative creation. Recommended background: design and development fundamentals. Students may not receive credit for both 2450 and IMGD/WR 3400.",
@@ -242371,7 +242372,7 @@
                     "room": "Kaven Hall 115",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [
@@ -243422,7 +243423,7 @@
                 "number": "C02",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 15,
+                "actualWaitlist": 14,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I This course will teach basic walking techniques and principles with the goal for students to develop and implement an individualized conditioning program for themselves.",
@@ -243441,7 +243442,7 @@
                     "room": "Recreation Center Track",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 15,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 15,
                     "specificSection": "C02",
                     "days": [
