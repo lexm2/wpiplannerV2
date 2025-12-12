@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 12, 2025, 3:43 PM",
+  "generated": "Dec 12, 2025, 3:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -79566,6 +79566,42 @@
                 "crn": 337781,
                 "number": "S01 - PRAC IN HUA: Performance & Dramaturgy (SP26)",
                 "seats": 12,
+                "seatsAvailable": 9,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "description": "Cat. I The practicum serves as the culmination for a student's Humanities and Arts Requirement. The practicum provides opportunities for sustained critical inquiry into a focused thematic area. The practicum seeks to help students learn to communicate effectively, to think critically, and to appreciate diverse perspectives in a spirit of openness and cooperation through research, creativity, and investigation. The specific theme of each practicum will vary and will be defined by the instructor. Prior to enrolling in the practicum, a student must have completed five courses in Humanities and Arts, at least two of which must be thematically related and at least one of which must be at the 2000-level or above. Consent of the instructor is required for enrollment.",
+                "term": "202201",
+                "computedTerm": "S",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Seminar",
+                    "professor": "Laura Eckelman",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 12,
+                    "seatsAvailable": 9,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "S01 - PRAC IN HUA: Performance & Dramaturgy (SP26)",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 337638,
+                "number": "S02 - PRAC IN HUA: Design (SP26)",
+                "seats": 12,
                 "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
@@ -79586,42 +79622,6 @@
                     "room": "Unknown",
                     "seats": 12,
                     "seatsAvailable": 10,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "S01 - PRAC IN HUA: Performance & Dramaturgy (SP26)",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 337638,
-                "number": "S02 - PRAC IN HUA: Design (SP26)",
-                "seats": 12,
-                "seatsAvailable": 11,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "description": "Cat. I The practicum serves as the culmination for a student's Humanities and Arts Requirement. The practicum provides opportunities for sustained critical inquiry into a focused thematic area. The practicum seeks to help students learn to communicate effectively, to think critically, and to appreciate diverse perspectives in a spirit of openness and cooperation through research, creativity, and investigation. The specific theme of each practicum will vary and will be defined by the instructor. Prior to enrolling in the practicum, a student must have completed five courses in Humanities and Arts, at least two of which must be thematically related and at least one of which must be at the 2000-level or above. Consent of the instructor is required for enrollment.",
-                "term": "202201",
-                "computedTerm": "S",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "Laura Eckelman",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 12,
-                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S02 - PRAC IN HUA: Design (SP26)",
