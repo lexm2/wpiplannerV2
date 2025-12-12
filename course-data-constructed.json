@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 12, 2025, 9:49 PM",
+  "generated": "Dec 12, 2025, 10:16 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5777,7 +5777,7 @@
                 "crn": 336509,
                 "number": "C01",
                 "seats": 24,
-                "seatsAvailable": 14,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -5796,7 +5796,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 24,
-                    "seatsAvailable": 14,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -49852,8 +49852,8 @@
               "section": {
                 "crn": 337823,
                 "number": "S01",
-                "seats": 15,
-                "seatsAvailable": 0,
+                "seats": 30,
+                "seatsAvailable": 8,
                 "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
@@ -49871,8 +49871,8 @@
                     "location": "Salisbury Labs 305",
                     "building": "",
                     "room": "Salisbury Labs 305",
-                    "seats": 15,
-                    "seatsAvailable": 0,
+                    "seats": 30,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -81481,8 +81481,8 @@
               "section": {
                 "crn": 346781,
                 "number": "C22 - SOC SCI RES-IQP- British Columbia (WI)",
-                "seats": 30,
-                "seatsAvailable": 19,
+                "seats": 19,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -81497,11 +81497,11 @@
                     "professor": "Caitlin Ferrarini",
                     "startTime": "18:30",
                     "endTime": "20:20",
-                    "location": "Olin Hall 223",
+                    "location": "Other",
                     "building": "",
-                    "room": "Olin Hall 223",
-                    "seats": 30,
-                    "seatsAvailable": 19,
+                    "room": "Other",
+                    "seats": 19,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "C22 - SOC SCI RES-IQP- British Columbia (WI)",
@@ -81520,8 +81520,8 @@
               "section": {
                 "crn": 346793,
                 "number": "C23 - SOC SCI RES-IQP- New Zealand (WI)",
-                "seats": 30,
-                "seatsAvailable": 20,
+                "seats": 19,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -81539,8 +81539,8 @@
                     "location": "Olin Hall 109",
                     "building": "",
                     "room": "Olin Hall 109",
-                    "seats": 30,
-                    "seatsAvailable": 20,
+                    "seats": 19,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "C23 - SOC SCI RES-IQP- New Zealand (WI)",
@@ -160934,93 +160934,6 @@
           ]
         },
         {
-          "id": "MA-2210",
-          "number": "2210",
-          "name": "Mathematical Methods In Decision Making",
-          "description": "Cat. IThis course introduces students to the principles of decision theory as applied tothe planning, design and management of complex projects. It will be useful tostudents in all areas of engineering, actuarial mathematics as well as those insuch interdisciplinary areas as environmental studies. It emphasizes quantitative,analytic approaches to decision making using the tools of applied mathematics,operations research, probability and computations. Topics covered include: thesystems approach, mathematical modeling, optimization and decision analyses.Case studies from various areas of engineering or actuarial mathematics are usedto illustrate applications of the materials covered in this course.Recommended background: MA 1024. Suggested background: Familiaritywith vectors and matrices. Although the course makes use of computers, noprogramming experience is assumed. Students who have received credit forCE 2010 may not receive credit for MA 2210.",
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "lectures": [
-            {
-              "section": {
-                "crn": 337518,
-                "number": "DL01",
-                "seats": 3,
-                "seatsAvailable": 1,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4503",
-                "description": "Cat. IThis course introduces students to the principles of decision theory as applied tothe planning, design and management of complex projects. It will be useful tostudents in all areas of engineering, actuarial mathematics as well as those insuch interdisciplinary areas as environmental studies. It emphasizes quantitative,analytic approaches to decision making using the tools of applied mathematics,operations research, probability and computations. Topics covered include: thesystems approach, mathematical modeling, optimization and decision analyses.Case studies from various areas of engineering or actuarial mathematics are usedto illustrate applications of the materials covered in this course.Recommended background: MA 1024. Suggested background: Familiaritywith vectors and matrices. Although the course makes use of computers, noprogramming experience is assumed. Students who have received credit forCE 2010 may not receive credit for MA 2210.",
-                "term": "202201",
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Marcus Sarkis-Martins",
-                    "startTime": "10:00",
-                    "endTime": "10:50",
-                    "location": "Stratton Hall 301",
-                    "building": "",
-                    "room": "Stratton Hall 301",
-                    "seats": 3,
-                    "seatsAvailable": 1,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "DL01",
-                    "days": [
-                      "M",
-                      "T",
-                      "R",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [
-                {
-                  "crn": 337044,
-                  "number": "DD01",
-                  "seats": 3,
-                  "seatsAvailable": 1,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4503",
-                  "description": "Cat. IThis course introduces students to the principles of decision theory as applied tothe planning, design and management of complex projects. It will be useful tostudents in all areas of engineering, actuarial mathematics as well as those insuch interdisciplinary areas as environmental studies. It emphasizes quantitative,analytic approaches to decision making using the tools of applied mathematics,operations research, probability and computations. Topics covered include: thesystems approach, mathematical modeling, optimization and decision analyses.Case studies from various areas of engineering or actuarial mathematics are usedto illustrate applications of the materials covered in this course.Recommended background: MA 1024. Suggested background: Familiaritywith vectors and matrices. Although the course makes use of computers, noprogramming experience is assumed. Students who have received credit forCE 2010 may not receive credit for MA 2210.",
-                  "term": "202201",
-                  "computedTerm": "D",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Marcus Sarkis-Martins",
-                      "startTime": "10:00",
-                      "endTime": "10:50",
-                      "location": "Stratton Hall 301",
-                      "building": "",
-                      "room": "Stratton Hall 301",
-                      "seats": 3,
-                      "seatsAvailable": 1,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "DD01",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                }
-              ],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
           "id": "MA-2211",
           "number": "2211",
           "name": "Theory Of Interest I",
@@ -172051,7 +171964,7 @@
                 "number": "D01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "ME 4323. Fundamentals of Vehicle Drivetrain Systems. Cat I This product-oriented course focuses on engineering fundamentals of ground vehicle drivetrain systems with application to automobiles, commercial and off-road vehicles as well as autonomous and electrically driven ground vehicles. The course focuses on “theory and practice” aspects of engineering design of vehicle transmissions, transfer cases, open and limited slip differentials, etc. A term project integrates design principles with materials selection to improve a drivetrain component for a given vehicle. Project steps include: problem definition and analysis, development of design specifications, development and analysis of alternative designs, conceptual design and material analysis, and a CAE design. Recommended Background: materials science (ES 2001), stress analysis (ES 2502), dynamics (ES 2503) or equivalents.",
@@ -172070,7 +171983,7 @@
                     "room": "Unity Hall 405",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -242159,7 +242072,7 @@
                 "number": "C02",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 14,
+                "actualWaitlist": 15,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I This course will teach basic walking techniques and principles with the goal for students to develop and implement an individualized conditioning program for themselves.",
@@ -242178,7 +242091,7 @@
                     "room": "Recreation Center Track",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 14,
+                    "actualWaitlist": 15,
                     "maxWaitlist": 15,
                     "specificSection": "C02",
                     "days": [
@@ -250681,7 +250594,7 @@
                 "number": "D02",
                 "seats": 15,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "WPE 1611 Introduction to Mindfulness (Cat. I, 1/12 unit) Introduction to Mindfulness is an evidence-based mindfulness curriculum designed for college aged adults by the Mindfulness Institute for Emerging Adults (MIEA). During this course, you will learn useful, practical tools to help manage your stress and increase self-compassion. Students will practice a variety of meditation skills, engage with the MIEA Mobile App, read the companion book, and participate in class discussion.",
@@ -250700,7 +250613,7 @@
                     "room": "Daniels Hall 102E",
                     "seats": 15,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
