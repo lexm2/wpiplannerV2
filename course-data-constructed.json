@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 12, 2025, 7:29 PM",
+  "generated": "Dec 12, 2025, 7:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -156274,7 +156274,7 @@
                 "crn": 336329,
                 "number": "CL03",
                 "seats": 105,
-                "seatsAvailable": 29,
+                "seatsAvailable": 28,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4316",
@@ -156293,7 +156293,7 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 105,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 28,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL03",
@@ -156312,7 +156312,7 @@
                   "crn": 336347,
                   "number": "CD11",
                   "seats": 35,
-                  "seatsAvailable": 6,
+                  "seatsAvailable": 5,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4316",
@@ -156331,7 +156331,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 35,
-                      "seatsAvailable": 6,
+                      "seatsAvailable": 5,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD11",
