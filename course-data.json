@@ -31492,7 +31492,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "8/15",
+      "Waitlist_Waitlist_Capacity": "7/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337602"
     },
     {
@@ -46209,7 +46209,7 @@
       "Course_Title": "ES 3002 - Mass Transfer",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "48/60",
+      "Enrolled_Capacity": "47/60",
       "Instructional_Format": "Discussion",
       "Instructors": "Andrew Teixeira",
       "Locations": "Fuller Labs 320",
@@ -46239,7 +46239,7 @@
       "Course_Title": "ES 3002 - Mass Transfer",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "48/60",
+      "Enrolled_Capacity": "47/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Andrew Teixeira",
       "Locations": "Fuller Labs 320",
@@ -46792,7 +46792,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "2/20",
+      "Waitlist_Waitlist_Capacity": "1/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337581"
     },
     {
@@ -61224,7 +61224,7 @@
       "Course_Title": "IMGD 5000 - IMGD Studio",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "13/24",
+      "Enrolled_Capacity": "14/24",
       "Instructional_Format": "Lecture",
       "Instructors": "Rodney DuPlessis",
       "Locations": "Kaven Hall 203 CARS Computer Lab",
@@ -61557,7 +61557,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Interactive Media and Game Development",
-      "Waitlist_Waitlist_Capacity": "4/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339181"
     },
     {
@@ -120147,7 +120147,7 @@
       "Course_Title": "WPE 1216 - Club Sport - Pep Band",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "11/75",
+      "Enrolled_Capacity": "10/75",
       "Instructional_Format": "Workshop",
       "Instructors": "Ann McCarron",
       "Offering_Period": "2026 Spring C Term",
