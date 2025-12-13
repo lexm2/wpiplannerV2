@@ -1381,6 +1381,7 @@
   "generated": "Dec 13, 2025, 5:14 PM",
   "generated": "Dec 13, 2025, 5:31 PM",
   "generated": "Dec 13, 2025, 5:49 PM",
+  "generated": "Dec 13, 2025, 6:21 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -168897,7 +168898,7 @@
                 "crn": 337713,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 12,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -168916,7 +168917,7 @@
                     "building": "",
                     "room": "Stratton Hall 202 (new)",
                     "seats": 30,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
