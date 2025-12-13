@@ -1365,6 +1365,7 @@
   "generated": "Dec 13, 2025, 11:13 AM",
   "generated": "Dec 13, 2025, 11:27 AM",
   "generated": "Dec 13, 2025, 11:38 AM",
+  "generated": "Dec 13, 2025, 11:49 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -48734,7 +48735,7 @@
                 "number": "DL02",
                 "seats": 75,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4440",
                 "description": "Cat. IThis course introduces the fundamental principles of software engineering. Modern software development techniques and life cycles are emphasized. Topics include requirements analysis and specification, analysis and design, architecture, implementation, testing and quality, configuration management, and project management.Students will be expected to complete a project that employs techniques from the topics studied.This course should be taken before any course requiring a large programming project.Undergraduate credit may not be earned both for this course and for CS 509. Recommended background: CS 2102, CS 2103, or CS 2119.",
@@ -48753,7 +48754,7 @@
                     "room": "Unity Hall 420",
                     "seats": 75,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "DL02",
                     "days": [
