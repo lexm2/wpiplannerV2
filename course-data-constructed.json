@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 13, 2025, 11:49 AM",
+  "generated": "Dec 13, 2025, 12:31 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -162750,7 +162750,7 @@
                 "crn": 337050,
                 "number": "DL02",
                 "seats": 78,
-                "seatsAvailable": 8,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4517",
@@ -162769,7 +162769,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 78,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL02",
@@ -162857,7 +162857,7 @@
                   "crn": 337064,
                   "number": "DX05",
                   "seats": 26,
-                  "seatsAvailable": 2,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4517",
@@ -162876,7 +162876,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 26,
-                      "seatsAvailable": 2,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX05",
