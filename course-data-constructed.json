@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 13, 2025, 1:38 PM",
+  "generated": "Dec 13, 2025, 1:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -173771,7 +173771,7 @@
                 "number": "S02",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "ME 528/RBE 501 Robot Dynamics (3 Credits) Foundations and principles of robot dynamics. Topics include system modeling including dynamical modeling of serial arm robots using Newton and Lagrange’s techniques, dynamical modeling of mobile robots, introduction to dynamics-based robot control, as well as advanced techniques for serial arm forward kinematics, trajectory planning, singularity and manipulability, and vision-based control. In addition, dynamic simulation techniques will be covered to apply the concepts learned using realistic simulators. An end of term team project would allow students to apply mastery of the subject to real-world robotic platforms. Prerequisites: RBE 500 or equivalent",
@@ -173790,7 +173790,7 @@
                     "room": "Unity Hall 400",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "S02",
                     "days": [
@@ -233847,7 +233847,7 @@
                 "number": "S02",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "ME 528/RBE 501 Robot Dynamics (3 Credits) Foundations and principles of robot dynamics. Topics include system modeling including dynamical modeling of serial arm robots using Newton and Lagrange’s techniques, dynamical modeling of mobile robots, introduction to dynamics-based robot control, as well as advanced techniques for serial arm forward kinematics, trajectory planning, singularity and manipulability, and vision-based control. In addition, dynamic simulation techniques will be covered to apply the concepts learned using realistic simulators. An end of term team project would allow students to apply mastery of the subject to real-world robotic platforms. Prerequisites: RBE 500 or equivalent",
@@ -233866,7 +233866,7 @@
                     "room": "Unity Hall 400",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "S02",
                     "days": [
@@ -233971,7 +233971,7 @@
                 "crn": 337698,
                 "number": "S02",
                 "seats": 60,
-                "seatsAvailable": 39,
+                "seatsAvailable": 38,
                 "actualWaitlist": 0,
                 "maxWaitlist": 40,
                 "note": null,
@@ -233990,7 +233990,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 60,
-                    "seatsAvailable": 39,
+                    "seatsAvailable": 38,
                     "actualWaitlist": 0,
                     "maxWaitlist": 40,
                     "specificSection": "S02",
