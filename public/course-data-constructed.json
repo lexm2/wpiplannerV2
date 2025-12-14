@@ -1413,6 +1413,7 @@
   "generated": "Dec 14, 2025, 7:37 AM",
   "generated": "Dec 14, 2025, 7:49 AM",
   "generated": "Dec 14, 2025, 8:20 AM",
+  "generated": "Dec 14, 2025, 8:45 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -245893,7 +245894,7 @@
                 "number": "C02",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I (1/12 unit) For the intermediate to advanced swimmer. This class is geared toward swimming for fitness purposes. Workouts will be administered each class period with students developing the knowledge to create workouts for themselves.",
@@ -245912,7 +245913,7 @@
                     "room": "Recreation Center Pool Lanes 1-3",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
