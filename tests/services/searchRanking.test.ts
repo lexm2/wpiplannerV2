@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'bun:test';
 import { SearchService } from '../../src/services/searchService';
 import type { Course, Department } from '../../src/types/types';
 

@@ -1,7 +1,7 @@
 import { syncManager } from '../../services/sync/SyncManager';
 import { providerRegistry } from '../../services/sync/ProviderRegistry';
 import type { SyncEvent } from '../../services/sync/types';
-import type { StateChangeEvent, ProfileState } from '../../core/ProfileStateManager';
+import type { StateChangeEvent, ProfileState } from '../../core/state/ProfileStateManager';
 import { getInlineSVG, type IconName } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
 import { syncEventBus } from '../../services/sync/SyncEventBus';
@@ -252,7 +252,7 @@ export class CloudStatusButton {
         } else {
             try {
                 // Get local data for initial sync/conflict check
-                const { ProfileStateManager } = await import('../../core/ProfileStateManager');
+                const { ProfileStateManager } = await import('../../core/state/ProfileStateManager');
                 const stateManager = ProfileStateManager.getInstance();
                 const exportedData = await stateManager.exportData();
 

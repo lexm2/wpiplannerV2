@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach } from 'vitest'
+import { describe, test, expect, beforeEach } from 'bun:test'
 import { CourseFilterService } from '../../src/services/CourseFilterService'
 import { SearchService } from '../../src/services/searchService'
 import { CourseSelectionService } from '../../src/services/CourseSelectionService'

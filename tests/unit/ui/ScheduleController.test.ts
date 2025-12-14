@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { ScheduleController } from '../../../src/ui/controllers/ScheduleController';
 import { CourseSelectionService } from '../../../src/services/CourseSelectionService';
 import { ScheduleFilterService } from '../../../src/services/ScheduleFilterService';
@@ -441,7 +441,7 @@ describe('ScheduleController Auto-Schedule Cycling', () => {
 
         // Mock setSelectedComponents to throw error
         const originalMethod = courseSelectionService.setSelectedComponents;
-        courseSelectionService.setSelectedComponents = vi.fn().mockRejectedValue(new Error('Test error'));
+        courseSelectionService.setSelectedComponents = mock().mockRejectedValue(new Error('Test error'));
 
         const mockSchedules = [
             [{ course: errorCourse, combination: { lecture: errorSection }, isLocked: false }]

@@ -1,6 +1,6 @@
 import type { ConflictInfo, ConflictResolution } from '../../services/sync/types';
 import { BaseModal } from './BaseModal';
-import { ModalService } from '../../services/ModalService';
+import { ModalService } from '../../services/ui/ModalService';
 
 export type ConflictResolveCallback = (resolution: ConflictResolution) => void;
 

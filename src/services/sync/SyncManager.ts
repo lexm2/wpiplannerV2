@@ -26,7 +26,7 @@ export class SyncManager {
      */
     private async getLocalSyncData(): Promise<SyncData | null> {
         try {
-            const { ProfileStateManager } = await import('../../core/ProfileStateManager');
+            const { ProfileStateManager } = await import('../../core/state/ProfileStateManager');
             const stateManager = ProfileStateManager.getInstance();
             const exportedData = await stateManager.exportData();
 

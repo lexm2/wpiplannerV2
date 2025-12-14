@@ -1,5 +1,5 @@
-import { ScheduleManagementService } from '../../services/ScheduleManagementService';
-import { ModalService } from '../../services/ModalService';
+import { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
+import { ModalService } from '../../services/ui/ModalService';
 import { Schedule } from '../../types/schedule';
 import { BaseModal } from './BaseModal';
 import { getInlineSVG } from '../../utils/iconPaths';

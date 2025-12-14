@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach } from 'vitest';
+import { describe, test, expect, beforeEach } from 'bun:test';
 import { PeriodDaysFilter } from '../../../src/core/filters/PeriodDaysFilter';
 import { Period, DayOfWeek, PeriodType } from '../../../src/types/types';
 

@@ -1,8 +1,8 @@
-import { vi } from 'vitest'
+import { mock, expect } from 'bun:test'
 import { SimpleTime } from '../../src/types/types'
 
 export const mockFetch = (data: any, ok: boolean = true) => {
-  global.fetch = vi.fn().mockResolvedValue({
+  global.fetch = mock().mockResolvedValue({
     ok,
     json: () => Promise.resolve(data),
     status: ok ? 200 : 500,
@@ -14,14 +14,14 @@ export const mockLocalStorage = () => {
   const store: Record<string, string> = {}
   
   return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
+    getItem: mock((key: string) => store[key] || null),
+    setItem: mock((key: string, value: string) => {
       store[key] = value
     }),
-    removeItem: vi.fn((key: string) => {
+    removeItem: mock((key: string) => {
       delete store[key]
     }),
-    clear: vi.fn(() => {
+    clear: mock(() => {
       Object.keys(store).forEach(key => delete store[key])
     }),
     get store() { return { ...store } }

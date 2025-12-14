@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach } from 'vitest';
+import { describe, test, expect, beforeEach } from 'bun:test';
 import { SectionCodeFilter } from '../../../src/core/filters/SectionCodeFilter';
 import { Section } from '../../../src/types/types';
 import { createMockSection } from '../../helpers/mockData';

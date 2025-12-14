@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, mock } from 'bun:test'
 import { AutoScheduler } from '../../../src/services/AutoScheduler'
 import type { SelectedCourse } from '../../../src/types/schedule'
 import type { Course, Section, DayOfWeek } from '../../../src/types/types'
@@ -486,7 +486,7 @@ describe('AutoScheduler - Complement Method', () => {
       const courses = createLargeCombinationSpace(3, 5)
       const selectedCourses = courses.map(c => createMockSelectedCourse({ course: c }))
 
-      const consoleSpy = vi.spyOn(console, 'warn')
+      const consoleSpy = spyOn(console, 'warn')
 
       const result = autoScheduler.generateAllSchedules(selectedCourses, 1000)
 
@@ -498,7 +498,7 @@ describe('AutoScheduler - Complement Method', () => {
       const courses = createLargeCombinationSpace(6, 10)
       const selectedCourses = courses.map(c => createMockSelectedCourse({ course: c }))
 
-      const consoleSpy = vi.spyOn(console, 'warn')
+      const consoleSpy = spyOn(console, 'warn')
 
       autoScheduler.generateAllSchedules(selectedCourses, 100)
 
@@ -511,7 +511,7 @@ describe('AutoScheduler - Complement Method', () => {
       const courses = createLargeCombinationSpace(8, 10)
       const selectedCourses = courses.map(c => createMockSelectedCourse({ course: c }))
 
-      const consoleSpy = vi.spyOn(console, 'warn')
+      const consoleSpy = spyOn(console, 'warn')
 
       const result = autoScheduler.generateAllSchedules(selectedCourses, 10000, 100)
 

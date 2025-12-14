@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi, afterEach } mock, from 'bun:test'
 import { CourseSelectionService } from '../../../src/services/CourseSelectionService'
 import { ProfileStateManager } from '../../../src/core/ProfileStateManager'
 import { DataValidator } from '../../../src/core/DataValidator'
@@ -74,7 +74,7 @@ describe('CourseSelectionService', () => {
 
   beforeEach(() => {
     mockStorage = mockLocalStorage()
-    consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    consoleSpy = spyOn(console, 'warn').mockImplementation(() => {})
     
     Object.defineProperty(window, 'localStorage', {
       value: mockStorage,
@@ -309,7 +309,7 @@ describe('CourseSelectionService', () => {
 
     it('should handle listener errors gracefully', async () => {
       const errorListener = () => { throw new Error('Listener error') }
-      const normalListener = vi.fn()
+      const normalListener = mock()
       
       courseSelectionService.addSelectionListener(errorListener)
       courseSelectionService.addSelectionListener(normalListener)
@@ -321,8 +321,8 @@ describe('CourseSelectionService', () => {
     })
 
     it('should remove listeners correctly', async () => {
-      const listener1 = vi.fn()
-      const listener2 = vi.fn()
+      const listener1 = mock()
+      const listener2 = mock()
       
       courseSelectionService.addSelectionListener(listener1)
       courseSelectionService.addSelectionListener(listener2)
@@ -347,7 +347,7 @@ describe('CourseSelectionService', () => {
 
 
     it('should handle save failures', async () => {
-      vi.spyOn(mockProfileStateManager, 'save').mockRejectedValue(
+      spyOn(mockProfileStateManager, 'save').mockRejectedValue(
         new Error('Save failed')
       )
 
@@ -358,7 +358,7 @@ describe('CourseSelectionService', () => {
 
 
     it('should auto-save by default (synchronous persistence)', async () => {
-      const saveSpy = vi.spyOn(mockProfileStateManager, 'save')
+      const saveSpy = spyOn(mockProfileStateManager, 'save')
 
       await courseSelectionService.selectCourse(mockCourse)
 
@@ -381,7 +381,7 @@ describe('CourseSelectionService', () => {
         schedules: []
       })
 
-      vi.spyOn(mockProfileStateManager, 'exportData').mockResolvedValue(mockExportData)
+      spyOn(mockProfileStateManager, 'exportData').mockResolvedValue(mockExportData)
 
       const result = await courseSelectionService.exportSelections()
       expect(result.success).toBe(true)
@@ -407,7 +407,7 @@ describe('CourseSelectionService', () => {
 
     it('should detect health issues', async () => {
       // Simulate unhealthy state
-      vi.spyOn(mockProfileStateManager, 'isHealthy').mockReturnValue({
+      spyOn(mockProfileStateManager, 'isHealthy').mockReturnValue({
         healthy: false,
         issues: ['State corruption detected']
       })

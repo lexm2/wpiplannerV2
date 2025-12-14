@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, mock } from 'bun:test';
 import { ThemeManager } from '../../src/themes/ThemeManager';
 import { ProfileStateManager } from '../../src/core/ProfileStateManager';
 import { StorageService } from '../../src/services/StorageService';
@@ -67,7 +67,7 @@ describe('Theme Persistence Integration', () => {
 
     it('should not have conflicting storage calls between ThemeSelector and ThemeManager', () => {
         // Mock the ProfileStateManager to track calls
-        const updatePreferencesSpy = vi.spyOn(profileStateManager, 'updatePreferences');
+        const updatePreferencesSpy = spyOn(profileStateManager, 'updatePreferences');
 
         // Change theme - should only call storage once (through ThemeManager -> StorageService)
         themeManager.setTheme('wpi-light');

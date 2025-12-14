@@ -1,5 +1,5 @@
-import { ModalService } from '../../services/ModalService';
-import { CourseFilterService } from '../../services/CourseFilterService';
+import { ModalService } from '../../services/ui/ModalService';
+import { CourseFilterService } from '../../services/filtering/CourseFilterService';
 import { Course, Department } from '../../types/types';
 import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';

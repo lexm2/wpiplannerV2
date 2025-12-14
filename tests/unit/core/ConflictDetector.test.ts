@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach } from 'bun:test'
 import { ConflictDetector } from '../../../src/core/ConflictDetector'
 import { ConflictType } from '../../../src/types/schedule'
 import { DayOfWeek, PeriodType } from '../../../src/types/types'

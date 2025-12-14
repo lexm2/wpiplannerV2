@@ -1,0 +1,62 @@
+import { AvailabilityFilterCriteria } from '../../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../../types/filterableUnit';
+
+export class AvailabilityFilter implements SectionBasedFilter {
+    readonly id = 'availability';
+    readonly name = 'Availability';
+    readonly description = 'Show only courses with available seats';
+    readonly priority = 50;
+
+    apply(sections: FilterableSection[], criteria: AvailabilityFilterCriteria, activeFilters?: Map<string, any>): FilterableSection[] {
+        if (!criteria.availableOnly && !criteria.minAvailable) {
+            return sections;
+        }
+
+        const termCriteria = activeFilters?.get('term');
+        const activeTerms = termCriteria?.terms
+            ? new Set(termCriteria.terms.map((t: string) => t.toUpperCase()))
+            : null;
+
+        return sections.filter(fs => {
+            if (activeTerms && !activeTerms.has(fs.section.computedTerm)) {
+                return false;
+            }
+
+            // Filter by availability
+            if (criteria.availableOnly && fs.section.seatsAvailable <= 0) {
+                return false;
+            }
+
+            // Filter by minimum available seats
+            if (criteria.minAvailable && fs.section.seatsAvailable < criteria.minAvailable) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+    
+    isValidCriteria(criteria: any): criteria is AvailabilityFilterCriteria {
+        if (!criteria || typeof criteria.availableOnly !== 'boolean') {
+            return false;
+        }
+        if (criteria.minAvailable !== undefined && typeof criteria.minAvailable !== 'number') {
+            return false;
+        }
+        return true;
+    }
+
+    getDisplayValue(criteria: AvailabilityFilterCriteria): string {
+        if (criteria.availableOnly && criteria.minAvailable) {
+            return `Available seats (min ${criteria.minAvailable})`;
+        }
+        if (criteria.availableOnly) {
+            return 'Available seats only';
+        }
+        if (criteria.minAvailable) {
+            return `Min ${criteria.minAvailable} seats`;
+        }
+        return 'All courses';
+    }
+}

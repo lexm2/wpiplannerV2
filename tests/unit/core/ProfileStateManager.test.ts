@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, mock, spyOn } from 'bun:test'
 import { ProfileStateManager, StateChangeEvent } from '../../../src/core/ProfileStateManager'
 import { TransactionalStorageManager } from '../../../src/core/TransactionalStorageManager'
 import { Schedule, SelectedCourse } from '../../../src/types/schedule'
@@ -6,6 +6,10 @@ import { Course } from '../../../src/types/types'
 import { mockLocalStorage } from '../../helpers/testUtils'
 import { createMockCourse, createMockSection } from '../../helpers/mockData'
 
+// Helper to wait for async events
+const waitForEvents = () => new Promise(resolve => setTimeout(resolve, 10));
+
+// TODO: Some tests use vi.waitFor which Bun doesn't support - these may need adjustment
 describe('ProfileStateManager', () => {
   let profileStateManager: ProfileStateManager
   let mockStorageManager: TransactionalStorageManager
@@ -87,7 +91,8 @@ describe('ProfileStateManager', () => {
       expect(state.selectedCourses[0].isRequired).toBe(false)
       expect(state.hasUnsavedChanges).toBe(true)
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'selected')).toBe(true)
       })
     })
@@ -105,7 +110,8 @@ describe('ProfileStateManager', () => {
       expect(state.selectedCourses.length).toBe(0)
       expect(state.hasUnsavedChanges).toBe(true)
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'unselected')).toBe(true)
       })
     })
@@ -122,7 +128,8 @@ describe('ProfileStateManager', () => {
       const selectedCourse = state.selectedCourses.find(sc => sc.course.id === mockCourse.id)
       expect(selectedCourse?.selectedLecture?.number).toBe('A01')
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'section_changed')).toBe(true)
       })
     })
@@ -146,7 +153,8 @@ describe('ProfileStateManager', () => {
       const state = profileStateManager.getState()
       expect(state.selectedCourses.length).toBe(0)
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'cleared')).toBe(true)
       })
     })
@@ -167,7 +175,8 @@ describe('ProfileStateManager', () => {
       expect(state.schedules.length).toBe(2)
       expect(state.schedules.some(s => s.id === schedule.id)).toBe(true)
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'created')).toBe(true)
       })
     })
@@ -188,7 +197,8 @@ describe('ProfileStateManager', () => {
       expect(state.activeScheduleId).toBe(schedule2.id)
       expect(state.selectedCourses.length).toBe(0)
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(listeners.some(e => e.type === 'active_schedule_changed')).toBe(true)
         expect(listeners.some(e => e.type === 'courses_changed')).toBe(true)
       })
@@ -207,7 +217,8 @@ describe('ProfileStateManager', () => {
       const updatedSchedule = state.schedules.find(s => s.id === schedule.id)
       expect(updatedSchedule?.name).toBe('Updated Name')
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'updated')).toBe(true)
       })
     })
@@ -245,7 +256,8 @@ describe('ProfileStateManager', () => {
       const state = profileStateManager.getState()
       expect(state.schedules.length).toBe(3)
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'duplicated')).toBe(true)
       })
     })
@@ -265,7 +277,8 @@ describe('ProfileStateManager', () => {
       expect(state.preferences.avoidBackToBackClasses).toBe(true)
       expect(state.preferences.theme).toBe('dark-mode')
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(listeners.some(e => e.type === 'preferences_changed')).toBe(true)
       })
     })
@@ -284,7 +297,8 @@ describe('ProfileStateManager', () => {
 
       profileStateManager.selectCourse(mockCourse, false, 'test')
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(events1.some(e => e.type === 'courses_changed' && e.data.action === 'selected')).toBe(true)
         expect(events2.some(e => e.type === 'courses_changed' && e.data.action === 'selected')).toBe(true)
       })
@@ -294,7 +308,8 @@ describe('ProfileStateManager', () => {
       profileStateManager.removeListener(listener1)
       profileStateManager.unselectCourse(mockCourse, 'test')
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(events1.length).toBe(events1CountAfterSelect)
         expect(events2.some(e => e.type === 'courses_changed' && e.data.action === 'unselected')).toBe(true)
       })
@@ -304,16 +319,17 @@ describe('ProfileStateManager', () => {
       const events2CountBefore = events2.length
       profileStateManager.selectCourse(mockCourse, false, 'test')
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(events2.length).toBe(events2CountBefore)
-      }, { timeout: 100 })
+      
     })
 
     it('should handle listener errors gracefully', async () => {
       const errorListener = () => {
         throw new Error('Listener error')
       }
-      const normalListener = vi.fn()
+      const normalListener = mock()
 
       profileStateManager.addListener(errorListener)
       profileStateManager.addListener(normalListener)
@@ -322,7 +338,8 @@ describe('ProfileStateManager', () => {
         profileStateManager.selectCourse(mockCourse, false, 'test')
       }).not.toThrow()
 
-      await vi.waitFor(() => {
+      await waitForEvents();
+      
         expect(normalListener).toHaveBeenCalled()
       })
     })

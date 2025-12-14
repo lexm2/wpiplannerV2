@@ -4,28 +4,23 @@
   "description": "Modern WPI course planner built with TypeScript",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "npm run generate-icons && npm run build:converter && vite build",
-    "build:converter": "tsc -p tsconfig.converter.json",
-    "convert": "node dist/scripts/convert-course-data.js",
-    "generate-icons": "node scripts/generate-icon-paths.cjs",
+    "dev": "vite --port 3000",
+    "build": "bun run generate-icons && vite build",
     "preview": "vite preview",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "fetch-rmp-data": "tsx scripts/rateMyProfessor/fetchRateMyProfessor.ts"
+    "convert": "bun run scripts/convert-course-data.ts",
+    "generate-icons": "bun run scripts/generate-icon-paths.ts",
+    "test": "bun test",
+    "test:run": "bun test",
+    "test:coverage": "bun test --coverage",
+    "fetch-data": "bun run scripts/fetch-course-data.ts",
+    "fetch-rmp-data": "bun run scripts/rateMyProfessor/fetchRateMyProfessor.ts"
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^16.6.0",
     "@testing-library/dom": "^10.4.1",
-    "@types/jest": "^30.0.0",
-    "@types/jsdom": "^27.0.0",
-    "@vitejs/plugin-legacy": "^5.0.0",
-    "jsdom": "^26.1.0",
-    "tsx": "^4.20.6",
+    "@types/bun": "^1.2.10",
     "typescript": "^5.0.0",
-    "vite": "^5.0.0",
-    "vitest": "^3.2.4"
+    "vite": "^7.2.7"
   },
   "keywords": [
     "wpi",

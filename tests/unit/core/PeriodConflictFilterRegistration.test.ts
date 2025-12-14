@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach } from 'vitest';
+import { describe, test, expect, beforeEach } from 'bun:test';
 import { PeriodConflictFilter } from '../../../src/core/filters/PeriodConflictFilter';
 import { ConflictDetector } from '../../../src/core/ConflictDetector';
 import { CourseFilterService } from '../../../src/services/CourseFilterService';

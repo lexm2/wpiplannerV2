@@ -6,7 +6,7 @@
  * after the operation.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
 import { ProfileStateManager } from '../../src/core/ProfileStateManager';
 import { TransactionalStorageManager } from '../../src/core/TransactionalStorageManager';
 import { ScheduleManagementService } from '../../src/services/ScheduleManagementService';
@@ -25,24 +25,23 @@ describe('Storage Persistence Integration Tests', () => {
     const mockLocalStorage: { [key: string]: string } = {};
 
     beforeEach(async () => {
-        // Clear all mocks and storage
-        vi.clearAllMocks();
+        // Clear storage
         Object.keys(mockLocalStorage).forEach(key => delete mockLocalStorage[key]);
 
         // Mock localStorage
         global.localStorage = {
-            getItem: vi.fn((key: string) => mockLocalStorage[key] || null),
-            setItem: vi.fn((key: string, value: string) => {
+            getItem: mock((key: string) => mockLocalStorage[key] || null),
+            setItem: mock((key: string, value: string) => {
                 mockLocalStorage[key] = value;
             }),
-            removeItem: vi.fn((key: string) => {
+            removeItem: mock((key: string) => {
                 delete mockLocalStorage[key];
             }),
-            clear: vi.fn(() => {
+            clear: mock(() => {
                 Object.keys(mockLocalStorage).forEach(key => delete mockLocalStorage[key]);
             }),
             length: 0,
-            key: vi.fn()
+            key: mock()
         } as Storage;
 
         // Initialize services
@@ -60,7 +59,7 @@ describe('Storage Persistence Integration Tests', () => {
     });
 
     afterEach(() => {
-        vi.restoreAllMocks();
+        // Bun automatically restores mocks between tests
     });
 
     describe('Schedule Deletion Persistence', () => {

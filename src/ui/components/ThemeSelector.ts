@@ -1,5 +1,5 @@
 import { ThemeManager } from '../../themes/ThemeManager'
-import { ProfileStateManager } from '../../core/ProfileStateManager'
+import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { getInlineSVG } from '../../utils/iconPaths'
 
 // UI component for theme switching with dropdown interface and persistent storage

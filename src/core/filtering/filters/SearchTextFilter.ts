@@ -1,0 +1,59 @@
+import { SearchTextFilterCriteria } from '../../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../../types/filterableUnit';
+
+export class SearchTextFilter implements SectionBasedFilter {
+    readonly id = 'searchText';
+    readonly name = 'Search Text';
+    readonly description = 'Filter courses by search text';
+    readonly priority = 1;
+
+    apply(sections: FilterableSection[], criteria: SearchTextFilterCriteria): FilterableSection[] {
+        if (!criteria.query || !criteria.query.trim()) {
+            return sections;
+        }
+
+        const query = criteria.query.trim().toLowerCase();
+
+        return sections.filter(fs => {
+            const course = fs.course;
+            const courseCode = `${course.department.abbreviation}${course.number}`;
+            const courseText = [
+                course.id,
+                course.name,
+                course.description,
+                course.department.name,
+                courseCode
+            ].join(' ').toLowerCase();
+
+            return courseText.includes(query) || this.fuzzyMatch(courseText, query);
+        });
+    }
+    
+    private fuzzyMatch(text: string, query: string): boolean {
+        // Allow for partial matches for better search experience
+        if (query.length <= 3) {
+            return text.includes(query);
+        }
+        
+        const words = query.split(/\s+/);
+        return words.every(word => {
+            if (word.length <= 2) return text.includes(word);
+            
+            // Allow partial matches for longer words
+            const partial = word.substring(0, Math.floor(word.length * 0.8));
+            return text.includes(partial);
+        });
+    }
+    
+    isValidCriteria(criteria: any): criteria is SearchTextFilterCriteria {
+        return !!(criteria &&
+               typeof criteria === 'object' &&
+               'query' in criteria &&
+               typeof criteria.query === 'string');
+    }
+    
+    getDisplayValue(criteria: SearchTextFilterCriteria): string {
+        return `"${criteria.query.trim()}"`;
+    }
+}

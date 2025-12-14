@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach } from 'vitest';
+import { describe, test, expect, beforeEach } from 'bun:test';
 import { PeriodTermFilter } from '../../../src/core/filters/PeriodTermFilter';
 import { Section } from '../../../src/types/types';
 

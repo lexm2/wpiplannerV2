@@ -1,5 +1,5 @@
 import type { IModal, ModalOptions } from '../../types/modal';
-import { ModalService } from '../../services/ModalService';
+import { ModalService } from '../../services/ui/ModalService';
 
 /**
  * Unified abstract base class for all modal implementations.

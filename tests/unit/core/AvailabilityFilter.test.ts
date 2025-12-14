@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach } from 'vitest'
+import { describe, test, expect, beforeEach } from 'bun:test'
 import { AvailabilityFilter } from '../../../src/core/filters/AvailabilityFilter'
 import {
   createMockFilterableSection

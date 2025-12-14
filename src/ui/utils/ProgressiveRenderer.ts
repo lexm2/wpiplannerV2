@@ -2,7 +2,7 @@ import { Course } from '../../types/types';
 import { CancellationToken, CancellationError } from '../../utils/RequestCancellation';
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics';
 import { getProfessorsByTerm, getAllSections } from '../../utils/courseUtils';
-import { rateMyProfessorService } from '../../services/RateMyProfessorService';
+import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { Validators } from '../../utils/validators';
 

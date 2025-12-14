@@ -1,4 +1,4 @@
-import { ModalService } from '../../services/ModalService';
+import { ModalService } from '../../services/ui/ModalService';
 import { BaseModal } from '../components/BaseModal';
 
 export type InfoModalType = 'info' | 'warning' | 'error' | 'success';

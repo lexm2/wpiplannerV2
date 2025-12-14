@@ -1,5 +1,5 @@
-import { ModalService } from '../../services/ModalService';
-import { rateMyProfessorService } from '../../services/RateMyProfessorService';
+import { ModalService } from '../../services/ui/ModalService';
+import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
 import { PeriodType } from '../../types/types';
 import { BaseModal } from '../components/BaseModal';
 import { getInlineSVG } from '../../utils/iconPaths';

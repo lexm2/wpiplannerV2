@@ -1,5 +1,5 @@
 import { ThemeDefinition, ThemeId, ThemeChangeEvent, ThemeChangeListener } from './types'
-import { ProfileStateManager } from '../core/ProfileStateManager'
+import { ProfileStateManager } from '../core/state/ProfileStateManager'
 
 // Import theme definitions
 import wpiClassic from './definitions/wpi-classic.json'

@@ -1,6 +1,6 @@
 import type { ScheduleConflict, ScheduleConflictResolution } from '../../types/schedule';
 import { BaseModal } from './BaseModal';
-import { ModalService } from '../../services/ModalService';
+import { ModalService } from '../../services/ui/ModalService';
 import { getInlineSVG } from '../../utils/iconPaths';
 
 export class CourseConflictModal extends BaseModal {

@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach } from 'vitest';
+import { describe, test, expect, beforeEach } from 'bun:test';
 import { PeriodConflictFilter, PeriodConflictCriteria } from '../../../src/core/filters/PeriodConflictFilter';
 import { ConflictDetector } from '../../../src/core/ConflictDetector';
 import { Period, Section, DayOfWeek, Time, Department, Course, PeriodType } from '../../../src/types/types';

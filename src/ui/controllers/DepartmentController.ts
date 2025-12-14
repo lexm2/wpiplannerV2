@@ -1,5 +1,5 @@
 import { Department } from '../../types/types'
-import { DepartmentSyncService } from '../../services/DepartmentSyncService'
+import { DepartmentSyncService } from '../../services/data/DepartmentSyncService'
 import { groupDepartmentsByCategory } from '../../utils/departmentUtils'
 
 export class DepartmentController {

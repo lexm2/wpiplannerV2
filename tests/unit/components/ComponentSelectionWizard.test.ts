@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { ComponentSelectionWizard } from '../../../src/ui/components/ComponentSelectionWizard';
 import { CourseDataService } from '../../../src/services/courseDataService';
 import { Course, Section, Period, Department, PeriodType, DayOfWeek } from '../../../src/types/types';
@@ -95,8 +95,8 @@ describe('ComponentSelectionWizard', () => {
     beforeEach(() => {
         document.body.innerHTML = '<div id="schedule-selected-courses"></div>';
         courseDataService = new CourseDataService();
-        mockOnComplete = vi.fn();
-        mockOnCancel = vi.fn();
+        mockOnComplete = mock();
+        mockOnCancel = mock();
     });
 
     describe('Constructor & Initialization', () => {
@@ -159,9 +159,9 @@ describe('ComponentSelectionWizard', () => {
             const course = createHierarchicalCourse();
 
             // Mock CourseDataService methods
-            vi.spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
-            vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
-            vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
+            spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
+            spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
+            spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
                 {
                     section: createSection(12345, 'A01', PeriodType.LECTURE),
                     compatibleDiscussions: [],
@@ -184,9 +184,9 @@ describe('ComponentSelectionWizard', () => {
             const course = createHierarchicalCourse();
 
             // Mock CourseDataService to return hierarchical structure
-            vi.spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
-            vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
-            vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
+            spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
+            spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
+            spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
                 {
                     section: createSection(12345, 'A01', PeriodType.LECTURE),
                     compatibleDiscussions: [createSection(12347, 'A11', PeriodType.DISCUSSION)],
@@ -210,9 +210,9 @@ describe('ComponentSelectionWizard', () => {
             const course = createHierarchicalCourse();
 
             // Mock CourseDataService
-            vi.spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
-            vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
-            vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
+            spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
+            spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
+            spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
                 {
                     section: createSection(12345, 'A01', PeriodType.LECTURE),
                     compatibleDiscussions: [],
@@ -544,7 +544,7 @@ describe('ComponentSelectionWizard', () => {
                 mockOnCancel
             );
 
-            const closeSpy = vi.spyOn(wizard as any, 'close');
+            const closeSpy = spyOn(wizard as any, 'close');
             wizard['complete']();
 
             expect(closeSpy).toHaveBeenCalled();
@@ -559,7 +559,7 @@ describe('ComponentSelectionWizard', () => {
                 mockOnCancel
             );
 
-            const closeSpy = vi.spyOn(wizard as any, 'close');
+            const closeSpy = spyOn(wizard as any, 'close');
             wizard['cancel']();
 
             expect(closeSpy).toHaveBeenCalled();

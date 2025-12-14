@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { CourseFilterService } from '../../../src/services/CourseFilterService';
 import { SearchService } from '../../../src/services/searchService';
 import { DepartmentFilter } from '../../../src/core/filters/DepartmentFilter';
@@ -186,7 +186,7 @@ describe('CourseFilterService', () => {
             courseFilterService.addFilter('department', { departments: ['CS'] }); // Priority 25
             courseFilterService.addFilter('availability', { availableOnly: true }); // Priority 50
 
-            const consoleSpy = vi.spyOn(console, 'log');
+            const consoleSpy = spyOn(console, 'log');
             const result = courseFilterService.filterCourses(testCourses);
 
             // Verify that debug logging occurred
@@ -285,7 +285,7 @@ describe('CourseFilterService', () => {
     describe('Configuration', () => {
         test('should toggle debug logging', () => {
             courseFilterService.setDebugLogging(true);
-            const consoleSpy = vi.spyOn(console, 'log');
+            const consoleSpy = spyOn(console, 'log');
 
             courseFilterService.addFilter('department', { departments: ['CS'] });
             courseFilterService.filterCourses(testCourses);

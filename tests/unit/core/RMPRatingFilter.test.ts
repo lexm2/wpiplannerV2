@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest'
+import { describe, test, expect, beforeEach, mock } from 'bun:test'
 import { RMPRatingFilter } from '../../../src/core/filters/RMPRatingFilter'
 import { RateMyProfessorService } from '../../../src/services/RateMyProfessorService'
 import { FilterableSection } from '../../../src/types/filterableUnit'
@@ -15,7 +15,7 @@ describe('RMPRatingFilter - includeWithoutData functionality', () => {
   beforeEach(() => {
     // Create mock RMP service
     mockRMPService = {
-      getRatingDisplay: vi.fn((professorName: string) => {
+      getRatingDisplay: mock((professorName: string) => {
         // Mock RMP data - Adam Messer has no RMP data
         if (professorName === 'Adam Messer') {
           return null

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect } from 'bun:test'
 import { createMockScheduleDB } from '../../helpers/mockData'
 import { safeStringify, safeParse } from '../../../src/utils/jsonSerializer'
 import { getAllSections } from '../../../src/utils/courseUtils'

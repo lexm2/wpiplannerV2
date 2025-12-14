@@ -3,9 +3,9 @@
 
 import { Course, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
-import { CourseDataService } from '../../services/courseDataService';
-import { ScheduleFilterService } from '../../services/ScheduleFilterService';
-import { rateMyProfessorService } from '../../services/RateMyProfessorService';
+import { CourseDataService } from '../../services/data/courseDataService';
+import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService';
+import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
 import { Validators } from '../../utils/validators';

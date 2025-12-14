@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { ComponentSelectionWizard } from '../../src/ui/components/ComponentSelectionWizard';
 import { CourseDataService } from '../../src/services/courseDataService';
 import { CourseSelectionService } from '../../src/services/CourseSelectionService';
@@ -73,8 +73,8 @@ describe('ComponentSelectionWizard Integration', () => {
     describe('Integration with CourseDataService', () => {
         test('should use CourseDataService to determine course structure', () => {
             const course = createTestCourse();
-            const mockOnComplete = vi.fn();
-            const mockOnCancel = vi.fn();
+            const mockOnComplete = mock();
+            const mockOnCancel = mock();
 
             const wizard = new ComponentSelectionWizard(
                 course,
@@ -90,8 +90,8 @@ describe('ComponentSelectionWizard Integration', () => {
 
         test('should get sections from CourseDataService', () => {
             const course = createTestCourse();
-            const mockOnComplete = vi.fn();
-            const mockOnCancel = vi.fn();
+            const mockOnComplete = mock();
+            const mockOnCancel = mock();
 
             const wizard = new ComponentSelectionWizard(
                 course,
@@ -106,13 +106,13 @@ describe('ComponentSelectionWizard Integration', () => {
 
         test('should handle hierarchical course detection', () => {
             const course = createTestCourse();
-            const mockOnComplete = vi.fn();
-            const mockOnCancel = vi.fn();
+            const mockOnComplete = mock();
+            const mockOnCancel = mock();
 
             // Mock CourseDataService to indicate hierarchical course
-            vi.spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
-            vi.spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
-            vi.spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
+            spyOn(courseDataService, 'isHierarchicalCourse').mockReturnValue(true);
+            spyOn(courseDataService, 'isLabOnlyCourse').mockReturnValue(false);
+            spyOn(courseDataService, 'getLecturesForCourse').mockReturnValue([
                 {
                     section: createSection(12345, 'A01', PeriodType.LECTURE),
                     compatibleDiscussions: [createSection(12347, 'A11', PeriodType.DISCUSSION)],
@@ -145,7 +145,7 @@ describe('ComponentSelectionWizard Integration', () => {
                 (selections) => {
                     capturedSelections = selections;
                 },
-                vi.fn()
+                mock()
             );
 
             wizard['currentStep'] = 'lecture';
@@ -166,7 +166,7 @@ describe('ComponentSelectionWizard Integration', () => {
                 (selections) => {
                     capturedSelections = selections;
                 },
-                vi.fn()
+                mock()
             );
 
             wizard['selections'] = {
@@ -195,7 +195,7 @@ describe('ComponentSelectionWizard Integration', () => {
                     completed = true;
                     expect(selections.lecture).toBeTruthy();
                 },
-                vi.fn()
+                mock()
             );
 
             // Simulate selecting lecture
@@ -223,7 +223,7 @@ describe('ComponentSelectionWizard Integration', () => {
             const wizard = new ComponentSelectionWizard(
                 course,
                 courseDataService,
-                vi.fn(),
+                mock(),
                 () => {
                     canceled = true;
                 }
@@ -238,8 +238,8 @@ describe('ComponentSelectionWizard Integration', () => {
             const wizard = new ComponentSelectionWizard(
                 course,
                 courseDataService,
-                vi.fn(),
-                vi.fn()
+                mock(),
+                mock()
             );
 
             const lecture = createSection(12345, 'A01', PeriodType.LECTURE);
@@ -263,8 +263,8 @@ describe('ComponentSelectionWizard Integration', () => {
             const wizard = new ComponentSelectionWizard(
                 course,
                 courseDataService,
-                vi.fn(),
-                vi.fn()
+                mock(),
+                mock()
             );
 
             // Should not throw
@@ -280,8 +280,8 @@ describe('ComponentSelectionWizard Integration', () => {
             const wizard = new ComponentSelectionWizard(
                 emptyCourse,
                 courseDataService,
-                vi.fn(),
-                vi.fn()
+                mock(),
+                mock()
             );
 
             const options = wizard.getOptionsForStep('lecture');
@@ -293,8 +293,8 @@ describe('ComponentSelectionWizard Integration', () => {
             const wizard = new ComponentSelectionWizard(
                 course,
                 courseDataService,
-                vi.fn(),
-                vi.fn()
+                mock(),
+                mock()
             );
 
             // Try to jump to invalid step

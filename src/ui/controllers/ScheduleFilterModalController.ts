@@ -1,5 +1,5 @@
-import { ModalService } from '../../services/ModalService';
-import { ScheduleFilterService } from '../../services/ScheduleFilterService';
+import { ModalService } from '../../services/ui/ModalService';
+import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService';
 import { SelectedCourse } from '../../types/schedule';
 import { BaseModal } from '../components/BaseModal';
 import { getAllSections } from '../../utils/courseUtils';
