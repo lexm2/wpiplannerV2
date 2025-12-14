@@ -93,7 +93,7 @@ export class RetryManager {
                 const errorObj = error instanceof Error ? error : new Error(String(error));
                 lastError = errorObj;
 
-                console.warn(`❌ ${operationName} failed on attempt ${attempt}/${this.config.maxAttempts}:`, errorObj.message);
+                console.warn(`${operationName} failed on attempt ${attempt}/${this.config.maxAttempts}:`, errorObj.message);
 
                 // Check if we should retry this error
                 const shouldRetry = this.shouldRetry(errorObj, attempt);
@@ -113,7 +113,7 @@ export class RetryManager {
                     }
                 }
 
-                console.log(`🔄 Retrying ${operationName} in ${delay}ms (attempt ${attempt + 1}/${this.config.maxAttempts})`);
+                console.log(`Retrying ${operationName} in ${delay}ms (attempt ${attempt + 1}/${this.config.maxAttempts})`);
                 
                 // Wait before next attempt
                 await this.delay(delay);
@@ -130,7 +130,7 @@ export class RetryManager {
             }
         }
 
-        console.error(`💥 ${operationName} failed after ${attempt} attempts over ${totalTime}ms`);
+        console.error(`${operationName} failed after ${attempt} attempts over ${totalTime}ms`);
 
         return {
             success: false,
@@ -235,7 +235,7 @@ export class RetryManager {
 
             // Check if circuit should be closed (recovered)
             if (isCircuitOpen && (now - lastFailureTime) > recoveryTimeout) {
-                console.log(`🔄 Circuit breaker for ${operationName} attempting recovery`);
+                console.log(`Circuit breaker for ${operationName} attempting recovery`);
                 isCircuitOpen = false;
                 failureCount = 0;
             }
@@ -267,7 +267,7 @@ export class RetryManager {
                 onSuccess: () => {
                     // Reset failure count on success
                     if (failureCount > 0) {
-                        console.log(`✅ Circuit breaker for ${operationName} reset after successful operation`);
+                        console.log(`Circuit breaker for ${operationName} reset after successful operation`);
                         failureCount = 0;
                     }
                 }

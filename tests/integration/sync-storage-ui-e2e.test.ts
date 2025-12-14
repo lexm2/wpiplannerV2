@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, jest } from 'bun:test';
 import { setupSyncTest, cleanupSyncTest, type SyncTestContext } from '../helpers/sync-test-setup';
-import { ProfileStateManager } from '../../src/core/ProfileStateManager';
-import { createSyncData, createSchedule, createSelectedCourse, advanceTimersByTime } from '../helpers/sync-test-utils';
+import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
+import { createSyncData, createSchedule, createSelectedCourse } from '../helpers/sync-test-utils';
 import type { MockIndexedDB } from '../mocks/MockIndexedDB';
 import {
     createMockUIComponents,
@@ -38,7 +38,6 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
         // Get ProfileStateManager
         profileManager = ProfileStateManager.getInstance();
-        await profileManager.initialize();
 
         // Get mock IndexedDB
         mockIndexedDB = (global as any).__mockIndexedDB__;
@@ -51,11 +50,14 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
         mockUI.courseDataCoordinator.registerConsumer(mockUI.departmentController);
 
         // Wire up UI hydration events
-        profileManager.on('schedule_changed', () => {
-            mockUI.scheduleController.displayScheduleSelectedCourses();
-            mockUI.courseController.refreshCourseSelectionUI();
-            mockUI.courseController.displaySelectedCourses();
-        });
+        const eventListener = (event: any) => {
+            if (event.type === 'schedule_changed') {
+                mockUI.scheduleController.displayScheduleSelectedCourses();
+                mockUI.courseController.refreshCourseSelectionUI();
+                mockUI.courseController.displaySelectedCourses();
+            }
+        };
+        profileManager.addListener(eventListener);
     });
 
     afterEach(() => {
@@ -75,7 +77,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                         selectedCourses: [
                             createSelectedCourse({
                                 courseId: 'CS-1101',
-                                selectedSectionIds: ['SEC-1'],
+                                selectedSectionCrn: 'SEC-1',
                                 isRequired: true
                             })
                         ]
@@ -171,7 +173,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
             // Act: Sign in with local data
             await syncCtx.syncManager.handleSignIn(localData);
-            await advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Data pushed to cloud
             expect(syncCtx.mockProvider.getCloudData()).toBeDefined();
@@ -220,8 +222,8 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             expect(syncCtx.eventSpy.hasEvent('sync-conflict')).toBe(true);
 
             // Resolve: Keep local
-            await syncCtx.syncManager.resolveConflict('keep-local');
-            await advanceTimersByTime(3000);
+            await syncCtx.syncManager.resolveConflict('local');
+            jest.advanceTimersByTime(3000);
 
             // Assert: Local data in IndexedDB
             const stored = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'schedule-1');
@@ -267,7 +269,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
             // Act: Sign in and resolve
             await syncCtx.syncManager.handleSignIn(localData);
-            await syncCtx.syncManager.resolveConflict('keep-cloud');
+            await syncCtx.syncManager.resolveConflict('cloud');
 
             // Assert: Cloud data in IndexedDB
             const stored = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'schedule-1');
@@ -316,7 +318,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             }));
 
             // Trigger debounced push
-            await advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Data pushed to cloud
             expect(syncCtx.mockProvider.callHistory.pushData).toBe(1);
@@ -351,11 +353,11 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                     activeScheduleId: 'schedule-1'
                 }));
 
-                await advanceTimersByTime(500); // Small delay between changes
+                jest.advanceTimersByTime(500); // Small delay between changes
             }
 
             // Wait for debounce to complete
-            await advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Only one push despite 5 changes
             expect(syncCtx.mockProvider.callHistory.pushData).toBe(1);
@@ -384,7 +386,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             // Act: Device A signs in and pushes
             syncCtx.mockProvider.setCloudData(null);
             await syncCtx.syncManager.handleSignIn(deviceAData);
-            await advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Data in cloud
             const cloudData = syncCtx.mockProvider.getCloudData();
@@ -458,7 +460,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                 activeScheduleId: 'schedule-1'
             }));
 
-            await advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Error state
             expect(syncCtx.syncManager.getStatus()).toBe('error');
@@ -472,7 +474,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                 activeScheduleId: 'schedule-1'
             }));
 
-            await advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Recovered to idle
             expect(syncCtx.syncManager.getStatus()).toBe('idle');
@@ -520,8 +522,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                         name: 'Test: Special chars & émojis 🎓',
                         selectedCourses: [
                             createSelectedCourse({
-                                courseId: 'CS-1101',
-                                notes: 'Notes with "quotes", \'apostrophes\', and unicode: 你好 مرحبا'
+                                courseId: 'CS-1101'
                             })
                         ]
                     })
@@ -537,7 +538,6 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             // Assert: Data preserved in IndexedDB
             const stored = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'complex-schedule');
             expect(stored.name).toBe('Test: Special chars & émojis 🎓');
-            expect(stored.selectedCourses[0].notes).toBe('Notes with "quotes", \'apostrophes\', and unicode: 你好 مرحبا');
 
             // Assert: Data preserved in ProfileStateManager
             const activeSchedule = profileManager.getActiveSchedule();
@@ -552,8 +552,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                 selectedCourses: Array.from({ length: 100 }, (_, i) =>
                     createSelectedCourse({
                         courseId: `CS-${1000 + i}`,
-                        selectedSectionIds: Array.from({ length: 3 }, (_, j) => `SEC-${i}-${j}`),
-                        notes: `Notes for course ${i}`.repeat(10)
+                        selectedSectionCrn: `SEC-${i}`
                     })
                 )
             });

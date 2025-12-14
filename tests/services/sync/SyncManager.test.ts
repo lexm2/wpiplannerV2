@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, mock, vi, jest } from 'bun:test';
 import { syncEventBus } from '../../../src/services/sync/SyncEventBus';
 import {
     setupSyncTest,
@@ -10,8 +10,6 @@ import {
 import {
     createSyncData,
     createConflictingData,
-    advanceTimersByTime,
-    flushPromises,
 } from '../../helpers/sync-test-utils';
 
 describe('SyncManager (Unified)', () => {
@@ -110,7 +108,7 @@ describe('SyncManager (Unified)', () => {
 
             // Set up mock state manager
             const mockStateManager = {
-                importData: vi.fn().mockResolvedValue({ success: true }),
+                importData: mock().mockResolvedValue({ success: true }),
             };
             ctx.syncManager.setStateManager(mockStateManager);
 
@@ -148,23 +146,23 @@ describe('SyncManager (Unified)', () => {
             syncEventBus.emitEvent('local-save-completed', {});
 
             // Before 3 seconds - shouldn't push yet
-            await advanceTimersByTime(2000);
+            jest.advanceTimersByTime(2000);
             expect(ctx.mockProvider.callHistory.pushData).toBe(0);
 
             // After 3 seconds - should push
-            await advanceTimersByTime(1000);
+            jest.advanceTimersByTime(1000);
             expect(ctx.mockProvider.callHistory.pushData).toBe(1);
         });
 
         it('should debounce multiple rapid changes into single push', async () => {
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(1000);
+            jest.advanceTimersByTime(1000);
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(1000);
+            jest.advanceTimersByTime(1000);
             syncEventBus.emitEvent('local-save-completed', {});
 
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(ctx.mockProvider.callHistory.pushData).toBe(1);
         });
@@ -174,16 +172,16 @@ describe('SyncManager (Unified)', () => {
             ctx.mockProvider.resetCallHistory();
 
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(ctx.mockProvider.callHistory.pushData).toBe(0);
         });
 
         it('should emit sync-pushed event on successful push', async () => {
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(ctx.eventSpy.hasEvent('sync-pushed')).toBe(true);
         });
@@ -193,8 +191,8 @@ describe('SyncManager (Unified)', () => {
             ctx.mockProvider.setConfig({ pushFails: true });
 
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(ctx.syncManager.getStatus()).toBe('error');
             expect(ctx.eventSpy.hasEvent('sync-failed')).toBe(true);
@@ -204,8 +202,8 @@ describe('SyncManager (Unified)', () => {
             ctx.syncManager.setDebounceMs(1000);
 
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(1000);
-            await flushPromises();
+            jest.advanceTimersByTime(1000);
+            jest.runAllTimers();
 
             expect(ctx.mockProvider.callHistory.pushData).toBe(1);
         });
@@ -245,8 +243,8 @@ describe('SyncManager (Unified)', () => {
             syncEventBus.emitEvent('local-save-completed', {});
             await ctx.syncManager.pushToCloud(data);
 
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(ctx.mockProvider.callHistory.pushData).toBe(1);
         });
@@ -275,8 +273,8 @@ describe('SyncManager (Unified)', () => {
             await ctx.syncManager.signOut();
             ctx.mockProvider.resetCallHistory();
 
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(ctx.mockProvider.callHistory.pushData).toBe(0);
         });

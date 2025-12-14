@@ -370,7 +370,7 @@ export class TransactionalStorageManager {
                 transactionId: `import-${Date.now()}`
             };
         } catch (error) {
-            console.error('[TransactionalStorageManager] ❌ importData() failed:', error);
+            console.error('[TransactionalStorageManager] importData() failed:', error);
             return {
                 success: false,
                 transactionId: `import-${Date.now()}`,

@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { IndexedDBStorageManager } from '../../src/core/IndexedDBStorageManager';
+import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
+import { IndexedDBStorageManager } from '../../src/core/storage/IndexedDBStorageManager';
 import type { Schedule } from '../../src/types/schedule';
-import { createSchedule, createSelectedCourse } from '../helpers/sync-test-utils';
+import { createMockSelectedCourse, createMockCourse } from '../helpers/mockData';
 import type { MockIndexedDB } from '../mocks/MockIndexedDB';
 
 /**
@@ -15,6 +15,19 @@ import type { MockIndexedDB } from '../mocks/MockIndexedDB';
  * - Storage stats calculation
  * - Batch operations
  */
+
+// Helper to create a proper Schedule object for testing
+function createMockSchedule(overrides?: Partial<Schedule>): Schedule {
+    return {
+        id: 'schedule-1',
+        name: 'Test Schedule',
+        selectedCourses: [],
+        generatedSchedules: [],
+        timestamp: Date.now(),
+        ...overrides,
+    };
+}
+
 describe('IndexedDBStorageManager', () => {
     let storageManager: IndexedDBStorageManager;
     let mockIndexedDB: MockIndexedDB;
@@ -65,11 +78,12 @@ describe('IndexedDBStorageManager', () => {
     describe('Save Schedule', () => {
         it('should save a schedule with compression', async () => {
             // Arrange
-            const schedule = createSchedule({
+            const course = createMockCourse({ id: 'CS-1101' });
+            const schedule = createMockSchedule({
                 id: 'test-schedule-1',
                 name: 'Test Schedule',
                 selectedCourses: [
-                    createSelectedCourse({ courseId: 'CS-1101' })
+                    createMockSelectedCourse({ course })
                 ]
             });
 
@@ -91,7 +105,7 @@ describe('IndexedDBStorageManager', () => {
 
         it('should update existing schedule', async () => {
             // Arrange: Save initial schedule
-            const schedule = createSchedule({
+            const schedule = createMockSchedule({
                 id: 'update-test',
                 name: 'Original Name',
                 selectedCourses: []
@@ -100,10 +114,11 @@ describe('IndexedDBStorageManager', () => {
             await storageManager.saveSchedule(schedule);
 
             // Act: Update schedule
-            const updatedSchedule = createSchedule({
+            const course = createMockCourse({ id: 'CS-1101' });
+            const updatedSchedule = createMockSchedule({
                 id: 'update-test',
                 name: 'Updated Name',
-                selectedCourses: [createSelectedCourse({ courseId: 'CS-1101' })]
+                selectedCourses: [createMockSelectedCourse({ course })]
             });
 
             const result = await storageManager.saveSchedule(updatedSchedule);
@@ -120,9 +135,9 @@ describe('IndexedDBStorageManager', () => {
         it('should save multiple schedules', async () => {
             // Arrange
             const schedules = [
-                createSchedule({ id: 'schedule-1', name: 'Schedule 1' }),
-                createSchedule({ id: 'schedule-2', name: 'Schedule 2' }),
-                createSchedule({ id: 'schedule-3', name: 'Schedule 3' })
+                createMockSchedule({ id: 'schedule-1', name: 'Schedule 1' }),
+                createMockSchedule({ id: 'schedule-2', name: 'Schedule 2' }),
+                createMockSchedule({ id: 'schedule-3', name: 'Schedule 3' })
             ];
 
             // Act
@@ -139,7 +154,7 @@ describe('IndexedDBStorageManager', () => {
 
         it('should add timestamp when saving', async () => {
             // Arrange
-            const schedule = createSchedule({
+            const schedule = createMockSchedule({
                 id: 'timestamp-test',
                 name: 'Test'
             });
@@ -157,15 +172,16 @@ describe('IndexedDBStorageManager', () => {
     describe('Load Schedule', () => {
         it('should load a saved schedule', async () => {
             // Arrange
-            const schedule = createSchedule({
+            const course = createMockCourse({ id: 'CS-1101' });
+            const section = { crn: 12345, number: 'SEC-1' } as any;
+            const schedule = createMockSchedule({
                 id: 'load-test',
                 name: 'Load Test Schedule',
                 selectedCourses: [
-                    createSelectedCourse({
-                        courseId: 'CS-1101',
-                        selectedSectionIds: ['SEC-1'],
-                        isRequired: true,
-                        notes: 'Test notes'
+                    createMockSelectedCourse({
+                        course,
+                        selectedSection: section,
+                        isRequired: true
                     })
                 ]
             });
@@ -181,9 +197,8 @@ describe('IndexedDBStorageManager', () => {
             expect(result.data?.id).toBe('load-test');
             expect(result.data?.name).toBe('Load Test Schedule');
             expect(result.data?.selectedCourses).toHaveLength(1);
-            expect(result.data?.selectedCourses[0].courseId).toBe('CS-1101');
+            expect(result.data?.selectedCourses[0].course.id).toBe('CS-1101');
             expect(result.data?.selectedCourses[0].isRequired).toBe(true);
-            expect(result.data?.selectedCourses[0].notes).toBe('Test notes');
         });
 
         it('should return error for non-existent schedule', async () => {
@@ -198,13 +213,12 @@ describe('IndexedDBStorageManager', () => {
 
         it('should decompress stored data correctly', async () => {
             // Arrange: Save schedule (will be compressed)
-            const schedule = createSchedule({
+            const schedule = createMockSchedule({
                 id: 'decompress-test',
                 name: 'Compression Test',
-                selectedCourses: Array.from({ length: 10 }, (_, i) =>
-                    createSelectedCourse({
-                        courseId: `CS-${1000 + i}`,
-                        notes: 'Long notes '.repeat(20) // Compresses well
+                selectedCourses: Array.from({ length: 10 }, (_: any, i: number) =>
+                    createMockSelectedCourse({
+                        course: createMockCourse({ id: `CS-${1000 + i}` })
                     })
                 )
             });
@@ -217,18 +231,16 @@ describe('IndexedDBStorageManager', () => {
             // Assert: Data should be decompressed correctly
             expect(result.success).toBe(true);
             expect(result.data?.selectedCourses).toHaveLength(10);
-            expect(result.data?.selectedCourses[0].notes).toContain('Long notes');
         });
 
         it('should preserve special characters and unicode', async () => {
             // Arrange
-            const schedule = createSchedule({
+            const schedule = createMockSchedule({
                 id: 'unicode-test',
                 name: 'Test: Special chars & émojis 🎓',
                 selectedCourses: [
-                    createSelectedCourse({
-                        courseId: 'CS-1101',
-                        notes: 'Unicode: 你好 مرحبا Здравствуйте "quotes" \'apostrophes\''
+                    createMockSelectedCourse({
+                        course: createMockCourse({ id: 'CS-1101' })
                     })
                 ]
             });
@@ -241,7 +253,6 @@ describe('IndexedDBStorageManager', () => {
             // Assert
             expect(result.success).toBe(true);
             expect(result.data?.name).toBe('Test: Special chars & émojis 🎓');
-            expect(result.data?.selectedCourses[0].notes).toBe('Unicode: 你好 مرحبا Здравствуйте "quotes" \'apostrophes\'');
         });
     });
 
@@ -249,9 +260,9 @@ describe('IndexedDBStorageManager', () => {
         it('should load all saved schedules', async () => {
             // Arrange: Save multiple schedules
             const schedules = [
-                createSchedule({ id: 'sched-1', name: 'Schedule 1' }),
-                createSchedule({ id: 'sched-2', name: 'Schedule 2' }),
-                createSchedule({ id: 'sched-3', name: 'Schedule 3' })
+                createMockSchedule({ id: 'sched-1', name: 'Schedule 1' }),
+                createMockSchedule({ id: 'sched-2', name: 'Schedule 2' }),
+                createMockSchedule({ id: 'sched-3', name: 'Schedule 3' })
             ];
 
             for (const schedule of schedules) {
@@ -265,7 +276,7 @@ describe('IndexedDBStorageManager', () => {
             expect(result.success).toBe(true);
             expect(result.data).toHaveLength(3);
 
-            const ids = result.data?.map(s => s.id).sort();
+            const ids = result.data?.map((s: any) => s.id).sort();
             expect(ids).toEqual(['sched-1', 'sched-2', 'sched-3']);
         });
 
@@ -280,11 +291,11 @@ describe('IndexedDBStorageManager', () => {
 
         it('should decompress all schedules', async () => {
             // Arrange: Save schedules with data
-            const schedules = Array.from({ length: 5 }, (_, i) =>
-                createSchedule({
+            const schedules = Array.from({ length: 5 }, (_: any, i: number) =>
+                createMockSchedule({
                     id: `schedule-${i}`,
                     name: `Schedule ${i}`,
-                    selectedCourses: [createSelectedCourse({ courseId: `CS-${i}` })]
+                    selectedCourses: [createMockSelectedCourse({ course: createMockCourse({ id: `CS-${i}` }) })]
                 })
             );
 
@@ -300,7 +311,7 @@ describe('IndexedDBStorageManager', () => {
             expect(result.data).toHaveLength(5);
 
             // Verify all schedules have their data intact
-            result.data?.forEach((schedule, i) => {
+            result.data?.forEach((schedule: any, i: number) => {
                 expect(schedule.name).toBe(`Schedule ${i}`);
                 expect(schedule.selectedCourses).toHaveLength(1);
             });
@@ -310,7 +321,7 @@ describe('IndexedDBStorageManager', () => {
     describe('Delete Schedule', () => {
         it('should delete a schedule', async () => {
             // Arrange
-            const schedule = createSchedule({ id: 'delete-test', name: 'To Be Deleted' });
+            const schedule = createMockSchedule({ id: 'delete-test', name: 'To Be Deleted' });
             await storageManager.saveSchedule(schedule);
 
             // Verify it exists
@@ -338,9 +349,9 @@ describe('IndexedDBStorageManager', () => {
 
         it('should only delete specified schedule', async () => {
             // Arrange: Save multiple schedules
-            await storageManager.saveSchedule(createSchedule({ id: 'keep-1', name: 'Keep 1' }));
-            await storageManager.saveSchedule(createSchedule({ id: 'delete-me', name: 'Delete' }));
-            await storageManager.saveSchedule(createSchedule({ id: 'keep-2', name: 'Keep 2' }));
+            await storageManager.saveSchedule(createMockSchedule({ id: 'keep-1', name: 'Keep 1' }));
+            await storageManager.saveSchedule(createMockSchedule({ id: 'delete-me', name: 'Delete' }));
+            await storageManager.saveSchedule(createMockSchedule({ id: 'keep-2', name: 'Keep 2' }));
 
             // Act
             await storageManager.deleteSchedule('delete-me');
@@ -349,7 +360,7 @@ describe('IndexedDBStorageManager', () => {
             const remaining = await storageManager.loadAllSchedules();
             expect(remaining.data).toHaveLength(2);
 
-            const ids = remaining.data?.map(s => s.id);
+            const ids = remaining.data?.map((s: any) => s.id);
             expect(ids).toContain('keep-1');
             expect(ids).toContain('keep-2');
             expect(ids).not.toContain('delete-me');
@@ -361,7 +372,7 @@ describe('IndexedDBStorageManager', () => {
             // Arrange: Save multiple schedules
             for (let i = 0; i < 10; i++) {
                 await storageManager.saveSchedule(
-                    createSchedule({ id: `schedule-${i}`, name: `Schedule ${i}` })
+                    createMockSchedule({ id: `schedule-${i}`, name: `Schedule ${i}` })
                 );
             }
 
@@ -394,17 +405,17 @@ describe('IndexedDBStorageManager', () => {
     describe('Storage Stats', () => {
         it('should calculate storage stats', async () => {
             // Arrange: Save schedules of various sizes
-            await storageManager.saveSchedule(createSchedule({
+            await storageManager.saveSchedule(createMockSchedule({
                 id: 'small',
                 name: 'Small',
                 selectedCourses: []
             }));
 
-            await storageManager.saveSchedule(createSchedule({
+            await storageManager.saveSchedule(createMockSchedule({
                 id: 'large',
                 name: 'Large',
-                selectedCourses: Array.from({ length: 20 }, (_, i) =>
-                    createSelectedCourse({ courseId: `CS-${i}` })
+                selectedCourses: Array.from({ length: 20 }, (_: any, i: number) =>
+                    createMockSelectedCourse({ course: createMockCourse({ id: `CS-${i}` }) })
                 )
             }));
 
@@ -441,13 +452,12 @@ describe('IndexedDBStorageManager', () => {
     describe('Compression Efficiency', () => {
         it('should compress large schedules efficiently', async () => {
             // Arrange: Create schedule with repetitive data (compresses well)
-            const largeSchedule = createSchedule({
+            const largeSchedule = createMockSchedule({
                 id: 'compression-test',
                 name: 'Large Schedule',
-                selectedCourses: Array.from({ length: 50 }, (_, i) =>
-                    createSelectedCourse({
-                        courseId: `CS-${1000 + i}`,
-                        notes: 'This is a repeated note that should compress well. '.repeat(10)
+                selectedCourses: Array.from({ length: 50 }, (_: any, i: number) =>
+                    createMockSelectedCourse({
+                        course: createMockCourse({ id: `CS-${1000 + i}` })
                     })
                 )
             });
@@ -468,14 +478,12 @@ describe('IndexedDBStorageManager', () => {
 
         it('should handle large data sets without errors', async () => {
             // Arrange: Very large schedule
-            const veryLargeSchedule = createSchedule({
+            const veryLargeSchedule = createMockSchedule({
                 id: 'very-large',
                 name: 'Very Large Schedule',
-                selectedCourses: Array.from({ length: 200 }, (_, i) =>
-                    createSelectedCourse({
-                        courseId: `COURSE-${i}`,
-                        selectedSectionIds: Array.from({ length: 5 }, (_, j) => `SEC-${i}-${j}`),
-                        notes: `Notes for course ${i}. `.repeat(20)
+                selectedCourses: Array.from({ length: 200 }, (_: any, i: number) =>
+                    createMockSelectedCourse({
+                        course: createMockCourse({ id: `COURSE-${i}` })
                     })
                 )
             });
@@ -496,7 +504,7 @@ describe('IndexedDBStorageManager', () => {
             // Arrange: Configure mock to fail
             mockIndexedDB.setConfig({ transactionFails: true });
 
-            const schedule = createSchedule({ id: 'fail-test', name: 'Test' });
+            const schedule = createMockSchedule({ id: 'fail-test', name: 'Test' });
 
             // Act
             const saveResult = await storageManager.saveSchedule(schedule);
@@ -508,13 +516,13 @@ describe('IndexedDBStorageManager', () => {
 
         it('should handle corrupted compressed data', async () => {
             // Arrange: Manually insert corrupted data using the mock API
-            const db = await new Promise<IDBDatabase>((resolve, reject) => {
+            const db = await new Promise<IDBDatabase>((resolve: any, reject: any) => {
                 const request = mockIndexedDB.open('wpi-planner-db', 1);
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = () => reject(request.error);
             });
 
-            await new Promise<void>((resolve, reject) => {
+            await new Promise<void>((resolve: any, reject: any) => {
                 const tx = db.transaction('schedules', 'readwrite');
                 const store = tx.objectStore('schedules');
 
@@ -542,17 +550,17 @@ describe('IndexedDBStorageManager', () => {
     describe('Concurrent Operations', () => {
         it('should handle concurrent saves', async () => {
             // Arrange: Multiple schedules
-            const schedules = Array.from({ length: 5 }, (_, i) =>
-                createSchedule({ id: `concurrent-${i}`, name: `Concurrent ${i}` })
+            const schedules = Array.from({ length: 5 }, (_: any, i: number) =>
+                createMockSchedule({ id: `concurrent-${i}`, name: `Concurrent ${i}` })
             );
 
             // Act: Save all concurrently
             const results = await Promise.all(
-                schedules.map(s => storageManager.saveSchedule(s))
+                schedules.map((s: any) => storageManager.saveSchedule(s))
             );
 
             // Assert: All should succeed
-            results.forEach(result => {
+            results.forEach((result: any) => {
                 expect(result.success).toBe(true);
             });
 
@@ -563,13 +571,13 @@ describe('IndexedDBStorageManager', () => {
 
         it('should handle save while loading', async () => {
             // Arrange: Save initial schedule
-            const schedule = createSchedule({ id: 'concurrent-test', name: 'Test' });
+            const schedule = createMockSchedule({ id: 'concurrent-test', name: 'Test' });
             await storageManager.saveSchedule(schedule);
 
             // Act: Load and save concurrently
             const [loadResult, saveResult] = await Promise.all([
                 storageManager.loadSchedule('concurrent-test'),
-                storageManager.saveSchedule(createSchedule({ id: 'new-schedule', name: 'New' }))
+                storageManager.saveSchedule(createMockSchedule({ id: 'new-schedule', name: 'New' }))
             ]);
 
             // Assert: Both should succeed
@@ -581,21 +589,17 @@ describe('IndexedDBStorageManager', () => {
     describe('Data Integrity', () => {
         it('should preserve exact schedule structure after save/load', async () => {
             // Arrange: Complex schedule
-            const originalSchedule = createSchedule({
+            const originalSchedule = createMockSchedule({
                 id: 'integrity-test',
                 name: 'Integrity Test',
                 selectedCourses: [
-                    createSelectedCourse({
-                        courseId: 'CS-1101',
-                        selectedSectionIds: ['SEC-1', 'SEC-2'],
-                        isRequired: true,
-                        notes: 'Important class'
+                    createMockSelectedCourse({
+                        course: createMockCourse({ id: 'CS-1101' }),
+                        isRequired: true
                     }),
-                    createSelectedCourse({
-                        courseId: 'MA-1021',
-                        selectedSectionIds: ['SEC-3'],
-                        isRequired: false,
-                        notes: null as any // Test null handling
+                    createMockSelectedCourse({
+                        course: createMockCourse({ id: 'MA-1021' }),
+                        isRequired: false
                     })
                 ]
             });
@@ -613,13 +617,11 @@ describe('IndexedDBStorageManager', () => {
             expect(loaded.selectedCourses).toHaveLength(originalSchedule.selectedCourses.length);
 
             // Check first course
-            expect(loaded.selectedCourses[0].courseId).toBe('CS-1101');
-            expect(loaded.selectedCourses[0].selectedSectionIds).toEqual(['SEC-1', 'SEC-2']);
+            expect(loaded.selectedCourses[0].course.id).toBe('CS-1101');
             expect(loaded.selectedCourses[0].isRequired).toBe(true);
-            expect(loaded.selectedCourses[0].notes).toBe('Important class');
 
             // Check second course
-            expect(loaded.selectedCourses[1].courseId).toBe('MA-1021');
+            expect(loaded.selectedCourses[1].course.id).toBe('MA-1021');
             expect(loaded.selectedCourses[1].isRequired).toBe(false);
         });
     });

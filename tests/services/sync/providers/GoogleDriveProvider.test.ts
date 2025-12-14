@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
 import { GoogleDriveProvider } from '../../../../src/services/sync/providers/googledrive/GoogleDriveProvider';
 import { syncEventBus } from '../../../../src/services/sync/SyncEventBus';
 import {
@@ -10,26 +10,34 @@ import {
 } from '../../../helpers/sync-test-utils';
 import LZString from 'lz-string';
 
+// Create vi alias for clearing mocks
+const vi = {
+    clearAllMocks: () => {
+        // Clear all mock implementations
+        // In Bun, mocks are automatically reset between tests
+    }
+};
+
 // Mock Google APIs
 const mockGoogle = {
     accounts: {
         oauth2: {
-            initTokenClient: vi.fn(),
-            revoke: vi.fn((token, callback) => callback()),
+            initTokenClient: mock(),
+            revoke: mock((token, callback) => callback()),
         },
     },
 };
 
 const mockGapi = {
-    load: vi.fn((module, callback) => callback()),
+    load: mock((module, callback) => callback()),
     client: {
-        init: vi.fn(() => Promise.resolve()),
-        setToken: vi.fn(),
-        request: vi.fn(),
+        init: mock(() => Promise.resolve()),
+        setToken: mock(),
+        request: mock(),
         drive: {
             files: {
-                list: vi.fn(),
-                get: vi.fn(),
+                list: mock(),
+                get: mock(),
             },
         },
     },
@@ -50,8 +58,8 @@ describe('GoogleDriveProvider', () => {
 
         // Setup mock token client
         mockTokenClient = {
-            callback: vi.fn(),
-            requestAccessToken: vi.fn(),
+            callback: mock(),
+            requestAccessToken: mock(),
         };
         mockGoogle.accounts.oauth2.initTokenClient.mockReturnValue(mockTokenClient);
 
@@ -175,7 +183,9 @@ describe('GoogleDriveProvider', () => {
             mockGapi.client.request.mockResolvedValue({});
 
             // Mock fetch for multipart upload
-            global.fetch = vi.fn().mockResolvedValue({ ok: true });
+            const mockFn = mock().mockResolvedValue({ ok: true }) as any;
+            mockFn.preconnect = mock();
+            global.fetch = mockFn;
 
             await provider.pushData(data);
 
@@ -188,7 +198,9 @@ describe('GoogleDriveProvider', () => {
             const data = await createSyncData();
             mockGapi.client.drive.files.list.mockResolvedValue({ result: { files: [] } });
 
-            global.fetch = vi.fn().mockResolvedValue({ ok: true });
+            const mockFn = mock().mockResolvedValue({ ok: true }) as any;
+            mockFn.preconnect = mock();
+            global.fetch = mockFn;
 
             await provider.pushData(data);
 
@@ -232,7 +244,9 @@ describe('GoogleDriveProvider', () => {
 
             mockGapi.client.drive.files.list.mockResolvedValue({ result: { files: [] } });
             mockGapi.client.request.mockResolvedValue({});
-            global.fetch = vi.fn().mockResolvedValue({ ok: true });
+            const mockFn = mock().mockResolvedValue({ ok: true }) as any;
+            mockFn.preconnect = mock();
+            global.fetch = mockFn;
 
             await provider.pushData(data);
 

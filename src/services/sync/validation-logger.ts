@@ -91,10 +91,11 @@ export class ValidationLogger {
         console.error(`[Validation]   Error: ${error.message}`);
 
         // If Zod ValidationError, log detailed field errors
-        if ('errors' in error && Array.isArray(error.errors)) {
-            error.errors.forEach((err, index) => {
+        if ('issues' in error && Array.isArray(error.issues)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            error.issues.forEach((err: any, index: number) => {
                 console.error(`[Validation]   Field Error ${index + 1}:`, {
-                    path: err.path.join('.'),
+                    path: Array.isArray(err.path) ? err.path.join('.') : String(err.path),
                     message: err.message,
                     code: err.code,
                     received: 'received' in err ? err.received : undefined
@@ -112,11 +113,12 @@ export class ValidationLogger {
     logSchemaError(error: ValidationError, data: unknown): void {
         console.error(`[Validation] ✗ Schema validation failed: ${this.context.source}`);
         console.error(`[Validation]   Operation: ${this.context.operation}`);
-        console.error(`[Validation]   Errors: ${error.errors.length}`);
+        console.error(`[Validation]   Errors: ${error.issues.length}`);
 
-        error.errors.forEach((err, index) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error.issues.forEach((err: any, index: number) => {
             console.error(`[Validation]   Error ${index + 1}:`, {
-                path: err.path.join('.') || 'root',
+                path: Array.isArray(err.path) ? err.path.join('.') : String(err.path) || 'root',
                 message: err.message,
                 code: err.code,
                 received: 'received' in err ? err.received : undefined,

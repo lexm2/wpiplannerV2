@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, mock, spyOn } from 'bun:test'
-import { ProfileStateManager, StateChangeEvent } from '../../../src/core/ProfileStateManager'
-import { TransactionalStorageManager } from '../../../src/core/TransactionalStorageManager'
+import { ProfileStateManager, StateChangeEvent } from '../../../src/core/state/ProfileStateManager'
+import { TransactionalStorageManager } from '../../../src/core/storage/TransactionalStorageManager'
 import { Schedule, SelectedCourse } from '../../../src/types/schedule'
 import { Course } from '../../../src/types/types'
 import { mockLocalStorage } from '../../helpers/testUtils'
@@ -39,7 +39,7 @@ describe('ProfileStateManager', () => {
 
   beforeEach(() => {
     mockStorage = mockLocalStorage()
-    consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    consoleSpy = spyOn(console, 'warn').mockImplementation(() => {})
     
     Object.defineProperty(window, 'localStorage', {
       value: mockStorage,
@@ -47,7 +47,7 @@ describe('ProfileStateManager', () => {
     })
 
     mockStorageManager = new TransactionalStorageManager()
-    profileStateManager = new ProfileStateManager(mockStorageManager)
+    profileStateManager = ProfileStateManager.getInstance()
     
     // Create a default schedule for tests that need an active schedule
     const defaultSchedule = profileStateManager.createSchedule('Test Schedule', 'test')
@@ -63,8 +63,8 @@ describe('ProfileStateManager', () => {
 
   describe('Initialization and State Management', () => {
     it('should initialize with default state', () => {
-      // Create a fresh instance without the default schedule from beforeEach
-      const freshProfileManager = new ProfileStateManager(mockStorageManager)
+      // Use the singleton instance
+      const freshProfileManager = ProfileStateManager.getInstance()
       const state = freshProfileManager.getState()
 
       expect(state.activeScheduleId).toBeNull()

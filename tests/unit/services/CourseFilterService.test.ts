@@ -1,10 +1,10 @@
-import { describe, test, expect, beforeEach, mock } from 'bun:test';
-import { CourseFilterService } from '../../../src/services/CourseFilterService';
-import { SearchService } from '../../../src/services/searchService';
-import { DepartmentFilter } from '../../../src/core/filters/DepartmentFilter';
-import { AvailabilityFilter } from '../../../src/core/filters/AvailabilityFilter';
-import { SearchTextFilter } from '../../../src/core/filters/SearchTextFilter';
-import { ProfessorFilter } from '../../../src/core/filters/ProfessorFilter';
+import { describe, test, expect, beforeEach, mock, spyOn } from 'bun:test';
+import { CourseFilterService } from '../../../src/services/filtering/CourseFilterService';
+import { SearchService } from '../../../src/services/filtering/searchService';
+import { DepartmentFilter } from '../../../src/core/filtering/filters/DepartmentFilter';
+import { AvailabilityFilter } from '../../../src/core/filtering/filters/AvailabilityFilter';
+import { SearchTextFilter } from '../../../src/core/filtering/filters/SearchTextFilter';
+import { ProfessorFilter } from '../../../src/core/filtering/filters/ProfessorFilter';
 import { Course, Department, Section, Period, DayOfWeek } from '../../../src/types/types';
 import { createMockSection } from '../../helpers/mockData';
 

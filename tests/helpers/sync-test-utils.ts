@@ -1,6 +1,6 @@
+import { expect } from 'bun:test';
 import type { SyncData, ScheduleData, SelectedCourseData, SyncEvent } from '../../src/services/sync/types';
 import { checksumCalculator } from '../../src/services/sync/checksum';
-import { vi } from 'vitest';
 
 /**
  * Test Utilities for Cloud Sync Testing
@@ -198,24 +198,6 @@ export function createEventBusSpy() {
             return events.filter((e) => e.type === type).length;
         },
     };
-}
-
-// =============================================================================
-// Time Manipulation
-// =============================================================================
-
-/**
- * Advance time and flush pending timers (for debounce testing)
- */
-export async function advanceTimersByTime(ms: number): Promise<void> {
-    await vi.advanceTimersByTimeAsync(ms);
-}
-
-/**
- * Wait for all pending promises to resolve
- */
-export async function flushPromises(): Promise<void> {
-    await vi.runAllTimersAsync();
 }
 
 // =============================================================================

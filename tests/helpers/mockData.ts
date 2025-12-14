@@ -1,5 +1,5 @@
 import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB, PeriodType } from '../../src/types/types'
-import { SelectedCourse } from '../../src/types/schedule'
+import { SelectedCourse, Schedule } from '../../src/types/schedule'
 
 export const createMockTime = (hours: number, minutes: number): Time => ({
   hours,
@@ -174,6 +174,17 @@ export const createMockSelectedCourseWithLocks = (
     selectedSectionNumber: null,
     isRequired: false,
     lockedSections: new Set(lockedCrns)
+  }
+}
+
+export const createMockSchedule = (overrides: Partial<Schedule> = {}): Schedule => {
+  return {
+    id: 'schedule-1',
+    name: 'Test Schedule',
+    selectedCourses: [],
+    generatedSchedules: [],
+    timestamp: Date.now(),
+    ...overrides
   }
 }
 

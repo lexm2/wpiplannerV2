@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'bun:test'
-import { CourseSelectionService } from '../../src/services/CourseSelectionService'
+import { CourseSelectionService } from '../../src/services/selection/CourseSelectionService'
 import { Course, Section, LectureGroup } from '../../src/types/types'
 
 function createMockCourseWithSections(numLectures: number, numDiscussions: number, numLabs: number): Course {

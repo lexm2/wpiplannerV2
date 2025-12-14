@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { ScheduleFilterService } from '../../../src/services/ScheduleFilterService';
-import { SearchService } from '../../../src/services/searchService';
-import { ConflictDetector } from '../../../src/core/ConflictDetector';
+import { ScheduleFilterService } from '../../../src/services/filtering/ScheduleFilterService';
+import { SearchService } from '../../../src/services/filtering/searchService';
+import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
 import { Course, Section, Period, Department, DayOfWeek, PeriodType } from '../../../src/types/types';
 import { SelectedCourse } from '../../../src/types/schedule';
 
@@ -128,9 +128,9 @@ describe('ScheduleFilterService', () => {
     describe('filterSections', () => {
         test('should return all sections when no filters are active', () => {
             const result = scheduleFilterService.filterSections([selectedCourse]);
-            
+
             expect(result).toHaveLength(3);
-            expect(result.map(r => r.section.number)).toEqual(['A01', 'AL01', 'B01']);
+            expect(result.map((r: any) => r.section.number)).toEqual(['A01', 'AL01', 'B01']);
         });
 
         test('should filter sections by section code', () => {
@@ -146,22 +146,22 @@ describe('ScheduleFilterService', () => {
         test('should filter sections by multiple section codes', () => {
             // Add section code filter for 'A01' and 'B01'
             scheduleFilterService.addFilter('sectionCode', { codes: ['A01', 'B01'] });
-            
+
             const result = scheduleFilterService.filterSections([selectedCourse]);
-            
+
             expect(result).toHaveLength(2);
-            const sectionNumbers = result.map(r => r.section.number).sort();
+            const sectionNumbers = result.map((r: any) => r.section.number).sort();
             expect(sectionNumbers).toEqual(['A01', 'B01']);
         });
 
         test('should filter sections by partial section code match', () => {
             // Add section code filter for 'A' (should match A01 and AL01)
             scheduleFilterService.addFilter('sectionCode', { codes: ['A'] });
-            
+
             const result = scheduleFilterService.filterSections([selectedCourse]);
-            
+
             expect(result).toHaveLength(2);
-            const sectionNumbers = result.map(r => r.section.number).sort();
+            const sectionNumbers = result.map((r: any) => r.section.number).sort();
             expect(sectionNumbers).toEqual(['A01', 'AL01']);
         });
 
@@ -187,11 +187,11 @@ describe('ScheduleFilterService', () => {
         test('should work with search text filter on professor names', () => {
             // Add search text filter for professor
             scheduleFilterService.addFilter('searchText', { query: 'Smith' });
-            
+
             const result = scheduleFilterService.filterSections([selectedCourse]);
-            
+
             expect(result).toHaveLength(2); // A01 and B01 both have Prof Smith
-            const sectionNumbers = result.map(r => r.section.number).sort();
+            const sectionNumbers = result.map((r: any) => r.section.number).sort();
             expect(sectionNumbers).toEqual(['A01', 'B01']);
         });
 
@@ -221,13 +221,13 @@ describe('ScheduleFilterService', () => {
         test('should exclude sections with periods on Tuesday', () => {
             // Add day exclusion filter for Tuesday
             scheduleFilterService.addFilter('periodDays', { days: [DayOfWeek.TUESDAY] });
-            
+
             const result = scheduleFilterService.filterSections([selectedCourse]);
-            
+
             // Should exclude AL01 (has periods on Tuesday)
             // Should keep A01 and B01 (have periods on Mon/Wed/Fri)
             expect(result).toHaveLength(2);
-            const sectionNumbers = result.map(r => r.section.number).sort();
+            const sectionNumbers = result.map((r: any) => r.section.number).sort();
             expect(sectionNumbers).toEqual(['A01', 'B01']);
         });
 
@@ -244,24 +244,24 @@ describe('ScheduleFilterService', () => {
         test('should return all sections when excluding non-existent days', () => {
             // Add day exclusion filter for days not used by any section
             scheduleFilterService.addFilter('periodDays', { days: [DayOfWeek.SATURDAY, DayOfWeek.SUNDAY] });
-            
+
             const result = scheduleFilterService.filterSections([selectedCourse]);
-            
+
             // Should return all sections since none have Saturday or Sunday periods
             expect(result).toHaveLength(3);
-            expect(result.map(r => r.section.number)).toEqual(['A01', 'AL01', 'B01']);
+            expect(result.map((r: any) => r.section.number)).toEqual(['A01', 'AL01', 'B01']);
         });
 
         test('should exclude sections with Lab period types', () => {
             // Add period type exclusion filter for Lab
             scheduleFilterService.addFilter('periodType', { types: ['lab'] });
-            
+
             const result = scheduleFilterService.filterSections([selectedCourse]);
-            
+
             // Should exclude AL01 (has Lab periods)
             // Should keep A01 and B01 (have Lecture periods)
             expect(result).toHaveLength(2);
-            const sectionNumbers = result.map(r => r.section.number).sort();
+            const sectionNumbers = result.map((r: any) => r.section.number).sort();
             expect(sectionNumbers).toEqual(['A01', 'B01']);
         });
 
@@ -290,12 +290,12 @@ describe('ScheduleFilterService', () => {
         test('should return all sections when excluding non-existent period types', () => {
             // Add period type exclusion filter for types not used by any section
             scheduleFilterService.addFilter('periodType', { types: ['seminar', 'discussion'] });
-            
+
             const result = scheduleFilterService.filterSections([selectedCourse]);
-            
+
             // Should return all sections since none have Seminar or Discussion periods
             expect(result).toHaveLength(3);
-            expect(result.map(r => r.section.number)).toEqual(['A01', 'AL01', 'B01']);
+            expect(result.map((r: any) => r.section.number)).toEqual(['A01', 'AL01', 'B01']);
         });
 
         test('should handle case insensitive period type exclusion', () => {
@@ -387,9 +387,9 @@ describe('ScheduleFilterService', () => {
 
         test('should return all sections when no term filter is active', () => {
             const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
-            
+
             expect(result).toHaveLength(3);
-            expect(result.map(r => r.section.computedTerm)).toEqual(['A', 'B', 'C']);
+            expect(result.map((r: any) => r.section.computedTerm)).toEqual(['A', 'B', 'C']);
         });
 
         test('should filter sections to show only A term', () => {
@@ -412,11 +412,11 @@ describe('ScheduleFilterService', () => {
 
         test('should filter sections to show multiple terms', () => {
             scheduleFilterService.addFilter('periodTerm', { terms: ['A', 'C'] });
-            
+
             const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
-            
+
             expect(result).toHaveLength(2);
-            const terms = result.map(r => r.section.computedTerm).sort();
+            const terms = result.map((r: any) => r.section.computedTerm).sort();
             expect(terms).toEqual(['A', 'C']);
         });
 
@@ -430,11 +430,11 @@ describe('ScheduleFilterService', () => {
 
         test('should handle case insensitive term filtering', () => {
             scheduleFilterService.addFilter('periodTerm', { terms: ['a', 'b'] });
-            
+
             const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
-            
+
             expect(result).toHaveLength(2);
-            const terms = result.map(r => r.section.computedTerm).sort();
+            const terms = result.map((r: any) => r.section.computedTerm).sort();
             expect(terms).toEqual(['A', 'B']);
         });
 
@@ -442,14 +442,14 @@ describe('ScheduleFilterService', () => {
             // Add both term filter and section code filter
             scheduleFilterService.addFilter('periodTerm', { terms: ['A', 'B'] });
             scheduleFilterService.addFilter('sectionCode', { codes: ['A01'] });
-            
+
             const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
-            
+
             // Should return sections that match both filters (A01 sections in A or B term)
             expect(result).toHaveLength(2);
-            const terms = result.map(r => r.section.computedTerm).sort();
+            const terms = result.map((r: any) => r.section.computedTerm).sort();
             expect(terms).toEqual(['A', 'B']);
-            const sectionNumbers = result.map(r => r.section.number);
+            const sectionNumbers = result.map((r: any) => r.section.number);
             expect(sectionNumbers).toEqual(['A01', 'A01']);
         });
     });

@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { CourseDataCoordinator } from '../../../src/services/CourseDataCoordinator'
+import { describe, it, expect, beforeEach, afterEach, mock, spyOn } from 'bun:test'
+import { CourseDataCoordinator } from '../../../src/services/data/CourseDataCoordinator'
 import { createMockScheduleDB, createMockDepartment } from '../../helpers/mockData'
 import type { Department } from '../../../src/types/types'
 
@@ -21,28 +21,28 @@ describe('CourseDataCoordinator', () => {
 
     // Mock CourseDataService
     mockCourseDataService = {
-      loadCourseData: vi.fn().mockResolvedValue(mockScheduleDB)
+      loadCourseData: mock().mockResolvedValue(mockScheduleDB)
     }
 
     // Mock TimestampManager
     mockTimestampManager = {
-      updateClientTimestamp: vi.fn(),
-      loadServerTimestamp: vi.fn().mockResolvedValue('2025-11-29T12:00:00Z')
+      updateClientTimestamp: mock(),
+      loadServerTimestamp: mock().mockResolvedValue('2025-11-29T12:00:00Z')
     }
 
     // Mock CourseSelectionService
     mockCourseSelectionService = {
-      reconstructSectionObjects: vi.fn()
+      reconstructSectionObjects: mock()
     }
 
     // Mock ScheduleManagementService
     mockScheduleManagementService = {
-      initializeDefaultScheduleIfNeeded: vi.fn().mockResolvedValue(undefined)
+      initializeDefaultScheduleIfNeeded: mock().mockResolvedValue(undefined)
     }
 
     // Spy on console methods
-    consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    consoleSpy = spyOn(console, 'log').mockImplementation(() => {})
+    consoleWarnSpy = spyOn(console, 'warn').mockImplementation(() => {})
 
     // Create coordinator instance
     coordinator = new CourseDataCoordinator(
@@ -69,8 +69,8 @@ describe('CourseDataCoordinator', () => {
 
   describe('Consumer Registration', () => {
     it('should register department consumers', () => {
-      const consumer1 = vi.fn()
-      const consumer2 = vi.fn()
+      const consumer1 = mock()
+      const consumer2 = mock()
 
       coordinator.registerDepartmentConsumer(consumer1)
       coordinator.registerDepartmentConsumer(consumer2)
@@ -80,8 +80,8 @@ describe('CourseDataCoordinator', () => {
     })
 
     it('should register catalog consumers', () => {
-      const consumer1 = vi.fn()
-      const consumer2 = vi.fn()
+      const consumer1 = mock()
+      const consumer2 = mock()
 
       coordinator.registerCatalogConsumer(consumer1)
       coordinator.registerCatalogConsumer(consumer2)
@@ -91,10 +91,10 @@ describe('CourseDataCoordinator', () => {
     })
 
     it('should register multiple consumers of different types', () => {
-      const deptConsumer1 = vi.fn()
-      const deptConsumer2 = vi.fn()
-      const catalogConsumer1 = vi.fn()
-      const catalogConsumer2 = vi.fn()
+      const deptConsumer1 = mock()
+      const deptConsumer2 = mock()
+      const catalogConsumer1 = mock()
+      const catalogConsumer2 = mock()
 
       coordinator.registerDepartmentConsumer(deptConsumer1)
       coordinator.registerDepartmentConsumer(deptConsumer2)
@@ -107,10 +107,10 @@ describe('CourseDataCoordinator', () => {
 
   describe('loadAndDistribute', () => {
     it('should successfully load and distribute data to all consumers', async () => {
-      const deptConsumer1 = vi.fn()
-      const deptConsumer2 = vi.fn()
-      const catalogConsumer1 = vi.fn()
-      const catalogConsumer2 = vi.fn()
+      const deptConsumer1 = mock()
+      const deptConsumer2 = mock()
+      const catalogConsumer1 = mock()
+      const catalogConsumer2 = mock()
 
       coordinator.registerDepartmentConsumer(deptConsumer1)
       coordinator.registerDepartmentConsumer(deptConsumer2)
@@ -182,7 +182,7 @@ describe('CourseDataCoordinator', () => {
         new Error('Timestamp error')
       )
 
-      const deptConsumer = vi.fn()
+      const deptConsumer = mock()
       coordinator.registerDepartmentConsumer(deptConsumer)
 
       // Should still succeed even if timestamp loading fails
@@ -203,8 +203,8 @@ describe('CourseDataCoordinator', () => {
     it('should call consumers in correct order', async () => {
       const callOrder: string[] = []
 
-      const deptConsumer = vi.fn(() => callOrder.push('dept'))
-      const catalogConsumer = vi.fn(() => callOrder.push('catalog'))
+      const deptConsumer = mock(() => callOrder.push('dept'))
+      const catalogConsumer = mock(() => callOrder.push('catalog'))
 
       coordinator.registerDepartmentConsumer(deptConsumer)
       coordinator.registerCatalogConsumer(catalogConsumer)
@@ -218,8 +218,8 @@ describe('CourseDataCoordinator', () => {
 
   describe('redistributeToConsumers', () => {
     it('should redistribute to all consumers after load', async () => {
-      const deptConsumer = vi.fn()
-      const catalogConsumer = vi.fn()
+      const deptConsumer = mock()
+      const catalogConsumer = mock()
 
       coordinator.registerDepartmentConsumer(deptConsumer)
       coordinator.registerCatalogConsumer(catalogConsumer)
@@ -246,8 +246,8 @@ describe('CourseDataCoordinator', () => {
     })
 
     it('should not call consumers if data not loaded', () => {
-      const deptConsumer = vi.fn()
-      const catalogConsumer = vi.fn()
+      const deptConsumer = mock()
+      const catalogConsumer = mock()
 
       coordinator.registerDepartmentConsumer(deptConsumer)
       coordinator.registerCatalogConsumer(catalogConsumer)
@@ -262,7 +262,7 @@ describe('CourseDataCoordinator', () => {
       let deptData1: Department[] | undefined
       let deptData2: Department[] | undefined
 
-      const deptConsumer = vi.fn((depts: Department[]) => {
+      const deptConsumer = mock((depts: Department[]) => {
         if (deptData1 === undefined) {
           deptData1 = depts
         } else {
@@ -281,9 +281,9 @@ describe('CourseDataCoordinator', () => {
     })
 
     it('should log redistribution count', async () => {
-      const deptConsumer1 = vi.fn()
-      const deptConsumer2 = vi.fn()
-      const catalogConsumer1 = vi.fn()
+      const deptConsumer1 = mock()
+      const deptConsumer2 = mock()
+      const catalogConsumer1 = mock()
 
       coordinator.registerDepartmentConsumer(deptConsumer1)
       coordinator.registerDepartmentConsumer(deptConsumer2)
@@ -363,9 +363,9 @@ describe('CourseDataCoordinator', () => {
   describe('Integration Scenarios', () => {
     it('should simulate cloud sync redistribution', async () => {
       // Setup consumers
-      const searchService = { setCourseData: vi.fn() }
-      const filterModal = { setCourseData: vi.fn() }
-      const stateManager = { setCourseData: vi.fn() }
+      const searchService = { setCourseData: mock() }
+      const filterModal = { setCourseData: mock() }
+      const stateManager = { setCourseData: mock() }
 
       coordinator.registerCatalogConsumer((depts) => searchService.setCourseData(depts))
       coordinator.registerCatalogConsumer((depts) => filterModal.setCourseData(depts))
@@ -393,7 +393,7 @@ describe('CourseDataCoordinator', () => {
     })
 
     it('should handle multiple redistribution calls', async () => {
-      const consumer = vi.fn()
+      const consumer = mock()
       coordinator.registerDepartmentConsumer(consumer)
 
       await coordinator.loadAndDistribute()
@@ -430,7 +430,7 @@ describe('CourseDataCoordinator', () => {
     })
 
     it('should maintain consumer registrations across failed loads', async () => {
-      const consumer = vi.fn()
+      const consumer = mock()
       coordinator.registerDepartmentConsumer(consumer)
 
       // Failed load

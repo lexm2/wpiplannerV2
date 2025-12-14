@@ -9,7 +9,7 @@ import courseData from '../../../public/course-data-constructed.json'
 
 describe('CourseDataService - Data Integrity', () => {
     // Use course data directly - no conversion needed since it's now in camelCase
-    const realCourseData = courseData as ScheduleDB
+    const realCourseData = courseData as unknown as ScheduleDB
 
     // Helper to get test data - use real data, fallback to mock if unavailable
     function getTestData(): ScheduleDB {

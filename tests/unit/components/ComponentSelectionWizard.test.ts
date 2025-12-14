@@ -1,13 +1,29 @@
-import { describe, test, expect, beforeEach, mock } from 'bun:test';
+import { describe, test, expect, beforeEach, mock, spyOn } from 'bun:test';
 import { ComponentSelectionWizard } from '../../../src/ui/components/ComponentSelectionWizard';
-import { CourseDataService } from '../../../src/services/courseDataService';
+import { CourseDataService } from '../../../src/services/data/courseDataService';
 import { Course, Section, Period, Department, PeriodType, DayOfWeek } from '../../../src/types/types';
 import { SelectedCourse } from '../../../src/types/schedule';
 
+// Create vi mock for timer functions
+// Note: Bun test doesn't have built-in fake timers like Jest/Vitest
+// We'll use actual timeouts for this test
+const vi = {
+    useFakeTimers: () => {
+        // No-op for Bun - we'll use real timers
+    },
+    useRealTimers: () => {
+        // No-op for Bun
+    },
+    advanceTimersByTimeAsync: async (ms: number) => {
+        // Use actual timeout in Bun
+        await new Promise(resolve => setTimeout(resolve, ms));
+    }
+};
+
 describe('ComponentSelectionWizard', () => {
     let courseDataService: CourseDataService;
-    let mockOnComplete: ReturnType<typeof vi.fn>;
-    let mockOnCancel: ReturnType<typeof vi.fn>;
+    let mockOnComplete: ReturnType<typeof mock>;
+    let mockOnCancel: ReturnType<typeof mock>;
 
     // Test data
     const department: Department = {

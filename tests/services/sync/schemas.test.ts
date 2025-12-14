@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, spyOn } from 'bun:test';
 import {
     SyncDataSchema,
     ScheduleDataSchema,
@@ -178,7 +178,7 @@ describe('Schema Validation', () => {
         });
 
         it('should log validation errors', () => {
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            const consoleSpy = spyOn(console, 'error').mockImplementation(() => {});
             const invalidData = createInvalidSyncData();
 
             try {

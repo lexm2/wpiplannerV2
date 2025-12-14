@@ -1,8 +1,8 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { PeriodConflictFilter } from '../../../src/core/filters/PeriodConflictFilter';
-import { ConflictDetector } from '../../../src/core/ConflictDetector';
-import { CourseFilterService } from '../../../src/services/CourseFilterService';
-import { SearchService } from '../../../src/services/searchService';
+import { PeriodConflictFilter } from '../../../src/core/filtering/filters/PeriodConflictFilter';
+import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
+import { CourseFilterService } from '../../../src/services/filtering/CourseFilterService';
+import { SearchService } from '../../../src/services/filtering/searchService';
 import { FilterableSection } from '../../../src/types/filterableUnit';
 
 describe('PeriodConflictFilter Registration', () => {

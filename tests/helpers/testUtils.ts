@@ -2,12 +2,14 @@ import { mock, expect } from 'bun:test'
 import { SimpleTime } from '../../src/types/types'
 
 export const mockFetch = (data: any, ok: boolean = true) => {
-  global.fetch = mock().mockResolvedValue({
+  const mockFn = mock().mockResolvedValue({
     ok,
     json: () => Promise.resolve(data),
     status: ok ? 200 : 500,
     statusText: ok ? 'OK' : 'Internal Server Error'
-  })
+  }) as any;
+  mockFn.preconnect = mock();
+  global.fetch = mockFn;
 }
 
 export const mockLocalStorage = () => {

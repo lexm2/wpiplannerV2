@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, spyOn, mock, vi, jest } from 'bun:test';
 import { SyncManager } from '../../../src/services/sync/SyncManager';
 import { syncEventBus } from '../../../src/services/sync/SyncEventBus';
 import { providerRegistry } from '../../../src/services/sync/ProviderRegistry';
@@ -7,8 +7,6 @@ import {
     createSyncData,
     createConflictingData,
     createEventBusSpy,
-    advanceTimersByTime,
-    flushPromises,
 } from '../../helpers/sync-test-utils';
 import type { SyncData } from '../../../src/services/sync/types';
 
@@ -142,9 +140,9 @@ describe('SyncManager', () => {
         });
 
         it('should resolve conflict with "cloud" choice', async () => {
-            const applyCloudData = vi.fn().mockResolvedValue(undefined);
+            const applyCloudData = mock().mockResolvedValue(undefined);
 
-            await syncManager.resolveConflict('cloud', applyCloudData);
+            await syncManager.resolveConflict('cloud');
 
             expect(syncManager.getStatus()).toBe('idle');
             expect(applyCloudData).toHaveBeenCalledWith(cloudData);
@@ -196,34 +194,34 @@ describe('SyncManager', () => {
             eventSpy.clear();
 
             // Mock getLocalSyncData to return test data
-            vi.spyOn(syncManager as any, 'getLocalSyncData').mockResolvedValue(testData);
+            spyOn(syncManager as any, 'getLocalSyncData').mockResolvedValue(testData);
         });
 
         it('should schedule a push after 3 seconds', async () => {
             syncEventBus.emitEvent('local-save-completed', {});
 
             // Before 3 seconds
-            await advanceTimersByTime(2000);
-            await flushPromises();
+            jest.advanceTimersByTime(2000);
+            jest.runAllTimers();
             expect(mockProvider.callHistory.pushData).toBe(0);
 
             // After 3 seconds
-            await advanceTimersByTime(1000);
-            await flushPromises();
+            jest.advanceTimersByTime(1000);
+            jest.runAllTimers();
             expect(mockProvider.callHistory.pushData).toBe(1);
         });
 
         it('should debounce multiple rapid changes into single push', async () => {
             // Trigger multiple saves rapidly
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(1000);
+            jest.advanceTimersByTime(1000);
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(1000);
+            jest.advanceTimersByTime(1000);
             syncEventBus.emitEvent('local-save-completed', {});
 
             // Wait for debounce
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             // Should only push once
             expect(mockProvider.callHistory.pushData).toBe(1);
@@ -234,16 +232,16 @@ describe('SyncManager', () => {
             mockProvider.resetCallHistory();
 
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(mockProvider.callHistory.pushData).toBe(0);
         });
 
         it('should emit sync-pushed event on successful push', async () => {
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(eventSpy.hasEvent('sync-pushed')).toBe(true);
         });
@@ -252,8 +250,8 @@ describe('SyncManager', () => {
             mockProvider.setConfig({ pushFails: true });
 
             syncEventBus.emitEvent('local-save-completed', {});
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(syncManager.getStatus()).toBe('error');
             expect(eventSpy.hasEvent('sync-failed')).toBe(true);
@@ -265,8 +263,8 @@ describe('SyncManager', () => {
             syncEventBus.emitEvent('local-save-completed', {});
 
             // Should push after 1 second now
-            await advanceTimersByTime(1000);
-            await flushPromises();
+            jest.advanceTimersByTime(1000);
+            jest.runAllTimers();
 
             expect(mockProvider.callHistory.pushData).toBe(1);
         });
@@ -282,7 +280,7 @@ describe('SyncManager', () => {
             eventSpy.clear();
 
             // Mock getLocalSyncData to return test data
-            vi.spyOn(syncManager as any, 'getLocalSyncData').mockResolvedValue(testData);
+            spyOn(syncManager as any, 'getLocalSyncData').mockResolvedValue(testData);
         });
 
         it('should push data immediately without debounce', async () => {
@@ -314,8 +312,8 @@ describe('SyncManager', () => {
             await syncManager.pushToCloud(data);
 
             // Advance timer - debounced push should not happen
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             // Should only have 1 push (the immediate one)
             expect(mockProvider.callHistory.pushData).toBe(1);
@@ -340,7 +338,7 @@ describe('SyncManager', () => {
             eventSpy.clear();
 
             // Mock getLocalSyncData to return test data
-            vi.spyOn(syncManager as any, 'getLocalSyncData').mockResolvedValue(testData);
+            spyOn(syncManager as any, 'getLocalSyncData').mockResolvedValue(testData);
         });
 
         it('should sign out successfully', async () => {
@@ -358,8 +356,8 @@ describe('SyncManager', () => {
             mockProvider.resetCallHistory();
 
             // Advance timer
-            await advanceTimersByTime(3000);
-            await flushPromises();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             // Push should not happen
             expect(mockProvider.callHistory.pushData).toBe(0);

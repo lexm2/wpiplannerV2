@@ -91,9 +91,9 @@ export function parseSyncData(data: unknown, source: string): SyncData {
     } catch (error) {
         if (error instanceof z.ZodError) {
             console.error(`[Validation] ✗ ${source} validation failed`);
-            // Defensive check: error.errors should always exist, but guard against edge cases
-            if (error.errors && Array.isArray(error.errors)) {
-                error.errors.forEach((err, index) => {
+            // Defensive check: error.issues should always exist, but guard against edge cases
+            if (error.issues && Array.isArray(error.issues)) {
+                error.issues.forEach((err: z.ZodIssue, index: number) => {
                     console.error(`[Validation]   Error ${index + 1}:`, {
                         path: err.path.join('.'),
                         message: err.message,

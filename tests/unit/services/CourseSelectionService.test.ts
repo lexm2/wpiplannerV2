@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach, mock, spyOn } from 'bun:test'
-import { CourseSelectionService } from '../../../src/services/CourseSelectionService'
-import { ProfileStateManager } from '../../../src/core/ProfileStateManager'
-import { DataValidator } from '../../../src/core/DataValidator'
-import { RetryManager } from '../../../src/core/RetryManager'
+import { CourseSelectionService } from '../../../src/services/selection/CourseSelectionService'
+import { ProfileStateManager } from '../../../src/core/state/ProfileStateManager'
+import { DataValidator } from '../../../src/core/validation/DataValidator'
+import { RetryManager } from '../../../src/core/operations/RetryManager'
 import { Course } from '../../../src/types/types'
 import { mockLocalStorage } from '../../helpers/testUtils'
 import { createMockCourse, createMockSection, createMockDepartment } from '../../helpers/mockData'
@@ -81,7 +81,7 @@ describe('CourseSelectionService', () => {
       writable: true
     })
 
-    mockProfileStateManager = new ProfileStateManager()
+    mockProfileStateManager = ProfileStateManager.getInstance()
     mockDataValidator = new DataValidator()
 
     courseSelectionService = new CourseSelectionService(

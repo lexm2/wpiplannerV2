@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { ProfileStateManager } from '../../src/core/ProfileStateManager';
+import { describe, it, expect, beforeEach, afterEach, mock, vi } from 'bun:test';
+import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
 import { MainController } from '../../src/ui/controllers/MainController';
-import type { SyncData } from '../../src/services/sync/schemas';
+import type { SyncData } from '../../src/services/sync/types';
 import { createSyncData, createSchedule, createSelectedCourse } from '../helpers/sync-test-utils';
 import type { MockIndexedDB } from '../mocks/MockIndexedDB';
 import {
@@ -39,7 +39,6 @@ describe('UI Hydration After Sync Import', () => {
 
         // Create ProfileStateManager
         profileManager = ProfileStateManager.getInstance();
-        await profileManager.initialize();
 
         // Create mock UI components
         mockUI = createMockUIComponents();
@@ -53,11 +52,14 @@ describe('UI Hydration After Sync Import', () => {
         mainController = new MainController();
 
         // Wire up event handlers manually for testing
-        profileManager.on('schedule_changed', () => {
-            mockUI.scheduleController.displayScheduleSelectedCourses();
-            mockUI.courseController.refreshCourseSelectionUI();
-            mockUI.courseController.displaySelectedCourses();
-        });
+        const eventListener = (event: any) => {
+            if (event.type === 'schedule_changed') {
+                mockUI.scheduleController.displayScheduleSelectedCourses();
+                mockUI.courseController.refreshCourseSelectionUI();
+                mockUI.courseController.displaySelectedCourses();
+            }
+        };
+        profileManager.addListener(eventListener);
     });
 
     afterEach(() => {
@@ -76,7 +78,7 @@ describe('UI Hydration After Sync Import', () => {
                         selectedCourses: [
                             createSelectedCourse({
                                 courseId: 'CS-1101',
-                                selectedSectionIds: ['SEC-1']
+                                selectedSectionCrn: 'SEC-1'
                             })
                         ]
                     })
@@ -231,7 +233,7 @@ describe('UI Hydration After Sync Import', () => {
             ];
 
             // Act: Distribute to consumers
-            mockUI.courseDataCoordinator.redistributeToConsumers(mockDepartments);
+            mockUI.courseDataCoordinator.redistributeToConsumers(mockDepartments as any);
 
             // Assert: All consumers should receive data
             assertUIHydrated(mockUI);
@@ -247,7 +249,7 @@ describe('UI Hydration After Sync Import', () => {
             ];
 
             // Act
-            mockUI.courseDataCoordinator.redistributeToConsumers(mockDepartments);
+            mockUI.courseDataCoordinator.redistributeToConsumers(mockDepartments as any);
 
             // Assert: Each consumer should have setAllDepartments called
             expect(mockUI.courseController.setAllDepartments).toHaveBeenCalled();
@@ -269,13 +271,13 @@ describe('UI Hydration After Sync Import', () => {
 
             // Act: Add new consumer after data is loaded
             const lateConsumer = {
-                setAllDepartments: vi.fn()
+                setAllDepartments: mock()
             };
             mockUI.courseDataCoordinator.registerConsumer(lateConsumer);
 
             // Manually trigger redistribution (normally done by CourseDataCoordinator)
             const mockDepartments = [{ name: 'CS', code: 'CS', courses: [] }];
-            mockUI.courseDataCoordinator.redistributeToConsumers(mockDepartments);
+            mockUI.courseDataCoordinator.redistributeToConsumers(mockDepartments as any);
 
             // Assert: Late consumer should receive data
             expect(lateConsumer.setAllDepartments).toHaveBeenCalled();
@@ -450,12 +452,12 @@ describe('UI Hydration After Sync Import', () => {
                         selectedCourses: [
                             createSelectedCourse({
                                 courseId: 'CS-1101',
-                                selectedSectionIds: ['SEC-1'],
+                                selectedSectionCrn: 'SEC-1',
                                 isRequired: true
                             }),
                             createSelectedCourse({
                                 courseId: 'MA-1021',
-                                selectedSectionIds: ['SEC-2'],
+                                selectedSectionCrn: 'SEC-2',
                                 isRequired: false
                             })
                         ]
@@ -484,7 +486,7 @@ describe('UI Hydration After Sync Import', () => {
 
             // Act: Complete hydration flow
             await profileManager.importData(syncData);
-            mockUI.courseDataCoordinator.redistributeToConsumers(mockDepartments);
+            mockUI.courseDataCoordinator.redistributeToConsumers(mockDepartments as any);
             mockUI.schedulePickerModal.refreshScheduleList();
             mockUI.searchService.reindex();
             mockUI.cloudStatusButton.updateStatus('idle');

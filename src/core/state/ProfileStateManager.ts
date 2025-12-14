@@ -570,8 +570,8 @@ export class ProfileStateManager {
     }
 
     async loadFromStorage(): Promise<boolean> {
-        console.log('[ProfileStateManager] 🔵 loadFromStorage() called');
-        console.log('[ProfileStateManager] 🔵 Current state before load:', {
+        console.log('[ProfileStateManager] loadFromStorage() called');
+        console.log('[ProfileStateManager] Current state before load:', {
             scheduleCount: this.state.schedules.length,
             activeScheduleId: this.state.activeScheduleId,
             isLoading: this.state.isLoading,
@@ -581,14 +581,14 @@ export class ProfileStateManager {
         // Prevent concurrent calls - if already loading, skip this call
         if (this.isLoadingFlag) {
             logger.log('[SKIP] Already loading from storage, skipping duplicate call');
-            console.log('[ProfileStateManager] 🔵 SKIPPED: Already loading');
+            console.log('[ProfileStateManager] SKIPPED: Already loading');
             return false;
         }
 
         // Skip if already loaded with schedules (redundant call prevention)
         if (this.state.schedules.length > 0 && !this.state.isLoading) {
             logger.log('[SKIP] Already loaded with schedules, skipping redundant call');
-            console.log('[ProfileStateManager] 🔵 SKIPPED: Already has schedules');
+            console.log('[ProfileStateManager] SKIPPED: Already has schedules');
             return true;
         }
 
@@ -605,9 +605,9 @@ export class ProfileStateManager {
             }
 
             // Load all schedules
-            console.log('[ProfileStateManager] 🔵 Loading schedules from IndexedDB...');
+            console.log('[ProfileStateManager] Loading schedules from IndexedDB...');
             const schedulesResult = await this.storageManager.loadAllSchedules();
-            console.log('[ProfileStateManager] 🔵 loadAllSchedules() returned:', {
+            console.log('[ProfileStateManager] loadAllSchedules() returned:', {
                 valid: schedulesResult.valid,
                 scheduleCount: schedulesResult.data?.length || 0,
                 schedules: schedulesResult.data?.map(s => ({ id: s.id, name: s.name, courses: s.selectedCourses.length })) || []
@@ -762,12 +762,12 @@ export class ProfileStateManager {
 
                 this.emitEvent('schedule_changed', { action: 'imported' }, 'system');
             } else {
-                console.error('[ProfileStateManager] ❌ Import failed:', result.error);
+                console.error('[ProfileStateManager] Import failed:', result.error);
             }
 
             return result;
         } catch (error) {
-            console.error('[ProfileStateManager] ❌ importData() failed:', error);
+            console.error('[ProfileStateManager] importData() failed:', error);
             return {
                 success: false,
                 transactionId: `import-${Date.now()}`,

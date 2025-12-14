@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, mock, spyOn } from 'bun:test';
 import { SyncEventBus } from '../../../src/services/sync/SyncEventBus';
 import type { SyncEvent, SyncEventType } from '../../../src/services/sync/types';
 
@@ -12,7 +12,7 @@ describe('SyncEventBus', () => {
 
     describe('Event Emission', () => {
         it('should emit auth-changed event', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('auth-changed', listener);
 
             eventBus.emitEvent('auth-changed', { authenticated: true });
@@ -27,7 +27,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should emit sync-conflict event', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('sync-conflict', listener);
 
             const conflictData = {
@@ -48,7 +48,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should emit sync-resolved event', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('sync-resolved', listener);
 
             eventBus.emitEvent('sync-resolved', { resolution: 'local' });
@@ -62,7 +62,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should emit sync-pushed event', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('sync-pushed', listener);
 
             eventBus.emitEvent('sync-pushed', { source: 'initial' });
@@ -76,7 +76,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should emit sync-failed event with error', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('sync-failed', listener);
 
             const error = new Error('Network error');
@@ -91,7 +91,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should emit sync-started event', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('sync-started', listener);
 
             eventBus.emitEvent('sync-started');
@@ -105,7 +105,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should emit local-save-completed event', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('local-save-completed', listener);
 
             eventBus.emitEvent('local-save-completed');
@@ -114,7 +114,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should emit offline-mode event', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('offline-mode', listener);
 
             eventBus.emitEvent('offline-mode');
@@ -123,7 +123,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should emit online-mode event', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('online-mode', listener);
 
             eventBus.emitEvent('online-mode');
@@ -134,7 +134,7 @@ describe('SyncEventBus', () => {
 
     describe('Event Listeners', () => {
         it('should register and call listener', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('auth-changed', listener);
 
             eventBus.emitEvent('auth-changed', { authenticated: false });
@@ -143,8 +143,8 @@ describe('SyncEventBus', () => {
         });
 
         it('should support multiple listeners for same event', () => {
-            const listener1 = vi.fn();
-            const listener2 = vi.fn();
+            const listener1 = mock();
+            const listener2 = mock();
 
             eventBus.on('sync-pushed', listener1);
             eventBus.on('sync-pushed', listener2);
@@ -156,7 +156,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should support wildcard listener for all events', () => {
-            const wildcard = vi.fn();
+            const wildcard = mock();
             eventBus.on('*', wildcard);
 
             eventBus.emitEvent('auth-changed');
@@ -167,7 +167,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should return unsubscribe function', () => {
-            const listener = vi.fn();
+            const listener = mock();
             const unsubscribe = eventBus.on('sync-pushed', listener);
 
             eventBus.emitEvent('sync-pushed');
@@ -179,7 +179,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should remove listener with off()', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('auth-changed', listener);
 
             eventBus.emitEvent('auth-changed');
@@ -191,8 +191,8 @@ describe('SyncEventBus', () => {
         });
 
         it('should clear all listeners', () => {
-            const listener1 = vi.fn();
-            const listener2 = vi.fn();
+            const listener1 = mock();
+            const listener2 = mock();
 
             eventBus.on('auth-changed', listener1);
             eventBus.on('sync-pushed', listener2);
@@ -209,10 +209,10 @@ describe('SyncEventBus', () => {
 
     describe('Error Handling', () => {
         it('should isolate listener errors', () => {
-            const errorListener = vi.fn(() => {
+            const errorListener = mock(() => {
                 throw new Error('Listener error');
             });
-            const goodListener = vi.fn();
+            const goodListener = mock();
 
             eventBus.on('auth-changed', errorListener);
             eventBus.on('auth-changed', goodListener);
@@ -228,14 +228,14 @@ describe('SyncEventBus', () => {
 
         it('should continue emitting to other listeners after error', () => {
             const listeners = [
-                vi.fn(() => {
+                mock(() => {
                     throw new Error('Error 1');
                 }),
-                vi.fn(),
-                vi.fn(() => {
+                mock(),
+                mock(() => {
                     throw new Error('Error 2');
                 }),
-                vi.fn(),
+                mock(),
             ];
 
             listeners.forEach((l) => eventBus.on('sync-pushed', l));
@@ -251,7 +251,7 @@ describe('SyncEventBus', () => {
 
     describe('Event Payload Structure', () => {
         it('should include timestamp in all events', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('sync-pushed', listener);
 
             const beforeTimestamp = Date.now();
@@ -264,7 +264,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should preserve data payload', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('sync-conflict', listener);
 
             const payload = { test: 'data', nested: { value: 123 } };
@@ -275,7 +275,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should preserve error object', () => {
-            const listener = vi.fn();
+            const listener = mock();
             eventBus.on('sync-failed', listener);
 
             const error = new Error('Test error');
@@ -297,7 +297,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should share listeners across getInstance() calls', () => {
-            const listener = vi.fn();
+            const listener = mock();
 
             const instance1 = SyncEventBus.getInstance();
             instance1.on('auth-changed', listener);
@@ -311,7 +311,7 @@ describe('SyncEventBus', () => {
 
     describe('Debug Mode', () => {
         it('should enable debug logging', () => {
-            const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+            const consoleSpy = spyOn(console, 'log').mockImplementation(() => {});
 
             eventBus.setDebugEnabled(true);
             eventBus.emitEvent('auth-changed');
@@ -322,7 +322,7 @@ describe('SyncEventBus', () => {
         });
 
         it('should disable debug logging', () => {
-            const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+            const consoleSpy = spyOn(console, 'log').mockImplementation(() => {});
 
             eventBus.setDebugEnabled(false);
             eventBus.emitEvent('auth-changed');

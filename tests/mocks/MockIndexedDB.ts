@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { mock } from 'bun:test';
 import LZString from 'lz-string';
 
 /**
@@ -72,11 +72,11 @@ export class MockIndexedDB {
             readyState: 'pending' as IDBRequestReadyState,
             onsuccess: null,
             onerror: null,
-            addEventListener: vi.fn((event: string, handler: any) => {
+            addEventListener: mock((event: string, handler: any) => {
                 if (event === 'success') request.onsuccess = handler;
                 if (event === 'error') request.onerror = handler;
             }),
-            removeEventListener: vi.fn(),
+            removeEventListener: mock(),
         };
 
         // Simulate async with configurable delay
@@ -161,7 +161,7 @@ export class MockIndexedDB {
             keyPath: 'id',
             autoIncrement: false,
 
-            get: vi.fn((key: string) => {
+            get: mock((key: string) => {
                 this.operations.get++;
                 if (this.config.transactionFails) {
                     return this.createRequest(
@@ -183,7 +183,7 @@ export class MockIndexedDB {
                 }
             }),
 
-            put: vi.fn((value: any, key?: string) => {
+            put: mock((value: any, key?: string) => {
                 this.operations.put++;
                 const storeKey = key || value.id;
 
@@ -212,7 +212,7 @@ export class MockIndexedDB {
                 }
             }),
 
-            delete: vi.fn((key: string) => {
+            delete: mock((key: string) => {
                 this.operations.delete++;
                 if (this.config.transactionFails) {
                     return this.createRequest(
@@ -236,7 +236,7 @@ export class MockIndexedDB {
                 return this.createRequest(undefined);
             }),
 
-            clear: vi.fn(() => {
+            clear: mock(() => {
                 this.operations.clear++;
                 if (this.config.transactionFails) {
                     return this.createRequest(
@@ -250,7 +250,7 @@ export class MockIndexedDB {
                 return this.createRequest(undefined);
             }),
 
-            getAll: vi.fn(() => {
+            getAll: mock(() => {
                 this.operations.getAll++;
                 if (this.config.transactionFails) {
                     return this.createRequest(
@@ -269,12 +269,12 @@ export class MockIndexedDB {
                 }
             }),
 
-            getAllKeys: vi.fn(() => {
+            getAllKeys: mock(() => {
                 const keys = Array.from(store.keys());
                 return this.createRequest(keys);
             }),
 
-            count: vi.fn(() => {
+            count: mock(() => {
                 return this.createRequest(store.size);
             }),
         };
@@ -299,13 +299,13 @@ export class MockIndexedDB {
             onerror: null,
             onabort: null,
 
-            objectStore: vi.fn((storeName: string) => {
+            objectStore: mock((storeName: string) => {
                 return this.createObjectStore(dbName, storeName);
             }),
 
-            abort: vi.fn(),
-            addEventListener: vi.fn(),
-            removeEventListener: vi.fn(),
+            abort: mock(),
+            addEventListener: mock(),
+            removeEventListener: mock(),
         };
 
         // Auto-complete transaction after a delay
@@ -338,18 +338,18 @@ export class MockIndexedDB {
                 }
             },
 
-            transaction: vi.fn((storeNames: string | string[], mode: IDBTransactionMode = 'readonly') => {
+            transaction: mock((storeNames: string | string[], mode: IDBTransactionMode = 'readonly') => {
                 return this.createTransaction(dbName, storeNames, mode);
             }),
 
-            createObjectStore: vi.fn((name: string) => {
+            createObjectStore: mock((name: string) => {
                 return this.createObjectStore(dbName, name);
             }),
 
-            deleteObjectStore: vi.fn(),
-            close: vi.fn(),
-            addEventListener: vi.fn(),
-            removeEventListener: vi.fn(),
+            deleteObjectStore: mock(),
+            close: mock(),
+            addEventListener: mock(),
+            removeEventListener: mock(),
         };
 
         return mockDB as IDBDatabase;
@@ -380,7 +380,7 @@ export class MockIndexedDB {
      */
     deleteDatabase(name: string): IDBOpenDBRequest {
         this.databasesMap.delete(name);
-        return this.createRequest(undefined) as IDBOpenDBRequest;
+        return this.createRequest(undefined) as unknown as IDBOpenDBRequest;
     }
 
     /**

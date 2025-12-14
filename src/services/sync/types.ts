@@ -56,6 +56,7 @@ export interface ScheduleData {
     id: string;
     name: string;
     selectedCourses: SelectedCourseData[];
+    timestamp?: number;
 }
 
 export interface SelectedCourseData {

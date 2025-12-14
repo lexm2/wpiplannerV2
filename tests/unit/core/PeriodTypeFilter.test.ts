@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { PeriodTypeFilter } from '../../../src/core/filters/PeriodTypeFilter';
+import { PeriodTypeFilter } from '../../../src/core/filtering/filters/PeriodTypeFilter';
 import { Period, PeriodType, DayOfWeek } from '../../../src/types/types';
 
 describe('PeriodTypeFilter', () => {

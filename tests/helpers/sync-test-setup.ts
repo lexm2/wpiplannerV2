@@ -1,4 +1,4 @@
-import { vi, beforeEach, afterEach } from 'vitest';
+import { beforeEach, afterEach, spyOn, mock, vi } from 'bun:test';
 import { SyncManager } from '../../src/services/sync/SyncManager';
 import { syncEventBus } from '../../src/services/sync/SyncEventBus';
 import { providerRegistry } from '../../src/services/sync/ProviderRegistry';
@@ -123,7 +123,7 @@ export async function setupSyncTest(options: SyncTestSetupOptions = {}): Promise
     syncEventBus.on('local-save-completed', eventSpy.listener);
 
     // Mock getLocalSyncData to return test data (needed for debounced push)
-    vi.spyOn(syncManager as any, 'getLocalSyncData').mockResolvedValue(testData);
+    spyOn(syncManager as any, 'getLocalSyncData').mockResolvedValue(testData);
 
     const context: SyncTestContext = {
         syncManager,
@@ -135,7 +135,6 @@ export async function setupSyncTest(options: SyncTestSetupOptions = {}): Promise
     // Setup storage infrastructure if requested
     if (includeStorage) {
         const profileManager = ProfileStateManager.getInstance();
-        await profileManager.initialize();
         const mockIndexedDB = (global as any).__mockIndexedDB__;
         mockIndexedDB.reset();
 
@@ -154,11 +153,12 @@ export async function setupSyncTest(options: SyncTestSetupOptions = {}): Promise
 
         // Wire up UI hydration events if requested
         if (wireUIEvents && context.profileManager) {
-            context.profileManager.on('schedule_changed', () => {
+            const eventListener = () => {
                 mockUI.scheduleController.displayScheduleSelectedCourses();
                 mockUI.courseController.refreshCourseSelectionUI();
                 mockUI.courseController.displaySelectedCourses();
-            });
+            };
+            context.profileManager.addListener(eventListener);
         }
     }
 
@@ -287,5 +287,5 @@ export async function recreateProviderWithConfig(
     ctx.syncManager.setProvider('mock');
 
     // Re-mock getLocalSyncData with new provider context
-    vi.spyOn(ctx.syncManager as any, 'getLocalSyncData').mockResolvedValue(ctx.testData);
+    spyOn(ctx.syncManager as any, 'getLocalSyncData').mockResolvedValue(ctx.testData);
 }

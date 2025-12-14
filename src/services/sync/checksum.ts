@@ -1,4 +1,4 @@
-import type { ValidatedSyncData, ValidatedScheduleData } from './schemas';
+import type { SyncData, ScheduleData } from './types';
 import { createJSONReplacer } from '../../utils/jsonSerializer';
 
 /**
@@ -18,7 +18,7 @@ export interface ChecksumVerificationResult {
 export interface ChecksumData {
     version: string;
     activeScheduleId: string | null;
-    schedules: ValidatedScheduleData[];
+    schedules: ScheduleData[];
     preferences?: unknown;
 }
 
@@ -141,7 +141,7 @@ export const checksumCalculator = new ChecksumCalculator();
  * @param syncData - SyncData object to calculate checksum for
  * @returns 64-character SHA-256 hex string
  */
-export async function calculateSyncDataChecksum(syncData: ValidatedSyncData): Promise<string> {
+export async function calculateSyncDataChecksum(syncData: SyncData): Promise<string> {
     return checksumCalculator.calculateChecksum({
         version: syncData.version,
         activeScheduleId: syncData.activeScheduleId,
@@ -158,7 +158,7 @@ export async function calculateSyncDataChecksum(syncData: ValidatedSyncData): Pr
  * @param syncData - SyncData object to verify
  * @returns Verification result
  */
-export async function verifySyncDataChecksum(syncData: ValidatedSyncData): Promise<ChecksumVerificationResult> {
+export async function verifySyncDataChecksum(syncData: SyncData): Promise<ChecksumVerificationResult> {
     return checksumCalculator.verifyChecksum(
         {
             version: syncData.version,

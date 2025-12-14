@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'bun:test'
-import { ConflictDetector } from '../../../src/core/ConflictDetector'
+import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine'
 import { ConflictType } from '../../../src/types/schedule'
 import { DayOfWeek, PeriodType } from '../../../src/types/types'
 import { createMockSection, createMockPeriod, createMockTime } from '../../helpers/mockData'

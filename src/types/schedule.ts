@@ -54,6 +54,7 @@ export interface Schedule {
     name: string;
     selectedCourses: SelectedCourse[];
     generatedSchedules: ScheduleCombination[];
+    timestamp?: number;
 }
 
 export interface ScheduleCombination {

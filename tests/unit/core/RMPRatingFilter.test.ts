@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, mock } from 'bun:test'
-import { RMPRatingFilter } from '../../../src/core/filters/RMPRatingFilter'
-import { RateMyProfessorService } from '../../../src/services/RateMyProfessorService'
+import { RMPRatingFilter } from '../../../src/core/filtering/filters/RMPRatingFilter'
+import { RateMyProfessorService } from '../../../src/services/external/RateMyProfessorService'
 import { FilterableSection } from '../../../src/types/filterableUnit'
 import {
   createMockCourse,

@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { SearchTextFilter } from '../../../src/core/filters/SearchTextFilter';
+import { SearchTextFilter } from '../../../src/core/filtering/filters/SearchTextFilter';
 import { FilterableSection } from '../../../src/types/filterableUnit';
 import { createMockCourse, createMockSection, createMockDepartment } from '../../helpers/mockData';
 

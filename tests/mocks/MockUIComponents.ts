@@ -1,5 +1,5 @@
-import { vi } from 'vitest';
-import type { Department } from '../../src/types/Course';
+import { mock, expect } from 'bun:test';
+import type { Department } from '../../src/types/types';
 
 /**
  * Mock UI Components for testing UI hydration after sync
@@ -12,10 +12,10 @@ import type { Department } from '../../src/types/Course';
  * Mock CourseController
  */
 export class MockCourseController {
-    public refreshCourseSelectionUI = vi.fn();
-    public displaySelectedCourses = vi.fn();
-    public setAllDepartments = vi.fn();
-    public setCourseData = vi.fn();
+    public refreshCourseSelectionUI = mock();
+    public displaySelectedCourses = mock();
+    public setAllDepartments = mock();
+    public setCourseData = mock();
 
     reset() {
         this.refreshCourseSelectionUI.mockClear();
@@ -29,9 +29,9 @@ export class MockCourseController {
  * Mock ScheduleController
  */
 export class MockScheduleController {
-    public displayScheduleSelectedCourses = vi.fn();
-    public renderScheduleGrids = vi.fn();
-    public setAllDepartments = vi.fn();
+    public displayScheduleSelectedCourses = mock();
+    public renderScheduleGrids = mock();
+    public setAllDepartments = mock();
 
     reset() {
         this.displayScheduleSelectedCourses.mockClear();
@@ -50,7 +50,7 @@ export class MockCourseDataCoordinator {
         this.consumers.push(consumer);
     }
 
-    public redistributeToConsumers = vi.fn((departments: Department[]) => {
+    public redistributeToConsumers = mock((departments: Department[]) => {
         this.consumers.forEach((consumer) => {
             consumer.setAllDepartments(departments);
         });
@@ -70,8 +70,8 @@ export class MockCourseDataCoordinator {
  * Mock CloudStatusButton
  */
 export class MockCloudStatusButton {
-    public onStateChange = vi.fn();
-    public updateStatus = vi.fn();
+    public onStateChange = mock();
+    public updateStatus = mock();
 
     reset() {
         this.onStateChange.mockClear();
@@ -83,8 +83,8 @@ export class MockCloudStatusButton {
  * Mock SchedulePickerModal
  */
 export class MockSchedulePickerModal {
-    public onActiveScheduleChange = vi.fn();
-    public refreshScheduleList = vi.fn();
+    public onActiveScheduleChange = mock();
+    public refreshScheduleList = mock();
 
     reset() {
         this.onActiveScheduleChange.mockClear();
@@ -96,8 +96,8 @@ export class MockSchedulePickerModal {
  * Mock DepartmentController
  */
 export class MockDepartmentController {
-    public setAllDepartments = vi.fn();
-    public renderDepartments = vi.fn();
+    public setAllDepartments = mock();
+    public renderDepartments = mock();
 
     reset() {
         this.setAllDepartments.mockClear();
@@ -109,8 +109,8 @@ export class MockDepartmentController {
  * Mock SearchService
  */
 export class MockSearchService {
-    public setCourseData = vi.fn();
-    public reindex = vi.fn();
+    public setCourseData = mock();
+    public reindex = mock();
 
     reset() {
         this.setCourseData.mockClear();
@@ -122,8 +122,8 @@ export class MockSearchService {
  * Mock FilterModalController
  */
 export class MockFilterModalController {
-    public setCourseData = vi.fn();
-    public resetFilters = vi.fn();
+    public setCourseData = mock();
+    public resetFilters = mock();
 
     reset() {
         this.setCourseData.mockClear();

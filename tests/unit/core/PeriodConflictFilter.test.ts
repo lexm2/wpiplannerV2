@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { PeriodConflictFilter, PeriodConflictCriteria } from '../../../src/core/filters/PeriodConflictFilter';
-import { ConflictDetector } from '../../../src/core/ConflictDetector';
+import { PeriodConflictFilter, PeriodConflictCriteria } from '../../../src/core/filtering/filters/PeriodConflictFilter';
+import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
 import { Period, Section, DayOfWeek, Time, Department, Course, PeriodType } from '../../../src/types/types';
 import { SelectedCourse } from '../../../src/types/schedule';
 

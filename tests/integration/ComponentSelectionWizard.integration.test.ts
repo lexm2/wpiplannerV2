@@ -1,7 +1,7 @@
-import { describe, test, expect, beforeEach, mock } from 'bun:test';
+import { describe, test, expect, beforeEach, mock, spyOn } from 'bun:test';
 import { ComponentSelectionWizard } from '../../src/ui/components/ComponentSelectionWizard';
-import { CourseDataService } from '../../src/services/courseDataService';
-import { CourseSelectionService } from '../../src/services/CourseSelectionService';
+import { CourseDataService } from '../../src/services/data/courseDataService';
+import { CourseSelectionService } from '../../src/services/selection/CourseSelectionService';
 import { Course, Section, Period, Department, PeriodType, DayOfWeek } from '../../src/types/types';
 
 describe('ComponentSelectionWizard Integration', () => {

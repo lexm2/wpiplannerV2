@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, mock } from 'bun:test'
-import { AutoScheduler } from '../../../src/services/AutoScheduler'
+import { describe, it, expect, beforeEach, mock, spyOn } from 'bun:test'
+import { AutoScheduler } from '../../../src/services/scheduling/AutoScheduler'
 import type { SelectedCourse } from '../../../src/types/schedule'
 import type { Course, Section, DayOfWeek } from '../../../src/types/types'
 import { PeriodType } from '../../../src/types/types'
@@ -152,7 +152,8 @@ describe('AutoScheduler - Complement Method', () => {
 
       expect(result.length).toBeGreaterThanOrEqual(2)
       expect(result[0][0].combination.lecture?.crn).toBe(10001)
-      expect([10101, 10102]).toContain(result[0][0].combination.discussion?.crn)
+      const discussionCrn = result[0][0].combination.discussion?.crn;
+      expect(discussionCrn === 10101 || discussionCrn === 10102).toBe(true)
     })
 
     it('should handle multiple courses with mixed lock states', () => {
@@ -219,7 +220,8 @@ describe('AutoScheduler - Complement Method', () => {
       expect(result.length).toBeGreaterThanOrEqual(2)
       expect(result[0]).toHaveLength(2)
       expect(result[0][0].combination.lecture?.crn).toBe(10001)
-      expect([20001, 20002]).toContain(result[0][1].combination.lecture?.crn)
+      const lectureCrn = result[0][1].combination.lecture?.crn;
+      expect(lectureCrn === 20001 || lectureCrn === 20002).toBe(true)
     })
 
     it('should handle standalone lab courses', () => {

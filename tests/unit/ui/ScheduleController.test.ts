@@ -1,9 +1,9 @@
 import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { ScheduleController } from '../../../src/ui/controllers/ScheduleController';
-import { CourseSelectionService } from '../../../src/services/CourseSelectionService';
-import { ScheduleFilterService } from '../../../src/services/ScheduleFilterService';
-import { SearchService } from '../../../src/services/searchService';
-import { ConflictDetector } from '../../../src/core/ConflictDetector';
+import { CourseSelectionService } from '../../../src/services/selection/CourseSelectionService';
+import { ScheduleFilterService } from '../../../src/services/filtering/ScheduleFilterService';
+import { SearchService } from '../../../src/services/filtering/searchService';
+import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
 import { Course, Section, Period, Department, DayOfWeek, PeriodType } from '../../../src/types/types';
 import { SelectedCourse } from '../../../src/types/schedule';
 import {

@@ -31,10 +31,10 @@ async function main() {
         const converter = new WorkdayConverter(converterConfig);
         await converter.convert(INPUT_PATH, OUTPUT_PATH);
 
-        console.log('✅ Conversion successful!');
+        console.log('Conversion successful!');
         process.exit(0);
     } catch (error) {
-        console.error('❌ Conversion failed:', error);
+        console.error('Conversion failed:', error);
         if (error instanceof Error) {
             console.error('Stack trace:', error.stack);
         }

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'bun:test';
 import { checksumCalculator } from '../../../src/services/sync/checksum';
 import type { ChecksumData } from '../../../src/services/sync/checksum';
 import {

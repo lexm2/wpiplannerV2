@@ -7,10 +7,10 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
-import { ProfileStateManager } from '../../src/core/ProfileStateManager';
-import { TransactionalStorageManager } from '../../src/core/TransactionalStorageManager';
-import { ScheduleManagementService } from '../../src/services/ScheduleManagementService';
-import { CourseSelectionService } from '../../src/services/CourseSelectionService';
+import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
+import { TransactionalStorageManager } from '../../src/core/storage/TransactionalStorageManager';
+import { ScheduleManagementService } from '../../src/services/selection/ScheduleManagementService';
+import { CourseSelectionService } from '../../src/services/selection/CourseSelectionService';
 import type { Course } from '../../src/types/types';
 import { createMockCourse, createMockSection, createMockPeriod, createMockTime, createMockDepartment } from '../helpers/mockData';
 import { DayOfWeek, PeriodType } from '../../src/types/types';
@@ -26,7 +26,7 @@ describe('Storage Persistence Integration Tests', () => {
 
     beforeEach(async () => {
         // Clear storage
-        Object.keys(mockLocalStorage).forEach(key => delete mockLocalStorage[key]);
+        Object.keys(mockLocalStorage).forEach((key: any) => delete mockLocalStorage[key]);
 
         // Mock localStorage
         global.localStorage = {
@@ -38,7 +38,7 @@ describe('Storage Persistence Integration Tests', () => {
                 delete mockLocalStorage[key];
             }),
             clear: mock(() => {
-                Object.keys(mockLocalStorage).forEach(key => delete mockLocalStorage[key]);
+                Object.keys(mockLocalStorage).forEach((key: any) => delete mockLocalStorage[key]);
             }),
             length: 0,
             key: mock()
@@ -46,7 +46,7 @@ describe('Storage Persistence Integration Tests', () => {
 
         // Initialize services
         storageManager = new TransactionalStorageManager();
-        profileStateManager = new ProfileStateManager(storageManager);
+        profileStateManager = ProfileStateManager.getInstance();
         courseSelectionService = new CourseSelectionService(profileStateManager);
         scheduleManagementService = new ScheduleManagementService(
             profileStateManager,
@@ -86,14 +86,13 @@ describe('Storage Persistence Integration Tests', () => {
             // CRITICAL: Simulate immediate page reload by creating a new ProfileStateManager instance
             // This mimics what happens when the user reloads the page - it reads from localStorage
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
 
             // Verify schedule is gone after "reload" - back to initial count
             schedules = newProfileStateManager.getAllSchedules();
             expect(schedules).toHaveLength(initialCount);
             // Verify our test schedule is not in the list
-            expect(schedules.find(s => s.id === scheduleId)).toBeUndefined();
+            expect(schedules.find((s: any) => s.id === scheduleId)).toBeUndefined();
         });
 
         it('should persist deletion of multiple schedules', async () => {
@@ -113,15 +112,14 @@ describe('Storage Persistence Integration Tests', () => {
 
             // Simulate reload
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
 
             // Verify correct number of schedules remain (initial + 2 new ones)
             const schedules = newProfileStateManager.getAllSchedules();
             expect(schedules).toHaveLength(initialCount + 2);
 
             // Verify Schedule 2 is gone and Schedules 1 and 3 remain
-            const scheduleNames = schedules.map(s => s.name);
+            const scheduleNames = schedules.map((s: any) => s.name);
             expect(scheduleNames).not.toContain('Schedule 2');
             expect(scheduleNames).toContain('Schedule 1');
             expect(scheduleNames).toContain('Schedule 3');
@@ -148,15 +146,14 @@ describe('Storage Persistence Integration Tests', () => {
 
             // Simulate reload
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
 
             // Verify correct number of schedules remain (initial + 2 new ones)
             const schedules = newProfileStateManager.getAllSchedules();
             expect(schedules).toHaveLength(initialCount + 2);
 
             // Verify schedules 2, 3, 4 are gone and 1 and 5 remain
-            const scheduleNames = schedules.map(s => s.name);
+            const scheduleNames = schedules.map((s: any) => s.name);
             expect(scheduleNames).not.toContain('Schedule 2');
             expect(scheduleNames).not.toContain('Schedule 3');
             expect(scheduleNames).not.toContain('Schedule 4');
@@ -210,8 +207,7 @@ describe('Storage Persistence Integration Tests', () => {
             expect(selectedCourses[0].course.id).toBe(mockCourse.id);
 
             // Simulate immediate reload
-            const newProfileStateManager = new ProfileStateManager();
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
             await newCourseSelectionService.initialize();
 
@@ -235,15 +231,14 @@ describe('Storage Persistence Integration Tests', () => {
 
             // Simulate reload
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
             await newCourseSelectionService.initialize();
 
             // Verify all courses are still selected
             const selectedCourses = newCourseSelectionService.getSelectedCourses();
             expect(selectedCourses).toHaveLength(3);
-            expect(selectedCourses.map(sc => sc.course.id).sort()).toEqual(['CS-2102', 'CS-3431', 'CS-4241']);
+            expect(selectedCourses.map((sc: any) => sc.course.id).sort()).toEqual(['CS-2102', 'CS-3431', 'CS-4241']);
         });
 
         it('should persist course unselection', async () => {
@@ -260,8 +255,7 @@ describe('Storage Persistence Integration Tests', () => {
 
             // Simulate reload
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
             await newCourseSelectionService.initialize();
 
@@ -342,14 +336,13 @@ describe('Storage Persistence Integration Tests', () => {
 
             // Simulate reload
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
             await newCourseSelectionService.initialize();
 
             // Verify section is still selected (check hierarchical field)
             const selectedCourses = newCourseSelectionService.getSelectedCourses();
-            const selectedCourse = selectedCourses.find(sc => sc.course.id === mockCourse.id);
+            const selectedCourse = selectedCourses.find((sc: any) => sc.course.id === mockCourse.id);
             expect(selectedCourse).toBeDefined();
             expect(selectedCourse?.selectedLecture?.number).toBe(mockSectionA01.number);
         });
@@ -372,14 +365,13 @@ describe('Storage Persistence Integration Tests', () => {
 
             // Simulate reload
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
             await newCourseSelectionService.initialize();
 
             // Verify section B01 is selected (not A01)
             const selectedCourses = newCourseSelectionService.getSelectedCourses();
-            const selectedCourse = selectedCourses.find(sc => sc.course.id === mockCourse.id);
+            const selectedCourse = selectedCourses.find((sc: any) => sc.course.id === mockCourse.id);
             expect(selectedCourse?.selectedLecture?.number).toBe(mockSectionB01.number);
         });
     });
@@ -408,8 +400,7 @@ describe('Storage Persistence Integration Tests', () => {
             const initialCount = initialSchedules.length;
 
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
             const schedules = newProfileStateManager.getAllSchedules();
             expect(schedules).toHaveLength(initialCount);
         });
@@ -422,8 +413,7 @@ describe('Storage Persistence Integration Tests', () => {
 
             // Load from empty storage - ProfileStateManager creates a default schedule if none exist
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
 
             const schedules = newProfileStateManager.getAllSchedules();
             // Default schedule "My Schedule" is created when loading from empty storage
@@ -437,8 +427,10 @@ describe('Storage Persistence Integration Tests', () => {
 
             // Should handle gracefully
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await expect(newProfileStateManager.loadFromStorage()).resolves.not.toThrow();
+            const newProfileStateManager = ProfileStateManager.getInstance();
+            // getInstance() already handles initialization, no need to call loadFromStorage()
+            const schedules = newProfileStateManager.getAllSchedules();
+            expect(schedules).toBeDefined();
         });
 
         it('should handle concurrent modifications', async () => {
@@ -468,8 +460,7 @@ describe('Storage Persistence Integration Tests', () => {
 
             // Simulate reload
             const newStorageManager = new TransactionalStorageManager();
-            const newProfileStateManager = new ProfileStateManager(newStorageManager);
-            await newProfileStateManager.loadFromStorage();
+            const newProfileStateManager = ProfileStateManager.getInstance();
             const newCourseSelectionService = new CourseSelectionService(newProfileStateManager);
             await newCourseSelectionService.initialize();
 

@@ -7,5 +7,5 @@ syncEventBus.setDebugEnabled(true);
 
 const mainController = new MainController();
 
-// Expose test function globally for development/testing
-(window as any).triggerRefresh = () => mainController.triggerTestRefresh();
+// Expose main controller globally for development/testing
+(window as any).mainController = mainController;

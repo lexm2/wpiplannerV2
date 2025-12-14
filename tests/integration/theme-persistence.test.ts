@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, mock } from 'bun:test';
+import { describe, it, expect, beforeEach, mock, spyOn } from 'bun:test';
 import { ThemeManager } from '../../src/themes/ThemeManager';
-import { ProfileStateManager } from '../../src/core/ProfileStateManager';
-import { StorageService } from '../../src/services/StorageService';
+import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
+import { StorageService } from '../../src/services/selection/StorageService';
 import { ThemeSelector } from '../../src/ui/components/ThemeSelector';
 
 /**
@@ -21,7 +21,7 @@ describe('Theme Persistence Integration', () => {
         StorageService.resetInstance();
 
         // Create shared ProfileStateManager
-        profileStateManager = new ProfileStateManager();
+        profileStateManager = ProfileStateManager.getInstance();
 
         // Create StorageService with shared ProfileStateManager
         storageService = StorageService.getInstance(profileStateManager);

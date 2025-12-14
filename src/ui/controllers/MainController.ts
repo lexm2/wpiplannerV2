@@ -33,7 +33,7 @@ import { syncManager } from '../../services/sync/SyncManager'
 import { providerRegistry } from '../../services/sync/ProviderRegistry'
 import { GoogleDriveProvider } from '../../services/sync/providers/googledrive/GoogleDriveProvider'
 import { syncEventBus } from '../../services/sync/SyncEventBus'
-import type { ConflictInfo } from '../../services/sync/types'
+import type { ConflictInfo, SyncData } from '../../services/sync/types'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
 
 /**
@@ -460,12 +460,12 @@ export class MainController {
                                     await new Promise(resolve => setTimeout(resolve, 500)); // Wait for state to settle
 
                                     console.log('\n═══════════════════════════════════════════════════════');
-                                    console.log('📊 POST-RESOLUTION STATE SNAPSHOT');
+                                    console.log('POST-RESOLUTION STATE SNAPSHOT');
                                     console.log('═══════════════════════════════════════════════════════\n');
 
                                     const state = this.profileStateManager.getState();
 
-                                    console.log('📋 Schedule Summary:');
+                                    console.log('Schedule Summary:');
                                     state.schedules.forEach((schedule, index) => {
                                         console.log(`\n  Schedule ${index + 1}:`);
                                         console.log(`    ID: ${schedule.id}`);
@@ -478,9 +478,9 @@ export class MainController {
                                         })));
                                     });
 
-                                    console.log(`\n🎯 Active Schedule ID: ${state.activeScheduleId}`);
-                                    console.log(`📅 Last Saved: ${new Date(state.lastSaved).toLocaleString()}`);
-                                    console.log(`💾 Has Unsaved Changes: ${state.hasUnsavedChanges}`);
+                                    console.log(`\nActive Schedule ID: ${state.activeScheduleId}`);
+                                    console.log(`Last Saved: ${new Date(state.lastSaved).toLocaleString()}`);
+                                    console.log(`Has Unsaved Changes: ${state.hasUnsavedChanges}`);
 
                                     console.log('\n═══════════════════════════════════════════════════════\n');
                                 } catch (error) {
