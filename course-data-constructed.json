@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 14, 2025, 7:49 AM",
+  "generated": "Dec 14, 2025, 8:20 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -164442,7 +164442,7 @@
                 "crn": 336630,
                 "number": "CL02",
                 "seats": 120,
-                "seatsAvailable": 20,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4404",
@@ -164461,7 +164461,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 120,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL02",
@@ -164480,7 +164480,7 @@
                   "crn": 336692,
                   "number": "CD05",
                   "seats": 30,
-                  "seatsAvailable": 8,
+                  "seatsAvailable": 7,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4404",
@@ -164499,7 +164499,7 @@
                       "building": "",
                       "room": "Stratton Hall 301",
                       "seats": 30,
-                      "seatsAvailable": 8,
+                      "seatsAvailable": 7,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD05",
