@@ -1401,6 +1401,7 @@
   "generated": "Dec 13, 2025, 11:31 PM",
   "generated": "Dec 13, 2025, 11:49 PM",
   "generated": "Dec 14, 2025, 1:24 AM",
+  "generated": "Dec 14, 2025, 3:12 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -74671,7 +74672,7 @@
                 "number": "C01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IAn introduction to historical analysis through selected periods or themes in thehistory of America before the Civil War. A variety of readings will reflect thevarious ways that historians have attempted to understand the development ofAmerica.",
@@ -74690,7 +74691,7 @@
                     "room": "Kaven Hall 115",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
