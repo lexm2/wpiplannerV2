@@ -22,7 +22,6 @@ import { rateMyProfessorService } from '../../services/external/RateMyProfessorS
 import { UIStateManager } from './UIStateManager'
 import { TimestampManager } from './TimestampManager'
 import { OperationManager, DebouncedOperation } from '../../utils/RequestCancellation'
-import { DepartmentSyncService } from '../../services/data/DepartmentSyncService'
 import { ScheduleManagementService } from '../../services/selection/ScheduleManagementService'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { StorageService } from '../../services/selection/StorageService'
@@ -64,7 +63,6 @@ export class MainController {
     private timestampManager: TimestampManager;
     private operationManager: OperationManager;
     private debouncedSearch: DebouncedOperation;
-    private departmentSyncService: DepartmentSyncService;
     private scheduleManagementService: ScheduleManagementService;
     private courseDataCoordinator: CourseDataCoordinator;
     private cloudStatusButton: CloudStatusButton;
@@ -201,11 +199,9 @@ export class MainController {
 
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
-        
-        // Initialize department synchronization service
-        this.departmentSyncService = new DepartmentSyncService(this.filterService, this.departmentController);
-        this.departmentController.setDepartmentSyncService(this.departmentSyncService);
-        this.departmentSyncService.setFilterModalController(this.filterModalController);
+
+        // Connect filter service to department controller
+        this.departmentController.setFilterService(this.filterService);
 
         // Initialize course data coordinator
         this.courseDataCoordinator = new CourseDataCoordinator(
@@ -300,10 +296,7 @@ export class MainController {
             
             await this.loadCourseData();
             this.departmentController.displayDepartments();
-            
-            // Initialize the department sync service AFTER departments are rendered
-            this.departmentSyncService.initialize();
-            
+
             // Set "All Departments" as the default selection on startup
             this.initializeDefaultDepartmentView();
             
@@ -338,15 +331,6 @@ export class MainController {
 
             // Expose debug methods globally for testing (development only)
             if (typeof window !== 'undefined') {
-                (window as any).debugDepartmentSync = {
-                    debug: () => this.departmentSyncService.debugVisualSync(),
-                    refresh: () => this.departmentSyncService.forceVisualRefresh(),
-                    enableDebug: () => this.departmentSyncService.enableDebugMode(),
-                    disableDebug: () => this.departmentSyncService.disableDebugMode(),
-                    getActive: () => this.departmentSyncService.getActiveDepartments(),
-                    getDescription: () => this.departmentSyncService.getSelectionDescription()
-                };
-                
                 (window as any).debugScheduleManagement = {
                     debug: () => this.scheduleManagementService.debugState(),
                     getService: () => this.scheduleManagementService,
@@ -615,11 +599,9 @@ export class MainController {
                     // Check if this is a multi-select click (Ctrl/Cmd key)
                     const multiSelect = (e as MouseEvent).ctrlKey || (e as MouseEvent).metaKey;
                     
-                    // Use the department controller which will now use the sync service
+                    // Use the department controller which updates the filter service
                     this.departmentController.handleDepartmentClick(deptId, multiSelect);
-                    
-                    // The sync service will trigger refreshCurrentView through filter changes
-                    // No need to manually display courses anymore
+                    // The filter service listener triggers refreshCurrentView automatically
                 }
             }
             
