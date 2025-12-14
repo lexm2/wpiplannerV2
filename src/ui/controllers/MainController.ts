@@ -27,8 +27,6 @@ import { ScheduleManagementService } from '../../services/selection/ScheduleMana
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { StorageService } from '../../services/selection/StorageService'
 import { ThemeManager } from '../../themes/ThemeManager'
-import { DataUpdateService } from '../../services/data/DataUpdateService'
-import type { DataUpdateAvailableEvent } from '../../types/worker'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { CourseDataCoordinator } from '../../services/data/CourseDataCoordinator'
 import { CloudStatusButton } from '../components/CloudStatusButton'
@@ -68,7 +66,6 @@ export class MainController {
     private debouncedSearch: DebouncedOperation;
     private departmentSyncService: DepartmentSyncService;
     private scheduleManagementService: ScheduleManagementService;
-    private dataUpdateService: DataUpdateService;
     private courseDataCoordinator: CourseDataCoordinator;
     private cloudStatusButton: CloudStatusButton;
     private googleDriveProvider: GoogleDriveProvider;
@@ -110,9 +107,6 @@ export class MainController {
         this.timestampManager = new TimestampManager();
         this.operationManager = new OperationManager();
         this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
-
-        // Initialize data update service
-        this.dataUpdateService = new DataUpdateService();
 
         // Initialize new sync system
         this.googleDriveProvider = new GoogleDriveProvider();
@@ -342,12 +336,6 @@ export class MainController {
             // Store reference for later use
             this.allDepartments = result.departments!;
 
-            // Initialize data update service (worker will start when tab becomes unfocused)
-            if (result.serverTimestamp) {
-                this.dataUpdateService.updateLastLoadedTimestamp(result.serverTimestamp);
-            }
-            this.setupDataUpdateListener();
-            
             // Expose debug methods globally for testing (development only)
             if (typeof window !== 'undefined') {
                 (window as any).debugDepartmentSync = {
@@ -1593,38 +1581,6 @@ export class MainController {
         }
     }
 
-    private setupDataUpdateListener(): void {
-        window.addEventListener('data-update-available', ((event: DataUpdateAvailableEvent) => {
-            const indicator = document.getElementById('optimistic-ui-status');
-            if (!indicator) return;
-
-            // Check if indicator is hidden (below 1600px breakpoint)
-            const isHidden = window.getComputedStyle(indicator).display === 'none';
-
-            if (isHidden) {
-                // Auto-refresh if button is hidden
-                this.refreshCourseData();
-            } else {
-                // Show refresh button and wait for user click
-                indicator.textContent = 'Refresh';
-                indicator.className = 'optimistic-status refresh-available';
-
-                // Remove any existing click listeners to prevent duplicates
-                const newIndicator = indicator.cloneNode(true) as HTMLElement;
-                indicator.parentNode?.replaceChild(newIndicator, indicator);
-
-                // Add click listener to trigger refresh
-                newIndicator.addEventListener('click', () => {
-                    this.refreshCourseData();
-                });
-            }
-        }) as EventListener);
-    }
-
-    private async refreshCourseData(): Promise<void> {
-        window.location.reload();
-    }
-
     /**
      * Efficiently sync UI for initially selected courses without global refresh
      */
@@ -1911,15 +1867,6 @@ export class MainController {
         } else {
             this.themeManager.setTheme('wpi-dark');
         }
-    }
-
-    // Public test method to manually trigger refresh prompt
-    public triggerTestRefresh(): void {
-        const event = new CustomEvent('data-update-available', {
-            detail: { serverTimestamp: new Date().toISOString() }
-        });
-        window.dispatchEvent(event);
-        console.log('Test refresh triggered - status indicator should show "Refresh" and auto-refresh data');
     }
 
     // Public methods for easy access to selected courses
