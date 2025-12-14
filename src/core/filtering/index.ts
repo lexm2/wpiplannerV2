@@ -1,4 +1,5 @@
 export { FilterState } from './FilterState';
 export { FilterPriorityQueue } from './FilterPriorityQueue';
-export { SectionFilterPipeline, SectionBasedFilter } from './SectionFilterPipeline';
+export type { SectionBasedFilter } from './SectionFilterPipeline';
+export { SectionFilterPipeline } from './SectionFilterPipeline';
 export * from './filters';

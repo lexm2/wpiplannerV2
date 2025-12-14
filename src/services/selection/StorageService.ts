@@ -1,6 +1,6 @@
-import { ProfileStateManager } from '../../core/state/ProfileStateManager'
-import { SchedulePreferences, Schedule, SelectedCourse } from '../../types/schedule'
-import { ThemeStorage } from '../themes/ThemeManager'
+import { ProfileStateManager } from '../../core/state'
+import type { SchedulePreferences, Schedule, SelectedCourse } from '../../types'
+import type { ThemeStorage } from '../../themes'
 
 /**
  * Singleton storage facade that coordinates persistent data management, theme preferences, and schedule operations

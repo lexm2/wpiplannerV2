@@ -6,10 +6,8 @@
  * across all class meetings.
  */
 
-import { Period, Section } from '../../../types/types';
-import { SectionFilter, RMPRatingFilterCriteria } from '../../../types/filters';
-import { SelectedCourse } from '../../../types/schedule';
-import { RateMyProfessorService } from '../../../services/RateMyProfessorService';
+import type { Period, Section, SectionFilter, RMPRatingFilterCriteria, SelectedCourse } from '../../../types';
+import { RateMyProfessorService } from '../../../services/external';
 
 export class PeriodRMPRatingFilter implements SectionFilter {
     readonly id = 'periodRmpRating';

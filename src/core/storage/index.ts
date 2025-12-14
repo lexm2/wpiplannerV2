@@ -1,2 +1,3 @@
 export { IndexedDBStorageManager } from './IndexedDBStorageManager';
-export { TransactionalStorageManager, StorageTransaction, StorageOperation, TransactionResult, StorageResult } from './TransactionalStorageManager';
+export type { StorageTransaction, StorageOperation, TransactionResult } from './TransactionalStorageManager';
+export { TransactionalStorageManager } from './TransactionalStorageManager';

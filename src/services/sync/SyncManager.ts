@@ -3,6 +3,14 @@ import { syncEventBus } from './SyncEventBus';
 import { providerRegistry } from './ProviderRegistry';
 
 /**
+ * Interface for state manager dependency injection.
+ * Uses a minimal interface to avoid circular dependencies.
+ */
+interface StateManagerInterface {
+    importData(data: SyncData): Promise<{ success: boolean; error?: Error }>;
+}
+
+/**
  * Main orchestrator for cloud sync operations.
  * Handles the simplified sync flow: SSO conflict check → push-only sync
  */
@@ -13,6 +21,7 @@ export class SyncManager {
     private pushDebounceMs = 3000;
     private pushTimeout: number | null = null;
     private pendingConflict: ConflictInfo | null = null;
+    private stateManager: StateManagerInterface | null = null;
 
     private constructor() {
         // Listen for local saves to trigger push
@@ -52,6 +61,14 @@ export class SyncManager {
             SyncManager.instance = new SyncManager();
         }
         return SyncManager.instance;
+    }
+
+    /**
+     * Set the state manager for data injection.
+     * This must be called before resolveConflict() with 'cloud' resolution.
+     */
+    setStateManager(stateManager: StateManagerInterface): void {
+        this.stateManager = stateManager;
     }
 
     /**
@@ -133,12 +150,10 @@ export class SyncManager {
     }
 
     /**
-     * Resolve a conflict with user's choice
+     * Resolve a conflict with user's choice.
+     * For 'cloud' resolution, the state manager must be set via setStateManager().
      */
-    async resolveConflict(
-        resolution: ConflictResolution,
-        onApplyCloudData?: (data: SyncData) => Promise<void>
-    ): Promise<void> {
+    async resolveConflict(resolution: ConflictResolution): Promise<void> {
         const provider = this.getCurrentProvider();
         if (!provider) {
             throw new Error('No provider set');
@@ -169,10 +184,10 @@ export class SyncManager {
 
                 case 'cloud':
                     // Apply cloud data locally - no push needed, cloud already has correct data
-                    // Await callback to ensure data is saved before emitting resolved event
-                    if (onApplyCloudData) {
-                        await onApplyCloudData(cloudData);
+                    if (!this.stateManager) {
+                        throw new Error('State manager not set - call setStateManager() before resolving with cloud');
                     }
+                    await this.stateManager.importData(cloudData);
                     this.status = 'idle';
                     syncEventBus.emitEvent('sync-resolved', { resolution: 'cloud' });
                     break;

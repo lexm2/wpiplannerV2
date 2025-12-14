@@ -1,1 +1,2 @@
-export { DataValidator, ValidationResult, ValidationError, ValidationWarning } from './DataValidator';
+export type { ValidationResult, ValidationError, ValidationWarning } from './DataValidator';
+export { DataValidator } from './DataValidator';

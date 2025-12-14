@@ -206,15 +206,19 @@ describe('Sync Integration Tests', () => {
 
         it('should complete "keep cloud" resolution flow', async () => {
             let appliedData: SyncData | null = null;
-            const applyCloudData = vi.fn(async (data: SyncData) => {
-                appliedData = data;
-            });
+            const mockStateManager = {
+                importData: vi.fn(async (data: SyncData) => {
+                    appliedData = data;
+                    return { success: true };
+                }),
+            };
+            syncManager.setStateManager(mockStateManager);
 
             // User chooses to keep cloud data
-            await syncManager.resolveConflict('cloud', applyCloudData);
+            await syncManager.resolveConflict('cloud');
 
-            // Verify cloud data applied locally
-            expect(applyCloudData).toHaveBeenCalledWith(cloudData);
+            // Verify cloud data applied locally via state manager
+            expect(mockStateManager.importData).toHaveBeenCalledWith(cloudData);
             expect(appliedData).toEqual(cloudData);
 
             // Verify no push (cloud already has correct data)

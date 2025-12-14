@@ -92,9 +92,8 @@ describe('ProfileStateManager', () => {
       expect(state.hasUnsavedChanges).toBe(true)
 
       await waitForEvents();
-      
-        expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'selected')).toBe(true)
-      })
+
+      expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'selected')).toBe(true)
     })
 
     it('should unselect course successfully', async () => {
@@ -111,9 +110,8 @@ describe('ProfileStateManager', () => {
       expect(state.hasUnsavedChanges).toBe(true)
 
       await waitForEvents();
-      
-        expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'unselected')).toBe(true)
-      })
+
+      expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'unselected')).toBe(true)
     })
 
     it('should set selected section successfully', async () => {
@@ -129,9 +127,8 @@ describe('ProfileStateManager', () => {
       expect(selectedCourse?.selectedLecture?.number).toBe('A01')
 
       await waitForEvents();
-      
-        expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'section_changed')).toBe(true)
-      })
+
+      expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'section_changed')).toBe(true)
     })
 
     it('should clear all selections', async () => {
@@ -154,9 +151,8 @@ describe('ProfileStateManager', () => {
       expect(state.selectedCourses.length).toBe(0)
 
       await waitForEvents();
-      
-        expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'cleared')).toBe(true)
-      })
+
+      expect(listeners.some(e => e.type === 'courses_changed' && e.data.action === 'cleared')).toBe(true)
     })
   })
 
@@ -176,9 +172,8 @@ describe('ProfileStateManager', () => {
       expect(state.schedules.some(s => s.id === schedule.id)).toBe(true)
 
       await waitForEvents();
-      
-        expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'created')).toBe(true)
-      })
+
+      expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'created')).toBe(true)
     })
 
     it('should set active schedule and load its courses', async () => {
@@ -198,10 +193,9 @@ describe('ProfileStateManager', () => {
       expect(state.selectedCourses.length).toBe(0)
 
       await waitForEvents();
-      
-        expect(listeners.some(e => e.type === 'active_schedule_changed')).toBe(true)
-        expect(listeners.some(e => e.type === 'courses_changed')).toBe(true)
-      })
+
+      expect(listeners.some(e => e.type === 'active_schedule_changed')).toBe(true)
+      expect(listeners.some(e => e.type === 'courses_changed')).toBe(true)
     })
 
     it('should update schedule successfully', async () => {
@@ -218,9 +212,8 @@ describe('ProfileStateManager', () => {
       expect(updatedSchedule?.name).toBe('Updated Name')
 
       await waitForEvents();
-      
-        expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'updated')).toBe(true)
-      })
+
+      expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'updated')).toBe(true)
     })
 
 
@@ -257,9 +250,8 @@ describe('ProfileStateManager', () => {
       expect(state.schedules.length).toBe(3)
 
       await waitForEvents();
-      
-        expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'duplicated')).toBe(true)
-      })
+
+      expect(listeners.some(e => e.type === 'schedule_changed' && e.data.action === 'duplicated')).toBe(true)
     })
   })
 
@@ -278,9 +270,8 @@ describe('ProfileStateManager', () => {
       expect(state.preferences.theme).toBe('dark-mode')
 
       await waitForEvents();
-      
-        expect(listeners.some(e => e.type === 'preferences_changed')).toBe(true)
-      })
+
+      expect(listeners.some(e => e.type === 'preferences_changed')).toBe(true)
     })
   })
 
@@ -298,10 +289,9 @@ describe('ProfileStateManager', () => {
       profileStateManager.selectCourse(mockCourse, false, 'test')
 
       await waitForEvents();
-      
-        expect(events1.some(e => e.type === 'courses_changed' && e.data.action === 'selected')).toBe(true)
-        expect(events2.some(e => e.type === 'courses_changed' && e.data.action === 'selected')).toBe(true)
-      })
+
+      expect(events1.some(e => e.type === 'courses_changed' && e.data.action === 'selected')).toBe(true)
+      expect(events2.some(e => e.type === 'courses_changed' && e.data.action === 'selected')).toBe(true)
 
       const events1CountAfterSelect = events1.length
 
@@ -309,10 +299,9 @@ describe('ProfileStateManager', () => {
       profileStateManager.unselectCourse(mockCourse, 'test')
 
       await waitForEvents();
-      
-        expect(events1.length).toBe(events1CountAfterSelect)
-        expect(events2.some(e => e.type === 'courses_changed' && e.data.action === 'unselected')).toBe(true)
-      })
+
+      expect(events1.length).toBe(events1CountAfterSelect)
+      expect(events2.some(e => e.type === 'courses_changed' && e.data.action === 'unselected')).toBe(true)
 
       profileStateManager.removeAllListeners()
 
@@ -320,9 +309,8 @@ describe('ProfileStateManager', () => {
       profileStateManager.selectCourse(mockCourse, false, 'test')
 
       await waitForEvents();
-      
-        expect(events2.length).toBe(events2CountBefore)
-      
+
+      expect(events2.length).toBe(events2CountBefore)
     })
 
     it('should handle listener errors gracefully', async () => {
@@ -339,9 +327,8 @@ describe('ProfileStateManager', () => {
       }).not.toThrow()
 
       await waitForEvents();
-      
-        expect(normalListener).toHaveBeenCalled()
-      })
+
+      expect(normalListener).toHaveBeenCalled()
     })
   })
 

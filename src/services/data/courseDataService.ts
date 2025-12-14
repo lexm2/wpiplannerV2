@@ -1,5 +1,6 @@
-import { ScheduleDB, Department, Course, Section, Period, Time, DayOfWeek, PeriodType } from '../../types/types'
-import { getAllSections } from '../../utils/courseUtils'
+import type { ScheduleDB, Department, Course, Section, Period, Time, LectureGroup } from '../../types'
+import { DayOfWeek, PeriodType } from '../../types'
+import { getAllSections } from '../../utils'
 
 /**
  * Fetches and transforms WPI course catalog data with duplicate resolution and HTML sanitization
@@ -186,7 +187,7 @@ export class CourseDataService {
      * Parses lecture groups from the NEW hierarchical structure
      * Each lecture group contains a lecture section with compatible discussions and labs
      */
-    private parseLectureGroups(lectureGroups: any[]): import('../types/types').LectureGroup[] {
+    private parseLectureGroups(lectureGroups: any[]): LectureGroup[] {
         return lectureGroups.map(groupData => {
             const lectureSection = this.parseConstructedSections([groupData.section])[0];
             const compatibleDiscussions = this.parseConstructedSections(groupData.compatibleDiscussions || []);
@@ -345,7 +346,7 @@ export class CourseDataService {
      * Gets all lecture groups for a course
      * Returns empty array if course uses old flat structure or is lab-only
      */
-    getLecturesForCourse(course: Course): import('../types/types').LectureGroup[] {
+    getLecturesForCourse(course: Course): LectureGroup[] {
         return course.lectures || [];
     }
 

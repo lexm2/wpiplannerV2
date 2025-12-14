@@ -13,7 +13,7 @@ import { CreditRangeFilter } from './CreditRangeFilter';
 import { ProfessorFilter } from './ProfessorFilter';
 import { TermFilter } from './TermFilter';
 import { RMPRatingFilter } from './RMPRatingFilter';
-import { RateMyProfessorService } from '../../../services/RateMyProfessorService';
+import { RateMyProfessorService } from '../../../services/external';
 
 // Default filter instances
 export const createDefaultFilters = (rmpService: RateMyProfessorService): SectionBasedFilter[] => [

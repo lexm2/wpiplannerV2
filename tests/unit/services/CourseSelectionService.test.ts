@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach } mock, from 'bun:test'
+import { describe, it, expect, beforeEach, vi, afterEach, mock, spyOn } from 'bun:test'
 import { CourseSelectionService } from '../../../src/services/CourseSelectionService'
 import { ProfileStateManager } from '../../../src/core/ProfileStateManager'
 import { DataValidator } from '../../../src/core/DataValidator'

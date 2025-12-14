@@ -2,7 +2,7 @@ import { vi, beforeEach, afterEach } from 'vitest';
 import { SyncManager } from '../../src/services/sync/SyncManager';
 import { syncEventBus } from '../../src/services/sync/SyncEventBus';
 import { providerRegistry } from '../../src/services/sync/ProviderRegistry';
-import { ProfileStateManager } from '../../src/core/ProfileStateManager';
+import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
 import { MockCloudProvider } from '../mocks/MockCloudProvider';
 import type { MockProviderConfig } from '../mocks/MockCloudProvider';
 import { createSyncData, createEventBusSpy } from './sync-test-utils';

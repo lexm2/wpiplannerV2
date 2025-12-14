@@ -1,3 +1,5 @@
-export { CourseSelectionService, CourseSelectionOptions, CourseSelectionResult } from './CourseSelectionService';
-export { ScheduleManagementService, ScheduleOperationResult } from './ScheduleManagementService';
+export { CourseSelectionService } from './CourseSelectionService';
+export type { CourseSelectionOptions, CourseSelectionResult } from './CourseSelectionService';
+export { ScheduleManagementService } from './ScheduleManagementService';
+export type { ScheduleOperationResult } from './ScheduleManagementService';
 export { StorageService } from './StorageService';

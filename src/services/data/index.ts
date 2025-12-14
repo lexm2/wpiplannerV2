@@ -1,4 +1,3 @@
 export { CourseDataService } from './courseDataService';
-export { CourseDataCoordinator, LoadResult } from './CourseDataCoordinator';
-export { DataUpdateService } from './DataUpdateService';
-export { DepartmentSyncService, DepartmentSyncEventListener } from './DepartmentSyncService';
+export type { LoadResult } from './CourseDataCoordinator';
+export { CourseDataCoordinator } from './CourseDataCoordinator';

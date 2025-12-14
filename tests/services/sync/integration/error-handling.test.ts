@@ -329,7 +329,7 @@ describe('Sync Error Handling', () => {
             expect(mockProvider.callHistory.pushData).toBe(1); // Only initial push from sign-in
         });
 
-        it('should handle conflict resolution with no callback', async () => {
+        it('should throw error when resolving with cloud but no state manager', async () => {
             // Create conflict
             const localData = await createSyncData();
             const cloudData = await createSyncData({
@@ -344,8 +344,10 @@ describe('Sync Error Handling', () => {
             mockProvider.setCloudData(cloudData);
             await syncManager.handleSignIn(localData);
 
-            // Resolve with cloud but no callback
-            await expect(syncManager.resolveConflict('cloud')).resolves.not.toThrow();
+            // Resolve with cloud but no state manager set - should throw
+            await expect(syncManager.resolveConflict('cloud')).rejects.toThrow(
+                'State manager not set'
+            );
         });
 
         it('should handle provider not set', async () => {

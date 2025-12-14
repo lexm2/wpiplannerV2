@@ -33,7 +33,7 @@ import { syncManager } from '../../services/sync/SyncManager'
 import { providerRegistry } from '../../services/sync/ProviderRegistry'
 import { GoogleDriveProvider } from '../../services/sync/providers/googledrive/GoogleDriveProvider'
 import { syncEventBus } from '../../services/sync/SyncEventBus'
-import type { ConflictInfo, SyncData } from '../../services/sync/types'
+import type { ConflictInfo } from '../../services/sync/types'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
 
 /**
@@ -110,6 +110,7 @@ export class MainController {
         this.googleDriveProvider = new GoogleDriveProvider();
         providerRegistry.register(this.googleDriveProvider);
         syncManager.setProvider('googledrive');
+        syncManager.setStateManager(this.profileStateManager);
 
         // Initialize Google Drive provider (loads GIS token client)
         this.googleDriveProvider.initialize().catch(error => {
@@ -129,37 +130,14 @@ export class MainController {
             this.conflictResolutionModal.show(conflictInfo, async (resolution) => {
                 console.log('[MainController] Conflict resolution:', resolution);
 
-                await syncManager.resolveConflict(resolution, async (cloudData: SyncData) => {
-                    console.log('[MainController] 🔵 resolveConflict callback called with cloudData:', {
-                        version: cloudData.version,
-                        timestamp: cloudData.timestamp,
-                        checksum: cloudData.checksum,
-                        activeScheduleId: cloudData.activeScheduleId,
-                        scheduleCount: cloudData.schedules.length,
-                        schedules: cloudData.schedules.map(s => ({
-                            id: s.id,
-                            name: s.name,
-                            courseCount: s.selectedCourses.length
-                        }))
-                    });
+                // SyncManager handles data injection via the injected state manager
+                await syncManager.resolveConflict(resolution);
 
-                    // Apply cloud data to local state
-                    // SyncData format matches ProfileStateManager's expected format
-                    // Pass cloudData directly without transformation - it's already in the correct format
-                    console.log('[MainController] 🟢 About to import data:', {
-                        scheduleCount: cloudData.schedules.length,
-                        activeScheduleId: cloudData.activeScheduleId,
-                        firstScheduleName: cloudData.schedules[0]?.name
-                    });
-
-                    // Await importData to ensure cloud data is saved before proceeding
-                    await this.profileStateManager.importData(JSON.stringify(cloudData));
-                    console.log('[MainController] 🟢 Cloud data imported and saved');
-
-                    // Redistribute to ensure all consumers are synchronized
+                // Redistribute to ensure all consumers are synchronized after cloud resolution
+                if (resolution === 'cloud') {
                     this.courseDataCoordinator.redistributeToConsumers();
                     console.log('[MainController] All consumers refreshed after cloud sync');
-                });
+                }
             });
         });
 

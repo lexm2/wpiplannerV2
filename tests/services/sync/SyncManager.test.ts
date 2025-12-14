@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { syncEventBus } from '../../../src/services/sync/SyncEventBus';
 import {
     setupSyncTest,
@@ -108,11 +108,16 @@ describe('SyncManager (Unified)', () => {
             await ctx.syncManager.handleSignIn(localData);
             ctx.eventSpy.clear();
 
-            const applyCloudData = vi.fn().mockResolvedValue(undefined);
-            await ctx.syncManager.resolveConflict('cloud', applyCloudData);
+            // Set up mock state manager
+            const mockStateManager = {
+                importData: vi.fn().mockResolvedValue({ success: true }),
+            };
+            ctx.syncManager.setStateManager(mockStateManager);
+
+            await ctx.syncManager.resolveConflict('cloud');
 
             expect(ctx.syncManager.getStatus()).toBe('idle');
-            expect(applyCloudData).toHaveBeenCalledWith(cloudData);
+            expect(mockStateManager.importData).toHaveBeenCalledWith(cloudData);
             expect(ctx.mockProvider.callHistory.pushData).toBe(0);
             expect(ctx.eventSpy.hasEvent('sync-resolved')).toBe(true);
         });

@@ -1,15 +1,13 @@
-import { Schedule, SchedulePreferences, SelectedCourse } from '../../types/schedule'
-import { Course, Section, Department } from '../../types/types'
-import { TransactionalStorageManager, TransactionResult } from '../storage/TransactionalStorageManager'
-import { getAllSections } from '../../utils/courseUtils'
+import type { Schedule, SchedulePreferences, SelectedCourse, Course, Section, Department } from '../../types'
+import { ApplicationState } from '../../types'
+import type { TransactionResult } from '../storage'
+import { TransactionalStorageManager } from '../storage'
+import { getAllSections, createJSONReplacer, createJSONReviver, logger } from '../../utils'
 import { UndoRedoManager } from './UndoRedoManager'
-import { createJSONReplacer, createJSONReviver } from '../../utils/jsonSerializer'
 import { syncEventBus } from '../../services/sync/SyncEventBus'
-import { logger } from '../../utils/logger'
-import { ModalService } from '../../services/ModalService'
+import { ModalService } from '../../services/ui'
 import type { SyncData } from '../../services/sync/types'
 import { parseSyncData } from '../../services/sync/schemas'
-import { ApplicationState } from '../../types/ApplicationState'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -706,14 +704,16 @@ export class ProfileStateManager {
      * This is the conversion boundary between cloud sync (IDs only) and
      * application state (full objects).
      *
-     * @param jsonData - JSON string containing SyncData (with SelectedCourseData)
+     * @param data - SyncData object or JSON string containing SyncData
      */
-    async importData(jsonData: string): Promise<TransactionResult> {
+    async importData(data: SyncData | string): Promise<TransactionResult> {
         console.log('[ProfileStateManager] importData() called');
 
         try {
             // Parse and validate as SyncData (with IDs only)
-            const syncData: SyncData = parseSyncData(JSON.parse(jsonData), 'ProfileStateManager.importData');
+            const syncData: SyncData = typeof data === 'string'
+                ? parseSyncData(JSON.parse(data), 'ProfileStateManager.importData')
+                : data;
 
             console.log('[ProfileStateManager] Validated SyncData:', {
                 version: syncData.version,
