@@ -206,11 +206,11 @@ export class GoogleDriveProvider implements CloudProvider {
 
     private async initializeGoogleIdentity(): Promise<void> {
         return new Promise((resolve) => {
-            const checkLoaded = setInterval(() => {
+            const checkLoaded = setInterval(async () => {
                 if (typeof google !== 'undefined' && google.accounts) {
                     clearInterval(checkLoaded);
                     this.initializeTokenClient();
-                    this.loadStoredAuth();
+                    await this.loadStoredAuth();
                     resolve();
                 }
             }, 100);
@@ -397,13 +397,14 @@ export class GoogleDriveProvider implements CloudProvider {
         }));
     }
 
-    private loadStoredAuth(): void {
+    private async loadStoredAuth(): Promise<void> {
         const stored = localStorage.getItem('google-drive-auth');
         if (stored) {
             try {
                 const data = JSON.parse(stored);
                 if (data.wasAuthenticated) {
-                    console.log('[GoogleDriveProvider] Previous auth detected');
+                    console.log('[GoogleDriveProvider] Previous auth detected, attempting silent sign-in');
+                    await this.attemptSilentSignIn();
                 }
             } catch {
                 this.clearAuthState();
@@ -413,5 +414,32 @@ export class GoogleDriveProvider implements CloudProvider {
 
     private clearAuthState(): void {
         localStorage.removeItem('google-drive-auth');
+    }
+
+    private async attemptSilentSignIn(): Promise<boolean> {
+        if (!this.tokenClient) return false;
+
+        return new Promise((resolve) => {
+            const originalCallback = this.tokenClient.callback;
+
+            this.tokenClient.callback = (tokenResponse: any) => {
+                this.tokenClient.callback = originalCallback;
+
+                if (tokenResponse.error) {
+                    console.log('[GoogleDriveProvider] Silent sign-in failed:', tokenResponse.error);
+                    this.clearAuthState();
+                    resolve(false);
+                    return;
+                }
+
+                this.accessToken = tokenResponse.access_token;
+                this.authenticated = true;
+                syncEventBus.emitEvent('auth-changed', { authenticated: true });
+                console.log('[GoogleDriveProvider] Silent sign-in successful');
+                resolve(true);
+            };
+
+            this.tokenClient.requestAccessToken({ prompt: '' });
+        });
     }
 }
