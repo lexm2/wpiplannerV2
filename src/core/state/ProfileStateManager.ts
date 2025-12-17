@@ -570,33 +570,19 @@ export class ProfileStateManager {
     }
 
     async loadFromStorage(): Promise<boolean> {
-        console.log('[ProfileStateManager] loadFromStorage() called');
-        console.log('[ProfileStateManager] Current state before load:', {
-            scheduleCount: this.state.schedules.length,
-            activeScheduleId: this.state.activeScheduleId,
-            isLoading: this.state.isLoading,
-            currentSchedules: this.state.schedules.map(s => ({ id: s.id, name: s.name }))
-        });
-
         // Prevent concurrent calls - if already loading, skip this call
         if (this.isLoadingFlag) {
-            logger.log('[SKIP] Already loading from storage, skipping duplicate call');
-            console.log('[ProfileStateManager] SKIPPED: Already loading');
             return false;
         }
 
         // Skip if already loaded with schedules (redundant call prevention)
         if (this.state.schedules.length > 0 && !this.state.isLoading) {
-            logger.log('[SKIP] Already loaded with schedules, skipping redundant call');
-            console.log('[ProfileStateManager] SKIPPED: Already has schedules');
             return true;
         }
 
         try {
             this.state.isLoading = true;
             this.isLoadingFlag = true;
-
-            logger.log('%cLOADING FROM STORAGE', 'color: #2196F3; font-weight: bold; font-size: 14px');
 
             // Load preferences first
             const preferencesResult = this.storageManager.loadPreferences();
@@ -605,13 +591,7 @@ export class ProfileStateManager {
             }
 
             // Load all schedules
-            console.log('[ProfileStateManager] Loading schedules from IndexedDB...');
             const schedulesResult = await this.storageManager.loadAllSchedules();
-            console.log('[ProfileStateManager] loadAllSchedules() returned:', {
-                valid: schedulesResult.valid,
-                scheduleCount: schedulesResult.data?.length || 0,
-                schedules: schedulesResult.data?.map(s => ({ id: s.id, name: s.name, courses: s.selectedCourses.length })) || []
-            });
 
             if (schedulesResult.valid && schedulesResult.data) {
                 this.state.schedules = schedulesResult.data;
@@ -707,27 +687,14 @@ export class ProfileStateManager {
      * @param data - SyncData object or JSON string containing SyncData
      */
     async importData(data: SyncData | string): Promise<TransactionResult> {
-        console.log('[ProfileStateManager] importData() called');
-
         try {
             // Parse and validate as SyncData (with IDs only)
             const syncData: SyncData = typeof data === 'string'
                 ? parseSyncData(JSON.parse(data), 'ProfileStateManager.importData')
                 : data;
 
-            console.log('[ProfileStateManager] Validated SyncData:', {
-                version: syncData.version,
-                scheduleCount: syncData.schedules.length,
-                activeScheduleId: syncData.activeScheduleId
-            });
-
             // Convert to ApplicationState (IDs → full objects)
             const appState = ApplicationState.fromCloudFormat(syncData, this.allDepartments);
-
-            console.log('[ProfileStateManager] Converted to ApplicationState:', {
-                scheduleCount: appState.getScheduleCount(),
-                totalCourses: appState.getTotalCourseCount()
-            });
 
             // Convert to legacy Schedule objects for storage
             const legacySchedules = appState.schedules.map(s => s.toLegacySchedule());
@@ -739,14 +706,7 @@ export class ProfileStateManager {
                 appState.preferences
             );
 
-            console.log('[ProfileStateManager] storageManager.importData() result:', {
-                success: result.success,
-                error: result.error
-            });
-
             if (result.success) {
-                console.log('[ProfileStateManager] Import successful, reloading...');
-
                 // Clear in-memory state to force reload
                 this.state.schedules = [];
                 this.state.selectedCourses = [];
@@ -754,11 +714,6 @@ export class ProfileStateManager {
 
                 // Reload from storage
                 await this.loadFromStorage();
-
-                console.log('[ProfileStateManager] ✓ State reloaded after import:', {
-                    scheduleCount: this.state.schedules.length,
-                    activeScheduleId: this.state.activeScheduleId
-                });
 
                 this.emitEvent('schedule_changed', { action: 'imported' }, 'system');
             } else {

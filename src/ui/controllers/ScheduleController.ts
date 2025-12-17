@@ -1396,8 +1396,6 @@ export class ScheduleController {
     }
 
     private async handleAutoSchedule(): Promise<void> {
-        console.log('[Auto-Schedule] Button clicked');
-
         if (!this.scheduleFilterService) {
             console.error('[Auto-Schedule] Filter service not available');
             alert('Filter service not available. Please try again.');
@@ -1405,7 +1403,6 @@ export class ScheduleController {
         }
 
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
-        console.log(`[Auto-Schedule] Found ${selectedCourses.length} selected courses`);
 
         if (selectedCourses.length === 0) {
             console.warn('[Auto-Schedule] No courses selected');
@@ -1436,9 +1433,7 @@ export class ScheduleController {
             } else {
                 // Loop back to first schedule
                 this.currentScheduleIndex = 0;
-                console.log('[Auto-Schedule] Looping back to first schedule');
             }
-            console.log(`[Auto-Schedule] Cycling to schedule ${this.currentScheduleIndex + 1}/${this.generatedSchedules.length}`);
             await this.applyScheduleAtIndex(this.currentScheduleIndex);
             this.updateAutoScheduleButtonUI();
             return;

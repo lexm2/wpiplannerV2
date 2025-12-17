@@ -27,7 +27,6 @@ import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { StorageService } from '../../services/selection/StorageService'
 import { ThemeManager } from '../../themes/ThemeManager'
 import { getInlineSVG } from '../../utils/iconPaths'
-import { CourseDataCoordinator } from '../../services/data/CourseDataCoordinator'
 import { CloudStatusButton } from '../components/CloudStatusButton'
 import { syncManager } from '../../services/sync/SyncManager'
 import { providerRegistry } from '../../services/sync/ProviderRegistry'
@@ -64,7 +63,6 @@ export class MainController {
     private operationManager: OperationManager;
     private debouncedSearch: DebouncedOperation;
     private scheduleManagementService: ScheduleManagementService;
-    private courseDataCoordinator: CourseDataCoordinator;
     private cloudStatusButton: CloudStatusButton;
     private googleDriveProvider: GoogleDriveProvider;
     private conflictResolutionModal: ConflictResolutionModal;
@@ -133,9 +131,9 @@ export class MainController {
                 // SyncManager handles data injection via the injected state manager
                 await syncManager.resolveConflict(resolution);
 
-                // Redistribute to ensure all consumers are synchronized after cloud resolution
+                // Notify consumers after cloud resolution
                 if (resolution === 'cloud') {
-                    this.courseDataCoordinator.redistributeToConsumers();
+                    this.courseDataService.notifyDataRefreshed();
                     console.log('[MainController] All consumers refreshed after cloud sync');
                 }
             });
@@ -181,16 +179,8 @@ export class MainController {
         // Connect filter service to department controller
         this.departmentController.setFilterService(this.filterService);
 
-        // Initialize course data coordinator
-        this.courseDataCoordinator = new CourseDataCoordinator(
-            this.courseDataService,
-            this.timestampManager,
-            this.courseSelectionService,
-            this.scheduleManagementService
-        );
-
-        // Register course data consumers
-        this.registerCourseDataConsumers();
+        // Set up course data event subscriptions
+        this.setupCourseDataSubscriptions();
 
         // Initialize tracking for course changes
         const initialSelectedCourses = this.courseSelectionService.getSelectedCourses();
@@ -207,31 +197,39 @@ export class MainController {
     }
 
     /**
-     * Register all consumers that need course data
-     * Called during construction to set up data distribution
+     * Set up event subscriptions for course data changes
      */
-    private registerCourseDataConsumers(): void {
-        // Register department consumers (services that need full department array)
-        this.courseDataCoordinator.registerDepartmentConsumer(
-            (depts) => this.departmentController.setAllDepartments(depts)
-        );
-        this.courseDataCoordinator.registerDepartmentConsumer(
-            (depts) => this.courseController.setAllDepartments(depts)
-        );
-        this.courseDataCoordinator.registerDepartmentConsumer(
-            (depts) => this.courseSelectionService.setAllDepartments(depts)
-        );
+    private setupCourseDataSubscriptions(): void {
+        // Subscribe to data-loaded event
+        this.courseDataService.on('data-loaded', (event) => {
+            // Phase 1: Set catalog (needed for section reconstruction)
+            this.profileStateManager.setCourseData(event.departments);
+            this.searchService.setCourseData(event.departments);
+            this.filterModalController.setCourseData(event.departments);
 
-        // Register catalog consumers (services that need catalog for indexing/search)
-        this.courseDataCoordinator.registerCatalogConsumer(
-            (depts) => this.profileStateManager.setCourseData(depts)
-        );
-        this.courseDataCoordinator.registerCatalogConsumer(
-            (depts) => this.searchService.setCourseData(depts)
-        );
-        this.courseDataCoordinator.registerCatalogConsumer(
-            (depts) => this.filterModalController.setCourseData(depts)
-        );
+            // Phase 2: Set department data
+            this.departmentController.setAllDepartments(event.departments);
+            this.courseController.setAllDepartments(event.departments);
+            this.courseSelectionService.setAllDepartments(event.departments);
+
+            // Phase 3: Post-load operations
+            this.courseSelectionService.reconstructSectionObjects();
+            this.scheduleManagementService.initializeDefaultScheduleIfNeeded();
+            this.timestampManager.updateClientTimestamp();
+
+            // Store reference for later use
+            this.allDepartments = event.departments;
+        });
+
+        // Subscribe to data-refreshed event (after cloud sync)
+        this.courseDataService.on('data-refreshed', (event) => {
+            this.profileStateManager.setCourseData(event.departments);
+            this.searchService.setCourseData(event.departments);
+            this.filterModalController.setCourseData(event.departments);
+            this.departmentController.setAllDepartments(event.departments);
+            this.courseController.setAllDepartments(event.departments);
+            this.courseSelectionService.setAllDepartments(event.departments);
+        });
     }
 
     private initializeFilters(): void {
@@ -297,267 +295,13 @@ export class MainController {
 
     private async loadCourseData(): Promise<void> {
         try {
-            // Use the coordinator to load and distribute course data
-            const result = await this.courseDataCoordinator.loadAndDistribute();
+            // Load course data - event listeners handle distribution
+            const scheduleDB = await this.courseDataService.loadCourseData();
 
-            if (!result.success) {
-                throw new Error(result.error || 'Failed to load course data');
-            }
+            // Load server timestamp
+            await this.timestampManager.loadServerTimestamp();
 
-            // Store reference for later use
-            this.allDepartments = result.departments!;
-
-            // Expose debug methods globally for testing (development only)
-            if (typeof window !== 'undefined') {
-                (window as any).debugScheduleManagement = {
-                    debug: () => this.scheduleManagementService.debugState(),
-                    getService: () => this.scheduleManagementService,
-                    createSchedule: (name: string) => this.scheduleManagementService.createNewSchedule(name),
-                    switchSchedule: (id: string) => this.scheduleManagementService.setActiveSchedule(id),
-                    getSchedules: () => this.scheduleManagementService.getAllSchedules(),
-                    getCurrentPage: () => this.uiStateManager.currentPage,
-                    createTestSchedules: async () => {
-                        const schedule1 = await this.scheduleManagementService.createNewSchedule('Test Schedule 1');
-                        const schedule2 = await this.scheduleManagementService.createNewSchedule('Test Schedule 2');
-                        console.log('Created test schedules:', schedule1.schedule?.id, schedule2.schedule?.id);
-                        return { schedule1, schedule2 };
-                    },
-                    testCompleteSwitch: (scheduleId?: string) => {
-                        const schedules = this.scheduleManagementService.getAllSchedules();
-                        if (schedules.length < 2 && !scheduleId) {
-                            const { schedule1 } = (window as any).debugScheduleManagement.createTestSchedules();
-                            scheduleId = schedule1.id;
-                        }
-                        const targetId = scheduleId || schedules[0].id;
-                        console.log('Testing complete schedule switch to:', targetId);
-                        this.scheduleManagementService.setActiveSchedule(targetId);
-                    }
-                };
-
-                /**
-                 * Debug utilities for testing cloud sync and conflict resolution
-                 *
-                 * Usage:
-                 *   await window.debugCloudSync.testConflict() - Simulate cloud conflict
-                 *   await window.debugCloudSync.getCurrentSyncData() - Get current state
-                 */
-                (window as any).debugCloudSync = {
-                    /**
-                     * Test conflict resolution modal by simulating cloud data
-                     * Creates a real conflict with cloud having only the first selected course
-                     */
-                    testConflict: async () => {
-                        try {
-                            console.log('[DebugCloudSync] Creating test conflict scenario...');
-
-                            // Get current local data
-                            const localExport = await this.profileStateManager.exportData();
-                            if (!localExport) {
-                                console.error('[DebugCloudSync] Failed to export local data');
-                                return;
-                            }
-                            const localData = JSON.parse(localExport);
-
-                            console.log('[DebugCloudSync] Local data loaded:', {
-                                schedules: localData.schedules.length,
-                                courses: localData.schedules[0]?.selectedCourses.length || 0
-                            });
-
-                            // Create modified cloud version with test schedule containing only first course
-                            const cloudData = JSON.parse(localExport);
-                            cloudData.timestamp = Date.now(); // Ensure it's a number
-
-                            // Create test schedule with only first course
-                            if (cloudData.schedules.length > 0 && cloudData.schedules[0].selectedCourses.length > 0) {
-                                const firstCourse = cloudData.schedules[0].selectedCourses[0];
-
-                                // Modify first schedule to be test schedule with only one course
-                                cloudData.schedules[0] = {
-                                    id: 'test-cloud-sync-' + Date.now(),
-                                    name: 'Test Cloud Sync',
-                                    selectedCourses: [firstCourse]
-                                };
-
-                                console.log('[DebugCloudSync] Created test cloud schedule:', {
-                                    name: 'Test Cloud Sync',
-                                    courseId: firstCourse.courseId,
-                                    totalCourses: 1
-                                });
-                            } else {
-                                console.warn('[DebugCloudSync] No courses in current schedule, creating empty test schedule');
-                                cloudData.schedules = [{
-                                    id: 'test-cloud-sync-' + Date.now(),
-                                    name: 'Test Cloud Sync',
-                                    selectedCourses: []
-                                }];
-                            }
-
-                            // Calculate proper checksum using checksumCalculator
-                            const { checksumCalculator } = await import('../../services/sync/checksum');
-                            const calculatedCloudChecksum = await checksumCalculator.calculateChecksum({
-                                version: cloudData.version,
-                                activeScheduleId: cloudData.activeScheduleId,
-                                schedules: cloudData.schedules,
-                                preferences: cloudData.preferences
-                            });
-                            cloudData.checksum = calculatedCloudChecksum;
-
-                            console.log('[DebugCloudSync] Calculated cloud checksum:', calculatedCloudChecksum);
-
-                            // Build proper SyncData objects
-                            const localSyncData: SyncData = {
-                                version: localData.version,
-                                timestamp: new Date(localData.timestamp).getTime(),
-                                checksum: localData.checksum,
-                                activeScheduleId: localData.activeScheduleId,
-                                schedules: localData.schedules,
-                                preferences: localData.preferences
-                            };
-
-                            const cloudSyncData: SyncData = {
-                                version: cloudData.version,
-                                timestamp: cloudData.timestamp,
-                                checksum: cloudData.checksum,
-                                activeScheduleId: cloudData.activeScheduleId,
-                                schedules: cloudData.schedules,
-                                preferences: cloudData.preferences
-                            };
-
-                            // Build ConflictInfo
-                            const conflictInfo: ConflictInfo = {
-                                hasConflict: true,
-                                localData: localSyncData,
-                                cloudData: cloudSyncData
-                            };
-
-                            console.log('[DebugCloudSync] Conflict details:');
-                            console.log('  Local:', {
-                                schedules: localSyncData.schedules.length,
-                                courses: localSyncData.schedules[0]?.selectedCourses.length || 0,
-                                name: localSyncData.schedules[0]?.name
-                            });
-                            console.log('  Cloud:', {
-                                schedules: cloudSyncData.schedules.length,
-                                courses: cloudSyncData.schedules[0]?.selectedCourses.length || 0,
-                                name: cloudSyncData.schedules[0]?.name
-                            });
-
-                            // Set the pending conflict in SyncManager so resolveConflict() will work
-                            // We access the private property directly for testing purposes
-                            (syncManager as any).pendingConflict = conflictInfo;
-
-                            // Trigger conflict event - this will show the modal
-                            syncEventBus.emitEvent('sync-conflict', conflictInfo);
-
-                            console.log('[DebugCloudSync] ✓ Conflict modal visible with real conflict');
-                            console.log('[DebugCloudSync] ✓ SyncManager has pending conflict set');
-                            console.log('[DebugCloudSync] Now click a button to test the resolution flow');
-
-                            // Log state after resolution
-                            // Listen for sync-resolved event to log final state
-                            const logFinalState = async () => {
-                                try {
-                                    await new Promise(resolve => setTimeout(resolve, 500)); // Wait for state to settle
-
-                                    console.log('\n═══════════════════════════════════════════════════════');
-                                    console.log('POST-RESOLUTION STATE SNAPSHOT');
-                                    console.log('═══════════════════════════════════════════════════════\n');
-
-                                    const state = this.profileStateManager.getState();
-
-                                    console.log('Schedule Summary:');
-                                    state.schedules.forEach((schedule, index) => {
-                                        console.log(`\n  Schedule ${index + 1}:`);
-                                        console.log(`    ID: ${schedule.id}`);
-                                        console.log(`    Name: ${schedule.name}`);
-                                        console.log(`    Selected Courses: ${schedule.selectedCourses.length}`);
-                                        console.log(`    Courses:`, schedule.selectedCourses.map(sc => ({
-                                            id: sc.course.id,
-                                            name: sc.course.name,
-                                            selectedSection: sc.selectedSectionNumber
-                                        })));
-                                    });
-
-                                    console.log(`\nActive Schedule ID: ${state.activeScheduleId}`);
-                                    console.log(`Last Saved: ${new Date(state.lastSaved).toLocaleString()}`);
-                                    console.log(`Has Unsaved Changes: ${state.hasUnsavedChanges}`);
-
-                                    console.log('\n═══════════════════════════════════════════════════════\n');
-                                } catch (error) {
-                                    console.error('[DebugCloudSync] Failed to log final state:', error);
-                                }
-                            };
-
-                            // Set up one-time listener for resolution
-                            const unsubscribe = syncEventBus.on('sync-resolved', (event) => {
-                                const data = event.data as { resolution: string };
-                                console.log(`\n[DebugCloudSync] Conflict resolved: ${data.resolution}`);
-                                logFinalState();
-                                unsubscribe(); // Remove listener after first call
-                            });
-
-                        } catch (error) {
-                            console.error('[DebugCloudSync] Failed to create test conflict:', error);
-                        }
-                    },
-
-                    /**
-                     * Get current sync data for inspection
-                     */
-                    getCurrentSyncData: async () => {
-                        try {
-                            const data = await this.profileStateManager.exportData();
-                            if (!data) {
-                                console.error('[DebugCloudSync] No data available');
-                                return null;
-                            }
-                            const parsed = JSON.parse(data);
-                            console.log('[DebugCloudSync] Current sync data:', parsed);
-                            return parsed;
-                        } catch (error) {
-                            console.error('[DebugCloudSync] Failed to get sync data:', error);
-                            throw error;
-                        }
-                    },
-
-                    /**
-                     * Get sync event bus for manual event testing
-                     */
-                    getEventBus: () => {
-                        console.log('[DebugCloudSync] Returning syncEventBus');
-                        return syncEventBus;
-                    },
-
-                    /**
-                     * Get sync manager instance
-                     */
-                    getSyncManager: () => {
-                        console.log('[DebugCloudSync] Returning syncManager');
-                        return syncManager;
-                    },
-
-                    /**
-                     * Get profile state manager instance
-                     */
-                    getProfileStateManager: () => {
-                        console.log('[DebugCloudSync] Returning ProfileStateManager');
-                        return this.profileStateManager;
-                    },
-
-                    /**
-                     * Get course data coordinator instance
-                     */
-                    getCourseDataCoordinator: () => {
-                        console.log('[DebugCloudSync] Returning CourseDataCoordinator');
-                        return this.courseDataCoordinator;
-                    }
-                };
-
-                console.log('[MainController] Debug utilities exposed on window object:');
-                console.log('  - window.debugDepartmentSync');
-                console.log('  - window.debugScheduleManagement');
-                console.log('  - window.debugCloudSync');
-            }
+            console.log(`[MainController] Course data loaded: ${scheduleDB.departments.length} departments`);
         } catch (error) {
             console.error('Failed to load course data:', error);
             this.uiStateManager.showErrorMessage('Failed to load course data. Please try refreshing the page.');

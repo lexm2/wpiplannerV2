@@ -561,29 +561,22 @@ export class ScheduleFilterService {
     }
     
     private getAvailableTerms(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
-        console.log(`[DEBUG] getAvailableTerms called with ${selectedCourses.length} courses`);
         const terms = new Set<string>();
-        
+
         selectedCourses.forEach(sc => {
             const sections = getAllSections(sc.course);
-            console.log(`[DEBUG] Processing course ${sc.course.id} with ${sections.length} sections`);
             sections.forEach((section: Section) => {
-                console.log(`[DEBUG] Section ${section.number}: computedTerm = "${section.computedTerm}"`);
-
                 // Filter out invalid computed terms
                 if (section.computedTerm &&
                     section.computedTerm.trim() &&
                     section.computedTerm !== 'undefined' &&
                     typeof section.computedTerm === 'string') {
                     terms.add(section.computedTerm.trim());
-                } else {
-                    console.warn(`[WARN] Invalid computedTerm for section ${section.number}: "${section.computedTerm}"`);
                 }
             });
         });
-        
+
         const termArray = Array.from(terms).sort();
-        console.log(`[DEBUG] Available terms found:`, termArray);
         return termArray.map(term => ({
             value: term,
             label: this.formatTermName(term)

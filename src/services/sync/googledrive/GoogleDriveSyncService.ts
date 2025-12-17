@@ -324,14 +324,7 @@ export class GoogleDriveSyncService implements CloudSyncService {
             const enrichedData = this.enrichWithSyncMetadata(data);
             const cloudData = await this.getCloudData();
 
-            console.log('[Google Drive] === DATA COMPARISON ===');
-            console.log('[Google Drive] Local data:', JSON.stringify(enrichedData, null, 2));
-            console.log('[Google Drive] Cloud data:', cloudData ? JSON.stringify(cloudData, null, 2) : 'No cloud data');
-            console.log('[Google Drive] Are they different?', JSON.stringify(enrichedData) !== JSON.stringify(cloudData));
-            console.log('[Google Drive] === END COMPARISON ===');
-
             if (cloudData) {
-                console.log('[Google Drive] Found existing data in cloud');
                 const conflict = this.detectConflict(enrichedData, cloudData);
                 if (conflict) {
                     console.warn('[Google Drive] Conflict detected, triggering merge flow');
@@ -612,24 +605,10 @@ export class GoogleDriveSyncService implements CloudSyncService {
         const localHash = localData.checksum || this.computeContentHash(localData);
         const cloudHash = cloudData.checksum || this.computeContentHash(cloudData);
 
-        // Log detailed comparison data
-        console.log('[Google Drive] === CONFLICT DETECTION ===');
-        console.log('[Google Drive] Local checksum (from data):', localData.checksum);
-        console.log('[Google Drive] Local computed hash:', this.computeContentHash(localData));
-        console.log('[Google Drive] Local hash used:', localHash);
-        console.log('[Google Drive] Cloud checksum (from data):', cloudData.checksum);
-        console.log('[Google Drive] Cloud computed hash:', this.computeContentHash(cloudData));
-        console.log('[Google Drive] Cloud hash used:', cloudHash);
-        console.log('[Google Drive] Local data:', JSON.stringify(localData, null, 2));
-        console.log('[Google Drive] Cloud data:', JSON.stringify(cloudData, null, 2));
-        console.log('[Google Drive] === END CONFLICT DETECTION ===');
-
         if (localHash !== cloudHash) {
-            console.log(`[Google Drive] Content hash mismatch - conflict detected`);
             return true;
         }
 
-        console.log('[Google Drive] No conflict detected');
         return false;
     }
 

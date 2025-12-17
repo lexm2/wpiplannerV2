@@ -273,11 +273,8 @@ export class PeriodConflictFilter implements SectionBasedFilter {
             }
         }
 
-        logger.log('[PeriodConflictFilter] Total selected sections in map:', selectedSectionsByCourse.size);
-
         // If no sections are selected, show all sections
         if (selectedSectionsByCourse.size === 0) {
-            logger.log('[PeriodConflictFilter] No selected sections - returning all');
             return sectionsWithContext;
         }
 
@@ -285,8 +282,6 @@ export class PeriodConflictFilter implements SectionBasedFilter {
         const result = sectionsWithContext.filter(item => {
             const currentCourse = item.course.course;
             const currentSection = item.section;
-
-            logger.log(`[PeriodConflictFilter] Testing section ${currentSection.number} from ${currentCourse.department.abbreviation}${currentCourse.number}`);
 
             // Build list of sections to check against:
             // 1. Same course: selected components EXCEPT the section being tested (to check lecture vs discussion, etc.)
@@ -299,26 +294,14 @@ export class PeriodConflictFilter implements SectionBasedFilter {
                     // This allows checking discussion against lecture, lab against lecture, etc.
                     const otherComponents = selectedSections.filter(s => s.crn !== currentSection.crn);
                     sectionsToCheckAgainst.push(...otherComponents);
-
-                    if (otherComponents.length > 0) {
-                        logger.log(`[PeriodConflictFilter]   Checking against ${otherComponents.length} other components from same course`);
-                        otherComponents.forEach(s => {
-                            logger.log(`[PeriodConflictFilter]     - ${s.number} (${s.periods.length} periods)`);
-                        });
-                    }
                 } else {
                     // Different course: check against ALL selected sections
                     sectionsToCheckAgainst.push(...selectedSections);
-                    logger.log(`[PeriodConflictFilter]   Checking against ${selectedSections.length} sections from other course ${courseId}`);
-                    selectedSections.forEach(s => {
-                        logger.log(`[PeriodConflictFilter]     - ${s.number} (${s.periods.length} periods)`);
-                    });
                 }
             }
 
             // If no sections to check against, no conflicts possible
             if (sectionsToCheckAgainst.length === 0) {
-                logger.log(`[PeriodConflictFilter]   ✓ PASS - No selected sections to check against`);
                 return true;
             }
 
@@ -332,14 +315,10 @@ export class PeriodConflictFilter implements SectionBasedFilter {
                 const conflicts = this.conflictDetector.detectConflicts(testSections);
 
                 if (conflicts.length > 0) {
-                    logger.log(`[PeriodConflictFilter]   ✗ FAIL - Period conflicts detected:`, conflicts.length);
-                    const daysStr = Array.isArray(currentPeriod.days) ? currentPeriod.days.join('') : currentPeriod.days;
-                    logger.log(`[PeriodConflictFilter]     Period: ${currentPeriod.type} ${daysStr} ${currentPeriod.startTime.hours}:${currentPeriod.startTime.minutes}-${currentPeriod.endTime.hours}:${currentPeriod.endTime.minutes}`);
                     return false;
                 }
             }
 
-            logger.log(`[PeriodConflictFilter]   ✓ PASS - No conflicts found`);
             return true;
         });
 
