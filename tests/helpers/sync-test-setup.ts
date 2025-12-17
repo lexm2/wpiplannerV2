@@ -59,6 +59,8 @@ export interface SyncTestSetupOptions {
     includeUI?: boolean;
     /** Wire up UI hydration events automatically (default: false, requires includeUI=true) */
     wireUIEvents?: boolean;
+    /** Mock getLocalSyncData (default: true). Set to false for E2E tests that need real data flow. */
+    mockLocalSyncData?: boolean;
 }
 
 /**
@@ -95,6 +97,7 @@ export async function setupSyncTest(options: SyncTestSetupOptions = {}): Promise
         includeStorage = false,
         includeUI = false,
         wireUIEvents = false,
+        mockLocalSyncData = true,
     } = options;
 
     // Setup fake timers if requested
@@ -125,7 +128,10 @@ export async function setupSyncTest(options: SyncTestSetupOptions = {}): Promise
     syncEventBus.on('local-save-completed', eventSpy.listener);
 
     // Mock getLocalSyncData to return test data (needed for debounced push)
-    spyOn(syncManager as any, 'getLocalSyncData').mockResolvedValue(testData);
+    // Set to false for E2E tests that need real data flow
+    if (mockLocalSyncData) {
+        spyOn(syncManager as any, 'getLocalSyncData').mockResolvedValue(testData);
+    }
 
     const context: SyncTestContext = {
         syncManager,
@@ -249,14 +255,16 @@ export async function setupSyncTestWithStorage(options: Omit<SyncTestSetupOption
  *
  * Convenience function for full integration tests.
  * Includes sync manager, storage, UI mocks, and wired events.
- * Equivalent to setupSyncTest({ includeStorage: true, includeUI: true, wireUIEvents: true })
+ * Does NOT mock getLocalSyncData so real data flow happens.
+ * Equivalent to setupSyncTest({ includeStorage: true, includeUI: true, wireUIEvents: true, mockLocalSyncData: false })
  */
-export async function setupSyncTestE2E(options: Omit<SyncTestSetupOptions, 'includeStorage' | 'includeUI' | 'wireUIEvents'> = {}): Promise<SyncTestContext> {
+export async function setupSyncTestE2E(options: Omit<SyncTestSetupOptions, 'includeStorage' | 'includeUI' | 'wireUIEvents' | 'mockLocalSyncData'> = {}): Promise<SyncTestContext> {
     return setupSyncTest({
         ...options,
         includeStorage: true,
         includeUI: true,
-        wireUIEvents: true
+        wireUIEvents: true,
+        mockLocalSyncData: false,
     });
 }
 

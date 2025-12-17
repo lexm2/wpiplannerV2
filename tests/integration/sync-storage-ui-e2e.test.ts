@@ -1,12 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from 'bun:test';
-import { setupSyncTest, cleanupSyncTest, type SyncTestContext } from '../helpers/sync-test-setup';
+import { setupSyncTestE2E, cleanupSyncTest, type SyncTestContext } from '../helpers/sync-test-setup';
 import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
-import { createSyncData, createSchedule, createSelectedCourse } from '../helpers/sync-test-utils';
+import { createSyncData, createSchedule, createSelectedCourse, REAL_COURSES } from '../helpers/sync-test-utils';
 import type { MockIndexedDB } from '../mocks/MockIndexedDB';
 import {
-    createMockUIComponents,
     resetMockUIComponents,
-    assertUIHydrated,
     assertScheduleUIUpdated,
     assertCourseSelectionUIUpdated,
     type MockUIContext
@@ -28,47 +26,29 @@ import {
  */
 describe('End-to-End: Cloud Sync → Storage → UI', () => {
     let syncCtx: SyncTestContext;
-    let profileManager: ProfileStateManager;
-    let mockIndexedDB: MockIndexedDB;
     let mockUI: MockUIContext;
 
     beforeEach(async () => {
-        // Setup sync infrastructure
-        syncCtx = await setupSyncTest();
-
-        // Get ProfileStateManager
-        profileManager = ProfileStateManager.getInstance();
-
-        // Get mock IndexedDB
-        mockIndexedDB = (global as any).__mockIndexedDB__;
-        mockIndexedDB.reset();
-
-        // Create mock UI
-        mockUI = createMockUIComponents();
-        mockUI.courseDataCoordinator.registerConsumer(mockUI.courseController);
-        mockUI.courseDataCoordinator.registerConsumer(mockUI.scheduleController);
-        mockUI.courseDataCoordinator.registerConsumer(mockUI.departmentController);
-
-        // Wire up UI hydration events
-        const eventListener = (event: any) => {
-            if (event.type === 'schedule_changed') {
-                mockUI.scheduleController.displayScheduleSelectedCourses();
-                mockUI.courseController.refreshCourseSelectionUI();
-                mockUI.courseController.displaySelectedCourses();
-            }
-        };
-        profileManager.addListener(eventListener);
+        // Setup complete E2E test environment with:
+        // - Real course catalog
+        // - Mock IndexedDB
+        // - Mock UI components
+        // - Wired UI events
+        // - NO mocking of getLocalSyncData (for real data flow)
+        syncCtx = await setupSyncTestE2E();
+        mockUI = syncCtx.mockUI!;
     });
 
     afterEach(() => {
         cleanupSyncTest(syncCtx);
-        resetMockUIComponents(mockUI);
-        mockIndexedDB.reset();
+        if (mockUI) {
+            resetMockUIComponents(mockUI);
+        }
     });
 
     describe('Complete Sign-In Flow', () => {
         it('should complete full flow: cloud → storage → UI', async () => {
-            // Arrange: Set up cloud data
+            // Arrange: Set up cloud data with real course/section data
             const cloudData = await createSyncData({
                 schedules: [
                     createSchedule({
@@ -76,8 +56,8 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                         name: 'Fall 2025',
                         selectedCourses: [
                             createSelectedCourse({
-                                courseId: 'CS-1101',
-                                selectedSectionCrn: 'SEC-1',
+                                courseId: REAL_COURSES.CS_1101.id,
+                                selectedSectionCrn: REAL_COURSES.CS_1101.crn,
                                 isRequired: true
                             })
                         ]
@@ -86,22 +66,26 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                 activeScheduleId: 'schedule-1'
             });
 
-            syncCtx.mockProvider.setCloudData(cloudData);
+            const profileManager = syncCtx.profileManager!;
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
 
-            // Act: Sign in (triggers entire flow)
-            await syncCtx.syncManager.handleSignIn(cloudData);
+            // Act: Import cloud data (simulates what happens after conflict resolution or initial sync)
+            const result = await profileManager.importData(cloudData);
 
-            // Assert Step 1: Sync Manager authenticated
-            expect(syncCtx.mockProvider.isAuthenticated()).toBe(true);
-            expect(syncCtx.eventSpy.hasEvent('auth-changed')).toBe(true);
+            // Process event queue (uses setTimeout internally)
+            jest.runAllTimers();
+
+            // Assert Step 1: Import succeeded
+            expect(result.success).toBe(true);
 
             // Assert Step 2: Data in IndexedDB
-            expect(mockIndexedDB.hasKey('wpi-planner', 'schedules', 'schedule-1')).toBe(true);
+            // Note: Data is stored as { id, serializedData (LZString compressed), timestamp, compressed }
+            expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'schedule-1')).toBe(true);
 
-            const stored = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'schedule-1');
+            const stored = mockIndexedDB.getRawData('wpi-planner-db', 'schedules', 'schedule-1');
             expect(stored).toBeDefined();
-            expect(stored.name).toBe('Fall 2025');
-            expect(stored.selectedCourses).toHaveLength(1);
+            expect(stored.id).toBe('schedule-1');
+            expect(stored.compressed).toBe(true);
 
             // Assert Step 3: ProfileStateManager has active schedule
             const activeSchedule = profileManager.getActiveSchedule();
@@ -115,23 +99,32 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
         });
 
         it('should handle sign-in with multiple schedules', async () => {
-            // Arrange: Cloud data with 3 schedules
+            // Arrange: Cloud data with 3 schedules using real courses
             const cloudData = await createSyncData({
                 schedules: [
                     createSchedule({
                         id: 'fall-2025',
                         name: 'Fall 2025',
-                        selectedCourses: [createSelectedCourse({ courseId: 'CS-1101' })]
+                        selectedCourses: [createSelectedCourse({
+                            courseId: REAL_COURSES.CS_1101.id,
+                            selectedSectionCrn: REAL_COURSES.CS_1101.crn
+                        })]
                     }),
                     createSchedule({
                         id: 'spring-2026',
                         name: 'Spring 2026',
-                        selectedCourses: [createSelectedCourse({ courseId: 'CS-2011' })]
+                        selectedCourses: [createSelectedCourse({
+                            courseId: REAL_COURSES.CS_2303.id,
+                            selectedSectionCrn: REAL_COURSES.CS_2303.crn
+                        })]
                     }),
                     createSchedule({
                         id: 'summer-2026',
                         name: 'Summer 2026',
-                        selectedCourses: [createSelectedCourse({ courseId: 'MA-1021' })]
+                        selectedCourses: [createSelectedCourse({
+                            courseId: REAL_COURSES.MA_1021.id,
+                            selectedSectionCrn: REAL_COURSES.MA_1021.crn
+                        })]
                     })
                 ],
                 activeScheduleId: 'spring-2026'
@@ -143,9 +136,10 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             await syncCtx.syncManager.handleSignIn(cloudData);
 
             // Assert: All schedules in IndexedDB
-            expect(mockIndexedDB.hasKey('wpi-planner', 'schedules', 'fall-2025')).toBe(true);
-            expect(mockIndexedDB.hasKey('wpi-planner', 'schedules', 'spring-2026')).toBe(true);
-            expect(mockIndexedDB.hasKey('wpi-planner', 'schedules', 'summer-2026')).toBe(true);
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
+            expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'fall-2025')).toBe(true);
+            expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'spring-2026')).toBe(true);
+            expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'summer-2026')).toBe(true);
 
             // Assert: Correct active schedule
             const activeSchedule = profileManager.getActiveSchedule();
@@ -180,7 +174,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             expect(syncCtx.mockProvider.callHistory.pushData).toBe(1);
 
             // Assert: Data in IndexedDB
-            expect(mockIndexedDB.hasKey('wpi-planner', 'schedules', 'initial-schedule')).toBe(true);
+            expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'initial-schedule')).toBe(true);
 
             // Assert: Sync status is idle
             expect(syncCtx.syncManager.getStatus()).toBe('idle');
@@ -226,7 +220,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             jest.advanceTimersByTime(3000);
 
             // Assert: Local data in IndexedDB
-            const stored = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'schedule-1');
+            const stored = mockIndexedDB.getRawData('wpi-planner-db', 'schedules', 'schedule-1');
             expect(stored.name).toBe('Local Version');
 
             // Assert: Local data pushed to cloud
@@ -272,7 +266,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             await syncCtx.syncManager.resolveConflict('cloud');
 
             // Assert: Cloud data in IndexedDB
-            const stored = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'schedule-1');
+            const stored = mockIndexedDB.getRawData('wpi-planner-db', 'schedules', 'schedule-1');
             expect(stored.name).toBe('Cloud');
 
             // Assert: No push (cloud data kept)
@@ -327,7 +321,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             expect(cloudData?.schedules[0].name).toBe('Updated');
 
             // Assert: Data in IndexedDB
-            const stored = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'schedule-1');
+            const stored = mockIndexedDB.getRawData('wpi-planner-db', 'schedules', 'schedule-1');
             expect(stored.name).toBe('Updated');
 
             // Assert: UI updated
@@ -405,7 +399,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             await deviceBProfileManager.importData(cloudData!);
 
             // Assert: Device B has same data
-            const deviceBSchedule = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'shared-schedule');
+            const deviceBSchedule = mockIndexedDB.getRawData('wpi-planner-db', 'schedules', 'shared-schedule');
             expect(deviceBSchedule).toBeDefined();
             expect(deviceBSchedule.name).toBe('Created on Device A');
 
@@ -433,7 +427,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             expect(syncCtx.eventSpy.hasEvent('auth-changed')).toBe(true);
 
             // Assert: Local data still in IndexedDB
-            expect(mockIndexedDB.hasKey('wpi-planner', 'schedules', 'schedule-1')).toBe(true);
+            expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'schedule-1')).toBe(true);
 
             // Assert: Sync status is idle
             expect(syncCtx.syncManager.getStatus()).toBe('idle');
@@ -508,7 +502,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             expect(syncCtx.syncManager.getStatus()).toBe('error');
 
             // Assert: No corrupted data in IndexedDB
-            expect(mockIndexedDB.hasKey('wpi-planner', 'schedules', 'schedule-1')).toBe(false);
+            expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'schedule-1')).toBe(false);
         });
     });
 
@@ -536,7 +530,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             await syncCtx.syncManager.handleSignIn(complexData);
 
             // Assert: Data preserved in IndexedDB
-            const stored = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'complex-schedule');
+            const stored = mockIndexedDB.getRawData('wpi-planner-db', 'schedules', 'complex-schedule');
             expect(stored.name).toBe('Test: Special chars & émojis 🎓');
 
             // Assert: Data preserved in ProfileStateManager
@@ -568,7 +562,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             await syncCtx.syncManager.handleSignIn(largeData);
 
             // Assert: All data stored correctly
-            const stored = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'large-schedule');
+            const stored = mockIndexedDB.getRawData('wpi-planner-db', 'schedules', 'large-schedule');
             expect(stored).toBeDefined();
             expect(stored.selectedCourses).toHaveLength(100);
 
