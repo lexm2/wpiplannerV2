@@ -1,7 +1,6 @@
 import { Schedule, SelectedCourse } from '../../types/schedule'
 import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../../core/state/ProfileStateManager'
 import { DataValidator } from '../../core/validation/DataValidator'
-import { RetryManager } from '../../core/operations/RetryManager'
 import { CourseSelectionService } from './CourseSelectionService'
 import { ICSGenerator, ICSExportOptions, ICSExportResult } from '../../utils/icsGenerator'
 import { safeStringify } from '../../utils/jsonSerializer'
@@ -43,7 +42,6 @@ export class ScheduleManagementService {
     private profileStateManager: ProfileStateManager;
     private courseSelectionService: CourseSelectionService;
     private dataValidator: DataValidator;
-    private retryManager: RetryManager;
     private scheduleListeners = new Set<ScheduleChangeListener>();
     private isInitialized = false;
     private initializationPromise: Promise<boolean> | null = null;
@@ -51,13 +49,11 @@ export class ScheduleManagementService {
     constructor(
         profileStateManager?: ProfileStateManager,
         courseSelectionService?: CourseSelectionService,
-        dataValidator?: DataValidator,
-        retryManager?: RetryManager
+        dataValidator?: DataValidator
     ) {
         this.profileStateManager = profileStateManager || ProfileStateManager.getInstance();
         this.courseSelectionService = courseSelectionService || new CourseSelectionService(this.profileStateManager);
         this.dataValidator = dataValidator || new DataValidator();
-        this.retryManager = retryManager || RetryManager.createStorageRetryManager();
 
         this.setupStateManagerListeners();
     }
@@ -138,27 +134,8 @@ export class ScheduleManagementService {
                 selectedCourses = this.profileStateManager.getSelectedCourses();
             }
 
-            // Create the schedule with retry using the unique name
-            const result = await this.retryManager.executeWithRetry(
-                () => {
-                    return this.profileStateManager.createSchedule(name, 'api');
-                },
-                {
-                    operationName: `create schedule "${name}"`,
-                    onRetry: (attempt, error) => {
-                        console.warn(`Schedule creation retry ${attempt}:`, error.message);
-                    }
-                }
-            );
-
-            if (!result.success || !result.result) {
-                return {
-                    success: false,
-                    error: `Failed to create schedule: ${result.error?.message || 'Unknown error'}`
-                };
-            }
-
-            const schedule = result.result;
+            // Create the schedule
+            const schedule = this.profileStateManager.createSchedule(name, 'api');
 
             // Update with selected courses if needed
             if (selectedCourses.length > 0) {
@@ -246,22 +223,8 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Activate with retry
-            const result = await this.retryManager.executeWithRetry(
-                () => {
-                    return this.profileStateManager.setActiveSchedule(scheduleId, 'api');
-                },
-                {
-                    operationName: `activate schedule "${schedule.name}"`,
-                }
-            );
-
-            if (!result.success) {
-                return {
-                    success: false,
-                    error: `Failed to activate schedule: ${result.error?.message || 'Unknown error'}`
-                };
-            }
+            // Activate
+            this.profileStateManager.setActiveSchedule(scheduleId, 'api');
 
             // Notify listeners
             this.notifyScheduleListeners({
@@ -311,22 +274,8 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Update with retry
-            const result = await this.retryManager.executeWithRetry(
-                () => {
-                    return this.profileStateManager.updateSchedule(scheduleId, updates, 'api');
-                },
-                {
-                    operationName: `update schedule "${existingSchedule.name}"`,
-                }
-            );
-
-            if (!result.success) {
-                return {
-                    success: false,
-                    error: `Failed to update schedule: ${result.error?.message || 'Unknown error'}`
-                };
-            }
+            // Update
+            this.profileStateManager.updateSchedule(scheduleId, updates, 'api');
 
             // Auto-save if requested
             if (autoSave) {
@@ -392,23 +341,14 @@ export class ScheduleManagementService {
                 };
             }
 
-            const result = await this.retryManager.executeWithRetry(
-                () => {
-                    return this.profileStateManager.duplicateSchedule(scheduleId, newName, 'api');
-                },
-                {
-                    operationName: `duplicate schedule to "${newName}"`,
-                }
-            );
+            const duplicatedSchedule = this.profileStateManager.duplicateSchedule(scheduleId, newName, 'api');
 
-            if (!result.success || !result.result) {
+            if (!duplicatedSchedule) {
                 return {
                     success: false,
-                    error: `Failed to duplicate schedule: ${result.error?.message || 'Unknown error'}`
+                    error: `Schedule with ID "${scheduleId}" not found`
                 };
             }
-
-            const duplicatedSchedule = result.result;
 
             // Auto-save
             try {
@@ -462,21 +402,7 @@ export class ScheduleManagementService {
                 };
             }
 
-            const result = await this.retryManager.executeWithRetry(
-                () => {
-                    return this.profileStateManager.deleteSchedule(scheduleId, 'api');
-                },
-                {
-                    operationName: `delete schedule "${scheduleToDelete.name}"`,
-                }
-            );
-
-            if (!result.success) {
-                return {
-                    success: false,
-                    error: `Failed to delete schedule: ${result.error?.message || 'Unknown error'}`
-                };
-            }
+            this.profileStateManager.deleteSchedule(scheduleId, 'api');
 
             // Force immediate save for critical delete operation
             try {
@@ -735,22 +661,14 @@ export class ScheduleManagementService {
                 // Resolve name conflicts automatically
                 const uniqueName = this.generateUniqueScheduleName(scheduleData.name);
 
-                // Create schedule using proper API
-                const result = await this.retryManager.executeWithRetry(
-                    () => {
-                        return this.profileStateManager.createSchedule(uniqueName, 'api');
-                    },
-                    {
-                        operationName: `import schedule "${uniqueName}"`,
-                    }
-                );
-
-                if (!result.success || !result.result) {
-                    errors.push(`Failed to import schedule "${scheduleData.name}": ${result.error?.message || 'Unknown error'}`);
+                // Create schedule
+                let importedSchedule;
+                try {
+                    importedSchedule = this.profileStateManager.createSchedule(uniqueName, 'api');
+                } catch (createError) {
+                    errors.push(`Failed to import schedule "${scheduleData.name}": ${createError}`);
                     continue;
                 }
-
-                const importedSchedule = result.result;
 
                 // Update with imported courses and generated schedules
                 if (scheduleData.selectedCourses && scheduleData.selectedCourses.length > 0) {

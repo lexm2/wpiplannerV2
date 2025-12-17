@@ -378,7 +378,7 @@ describe('Storage Persistence Integration Tests', () => {
 
     describe('Batch Queue Flushing', () => {
         it('should flush pending batch operations before critical saves', async () => {
-            // This test verifies that BatchOperationManager flushes pending operations
+            // This test verifies that batch operations are flushed
             // before critical saves happen
 
             // Create a schedule

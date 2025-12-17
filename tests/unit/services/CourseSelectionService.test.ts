@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, vi, afterEach, mock, spyOn } from 'bu
 import { CourseSelectionService } from '../../../src/services/selection/CourseSelectionService'
 import { ProfileStateManager } from '../../../src/core/state/ProfileStateManager'
 import { DataValidator } from '../../../src/core/validation/DataValidator'
-import { RetryManager } from '../../../src/core/operations/RetryManager'
 import { Course } from '../../../src/types/types'
 import { mockLocalStorage } from '../../helpers/testUtils'
 import { createMockCourse, createMockSection, createMockDepartment } from '../../helpers/mockData'
@@ -11,7 +10,6 @@ describe('CourseSelectionService', () => {
   let courseSelectionService: CourseSelectionService
   let mockProfileStateManager: ProfileStateManager
   let mockDataValidator: DataValidator
-  let mockRetryManager: RetryManager
   let mockStorage: any
   let consoleSpy: any
 
