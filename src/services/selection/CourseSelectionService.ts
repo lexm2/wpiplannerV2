@@ -820,6 +820,11 @@ export class CourseSelectionService {
                     // Already handled in our methods where we emit events
                     break;
                 case 'active_schedule_changed':
+                    // Skip UI refresh for calendar exclusion changes - no courses changed
+                    if (event.source === 'calendar-event-exclusion') {
+                        break;
+                    }
+
                     // Force complete UI refresh for schedule changes
                     const newSelectedCourses = this.profileStateManager.getSelectedCourses();
 
