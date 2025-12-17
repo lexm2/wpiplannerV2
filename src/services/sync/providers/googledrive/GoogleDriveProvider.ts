@@ -95,6 +95,10 @@ export class GoogleDriveProvider implements CloudProvider {
         return this.authenticated && this.accessToken !== null;
     }
 
+    getAccessToken(): string | null {
+        return this.accessToken;
+    }
+
     async pushData(data: SyncData): Promise<void> {
         if (!this.isAuthenticated()) {
             throw new Error('Not authenticated');

@@ -145,6 +145,19 @@ export class CalendarService {
         // Convert schedule to events
         const { events, skipped } = this.scheduleToEvents(schedule, options);
 
+        console.log('[CalendarService] Converted schedule to events:', {
+            scheduleName: schedule.name,
+            totalCourses: schedule.selectedCourses.length,
+            eventsGenerated: events.length,
+            coursesSkipped: skipped,
+            events: events.map(e => ({
+                summary: e.summary,
+                location: e.location,
+                start: e.start.dateTime,
+                recurrence: e.recurrence,
+            })),
+        });
+
         if (events.length === 0) {
             return {
                 success: false,
@@ -159,7 +172,7 @@ export class CalendarService {
         // Create events
         try {
             const created = await this.provider.createEvents(calendarId, events);
-            return {
+            const result: CalendarExportResult = {
                 success: true,
                 calendarId,
                 calendarName,
@@ -167,8 +180,10 @@ export class CalendarService {
                 coursesSkipped: skipped,
                 errors,
             };
+            console.log('[CalendarService] Export completed:', result);
+            return result;
         } catch (error) {
-            return {
+            const result: CalendarExportResult = {
                 success: false,
                 calendarId,
                 calendarName,
@@ -176,6 +191,8 @@ export class CalendarService {
                 coursesSkipped: skipped,
                 errors: [`Failed to create events: ${error}`],
             };
+            console.error('[CalendarService] Export failed:', result);
+            return result;
         }
     }
 

@@ -67,13 +67,16 @@ export class GoogleCalendarProvider implements CalendarProvider {
         const response = await gapi.client.calendar.calendarList.list();
         const items = response.result.items || [];
 
-        return items.map((cal: any) => ({
+        const calendars = items.map((cal: any) => ({
             id: cal.id,
             name: cal.summary,
             isPrimary: cal.primary === true,
             color: cal.backgroundColor,
             canEdit: cal.accessRole === 'owner' || cal.accessRole === 'writer',
         }));
+
+        console.log('[GoogleCalendarProvider] Listed calendars:', calendars);
+        return calendars;
     }
 
     async createCalendar(name: string): Promise<CalendarInfo> {
@@ -125,6 +128,12 @@ export class GoogleCalendarProvider implements CalendarProvider {
         this.ensureAuthenticated();
         this.ensureApiLoaded();
 
+        console.log('[GoogleCalendarProvider] Fetching events:', {
+            calendarId,
+            timeMin: timeMin.toISOString(),
+            timeMax: timeMax.toISOString(),
+        });
+
         const response = await gapi.client.calendar.events.list({
             calendarId,
             timeMin: timeMin.toISOString(),
@@ -134,8 +143,19 @@ export class GoogleCalendarProvider implements CalendarProvider {
         });
 
         const items = response.result.items || [];
+        const events = items.map((event: any) => this.mapGoogleEventToCalendarEvent(event));
 
-        return items.map((event: any) => this.mapGoogleEventToCalendarEvent(event));
+        console.log('[GoogleCalendarProvider] Fetched events:', {
+            count: events.length,
+            events: events.map(e => ({
+                id: e.id,
+                summary: e.summary,
+                start: e.start.dateTime,
+                recurrence: e.recurrence,
+            })),
+        });
+
+        return events;
     }
 
     async createEvent(calendarId: string, event: CalendarEvent): Promise<CalendarEvent> {

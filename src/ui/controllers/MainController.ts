@@ -34,6 +34,7 @@ import { GoogleDriveProvider } from '../../services/sync/providers/googledrive/G
 import { syncEventBus } from '../../services/sync/SyncEventBus'
 import type { ConflictInfo, SyncData } from '../../services/sync/types'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
+import { calendarService, GoogleCalendarProvider } from '../../services/calendar'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -65,6 +66,7 @@ export class MainController {
     private scheduleManagementService: ScheduleManagementService;
     private cloudStatusButton: CloudStatusButton;
     private googleDriveProvider: GoogleDriveProvider;
+    private googleCalendarProvider: GoogleCalendarProvider;
     private conflictResolutionModal: ConflictResolutionModal;
     private cloudSyncMenuItem: HTMLButtonElement | null = null;
     private allDepartments: Department[] = [];
@@ -113,6 +115,38 @@ export class MainController {
         // Initialize Google Drive provider (loads GIS token client)
         this.googleDriveProvider.initialize().catch(error => {
             console.warn('[MainController] Google Drive initialization failed:', error);
+        });
+
+        // Initialize Google Calendar provider
+        this.googleCalendarProvider = new GoogleCalendarProvider();
+        this.googleCalendarProvider.initialize().catch(error => {
+            console.warn('[MainController] Google Calendar initialization failed:', error);
+        });
+        calendarService.setProvider(this.googleCalendarProvider);
+
+        // Sync calendar auth with Drive auth
+        syncEventBus.on('auth-changed', async (event) => {
+            const { authenticated } = event.data as { authenticated: boolean };
+            if (authenticated) {
+                const token = this.googleDriveProvider.getAccessToken();
+                if (token) {
+                    this.googleCalendarProvider.setAccessToken(token);
+                    console.log('[MainController] Calendar provider token synced');
+
+                    // Auto-fetch calendar data on sign-in
+                    try {
+                        await calendarService.listCalendars();
+
+                        // Fetch events for current year
+                        const now = new Date();
+                        const yearStart = new Date(now.getFullYear(), 0, 1);
+                        const yearEnd = new Date(now.getFullYear(), 11, 31);
+                        await calendarService.getEvents('primary', yearStart, yearEnd);
+                    } catch (error) {
+                        console.error('[MainController] Failed to fetch calendar data:', error);
+                    }
+                }
+            }
         });
 
         // Initialize unified cloud status button
