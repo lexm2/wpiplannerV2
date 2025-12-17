@@ -1,9 +1,27 @@
 import { beforeEach, afterEach, mock } from 'bun:test'
+import { MockIndexedDB } from './mocks/MockIndexedDB'
+
+// Create global MockIndexedDB instance
+const mockIndexedDBInstance = new MockIndexedDB();
+
+// Expose MockIndexedDB globally for tests that need it
+(global as any).__mockIndexedDB__ = mockIndexedDBInstance;
+
+// Setup global indexedDB to use MockIndexedDB
+(global as any).indexedDB = {
+  open: (name: string, version?: number) => mockIndexedDBInstance.open(name, version),
+  deleteDatabase: (name: string) => mockIndexedDBInstance.deleteDatabase(name),
+  databases: () => mockIndexedDBInstance.databases(),
+  cmp: (a: any, b: any) => (a < b ? -1 : a > b ? 1 : 0),
+};
 
 // Setup DOM environment
 beforeEach(() => {
   // Clear DOM
   document.body.innerHTML = ''
+
+  // Reset MockIndexedDB between tests
+  mockIndexedDBInstance.reset();
 
   // Mock localStorage with functional storage
   const storage: Record<string, string> = {}
@@ -20,110 +38,6 @@ beforeEach(() => {
     value: localStorageMock,
     writable: true
   })
-
-  // Mock IndexedDB storage
-  const indexedDBStorage = new Map<any, any>()
-
-  const mockIDBRequest = (result?: any): IDBRequest => {
-    const request: any = {
-      result,
-      error: null,
-      source: null,
-      transaction: null,
-      readyState: 'done',
-      onsuccess: null,
-      onerror: null,
-      addEventListener: mock((event: string, handler: any) => {
-        if (event === 'success') request.onsuccess = handler;
-        if (event === 'error') request.onerror = handler;
-      }),
-      removeEventListener: mock()
-    };
-
-    setTimeout(() => {
-      if (request.onsuccess) {
-        request.onsuccess({ target: request });
-      }
-    }, 0);
-
-    return request as IDBRequest;
-  };
-
-  const mockObjectStore: any = {
-    add: mock((value: any, key?: any) => {
-      const storeKey = key || value.id;
-      indexedDBStorage.set(storeKey, value);
-      return mockIDBRequest(storeKey);
-    }),
-    put: mock((value: any, key?: any) => {
-      const storeKey = key || value.id;
-      indexedDBStorage.set(storeKey, value);
-      return mockIDBRequest(storeKey);
-    }),
-    get: mock((key: any) => {
-      const value = indexedDBStorage.get(key);
-      return mockIDBRequest(value);
-    }),
-    delete: mock((key: any) => {
-      indexedDBStorage.delete(key);
-      return mockIDBRequest(undefined);
-    }),
-    clear: mock(() => {
-      indexedDBStorage.clear();
-      return mockIDBRequest(undefined);
-    }),
-    getAll: mock(() => {
-      const values = Array.from(indexedDBStorage.values());
-      return mockIDBRequest(values);
-    }),
-    getAllKeys: mock(() => {
-      const keys = Array.from(indexedDBStorage.keys());
-      return mockIDBRequest(keys);
-    })
-  };
-
-  const mockTransaction: any = {
-    objectStore: mock(() => mockObjectStore),
-    oncomplete: null,
-    onerror: null,
-    onabort: null,
-    addEventListener: mock(),
-    removeEventListener: mock()
-  };
-
-  const mockDB: any = {
-    transaction: mock(() => mockTransaction),
-    close: mock(),
-    createObjectStore: mock(() => mockObjectStore),
-    deleteObjectStore: mock(),
-    objectStoreNames: { contains: mock(() => true) }
-  };
-
-  const mockOpenDBRequest: any = mockIDBRequest(mockDB);
-  mockOpenDBRequest.onupgradeneeded = null;
-
-  const mockIndexedDB = {
-    open: mock(() => {
-      setTimeout(() => {
-        if (mockOpenDBRequest.onupgradeneeded) {
-          mockOpenDBRequest.onupgradeneeded({ target: mockOpenDBRequest });
-        }
-        if (mockOpenDBRequest.onsuccess) {
-          mockOpenDBRequest.onsuccess({ target: mockOpenDBRequest });
-        }
-      }, 0);
-      return mockOpenDBRequest;
-    }),
-    deleteDatabase: mock(() => mockIDBRequest(undefined)),
-    databases: mock(async () => []),
-    cmp: mock((a: any, b: any) => (a < b ? -1 : a > b ? 1 : 0))
-  };
-
-  Object.defineProperty(window, 'indexedDB', {
-    value: mockIndexedDB,
-    writable: true,
-    configurable: true
-  });
 
   // Mock fetch
   global.fetch = mock() as any

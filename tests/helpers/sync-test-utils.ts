@@ -47,7 +47,9 @@ export function createSchedule(overrides?: Partial<ScheduleData>): ScheduleData 
  */
 export async function createSyncData(overrides?: Partial<SyncData>): Promise<SyncData> {
     const schedules = overrides?.schedules || [createSchedule()];
-    const activeScheduleId = overrides?.activeScheduleId || schedules[0].id;
+    const activeScheduleId = overrides?.activeScheduleId !== undefined
+        ? overrides.activeScheduleId
+        : (schedules.length > 0 ? schedules[0].id : null);
     const version = overrides?.version || '3.0';
     const preferences = overrides?.preferences || {};
 

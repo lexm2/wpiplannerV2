@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, mock, vi } from 'bun:test';
+import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
 import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
 import { MainController } from '../../src/ui/controllers/MainController';
 import type { SyncData } from '../../src/services/sync/types';

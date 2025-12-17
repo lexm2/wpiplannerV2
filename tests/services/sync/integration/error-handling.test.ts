@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, spyOn, vi, jest } from 'bun:test';
+import { describe, it, expect, beforeEach, afterEach, spyOn } from 'bun:test';
 import { SyncManager } from '../../../../src/services/sync/SyncManager';
 import { syncEventBus } from '../../../../src/services/sync/SyncEventBus';
 import { providerRegistry } from '../../../../src/services/sync/ProviderRegistry';
@@ -9,6 +9,7 @@ import {
     createInvalidSyncData,
     createEventBusSpy,
 } from '../../../helpers/sync-test-utils';
+import { sharedTimerMock as timerMock } from '../../../helpers/sync-test-setup';
 
 /**
  * Error Handling and Edge Case Tests
@@ -22,7 +23,7 @@ describe('Sync Error Handling', () => {
     let eventSpy: ReturnType<typeof createEventBusSpy>;
 
     beforeEach(async () => {
-        vi.useFakeTimers();
+        timerMock.install();
 
         syncManager = SyncManager.getInstance();
         mockProvider = new MockCloudProvider();
@@ -39,8 +40,7 @@ describe('Sync Error Handling', () => {
     });
 
     afterEach(() => {
-        vi.restoreAllMocks();
-        vi.useRealTimers();
+        timerMock.restore();
         mockProvider.reset();
         eventSpy.clear();
     });
@@ -69,8 +69,8 @@ describe('Sync Error Handling', () => {
             });
 
             syncEventBus.emitEvent('local-save-completed', {});
-            jest.advanceTimersByTime(3000);
-            jest.runAllTimers();
+            timerMock.advanceTimersByTime(3000);
+            timerMock.runAllTimers();
 
             expect(syncManager.getStatus()).toBe('error');
             expect(eventSpy.hasEvent('sync-failed')).toBe(true);
@@ -95,16 +95,16 @@ describe('Sync Error Handling', () => {
             // Network fails
             mockProvider.setConfig({ pushFails: true });
             syncEventBus.emitEvent('local-save-completed', {});
-            jest.advanceTimersByTime(3000);
-            jest.runAllTimers();
+            timerMock.advanceTimersByTime(3000);
+            timerMock.runAllTimers();
 
             expect(syncManager.getStatus()).toBe('error');
 
             // Network recovers
             mockProvider.setConfig({ pushFails: false });
             syncEventBus.emitEvent('local-save-completed', {});
-            jest.advanceTimersByTime(3000);
-            jest.runAllTimers();
+            timerMock.advanceTimersByTime(3000);
+            timerMock.runAllTimers();
 
             expect(syncManager.getStatus()).toBe('idle');
             expect(eventSpy.hasEvent('sync-pushed')).toBe(true);
@@ -181,8 +181,8 @@ describe('Sync Error Handling', () => {
             const localData = await createSyncData();
 
             syncEventBus.emitEvent('local-save-completed', {});
-            jest.advanceTimersByTime(3000);
-            jest.runAllTimers();
+            timerMock.advanceTimersByTime(3000);
+            timerMock.runAllTimers();
 
             expect(mockProvider.callHistory.pushData).toBe(0);
         });
@@ -199,8 +199,8 @@ describe('Sync Error Handling', () => {
             });
 
             syncEventBus.emitEvent('local-save-completed', {});
-            jest.advanceTimersByTime(3000);
-            jest.runAllTimers();
+            timerMock.advanceTimersByTime(3000);
+            timerMock.runAllTimers();
 
             expect(syncManager.getStatus()).toBe('error');
             expect(eventSpy.hasEvent('sync-failed')).toBe(true);
@@ -216,8 +216,8 @@ describe('Sync Error Handling', () => {
             });
 
             syncEventBus.emitEvent('local-save-completed', {});
-            jest.advanceTimersByTime(3000);
-            jest.runAllTimers();
+            timerMock.advanceTimersByTime(3000);
+            timerMock.runAllTimers();
 
             expect(eventSpy.hasEvent('sync-failed')).toBe(true);
         });
@@ -320,8 +320,8 @@ describe('Sync Error Handling', () => {
             await syncManager.signOut();
 
             // Advance timer
-            jest.advanceTimersByTime(3000);
-            jest.runAllTimers();
+            timerMock.advanceTimersByTime(3000);
+            timerMock.runAllTimers();
 
             // Push should not happen (signed out)
             expect(mockProvider.callHistory.pushData).toBe(1); // Only initial push from sign-in
@@ -369,8 +369,8 @@ describe('Sync Error Handling', () => {
             }
 
             // Wait for debounce
-            jest.advanceTimersByTime(3000);
-            jest.runAllTimers();
+            timerMock.advanceTimersByTime(3000);
+            timerMock.runAllTimers();
 
             // Should only push once due to debouncing
             expect(mockProvider.callHistory.pushData).toBe(1);
@@ -392,8 +392,8 @@ describe('Sync Error Handling', () => {
             await syncManager.resolveConflict('local');
 
             // Wait for any pending push
-            jest.advanceTimersByTime(3000);
-            jest.runAllTimers();
+            timerMock.advanceTimersByTime(3000);
+            timerMock.runAllTimers();
 
             // Should have pushed during resolution
             expect(mockProvider.callHistory.pushData).toBeGreaterThan(0);
@@ -415,17 +415,18 @@ describe('Sync Error Handling', () => {
         });
 
         it('should emit sync-failed event with error details', async () => {
+            const localData = await createSyncData();
+            await syncManager.handleSignIn(localData);
+
+            // Set push to fail AFTER successful sign-in
             mockProvider.setConfig({
                 pushFails: true,
                 errorToThrow: new Error('Custom error message'),
             });
 
-            const localData = await createSyncData();
-            await syncManager.handleSignIn(localData);
-
             syncEventBus.emitEvent('local-save-completed', {});
-            jest.advanceTimersByTime(3000);
-            jest.runAllTimers();
+            timerMock.advanceTimersByTime(3000);
+            timerMock.runAllTimers();
 
             const failedEvent = eventSpy.getLatestEvent('sync-failed');
             expect(failedEvent).toBeDefined();

@@ -332,38 +332,30 @@ export class TransactionalStorageManager {
         preferences?: SchedulePreferences
     ): Promise<TransactionResult> {
         try {
-            console.log('[TransactionalStorageManager] importData() called');
-            console.log('[TransactionalStorageManager]   Schedules:', schedules.length);
-            console.log('[TransactionalStorageManager]   ActiveScheduleId:', activeScheduleId);
-            console.log('[TransactionalStorageManager]   Preferences:', !!preferences);
-
             // Save preferences if provided
             if (preferences) {
                 localStorage.setItem(
                     TransactionalStorageManager.STORAGE_KEYS.PREFERENCES,
                     this.safeStringify(preferences)
                 );
-                console.log('[TransactionalStorageManager] ✓ Saved preferences');
             }
 
             // Save schedules to IndexedDB
             if (schedules.length > 0) {
                 await this.ensureInitialized();
-                console.log('[TransactionalStorageManager] Saving', schedules.length, 'schedules...');
                 for (const schedule of schedules) {
-                    console.log('[TransactionalStorageManager]   → Saving:', schedule.id, schedule.name);
                     await this.saveSchedule(schedule);
                 }
-                console.log('[TransactionalStorageManager] ✓ All schedules saved');
+                console.log('[TransactionalStorageManager] All schedules saved');
             }
 
             // Save active schedule ID
             if (activeScheduleId !== undefined) {
                 this.saveActiveScheduleId(activeScheduleId);
-                console.log('[TransactionalStorageManager] ✓ Saved activeScheduleId:', activeScheduleId);
+                console.log('[TransactionalStorageManager] Saved activeScheduleId:', activeScheduleId);
             }
 
-            console.log('[TransactionalStorageManager] ✓ Import completed successfully');
+            console.log('[TransactionalStorageManager] Import completed successfully');
 
             return {
                 success: true,

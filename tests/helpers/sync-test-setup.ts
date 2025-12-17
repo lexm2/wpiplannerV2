@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, spyOn, mock, vi } from 'bun:test';
+import { beforeEach, afterEach, spyOn, mock } from 'bun:test';
 import { SyncManager } from '../../src/services/sync/SyncManager';
 import { syncEventBus } from '../../src/services/sync/SyncEventBus';
 import { providerRegistry } from '../../src/services/sync/ProviderRegistry';
@@ -6,6 +6,7 @@ import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
 import { MockCloudProvider } from '../mocks/MockCloudProvider';
 import type { MockProviderConfig } from '../mocks/MockCloudProvider';
 import { createSyncData, createEventBusSpy } from './sync-test-utils';
+import { createTimerMock } from './timerMock';
 import type { SyncData } from '../../src/services/sync/types';
 import type { MockIndexedDB } from '../mocks/MockIndexedDB';
 import {
@@ -13,6 +14,10 @@ import {
     resetMockUIComponents,
     type MockUIContext
 } from '../mocks/MockUIComponents';
+
+// Shared timer mock instance for sync tests
+// Export this for tests that need to advance timers
+export const sharedTimerMock = createTimerMock();
 
 /**
  * Unified Sync Test Context
@@ -97,7 +102,7 @@ export async function setupSyncTest(options: SyncTestSetupOptions = {}): Promise
 
     // Setup fake timers if requested
     if (useFakeTimers) {
-        vi.useFakeTimers();
+        sharedTimerMock.install();
     }
 
     // Create test data
@@ -185,11 +190,8 @@ export async function setupSyncTest(options: SyncTestSetupOptions = {}): Promise
  * ```
  */
 export function cleanupSyncTest(ctx: SyncTestContext): void {
-    // Restore all mocks
-    vi.restoreAllMocks();
-
-    // Restore real timers
-    vi.useRealTimers();
+    // Restore timer mock
+    sharedTimerMock.restore();
 
     // Reset mock provider
     ctx.mockProvider.reset();
