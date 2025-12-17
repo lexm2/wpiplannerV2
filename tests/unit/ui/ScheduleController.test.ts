@@ -81,7 +81,7 @@ describe('ScheduleController Expansion State', () => {
     beforeEach(() => {
         // Set up DOM elements that the controller expects
         document.body.innerHTML = `
-            <div id="schedule-selected-courses"></div>
+            <div id="schedule-sidebar-content"></div>
             <div id="schedule-selected-count"></div>
         `;
 
@@ -181,7 +181,7 @@ describe('ScheduleController Auto-Schedule Cycling', () => {
     beforeEach(() => {
         // Set up DOM elements that the controller expects
         document.body.innerHTML = `
-            <div id="schedule-selected-courses"></div>
+            <div id="schedule-sidebar-content"></div>
             <div id="schedule-selected-count"></div>
             <div id="auto-schedule-btn"></div>
             <div id="schedule-grid-a"></div>

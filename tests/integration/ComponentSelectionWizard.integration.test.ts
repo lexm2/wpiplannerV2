@@ -65,7 +65,7 @@ describe('ComponentSelectionWizard Integration', () => {
     });
 
     beforeEach(() => {
-        document.body.innerHTML = '<div id="schedule-selected-courses"></div>';
+        document.body.innerHTML = '<div id="schedule-sidebar-content"></div>';
         courseDataService = new CourseDataService();
         courseSelectionService = new CourseSelectionService();
     });

@@ -32,7 +32,7 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
 
     constructor(options: CalendarEventsPanelOptions) {
         super({
-            containerId: 'schedule-selected-courses',
+            containerId: 'schedule-sidebar-content',
             animationDuration: 250,
             escapeToClose: true,
             animationType: 'slide-right',

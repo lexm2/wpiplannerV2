@@ -109,7 +109,7 @@ describe('ComponentSelectionWizard', () => {
     });
 
     beforeEach(() => {
-        document.body.innerHTML = '<div id="schedule-selected-courses"></div>';
+        document.body.innerHTML = '<div id="schedule-sidebar-content"></div>';
         courseDataService = new CourseDataService();
         mockOnComplete = mock();
         mockOnCancel = mock();
@@ -594,8 +594,8 @@ describe('ComponentSelectionWizard', () => {
 
             wizard.open();
 
-            const container = document.getElementById('schedule-selected-courses');
-            const panel = container?.querySelector('.wizard-inline-panel');
+            const container = document.getElementById('schedule-sidebar-content');
+            const panel = container?.querySelector('.sidebar-panel--component-wizard');
             expect(panel).toBeTruthy();
         });
 
@@ -614,8 +614,8 @@ describe('ComponentSelectionWizard', () => {
 
             await vi.advanceTimersByTimeAsync(350);
 
-            const container = document.getElementById('schedule-selected-courses');
-            const panel = container?.querySelector('.wizard-inline-panel');
+            const container = document.getElementById('schedule-sidebar-content');
+            const panel = container?.querySelector('.sidebar-panel--component-wizard');
             expect(panel).toBeFalsy();
             vi.useRealTimers();
         });
@@ -634,7 +634,7 @@ describe('ComponentSelectionWizard', () => {
             await new Promise<void>((resolve) => {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
-                        const panel = document.querySelector('.wizard-inline-panel');
+                        const panel = document.querySelector('.sidebar-panel--component-wizard');
                         expect(panel).toBeTruthy();
                         if (panel) {
                             expect(panel.classList.contains('active')).toBe(true);
@@ -656,7 +656,7 @@ describe('ComponentSelectionWizard', () => {
                 mockOnCancel
             );
 
-            const content = wizard['renderWizardContent']();
+            const content = wizard['renderContent']();
             expect(content).toContain(course.department.abbreviation);
             expect(content).toContain(course.number);
             expect(content).toContain(course.name);

@@ -289,7 +289,7 @@
     animation: slideInLeft 0.3s ease;
   }
 
-  .schedule-sidebar.mobile-open .schedule-selected-courses-footer {
+  .schedule-sidebar.mobile-open .schedule-sidebar-content-footer {
     padding: 0.5rem 1rem;
   }
 

@@ -88,3 +88,108 @@
         opacity: 0;
     }
 }
+
+/* =============================================================================
+   Animated List Styles
+   ============================================================================= */
+
+/* Base list container */
+.sidebar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Base list item with stagger animation support */
+.sidebar-list-item {
+    opacity: 0;
+    transform: translateX(20px);
+    animation: slideInListItem 0.25s ease forwards;
+    animation-delay: calc(var(--card-index, 0) * 40ms);
+}
+
+@keyframes slideInListItem {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Group styles */
+.sidebar-list-group {
+    margin-bottom: 1rem;
+}
+
+.sidebar-list-group:last-child {
+    margin-bottom: 0;
+}
+
+.sidebar-list-group-header {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    padding: 0.75rem 0 0.5rem 0;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-border);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Slide out animations for exit transitions */
+.sidebar-list--exiting .sidebar-list-item {
+    animation: slideOutListItem 0.25s ease forwards;
+    animation-delay: calc(var(--card-index, 0) * 40ms);
+}
+
+@keyframes slideOutListItem {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+}
+
+/* =============================================================================
+   Base Panel Header Styles (overridable by subclasses)
+   ============================================================================= */
+
+.sidebar-panel-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-panel-header .panel-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.sidebar-panel-header .panel-close-btn:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text);
+}
+
+/* Content area */
+.sidebar-panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: var(--color-background);
+}

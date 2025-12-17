@@ -3,7 +3,7 @@
    ============================================================================= */
 
 /* When panel is active, hide scrollbar on parent */
-.schedule-selected-courses.calendar-panel-active {
+.schedule-sidebar-content.calendar-panel-active {
     overflow-y: hidden;
 }
 

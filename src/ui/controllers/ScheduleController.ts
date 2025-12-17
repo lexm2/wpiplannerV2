@@ -52,7 +52,7 @@ export class ScheduleController {
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
-        this.sidebarManager = new SidebarManager('schedule-selected-courses');
+        this.sidebarManager = new SidebarManager('schedule-sidebar-content');
         this.setupTermFocusHandlers();
         this.setupColorManagement();
     }
@@ -162,6 +162,37 @@ export class ScheduleController {
                 C: this.externalEvents.get('C')?.length || 0,
                 D: this.externalEvents.get('D')?.length || 0,
             });
+
+            // Clean up stale exclusion IDs (IDs that no longer exist in calendar events)
+            if (schedule.connectedCalendar?.excludedEventIds?.length) {
+                const validEventIds = this.collectAllEventIds();
+                const currentExclusions = schedule.connectedCalendar.excludedEventIds;
+                const validExclusions = currentExclusions.filter(id => validEventIds.has(id));
+
+                // If any stale IDs were removed, update and persist
+                if (validExclusions.length !== currentExclusions.length) {
+                    const staleCount = currentExclusions.length - validExclusions.length;
+                    console.log(`[ScheduleController] Removed ${staleCount} stale exclusion IDs`);
+
+                    const updatedCalendar = {
+                        ...schedule.connectedCalendar,
+                        excludedEventIds: validExclusions,
+                    };
+
+                    // Update local state
+                    this.currentSchedule = {
+                        ...schedule,
+                        connectedCalendar: updatedCalendar,
+                    };
+
+                    // Persist to backend
+                    if (this.onScheduleUpdate) {
+                        this.onScheduleUpdate(schedule.id, {
+                            connectedCalendar: updatedCalendar,
+                        });
+                    }
+                }
+            }
 
             // Re-render grids with external events
             this.renderScheduleGrids();
@@ -354,6 +385,22 @@ export class ScheduleController {
     }
 
     /**
+     * Collect all event IDs from loaded external events.
+     * Used for validating exclusions and calculating counts.
+     */
+    private collectAllEventIds(): Set<string> {
+        const ids = new Set<string>();
+        for (const events of this.externalEvents.values()) {
+            for (const event of events) {
+                if (event.id) {
+                    ids.add(event.id);
+                }
+            }
+        }
+        return ids;
+    }
+
+    /**
      * Open the component selection wizard for a course.
      * Uses SidebarManager for consistent panel management.
      */
@@ -485,7 +532,7 @@ export class ScheduleController {
 
     displayScheduleSelectedCourses(): void {
 
-        const selectedCoursesContainer = document.getElementById('schedule-selected-courses');
+        const selectedCoursesContainer = document.getElementById('schedule-sidebar-content');
         const countElement = document.getElementById('schedule-selected-count');
 
         if (!selectedCoursesContainer) {
@@ -505,17 +552,17 @@ export class ScheduleController {
             console.log(`FILTER: ${filteredSections.length} sections match active filters`);
         }
         
-        // Check if we have external events to show
-        const hasExternalEvents = this.getTotalExternalEventCount() > 0;
+        // Check if we have a connected calendar (show button even if all events are excluded)
+        const hasConnectedCalendar = !!this.currentSchedule?.connectedCalendar;
 
-        if (selectedCourses.length === 0 && !hasExternalEvents) {
+        if (selectedCourses.length === 0 && !hasConnectedCalendar) {
             console.log('Early return: 0 selected courses and no external events - displaying empty state');
             if (countElement) {
                 countElement.textContent = '(0)';
             }
 
             // Preserve panels if open
-            const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
+            const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
             const sidebarPanel = selectedCoursesContainer.querySelector('.sidebar-panel');
             selectedCoursesContainer.innerHTML = '<div class="empty-state">No courses selected yet</div>';
             if (wizardPanel) {
@@ -528,14 +575,14 @@ export class ScheduleController {
         }
 
         // If no courses but we have external events, show just the calendar button
-        if (selectedCourses.length === 0 && hasExternalEvents) {
+        if (selectedCourses.length === 0 && hasConnectedCalendar) {
             console.log('No courses but external events exist - showing calendar button');
             if (countElement) {
                 countElement.textContent = '(0)';
             }
 
             // Preserve panels if open
-            const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
+            const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
             const sidebarPanel = selectedCoursesContainer.querySelector('.sidebar-panel');
 
             // Build just the calendar events button
@@ -561,7 +608,7 @@ export class ScheduleController {
             }
 
             // Preserve wizard if open
-            const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
+            const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
             selectedCoursesContainer.innerHTML = '<div class="empty-state">No sections match the current filters</div>';
             if (wizardPanel) {
                 selectedCoursesContainer.appendChild(wizardPanel);
@@ -595,8 +642,8 @@ export class ScheduleController {
         }
 
         // Check if any panel is open before wiping innerHTML
-        // Wizard uses .wizard-inline-panel, other panels use .sidebar-panel base class
-        const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
+        // Both wizard and other panels use .sidebar-panel base class (wizard adds --component-wizard modifier)
+        const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
         const sidebarPanel = selectedCoursesContainer.querySelector('.sidebar-panel');
 
         selectedCoursesContainer.innerHTML = html;
@@ -646,7 +693,7 @@ export class ScheduleController {
     private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, _selectedCourses: any[], dropdownStates?: Map<string, boolean>): string {
         // Group filtered sections by course
         const sectionsByCourse = new Map();
-        
+
         filteredSections.forEach(fs => {
             const courseId = fs.course.course.id;
             if (!sectionsByCourse.has(courseId)) {
@@ -657,8 +704,9 @@ export class ScheduleController {
             }
             sectionsByCourse.get(courseId).sections.push(fs.section);
         });
-        
-        let html = '';
+
+        // Calendar button at top if connected
+        let html = this.buildCalendarEventsButtonHTML();
         
         // Sort courses by department and number
         const sortedEntries = Array.from(sectionsByCourse.entries()).sort((a, b) => {
@@ -717,7 +765,7 @@ export class ScheduleController {
         }
 
         return `
-            <div class="schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}">
+            <div class="sidebar-content-item schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}">
                 <div class="schedule-course-header">
                     <div class="schedule-course-info">
                         <div class="schedule-course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
@@ -820,7 +868,8 @@ export class ScheduleController {
     }
     
     private buildAllCoursesHTML(sortedCourses: any[]): string {
-        let html = '';
+        // Calendar button at top if connected
+        let html = this.buildCalendarEventsButtonHTML();
 
         sortedCourses.forEach(selectedCourse => {
             const course = selectedCourse.course;
@@ -829,27 +878,29 @@ export class ScheduleController {
             html += '</div>'; // Close schedule-course-item
         });
 
-        // Add calendar events button if we have external events
-        html += this.buildCalendarEventsButtonHTML();
-
         return html;
     }
 
     /**
-     * Build HTML for the calendar events button (shown when external events are loaded).
+     * Build HTML for the calendar events button (shown when a calendar is connected).
      */
     private buildCalendarEventsButtonHTML(): string {
-        const totalEvents = this.getTotalExternalEventCount();
-        if (totalEvents === 0 || !this.currentSchedule?.connectedCalendar) {
+        // Show button if there's a connected calendar, regardless of event count
+        if (!this.currentSchedule?.connectedCalendar) {
             return '';
         }
 
         const calendarName = this.currentSchedule.connectedCalendar.calendarName;
-        const excludedCount = this.currentSchedule.connectedCalendar.excludedEventIds?.length || 0;
-        const visibleCount = totalEvents - excludedCount;
+        const totalEvents = this.getTotalExternalEventCount();
+
+        // Count only valid exclusions (IDs that actually exist in loaded events)
+        const allEventIds = this.collectAllEventIds();
+        const excludedIds = this.currentSchedule.connectedCalendar.excludedEventIds || [];
+        const validExcludedCount = excludedIds.filter(id => allEventIds.has(id)).length;
+        const visibleCount = totalEvents - validExcludedCount;
 
         return `
-            <div class="calendar-events-section">
+            <div class="sidebar-content-item calendar-events-section">
                 <button class="calendar-events-btn" id="calendar-events-btn">
                     <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
                     <span class="calendar-events-btn-info">
@@ -1131,9 +1182,9 @@ export class ScheduleController {
             });
             
             // Check if we have external events for this term
-            const hasExternalEvents = (this.externalEvents.get(term)?.length || 0) > 0;
+            const hasConnectedCalendar = (this.externalEvents.get(term)?.length || 0) > 0;
 
-            if (termCourses.length === 0 && !hasExternalEvents) {
+            if (termCourses.length === 0 && !hasConnectedCalendar) {
                 this.renderEmptyGrid(gridContainer);
                 return;
             }

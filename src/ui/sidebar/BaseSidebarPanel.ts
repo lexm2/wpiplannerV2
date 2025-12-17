@@ -2,13 +2,28 @@
 // Base Sidebar Panel - Abstract base class for sidebar overlay panels
 // =============================================================================
 
-import type { SidebarPanel, SidebarPanelOptions, PanelAnimationType } from './types';
+import type {
+    SidebarPanel,
+    SidebarPanelOptions,
+    PanelAnimationType,
+    SidebarListItem,
+    SidebarListGroup,
+    AnimatedListOptions,
+} from './types';
 
-const DEFAULT_OPTIONS: Required<SidebarPanelOptions> = {
-    containerId: 'schedule-selected-courses',
+const DEFAULT_OPTIONS: Required<Omit<SidebarPanelOptions, 'animatedList'>> = {
+    containerId: 'schedule-sidebar-content',
     animationDuration: 250,
     escapeToClose: true,
     animationType: 'fade',
+};
+
+const DEFAULT_LIST_OPTIONS: Required<AnimatedListOptions> = {
+    staggerDelay: 40,
+    itemClass: 'sidebar-list-item',
+    listClass: 'sidebar-list',
+    groupClass: 'sidebar-list-group',
+    groupHeaderClass: 'sidebar-list-group-header',
 };
 
 /**
@@ -35,13 +50,22 @@ export abstract class BaseSidebarPanel implements SidebarPanel {
     protected panel: HTMLElement | null = null;
 
     /** Merged options with defaults */
-    protected options: Required<SidebarPanelOptions>;
+    protected options: Required<Omit<SidebarPanelOptions, 'animatedList'>>;
+
+    /** Animated list configuration (if enabled) */
+    protected listOptions: Required<AnimatedListOptions> | null = null;
 
     /** Bound escape key handler for cleanup */
     private boundEscapeHandler: ((e: KeyboardEvent) => void) | null = null;
 
     constructor(options?: SidebarPanelOptions) {
-        this.options = { ...DEFAULT_OPTIONS, ...options };
+        const { animatedList, ...panelOptions } = options || {};
+        this.options = { ...DEFAULT_OPTIONS, ...panelOptions };
+
+        // Initialize list options if animated list is enabled
+        if (animatedList) {
+            this.listOptions = { ...DEFAULT_LIST_OPTIONS, ...animatedList };
+        }
     }
 
     // =========================================================================
@@ -69,6 +93,37 @@ export abstract class BaseSidebarPanel implements SidebarPanel {
 
     /** Called before the panel closes */
     protected onClose?(): void;
+
+    // =========================================================================
+    // Optional Methods for Animated Lists - Can be overridden by subclasses
+    // =========================================================================
+
+    /**
+     * Get the items to render in the animated list.
+     * Only called if animatedList options are provided.
+     * Default returns empty array.
+     */
+    protected getListItems(): SidebarListItem[] {
+        return [];
+    }
+
+    /**
+     * Get grouped items for the animated list.
+     * If groups are returned, items are rendered with group headers.
+     * Default returns null (no grouping).
+     */
+    protected getListGroups(): SidebarListGroup[] | null {
+        return null;
+    }
+
+    /**
+     * Attach event listeners to a specific list item.
+     * Called for each item after rendering.
+     * Default does nothing.
+     */
+    protected attachItemListeners(_itemElement: HTMLElement, _item: SidebarListItem): void {
+        // Override in subclass to attach item-specific listeners
+    }
 
     // =========================================================================
     // Public Methods - SidebarPanel interface implementation
@@ -113,6 +168,11 @@ export abstract class BaseSidebarPanel implements SidebarPanel {
 
         // Attach event listeners
         this.attachEventListeners();
+
+        // Attach item listeners if animated list is enabled
+        if (this.listOptions) {
+            this.attachAllItemListeners();
+        }
 
         // Set up escape key handler
         if (this.options.escapeToClose) {
@@ -194,6 +254,11 @@ export abstract class BaseSidebarPanel implements SidebarPanel {
 
         this.panel.innerHTML = this.renderContent();
         this.attachEventListeners();
+
+        // Re-attach item listeners if animated list is enabled
+        if (this.listOptions) {
+            this.attachAllItemListeners();
+        }
     }
 
     /**
@@ -211,8 +276,124 @@ export abstract class BaseSidebarPanel implements SidebarPanel {
     }
 
     // =========================================================================
+    // Protected Methods for Animated Lists
+    // =========================================================================
+
+    /**
+     * Render the animated list content.
+     * Should be called from renderContent() where the list should appear.
+     * Automatically uses groups if getListGroups() returns non-null.
+     */
+    protected renderAnimatedList(): string {
+        if (!this.listOptions) return '';
+
+        const groups = this.getListGroups();
+        if (groups) {
+            return this.renderGroupedList(groups);
+        }
+
+        const items = this.getListItems();
+        return this.renderItemList(items);
+    }
+
+    /**
+     * Render a flat list of items with stagger animation.
+     * @param items - List items to render
+     * @param startIndex - Starting index for stagger delay calculation
+     */
+    protected renderItemList(items: SidebarListItem[], startIndex = 0): string {
+        if (!this.listOptions) return '';
+
+        return `
+            <div class="${this.listOptions.listClass}">
+                ${items.map((item, index) =>
+                    this.renderListItem(item, startIndex + index)
+                ).join('')}
+            </div>
+        `;
+    }
+
+    /**
+     * Render grouped items with headers and stagger animation.
+     * @param groups - List groups to render
+     */
+    protected renderGroupedList(groups: SidebarListGroup[]): string {
+        if (!this.listOptions) return '';
+
+        let cardIndex = 0;
+        let html = '';
+
+        for (const group of groups) {
+            if (group.items.length === 0) continue;
+
+            const headerHtml = group.headerHtml || (group.label
+                ? `<div class="${this.listOptions.groupHeaderClass}">${group.label}</div>`
+                : '');
+
+            html += `
+                <div class="${this.listOptions.groupClass}" data-group-id="${group.id}">
+                    ${headerHtml}
+                    <div class="${this.listOptions.listClass}">
+                        ${group.items.map(item =>
+                            this.renderListItem(item, cardIndex++)
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        return html;
+    }
+
+    /**
+     * Render a single list item with stagger index.
+     * @param item - The item to render
+     * @param index - Index for stagger animation delay
+     */
+    protected renderListItem(item: SidebarListItem, index: number): string {
+        if (!this.listOptions) return '';
+
+        const className = [this.listOptions.itemClass, item.className]
+            .filter(Boolean).join(' ');
+
+        const dataAttrs = Object.entries(item.dataAttributes || {})
+            .map(([key, value]) => `data-${key}="${value}"`)
+            .join(' ');
+
+        return `
+            <div class="${className}"
+                 data-item-id="${item.id}"
+                 style="--card-index: ${index}"
+                 ${dataAttrs}>
+                ${item.render()}
+            </div>
+        `;
+    }
+
+    // =========================================================================
     // Private Methods
     // =========================================================================
+
+    /**
+     * Attach event listeners to all list items.
+     */
+    private attachAllItemListeners(): void {
+        if (!this.listOptions || !this.panel) return;
+
+        const groups = this.getListGroups();
+        const items = groups
+            ? groups.flatMap(g => g.items)
+            : this.getListItems();
+
+        for (const item of items) {
+            const element = this.panel.querySelector<HTMLElement>(
+                `[data-item-id="${item.id}"]`
+            );
+            if (element) {
+                this.attachItemListeners(element, item);
+            }
+        }
+    }
 
     /**
      * Handle escape key press to close the panel.

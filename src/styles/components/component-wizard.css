@@ -1,23 +1,9 @@
 /* Component Selection Wizard - Inline Sidebar Version */
+/* Now extends BaseSidebarPanel, inherits base .sidebar-panel styles */
 
-/* Wizard Panel (renders inside sidebar) */
-.wizard-inline-panel {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--color-surface);
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    z-index: 10;
+/* Wizard-specific panel overrides */
+.sidebar-panel--component-wizard {
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.wizard-inline-panel.active {
-    opacity: 1;
 }
 
 /* Header */
@@ -207,52 +193,7 @@
     margin-bottom: 0.5rem;
 }
 
-/* Slide Animation Keyframes */
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideInLeft {
-    from {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideOutLeft {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-}
-
-@keyframes slideOutRight {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-}
-
-/* Animation Classes */
+/* Animation Classes - uses keyframes from sidebar-panel.css */
 .wizard-step.slide-in-right {
     animation: slideInRight 0.25s ease-out forwards;
 }
@@ -464,7 +405,7 @@
 }
 
 /* Ensure sidebar container can hold wizard */
-.schedule-selected-courses {
+.schedule-sidebar-content {
     position: relative;
 }
 

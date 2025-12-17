@@ -9,7 +9,8 @@ import { rateMyProfessorService } from '../../services/external/RateMyProfessorS
 import { getInlineSVG } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
 import { Validators } from '../../utils/validators';
-import type { SidebarPanel } from '../sidebar/types';
+import { BaseSidebarPanel } from '../sidebar/BaseSidebarPanel';
+import type { SidebarListItem, SidebarListGroup } from '../sidebar/types';
 
 type WizardStep = 'lecture' | 'discussion' | 'lab';
 
@@ -19,11 +20,16 @@ interface WizardSelections {
     lab: Section | null;
 }
 
+/** List item representing a section card in the wizard */
+interface WizardSectionItem extends SidebarListItem {
+    section: Section;
+}
+
 /**
  * Sidebar wizard for selecting course components.
- * Implements SidebarPanel interface for consistent sidebar panel management.
+ * Extends BaseSidebarPanel for consistent lifecycle management.
  */
-export class ComponentSelectionWizard implements SidebarPanel {
+export class ComponentSelectionWizard extends BaseSidebarPanel {
     readonly panelId = 'component-wizard';
     readonly panelClass = 'wizard-active';
     private course: Course;
@@ -35,9 +41,7 @@ export class ComponentSelectionWizard implements SidebarPanel {
     private onCancel: () => void;
     private onSelectionChange?: (selections: WizardSelections) => void;
     private onHoverPreview?: (selections: WizardSelections) => void;
-    private container: HTMLElement | null = null;
     private availableSteps: WizardStep[] = [];
-    private wizardPanel: HTMLElement | null = null;
     private filterChangeHandler: (() => void) | null = null;
     private allSelectedCourses: SelectedCourse[] = [];
 
@@ -52,6 +56,21 @@ export class ComponentSelectionWizard implements SidebarPanel {
         allSelectedCourses?: SelectedCourse[],
         onHoverPreview?: (selections: WizardSelections) => void
     ) {
+        // Initialize base panel with animated list support
+        super({
+            containerId: 'schedule-sidebar-content',
+            animationDuration: 250,
+            escapeToClose: false, // We handle escape key ourselves for custom cancel behavior
+            animationType: 'fade',
+            animatedList: {
+                staggerDelay: 40,
+                itemClass: 'wizard-section-card',
+                listClass: 'wizard-sections-grid',
+                groupClass: 'wizard-term-group',
+                groupHeaderClass: 'wizard-term-separator',
+            }
+        });
+
         this.course = course;
         this.courseDataService = courseDataService;
         this.onComplete = onComplete;
@@ -60,7 +79,6 @@ export class ComponentSelectionWizard implements SidebarPanel {
         this.onHoverPreview = onHoverPreview;
         this.scheduleFilterService = scheduleFilterService || null;
         this.allSelectedCourses = allSelectedCourses || [];
-
 
         // Initialize selections from existing if editing
         this.selections = {
@@ -312,81 +330,41 @@ export class ComponentSelectionWizard implements SidebarPanel {
      * Open the wizard with slide-in animation in sidebar
      */
     open(): void {
-        const sidebarContainer = document.getElementById('schedule-selected-courses');
-        if (!sidebarContainer) {
-            logger.error('Sidebar container not found');
-            return;
-        }
-
         // Verify RMP data is loaded (should be loaded by MainController during app init)
         if (!rateMyProfessorService.isLoaded()) {
             logger.warn('[Wizard] WARNING: RMP data is not loaded! RMP filters will not work properly.');
             logger.warn('[Wizard] This may indicate a race condition - RMP data should be loaded during app initialization');
         }
 
-        this.container = sidebarContainer;
+        // Call base open() which handles container, panel creation, and animations
+        super.open();
 
-        // Scroll container to top so wizard is visible in viewport
-        sidebarContainer.scrollTop = 0;
-
-        // Prevent background scrolling
-        sidebarContainer.classList.add('wizard-active');
-
-        // Create wizard panel
-        this.wizardPanel = document.createElement('div');
-        this.wizardPanel.className = 'wizard-inline-panel';
-        this.wizardPanel.innerHTML = this.renderWizardContent();
-
-        // Add to sidebar
-        sidebarContainer.appendChild(this.wizardPanel);
-
-        // Trigger fade-in for background (instant) and slide-in for cards
-        requestAnimationFrame(() => {
-            this.wizardPanel?.classList.add('active');
-        });
-
-        // Attach event listeners
-        this.attachEventListeners();
-
-        // Add escape key handler
-        document.addEventListener('keydown', this.handleEscapeKey);
+        // Add wizard-specific escape key handler for cancel behavior
+        document.addEventListener('keydown', this.handleWizardEscapeKey);
     }
 
     /**
      * Close the wizard with slide-out animation
      */
     close(): void {
-        if (!this.wizardPanel) return;
+        if (!this.panel) return;
 
-        // Get the active step and add slide-out-left animation
-        const activeStep = this.wizardPanel.querySelector('.wizard-step.active');
+        // Get the active step and add slide-out-left animation for visual effect
+        const activeStep = this.panel.querySelector('.wizard-step.active');
         if (activeStep) {
             activeStep.classList.add('slide-out-left');
             activeStep.classList.remove('slide-in-right', 'slide-in-left');
         }
 
-        // Immediately start fading out the background
-        this.wizardPanel.classList.remove('active');
-
-        // Wait for slide-out-left animation, then remove from DOM
-        setTimeout(() => {
-            if (this.wizardPanel && this.container && this.container.contains(this.wizardPanel)) {
-                this.container.removeChild(this.wizardPanel);
-                // Re-enable background scrolling
-                this.container.classList.remove('wizard-active');
-                this.wizardPanel = null;
-                this.container = null;
-            }
-        }, 250); // Match animation duration
-
-        this.cleanup();
+        // Call base close() which handles panel removal and cleanup
+        super.close();
     }
 
     /**
-     * Cleanup all event listeners and handlers
+     * Called before the panel closes - cleanup wizard-specific resources
      */
-    private cleanup(): void {
-        document.removeEventListener('keydown', this.handleEscapeKey);
+    protected onClose(): void {
+        document.removeEventListener('keydown', this.handleWizardEscapeKey);
 
         if (this.scheduleFilterService && this.filterChangeHandler) {
             this.scheduleFilterService.removeEventListener(this.filterChangeHandler);
@@ -395,43 +373,19 @@ export class ComponentSelectionWizard implements SidebarPanel {
     }
 
     /**
-     * Public destroy method for comprehensive cleanup
-     */
-    public destroy(): void {
-        this.cleanup();
-
-        if (this.wizardPanel && this.container && this.container.contains(this.wizardPanel)) {
-            this.container.removeChild(this.wizardPanel);
-            this.container.classList.remove('wizard-active');
-        }
-
-        this.wizardPanel = null;
-        this.container = null;
-    }
-
-    /**
-     * Check if the wizard panel is currently open.
-     * Part of the SidebarPanel interface.
-     */
-    isOpen(): boolean {
-        return this.wizardPanel !== null;
-    }
-
-    /**
      * Handle filter changes - refresh current step
      */
     private onFilterChange(): void {
-        if (!this.wizardPanel) return;
+        if (!this.panel) return;
 
-        // Re-render the current step with filtered sections
-        this.wizardPanel.innerHTML = this.renderWizardContent();
-        this.attachEventListeners();
+        // Re-render the panel with filtered sections
+        this.rerender();
     }
 
     /**
-     * Handle escape key to close wizard
+     * Handle escape key to cancel wizard
      */
-    private handleEscapeKey = (e: KeyboardEvent): void => {
+    private handleWizardEscapeKey = (e: KeyboardEvent): void => {
         if (e.key === 'Escape') {
             this.cancel();
         }
@@ -459,9 +413,9 @@ export class ComponentSelectionWizard implements SidebarPanel {
         }
 
         // Update visual selection state without re-rendering
-        if (this.wizardPanel) {
+        if (this.panel) {
             // Remove 'selected' class and badges from all section cards
-            const allSections = this.wizardPanel.querySelectorAll('.wizard-section-card');
+            const allSections = this.panel.querySelectorAll('.wizard-section-card');
             allSections.forEach(el => {
                 el.classList.remove('selected');
                 // Remove any existing selected badge
@@ -472,7 +426,7 @@ export class ComponentSelectionWizard implements SidebarPanel {
             });
 
             // Add 'selected' class to the newly selected section and add badge
-            const selectedSection = this.wizardPanel.querySelector(`.wizard-section-card[data-crn="${section.crn}"]`);
+            const selectedSection = this.panel.querySelector(`.wizard-section-card[data-crn="${section.crn}"]`);
             if (selectedSection) {
                 selectedSection.classList.add('selected');
                 // Add selected badge
@@ -486,14 +440,14 @@ export class ComponentSelectionWizard implements SidebarPanel {
             const hasSelection = this.selections[this.currentStep] !== null;
             const currentIndex = this.availableSteps.indexOf(this.currentStep);
             const isLastStep = currentIndex === this.availableSteps.length - 1;
-            const nextBtn = this.wizardPanel.querySelector('#wizard-next-btn');
-            const skipBtn = this.wizardPanel.querySelector('#wizard-skip-btn');
+            const nextBtn = this.panel.querySelector('#wizard-next-btn');
+            const skipBtn = this.panel.querySelector('#wizard-skip-btn');
 
             if (!hasSelection && nextBtn) {
                 // Remove Next button and add Skip button (if not last step)
                 nextBtn.remove();
                 if (!isLastStep && !skipBtn) {
-                    const footer = this.wizardPanel.querySelector('.wizard-footer');
+                    const footer = this.panel.querySelector('.wizard-footer');
                     if (footer) {
                         const skipBtnHTML = `
                             <button class="wizard-btn wizard-btn-secondary" id="wizard-skip-btn">
@@ -509,7 +463,7 @@ export class ComponentSelectionWizard implements SidebarPanel {
             } else if (hasSelection && !nextBtn) {
                 // Remove Skip button and add Next button
                 skipBtn?.remove();
-                const footer = this.wizardPanel.querySelector('.wizard-footer');
+                const footer = this.panel.querySelector('.wizard-footer');
                 if (footer) {
                     const nextBtnHTML = `
                         <button class="wizard-btn wizard-btn-primary" id="wizard-next-btn">
@@ -589,10 +543,10 @@ export class ComponentSelectionWizard implements SidebarPanel {
      * Transition to a different step with animation
      */
     private transitionToStep(_toStep: WizardStep, direction: 'forward' | 'backward'): void {
-        if (!this.wizardPanel) return;
+        if (!this.panel) return;
 
         // Get current step element
-        const currentStepElement = this.wizardPanel.querySelector('.wizard-step.active');
+        const currentStepElement = this.panel.querySelector('.wizard-step.active');
 
         if (currentStepElement) {
             // Add exit animation class based on direction
@@ -603,10 +557,10 @@ export class ComponentSelectionWizard implements SidebarPanel {
             // Wait for exit animation to complete (250ms base + 250ms max stagger = 500ms)
             setTimeout(() => {
                 // Re-render with new step (which includes slide-in-right by default)
-                this.wizardPanel!.innerHTML = this.renderWizardContent();
+                this.panel!.innerHTML = this.renderContent();
 
                 // Get the new step element and add appropriate slide-in animation
-                const newStepElement = this.wizardPanel!.querySelector('.wizard-step.active');
+                const newStepElement = this.panel!.querySelector('.wizard-step.active');
                 if (newStepElement) {
                     // Remove default slide-in-right, add direction-specific animation
                     newStepElement.classList.remove('slide-in-right');
@@ -618,7 +572,7 @@ export class ComponentSelectionWizard implements SidebarPanel {
             }, 250); // Match base animation duration (stagger will happen automatically via CSS)
         } else {
             // No current step element, just render
-            this.wizardPanel.innerHTML = this.renderWizardContent();
+            this.panel.innerHTML = this.renderContent();
             this.attachEventListeners();
         }
     }
@@ -640,9 +594,10 @@ export class ComponentSelectionWizard implements SidebarPanel {
     }
 
     /**
-     * Render the complete wizard content
+     * Render the complete wizard content.
+     * Required by BaseSidebarPanel.
      */
-    private renderWizardContent(): string {
+    protected renderContent(): string {
         return `
             <div class="wizard-header">
                 <button class="wizard-close-btn" id="wizard-close-btn">&times;</button>
@@ -981,25 +936,26 @@ export class ComponentSelectionWizard implements SidebarPanel {
     }
 
     /**
-     * Attach event listeners to wizard elements
+     * Attach event listeners to wizard elements.
+     * Required by BaseSidebarPanel.
      */
-    private attachEventListeners(): void {
-        if (!this.wizardPanel) return;
+    protected attachEventListeners(): void {
+        if (!this.panel) return;
 
         // Close button
-        const closeBtn = this.wizardPanel.querySelector('#wizard-close-btn');
+        const closeBtn = this.panel.querySelector('#wizard-close-btn');
         closeBtn?.addEventListener('click', () => this.cancel());
 
         // Cancel button
-        const cancelBtn = this.wizardPanel.querySelector('#wizard-cancel-btn');
+        const cancelBtn = this.panel.querySelector('#wizard-cancel-btn');
         cancelBtn?.addEventListener('click', () => this.cancel());
 
         // Back button
-        const backBtn = this.wizardPanel.querySelector('#wizard-back-btn');
+        const backBtn = this.panel.querySelector('#wizard-back-btn');
         backBtn?.addEventListener('click', () => this.prevStep());
 
         // Next/Finish button
-        const nextBtn = this.wizardPanel.querySelector('#wizard-next-btn');
+        const nextBtn = this.panel.querySelector('#wizard-next-btn');
         nextBtn?.addEventListener('click', () => {
             const currentIndex = this.availableSteps.indexOf(this.currentStep);
             const isLastStep = currentIndex === this.availableSteps.length - 1;
@@ -1011,13 +967,13 @@ export class ComponentSelectionWizard implements SidebarPanel {
         });
 
         // Skip button (shown when no selection is made on non-last steps)
-        const skipBtn = this.wizardPanel.querySelector('#wizard-skip-btn');
+        const skipBtn = this.panel.querySelector('#wizard-skip-btn');
         skipBtn?.addEventListener('click', () => {
             this.nextStep();
         });
 
         // Breadcrumb navigation
-        const breadcrumbs = this.wizardPanel.querySelectorAll('.wizard-breadcrumb:not([disabled])');
+        const breadcrumbs = this.panel.querySelectorAll('.wizard-breadcrumb:not([disabled])');
         breadcrumbs.forEach(breadcrumb => {
             breadcrumb.addEventListener('click', (e) => {
                 const step = (e.currentTarget as HTMLElement).dataset.step as WizardStep;
@@ -1026,7 +982,7 @@ export class ComponentSelectionWizard implements SidebarPanel {
         });
 
         // Section cards
-        const sectionCards = this.wizardPanel.querySelectorAll('.wizard-section-card');
+        const sectionCards = this.panel.querySelectorAll('.wizard-section-card');
         sectionCards.forEach(card => {
             card.addEventListener('click', (e) => {
                 const crn = parseInt((e.currentTarget as HTMLElement).dataset.crn || '0');

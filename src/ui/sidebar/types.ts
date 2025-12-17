@@ -10,6 +10,66 @@
  */
 export type PanelAnimationType = 'fade' | 'slide-right' | 'slide-left';
 
+// =============================================================================
+// Animated List Types
+// =============================================================================
+
+/**
+ * Represents a single item in an animated sidebar list.
+ * Items provide their own HTML rendering (inner content only).
+ */
+export interface SidebarListItem {
+    /** Unique identifier for this item */
+    readonly id: string;
+
+    /** Render the item content as HTML (just the inner content, not the wrapper) */
+    render(): string;
+
+    /** Optional CSS class to add to the item wrapper */
+    className?: string;
+
+    /** Optional data attributes to add to the item wrapper */
+    dataAttributes?: Record<string, string>;
+}
+
+/**
+ * Represents a group of items with an optional header.
+ * Groups allow organizing items into sections with separators.
+ */
+export interface SidebarListGroup<T extends SidebarListItem = SidebarListItem> {
+    /** Unique identifier for this group */
+    readonly id: string;
+
+    /** Items in this group */
+    readonly items: T[];
+
+    /** Optional group header label (e.g., "A Term (Fall 1)") */
+    label?: string;
+
+    /** Optional custom header HTML (overrides label if provided) */
+    headerHtml?: string;
+}
+
+/**
+ * Configuration for animated list behavior.
+ */
+export interface AnimatedListOptions {
+    /** Animation delay between items in milliseconds. Default: 40 */
+    staggerDelay?: number;
+
+    /** CSS class for list items. Default: 'sidebar-list-item' */
+    itemClass?: string;
+
+    /** CSS class for the list container. Default: 'sidebar-list' */
+    listClass?: string;
+
+    /** CSS class for group containers. Default: 'sidebar-list-group' */
+    groupClass?: string;
+
+    /** CSS class for group headers. Default: 'sidebar-list-group-header' */
+    groupHeaderClass?: string;
+}
+
 /**
  * Interface for sidebar overlay panels (wizard, calendar events, etc.)
  * Panels are full-screen overlays that appear on top of the sidebar content.
@@ -59,10 +119,10 @@ export interface SidebarEntry {
  * Configuration options for BaseSidebarPanel
  */
 export interface SidebarPanelOptions {
-    /** DOM ID of the sidebar container. Default: 'schedule-selected-courses' */
+    /** DOM ID of the sidebar container. Default: 'schedule-sidebar-content' */
     containerId?: string;
 
-    /** Animation duration in milliseconds. Default: 200 */
+    /** Animation duration in milliseconds. Default: 250 */
     animationDuration?: number;
 
     /** Whether pressing Escape closes the panel. Default: true */
@@ -70,6 +130,9 @@ export interface SidebarPanelOptions {
 
     /** Animation type for open/close. Default: 'fade' */
     animationType?: PanelAnimationType;
+
+    /** Animated list options. If provided, enables animated list support */
+    animatedList?: AnimatedListOptions;
 }
 
 /**
