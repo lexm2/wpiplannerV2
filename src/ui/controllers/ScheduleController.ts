@@ -7,6 +7,9 @@ import { ScheduleManagementService } from '../../services/selection/ScheduleMana
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
+import { CalendarEventsPanel } from '../components/CalendarEventsPanel'
+import { SidebarManager } from '../sidebar/SidebarManager'
+import type { SidebarPanel } from '../sidebar/types'
 import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine'
 import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../../utils/typeGuards'
@@ -43,9 +46,13 @@ export class ScheduleController {
     private isApplyingAutoSchedule: boolean = false;
     private externalEvents: Map<string, CalendarEvent[]> = new Map(); // term -> events
     private currentSchedule: Schedule | null = null;
+    private calendarEventsPanel: CalendarEventsPanel | null = null;
+    private onScheduleUpdate: ((scheduleId: string, updates: Partial<Schedule>) => void) | null = null;
+    private sidebarManager: SidebarManager;
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
+        this.sidebarManager = new SidebarManager('schedule-selected-courses');
         this.setupTermFocusHandlers();
         this.setupColorManagement();
     }
@@ -173,17 +180,187 @@ export class ScheduleController {
     }
 
     /**
-     * Open the component selection wizard for a course
+     * Set the callback for updating schedules (used for saving exclusion changes).
+     */
+    setScheduleUpdateCallback(callback: (scheduleId: string, updates: Partial<Schedule>) => void): void {
+        this.onScheduleUpdate = callback;
+    }
+
+    /**
+     * Open the calendar events panel to manage event visibility.
+     * Uses SidebarManager for consistent panel management.
+     */
+    openCalendarEventsPanel(): void {
+        if (!this.currentSchedule?.connectedCalendar) {
+            console.warn('[ScheduleController] Cannot open calendar panel - no connected calendar');
+            return;
+        }
+
+        const excludedIds = new Set(this.currentSchedule.connectedCalendar.excludedEventIds || []);
+
+        this.calendarEventsPanel = new CalendarEventsPanel({
+            calendarName: this.currentSchedule.connectedCalendar.calendarName,
+            events: this.externalEvents,
+            excludedEventIds: excludedIds,
+            onExclusionChange: (eventId, excluded) => this.handleEventExclusionChange(eventId, excluded),
+            onShowAll: () => this.handleShowAllEvents(),
+            onHideAll: () => this.handleHideAllEvents(),
+            onClose: () => this.closeCalendarEventsPanel(),
+        });
+
+        // Use SidebarManager to open the panel (handles closing existing panels)
+        this.sidebarManager.openPanel(this.calendarEventsPanel);
+    }
+
+    /**
+     * Close the calendar events panel.
+     * Note: Don't call sidebarManager.closePanel() here - this method is called
+     * from the panel's onClose callback, so the panel is already closing.
+     */
+    closeCalendarEventsPanel(): void {
+        this.calendarEventsPanel = null;
+        this.displayScheduleSelectedCourses();
+    }
+
+    /**
+     * Handle toggling an event's exclusion status.
+     * Uses optimistic UI updates - updates UI first, then persists to backend.
+     */
+    private handleEventExclusionChange(eventId: string, excluded: boolean): void {
+        if (!this.currentSchedule?.connectedCalendar || !this.onScheduleUpdate) {
+            console.warn('[ScheduleController] Cannot update exclusion - no schedule or callback');
+            return;
+        }
+
+        const currentExcluded = new Set(this.currentSchedule.connectedCalendar.excludedEventIds || []);
+
+        if (excluded) {
+            currentExcluded.add(eventId);
+        } else {
+            currentExcluded.delete(eventId);
+        }
+
+        // 1. OPTIMISTIC UI: Update panel display immediately for instant feedback
+        if (this.calendarEventsPanel) {
+            this.calendarEventsPanel.updateExcludedIds(currentExcluded);
+        }
+
+        // 2. Update local state
+        const newExcludedArray = Array.from(currentExcluded);
+        const updatedCalendar = {
+            ...this.currentSchedule.connectedCalendar,
+            excludedEventIds: newExcludedArray,
+        };
+        this.currentSchedule = {
+            ...this.currentSchedule,
+            connectedCalendar: updatedCalendar,
+        };
+
+        // 3. Re-render grids to show/hide the event
+        this.renderScheduleGrids();
+
+        // 4. Persist to backend LAST (this triggers events that could interfere with UI)
+        this.onScheduleUpdate(this.currentSchedule.id, {
+            connectedCalendar: updatedCalendar,
+        });
+    }
+
+    /**
+     * Handle showing all events (removes all exclusions).
+     */
+    private handleShowAllEvents(): void {
+        if (!this.currentSchedule?.connectedCalendar || !this.onScheduleUpdate) {
+            return;
+        }
+
+        // Clear all exclusions
+        const emptyExcluded = new Set<string>();
+
+        // 1. Optimistic UI update
+        if (this.calendarEventsPanel) {
+            this.calendarEventsPanel.updateExcludedIds(emptyExcluded);
+        }
+
+        // 2. Update local state
+        const updatedCalendar = {
+            ...this.currentSchedule.connectedCalendar,
+            excludedEventIds: [],
+        };
+        this.currentSchedule = {
+            ...this.currentSchedule,
+            connectedCalendar: updatedCalendar,
+        };
+
+        // 3. Re-render grids
+        this.renderScheduleGrids();
+
+        // 4. Persist to backend
+        this.onScheduleUpdate(this.currentSchedule.id, {
+            connectedCalendar: updatedCalendar,
+        });
+    }
+
+    /**
+     * Handle hiding all events (adds all event IDs to exclusions).
+     */
+    private handleHideAllEvents(): void {
+        if (!this.currentSchedule?.connectedCalendar || !this.onScheduleUpdate) {
+            return;
+        }
+
+        // Collect all event IDs from all terms
+        const allEventIds = new Set<string>();
+        for (const events of this.externalEvents.values()) {
+            for (const event of events) {
+                if (event.id) {
+                    allEventIds.add(event.id);
+                }
+            }
+        }
+
+        // 1. Optimistic UI update
+        if (this.calendarEventsPanel) {
+            this.calendarEventsPanel.updateExcludedIds(allEventIds);
+        }
+
+        // 2. Update local state
+        const updatedCalendar = {
+            ...this.currentSchedule.connectedCalendar,
+            excludedEventIds: Array.from(allEventIds),
+        };
+        this.currentSchedule = {
+            ...this.currentSchedule,
+            connectedCalendar: updatedCalendar,
+        };
+
+        // 3. Re-render grids
+        this.renderScheduleGrids();
+
+        // 4. Persist to backend
+        this.onScheduleUpdate(this.currentSchedule.id, {
+            connectedCalendar: updatedCalendar,
+        });
+    }
+
+    /**
+     * Get total count of external events across all terms.
+     */
+    getTotalExternalEventCount(): number {
+        let total = 0;
+        for (const events of this.externalEvents.values()) {
+            total += events.length;
+        }
+        return total;
+    }
+
+    /**
+     * Open the component selection wizard for a course.
+     * Uses SidebarManager for consistent panel management.
      */
     openComponentWizard(course: Course, existingSelections?: any): void {
         if (!this.courseDataService) {
             console.error('CourseDataService not available');
             return;
-        }
-
-        // Close any existing wizard
-        if (this.componentWizard) {
-            this.componentWizard.close();
         }
 
         // Look up fresh course data from courseDataService to ensure we have the latest structure
@@ -217,17 +394,16 @@ export class ScheduleController {
             (selections) => this.onWizardHoverPreview(freshCourse, selections)
         );
 
-        this.componentWizard.open();
+        // Use SidebarManager to open the panel (handles closing existing panels)
+        this.sidebarManager.openPanel(this.componentWizard);
     }
 
     /**
      * Close the component selection wizard
      */
     closeComponentWizard(): void {
-        if (this.componentWizard) {
-            this.componentWizard.close();
-            this.componentWizard = null;
-        }
+        this.componentWizard = null;
+        this.sidebarManager.closePanel();
 
         // Clear preview and re-render calendar
         this.wizardPreviewCourse = null;
@@ -329,18 +505,52 @@ export class ScheduleController {
             console.log(`FILTER: ${filteredSections.length} sections match active filters`);
         }
         
-        if (selectedCourses.length === 0) {
-            console.log('Early return: 0 selected courses - displaying empty state');
+        // Check if we have external events to show
+        const hasExternalEvents = this.getTotalExternalEventCount() > 0;
+
+        if (selectedCourses.length === 0 && !hasExternalEvents) {
+            console.log('Early return: 0 selected courses and no external events - displaying empty state');
             if (countElement) {
                 countElement.textContent = '(0)';
             }
 
-            // Preserve wizard if open
+            // Preserve panels if open
             const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
+            const sidebarPanel = selectedCoursesContainer.querySelector('.sidebar-panel');
             selectedCoursesContainer.innerHTML = '<div class="empty-state">No courses selected yet</div>';
             if (wizardPanel) {
                 selectedCoursesContainer.appendChild(wizardPanel);
             }
+            if (sidebarPanel) {
+                selectedCoursesContainer.appendChild(sidebarPanel);
+            }
+            return;
+        }
+
+        // If no courses but we have external events, show just the calendar button
+        if (selectedCourses.length === 0 && hasExternalEvents) {
+            console.log('No courses but external events exist - showing calendar button');
+            if (countElement) {
+                countElement.textContent = '(0)';
+            }
+
+            // Preserve panels if open
+            const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
+            const sidebarPanel = selectedCoursesContainer.querySelector('.sidebar-panel');
+
+            // Build just the calendar events button
+            const html = this.buildCalendarEventsButtonHTML();
+            selectedCoursesContainer.innerHTML = html;
+
+            if (wizardPanel) {
+                selectedCoursesContainer.appendChild(wizardPanel);
+            }
+            if (sidebarPanel) {
+                selectedCoursesContainer.appendChild(sidebarPanel);
+            }
+
+            // Set up calendar events button click handler
+            this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
             return;
         }
 
@@ -384,14 +594,21 @@ export class ScheduleController {
             }
         }
 
-        // Check if wizard is open before wiping innerHTML
+        // Check if any panel is open before wiping innerHTML
+        // Wizard uses .wizard-inline-panel, other panels use .sidebar-panel base class
         const wizardPanel = selectedCoursesContainer.querySelector('.wizard-inline-panel');
+        const sidebarPanel = selectedCoursesContainer.querySelector('.sidebar-panel');
 
         selectedCoursesContainer.innerHTML = html;
 
         // Restore wizard panel if it was open
         if (wizardPanel) {
             selectedCoursesContainer.appendChild(wizardPanel);
+        }
+
+        // Restore sidebar panel (calendar events, etc.) if it was open
+        if (sidebarPanel) {
+            selectedCoursesContainer.appendChild(sidebarPanel);
         }
 
         // Initialize eraser icons
@@ -408,6 +625,21 @@ export class ScheduleController {
         } else {
             // For filtered view, we need to set up mapping differently
             this.setupFilteredDOMElementMapping(selectedCoursesContainer, filteredSections);
+        }
+
+        // Set up calendar events button click handler
+        this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
+    }
+
+    /**
+     * Set up click handler for the calendar events button.
+     */
+    private setupCalendarEventsButtonHandler(container: HTMLElement): void {
+        const calendarBtn = container.querySelector('#calendar-events-btn');
+        if (calendarBtn) {
+            calendarBtn.addEventListener('click', () => {
+                this.openCalendarEventsPanel();
+            });
         }
     }
     
@@ -597,7 +829,36 @@ export class ScheduleController {
             html += '</div>'; // Close schedule-course-item
         });
 
+        // Add calendar events button if we have external events
+        html += this.buildCalendarEventsButtonHTML();
+
         return html;
+    }
+
+    /**
+     * Build HTML for the calendar events button (shown when external events are loaded).
+     */
+    private buildCalendarEventsButtonHTML(): string {
+        const totalEvents = this.getTotalExternalEventCount();
+        if (totalEvents === 0 || !this.currentSchedule?.connectedCalendar) {
+            return '';
+        }
+
+        const calendarName = this.currentSchedule.connectedCalendar.calendarName;
+        const excludedCount = this.currentSchedule.connectedCalendar.excludedEventIds?.length || 0;
+        const visibleCount = totalEvents - excludedCount;
+
+        return `
+            <div class="calendar-events-section">
+                <button class="calendar-events-btn" id="calendar-events-btn">
+                    <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
+                    <span class="calendar-events-btn-info">
+                        <span class="calendar-events-btn-name">${Validators.escapeHtml(calendarName)}</span>
+                        <span class="calendar-events-btn-count">${visibleCount} of ${totalEvents} events visible</span>
+                    </span>
+                </button>
+            </div>
+        `;
     }
     
     private initializeEraserIcons(container: HTMLElement): void {
@@ -910,9 +1171,11 @@ export class ScheduleController {
             html += `<div class="day-header">${TimeUtils.getDayAbbr(day)}</div>`;
         });
 
-        // Get external events for this term
-        const externalEventsForTerm = this.externalEvents.get(term) || [];
-        console.log(`[ScheduleController] Rendering term ${term} with ${externalEventsForTerm.length} external events:`, externalEventsForTerm);
+        // Get external events for this term, filtering out excluded ones
+        const allExternalEvents = this.externalEvents.get(term) || [];
+        const excludedIds = new Set(this.currentSchedule?.connectedCalendar?.excludedEventIds || []);
+        const externalEventsForTerm = allExternalEvents.filter(event => !event.id || !excludedIds.has(event.id));
+        console.log(`[ScheduleController] Rendering term ${term} with ${externalEventsForTerm.length}/${allExternalEvents.length} external events (${excludedIds.size} excluded)`);
 
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {

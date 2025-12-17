@@ -1,0 +1,238 @@
+/* =============================================================================
+   Calendar Events Panel - Manage external calendar event visibility
+   ============================================================================= */
+
+/* When panel is active, hide scrollbar on parent */
+.schedule-selected-courses.calendar-panel-active {
+    overflow-y: hidden;
+}
+
+/* Header with calendar name and close button */
+.calendar-events-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-background-alt);
+    flex-shrink: 0;
+}
+
+.calendar-events-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.calendar-events-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-events-icon .calendar-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--color-primary);
+}
+
+.calendar-events-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.calendar-events-info .calendar-name {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
+    font-size: 0.95rem;
+}
+
+.calendar-events-info .events-count {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+/* Action buttons container */
+.calendar-events-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.calendar-events-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    border-radius: var(--effect-border-radius);
+    cursor: pointer;
+    transition: var(--effect-transition);
+}
+
+.calendar-events-action-btn:hover {
+    background: var(--color-surface);
+}
+
+.calendar-events-action-btn .action-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--color-text-secondary);
+}
+
+.calendar-events-action-btn:hover .action-icon {
+    color: var(--color-text);
+}
+
+.calendar-events-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: var(--effect-border-radius);
+    cursor: pointer;
+    transition: var(--effect-transition);
+}
+
+.calendar-events-close-btn:hover {
+    background: var(--color-surface);
+}
+
+.calendar-events-close-btn .close-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-secondary);
+}
+
+/* Instructions text */
+.calendar-events-instructions {
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    background: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+/* Scrollable content area */
+.calendar-events-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+/* Term group */
+.calendar-term-group {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.calendar-term-group:last-child {
+    border-bottom: none;
+}
+
+.calendar-term-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--color-background-alt);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.calendar-term-header .term-label {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
+    font-size: 0.85rem;
+}
+
+.calendar-term-header .term-count {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+/* Event items */
+.calendar-term-events {
+    padding: 0;
+}
+
+.calendar-event-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: var(--effect-transition);
+}
+
+.calendar-event-item:last-child {
+    border-bottom: none;
+}
+
+.calendar-event-item:hover {
+    background: var(--color-background-alt);
+}
+
+.calendar-event-item.excluded {
+    opacity: 0.5;
+}
+
+.calendar-event-item.excluded .event-summary {
+    text-decoration: line-through;
+}
+
+/* Visibility toggle icon */
+.event-visibility-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.event-visibility-toggle .visibility-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.event-visibility-toggle .visibility-icon.visible {
+    color: var(--color-success, #10b981);
+}
+
+.event-visibility-toggle .visibility-icon.hidden {
+    color: var(--color-text-secondary);
+}
+
+/* Event details */
+.event-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.event-summary {
+    font-size: 0.85rem;
+    color: var(--color-text);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.2rem;
+}
+
+.event-datetime {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+/* Empty state */
+.no-events-message {
+    padding: 2rem;
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-style: italic;
+}

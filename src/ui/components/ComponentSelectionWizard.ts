@@ -9,6 +9,7 @@ import { rateMyProfessorService } from '../../services/external/RateMyProfessorS
 import { getInlineSVG } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
 import { Validators } from '../../utils/validators';
+import type { SidebarPanel } from '../sidebar/types';
 
 type WizardStep = 'lecture' | 'discussion' | 'lab';
 
@@ -18,7 +19,13 @@ interface WizardSelections {
     lab: Section | null;
 }
 
-export class ComponentSelectionWizard {
+/**
+ * Sidebar wizard for selecting course components.
+ * Implements SidebarPanel interface for consistent sidebar panel management.
+ */
+export class ComponentSelectionWizard implements SidebarPanel {
+    readonly panelId = 'component-wizard';
+    readonly panelClass = 'wizard-active';
     private course: Course;
     private courseDataService: CourseDataService;
     private scheduleFilterService: ScheduleFilterService | null;
@@ -400,6 +407,14 @@ export class ComponentSelectionWizard {
 
         this.wizardPanel = null;
         this.container = null;
+    }
+
+    /**
+     * Check if the wizard panel is currently open.
+     * Part of the SidebarPanel interface.
+     */
+    isOpen(): boolean {
+        return this.wizardPanel !== null;
     }
 
     /**

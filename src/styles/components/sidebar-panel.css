@@ -1,0 +1,90 @@
+/* =============================================================================
+   Sidebar Panel - Base styles for all sidebar overlay panels
+   ============================================================================= */
+
+/* Base panel container - positioned over sidebar content */
+.sidebar-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-surface);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.sidebar-panel.active {
+    opacity: 1;
+}
+
+/* =============================================================================
+   Slide Animations
+   ============================================================================= */
+
+/* Slide in from right */
+.sidebar-panel.slide-in-right {
+    animation: slideInRight 0.25s ease forwards;
+}
+
+/* Slide in from left */
+.sidebar-panel.slide-in-left {
+    animation: slideInLeft 0.25s ease forwards;
+}
+
+/* Slide out to left */
+.sidebar-panel.slide-out-left {
+    animation: slideOutLeft 0.25s ease forwards;
+}
+
+/* Slide out to right */
+.sidebar-panel.slide-out-right {
+    animation: slideOutRight 0.25s ease forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutLeft {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}

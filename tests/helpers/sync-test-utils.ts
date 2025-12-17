@@ -6,19 +6,34 @@ import { checksumCalculator } from '../../src/services/sync/checksum';
  * Test Utilities for Cloud Sync Testing
  *
  * Provides factory functions, helpers, and utilities for testing the sync system.
+ * Uses real course IDs and CRNs from the course catalog.
  */
+
+// =============================================================================
+// Real Course Data Constants (from public/course-data-constructed.json)
+// =============================================================================
+
+/** Real course IDs and CRNs from the catalog */
+export const REAL_COURSES = {
+    CS_1101: { id: 'CS-1101', crn: '334067' },
+    CS_2303: { id: 'CS-2303', crn: '334132' },
+    MA_1024: { id: 'MA-1024', crn: '334058' },
+    MA_1021: { id: 'MA-1021', crn: '334063' },
+    CS_2022: { id: 'CS-2022', crn: '334112' },
+    CS_2102: { id: 'CS-2102', crn: '334115' },
+} as const;
 
 // =============================================================================
 // Factory Functions - Create Test Data
 // =============================================================================
 
 /**
- * Create a test SelectedCourseData object
+ * Create a test SelectedCourseData object with real course/section data
  */
 export function createSelectedCourse(overrides?: Partial<SelectedCourseData>): SelectedCourseData {
     return {
-        courseId: 'CS-1101',
-        selectedSectionCrn: '12345',
+        courseId: REAL_COURSES.CS_1101.id,
+        selectedSectionCrn: REAL_COURSES.CS_1101.crn,
         lockedSectionCrn: undefined,
         isRequired: true,
         timestamp: Date.now(),
@@ -27,15 +42,21 @@ export function createSelectedCourse(overrides?: Partial<SelectedCourseData>): S
 }
 
 /**
- * Create a test ScheduleData object
+ * Create a test ScheduleData object with real course data
  */
 export function createSchedule(overrides?: Partial<ScheduleData>): ScheduleData {
     return {
         id: 'schedule-1',
         name: 'Test Schedule',
         selectedCourses: [
-            createSelectedCourse({ courseId: 'CS-1101' }),
-            createSelectedCourse({ courseId: 'CS-2303' }),
+            createSelectedCourse({
+                courseId: REAL_COURSES.CS_1101.id,
+                selectedSectionCrn: REAL_COURSES.CS_1101.crn
+            }),
+            createSelectedCourse({
+                courseId: REAL_COURSES.CS_2303.id,
+                selectedSectionCrn: REAL_COURSES.CS_2303.crn
+            }),
         ],
         timestamp: Date.now(),
         ...overrides,
@@ -72,17 +93,31 @@ export async function createSyncData(overrides?: Partial<SyncData>): Promise<Syn
 }
 
 /**
- * Create SyncData with multiple schedules
+ * Create SyncData with multiple schedules using real courses
  */
 export async function createSyncDataWithMultipleSchedules(count: number): Promise<SyncData> {
+    // Use an array of real courses for variety
+    const realCourseList = [
+        REAL_COURSES.CS_1101,
+        REAL_COURSES.CS_2303,
+        REAL_COURSES.MA_1024,
+        REAL_COURSES.MA_1021,
+        REAL_COURSES.CS_2022,
+        REAL_COURSES.CS_2102,
+    ];
+
     const schedules: ScheduleData[] = [];
     for (let i = 0; i < count; i++) {
+        const courseInfo = realCourseList[i % realCourseList.length];
         schedules.push(
             createSchedule({
                 id: `schedule-${i + 1}`,
                 name: `Schedule ${i + 1}`,
                 selectedCourses: [
-                    createSelectedCourse({ courseId: `CS-${1000 + i}` }),
+                    createSelectedCourse({
+                        courseId: courseInfo.id,
+                        selectedSectionCrn: courseInfo.crn
+                    }),
                 ],
             })
         );
@@ -117,7 +152,7 @@ export async function createSyncDataWithInvalidChecksumFormat(): Promise<SyncDat
 }
 
 /**
- * Create two different SyncData objects (conflicting data)
+ * Create two different SyncData objects (conflicting data) with real courses
  */
 export async function createConflictingData(): Promise<{
     localData: SyncData;
@@ -129,7 +164,10 @@ export async function createConflictingData(): Promise<{
                 id: 'schedule-1',
                 name: 'Local Schedule',
                 selectedCourses: [
-                    createSelectedCourse({ courseId: 'CS-1101' }),
+                    createSelectedCourse({
+                        courseId: REAL_COURSES.CS_1101.id,
+                        selectedSectionCrn: REAL_COURSES.CS_1101.crn
+                    }),
                 ],
             }),
         ],
@@ -141,8 +179,14 @@ export async function createConflictingData(): Promise<{
                 id: 'schedule-1',
                 name: 'Cloud Schedule',
                 selectedCourses: [
-                    createSelectedCourse({ courseId: 'CS-2303' }),
-                    createSelectedCourse({ courseId: 'MA-1024' }),
+                    createSelectedCourse({
+                        courseId: REAL_COURSES.CS_2303.id,
+                        selectedSectionCrn: REAL_COURSES.CS_2303.crn
+                    }),
+                    createSelectedCourse({
+                        courseId: REAL_COURSES.MA_1024.id,
+                        selectedSectionCrn: REAL_COURSES.MA_1024.crn
+                    }),
                 ],
             }),
         ],

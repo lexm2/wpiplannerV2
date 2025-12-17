@@ -13,6 +13,7 @@ import {
     resetMockUIComponents,
     type MockUIContext
 } from '../mocks/MockUIComponents';
+import { loadCourseCatalog } from './loadCourseCatalog';
 
 
 /**
@@ -138,6 +139,10 @@ export async function setupSyncTest(options: SyncTestSetupOptions = {}): Promise
         const profileManager = ProfileStateManager.getInstance();
         const mockIndexedDB = (global as any).__mockIndexedDB__;
         mockIndexedDB.reset();
+
+        // Load and set the real course catalog so importData can convert IDs to full objects
+        const courseCatalog = await loadCourseCatalog();
+        profileManager.setCourseData(courseCatalog);
 
         context.profileManager = profileManager;
         context.mockIndexedDB = mockIndexedDB;

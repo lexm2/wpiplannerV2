@@ -212,6 +212,11 @@ export class MainController {
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
 
+        // Set up schedule update callback for calendar event exclusions
+        this.scheduleController.setScheduleUpdateCallback((scheduleId, updates) => {
+            this.profileStateManager.updateSchedule(scheduleId, updates, 'calendar-event-exclusion');
+        });
+
         // Connect filter service to department controller
         this.departmentController.setFilterService(this.filterService);
 
@@ -1194,8 +1199,15 @@ export class MainController {
     }
 
     private setupScheduleChangeListener(): void {
-        this.scheduleManagementService.onActiveScheduleChange(() => {
+        this.scheduleManagementService.onActiveScheduleChange((_activeSchedule, event) => {
             this.updateSchedulePickerButton();
+
+            // Skip reloading events if this was just an exclusion change
+            // (the UI already updated optimistically, no need to refetch)
+            if (event?.source === 'calendar-event-exclusion') {
+                console.log('[MainController] Skipping external events reload for exclusion change');
+                return;
+            }
 
             // Load external calendar events for the new active schedule
             const activeSchedule = this.scheduleManagementService.getActiveSchedule();

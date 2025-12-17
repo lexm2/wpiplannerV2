@@ -18,6 +18,8 @@ export interface ScheduleChangeEvent {
     schedule?: Schedule;
     schedules?: Schedule[];
     timestamp: number;
+    /** Source of the event, used to identify what triggered the change */
+    source?: string;
 }
 
 export type ScheduleChangeListener = (event: ScheduleChangeEvent) => void;
@@ -739,10 +741,10 @@ export class ScheduleManagementService {
     }
 
     // Convenience method for backward compatibility
-    onActiveScheduleChange(callback: (activeSchedule: Schedule | null) => void): void {
+    onActiveScheduleChange(callback: (activeSchedule: Schedule | null, event?: ScheduleChangeEvent) => void): void {
         const listener: ScheduleChangeListener = (event) => {
             if (event.type === 'schedule_activated') {
-                callback(event.schedule || null);
+                callback(event.schedule || null, event);
             }
         };
         this.addScheduleListener(listener);
@@ -835,7 +837,8 @@ export class ScheduleManagementService {
                     this.notifyScheduleListeners({
                         type: 'schedule_activated',
                         schedule: event.data.schedule,
-                        timestamp: event.timestamp
+                        timestamp: event.timestamp,
+                        source: event.source
                     });
                     break;
             }
