@@ -11,6 +11,7 @@ export type {
     CalendarExportResult,
     CalendarProvider,
     TermDates,
+    ConnectedCalendar,
 } from './types';
 
 export { DAY_TO_RRULE } from './types';

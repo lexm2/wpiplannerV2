@@ -124,27 +124,29 @@ export class MainController {
         });
         calendarService.setProvider(this.googleCalendarProvider);
 
+        // Register callback for when Google Calendar auth is ready
+        this.googleCalendarProvider.onAuthenticated((provider) => {
+            // Auto-connect schedules to default Google Calendar
+            const schedules = this.profileStateManager.getAllSchedules();
+            provider.autoConnectSchedules(schedules, (scheduleId, updates) => {
+                this.profileStateManager.updateSchedule(scheduleId, updates, 'calendar-auto-connect');
+            });
+
+            // Load external events for the active schedule
+            const activeSchedule = this.scheduleManagementService.getActiveSchedule();
+            if (activeSchedule) {
+                console.log('[MainController] Loading external events after calendar auth');
+                this.scheduleController.loadExternalEvents(activeSchedule);
+            }
+        });
+
         // Sync calendar auth with Drive auth
-        syncEventBus.on('auth-changed', async (event) => {
+        syncEventBus.on('auth-changed', (event) => {
             const { authenticated } = event.data as { authenticated: boolean };
             if (authenticated) {
                 const token = this.googleDriveProvider.getAccessToken();
                 if (token) {
                     this.googleCalendarProvider.setAccessToken(token);
-                    console.log('[MainController] Calendar provider token synced');
-
-                    // Auto-fetch calendar data on sign-in
-                    try {
-                        await calendarService.listCalendars();
-
-                        // Fetch events for current year
-                        const now = new Date();
-                        const yearStart = new Date(now.getFullYear(), 0, 1);
-                        const yearEnd = new Date(now.getFullYear(), 11, 31);
-                        await calendarService.getEvents('primary', yearStart, yearEnd);
-                    } catch (error) {
-                        console.error('[MainController] Failed to fetch calendar data:', error);
-                    }
                 }
             }
         });
@@ -1194,6 +1196,13 @@ export class MainController {
     private setupScheduleChangeListener(): void {
         this.scheduleManagementService.onActiveScheduleChange(() => {
             this.updateSchedulePickerButton();
+
+            // Load external calendar events for the new active schedule
+            const activeSchedule = this.scheduleManagementService.getActiveSchedule();
+            if (activeSchedule && calendarService.isReady()) {
+                console.log('[MainController] Loading external events after schedule change');
+                this.scheduleController.loadExternalEvents(activeSchedule);
+            }
         });
         this.updateSchedulePickerButton();
     }

@@ -3,6 +3,25 @@
 // =============================================================================
 
 // -----------------------------------------------------------------------------
+// Connected Calendar (stored on Schedule)
+// -----------------------------------------------------------------------------
+
+/**
+ * Represents a calendar connection for a schedule.
+ * Stored on the Schedule object to track which calendar events are synced to/from.
+ */
+export interface ConnectedCalendar {
+    /** Provider identifier (e.g., 'google', 'outlook') */
+    providerId: string;
+    /** Calendar ID within the provider ('primary' or specific calendar ID) */
+    calendarId: string;
+    /** Human-readable calendar name for display */
+    calendarName: string;
+    /** Event IDs to exclude from display (hidden events) */
+    excludedEventIds?: string[];
+}
+
+// -----------------------------------------------------------------------------
 // Calendar Event Types
 // -----------------------------------------------------------------------------
 

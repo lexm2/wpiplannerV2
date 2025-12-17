@@ -2,6 +2,8 @@
 // Cloud Sync Types - Simplified Architecture
 // =============================================================================
 
+import type { ConnectedCalendar } from '../calendar/types';
+
 // -----------------------------------------------------------------------------
 // Sync Status & Events
 // -----------------------------------------------------------------------------
@@ -57,6 +59,7 @@ export interface ScheduleData {
     name: string;
     selectedCourses: SelectedCourseData[];
     timestamp?: number;
+    connectedCalendar?: ConnectedCalendar;
 }
 
 export interface SelectedCourseData {

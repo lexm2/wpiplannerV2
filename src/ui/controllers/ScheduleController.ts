@@ -1,5 +1,5 @@
 import { DayOfWeek, Course, Section } from '../../types/types'
-import { SelectedCourse } from '../../types/schedule'
+import { SelectedCourse, Schedule } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
 import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService'
@@ -15,6 +15,7 @@ import type { AutoScheduleConfig } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { getAllSections } from '../../utils/courseUtils'
+import { calendarService, type CalendarEvent } from '../../services/calendar'
 
 interface WizardSelections {
     lecture: Section | null;
@@ -40,6 +41,8 @@ export class ScheduleController {
     private generatedSchedules: any[][] = [];
     private currentScheduleIndex: number = 0;
     private isApplyingAutoSchedule: boolean = false;
+    private externalEvents: Map<string, CalendarEvent[]> = new Map(); // term -> events
+    private currentSchedule: Schedule | null = null;
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
@@ -99,6 +102,74 @@ export class ScheduleController {
 
     setScheduleManagementService(_scheduleManagementService: ScheduleManagementService): void {
         // Intentionally empty - kept for backward compatibility
+    }
+
+    // =========================================================================
+    // External Calendar Events
+    // =========================================================================
+
+    /**
+     * Load external calendar events for a schedule.
+     * Should be called when the active schedule changes or calendar auth completes.
+     */
+    async loadExternalEvents(schedule: Schedule): Promise<void> {
+        console.log('[ScheduleController] loadExternalEvents called with schedule:', {
+            name: schedule.name,
+            id: schedule.id,
+            connectedCalendar: schedule.connectedCalendar,
+        });
+
+        this.currentSchedule = schedule;
+        this.externalEvents.clear();
+
+        if (!schedule.connectedCalendar) {
+            console.log('[ScheduleController] No connected calendar, skipping external events load');
+            this.renderScheduleGrids();
+            return;
+        }
+
+        console.log('[ScheduleController] Calendar service state:', {
+            isReady: calendarService.isReady(),
+            provider: calendarService.getProvider()?.id,
+        });
+
+        if (!calendarService.isReady()) {
+            console.log('[ScheduleController] Calendar service not ready, skipping external events load');
+            this.renderScheduleGrids();
+            return;
+        }
+
+        try {
+            console.log('[ScheduleController] Loading external events for schedule:', schedule.name);
+            const eventsMap = await calendarService.getEventsForAllTerms(schedule.connectedCalendar);
+
+            // Store events by term
+            for (const [term, events] of eventsMap) {
+                this.externalEvents.set(term, events);
+                console.log(`[ScheduleController] Term ${term} events:`, events);
+            }
+
+            console.log('[ScheduleController] Loaded external events summary:', {
+                A: this.externalEvents.get('A')?.length || 0,
+                B: this.externalEvents.get('B')?.length || 0,
+                C: this.externalEvents.get('C')?.length || 0,
+                D: this.externalEvents.get('D')?.length || 0,
+            });
+
+            // Re-render grids with external events
+            this.renderScheduleGrids();
+        } catch (error) {
+            console.error('[ScheduleController] Failed to load external events:', error);
+        }
+    }
+
+    /**
+     * Clear external events (e.g., when signing out or disconnecting calendar).
+     */
+    clearExternalEvents(): void {
+        this.externalEvents.clear();
+        this.currentSchedule = null;
+        this.renderScheduleGrids();
     }
 
     /**
@@ -798,11 +869,14 @@ export class ScheduleController {
                 return displayTerms.includes(term);
             });
             
-            if (termCourses.length === 0) {
+            // Check if we have external events for this term
+            const hasExternalEvents = (this.externalEvents.get(term)?.length || 0) > 0;
+
+            if (termCourses.length === 0 && !hasExternalEvents) {
                 this.renderEmptyGrid(gridContainer);
                 return;
             }
-            
+
             this.renderPopulatedGrid(gridContainer, termCourses, term);
         });
         
@@ -836,6 +910,10 @@ export class ScheduleController {
             html += `<div class="day-header">${TimeUtils.getDayAbbr(day)}</div>`;
         });
 
+        // Get external events for this term
+        const externalEventsForTerm = this.externalEvents.get(term) || [];
+        console.log(`[ScheduleController] Rendering term ${term} with ${externalEventsForTerm.length} external events:`, externalEventsForTerm);
+
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {
             const hour = slot + TimeUtils.START_HOUR;
@@ -847,7 +925,7 @@ export class ScheduleController {
 
             // Schedule cells for each day
             weekdays.forEach(day => {
-                const cell = this.getCellContent(courses, day, slot);
+                const cell = this.getCellContent(courses, day, slot, externalEventsForTerm);
                 if (cell.classes.includes('has-conflict')) {
                     hasConflicts = true;
                 }
@@ -888,9 +966,11 @@ export class ScheduleController {
         }
     }
 
-    private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number): { content: string, classes: string } {
+    private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number, externalEvents: CalendarEvent[] = []): { content: string, classes: string } {
         // Find all sections that occupy this cell
         const occupyingSections: any[] = [];
+        // Find external events that occupy this cell
+        const occupyingExternalEvents: any[] = [];
 
         for (const selectedCourse of courses) {
             // Collect all component sections (lecture, discussion, lab)
@@ -961,7 +1041,77 @@ export class ScheduleController {
             }
         }
 
-        if (occupyingSections.length === 0) {
+        // Process external calendar events
+        const dayMapping: Record<DayOfWeek, number> = {
+            [DayOfWeek.SUNDAY]: 0,
+            [DayOfWeek.MONDAY]: 1,
+            [DayOfWeek.TUESDAY]: 2,
+            [DayOfWeek.WEDNESDAY]: 3,
+            [DayOfWeek.THURSDAY]: 4,
+            [DayOfWeek.FRIDAY]: 5,
+            [DayOfWeek.SATURDAY]: 6,
+        };
+
+        for (const event of externalEvents) {
+            // Parse event start/end times
+            const startDate = new Date(event.start.dateTime);
+            const endDate = new Date(event.end.dateTime);
+
+            // Check if this event is on the current day
+            const eventDay = startDate.getDay();
+            const targetDayNum = dayMapping[day];
+
+            // Debug logging for first slot only to reduce noise
+            if (timeSlot === 0) {
+                console.log(`[getCellContent] Processing event "${event.summary}":`, {
+                    eventDay,
+                    targetDayNum,
+                    day,
+                    startDateTime: event.start.dateTime,
+                    parsedStartDate: startDate.toString(),
+                    startHour: startDate.getHours(),
+                    startMinutes: startDate.getMinutes(),
+                });
+            }
+
+            if (eventDay !== targetDayNum) {
+                continue;
+            }
+
+            // Calculate time slots
+            const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
+            const endMinutes = endDate.getHours() * 60 + endDate.getMinutes();
+
+            // Map to grid slots (TimeUtils.START_HOUR is typically 7am)
+            const startSlot = Math.floor((startMinutes - TimeUtils.START_HOUR * 60) / 60);
+            const endSlot = Math.ceil((endMinutes - TimeUtils.START_HOUR * 60) / 60);
+
+            console.log(`[getCellContent] Event "${event.summary}" time calculation:`, {
+                startMinutes,
+                endMinutes,
+                startSlot,
+                endSlot,
+                currentTimeSlot: timeSlot,
+                START_HOUR: TimeUtils.START_HOUR,
+                overlaps: timeSlot >= startSlot && timeSlot < endSlot,
+            });
+
+            // Check if this event overlaps with current time slot
+            if (timeSlot >= startSlot && timeSlot < endSlot) {
+                const isFirstSlot = timeSlot === startSlot;
+
+                occupyingExternalEvents.push({
+                    event,
+                    startSlot,
+                    endSlot,
+                    isFirstSlot,
+                    startMinutes,
+                    endMinutes,
+                });
+            }
+        }
+
+        if (occupyingSections.length === 0 && occupyingExternalEvents.length === 0) {
             return { content: '', classes: '' };
         }
 
@@ -1086,7 +1236,49 @@ export class ScheduleController {
             }
         }
 
-        const hasAnyFirstSlot = occupyingSections.some(os => os.isFirstSlot);
+        // Render external calendar events
+        for (const externalEvent of occupyingExternalEvents) {
+            if (!externalEvent.isFirstSlot) {
+                continue; // Skip continuation slots
+            }
+
+            const durationMinutes = externalEvent.endMinutes - externalEvent.startMinutes;
+            const startOffsetMinutes = externalEvent.startMinutes - (TimeUtils.START_HOUR * 60);
+            const slotStartMinutes = timeSlot * 60;
+            const topOffsetPercent = ((startOffsetMinutes - slotStartMinutes) / 60) * 100;
+            const heightPercent = (durationMinutes / 60) * 100;
+
+            // Escape the event summary for safe HTML insertion
+            const eventTitle = Validators.escapeHtml(externalEvent.event.summary || 'Untitled Event');
+            const eventId = externalEvent.event.id || '';
+
+            contentBlocks += `
+                <div class="external-event-block"
+                     data-event-id="${eventId}"
+                     title="${eventTitle}"
+                     style="
+                    height: ${heightPercent}%;
+                    width: 100%;
+                    position: absolute;
+                    top: ${topOffsetPercent}%;
+                    left: 0;
+                    z-index: 5;
+                    border-radius: 3px;
+                    box-sizing: border-box;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    font-weight: 500;
+                    font-size: 0.7rem;
+                    overflow: hidden;
+                ">
+                    ${eventTitle}
+                </div>
+            `;
+        }
+
+        const hasAnyFirstSlot = occupyingSections.some(os => os.isFirstSlot) || occupyingExternalEvents.some(e => e.isFirstSlot);
         const classes = hasAnyFirstSlot ?
             `occupied section-start ${hasConflict ? 'has-conflict' : ''}` :
             '';

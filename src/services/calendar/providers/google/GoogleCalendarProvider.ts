@@ -6,9 +6,13 @@ import type {
     CalendarProvider,
     CalendarEvent,
     CalendarInfo,
+    ConnectedCalendar,
 } from '../../types';
+import type { Schedule } from '../../../../types/schedule';
 
 declare const gapi: any;
+
+export type OnAuthenticatedCallback = (provider: GoogleCalendarProvider) => void;
 
 /**
  * Google Calendar provider implementation.
@@ -22,6 +26,7 @@ export class GoogleCalendarProvider implements CalendarProvider {
     private accessToken: string | null = null;
     private initialized = false;
     private calendarApiLoaded = false;
+    private onAuthenticatedCallback: OnAuthenticatedCallback | null = null;
 
     // =========================================================================
     // Lifecycle
@@ -54,6 +59,73 @@ export class GoogleCalendarProvider implements CalendarProvider {
         if (typeof gapi !== 'undefined' && gapi.client) {
             gapi.client.setToken({ access_token: token });
         }
+        console.log('[GoogleCalendarProvider] Access token set');
+
+        // Fire callback if registered
+        if (this.onAuthenticatedCallback) {
+            this.onAuthenticatedCallback(this);
+        }
+    }
+
+    /**
+     * Register a callback to be called when authentication is complete.
+     */
+    onAuthenticated(callback: OnAuthenticatedCallback): void {
+        this.onAuthenticatedCallback = callback;
+    }
+
+    // =========================================================================
+    // Google-Specific: Default Calendar & Auto-Connect
+    // =========================================================================
+
+    /**
+     * Get the default Google Calendar connection (primary calendar).
+     */
+    getDefaultConnectedCalendar(): ConnectedCalendar {
+        const defaultCalendar: ConnectedCalendar = {
+            providerId: this.id,
+            calendarId: 'primary',
+            calendarName: 'Primary Calendar',
+        };
+        console.log('[GoogleCalendarProvider] Default calendar:', defaultCalendar);
+        return defaultCalendar;
+    }
+
+    /**
+     * Auto-connect schedules that don't have a connected calendar.
+     * Returns the number of schedules that were connected.
+     */
+    autoConnectSchedules(
+        schedules: Schedule[],
+        updateSchedule: (scheduleId: string, updates: Partial<Schedule>) => void
+    ): number {
+        const defaultCalendar = this.getDefaultConnectedCalendar();
+        let connectedCount = 0;
+
+        console.log('[GoogleCalendarProvider] Auto-connecting schedules:', {
+            totalSchedules: schedules.length,
+            schedulesWithoutCalendar: schedules.filter(s => !s.connectedCalendar).length,
+        });
+
+        for (const schedule of schedules) {
+            console.log(`[GoogleCalendarProvider] Schedule "${schedule.name}":`, {
+                id: schedule.id,
+                hasConnectedCalendar: !!schedule.connectedCalendar,
+                connectedCalendar: schedule.connectedCalendar,
+            });
+
+            if (!schedule.connectedCalendar) {
+                updateSchedule(schedule.id, { connectedCalendar: defaultCalendar });
+                connectedCount++;
+                console.log(`[GoogleCalendarProvider] Connected calendar to schedule "${schedule.name}"`);
+            }
+        }
+
+        if (connectedCount > 0) {
+            console.log(`[GoogleCalendarProvider] Auto-connected ${connectedCount} schedule(s)`);
+        }
+
+        return connectedCount;
     }
 
     // =========================================================================

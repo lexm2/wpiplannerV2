@@ -912,6 +912,23 @@
   );
 }
 
+/* External calendar events - distinct styling from course sections */
+.external-event-block {
+  background: rgba(107, 114, 128, 0.15);
+  border: 2px dashed #6B7280;
+  color: var(--color-text-secondary);
+  padding: 2px 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.external-event-block:hover {
+  background: rgba(107, 114, 128, 0.25);
+  border-color: #4B5563;
+  color: var(--color-text);
+}
+
 /* Empty grid state */
 .schedule-grid.empty {
   display: flex;

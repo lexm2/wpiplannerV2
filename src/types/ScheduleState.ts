@@ -1,6 +1,7 @@
 import type { Course, Section, Department } from './types';
 import type { SelectedCourse, ScheduleCombination, Schedule } from './schedule';
 import type { ScheduleData, SelectedCourseData } from '../services/sync/types';
+import type { ConnectedCalendar } from '../services/calendar/types';
 import { checksumCalculator } from '../services/sync/checksum';
 import { getAllSections } from '../utils/courseUtils';
 
@@ -24,19 +25,22 @@ export class ScheduleState {
     readonly selectedCourses: SelectedCourse[];
     readonly generatedSchedules: ScheduleCombination[];
     readonly timestamp: number;
+    readonly connectedCalendar?: ConnectedCalendar;
 
     constructor(
         id: string,
         name: string,
         selectedCourses: SelectedCourse[] = [],
         generatedSchedules: ScheduleCombination[] = [],
-        timestamp: number = Date.now()
+        timestamp: number = Date.now(),
+        connectedCalendar?: ConnectedCalendar
     ) {
         this.id = id;
         this.name = name;
         this.selectedCourses = selectedCourses;
         this.generatedSchedules = generatedSchedules;
         this.timestamp = timestamp;
+        this.connectedCalendar = connectedCalendar;
     }
 
     /**
@@ -90,7 +94,8 @@ export class ScheduleState {
                     timestamp: this.timestamp
                 };
                 return courseData;
-            })
+            }),
+            connectedCalendar: this.connectedCalendar
         };
     }
 
@@ -151,7 +156,8 @@ export class ScheduleState {
             cloudData.name,
             selectedCourses,
             [], // generatedSchedules not synced to cloud
-            cloudData.timestamp || Date.now()
+            cloudData.timestamp || Date.now(),
+            cloudData.connectedCalendar
         );
     }
 
@@ -165,13 +171,15 @@ export class ScheduleState {
         name: string;
         selectedCourses: SelectedCourse[];
         generatedSchedules: ScheduleCombination[];
+        connectedCalendar: ConnectedCalendar;
     }>): ScheduleState {
         return new ScheduleState(
             this.id,
             updates.name ?? this.name,
             updates.selectedCourses ?? this.selectedCourses,
             updates.generatedSchedules ?? this.generatedSchedules,
-            Date.now() // Update timestamp on any change
+            Date.now(), // Update timestamp on any change
+            updates.connectedCalendar ?? this.connectedCalendar
         );
     }
 
@@ -378,7 +386,8 @@ export class ScheduleState {
             schedule.name,
             schedule.selectedCourses,
             schedule.generatedSchedules,
-            schedule.timestamp || Date.now()
+            schedule.timestamp || Date.now(),
+            schedule.connectedCalendar
         );
     }
 
@@ -393,7 +402,8 @@ export class ScheduleState {
             name: this.name,
             selectedCourses: this.selectedCourses,
             generatedSchedules: this.generatedSchedules,
-            timestamp: this.timestamp
+            timestamp: this.timestamp,
+            connectedCalendar: this.connectedCalendar
         };
     }
 }

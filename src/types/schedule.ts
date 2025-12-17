@@ -1,4 +1,5 @@
 import { Course, Section, SimpleTime, DayOfWeek } from './types'
+import type { ConnectedCalendar } from '../services/calendar/types'
 
 export interface SelectedCourse {
     course: Course;
@@ -55,6 +56,7 @@ export interface Schedule {
     selectedCourses: SelectedCourse[];
     generatedSchedules: ScheduleCombination[];
     timestamp?: number;
+    connectedCalendar?: ConnectedCalendar;
 }
 
 export interface ScheduleCombination {

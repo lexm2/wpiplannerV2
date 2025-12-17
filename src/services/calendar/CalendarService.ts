@@ -12,6 +12,7 @@ import type {
     CalendarExportOptions,
     CalendarExportResult,
     TermDates,
+    ConnectedCalendar,
 } from './types';
 import { DAY_TO_RRULE } from './types';
 
@@ -118,7 +119,7 @@ export class CalendarService {
 
         const errors: string[] = [];
 
-        // Determine target calendar
+        // Determine target calendar (priority: options > schedule.connectedCalendar > primary)
         let calendarId: string;
         let calendarName: string;
 
@@ -137,9 +138,15 @@ export class CalendarService {
                     errors: [`Failed to create calendar: ${error}`],
                 };
             }
-        } else {
-            calendarId = options.targetCalendarId || 'primary';
+        } else if (options.targetCalendarId) {
+            calendarId = options.targetCalendarId;
             calendarName = calendarId === 'primary' ? 'Primary Calendar' : calendarId;
+        } else if (schedule.connectedCalendar) {
+            calendarId = schedule.connectedCalendar.calendarId;
+            calendarName = schedule.connectedCalendar.calendarName;
+        } else {
+            calendarId = 'primary';
+            calendarName = 'Primary Calendar';
         }
 
         // Convert schedule to events
@@ -236,6 +243,118 @@ export class CalendarService {
         }
 
         return this.provider.createCalendar(name);
+    }
+
+    /**
+     * Create a default ConnectedCalendar for the primary calendar.
+     */
+    getDefaultConnectedCalendar(): ConnectedCalendar {
+        return {
+            providerId: this.provider?.id || 'google',
+            calendarId: 'primary',
+            calendarName: 'Primary Calendar',
+        };
+    }
+
+    /**
+     * Create a ConnectedCalendar from a CalendarInfo.
+     */
+    createConnectedCalendar(calendarInfo: CalendarInfo): ConnectedCalendar {
+        return {
+            providerId: this.provider?.id || 'google',
+            calendarId: calendarInfo.id,
+            calendarName: calendarInfo.name,
+        };
+    }
+
+    // =========================================================================
+    // External Event Display
+    // =========================================================================
+
+    /**
+     * Get events for a specific term from a connected calendar.
+     * Filters out excluded events based on the ConnectedCalendar config.
+     * @param connectedCalendar The connected calendar to fetch from
+     * @param term The term letter (A, B, C, D)
+     * @param academicYear The academic year (defaults to current year)
+     * @returns Events for display on the term grid
+     */
+    async getEventsForTerm(
+        connectedCalendar: ConnectedCalendar,
+        term: string,
+        academicYear?: number
+    ): Promise<CalendarEvent[]> {
+        console.log(`[CalendarService] getEventsForTerm called:`, {
+            connectedCalendar,
+            term,
+            academicYear,
+            providerReady: this.provider !== null,
+            isAuthenticated: this.provider?.isAuthenticated(),
+        });
+
+        if (!this.provider || !this.provider.isAuthenticated()) {
+            console.warn(`[CalendarService] Provider not ready - provider: ${!!this.provider}, authenticated: ${this.provider?.isAuthenticated()}`);
+            return [];
+        }
+
+        const year = academicYear || new Date().getFullYear();
+        const termDates = this.getTermDates(term, year);
+
+        console.log(`[CalendarService] Term dates for ${term} (year ${year}):`, termDates);
+
+        if (!termDates) {
+            console.warn(`[CalendarService] Invalid term: ${term}`);
+            return [];
+        }
+
+        try {
+            console.log(`[CalendarService] Fetching events from calendar "${connectedCalendar.calendarId}" for ${termDates.start.toISOString()} to ${termDates.end.toISOString()}`);
+
+            const events = await this.provider.getEvents(
+                connectedCalendar.calendarId,
+                termDates.start,
+                termDates.end
+            );
+
+            console.log(`[CalendarService] Raw events received for term ${term}:`, events);
+
+            // Filter out excluded events
+            const excludedIds = new Set(connectedCalendar.excludedEventIds || []);
+            const filteredEvents = events.filter(e => !e.id || !excludedIds.has(e.id));
+
+            console.log(`[CalendarService] Fetched ${events.length} events for term ${term}, ${filteredEvents.length} after exclusions`);
+            return filteredEvents;
+        } catch (error) {
+            console.error(`[CalendarService] Failed to fetch events for term ${term}:`, error);
+            return [];
+        }
+    }
+
+    /**
+     * Get events for all terms from a connected calendar.
+     * @param connectedCalendar The connected calendar to fetch from
+     * @param academicYear The academic year (defaults to current year)
+     * @returns Map of term letter to events
+     */
+    async getEventsForAllTerms(
+        connectedCalendar: ConnectedCalendar,
+        academicYear?: number
+    ): Promise<Map<string, CalendarEvent[]>> {
+        const result = new Map<string, CalendarEvent[]>();
+        const terms = ['A', 'B', 'C', 'D'];
+
+        // Fetch all terms in parallel
+        const promises = terms.map(async (term) => {
+            const events = await this.getEventsForTerm(connectedCalendar, term, academicYear);
+            return { term, events };
+        });
+
+        const results = await Promise.all(promises);
+        for (const { term, events } of results) {
+            result.set(term, events);
+        }
+
+        return result;
     }
 
     // =========================================================================
