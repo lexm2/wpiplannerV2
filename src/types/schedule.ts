@@ -1,4 +1,4 @@
-import { Course, Section, SimpleTime } from './types'
+import { Course, Section, SimpleTime, DayOfWeek } from './types'
 
 export interface SelectedCourse {
     course: Course;
@@ -91,29 +91,42 @@ export interface UserScheduleState {
     preferences: SchedulePreferences;
 }
 
-export interface ScheduleScore {
-    totalScore: number;
-    timeGapScore: number;
-    compactnessScore: number;
-    timePreferenceScore: number;
-    consecutiveClassScore: number;
-    buildingTransitionScore: number;
-    balancedLoadScore: number;
-    earlyMorningPenalty: number;
-    professorRatingScore: number;
-    classesPerTermScore: number;
+/**
+ * Academic term for blocked time periods.
+ * Maps to WPI's 7-week term system.
+ */
+export enum AcademicTerm {
+    A = 'A',
+    B = 'B',
+    C = 'C',
+    D = 'D',
+    ALL = 'ALL'  // Applies to all terms
 }
 
-export interface ScoreWeights {
-    professorRating: number;
-    earlyMorning: number;
-    classesPerTerm: number;
-    timeGap: number;
+/**
+ * A time period that the user wants to block off from scheduling.
+ * Used for non-academic commitments like work, clubs, appointments, etc.
+ *
+ * All fields are strongly typed - no string parsing needed.
+ */
+export interface BlockedTimePeriod {
+    /** Unique identifier for this blocked period */
+    id: string;
+    /** Day of the week this block applies to */
+    day: DayOfWeek;
+    /** Start time of the blocked period */
+    startTime: SimpleTime;
+    /** End time of the blocked period */
+    endTime: SimpleTime;
+    /** Which academic term(s) this block applies to */
+    term: AcademicTerm;
 }
 
-export const DEFAULT_SCORE_WEIGHTS = {
-    professorRating: 0.25,
-    earlyMorning: 0.10,
-    classesPerTerm: 0.50,
-    timeGap: 0.15
-} as const;
+/**
+ * Configuration for the auto-scheduler.
+ * Intentionally minimal - add features incrementally.
+ */
+export interface AutoScheduleConfig {
+    /** Time periods to avoid when scheduling */
+    blockedTimes: BlockedTimePeriod[];
+}

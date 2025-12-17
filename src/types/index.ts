@@ -11,10 +11,10 @@ export type {
   TimeConflict,
   SchedulePreferences,
   UserScheduleState,
-  ScheduleScore,
-  ScoreWeights,
+  BlockedTimePeriod,
+  AutoScheduleConfig,
 } from './schedule';
-export { ConflictType, DEFAULT_SCORE_WEIGHTS } from './schedule';
+export { ConflictType, AcademicTerm } from './schedule';
 export type { FilterableSection, FilterablePeriod } from './filterableUnit';
 export { ScheduleState } from './ScheduleState';
 export type {

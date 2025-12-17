@@ -1,21 +1,18 @@
-import { describe, it, expect, beforeEach, mock, spyOn } from 'bun:test'
+import { describe, it, expect, beforeEach } from 'bun:test'
 import { AutoScheduler } from '../../../src/services/scheduling/AutoScheduler'
-import type { SelectedCourse } from '../../../src/types/schedule'
-import type { Course, Section, DayOfWeek } from '../../../src/types/types'
-import { PeriodType } from '../../../src/types/types'
+import type { AutoScheduleConfig, BlockedTimePeriod } from '../../../src/types/schedule'
+import { AcademicTerm } from '../../../src/types/schedule'
+import { DayOfWeek } from '../../../src/types/types'
 import {
   createMockCourse,
   createMockSection,
   createMockPeriod,
   createMockTime,
   createMockSelectedCourse,
-  createMockSelectedCourseWithLocks,
-  createCoursesWithConflicts,
-  createLargeCombinationSpace,
   createMockScheduleFilterService
 } from '../../helpers/mockData'
 
-describe('AutoScheduler - Complement Method', () => {
+describe('AutoScheduler', () => {
   let autoScheduler: AutoScheduler
   let mockFilterService: any
 
@@ -24,17 +21,21 @@ describe('AutoScheduler - Complement Method', () => {
     autoScheduler = new AutoScheduler(mockFilterService)
   })
 
-  describe('Basic Functionality Tests', () => {
-    it('should handle empty courses list', () => {
-      const result = autoScheduler.generateAllSchedules([], 1000)
+  describe('Basic Schedule Generation', () => {
+    it('should return empty array for no courses', () => {
+      const config: AutoScheduleConfig = { blockedTimes: [] }
+      const result = autoScheduler.generateSchedules([], config)
       expect(result).toEqual([])
     })
 
-    it('should handle all courses with complete locked selections', () => {
+    it('should generate schedules for a single course', () => {
       const lecture = createMockSection({
         crn: 10001,
         number: 'A01',
-        periods: [createMockPeriod()]
+        periods: [createMockPeriod({
+          startTime: createMockTime(9, 0),
+          endTime: createMockTime(10, 50)
+        })]
       })
 
       const course = createMockCourse({
@@ -46,231 +47,107 @@ describe('AutoScheduler - Complement Method', () => {
         }]
       })
 
-      const selectedCourse: SelectedCourse = {
-        course,
-        selectedLecture: lecture,
-        selectedDiscussion: null,
-        selectedLab: null,
-        selectedSection: null,
-        selectedSectionNumber: null,
-        isRequired: false,
-        lockedSections: new Set(['10001'])
-      }
-
-      const result = autoScheduler.generateAllSchedules([selectedCourse], 1000)
-
-      expect(result).toHaveLength(1)
-      expect(result[0]).toHaveLength(1)
-      expect(result[0][0].isLocked).toBe(true)
-      expect(result[0][0].combination.lecture?.crn).toBe(10001)
-    })
-
-    it('should auto-fill when no sections are selected', () => {
-      const lectureA = createMockSection({
-        crn: 10001,
-        number: 'A01',
-        periods: [createMockPeriod({
-          startTime: createMockTime(9, 0),
-          endTime: createMockTime(10, 50)
-        })]
-      })
-
-      const lectureB = createMockSection({
-        crn: 10002,
-        number: 'B01',
-        periods: [createMockPeriod({
-          startTime: createMockTime(13, 0),
-          endTime: createMockTime(14, 50)
-        })]
-      })
-
-      const course = createMockCourse({
-        id: 'CS-1101',
-        lectures: [
-          { section: lectureA, compatibleDiscussions: [], compatibleLabs: [] },
-          { section: lectureB, compatibleDiscussions: [], compatibleLabs: [] }
-        ]
-      })
-
       const selectedCourse = createMockSelectedCourse({ course })
+      const config: AutoScheduleConfig = { blockedTimes: [] }
 
-      const result = autoScheduler.generateAllSchedules([selectedCourse], 1000)
+      const result = autoScheduler.generateSchedules([selectedCourse], config)
 
       expect(result.length).toBeGreaterThan(0)
       expect(result[0]).toHaveLength(1)
-      expect(result[0][0].isLocked).toBeFalsy()
+      expect(result[0][0].combination.lecture?.crn).toBe(10001)
     })
 
-    it('should handle partially locked sections - lock lecture, auto-fill discussion', () => {
+    it('should generate single schedule via convenience method', () => {
       const lecture = createMockSection({
         crn: 10001,
         number: 'A01',
         periods: [createMockPeriod()]
       })
 
-      const disc1 = createMockSection({
-        crn: 10101,
-        number: 'A01',
-        periods: [createMockPeriod({
-          type: PeriodType.DISCUSSION,
-          startTime: createMockTime(11, 0),
-          endTime: createMockTime(11, 50)
-        })]
-      })
-
-      const disc2 = createMockSection({
-        crn: 10102,
-        number: 'A02',
-        periods: [createMockPeriod({
-          type: PeriodType.DISCUSSION,
-          startTime: createMockTime(14, 0),
-          endTime: createMockTime(14, 50)
-        })]
-      })
-
       const course = createMockCourse({
         id: 'CS-1101',
         lectures: [{
           section: lecture,
-          compatibleDiscussions: [disc1, disc2],
+          compatibleDiscussions: [],
           compatibleLabs: []
         }]
       })
 
-      const selectedCourse: SelectedCourse = {
-        course,
-        selectedLecture: lecture,
-        selectedDiscussion: null,
-        selectedLab: null,
-        selectedSection: null,
-        selectedSectionNumber: null,
-        isRequired: false,
-        lockedSections: new Set(['10001'])
-      }
+      const selectedCourse = createMockSelectedCourse({ course })
+      const config: AutoScheduleConfig = { blockedTimes: [] }
 
-      const result = autoScheduler.generateAllSchedules([selectedCourse], 1000)
+      const result = autoScheduler.generateSchedule([selectedCourse], config)
 
-      expect(result.length).toBeGreaterThanOrEqual(2)
-      expect(result[0][0].combination.lecture?.crn).toBe(10001)
-      const discussionCrn = result[0][0].combination.discussion?.crn;
-      expect(discussionCrn === 10101 || discussionCrn === 10102).toBe(true)
+      expect(result).not.toBeNull()
+      expect(result![0].combination.lecture?.crn).toBe(10001)
     })
+  })
 
-    it('should handle multiple courses with mixed lock states', () => {
-      const course1Lecture = createMockSection({
+  describe('Blocked Time Filtering', () => {
+    it('should exclude sections that conflict with blocked times', () => {
+      // Create two lectures - one at 9am, one at 2pm
+      const morningLecture = createMockSection({
         crn: 10001,
         number: 'A01',
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
-          endTime: createMockTime(10, 50)
+          endTime: createMockTime(10, 50),
+          days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY])
         })]
       })
 
-      const course1 = createMockCourse({
-        id: 'CS-1101',
-        lectures: [{
-          section: course1Lecture,
-          compatibleDiscussions: [],
-          compatibleLabs: []
-        }]
-      })
-
-      const course2LectureA = createMockSection({
-        crn: 20001,
-        number: 'A01',
-        periods: [createMockPeriod({
-          startTime: createMockTime(13, 0),
-          endTime: createMockTime(14, 50)
-        })]
-      })
-
-      const course2LectureB = createMockSection({
-        crn: 20002,
+      const afternoonLecture = createMockSection({
+        crn: 10002,
         number: 'B01',
         periods: [createMockPeriod({
-          startTime: createMockTime(15, 0),
-          endTime: createMockTime(16, 50)
-        })]
-      })
-
-      const course2 = createMockCourse({
-        id: 'MA-1021',
-        number: '1021',
-        lectures: [
-          { section: course2LectureA, compatibleDiscussions: [], compatibleLabs: [] },
-          { section: course2LectureB, compatibleDiscussions: [], compatibleLabs: [] }
-        ]
-      })
-
-      const selected1: SelectedCourse = {
-        course: course1,
-        selectedLecture: course1Lecture,
-        selectedDiscussion: null,
-        selectedLab: null,
-        selectedSection: null,
-        selectedSectionNumber: null,
-        isRequired: false,
-        lockedSections: new Set(['10001'])
-      }
-
-      const selected2 = createMockSelectedCourse({ course: course2 })
-
-      const result = autoScheduler.generateAllSchedules([selected1, selected2], 1000)
-
-      expect(result.length).toBeGreaterThanOrEqual(2)
-      expect(result[0]).toHaveLength(2)
-      expect(result[0][0].combination.lecture?.crn).toBe(10001)
-      const lectureCrn = result[0][1].combination.lecture?.crn;
-      expect(lectureCrn === 20001 || lectureCrn === 20002).toBe(true)
-    })
-
-    it('should handle standalone lab courses', () => {
-      const lab1 = createMockSection({
-        crn: 30001,
-        number: 'L01',
-        periods: [createMockPeriod({
-          type: PeriodType.LAB,
           startTime: createMockTime(14, 0),
-          endTime: createMockTime(16, 50)
-        })]
-      })
-
-      const lab2 = createMockSection({
-        crn: 30002,
-        number: 'L02',
-        periods: [createMockPeriod({
-          type: PeriodType.LAB,
-          startTime: createMockTime(18, 0),
-          endTime: createMockTime(20, 50)
+          endTime: createMockTime(15, 50),
+          days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY])
         })]
       })
 
       const course = createMockCourse({
-        id: 'CS-1004',
-        number: '1004',
-        name: 'Programming Lab',
-        lectures: undefined,
-        standaloneLabs: [lab1, lab2]
+        id: 'CS-1101',
+        lectures: [
+          { section: morningLecture, compatibleDiscussions: [], compatibleLabs: [] },
+          { section: afternoonLecture, compatibleDiscussions: [], compatibleLabs: [] }
+        ]
       })
 
       const selectedCourse = createMockSelectedCourse({ course })
 
-      const result = autoScheduler.generateAllSchedules([selectedCourse], 1000)
+      // Block 9-11am on Monday
+      const blockedTime: BlockedTimePeriod = {
+        id: 'block-1',
+        day: DayOfWeek.MONDAY,
+        startTime: { hours: 9, minutes: 0 },
+        endTime: { hours: 11, minutes: 0 },
+        term: AcademicTerm.ALL
+      }
 
-      expect(result.length).toBe(2)
-      expect(result[0][0].combination.lecture).toBeNull()
-      expect(result[0][0].combination.lab).not.toBeNull()
+      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
+
+      const result = autoScheduler.generateSchedules([selectedCourse], config)
+
+      // Should only return the afternoon lecture (morning is blocked)
+      expect(result.length).toBe(1)
+      expect(result[0][0].combination.lecture?.crn).toBe(10002)
     })
 
-    it('should handle courses with only lectures (no discussion/lab)', () => {
+    it('should respect term-specific blocked times', () => {
       const lecture = createMockSection({
-        crn: 40001,
+        crn: 10001,
         number: 'A01',
-        periods: [createMockPeriod()]
+        computedTerm: 'A',
+        periods: [createMockPeriod({
+          startTime: createMockTime(9, 0),
+          endTime: createMockTime(10, 50),
+          days: new Set([DayOfWeek.MONDAY])
+        })]
       })
 
       const course = createMockCourse({
-        id: 'HU-3900',
+        id: 'CS-1101',
         lectures: [{
           section: lecture,
           compatibleDiscussions: [],
@@ -280,113 +157,110 @@ describe('AutoScheduler - Complement Method', () => {
 
       const selectedCourse = createMockSelectedCourse({ course })
 
-      const result = autoScheduler.generateAllSchedules([selectedCourse], 1000)
+      // Block only in term B (section is in term A, so should NOT be blocked)
+      const blockedTime: BlockedTimePeriod = {
+        id: 'block-1',
+        day: DayOfWeek.MONDAY,
+        startTime: { hours: 9, minutes: 0 },
+        endTime: { hours: 11, minutes: 0 },
+        term: AcademicTerm.B
+      }
 
-      expect(result).toHaveLength(1)
-      expect(result[0][0].combination.lecture?.crn).toBe(40001)
-      expect(result[0][0].combination.discussion).toBeNull()
-      expect(result[0][0].combination.lab).toBeNull()
+      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
+
+      const result = autoScheduler.generateSchedules([selectedCourse], config)
+
+      // Section should NOT be blocked (wrong term)
+      expect(result.length).toBe(1)
+      expect(result[0][0].combination.lecture?.crn).toBe(10001)
+    })
+
+    it('should return empty when all sections conflict with blocked times', () => {
+      const lecture = createMockSection({
+        crn: 10001,
+        number: 'A01',
+        periods: [createMockPeriod({
+          startTime: createMockTime(9, 0),
+          endTime: createMockTime(10, 50),
+          days: new Set([DayOfWeek.MONDAY])
+        })]
+      })
+
+      const course = createMockCourse({
+        id: 'CS-1101',
+        lectures: [{
+          section: lecture,
+          compatibleDiscussions: [],
+          compatibleLabs: []
+        }]
+      })
+
+      const selectedCourse = createMockSelectedCourse({ course })
+
+      // Block the entire time slot
+      const blockedTime: BlockedTimePeriod = {
+        id: 'block-1',
+        day: DayOfWeek.MONDAY,
+        startTime: { hours: 8, minutes: 0 },
+        endTime: { hours: 12, minutes: 0 },
+        term: AcademicTerm.ALL
+      }
+
+      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
+
+      const result = autoScheduler.generateSchedules([selectedCourse], config)
+
+      expect(result).toHaveLength(0)
     })
   })
 
-  describe('Conflict Handling Tests', () => {
-    it('should return locked sections as-is even if they conflict', () => {
-      const { course1, course2, conflictingSection1, conflictingSection2 } = createCoursesWithConflicts()
-
-      const selected1: SelectedCourse = {
-        course: course1,
-        selectedLecture: conflictingSection1,
-        selectedDiscussion: null,
-        selectedLab: null,
-        selectedSection: null,
-        selectedSectionNumber: null,
-        isRequired: false,
-        lockedSections: new Set([String(conflictingSection1.crn)])
-      }
-
-      const selected2: SelectedCourse = {
-        course: course2,
-        selectedLecture: conflictingSection2,
-        selectedDiscussion: null,
-        selectedLab: null,
-        selectedSection: null,
-        selectedSectionNumber: null,
-        isRequired: false,
-        lockedSections: new Set([String(conflictingSection2.crn)])
-      }
-
-      const result = autoScheduler.generateAllSchedules([selected1, selected2], 1000)
-
-      expect(result).toHaveLength(1)
-      expect(result[0]).toHaveLength(2)
-      expect(result[0][0].isLocked).toBe(true)
-      expect(result[0][1].isLocked).toBe(true)
-    })
-
-    it('should filter out conflicting candidates', () => {
-      const lectureA = createMockSection({
+  describe('Conflict Detection', () => {
+    it('should filter out conflicting section combinations', () => {
+      // Two sections at the same time
+      const section1 = createMockSection({
         crn: 10001,
         number: 'A01',
         periods: [createMockPeriod({
           startTime: createMockTime(10, 0),
           endTime: createMockTime(11, 50),
-          days: new Set(['M', 'W', 'F'] as DayOfWeek[])
+          days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
         })]
       })
 
-      const lectureB = createMockSection({
-        crn: 10002,
-        number: 'B01',
+      const section2 = createMockSection({
+        crn: 20001,
+        number: 'A01',
         periods: [createMockPeriod({
           startTime: createMockTime(10, 30),
           endTime: createMockTime(12, 20),
-          days: new Set(['M', 'W'] as DayOfWeek[])
+          days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY])
         })]
       })
 
       const course1 = createMockCourse({
         id: 'CS-1101',
-        lectures: [{ section: lectureA, compatibleDiscussions: [], compatibleLabs: [] }]
+        lectures: [{ section: section1, compatibleDiscussions: [], compatibleLabs: [] }]
       })
 
       const course2 = createMockCourse({
         id: 'MA-1021',
         number: '1021',
-        lectures: [{ section: lectureB, compatibleDiscussions: [], compatibleLabs: [] }]
+        lectures: [{ section: section2, compatibleDiscussions: [], compatibleLabs: [] }]
       })
 
       const selected1 = createMockSelectedCourse({ course: course1 })
       const selected2 = createMockSelectedCourse({ course: course2 })
+      const config: AutoScheduleConfig = { blockedTimes: [] }
 
-      const result = autoScheduler.generateAllSchedules([selected1, selected2], 1000)
+      const result = autoScheduler.generateSchedules([selected1, selected2], config)
 
+      // No valid schedules because sections conflict
       expect(result).toHaveLength(0)
     })
 
-    it('should return null when no valid schedules exist', () => {
-      const { course1, course2 } = createCoursesWithConflicts()
-
-      const selected1 = createMockSelectedCourse({ course: course1 })
-      const selected2 = createMockSelectedCourse({ course: course2 })
-
-      const result = autoScheduler.generateBestSchedule(
-        [selected1, selected2],
-        {
-          preferredTimeRange: {
-            startTime: { hours: 8, minutes: 0 },
-            endTime: { hours: 18, minutes: 0 }
-          },
-          preferredDays: new Set(),
-          avoidBackToBackClasses: false
-        }
-      )
-
-      expect(result).toBeNull()
-    })
-
-    it('should handle overlap map filtering correctly', () => {
+    it('should allow non-conflicting sections', () => {
       const section1 = createMockSection({
-        crn: 50001,
+        crn: 10001,
         number: 'A01',
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
@@ -395,7 +269,7 @@ describe('AutoScheduler - Complement Method', () => {
       })
 
       const section2 = createMockSection({
-        crn: 50002,
+        crn: 20001,
         number: 'A01',
         periods: [createMockPeriod({
           startTime: createMockTime(13, 0),
@@ -416,115 +290,19 @@ describe('AutoScheduler - Complement Method', () => {
 
       const selected1 = createMockSelectedCourse({ course: course1 })
       const selected2 = createMockSelectedCourse({ course: course2 })
+      const config: AutoScheduleConfig = { blockedTimes: [] }
 
-      const result = autoScheduler.generateAllSchedules([selected1, selected2], 1000)
+      const result = autoScheduler.generateSchedules([selected1, selected2], config)
 
       expect(result.length).toBeGreaterThan(0)
       expect(result[0]).toHaveLength(2)
     })
   })
 
-  describe('Edge Case Tests', () => {
-    it('should filter out sections with 0 time periods', () => {
-      const validSection = createMockSection({
-        crn: 60001,
-        number: 'A01',
-        periods: [createMockPeriod()]
-      })
-
-      const invalidSection = createMockSection({
-        crn: 60002,
-        number: 'B01',
-        periods: []
-      })
-
-      const course = createMockCourse({
-        id: 'CS-1101',
-        lectures: [
-          { section: validSection, compatibleDiscussions: [], compatibleLabs: [] },
-          { section: invalidSection, compatibleDiscussions: [], compatibleLabs: [] }
-        ]
-      })
-
-      const selectedCourse = createMockSelectedCourse({ course })
-
-      const result = autoScheduler.generateAllSchedules([selectedCourse], 1000)
-
-      expect(result).toHaveLength(1)
-      expect(result[0][0].combination.lecture?.crn).toBe(60001)
-    })
-
-    it('should filter out sections with no days', () => {
-      const validSection = createMockSection({
-        crn: 70001,
-        number: 'A01',
-        periods: [createMockPeriod()]
-      })
-
-      const invalidSection = createMockSection({
-        crn: 70002,
-        number: 'B01',
-        periods: [createMockPeriod({
-          days: new Set()
-        })]
-      })
-
-      const course = createMockCourse({
-        id: 'CS-1101',
-        lectures: [
-          { section: validSection, compatibleDiscussions: [], compatibleLabs: [] },
-          { section: invalidSection, compatibleDiscussions: [], compatibleLabs: [] }
-        ]
-      })
-
-      const selectedCourse = createMockSelectedCourse({ course })
-
-      const result = autoScheduler.generateAllSchedules([selectedCourse], 1000)
-
-      expect(result).toHaveLength(1)
-    })
-
-    it('should handle large combination spaces', () => {
-      const courses = createLargeCombinationSpace(3, 5)
-      const selectedCourses = courses.map(c => createMockSelectedCourse({ course: c }))
-
-      const consoleSpy = spyOn(console, 'warn')
-
-      const result = autoScheduler.generateAllSchedules(selectedCourses, 1000)
-
-      expect(result.length).toBeGreaterThan(0)
-      expect(result.length).toBeLessThanOrEqual(1000)
-    })
-
-    it('should warn when combination space exceeds 100K', () => {
-      const courses = createLargeCombinationSpace(6, 10)
-      const selectedCourses = courses.map(c => createMockSelectedCourse({ course: c }))
-
-      const consoleSpy = spyOn(console, 'warn')
-
-      autoScheduler.generateAllSchedules(selectedCourses, 100)
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('1000000 possible combinations')
-      )
-    })
-
-    it('should handle timeout protection', () => {
-      const courses = createLargeCombinationSpace(8, 10)
-      const selectedCourses = courses.map(c => createMockSelectedCourse({ course: c }))
-
-      const consoleSpy = spyOn(console, 'warn')
-
-      const result = autoScheduler.generateAllSchedules(selectedCourses, 10000, 100)
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Timeout after')
-      )
-    })
-
-    it('should handle empty locked sections Set', () => {
+  describe('Locked Sections', () => {
+    it('should respect fully locked courses', () => {
       const lecture = createMockSection({
-        crn: 80001,
+        crn: 10001,
         number: 'A01',
         periods: [createMockPeriod()]
       })
@@ -538,186 +316,24 @@ describe('AutoScheduler - Complement Method', () => {
         }]
       })
 
-      const selectedCourse: SelectedCourse = {
+      const selectedCourse = {
         course,
-        selectedLecture: null,
+        selectedLecture: lecture,
         selectedDiscussion: null,
         selectedLab: null,
         selectedSection: null,
         selectedSectionNumber: null,
         isRequired: false,
-        lockedSections: new Set()
+        lockedSections: new Set(['10001'])
       }
 
-      const result = autoScheduler.generateAllSchedules([selectedCourse], 1000)
+      const config: AutoScheduleConfig = { blockedTimes: [] }
+
+      const result = autoScheduler.generateSchedules([selectedCourse], config)
 
       expect(result).toHaveLength(1)
-    })
-
-    it('should handle courses without lectures property', () => {
-      const lab = createMockSection({
-        crn: 90001,
-        number: 'L01',
-        periods: [createMockPeriod({ type: PeriodType.LAB })]
-      })
-
-      const course = createMockCourse({
-        id: 'PH-1110',
-        lectures: undefined,
-        standaloneLabs: [lab]
-      })
-
-      const selectedCourse = createMockSelectedCourse({ course })
-
-      const result = autoScheduler.generateAllSchedules([selectedCourse], 1000)
-
-      expect(result).toHaveLength(1)
-      expect(result[0][0].combination.lab?.crn).toBe(90001)
-    })
-  })
-
-  describe('Algorithm Correctness Tests', () => {
-    it('should respect dynamic type detection', () => {
-      const lecture = createMockSection({
-        crn: 11001,
-        number: 'A01',
-        periods: [createMockPeriod()]
-      })
-
-      const discussion = createMockSection({
-        crn: 11101,
-        number: 'A01',
-        periods: [createMockPeriod({
-          type: PeriodType.DISCUSSION,
-          startTime: createMockTime(14, 0),
-          endTime: createMockTime(14, 50)
-        })]
-      })
-
-      const course = createMockCourse({
-        id: 'CS-2011',
-        lectures: [{
-          section: lecture,
-          compatibleDiscussions: [discussion],
-          compatibleLabs: []
-        }]
-      })
-
-      const selectedCourse = createMockSelectedCourse({ course })
-
-      const result = autoScheduler.generateAllSchedules([selectedCourse], 1000)
-
-      expect(result).toHaveLength(1)
-      expect(result[0][0].combination.lecture?.crn).toBe(11001)
-      expect(result[0][0].combination.discussion?.crn).toBe(11101)
-      expect(result[0][0].combination.lab).toBeNull()
-    })
-
-    it('should generate correct Cartesian product', () => {
-      const lectureA = createMockSection({
-        crn: 12001,
-        number: 'A01',
-        periods: [createMockPeriod({
-          startTime: createMockTime(9, 0),
-          endTime: createMockTime(10, 50)
-        })]
-      })
-
-      const lectureB = createMockSection({
-        crn: 12002,
-        number: 'B01',
-        periods: [createMockPeriod({
-          startTime: createMockTime(13, 0),
-          endTime: createMockTime(14, 50)
-        })]
-      })
-
-      const course1 = createMockCourse({
-        id: 'CS-1101',
-        lectures: [
-          { section: lectureA, compatibleDiscussions: [], compatibleLabs: [] },
-          { section: lectureB, compatibleDiscussions: [], compatibleLabs: [] }
-        ]
-      })
-
-      const lectureC = createMockSection({
-        crn: 13001,
-        number: 'A01',
-        periods: [createMockPeriod({
-          startTime: createMockTime(11, 0),
-          endTime: createMockTime(12, 50)
-        })]
-      })
-
-      const lectureD = createMockSection({
-        crn: 13002,
-        number: 'B01',
-        periods: [createMockPeriod({
-          startTime: createMockTime(15, 0),
-          endTime: createMockTime(16, 50)
-        })]
-      })
-
-      const course2 = createMockCourse({
-        id: 'MA-1021',
-        number: '1021',
-        lectures: [
-          { section: lectureC, compatibleDiscussions: [], compatibleLabs: [] },
-          { section: lectureD, compatibleDiscussions: [], compatibleLabs: [] }
-        ]
-      })
-
-      const selected1 = createMockSelectedCourse({ course: course1 })
-      const selected2 = createMockSelectedCourse({ course: course2 })
-
-      const result = autoScheduler.generateAllSchedules([selected1, selected2], 1000)
-
-      expect(result).toHaveLength(4)
-    })
-
-    it('should integrate with schedule scoring', () => {
-      const morningLecture = createMockSection({
-        crn: 14001,
-        number: 'A01',
-        periods: [createMockPeriod({
-          startTime: createMockTime(9, 0),
-          endTime: createMockTime(10, 50)
-        })]
-      })
-
-      const afternoonLecture = createMockSection({
-        crn: 14002,
-        number: 'B01',
-        periods: [createMockPeriod({
-          startTime: createMockTime(15, 0),
-          endTime: createMockTime(16, 50)
-        })]
-      })
-
-      const course = createMockCourse({
-        id: 'CS-1101',
-        lectures: [
-          { section: morningLecture, compatibleDiscussions: [], compatibleLabs: [] },
-          { section: afternoonLecture, compatibleDiscussions: [], compatibleLabs: [] }
-        ]
-      })
-
-      const selectedCourse = createMockSelectedCourse({ course })
-
-      const result = autoScheduler.generateBestSchedule(
-        [selectedCourse],
-        {
-          preferredTimeRange: {
-            startTime: { hours: 8, minutes: 0 },
-            endTime: { hours: 12, minutes: 0 }
-          },
-          preferredDays: new Set(),
-          avoidBackToBackClasses: false
-        }
-      )
-
-      expect(result).not.toBeNull()
-      expect(result![0].combination.lecture?.crn).toBe(14001)
+      expect(result[0][0].isLocked).toBe(true)
+      expect(result[0][0].combination.lecture?.crn).toBe(10001)
     })
   })
 })

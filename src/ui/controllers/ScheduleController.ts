@@ -11,7 +11,7 @@ import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine'
 import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../../utils/typeGuards'
 import { AutoScheduler } from '../../services/scheduling/AutoScheduler'
-import { ScheduleScorer } from '../../services/scheduling/ScheduleScorer'
+import type { AutoScheduleConfig } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { getAllSections } from '../../utils/courseUtils'
@@ -1451,41 +1451,26 @@ export class ScheduleController {
         try {
             const autoScheduler = new AutoScheduler(this.scheduleFilterService);
 
-            const defaultPreferences = {
-                preferredTimeRange: {
-                    startTime: { hours: 8, minutes: 0 },
-                    endTime: { hours: 18, minutes: 0 }
-                },
-                preferredDays: new Set<string>(),
-                avoidBackToBackClasses: false
+            // Config with empty blocked times for now (UI will be added later)
+            const config: AutoScheduleConfig = {
+                blockedTimes: []
             };
 
-            const allSchedules = autoScheduler.generateAllSchedules(selectedCourses, 1000);
+            const allSchedules = autoScheduler.generateSchedules(selectedCourses, config, 100);
             console.log(`[Auto-Schedule] Generated ${allSchedules.length} valid schedules`);
 
             if (allSchedules.length === 0) {
                 console.warn('[Auto-Schedule] No valid schedules found');
-                console.warn('[Auto-Schedule] Check the console above for detailed debugging information about which course failed and why.');
-                alert('Could not generate a valid schedule.\n\nPlease check the browser console (F12 → Console tab) for detailed debugging information about which course is causing the issue.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts');
+                alert('Could not generate a valid schedule.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts');
                 this.updateAutoScheduleButtonUI();
                 return;
             }
 
-            // Score and sort schedules
-            const scorer = new ScheduleScorer();
-            const scored = allSchedules.map((schedule, index) => ({
-                schedule,
-                score: scorer.calculateCompositeScore(schedule, defaultPreferences),
-                id: `schedule-${index}`
-            }));
-
-            scored.sort((a, b) => b.score.totalScore - a.score.totalScore);
-
-            // Store all generated schedules
-            this.generatedSchedules = scored.map(s => s.schedule);
+            // Store all generated schedules (no scoring for now)
+            this.generatedSchedules = allSchedules;
             this.currentScheduleIndex = 0;
 
-            // Apply the first (best) schedule
+            // Apply the first schedule
             await this.applyScheduleAtIndex(0);
             this.updateAutoScheduleButtonUI();
 
