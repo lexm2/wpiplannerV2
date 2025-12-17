@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, spyOn, mock } from 'bun:test';
+import { describe, it, expect, beforeEach, afterEach, spyOn, mock, jest } from 'bun:test';
 import { SyncManager } from '../../../../src/services/sync/SyncManager';
 import { syncEventBus } from '../../../../src/services/sync/SyncEventBus';
 import { providerRegistry } from '../../../../src/services/sync/ProviderRegistry';
@@ -9,7 +9,6 @@ import {
     createEventBusSpy,
     assertSyncDataEqual,
 } from '../../../helpers/sync-test-utils';
-import { sharedTimerMock as timerMock } from '../../../helpers/sync-test-setup';
 import type { SyncData } from '../../../../src/services/sync/types';
 
 /**
@@ -24,7 +23,7 @@ describe('Sync Integration Tests', () => {
     let eventSpy: ReturnType<typeof createEventBusSpy>;
 
     beforeEach(async () => {
-        timerMock.install();
+        jest.useFakeTimers();
 
         syncManager = SyncManager.getInstance();
         mockProvider = new MockCloudProvider();
@@ -45,7 +44,7 @@ describe('Sync Integration Tests', () => {
     });
 
     afterEach(() => {
-        timerMock.restore();
+        jest.useRealTimers();
         mockProvider.reset();
         eventSpy.clear();
     });
@@ -128,8 +127,8 @@ describe('Sync Integration Tests', () => {
             syncEventBus.emitEvent('local-save-completed', {});
 
             // Wait for debounce (3 seconds)
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             // Verify push completed
             expect(mockProvider.callHistory.pushData).toBe(1);
@@ -140,17 +139,17 @@ describe('Sync Integration Tests', () => {
         it('should handle rapid state changes with single push', async () => {
             // Simulate multiple rapid saves
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(1000);
+            jest.advanceTimersByTime(1000);
 
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(1000);
+            jest.advanceTimersByTime(1000);
 
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(1000);
+            jest.advanceTimersByTime(1000);
 
             // Wait for debounce
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             // Should only push once
             expect(mockProvider.callHistory.pushData).toBe(1);
@@ -159,15 +158,15 @@ describe('Sync Integration Tests', () => {
         it('should continue pushing after multiple changes', async () => {
             // First change
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(mockProvider.callHistory.pushData).toBe(1);
 
             // Second change
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(mockProvider.callHistory.pushData).toBe(2);
         });
@@ -251,8 +250,8 @@ describe('Sync Integration Tests', () => {
 
             // Trigger new push
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             // Should push normally
             expect(mockProvider.callHistory.pushData).toBe(2); // 1 from resolution + 1 from new push
@@ -269,15 +268,15 @@ describe('Sync Integration Tests', () => {
 
             // Step 2: User modifies schedule
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(mockProvider.callHistory.pushData).toBe(2); // Initial + modification
 
             // Step 3: User modifies again
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(mockProvider.callHistory.pushData).toBe(3);
 
@@ -304,8 +303,8 @@ describe('Sync Integration Tests', () => {
 
             // Step 3: User continues working
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(mockProvider.callHistory.pushData).toBe(2); // Resolution + new change
         });
@@ -340,8 +339,8 @@ describe('Sync Integration Tests', () => {
 
             // Trigger push - this should work (pushes override cloud during conflict)
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             // Push happens even during conflict (local changes are pushed)
             expect(mockProvider.callHistory.pushData).toBeGreaterThan(0);
@@ -400,16 +399,16 @@ describe('Sync Integration Tests', () => {
             // Simulate push failure
             mockProvider.setConfig({ pushFails: true });
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(syncManager.getStatus()).toBe('error');
 
             // Recover (network back)
             mockProvider.setConfig({ pushFails: false });
             syncEventBus.emitEvent('local-save-completed', {});
-            timerMock.advanceTimersByTime(3000);
-            timerMock.runAllTimers();
+            jest.advanceTimersByTime(3000);
+            jest.runAllTimers();
 
             expect(syncManager.getStatus()).toBe('idle');
         });
@@ -424,8 +423,8 @@ describe('Sync Integration Tests', () => {
             // Make new changes
             for (let i = 0; i < 3; i++) {
                 syncEventBus.emitEvent('local-save-completed', {});
-                timerMock.advanceTimersByTime(3000);
-                timerMock.runAllTimers();
+                jest.advanceTimersByTime(3000);
+                jest.runAllTimers();
             }
 
             // Should push all changes

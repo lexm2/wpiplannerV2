@@ -1,17 +1,6 @@
 import { mock, expect } from 'bun:test'
 import { SimpleTime } from '../../src/types/types'
 
-export const mockFetch = (data: any, ok: boolean = true) => {
-  const mockFn = mock().mockResolvedValue({
-    ok,
-    json: () => Promise.resolve(data),
-    status: ok ? 200 : 500,
-    statusText: ok ? 'OK' : 'Internal Server Error'
-  }) as any;
-  mockFn.preconnect = mock();
-  global.fetch = mockFn;
-}
-
 export const mockLocalStorage = () => {
   const store: Record<string, string> = {}
   
@@ -38,7 +27,7 @@ export const createMockDOM = () => {
   `
 }
 
-export const waitFor = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+export const waitFor = (ms: number) => Bun.sleep(ms)
 
 export const expectEventually = async (assertion: () => void, timeout: number = 1000) => {
   const start = Date.now()
@@ -47,7 +36,7 @@ export const expectEventually = async (assertion: () => void, timeout: number = 
       assertion()
       return
     } catch {
-      await waitFor(10)
+      await Bun.sleep(10)
     }
   }
   assertion() // Final attempt that will throw if still failing

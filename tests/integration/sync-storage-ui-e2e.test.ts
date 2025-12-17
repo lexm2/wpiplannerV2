@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
-import { setupSyncTest, cleanupSyncTest, sharedTimerMock as timerMock, type SyncTestContext } from '../helpers/sync-test-setup';
+import { describe, it, expect, beforeEach, afterEach, jest } from 'bun:test';
+import { setupSyncTest, cleanupSyncTest, type SyncTestContext } from '../helpers/sync-test-setup';
 import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
 import { createSyncData, createSchedule, createSelectedCourse } from '../helpers/sync-test-utils';
 import type { MockIndexedDB } from '../mocks/MockIndexedDB';
@@ -173,7 +173,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
             // Act: Sign in with local data
             await syncCtx.syncManager.handleSignIn(localData);
-            timerMock.advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Data pushed to cloud
             expect(syncCtx.mockProvider.getCloudData()).toBeDefined();
@@ -223,7 +223,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
             // Resolve: Keep local
             await syncCtx.syncManager.resolveConflict('local');
-            timerMock.advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Local data in IndexedDB
             const stored = mockIndexedDB.getRawData('wpi-planner', 'schedules', 'schedule-1');
@@ -318,7 +318,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             }));
 
             // Trigger debounced push
-            timerMock.advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Data pushed to cloud
             expect(syncCtx.mockProvider.callHistory.pushData).toBe(1);
@@ -353,11 +353,11 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                     activeScheduleId: 'schedule-1'
                 }));
 
-                timerMock.advanceTimersByTime(500); // Small delay between changes
+                jest.advanceTimersByTime(500); // Small delay between changes
             }
 
             // Wait for debounce to complete
-            timerMock.advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Only one push despite 5 changes
             expect(syncCtx.mockProvider.callHistory.pushData).toBe(1);
@@ -386,7 +386,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
             // Act: Device A signs in and pushes
             syncCtx.mockProvider.setCloudData(null);
             await syncCtx.syncManager.handleSignIn(deviceAData);
-            timerMock.advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Data in cloud
             const cloudData = syncCtx.mockProvider.getCloudData();
@@ -460,7 +460,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                 activeScheduleId: 'schedule-1'
             }));
 
-            timerMock.advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Error state
             expect(syncCtx.syncManager.getStatus()).toBe('error');
@@ -474,7 +474,7 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
                 activeScheduleId: 'schedule-1'
             }));
 
-            timerMock.advanceTimersByTime(3000);
+            jest.advanceTimersByTime(3000);
 
             // Assert: Recovered to idle
             expect(syncCtx.syncManager.getStatus()).toBe('idle');
