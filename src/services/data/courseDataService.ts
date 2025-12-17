@@ -64,9 +64,7 @@ export class CourseDataService {
             generated: jsonData.generated || new Date().toISOString()
         };
         
-        
-        // Log sections for MA1024 specifically
-        this.logMA1024Sections(scheduleDB);
+        //this.logMA1024Sections(scheduleDB); << Lots of sections for reference
         
         return scheduleDB;
     }

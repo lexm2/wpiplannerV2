@@ -79,8 +79,8 @@ export class MockIndexedDB {
             removeEventListener: mock(),
         };
 
-        // Simulate async with configurable delay
-        setTimeout(() => {
+        // Callback to fire when request completes
+        const fireCallback = () => {
             request.readyState = 'done';
             if (error) {
                 if (request.onerror) {
@@ -91,7 +91,15 @@ export class MockIndexedDB {
                     request.onsuccess({ target: request });
                 }
             }
-        }, this.config.operationDelay);
+        };
+
+        // Use queueMicrotask for zero delay to ensure callbacks are assigned first
+        // This fixes race conditions where setTimeout(0) fires before callback assignment
+        if (this.config.operationDelay === 0) {
+            queueMicrotask(fireCallback);
+        } else {
+            setTimeout(fireCallback, this.config.operationDelay);
+        }
 
         return request as IDBRequest<T>;
     }
@@ -309,11 +317,19 @@ export class MockIndexedDB {
         };
 
         // Auto-complete transaction after a delay
-        setTimeout(() => {
+        // Use queueMicrotask for zero delay to ensure operations complete first
+        const fireComplete = () => {
             if (mockTransaction.oncomplete) {
                 mockTransaction.oncomplete({ target: mockTransaction });
             }
-        }, this.config.operationDelay + 10);
+        };
+
+        if (this.config.operationDelay === 0) {
+            // Use nested queueMicrotask to run after request callbacks
+            queueMicrotask(() => queueMicrotask(fireComplete));
+        } else {
+            setTimeout(fireComplete, this.config.operationDelay + 10);
+        }
 
         return mockTransaction as IDBTransaction;
     }
@@ -366,11 +382,18 @@ export class MockIndexedDB {
         request.onupgradeneeded = null;
 
         // Trigger upgrade if needed
-        setTimeout(() => {
+        // Use queueMicrotask for zero delay to ensure callback is assigned first
+        const fireUpgrade = () => {
             if (request.onupgradeneeded) {
                 request.onupgradeneeded({ target: request, oldVersion: 0, newVersion: version });
             }
-        }, this.config.operationDelay / 2);
+        };
+
+        if (this.config.operationDelay === 0) {
+            queueMicrotask(fireUpgrade);
+        } else {
+            setTimeout(fireUpgrade, this.config.operationDelay / 2);
+        }
 
         return request as IDBOpenDBRequest;
     }

@@ -8,12 +8,18 @@ const mockIndexedDBInstance = new MockIndexedDB();
 (global as any).__mockIndexedDB__ = mockIndexedDBInstance;
 
 // Setup global indexedDB to use MockIndexedDB
-(global as any).indexedDB = {
+const mockIndexedDBGlobal = {
   open: (name: string, version?: number) => mockIndexedDBInstance.open(name, version),
   deleteDatabase: (name: string) => mockIndexedDBInstance.deleteDatabase(name),
   databases: () => mockIndexedDBInstance.databases(),
   cmp: (a: any, b: any) => (a < b ? -1 : a > b ? 1 : 0),
 };
+
+// Set on both global and window (Happy-DOM creates separate window object)
+(global as any).indexedDB = mockIndexedDBGlobal;
+if (typeof window !== 'undefined') {
+  (window as any).indexedDB = mockIndexedDBGlobal;
+}
 
 // Setup DOM environment
 beforeEach(() => {
