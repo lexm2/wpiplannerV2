@@ -10,8 +10,14 @@ export interface GoogleDriveConfig {
 
 export const GOOGLE_DRIVE_CONFIG: GoogleDriveConfig = {
     clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_CLIENT_ID_HERE',
-    scopes: ['https://www.googleapis.com/auth/drive.appdata'],
-    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+    scopes: [
+        'https://www.googleapis.com/auth/drive.appdata',
+        'https://www.googleapis.com/auth/calendar'
+    ],
+    discoveryDocs: [
+        'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
+        'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'
+    ],
     appDataFolderName: 'wpi-planner-state.json',
     syncDebounceMs: 2500,
     autoSyncEnabled: true,
