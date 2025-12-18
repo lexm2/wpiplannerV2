@@ -194,80 +194,88 @@ export class ProgressiveRenderer {
                             <div class="course-details">
                                 <div class="course-name">
                                     ${Validators.escapeHtml(course.name)}
-                                    ${hasWarning ? `<span class="warning-icon-wrapper" title="All sections full">${getInlineSVG('ALERT_SQUARE_ROUNDED', 'warning-icon')}</span>` : ''}
+                                    ${hasWarning ? `<span class="capacity-badge">At capacity</span>` : ''}
                                 </div>
-                                ${(() => {
-                                    // Group sections by term
-                                    const sectionsByTerm = new Map<string, any[]>();
-                                    getAllSections(course).forEach((section: any) => {
-                                        const term = section.computedTerm || 'Unknown';
-                                        if (!sectionsByTerm.has(term)) {
-                                            sectionsByTerm.set(term, []);
-                                        }
-                                        sectionsByTerm.get(term)!.push(section);
-                                    });
+                            </div>
+                            ${(() => {
+                                // Group sections by term
+                                const sectionsByTerm = new Map<string, any[]>();
+                                getAllSections(course).forEach((section: any) => {
+                                    const term = section.computedTerm || 'Unknown';
+                                    if (!sectionsByTerm.has(term)) {
+                                        sectionsByTerm.set(term, []);
+                                    }
+                                    sectionsByTerm.get(term)!.push(section);
+                                });
 
-                                    // Sort terms alphabetically
-                                    const sortedTerms = Array.from(sectionsByTerm.keys()).sort();
+                                // Fixed term order: A, B, C, D
+                                const allTerms = ['A', 'B', 'C', 'D'];
+                                // Terms that have sections (for section containers)
+                                const sortedTerms = allTerms.filter(t => sectionsByTerm.has(t));
 
-                                    // Create term badges container (initial view)
-                                    const termBadgesHtml = sortedTerms.map(term => {
-                                        const sections = sectionsByTerm.get(term)!;
-                                        const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
-                                        return `<span class="term-badge ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}">
+                                // Create term badges container (initial view) with fixed positions
+                                const termBadgesHtml = allTerms.map(term => {
+                                    const sections = sectionsByTerm.get(term);
+                                    if (!sections) {
+                                        // Term not available for this course
+                                        return `<span class="term-badge unavailable" data-term="${Validators.escapeHtml(term)}">
+                                            <span class="term-letter">${Validators.escapeHtml(term)}</span>
+                                        </span>`;
+                                    }
+                                    const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
+                                    return `<span class="term-badge ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}">
+                                        <span class="term-letter">${Validators.escapeHtml(term)}</span>
+                                        ${getInlineSVG('PLUS', 'term-icon')}
+                                    </span>`;
+                                }).join('');
+
+                                // Create term-specific section containers (hidden by default)
+                                const termSectionsHtml = sortedTerms.map(term => {
+                                    const sections = sectionsByTerm.get(term)!;
+                                    const sectionBadgesHtml = sections.map((section: any) => {
+                                        const isFull = section.seatsAvailable <= 0;
+                                        const professors = new Set<string>();
+                                        section.periods.forEach((period: { professor: string; }) => {
+                                            if (period.professor &&
+                                                period.professor !== 'TBA' &&
+                                                period.professor !== 'Not Assigned' &&
+                                                period.professor.trim() !== '') {
+                                                professors.add(period.professor);
+                                            }
+                                        });
+                                        const profArray = Array.from(professors);
+                                        const profListPlain = profArray.join(', ') || 'TBA';
+                                        const profListHtml = profArray.length > 0
+                                            ? profArray.map(prof => {
+                                                const escapedProf = Validators.escapeHtml(prof);
+                                                const rmpUrl = rateMyProfessorService.getProfessorRMPUrl(prof);
+                                                return rmpUrl
+                                                    ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProf}</a>`
+                                                    : escapedProf;
+                                            }).join(', ')
+                                            : 'TBA';
+                                        const escapedSectionNumber = Validators.escapeHtml(section.number);
+                                        const escapedProfListPlain = Validators.escapeHtml(profListPlain);
+                                        return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${escapedSectionNumber}" title="${escapedProfListPlain}: ${escapedSectionNumber}">${profListHtml}: ${escapedSectionNumber}</span>`;
+                                    }).join('');
+
+                                    const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
+                                    return `<div class="term-sections-container" data-term="${Validators.escapeHtml(term)}" style="display: none;">
+                                        <span class="term-badge active ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}">
                                             <span class="term-letter">${Validators.escapeHtml(term)}</span>
                                             ${getInlineSVG('PLUS', 'term-icon')}
-                                        </span>`;
-                                    }).join('');
-
-                                    // Create term-specific section containers (hidden by default)
-                                    const termSectionsHtml = sortedTerms.map(term => {
-                                        const sections = sectionsByTerm.get(term)!;
-                                        const sectionBadgesHtml = sections.map((section: any) => {
-                                            const isFull = section.seatsAvailable <= 0;
-                                            const professors = new Set<string>();
-                                            section.periods.forEach((period: { professor: string; }) => {
-                                                if (period.professor &&
-                                                    period.professor !== 'TBA' &&
-                                                    period.professor !== 'Not Assigned' &&
-                                                    period.professor.trim() !== '') {
-                                                    professors.add(period.professor);
-                                                }
-                                            });
-                                            const profArray = Array.from(professors);
-                                            const profListPlain = profArray.join(', ') || 'TBA';
-                                            const profListHtml = profArray.length > 0
-                                                ? profArray.map(prof => {
-                                                    const escapedProf = Validators.escapeHtml(prof);
-                                                    const rmpUrl = rateMyProfessorService.getProfessorRMPUrl(prof);
-                                                    return rmpUrl
-                                                        ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProf}</a>`
-                                                        : escapedProf;
-                                                }).join(', ')
-                                                : 'TBA';
-                                            const escapedSectionNumber = Validators.escapeHtml(section.number);
-                                            const escapedProfListPlain = Validators.escapeHtml(profListPlain);
-                                            return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${escapedSectionNumber}" title="${escapedProfListPlain}: ${escapedSectionNumber}">${profListHtml}: ${escapedSectionNumber}</span>`;
-                                        }).join('');
-
-                                        const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
-                                        return `<div class="term-sections-container" data-term="${Validators.escapeHtml(term)}" style="display: none;">
-                                            <span class="term-badge active ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}">
-                                                <span class="term-letter">${Validators.escapeHtml(term)}</span>
-                                                ${getInlineSVG('PLUS', 'term-icon')}
-                                            </span>
-                                            ${sectionBadgesHtml}
-                                        </div>`;
-                                    }).join('');
-
-                                    return `<div class="course-sections" data-course-id="${Validators.escapeHtml(course.id)}">
-                                        <div class="term-badges-container" style="opacity: 1; transform: translateX(0);">
-                                            ${termBadgesHtml}
-                                        </div>
-                                        ${termSectionsHtml}
+                                        </span>
+                                        ${sectionBadgesHtml}
                                     </div>`;
-                                })()}
-                            </div>
+                                }).join('');
+
+                                return `<div class="course-sections" data-course-id="${Validators.escapeHtml(course.id)}">
+                                    <div class="term-badges-container" style="opacity: 1; transform: translateX(0);">
+                                        ${termBadgesHtml}
+                                    </div>
+                                    ${termSectionsHtml}
+                                </div>`;
+                            })()}
                         </div>
                     </div>
                 `;
@@ -399,7 +407,7 @@ export class ProgressiveRenderer {
                         <div class="course-code-badge">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
                         <div class="course-info">
                             <div class="course-professors-list">${professorDisplay}</div>
-                            ${hasWarning ? `<div class="course-warning" title="All sections full">${getInlineSVG('ALERT_SQUARE_ROUNDED', 'warning-icon')} All sections full</div>` : ''}
+                            ${hasWarning ? `<span class="capacity-badge">At capacity</span>` : ''}
                         </div>
                     </div>
                 `;
