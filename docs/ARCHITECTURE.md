@@ -872,6 +872,28 @@ Time range selection component.
 
 **Used by:** Filter modals for time selection
 
+#### [ResizablePanel.ts](../src/ui/components/ResizablePanel.ts)
+
+Drag-to-resize functionality for layout panels.
+
+**Responsibilities:**
+- Handle mouse/touch drag events on resize handles
+- Update CSS custom properties for panel widths
+- Enforce min/max width constraints
+- Show visual feedback during drag (cursor, indicator line)
+
+**Key Methods:**
+- `resetWidths()` - Reset all panels to default widths
+- `destroy()` - Clean up event listeners
+
+**Configuration per panel:**
+- `handleSelector` - CSS selector for the resize handle element
+- `targetProperty` - CSS custom property to update (e.g., `--panel-sidebar-width`)
+- `minWidth` / `maxWidth` - Width constraints in pixels
+- `direction` - Whether dragging right increases (`left`) or decreases (`right`) width
+
+**Used by:** [MainController](../src/ui/controllers/MainController.ts) - Initialized on startup
+
 #### [SharedFilterComponents.ts](../src/ui/components/SharedFilterComponents.ts)
 
 Reusable filter UI components.
