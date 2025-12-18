@@ -15,6 +15,8 @@ export interface CalendarEventsPanelOptions {
     onShowAll: () => void;
     onHideAll: () => void;
     onClose: () => void;
+    /** Callback when user clicks to change calendar source */
+    onChangeCalendar: () => void;
 }
 
 /**
@@ -152,6 +154,9 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
                     </div>
                 </div>
                 <div class="calendar-events-actions">
+                    <button class="calendar-events-action-btn" id="calendar-change-btn" title="Change calendar">
+                        ${getInlineSVG('CALENDAR_REPEAT', 'action-icon')}
+                    </button>
                     <button class="calendar-events-action-btn" id="calendar-show-all-btn" title="Show all events">
                         ${getInlineSVG('HEXAGON_PLUS', 'action-icon')}
                     </button>
@@ -192,6 +197,12 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         const hideAllBtn = this.querySelector<HTMLButtonElement>('#calendar-hide-all-btn');
         if (hideAllBtn) {
             hideAllBtn.addEventListener('click', () => this.panelOptions.onHideAll());
+        }
+
+        // Change calendar button
+        const changeBtn = this.querySelector<HTMLButtonElement>('#calendar-change-btn');
+        if (changeBtn) {
+            changeBtn.addEventListener('click', () => this.panelOptions.onChangeCalendar());
         }
 
         // Event items

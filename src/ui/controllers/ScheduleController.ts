@@ -8,6 +8,7 @@ import { SectionInfoModalController } from './SectionInfoModalController'
 import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
 import { CalendarEventsPanel } from '../components/CalendarEventsPanel'
+import { CalendarSelectModal } from '../components/CalendarSelectModal'
 import { SidebarManager } from '../sidebar/SidebarManager'
 import type { SidebarPanel } from '../sidebar/types'
 import { TimeUtils } from '../utils/timeUtils'
@@ -18,7 +19,8 @@ import type { AutoScheduleConfig } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { getAllSections } from '../../utils/courseUtils'
-import { calendarService, type CalendarEvent } from '../../services/calendar'
+import { calendarService, type CalendarEvent, type CalendarInfo, type ConnectedCalendar } from '../../services/calendar'
+import { ModalService } from '../../services/ui/ModalService'
 
 interface WizardSelections {
     lecture: Section | null;
@@ -50,12 +52,20 @@ export class ScheduleController {
     private calendarEventsPanel: CalendarEventsPanel | null = null;
     private onScheduleUpdate: ((scheduleId: string, updates: Partial<Schedule>) => void) | null = null;
     private sidebarManager: SidebarManager;
+    private modalService: ModalService | null = null;
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
         this.sidebarManager = new SidebarManager('schedule-sidebar-content');
         this.setupTermFocusHandlers();
         this.setupColorManagement();
+    }
+
+    /**
+     * Set the ModalService for opening modals from this controller.
+     */
+    setModalService(modalService: ModalService): void {
+        this.modalService = modalService;
     }
 
     /**
@@ -244,6 +254,7 @@ export class ScheduleController {
             onShowAll: () => this.handleShowAllEvents(),
             onHideAll: () => this.handleHideAllEvents(),
             onClose: () => this.closeCalendarEventsPanel(),
+            onChangeCalendar: () => this.openCalendarSelectModal(),
         });
 
         // Use SidebarManager to open the panel (handles closing existing panels)
@@ -258,6 +269,76 @@ export class ScheduleController {
     closeCalendarEventsPanel(): void {
         this.calendarEventsPanel = null;
         this.displayScheduleSelectedCourses();
+    }
+
+    /**
+     * Open the calendar selection modal to choose a different calendar.
+     */
+    private openCalendarSelectModal(): void {
+        if (!this.modalService) {
+            console.warn('[ScheduleController] Cannot open calendar select modal - no modal service');
+            return;
+        }
+
+        const provider = calendarService.getProvider();
+        if (!provider) {
+            console.warn('[ScheduleController] Cannot open calendar select modal - no calendar provider');
+            return;
+        }
+
+        const currentCalendarId = this.currentSchedule?.connectedCalendar?.calendarId || 'primary';
+
+        const modal = new CalendarSelectModal(this.modalService, {
+            currentCalendarId,
+            onSelect: async (calendar: CalendarInfo) => {
+                // Only change if different calendar selected
+                if (calendar.id !== currentCalendarId) {
+                    await this.changeConnectedCalendar(calendar);
+                }
+                modal.hide();
+            },
+        });
+
+        modal.show(provider);
+    }
+
+    /**
+     * Change the connected calendar and reload events.
+     */
+    private async changeConnectedCalendar(calendar: CalendarInfo): Promise<void> {
+        if (!this.currentSchedule || !this.onScheduleUpdate) {
+            console.warn('[ScheduleController] Cannot change calendar - no schedule or callback');
+            return;
+        }
+
+        // Build new connected calendar object (clear exclusions for new calendar)
+        const connectedCalendar: ConnectedCalendar = {
+            providerId: 'google',
+            calendarId: calendar.id,
+            calendarName: calendar.name,
+            excludedEventIds: [],
+        };
+
+        // Update local state
+        this.currentSchedule = {
+            ...this.currentSchedule,
+            connectedCalendar,
+        };
+
+        // Persist to backend
+        this.onScheduleUpdate(this.currentSchedule.id, { connectedCalendar });
+
+        // Clear old events and reload from new calendar
+        this.externalEventInstances.clear();
+        this.externalEventParents.clear();
+        await this.loadExternalEvents(this.currentSchedule);
+
+        // Close and re-open the panel to show new calendar events
+        if (this.calendarEventsPanel) {
+            this.calendarEventsPanel.close();
+            this.calendarEventsPanel = null;
+            this.openCalendarEventsPanel();
+        }
     }
 
     /**

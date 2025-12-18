@@ -21,6 +21,7 @@
 @import url('./styles/components/component-wizard.css');
 @import url('./styles/components/sidebar-panel.css'); /* Base sidebar panel styles */
 @import url('./styles/components/calendar-events-panel.css');
+@import url('./styles/components/calendar-select-modal.css');
 @import url('./styles/components/buttons.css');
 @import url('./styles/components/states.css');
 @import url('./styles/components/cloud-status-button.css'); /* Unified cloud status and auth button */

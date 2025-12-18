@@ -213,6 +213,7 @@ export class MainController {
 
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
+        this.scheduleController.setModalService(this.modalService);
 
         // Set up schedule update callback for calendar event exclusions
         this.scheduleController.setScheduleUpdateCallback((scheduleId, updates) => {
