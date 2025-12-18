@@ -44,7 +44,8 @@ export class ScheduleController {
     private generatedSchedules: any[][] = [];
     private currentScheduleIndex: number = 0;
     private isApplyingAutoSchedule: boolean = false;
-    private externalEvents: Map<string, CalendarEvent[]> = new Map(); // term -> events
+    private externalEventInstances: Map<string, CalendarEvent[]> = new Map(); // term -> expanded instances (for grid)
+    private externalEventParents: Map<string, CalendarEvent[]> = new Map(); // term -> parent events (for panel)
     private currentSchedule: Schedule | null = null;
     private calendarEventsPanel: CalendarEventsPanel | null = null;
     private onScheduleUpdate: ((scheduleId: string, updates: Partial<Schedule>) => void) | null = null;
@@ -127,7 +128,8 @@ export class ScheduleController {
         });
 
         this.currentSchedule = schedule;
-        this.externalEvents.clear();
+        this.externalEventInstances.clear();
+        this.externalEventParents.clear();
 
         if (!schedule.connectedCalendar) {
             console.log('[ScheduleController] No connected calendar, skipping external events load');
@@ -148,19 +150,21 @@ export class ScheduleController {
 
         try {
             console.log('[ScheduleController] Loading external events for schedule:', schedule.name);
-            const eventsMap = await calendarService.getEventsForAllTerms(schedule.connectedCalendar);
+            const { instances, parents } = await calendarService.getEventsForAllTerms(schedule.connectedCalendar);
 
-            // Store events by term
-            for (const [term, events] of eventsMap) {
-                this.externalEvents.set(term, events);
-                console.log(`[ScheduleController] Term ${term} events:`, events);
+            // Store instances (for grid) and parents (for panel) by term
+            for (const [term, termInstances] of instances) {
+                this.externalEventInstances.set(term, termInstances);
+            }
+            for (const [term, termParents] of parents) {
+                this.externalEventParents.set(term, termParents);
             }
 
             console.log('[ScheduleController] Loaded external events summary:', {
-                A: this.externalEvents.get('A')?.length || 0,
-                B: this.externalEvents.get('B')?.length || 0,
-                C: this.externalEvents.get('C')?.length || 0,
-                D: this.externalEvents.get('D')?.length || 0,
+                A: { instances: this.externalEventInstances.get('A')?.length || 0, parents: this.externalEventParents.get('A')?.length || 0 },
+                B: { instances: this.externalEventInstances.get('B')?.length || 0, parents: this.externalEventParents.get('B')?.length || 0 },
+                C: { instances: this.externalEventInstances.get('C')?.length || 0, parents: this.externalEventParents.get('C')?.length || 0 },
+                D: { instances: this.externalEventInstances.get('D')?.length || 0, parents: this.externalEventParents.get('D')?.length || 0 },
             });
 
             // Clean up stale exclusion IDs (IDs that no longer exist in calendar events)
@@ -196,6 +200,8 @@ export class ScheduleController {
 
             // Re-render grids with external events
             this.renderScheduleGrids();
+            // Re-render sidebar to show calendar button
+            this.displayScheduleSelectedCourses();
         } catch (error) {
             console.error('[ScheduleController] Failed to load external events:', error);
         }
@@ -205,7 +211,8 @@ export class ScheduleController {
      * Clear external events (e.g., when signing out or disconnecting calendar).
      */
     clearExternalEvents(): void {
-        this.externalEvents.clear();
+        this.externalEventInstances.clear();
+        this.externalEventParents.clear();
         this.currentSchedule = null;
         this.renderScheduleGrids();
     }
@@ -231,7 +238,7 @@ export class ScheduleController {
 
         this.calendarEventsPanel = new CalendarEventsPanel({
             calendarName: this.currentSchedule.connectedCalendar.calendarName,
-            events: this.externalEvents,
+            events: this.externalEventParents, // Pass parent events for panel display
             excludedEventIds: excludedIds,
             onExclusionChange: (eventId, excluded) => this.handleEventExclusionChange(eventId, excluded),
             onShowAll: () => this.handleShowAllEvents(),
@@ -339,9 +346,9 @@ export class ScheduleController {
             return;
         }
 
-        // Collect all event IDs from all terms
+        // Collect all parent event IDs from all terms
         const allEventIds = new Set<string>();
-        for (const events of this.externalEvents.values()) {
+        for (const events of this.externalEventParents.values()) {
             for (const event of events) {
                 if (event.id) {
                     allEventIds.add(event.id);
@@ -374,23 +381,24 @@ export class ScheduleController {
     }
 
     /**
-     * Get total count of external events across all terms.
+     * Get total count of external parent events across all terms.
+     * Returns the count of unique events (not expanded instances).
      */
     getTotalExternalEventCount(): number {
         let total = 0;
-        for (const events of this.externalEvents.values()) {
+        for (const events of this.externalEventParents.values()) {
             total += events.length;
         }
         return total;
     }
 
     /**
-     * Collect all event IDs from loaded external events.
+     * Collect all parent event IDs from loaded external events.
      * Used for validating exclusions and calculating counts.
      */
     private collectAllEventIds(): Set<string> {
         const ids = new Set<string>();
-        for (const events of this.externalEvents.values()) {
+        for (const events of this.externalEventParents.values()) {
             for (const event of events) {
                 if (event.id) {
                     ids.add(event.id);
@@ -398,6 +406,38 @@ export class ScheduleController {
             }
         }
         return ids;
+    }
+
+    /**
+     * Deduplicate recurring event instances for grid display.
+     * Recurring events (those with parentId) only appear once per day-of-week.
+     * Non-recurring events pass through unchanged.
+     * This prevents showing the same event multiple times (once per week) on the term grid.
+     */
+    private deduplicateRecurringEvents(events: CalendarEvent[]): CalendarEvent[] {
+        const seen = new Set<string>();
+        const result: CalendarEvent[] = [];
+
+        for (const event of events) {
+            if (!event.parentId) {
+                // Non-recurring event - keep as-is
+                result.push(event);
+                continue;
+            }
+
+            // Recurring event - deduplicate by (parentId, dayOfWeek, startTime)
+            const eventDate = new Date(event.start.dateTime);
+            const dayOfWeek = eventDate.getDay(); // 0-6
+            const timeOfDay = eventDate.toTimeString().slice(0, 5); // "HH:MM"
+            const key = `${event.parentId}-${dayOfWeek}-${timeOfDay}`;
+
+            if (!seen.has(key)) {
+                seen.add(key);
+                result.push(event);
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -1181,8 +1221,8 @@ export class ScheduleController {
                 return displayTerms.includes(term);
             });
             
-            // Check if we have external events for this term
-            const hasConnectedCalendar = (this.externalEvents.get(term)?.length || 0) > 0;
+            // Check if we have external event instances for this term
+            const hasConnectedCalendar = (this.externalEventInstances.get(term)?.length || 0) > 0;
 
             if (termCourses.length === 0 && !hasConnectedCalendar) {
                 this.renderEmptyGrid(gridContainer);
@@ -1222,11 +1262,21 @@ export class ScheduleController {
             html += `<div class="day-header">${TimeUtils.getDayAbbr(day)}</div>`;
         });
 
-        // Get external events for this term, filtering out excluded ones
-        const allExternalEvents = this.externalEvents.get(term) || [];
+        // Get external event instances for this term, filtering out excluded ones
+        // For instances, check parentId (for recurring) or id (for non-recurring)
+        const allExternalEvents = this.externalEventInstances.get(term) || [];
         const excludedIds = new Set(this.currentSchedule?.connectedCalendar?.excludedEventIds || []);
-        const externalEventsForTerm = allExternalEvents.filter(event => !event.id || !excludedIds.has(event.id));
-        console.log(`[ScheduleController] Rendering term ${term} with ${externalEventsForTerm.length}/${allExternalEvents.length} external events (${excludedIds.size} excluded)`);
+        const filteredEvents = allExternalEvents.filter(event => {
+            // For instances, check parentId first (recurring), then id (non-recurring)
+            const idToCheck = event.parentId || event.id;
+            if (idToCheck && excludedIds.has(idToCheck)) return false;
+            return true;
+        });
+
+        // Deduplicate recurring events: only show one instance per (parentId, dayOfWeek, startTime)
+        // This prevents showing the same recurring event multiple times (once per week) on the grid
+        const externalEventsForTerm = this.deduplicateRecurringEvents(filteredEvents);
+        console.log(`[ScheduleController] Rendering term ${term} with ${externalEventsForTerm.length} unique external events (${filteredEvents.length} after exclusions, ${allExternalEvents.length} total instances)`);
 
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {

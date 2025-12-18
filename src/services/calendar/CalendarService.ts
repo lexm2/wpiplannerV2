@@ -15,6 +15,18 @@ import type {
     ConnectedCalendar,
 } from './types';
 import { DAY_TO_RRULE } from './types';
+import { expandRecurringEvents, type ExpandedEventsResult } from './rruleExpander';
+
+/**
+ * Result of fetching events for all terms.
+ * Contains both expanded instances (for grid rendering) and parent events (for panel display).
+ */
+export interface AllTermsEventsResult {
+    /** Expanded event instances by term (for grid placement) */
+    instances: Map<string, CalendarEvent[]>;
+    /** Parent events with recurrence info by term (for panel display) */
+    parents: Map<string, CalendarEvent[]>;
+}
 
 // =============================================================================
 // Term Date Constants (from ICSGenerator)
@@ -273,17 +285,17 @@ export class CalendarService {
 
     /**
      * Get events for a specific term from a connected calendar.
-     * Filters out excluded events based on the ConnectedCalendar config.
+     * Returns both expanded instances (for grid) and parent events (for panel).
      * @param connectedCalendar The connected calendar to fetch from
      * @param term The term letter (A, B, C, D)
      * @param academicYear The academic year (defaults to current year)
-     * @returns Events for display on the term grid
+     * @returns Object with instances (for grid) and parents (for panel)
      */
     async getEventsForTerm(
         connectedCalendar: ConnectedCalendar,
         term: string,
         academicYear?: number
-    ): Promise<CalendarEvent[]> {
+    ): Promise<ExpandedEventsResult> {
         console.log(`[CalendarService] getEventsForTerm called:`, {
             connectedCalendar,
             term,
@@ -294,7 +306,7 @@ export class CalendarService {
 
         if (!this.provider || !this.provider.isAuthenticated()) {
             console.warn(`[CalendarService] Provider not ready - provider: ${!!this.provider}, authenticated: ${this.provider?.isAuthenticated()}`);
-            return [];
+            return { instances: [], parents: [] };
         }
 
         const year = academicYear || new Date().getFullYear();
@@ -304,57 +316,75 @@ export class CalendarService {
 
         if (!termDates) {
             console.warn(`[CalendarService] Invalid term: ${term}`);
-            return [];
+            return { instances: [], parents: [] };
         }
 
         try {
             console.log(`[CalendarService] Fetching events from calendar "${connectedCalendar.calendarId}" for ${termDates.start.toISOString()} to ${termDates.end.toISOString()}`);
 
-            const events = await this.provider.getEvents(
+            const rawEvents = await this.provider.getEvents(
                 connectedCalendar.calendarId,
                 termDates.start,
                 termDates.end
             );
 
-            console.log(`[CalendarService] Raw events received for term ${term}:`, events);
+            console.log(`[CalendarService] Raw events received for term ${term}:`, rawEvents);
 
-            // Filter out excluded events
+            // Expand recurring events - returns both instances and parents
+            const { instances, parents } = expandRecurringEvents(rawEvents, termDates.start, termDates.end);
+            console.log(`[CalendarService] Expanded ${rawEvents.length} events to ${instances.length} instances, ${parents.length} parents`);
+
+            // Filter out excluded events from instances (check parentId for recurring events)
             const excludedIds = new Set(connectedCalendar.excludedEventIds || []);
-            const filteredEvents = events.filter(e => !e.id || !excludedIds.has(e.id));
+            const filteredInstances = instances.filter(e => {
+                // For instances, check parentId first (recurring), then id (non-recurring)
+                const idToCheck = e.parentId || e.id;
+                if (idToCheck && excludedIds.has(idToCheck)) return false;
+                return true;
+            });
 
-            console.log(`[CalendarService] Fetched ${events.length} events for term ${term}, ${filteredEvents.length} after exclusions`);
-            return filteredEvents;
+            // Filter out excluded events from parents (check id directly)
+            const filteredParents = parents.filter(e => {
+                if (e.id && excludedIds.has(e.id)) return false;
+                return true;
+            });
+
+            console.log(`[CalendarService] Fetched ${instances.length} instances for term ${term}, ${filteredInstances.length} after exclusions`);
+            return { instances: filteredInstances, parents: filteredParents };
         } catch (error) {
             console.error(`[CalendarService] Failed to fetch events for term ${term}:`, error);
-            return [];
+            return { instances: [], parents: [] };
         }
     }
 
     /**
      * Get events for all terms from a connected calendar.
+     * Returns both expanded instances (for grid) and parent events (for panel).
      * @param connectedCalendar The connected calendar to fetch from
      * @param academicYear The academic year (defaults to current year)
-     * @returns Map of term letter to events
+     * @returns Object with instances map (for grid) and parents map (for panel)
      */
     async getEventsForAllTerms(
         connectedCalendar: ConnectedCalendar,
         academicYear?: number
-    ): Promise<Map<string, CalendarEvent[]>> {
-        const result = new Map<string, CalendarEvent[]>();
+    ): Promise<AllTermsEventsResult> {
+        const instancesMap = new Map<string, CalendarEvent[]>();
+        const parentsMap = new Map<string, CalendarEvent[]>();
         const terms = ['A', 'B', 'C', 'D'];
 
         // Fetch all terms in parallel
         const promises = terms.map(async (term) => {
-            const events = await this.getEventsForTerm(connectedCalendar, term, academicYear);
-            return { term, events };
+            const { instances, parents } = await this.getEventsForTerm(connectedCalendar, term, academicYear);
+            return { term, instances, parents };
         });
 
         const results = await Promise.all(promises);
-        for (const { term, events } of results) {
-            result.set(term, events);
+        for (const { term, instances, parents } of results) {
+            instancesMap.set(term, instances);
+            parentsMap.set(term, parents);
         }
 
-        return result;
+        return { instances: instancesMap, parents: parentsMap };
     }
 
     // =========================================================================

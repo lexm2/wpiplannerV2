@@ -32,6 +32,8 @@ export interface ConnectedCalendar {
 export interface CalendarEvent {
     /** Provider-assigned event ID (undefined for new events) */
     id?: string;
+    /** Parent event ID for expanded recurring event instances */
+    parentId?: string;
     /** Event title */
     summary: string;
     /** Event description/notes */
@@ -46,6 +48,10 @@ export interface CalendarEvent {
     recurrence?: string[];
     /** Provider-specific color ID */
     colorId?: string;
+    /** Human-readable recurrence description (e.g., "Weekly on Mon, Wed, Fri") */
+    recurrenceDescription?: string;
+    /** Number of occurrences in the current term (for parent events only) */
+    occurrenceCount?: number;
 }
 
 /**

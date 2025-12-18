@@ -253,7 +253,7 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
     }
 
     /**
-     * Render a single event item
+     * Render a single event item (parent event with optional recurrence info)
      */
     private renderEventItem(event: CalendarEvent, term: string): string {
         const isExcluded = event.id ? this.panelOptions.excludedEventIds.has(event.id) : false;
@@ -262,8 +262,24 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         const time = eventDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
         const dateStr = eventDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
+        // For recurring events, show recurrence description instead of specific date
+        const isRecurring = !!event.recurrenceDescription;
+        const recurrenceHtml = isRecurring
+            ? `<div class="event-recurrence">${Validators.escapeHtml(event.recurrenceDescription!)}</div>`
+            : '';
+
+        // Show occurrence count for recurring events
+        const occurrenceHtml = event.occurrenceCount && event.occurrenceCount > 1
+            ? `<span class="occurrence-count">${event.occurrenceCount} occurrences</span>`
+            : '';
+
+        // Show start time and first date (or just time for recurring)
+        const datetimeHtml = isRecurring
+            ? `<div class="event-datetime">${time}${occurrenceHtml ? ` · ${occurrenceHtml}` : ''}</div>`
+            : `<div class="event-datetime">${dayName}, ${dateStr} at ${time}</div>`;
+
         return `
-            <div class="calendar-event-item ${isExcluded ? 'excluded' : ''}"
+            <div class="calendar-event-item ${isExcluded ? 'excluded' : ''} ${isRecurring ? 'recurring' : ''}"
                  data-event-id="${event.id || ''}"
                  data-term="${term}">
                 <div class="event-visibility-toggle">
@@ -274,7 +290,8 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
                 </div>
                 <div class="event-details">
                     <div class="event-summary">${Validators.escapeHtml(event.summary || 'Untitled Event')}</div>
-                    <div class="event-datetime">${dayName}, ${dateStr} at ${time}</div>
+                    ${recurrenceHtml}
+                    ${datetimeHtml}
                 </div>
             </div>
         `;

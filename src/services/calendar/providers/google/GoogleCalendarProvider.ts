@@ -210,22 +210,12 @@ export class GoogleCalendarProvider implements CalendarProvider {
             calendarId,
             timeMin: timeMin.toISOString(),
             timeMax: timeMax.toISOString(),
-            singleEvents: false, // Get recurring events as-is
+            singleEvents: false, // Get recurring events as-is for local RRULE expansion
             maxResults: 250,
         });
 
         const items = response.result.items || [];
         const events = items.map((event: any) => this.mapGoogleEventToCalendarEvent(event));
-
-        console.log('[GoogleCalendarProvider] Fetched events:', {
-            count: events.length,
-            events: events.map(e => ({
-                id: e.id,
-                summary: e.summary,
-                start: e.start.dateTime,
-                recurrence: e.recurrence,
-            })),
-        });
 
         return events;
     }

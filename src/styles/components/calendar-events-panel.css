@@ -229,6 +229,30 @@
     color: var(--color-text-secondary);
 }
 
+/* Recurrence info for recurring events */
+.event-recurrence {
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: 0.15rem;
+}
+
+/* Occurrence count badge */
+.occurrence-count {
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+    font-weight: normal;
+}
+
+/* Recurring event indicator */
+.calendar-event-item.recurring {
+    border-left: 3px solid var(--color-primary);
+}
+
+.calendar-event-item.recurring.excluded {
+    border-left-color: var(--color-text-secondary);
+}
+
 /* Empty state */
 .no-events-message {
     padding: 2rem;
