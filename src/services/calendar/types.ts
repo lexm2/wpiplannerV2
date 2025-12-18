@@ -253,3 +253,66 @@ export const DAY_TO_RRULE: Record<string, string> = {
     'S': 'SA',
     'U': 'SU'
 };
+
+// -----------------------------------------------------------------------------
+// Utility Functions
+// -----------------------------------------------------------------------------
+
+import { DayOfWeek } from '../../types/types';
+import { AcademicTerm, BlockedTimePeriod } from '../../types/schedule';
+
+/**
+ * Convert a calendar event to a blocked time period.
+ * Returns null if the event is on a weekend or cannot be converted.
+ *
+ * @param event - The calendar event to convert
+ * @param term - The academic term this event belongs to ('A', 'B', 'C', 'D')
+ * @returns BlockedTimePeriod or null if conversion not possible
+ */
+export function calendarEventToBlockedTime(
+    event: CalendarEvent,
+    term: string
+): BlockedTimePeriod | null {
+    // Parse event datetime
+    const startDate = new Date(event.start.dateTime);
+    const endDate = new Date(event.end.dateTime);
+
+    // Get day of week (0=Sun, 1=Mon, etc.)
+    const dayIndex = startDate.getDay();
+
+    // Skip weekend events
+    if (dayIndex === 0 || dayIndex === 6) return null;
+
+    // Convert to DayOfWeek enum
+    const dayMap: Record<number, DayOfWeek> = {
+        1: DayOfWeek.MONDAY,
+        2: DayOfWeek.TUESDAY,
+        3: DayOfWeek.WEDNESDAY,
+        4: DayOfWeek.THURSDAY,
+        5: DayOfWeek.FRIDAY
+    };
+    const day = dayMap[dayIndex];
+    if (!day) return null;
+
+    // Map term string to AcademicTerm enum
+    const termMap: Record<string, AcademicTerm> = {
+        'A': AcademicTerm.A,
+        'B': AcademicTerm.B,
+        'C': AcademicTerm.C,
+        'D': AcademicTerm.D
+    };
+    const academicTerm = termMap[term];
+    if (!academicTerm) return null;
+
+    // Create time objects
+    const startTime = { hours: startDate.getHours(), minutes: startDate.getMinutes() };
+    const endTime = { hours: endDate.getHours(), minutes: endDate.getMinutes() };
+
+    return {
+        id: `calendar-${event.id || `${term}-${day}-${startTime.hours}:${startTime.minutes}`}`,
+        day,
+        startTime,
+        endTime,
+        term: academicTerm
+    };
+}

@@ -1446,3 +1446,111 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
+/* ===== Auto Schedule Settings Modal ===== */
+.auto-schedule-settings-modal .modal-dialog {
+  max-width: 500px;
+}
+
+.auto-schedule-settings-body {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.auto-schedule-settings-body .settings-section {
+  width: 100%;
+}
+
+.auto-schedule-settings-body .settings-section.calendar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.auto-schedule-settings-body .settings-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--effect-border-radius);
+  transition: var(--effect-transition);
+}
+
+.auto-schedule-settings-body .settings-toggle-label:hover {
+  background: var(--color-secondary);
+}
+
+.auto-schedule-settings-body .settings-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  appearance: none;
+  background: var(--color-border);
+  border-radius: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: var(--effect-transition);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.auto-schedule-settings-body .settings-toggle:checked {
+  background: var(--color-primary);
+}
+
+.auto-schedule-settings-body .settings-toggle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: var(--effect-transition);
+}
+
+.auto-schedule-settings-body .settings-toggle:checked::before {
+  transform: translateX(20px);
+}
+
+.auto-schedule-settings-body .settings-toggle-text {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  user-select: none;
+}
+
+/* Calendar button in modal - inherits from schedule-page.css .calendar-events-btn */
+.auto-schedule-settings-body .modal-calendar-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+  transition: var(--effect-transition);
+  text-align: left;
+}
+
+.auto-schedule-settings-body .modal-calendar-btn:hover {
+  background: var(--color-background-alt);
+  border-color: var(--color-primary);
+}
+
+.auto-schedule-settings-body .settings-placeholder {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.auto-schedule-settings-body .settings-hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+

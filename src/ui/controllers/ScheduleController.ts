@@ -15,11 +15,12 @@ import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine'
 import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../../utils/typeGuards'
 import { AutoScheduler } from '../../services/scheduling/AutoScheduler'
-import type { AutoScheduleConfig } from '../../types/schedule'
+import type { AutoScheduleConfig, AutoScheduleSettings, BlockedTimePeriod } from '../../types/schedule'
+import { AutoScheduleSettingsModal } from '../components/AutoScheduleSettingsModal'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { getAllSections } from '../../utils/courseUtils'
-import { calendarService, type CalendarEvent, type CalendarInfo, type ConnectedCalendar } from '../../services/calendar'
+import { calendarService, calendarEventToBlockedTime, type CalendarEvent, type CalendarInfo, type ConnectedCalendar } from '../../services/calendar'
 import { ModalService } from '../../services/ui/ModalService'
 
 interface WizardSelections {
@@ -2070,8 +2071,44 @@ export class ScheduleController {
             return;
         }
 
-        // Generate new schedules (first click or after manual selection change cleared the array)
-        console.log('[Auto-Schedule] Generating new schedules...');
+        // Generate new schedules - show settings modal first
+        if (!this.modalService) {
+            console.error('[Auto-Schedule] Modal service not available');
+            // Fall back to generating with default settings
+            await this.generateSchedulesWithSettings({ blockedTimes: [] }, selectedCourses);
+            return;
+        }
+
+        // Show the settings modal with calendar info if connected
+        const hasConnectedCalendar = !!this.currentSchedule?.connectedCalendar;
+        const calendarName = this.currentSchedule?.connectedCalendar?.calendarName;
+        const calendarProvider = this.currentSchedule?.connectedCalendar?.providerId;
+        const calendarEventCount = this.getBlockableEventCount();
+
+        const settingsModal = new AutoScheduleSettingsModal(this.modalService, {
+            onNext: async (settings: AutoScheduleSettings) => {
+                await this.generateSchedulesWithSettings(settings, selectedCourses);
+            },
+            onOpenCalendarPanel: () => {
+                this.openCalendarEventsPanel();
+            },
+            hasConnectedCalendar,
+            calendarName,
+            calendarProvider,
+            calendarEventCount
+        });
+        settingsModal.show();
+    }
+
+    /**
+     * Generate schedules with the given settings.
+     * Called after user configures settings in the modal.
+     */
+    private async generateSchedulesWithSettings(
+        settings: AutoScheduleSettings,
+        selectedCourses: SelectedCourse[]
+    ): Promise<void> {
+        console.log('[Auto-Schedule] Generating new schedules with settings:', settings);
 
         const autoScheduleBtn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
         if (autoScheduleBtn) {
@@ -2080,11 +2117,18 @@ export class ScheduleController {
         }
 
         try {
-            const autoScheduler = new AutoScheduler(this.scheduleFilterService);
+            const autoScheduler = new AutoScheduler(this.scheduleFilterService!);
 
-            // Config with empty blocked times for now (UI will be added later)
+            // Merge calendar events into blocked times if enabled
+            let blockedTimes = [...settings.blockedTimes];
+            if (settings.avoidCalendarEvents) {
+                const calendarBlockedTimes = this.convertCalendarEventsToBlockedTimes();
+                blockedTimes = [...blockedTimes, ...calendarBlockedTimes];
+                console.log(`[Auto-Schedule] Added ${calendarBlockedTimes.length} blocked times from calendar events`);
+            }
+
             const config: AutoScheduleConfig = {
-                blockedTimes: []
+                blockedTimes
             };
 
             const allSchedules = autoScheduler.generateSchedules(selectedCourses, config, 100);
@@ -2114,6 +2158,72 @@ export class ScheduleController {
             this.currentScheduleIndex = 0;
             this.updateAutoScheduleButtonUI();
         }
+    }
+
+    /**
+     * Convert calendar events to blocked time periods for the auto-scheduler.
+     * Deduplicates by term+day+time (like the display does for recurring events).
+     */
+    private convertCalendarEventsToBlockedTimes(): BlockedTimePeriod[] {
+        const blockedTimes: BlockedTimePeriod[] = [];
+        const seen = new Set<string>(); // Dedupe by term+day+time
+
+        // Get excluded event IDs
+        const excludedIds = new Set(
+            this.currentSchedule?.connectedCalendar?.excludedEventIds || []
+        );
+
+        for (const [term, events] of this.externalEventInstances) {
+            for (const event of events) {
+                // Skip excluded events
+                const eventIdToCheck = event.parentId || event.id;
+                if (eventIdToCheck && excludedIds.has(eventIdToCheck)) continue;
+
+                // Convert using utility function
+                const blockedTime = calendarEventToBlockedTime(event, term);
+                if (!blockedTime) continue;
+
+                // Dedupe by term+day+startTime+endTime
+                const key = `${term}-${blockedTime.day}-${blockedTime.startTime.hours}:${blockedTime.startTime.minutes}-${blockedTime.endTime.hours}:${blockedTime.endTime.minutes}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+
+                blockedTimes.push(blockedTime);
+            }
+        }
+
+        return blockedTimes;
+    }
+
+    /**
+     * Get the count of calendar events that will be blocked (non-excluded, weekday events).
+     */
+    private getBlockableEventCount(): number {
+        const excludedIds = new Set(
+            this.currentSchedule?.connectedCalendar?.excludedEventIds || []
+        );
+        const seen = new Set<string>();
+        let count = 0;
+
+        for (const [term, events] of this.externalEventInstances) {
+            for (const event of events) {
+                const eventIdToCheck = event.parentId || event.id;
+                if (eventIdToCheck && excludedIds.has(eventIdToCheck)) continue;
+
+                // Convert using utility function to check validity
+                const blockedTime = calendarEventToBlockedTime(event, term);
+                if (!blockedTime) continue;
+
+                // Dedupe by term+day+time
+                const key = `${term}-${blockedTime.day}-${blockedTime.startTime.hours}:${blockedTime.startTime.minutes}-${blockedTime.endTime.hours}:${blockedTime.endTime.minutes}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+
+                count++;
+            }
+        }
+
+        return count;
     }
 
     private async applyScheduleAtIndex(index: number): Promise<void> {

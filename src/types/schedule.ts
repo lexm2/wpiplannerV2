@@ -137,8 +137,9 @@ export interface AutoScheduleConfig {
 /**
  * Settings for the auto-scheduler including user preferences.
  * Extended from AutoScheduleConfig to include weights and other settings.
- * Currently empty - will add weights and preferences incrementally.
  */
 export interface AutoScheduleSettings extends AutoScheduleConfig {
+    /** Whether to avoid calendar events when scheduling */
+    avoidCalendarEvents?: boolean;
     // Future: weights for scoring (professorRating, earlyMorning, timeGap, etc.)
 }

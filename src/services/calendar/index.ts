@@ -14,10 +14,13 @@ export type {
     ConnectedCalendar,
 } from './types';
 
-export { DAY_TO_RRULE } from './types';
+export { DAY_TO_RRULE, calendarEventToBlockedTime } from './types';
 
 // Service
 export { CalendarService, calendarService } from './CalendarService';
+
+// State - now in core/state
+// export { CalendarState } from '../../core/state/CalendarState';
 
 // Providers
 export { GoogleCalendarProvider } from './providers/google/GoogleCalendarProvider';
