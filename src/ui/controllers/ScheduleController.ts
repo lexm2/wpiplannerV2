@@ -15,12 +15,13 @@ import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine'
 import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../../utils/typeGuards'
 import { AutoScheduler } from '../../services/scheduling/AutoScheduler'
-import type { AutoScheduleConfig, AutoScheduleSettings, BlockedTimePeriod } from '../../types/schedule'
+import type { AutoScheduleConfig, AutoScheduleSettings, BlockedTimePeriod, WeeklyTimeSlot } from '../../types/schedule'
 import { AutoScheduleSettingsModal } from '../components/AutoScheduleSettingsModal'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { getAllSections } from '../../utils/courseUtils'
-import { calendarService, calendarEventToBlockedTime, type CalendarEvent, type CalendarInfo, type ConnectedCalendar } from '../../services/calendar'
+import { calendarService, type CalendarEvent, type CalendarInfo, type ConnectedCalendar } from '../../services/calendar'
+import { CalendarState } from '../../core/state/CalendarState'
 import { ModalService } from '../../services/ui/ModalService'
 
 interface WizardSelections {
@@ -47,8 +48,7 @@ export class ScheduleController {
     private generatedSchedules: any[][] = [];
     private currentScheduleIndex: number = 0;
     private isApplyingAutoSchedule: boolean = false;
-    private externalEventInstances: Map<string, CalendarEvent[]> = new Map(); // term -> expanded instances (for grid)
-    private externalEventParents: Map<string, CalendarEvent[]> = new Map(); // term -> parent events (for panel)
+    private calendarState: CalendarState = new CalendarState();
     private currentSchedule: Schedule | null = null;
     private calendarEventsPanel: CalendarEventsPanel | null = null;
     private onScheduleUpdate: ((scheduleId: string, updates: Partial<Schedule>) => void) | null = null;
@@ -139,48 +139,32 @@ export class ScheduleController {
         });
 
         this.currentSchedule = schedule;
-        this.externalEventInstances.clear();
-        this.externalEventParents.clear();
 
         if (!schedule.connectedCalendar) {
             console.log('[ScheduleController] No connected calendar, skipping external events load');
+            this.calendarState.clearEvents();
             this.renderScheduleGrids();
             return;
         }
 
-        console.log('[ScheduleController] Calendar service state:', {
-            isReady: calendarService.isReady(),
-            provider: calendarService.getProvider()?.id,
-        });
-
         if (!calendarService.isReady()) {
             console.log('[ScheduleController] Calendar service not ready, skipping external events load');
+            this.calendarState.clearEvents();
             this.renderScheduleGrids();
             return;
         }
 
         try {
             console.log('[ScheduleController] Loading external events for schedule:', schedule.name);
-            const { instances, parents } = await calendarService.getEventsForAllTerms(schedule.connectedCalendar);
 
-            // Store instances (for grid) and parents (for panel) by term
-            for (const [term, termInstances] of instances) {
-                this.externalEventInstances.set(term, termInstances);
-            }
-            for (const [term, termParents] of parents) {
-                this.externalEventParents.set(term, termParents);
-            }
+            // Use CalendarState to load events
+            await this.calendarState.loadEvents(schedule.connectedCalendar);
 
-            console.log('[ScheduleController] Loaded external events summary:', {
-                A: { instances: this.externalEventInstances.get('A')?.length || 0, parents: this.externalEventParents.get('A')?.length || 0 },
-                B: { instances: this.externalEventInstances.get('B')?.length || 0, parents: this.externalEventParents.get('B')?.length || 0 },
-                C: { instances: this.externalEventInstances.get('C')?.length || 0, parents: this.externalEventParents.get('C')?.length || 0 },
-                D: { instances: this.externalEventInstances.get('D')?.length || 0, parents: this.externalEventParents.get('D')?.length || 0 },
-            });
+            console.log('[ScheduleController] Loaded external events via CalendarState');
 
             // Clean up stale exclusion IDs (IDs that no longer exist in calendar events)
             if (schedule.connectedCalendar?.excludedEventIds?.length) {
-                const validEventIds = this.collectAllEventIds();
+                const validEventIds = this.calendarState.collectAllEventIds();
                 const currentExclusions = schedule.connectedCalendar.excludedEventIds;
                 const validExclusions = currentExclusions.filter(id => validEventIds.has(id));
 
@@ -188,6 +172,9 @@ export class ScheduleController {
                 if (validExclusions.length !== currentExclusions.length) {
                     const staleCount = currentExclusions.length - validExclusions.length;
                     console.log(`[ScheduleController] Removed ${staleCount} stale exclusion IDs`);
+
+                    // Update CalendarState with valid exclusions
+                    this.calendarState.setExcludedIds(validExclusions);
 
                     const updatedCalendar = {
                         ...schedule.connectedCalendar,
@@ -222,8 +209,7 @@ export class ScheduleController {
      * Clear external events (e.g., when signing out or disconnecting calendar).
      */
     clearExternalEvents(): void {
-        this.externalEventInstances.clear();
-        this.externalEventParents.clear();
+        this.calendarState.clearEvents();
         this.currentSchedule = null;
         this.renderScheduleGrids();
     }
@@ -245,11 +231,12 @@ export class ScheduleController {
             return;
         }
 
-        const excludedIds = new Set(this.currentSchedule.connectedCalendar.excludedEventIds || []);
+        const excludedIds = this.calendarState.getExcludedIds();
+        const eventsByTerm = this.calendarState.getAllParents();
 
         this.calendarEventsPanel = new CalendarEventsPanel({
             calendarName: this.currentSchedule.connectedCalendar.calendarName,
-            events: this.externalEventParents, // Pass parent events for panel display
+            events: eventsByTerm, // Pass parent events for panel display
             excludedEventIds: excludedIds,
             onExclusionChange: (eventId, excluded) => this.handleEventExclusionChange(eventId, excluded),
             onShowAll: () => this.handleShowAllEvents(),
@@ -330,8 +317,7 @@ export class ScheduleController {
         this.onScheduleUpdate(this.currentSchedule.id, { connectedCalendar });
 
         // Clear old events and reload from new calendar
-        this.externalEventInstances.clear();
-        this.externalEventParents.clear();
+        this.calendarState.clearEvents();
         await this.loadExternalEvents(this.currentSchedule);
 
         // Close and re-open the panel to show new calendar events
@@ -352,21 +338,11 @@ export class ScheduleController {
             return;
         }
 
-        const currentExcluded = new Set(this.currentSchedule.connectedCalendar.excludedEventIds || []);
+        // Update CalendarState (triggers recompute of blocked times)
+        this.calendarState.setExcluded(eventId, excluded);
 
-        if (excluded) {
-            currentExcluded.add(eventId);
-        } else {
-            currentExcluded.delete(eventId);
-        }
-
-        // 1. OPTIMISTIC UI: Update panel display immediately for instant feedback
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateExcludedIds(currentExcluded);
-        }
-
-        // 2. Update local state
-        const newExcludedArray = Array.from(currentExcluded);
+        // Persist to schedule
+        const newExcludedArray = this.calendarState.getExcludedIdsArray();
         const updatedCalendar = {
             ...this.currentSchedule.connectedCalendar,
             excludedEventIds: newExcludedArray,
@@ -376,10 +352,13 @@ export class ScheduleController {
             connectedCalendar: updatedCalendar,
         };
 
-        // 3. Re-render grids to show/hide the event
+        // Update UI
+        if (this.calendarEventsPanel) {
+            this.calendarEventsPanel.updateExcludedIds(this.calendarState.getExcludedIds());
+        }
         this.renderScheduleGrids();
 
-        // 4. Persist to backend LAST (this triggers events that could interfere with UI)
+        // Persist to backend
         this.onScheduleUpdate(this.currentSchedule.id, {
             connectedCalendar: updatedCalendar,
         });
@@ -393,15 +372,10 @@ export class ScheduleController {
             return;
         }
 
-        // Clear all exclusions
-        const emptyExcluded = new Set<string>();
+        // Clear all exclusions in CalendarState
+        this.calendarState.showAll();
 
-        // 1. Optimistic UI update
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateExcludedIds(emptyExcluded);
-        }
-
-        // 2. Update local state
+        // Update local state
         const updatedCalendar = {
             ...this.currentSchedule.connectedCalendar,
             excludedEventIds: [],
@@ -411,10 +385,13 @@ export class ScheduleController {
             connectedCalendar: updatedCalendar,
         };
 
-        // 3. Re-render grids
+        // Update UI
+        if (this.calendarEventsPanel) {
+            this.calendarEventsPanel.updateExcludedIds(this.calendarState.getExcludedIds());
+        }
         this.renderScheduleGrids();
 
-        // 4. Persist to backend
+        // Persist to backend
         this.onScheduleUpdate(this.currentSchedule.id, {
             connectedCalendar: updatedCalendar,
         });
@@ -428,35 +405,26 @@ export class ScheduleController {
             return;
         }
 
-        // Collect all parent event IDs from all terms
-        const allEventIds = new Set<string>();
-        for (const events of this.externalEventParents.values()) {
-            for (const event of events) {
-                if (event.id) {
-                    allEventIds.add(event.id);
-                }
-            }
-        }
+        // Hide all events in CalendarState
+        this.calendarState.hideAll();
 
-        // 1. Optimistic UI update
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateExcludedIds(allEventIds);
-        }
-
-        // 2. Update local state
+        // Update local state
         const updatedCalendar = {
             ...this.currentSchedule.connectedCalendar,
-            excludedEventIds: Array.from(allEventIds),
+            excludedEventIds: this.calendarState.getExcludedIdsArray(),
         };
         this.currentSchedule = {
             ...this.currentSchedule,
             connectedCalendar: updatedCalendar,
         };
 
-        // 3. Re-render grids
+        // Update UI
+        if (this.calendarEventsPanel) {
+            this.calendarEventsPanel.updateExcludedIds(this.calendarState.getExcludedIds());
+        }
         this.renderScheduleGrids();
 
-        // 4. Persist to backend
+        // Persist to backend
         this.onScheduleUpdate(this.currentSchedule.id, {
             connectedCalendar: updatedCalendar,
         });
@@ -468,58 +436,10 @@ export class ScheduleController {
      */
     getTotalExternalEventCount(): number {
         let total = 0;
-        for (const events of this.externalEventParents.values()) {
+        for (const events of this.calendarState.getAllParents().values()) {
             total += events.length;
         }
         return total;
-    }
-
-    /**
-     * Collect all parent event IDs from loaded external events.
-     * Used for validating exclusions and calculating counts.
-     */
-    private collectAllEventIds(): Set<string> {
-        const ids = new Set<string>();
-        for (const events of this.externalEventParents.values()) {
-            for (const event of events) {
-                if (event.id) {
-                    ids.add(event.id);
-                }
-            }
-        }
-        return ids;
-    }
-
-    /**
-     * Deduplicate recurring event instances for grid display.
-     * Recurring events (those with parentId) only appear once per day-of-week.
-     * Non-recurring events pass through unchanged.
-     * This prevents showing the same event multiple times (once per week) on the term grid.
-     */
-    private deduplicateRecurringEvents(events: CalendarEvent[]): CalendarEvent[] {
-        const seen = new Set<string>();
-        const result: CalendarEvent[] = [];
-
-        for (const event of events) {
-            if (!event.parentId) {
-                // Non-recurring event - keep as-is
-                result.push(event);
-                continue;
-            }
-
-            // Recurring event - deduplicate by (parentId, dayOfWeek, startTime)
-            const eventDate = new Date(event.start.dateTime);
-            const dayOfWeek = eventDate.getDay(); // 0-6
-            const timeOfDay = eventDate.toTimeString().slice(0, 5); // "HH:MM"
-            const key = `${event.parentId}-${dayOfWeek}-${timeOfDay}`;
-
-            if (!seen.has(key)) {
-                seen.add(key);
-                result.push(event);
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -1014,7 +934,7 @@ export class ScheduleController {
         const totalEvents = this.getTotalExternalEventCount();
 
         // Count only valid exclusions (IDs that actually exist in loaded events)
-        const allEventIds = this.collectAllEventIds();
+        const allEventIds = this.calendarState.collectAllEventIds();
         const excludedIds = this.currentSchedule.connectedCalendar.excludedEventIds || [];
         const validExcludedCount = excludedIds.filter(id => allEventIds.has(id)).length;
         const visibleCount = totalEvents - validExcludedCount;
@@ -1298,9 +1218,9 @@ export class ScheduleController {
             });
             
             // Check if we have external event instances for this term
-            const hasConnectedCalendar = (this.externalEventInstances.get(term)?.length || 0) > 0;
+            const hasExternalEvents = this.calendarState.getInstancesForTerm(term).length > 0;
 
-            if (termCourses.length === 0 && !hasConnectedCalendar) {
+            if (termCourses.length === 0 && !hasExternalEvents) {
                 this.renderEmptyGrid(gridContainer);
                 return;
             }
@@ -1338,21 +1258,9 @@ export class ScheduleController {
             html += `<div class="day-header">${TimeUtils.getDayAbbr(day)}</div>`;
         });
 
-        // Get external event instances for this term, filtering out excluded ones
-        // For instances, check parentId (for recurring) or id (for non-recurring)
-        const allExternalEvents = this.externalEventInstances.get(term) || [];
-        const excludedIds = new Set(this.currentSchedule?.connectedCalendar?.excludedEventIds || []);
-        const filteredEvents = allExternalEvents.filter(event => {
-            // For instances, check parentId first (recurring), then id (non-recurring)
-            const idToCheck = event.parentId || event.id;
-            if (idToCheck && excludedIds.has(idToCheck)) return false;
-            return true;
-        });
-
-        // Deduplicate recurring events: only show one instance per (parentId, dayOfWeek, startTime)
-        // This prevents showing the same recurring event multiple times (once per week) on the grid
-        const externalEventsForTerm = this.deduplicateRecurringEvents(filteredEvents);
-        console.log(`[ScheduleController] Rendering term ${term} with ${externalEventsForTerm.length} unique external events (${filteredEvents.length} after exclusions, ${allExternalEvents.length} total instances)`);
+        // Get weekly slots (pre-computed, deduplicated, filtered) from CalendarState
+        const calendarSlotsForTerm = this.calendarState.getWeeklySlotsForTerm(term);
+        console.log(`[ScheduleController] Rendering term ${term} with ${calendarSlotsForTerm.length} calendar slots`);
 
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {
@@ -1365,7 +1273,7 @@ export class ScheduleController {
 
             // Schedule cells for each day
             weekdays.forEach(day => {
-                const cell = this.getCellContent(courses, day, slot, externalEventsForTerm);
+                const cell = this.getCellContent(courses, day, slot, calendarSlotsForTerm);
                 if (cell.classes.includes('has-conflict')) {
                     hasConflicts = true;
                 }
@@ -1406,11 +1314,11 @@ export class ScheduleController {
         }
     }
 
-    private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number, externalEvents: CalendarEvent[] = []): { content: string, classes: string } {
+    private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number, calendarSlots: WeeklyTimeSlot[] = []): { content: string, classes: string } {
         // Find all sections that occupy this cell
         const occupyingSections: any[] = [];
-        // Find external events that occupy this cell
-        const occupyingExternalEvents: any[] = [];
+        // Find calendar slots that occupy this cell
+        const occupyingCalendarSlots: any[] = [];
 
         for (const selectedCourse of courses) {
             // Collect all component sections (lecture, discussion, lab)
@@ -1481,67 +1389,27 @@ export class ScheduleController {
             }
         }
 
-        // Process external calendar events
-        const dayMapping: Record<DayOfWeek, number> = {
-            [DayOfWeek.SUNDAY]: 0,
-            [DayOfWeek.MONDAY]: 1,
-            [DayOfWeek.TUESDAY]: 2,
-            [DayOfWeek.WEDNESDAY]: 3,
-            [DayOfWeek.THURSDAY]: 4,
-            [DayOfWeek.FRIDAY]: 5,
-            [DayOfWeek.SATURDAY]: 6,
-        };
-
-        for (const event of externalEvents) {
-            // Parse event start/end times
-            const startDate = new Date(event.start.dateTime);
-            const endDate = new Date(event.end.dateTime);
-
-            // Check if this event is on the current day
-            const eventDay = startDate.getDay();
-            const targetDayNum = dayMapping[day];
-
-            // Debug logging for first slot only to reduce noise
-            if (timeSlot === 0) {
-                console.log(`[getCellContent] Processing event "${event.summary}":`, {
-                    eventDay,
-                    targetDayNum,
-                    day,
-                    startDateTime: event.start.dateTime,
-                    parsedStartDate: startDate.toString(),
-                    startHour: startDate.getHours(),
-                    startMinutes: startDate.getMinutes(),
-                });
-            }
-
-            if (eventDay !== targetDayNum) {
+        // Process calendar slots (already pre-computed with day and time info)
+        for (const slot of calendarSlots) {
+            // Check if this slot is on the current day
+            if (slot.day !== day) {
                 continue;
             }
 
-            // Calculate time slots
-            const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
-            const endMinutes = endDate.getHours() * 60 + endDate.getMinutes();
+            // Use pre-computed time values from WeeklyTimeSlot
+            const startMinutes = slot.startTime.hours * 60 + slot.startTime.minutes;
+            const endMinutes = slot.endTime.hours * 60 + slot.endTime.minutes;
 
             // Map to grid slots (TimeUtils.START_HOUR is typically 7am)
             const startSlot = Math.floor((startMinutes - TimeUtils.START_HOUR * 60) / 60);
             const endSlot = Math.ceil((endMinutes - TimeUtils.START_HOUR * 60) / 60);
 
-            console.log(`[getCellContent] Event "${event.summary}" time calculation:`, {
-                startMinutes,
-                endMinutes,
-                startSlot,
-                endSlot,
-                currentTimeSlot: timeSlot,
-                START_HOUR: TimeUtils.START_HOUR,
-                overlaps: timeSlot >= startSlot && timeSlot < endSlot,
-            });
-
-            // Check if this event overlaps with current time slot
+            // Check if this slot overlaps with current time slot
             if (timeSlot >= startSlot && timeSlot < endSlot) {
                 const isFirstSlot = timeSlot === startSlot;
 
-                occupyingExternalEvents.push({
-                    event,
+                occupyingCalendarSlots.push({
+                    slot,
                     startSlot,
                     endSlot,
                     isFirstSlot,
@@ -1551,7 +1419,7 @@ export class ScheduleController {
             }
         }
 
-        if (occupyingSections.length === 0 && occupyingExternalEvents.length === 0) {
+        if (occupyingSections.length === 0 && occupyingCalendarSlots.length === 0) {
             return { content: '', classes: '' };
         }
 
@@ -1676,21 +1544,21 @@ export class ScheduleController {
             }
         }
 
-        // Render external calendar events
-        for (const externalEvent of occupyingExternalEvents) {
-            if (!externalEvent.isFirstSlot) {
+        // Render calendar slots
+        for (const calendarSlot of occupyingCalendarSlots) {
+            if (!calendarSlot.isFirstSlot) {
                 continue; // Skip continuation slots
             }
 
-            const durationMinutes = externalEvent.endMinutes - externalEvent.startMinutes;
-            const startOffsetMinutes = externalEvent.startMinutes - (TimeUtils.START_HOUR * 60);
+            const durationMinutes = calendarSlot.endMinutes - calendarSlot.startMinutes;
+            const startOffsetMinutes = calendarSlot.startMinutes - (TimeUtils.START_HOUR * 60);
             const slotStartMinutes = timeSlot * 60;
             const topOffsetPercent = ((startOffsetMinutes - slotStartMinutes) / 60) * 100;
             const heightPercent = (durationMinutes / 60) * 100;
 
-            // Escape the event summary for safe HTML insertion
-            const eventTitle = Validators.escapeHtml(externalEvent.event.summary || 'Untitled Event');
-            const eventId = externalEvent.event.id || '';
+            // Use title from WeeklyTimeSlot (already computed)
+            const eventTitle = Validators.escapeHtml(calendarSlot.slot.title || 'Untitled Event');
+            const eventId = calendarSlot.slot.sourceId || '';
 
             contentBlocks += `
                 <div class="external-event-block"
@@ -1718,7 +1586,7 @@ export class ScheduleController {
             `;
         }
 
-        const hasAnyFirstSlot = occupyingSections.some(os => os.isFirstSlot) || occupyingExternalEvents.some(e => e.isFirstSlot);
+        const hasAnyFirstSlot = occupyingSections.some(os => os.isFirstSlot) || occupyingCalendarSlots.some(s => s.isFirstSlot);
         const classes = hasAnyFirstSlot ?
             `occupied section-start ${hasConflict ? 'has-conflict' : ''}` :
             '';
@@ -2083,7 +1951,7 @@ export class ScheduleController {
         const hasConnectedCalendar = !!this.currentSchedule?.connectedCalendar;
         const calendarName = this.currentSchedule?.connectedCalendar?.calendarName;
         const calendarProvider = this.currentSchedule?.connectedCalendar?.providerId;
-        const calendarEventCount = this.getBlockableEventCount();
+        const calendarEventCount = this.calendarState.getBlockableEventCount();
 
         const settingsModal = new AutoScheduleSettingsModal(this.modalService, {
             onNext: async (settings: AutoScheduleSettings) => {
@@ -2122,7 +1990,7 @@ export class ScheduleController {
             // Merge calendar events into blocked times if enabled
             let blockedTimes = [...settings.blockedTimes];
             if (settings.avoidCalendarEvents) {
-                const calendarBlockedTimes = this.convertCalendarEventsToBlockedTimes();
+                const calendarBlockedTimes = this.calendarState.getAllBlockedTimes();
                 blockedTimes = [...blockedTimes, ...calendarBlockedTimes];
                 console.log(`[Auto-Schedule] Added ${calendarBlockedTimes.length} blocked times from calendar events`);
             }
@@ -2158,72 +2026,6 @@ export class ScheduleController {
             this.currentScheduleIndex = 0;
             this.updateAutoScheduleButtonUI();
         }
-    }
-
-    /**
-     * Convert calendar events to blocked time periods for the auto-scheduler.
-     * Deduplicates by term+day+time (like the display does for recurring events).
-     */
-    private convertCalendarEventsToBlockedTimes(): BlockedTimePeriod[] {
-        const blockedTimes: BlockedTimePeriod[] = [];
-        const seen = new Set<string>(); // Dedupe by term+day+time
-
-        // Get excluded event IDs
-        const excludedIds = new Set(
-            this.currentSchedule?.connectedCalendar?.excludedEventIds || []
-        );
-
-        for (const [term, events] of this.externalEventInstances) {
-            for (const event of events) {
-                // Skip excluded events
-                const eventIdToCheck = event.parentId || event.id;
-                if (eventIdToCheck && excludedIds.has(eventIdToCheck)) continue;
-
-                // Convert using utility function
-                const blockedTime = calendarEventToBlockedTime(event, term);
-                if (!blockedTime) continue;
-
-                // Dedupe by term+day+startTime+endTime
-                const key = `${term}-${blockedTime.day}-${blockedTime.startTime.hours}:${blockedTime.startTime.minutes}-${blockedTime.endTime.hours}:${blockedTime.endTime.minutes}`;
-                if (seen.has(key)) continue;
-                seen.add(key);
-
-                blockedTimes.push(blockedTime);
-            }
-        }
-
-        return blockedTimes;
-    }
-
-    /**
-     * Get the count of calendar events that will be blocked (non-excluded, weekday events).
-     */
-    private getBlockableEventCount(): number {
-        const excludedIds = new Set(
-            this.currentSchedule?.connectedCalendar?.excludedEventIds || []
-        );
-        const seen = new Set<string>();
-        let count = 0;
-
-        for (const [term, events] of this.externalEventInstances) {
-            for (const event of events) {
-                const eventIdToCheck = event.parentId || event.id;
-                if (eventIdToCheck && excludedIds.has(eventIdToCheck)) continue;
-
-                // Convert using utility function to check validity
-                const blockedTime = calendarEventToBlockedTime(event, term);
-                if (!blockedTime) continue;
-
-                // Dedupe by term+day+time
-                const key = `${term}-${blockedTime.day}-${blockedTime.startTime.hours}:${blockedTime.startTime.minutes}-${blockedTime.endTime.hours}:${blockedTime.endTime.minutes}`;
-                if (seen.has(key)) continue;
-                seen.add(key);
-
-                count++;
-            }
-        }
-
-        return count;
     }
 
     private async applyScheduleAtIndex(index: number): Promise<void> {

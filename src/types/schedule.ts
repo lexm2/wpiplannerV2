@@ -126,6 +126,40 @@ export interface BlockedTimePeriod {
 }
 
 /**
+ * Unified representation of a weekly time slot.
+ * Used for calendar events, blocked times, and grid display.
+ *
+ * This provides a single structure for anything that occupies
+ * a day+time on the weekly schedule grid.
+ */
+export interface WeeklyTimeSlot {
+    /** Unique identifier for this slot */
+    id: string;
+    /** Day of the week */
+    day: DayOfWeek;
+    /** Start time */
+    startTime: SimpleTime;
+    /** End time */
+    endTime: SimpleTime;
+    /** Which academic term this slot belongs to */
+    term: AcademicTerm;
+
+    // Display metadata
+    /** Title to display (event name, course code, etc.) */
+    title: string;
+    /** Subtitle (location, description, etc.) */
+    subtitle?: string;
+    /** Color for visual styling */
+    color?: string;
+
+    // Source tracking
+    /** Where this slot came from */
+    sourceType: 'calendar' | 'blocked' | 'course';
+    /** Original ID from source (event ID, period ID, etc.) */
+    sourceId?: string;
+}
+
+/**
  * Configuration for the auto-scheduler.
  * Intentionally minimal - add features incrementally.
  */

@@ -3,8 +3,9 @@
 // =============================================================================
 
 import type { ConnectedCalendar, CalendarEvent } from '../../services/calendar/types';
-import type { BlockedTimePeriod } from '../../types/schedule';
-import { calendarEventToBlockedTime } from '../../services/calendar/types';
+import type { BlockedTimePeriod, WeeklyTimeSlot } from '../../types/schedule';
+import { AcademicTerm } from '../../types/schedule';
+import { DayOfWeek } from '../../types/types';
 import { calendarService } from '../../services/calendar/CalendarService';
 
 /**
@@ -33,9 +34,12 @@ export class CalendarState {
     // Exclusions
     private excludedEventIds: Set<string> = new Set();
 
-    // Blocked times (pre-computed per term)
+    // Weekly slots (unified representation for display)
+    private weeklySlots: Map<string, WeeklyTimeSlot[]> = new Map();
+    private weeklySlotsDirty: boolean = true;
+
+    // Blocked times (derived from weekly slots)
     private blockedTimesCache: Map<string, BlockedTimePeriod[]> = new Map();
-    private blockedTimesDirty: boolean = true;
 
     // Callbacks
     private exclusionChangeCallbacks: ExclusionChangeCallback[] = [];
@@ -92,7 +96,7 @@ export class CalendarState {
         this.excludedEventIds = new Set(calendar.excludedEventIds || []);
 
         // 5. Mark blocked times as dirty
-        this.blockedTimesDirty = true;
+        this.weeklySlotsDirty = true;
     }
 
     /**
@@ -107,7 +111,7 @@ export class CalendarState {
         this.eventInstances = instances;
         this.eventParents = parents;
         this.excludedEventIds = new Set(calendar.excludedEventIds || []);
-        this.blockedTimesDirty = true;
+        this.weeklySlotsDirty = true;
     }
 
     /**
@@ -119,7 +123,7 @@ export class CalendarState {
         this.eventParents.clear();
         this.excludedEventIds.clear();
         this.blockedTimesCache.clear();
-        this.blockedTimesDirty = true;
+        this.weeklySlotsDirty = true;
     }
 
     // -------------------------------------------------------------------------
@@ -180,7 +184,7 @@ export class CalendarState {
         }
 
         if (changed) {
-            this.blockedTimesDirty = true;
+            this.weeklySlotsDirty = true;
             this.notifyExclusionChange();
         }
     }
@@ -205,7 +209,7 @@ export class CalendarState {
     showAll(): void {
         if (this.excludedEventIds.size > 0) {
             this.excludedEventIds.clear();
-            this.blockedTimesDirty = true;
+            this.weeklySlotsDirty = true;
             this.notifyExclusionChange();
         }
     }
@@ -220,15 +224,15 @@ export class CalendarState {
         this.excludedEventIds = allIds;
 
         if (hadChanges) {
-            this.blockedTimesDirty = true;
+            this.weeklySlotsDirty = true;
             this.notifyExclusionChange();
         }
     }
 
     /**
-     * Collect all event IDs (for hideAll)
+     * Collect all unique event IDs from parents (for validation and hideAll)
      */
-    private collectAllEventIds(): Set<string> {
+    collectAllEventIds(): Set<string> {
         const ids = new Set<string>();
         for (const events of this.eventParents.values()) {
             for (const event of events) {
@@ -236,6 +240,161 @@ export class CalendarState {
             }
         }
         return ids;
+    }
+
+    /**
+     * Set excluded IDs directly (for loading from schedule)
+     */
+    setExcludedIds(ids: string[]): void {
+        this.excludedEventIds = new Set(ids);
+        this.weeklySlotsDirty = true;
+    }
+
+    /**
+     * Get filtered, deduplicated instances for grid display.
+     * Filters out excluded events and deduplicates recurring events
+     * (same parentId + day + time).
+     * @deprecated Use getWeeklySlotsForTerm() instead
+     */
+    getFilteredInstancesForTerm(term: string): CalendarEvent[] {
+        const instances = this.eventInstances.get(term) || [];
+
+        // Filter excluded
+        const filtered = instances.filter(event => {
+            const idToCheck = event.parentId || event.id;
+            return !idToCheck || !this.excludedEventIds.has(idToCheck);
+        });
+
+        // Deduplicate recurring events (same parentId + day + time)
+        const seen = new Set<string>();
+        return filtered.filter(event => {
+            const startDate = new Date(event.start.dateTime);
+            const key = `${event.parentId || event.id}-${startDate.getDay()}-${startDate.getHours()}:${startDate.getMinutes()}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }
+
+    // -------------------------------------------------------------------------
+    // Weekly Slots (Unified Display Representation)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Get weekly time slots for a term (for grid display).
+     * Returns deduplicated, non-excluded events as WeeklyTimeSlot objects.
+     */
+    getWeeklySlotsForTerm(term: string): WeeklyTimeSlot[] {
+        this.ensureWeeklySlotsComputed();
+        return this.weeklySlots.get(term) || [];
+    }
+
+    /**
+     * Get all weekly slots across all terms.
+     */
+    getAllWeeklySlots(): Map<string, WeeklyTimeSlot[]> {
+        this.ensureWeeklySlotsComputed();
+        return this.weeklySlots;
+    }
+
+    /**
+     * Ensure weekly slots are computed (lazy computation).
+     */
+    private ensureWeeklySlotsComputed(): void {
+        if (!this.weeklySlotsDirty) return;
+        this.computeWeeklySlots();
+        this.weeklySlotsDirty = false;
+    }
+
+    /**
+     * Compute weekly slots from event instances.
+     * Handles deduplication and exclusion filtering.
+     */
+    private computeWeeklySlots(): void {
+        this.weeklySlots.clear();
+
+        for (const [term, events] of this.eventInstances) {
+            const slots: WeeklyTimeSlot[] = [];
+            const seen = new Set<string>(); // Dedupe key
+
+            for (const event of events) {
+                // Skip excluded
+                const idToCheck = event.parentId || event.id;
+                if (idToCheck && this.excludedEventIds.has(idToCheck)) continue;
+
+                const slot = this.eventToWeeklySlot(event, term);
+                if (!slot) continue;
+
+                // Dedupe by day+startTime+endTime (recurring events)
+                const key = `${slot.day}-${slot.startTime.hours}:${slot.startTime.minutes}-${slot.endTime.hours}:${slot.endTime.minutes}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+
+                slots.push(slot);
+            }
+
+            this.weeklySlots.set(term, slots);
+        }
+
+        // Also recompute blocked times (derived from weekly slots)
+        this.computeBlockedTimes();
+    }
+
+    /**
+     * Convert a CalendarEvent to a WeeklyTimeSlot.
+     * Returns null if the event is on a weekend or invalid.
+     */
+    private eventToWeeklySlot(event: CalendarEvent, term: string): WeeklyTimeSlot | null {
+        const startDate = new Date(event.start.dateTime);
+        const endDate = new Date(event.end.dateTime);
+        const dayIndex = startDate.getDay();
+
+        // Skip weekends
+        if (dayIndex === 0 || dayIndex === 6) return null;
+
+        const dayMap: Record<number, DayOfWeek> = {
+            1: DayOfWeek.MONDAY,
+            2: DayOfWeek.TUESDAY,
+            3: DayOfWeek.WEDNESDAY,
+            4: DayOfWeek.THURSDAY,
+            5: DayOfWeek.FRIDAY
+        };
+        const day = dayMap[dayIndex];
+        if (!day) return null;
+
+        const termMap: Record<string, AcademicTerm> = {
+            'A': AcademicTerm.A,
+            'B': AcademicTerm.B,
+            'C': AcademicTerm.C,
+            'D': AcademicTerm.D
+        };
+        const academicTerm = termMap[term];
+        if (!academicTerm) return null;
+
+        return {
+            id: `cal-${event.id || event.parentId}-${day}`,
+            day,
+            startTime: { hours: startDate.getHours(), minutes: startDate.getMinutes() },
+            endTime: { hours: endDate.getHours(), minutes: endDate.getMinutes() },
+            term: academicTerm,
+            title: event.summary,
+            subtitle: event.location,
+            sourceType: 'calendar',
+            sourceId: event.id || event.parentId,
+        };
+    }
+
+    /**
+     * Convert a WeeklyTimeSlot to a BlockedTimePeriod.
+     */
+    private weeklySlotToBlockedTime(slot: WeeklyTimeSlot): BlockedTimePeriod {
+        return {
+            id: slot.id,
+            day: slot.day,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            term: slot.term,
+        };
     }
 
     // -------------------------------------------------------------------------
@@ -275,49 +434,25 @@ export class CalendarState {
     }
 
     /**
-     * Ensure blocked times are computed (lazy computation)
+     * Ensure blocked times are computed (lazy computation).
+     * Blocked times are derived from weekly slots, so this just ensures
+     * weekly slots are computed.
      */
     private ensureBlockedTimesComputed(): void {
-        if (!this.blockedTimesDirty) return;
-        this.computeBlockedTimes();
-        this.blockedTimesDirty = false;
+        this.ensureWeeklySlotsComputed();
     }
 
     /**
-     * Compute blocked times from events.
-     * Handles rrule deduplication - recurring events expand to many instances
-     * with the same day/time, so we deduplicate by term+day+time.
+     * Compute blocked times from weekly slots.
+     * Since weekly slots are already deduplicated and filtered,
+     * this is a simple conversion.
      */
     private computeBlockedTimes(): void {
         this.blockedTimesCache.clear();
 
-        // For each term in eventInstances
-        for (const [term, events] of this.eventInstances) {
-            const termBlockedTimes: BlockedTimePeriod[] = [];
-            const seenKeys = new Set<string>(); // For deduplication
-
-            for (const event of events) {
-                // Skip if excluded (check parentId for recurring, or id for non-recurring)
-                const idToCheck = event.parentId || event.id;
-                if (idToCheck && this.excludedEventIds.has(idToCheck)) {
-                    continue;
-                }
-
-                // Convert using calendarEventToBlockedTime()
-                const blockedTime = calendarEventToBlockedTime(event, term);
-                if (!blockedTime) continue;
-
-                // Deduplicate by term+day+startTime+endTime
-                // This is critical for rrule events which expand to many instances
-                // with the same day/time but different dates
-                const key = `${term}-${blockedTime.day}-${blockedTime.startTime.hours}:${blockedTime.startTime.minutes}-${blockedTime.endTime.hours}:${blockedTime.endTime.minutes}`;
-                if (seenKeys.has(key)) continue;
-                seenKeys.add(key);
-
-                termBlockedTimes.push(blockedTime);
-            }
-
-            this.blockedTimesCache.set(term, termBlockedTimes);
+        for (const [term, slots] of this.weeklySlots) {
+            const blockedTimes = slots.map(slot => this.weeklySlotToBlockedTime(slot));
+            this.blockedTimesCache.set(term, blockedTimes);
         }
     }
 
