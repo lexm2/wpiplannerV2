@@ -9,6 +9,7 @@
 @import url('./styles/components/header.css');
 @import url('./styles/components/theme-selector.css');
 @import url('./styles/components/layout.css');
+@import url('./styles/components/resize-handle.css');
 @import url('./styles/components/sidebar.css');
 @import url('./styles/components/main-content.css');
 @import url('./styles/components/course-list.css');

@@ -9,7 +9,7 @@
 
 .schedule-page-layout {
   display: grid;
-  grid-template-columns: 25rem 1fr;
+  grid-template-columns: var(--panel-schedule-sidebar-width, 25rem) auto 1fr;
   height: 100%;
   gap: 0;
   overflow: hidden;
@@ -1016,6 +1016,10 @@
 @media (max-width: 1024px) {
   .schedule-page-layout {
     grid-template-columns: 20rem 1fr;
+  }
+
+  .resize-handle-schedule {
+    display: none;
   }
 
   .terms-grid {

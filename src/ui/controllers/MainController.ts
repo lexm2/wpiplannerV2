@@ -35,6 +35,7 @@ import { syncEventBus } from '../../services/sync/SyncEventBus'
 import type { ConflictInfo, SyncData } from '../../services/sync/types'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
 import { calendarService, GoogleCalendarProvider } from '../../services/calendar'
+import { ResizablePanel } from '../components/ResizablePanel'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -69,6 +70,7 @@ export class MainController {
     private googleCalendarProvider: GoogleCalendarProvider;
     private conflictResolutionModal: ConflictResolutionModal;
     private cloudSyncMenuItem: HTMLButtonElement | null = null;
+    private resizablePanel: ResizablePanel | null = null;
     private allDepartments: Department[] = [];
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
     private pendingExpansions: Array<{courseId: string, term: string}> = [];
@@ -489,6 +491,8 @@ export class MainController {
                                 });
                             });
                         }
+                        // Remove expanded class after collapse completes
+                        courseSections.classList.remove('expanded');
                     }, totalAnimationTime + 300);
                 } else {
                     // Update state: term is being expanded
@@ -828,6 +832,9 @@ export class MainController {
         // Settings menu for mobile
         this.setupSettingsMenu();
 
+        // Resizable panels
+        this.setupResizablePanels();
+
         // Keyboard shortcuts for undo/redo
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
@@ -877,6 +884,9 @@ export class MainController {
         clickedTermContainer: HTMLElement,
         onComplete?: () => void
     ): void {
+        // Mark as expanded for full-width layout
+        courseSections.classList.add('expanded');
+
         // Fade out term-badges
         termBadgesContainer.style.opacity = '0';
         termBadgesContainer.style.transform = 'translateX(10px)';
@@ -956,6 +966,9 @@ export class MainController {
             const expandedTermContainer = courseSections.querySelector(`.term-sections-container[data-term="${expandedTerm}"]`) as HTMLElement;
 
             if (!expandedTermContainer || !termBadgesContainer) return;
+
+            // Mark as expanded for full-width layout
+            courseSections.classList.add('expanded');
 
             // Hide term badges container
             termBadgesContainer.style.display = 'none';
@@ -1615,6 +1628,37 @@ export class MainController {
         if (dropdown) {
             dropdown.classList.remove('active');
         }
+    }
+
+    private setupResizablePanels(): void {
+        this.resizablePanel = new ResizablePanel({
+            panels: [
+                {
+                    handleSelector: '.resize-handle-left',
+                    targetProperty: '--panel-sidebar-width',
+                    minWidth: 200,
+                    maxWidth: 400,
+                    defaultWidth: 280,
+                    direction: 'left'
+                },
+                {
+                    handleSelector: '.resize-handle-right',
+                    targetProperty: '--panel-right-width',
+                    minWidth: 250,
+                    maxWidth: 500,
+                    defaultWidth: 320,
+                    direction: 'right'
+                },
+                {
+                    handleSelector: '.resize-handle-schedule',
+                    targetProperty: '--panel-schedule-sidebar-width',
+                    minWidth: 200,
+                    maxWidth: 500,
+                    defaultWidth: 400,
+                    direction: 'left'
+                }
+            ]
+        });
     }
 
     private toggleTheme(): void {
