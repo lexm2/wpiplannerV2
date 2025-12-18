@@ -417,6 +417,50 @@ export class ProfileStateManager {
         });
     }
 
+    // Bookmark management
+    bookmarkCourse(courseId: string, source: string = 'user'): void {
+        this.withStateUpdate(() => {
+            const bookmarks = this.state.preferences.bookmarkedCourseIds ?? [];
+            if (!bookmarks.includes(courseId)) {
+                this.state.preferences = {
+                    ...this.state.preferences,
+                    bookmarkedCourseIds: [...bookmarks, courseId]
+                };
+                this.emitEvent('preferences_changed', {
+                    preferences: this.state.preferences,
+                    action: 'bookmark_added',
+                    courseId
+                }, source);
+            }
+        });
+    }
+
+    unbookmarkCourse(courseId: string, source: string = 'user'): void {
+        this.withStateUpdate(() => {
+            const bookmarks = this.state.preferences.bookmarkedCourseIds ?? [];
+            const index = bookmarks.indexOf(courseId);
+            if (index >= 0) {
+                this.state.preferences = {
+                    ...this.state.preferences,
+                    bookmarkedCourseIds: bookmarks.filter(id => id !== courseId)
+                };
+                this.emitEvent('preferences_changed', {
+                    preferences: this.state.preferences,
+                    action: 'bookmark_removed',
+                    courseId
+                }, source);
+            }
+        });
+    }
+
+    isBookmarked(courseId: string): boolean {
+        return this.state.preferences.bookmarkedCourseIds?.includes(courseId) ?? false;
+    }
+
+    getBookmarkedCourseIds(): string[] {
+        return [...(this.state.preferences.bookmarkedCourseIds ?? [])];
+    }
+
     // Event handling
     addListener(listener: StateChangeListener): void {
         this.listeners.add(listener);
@@ -826,7 +870,8 @@ export class ProfileStateManager {
                 },
                 preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
                 avoidBackToBackClasses: false,
-                theme: 'wpi-dark'
+                theme: 'wpi-dark',
+                bookmarkedCourseIds: []
             },
             isLoading: false,
             lastSaved: 0,

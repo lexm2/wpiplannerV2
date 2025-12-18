@@ -81,6 +81,7 @@ export interface SchedulePreferences {
     preferredDays: Set<string>;
     avoidBackToBackClasses: boolean;
     theme?: string;
+    bookmarkedCourseIds?: string[];
 }
 
 export enum ConflictType {
@@ -131,4 +132,13 @@ export interface BlockedTimePeriod {
 export interface AutoScheduleConfig {
     /** Time periods to avoid when scheduling */
     blockedTimes: BlockedTimePeriod[];
+}
+
+/**
+ * Settings for the auto-scheduler including user preferences.
+ * Extended from AutoScheduleConfig to include weights and other settings.
+ * Currently empty - will add weights and preferences incrementally.
+ */
+export interface AutoScheduleSettings extends AutoScheduleConfig {
+    // Future: weights for scoring (professorRating, earlyMorning, timeGap, etc.)
 }

@@ -14,11 +14,20 @@ export class CourseFilterService {
     private searchService: SearchService;
     private debugLogging: boolean = false;
     private sectionPipeline: SectionFilterPipeline;
+    private getBookmarkedCourseIds: (() => string[]) | null = null;
 
     constructor(searchService: SearchService) {
         this.filterState = new FilterState();
         this.searchService = searchService;
         this.sectionPipeline = new SectionFilterPipeline();
+    }
+
+    /**
+     * Set the function to retrieve bookmarked course IDs.
+     * This is used by the bookmark filter to access bookmarks from ProfileStateManager.
+     */
+    setBookmarkProvider(getBookmarkedCourseIds: () => string[]): void {
+        this.getBookmarkedCourseIds = getBookmarkedCourseIds;
     }
 
     // Filter Registration
@@ -55,6 +64,12 @@ export class CourseFilterService {
             };
             const displayValue = levelNames[criteria.level] || 'Unknown Level';
             this.filterState.addFilter(filterId, 'Course Level', criteria, displayValue);
+            return true;
+        }
+
+        if (filterId === 'bookmark') {
+            const displayValue = criteria.showBookmarkedOnly ? 'Bookmarked Only' : 'All Courses';
+            this.filterState.addFilter(filterId, 'Bookmarks', criteria, displayValue);
             return true;
         }
 
@@ -172,6 +187,17 @@ export class CourseFilterService {
 
             if (this.debugLogging) {
                 console.log(`Filtered by graduate level: ${filteredCourses.length} courses`);
+            }
+        }
+
+        // Apply bookmark filter at course level
+        const bookmarkCriteria = criteriaMap.get('bookmark');
+        if (bookmarkCriteria && bookmarkCriteria.showBookmarkedOnly && this.getBookmarkedCourseIds) {
+            const bookmarkedIds = new Set(this.getBookmarkedCourseIds());
+            filteredCourses = filteredCourses.filter(course => bookmarkedIds.has(course.id));
+
+            if (this.debugLogging) {
+                console.log(`Filtered by bookmarks: ${filteredCourses.length} courses`);
             }
         }
 

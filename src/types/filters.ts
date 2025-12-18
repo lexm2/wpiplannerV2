@@ -154,3 +154,7 @@ export interface RMPRatingFilterCriteria {
     maxWouldTakeAgain?: number; // Maximum "would take again" percentage (0-100)
     includeWithoutData?: boolean; // Include professors without RMP data (default: true)
 }
+
+export interface BookmarkFilterCriteria {
+    showBookmarkedOnly: boolean;
+}
