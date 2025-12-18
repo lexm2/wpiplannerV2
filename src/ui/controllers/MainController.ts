@@ -455,7 +455,8 @@ export class MainController {
                     // Swap containers after animations complete
                     setTimeout(() => {
                         termSectionsContainers.forEach(container => {
-                            container.classList.remove('expanded');
+                            container.style.display = 'none';
+                            container.style.opacity = '0';
                         });
                         if (termBadgesContainer) {
                             termBadgesContainer.style.display = 'flex';
@@ -893,10 +894,10 @@ export class MainController {
         setTimeout(() => {
             termBadgesContainer.style.display = 'none';
             termSectionsContainers.forEach(container => {
-                container.classList.remove('expanded');
+                container.style.display = 'none';
             });
 
-            clickedTermContainer.classList.add('expanded');
+            clickedTermContainer.style.display = 'flex';
             clickedTermContainer.style.opacity = '0';
 
             // Set initial state for all children
@@ -974,11 +975,11 @@ export class MainController {
 
             // Hide all term sections
             termSectionsContainers.forEach(container => {
-                container.classList.remove('expanded');
+                container.style.display = 'none';
             });
 
             // Show the expanded term container
-            expandedTermContainer.classList.add('expanded');
+            expandedTermContainer.style.display = 'flex';
             expandedTermContainer.style.opacity = '1';
             expandedTermContainer.style.transform = 'translateX(0)';
 
