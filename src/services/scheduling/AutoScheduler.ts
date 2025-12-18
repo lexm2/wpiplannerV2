@@ -386,12 +386,15 @@ export class AutoScheduler {
   }
 
   /**
-   * Check if a section has at least one valid time slot.
+   * Check if a section has at least one valid time slot (or is async).
    */
   private hasValidTimeSlot(section: Section): boolean {
     if (!section.periods?.length) return false;
 
     return section.periods.some(period => {
+      // Async periods are always valid (no time slot needed)
+      if (period.isAsync) return true;
+
       const hasTime = period.startTime.hours !== period.endTime.hours ||
              period.startTime.minutes !== period.endTime.minutes;
       const hasDays = period.days?.size > 0;
