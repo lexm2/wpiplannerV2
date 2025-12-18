@@ -719,7 +719,7 @@ export class CourseController {
                     ${timeLocationContent}
                     <div class="section-professor">${rmpUrl ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProfessor}</a>` : escapedProfessor}</div>
                     <div class="section-seats">
-                        Seats: ${section.seatsAvailable}/${section.seats}
+                        Seats: ${section.seatsAvailable}/${section.seats} available
                         ${section.actualWaitlist > 0 ? `(Waitlist: ${section.actualWaitlist}/${section.maxWaitlist})` : ''}
                     </div>
                 </div>

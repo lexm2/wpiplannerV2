@@ -190,8 +190,6 @@ export class ProgressiveRenderer {
                                     ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
                                 </button>
                                 <div class="course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
-                            </div>
-                            <div class="course-details">
                                 <div class="course-name">
                                     ${Validators.escapeHtml(course.name)}
                                     ${hasWarning ? `<span class="capacity-badge">At capacity</span>` : ''}

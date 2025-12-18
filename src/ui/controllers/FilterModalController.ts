@@ -162,13 +162,13 @@ export class FilterModalController extends BaseModal {
         return `
             <div class="filter-sections">
                 ${this.createGraduateLevelFilter()}
-                ${this.createTermFilter()}
-                ${this.createDepartmentFilter()}
                 ${this.createSearchTextFilter()}
+                ${this.createTermFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createConflictFilter()}
-                ${this.createProfessorFilter()}
+                ${this.createDepartmentFilter()}
                 ${this.createCreditRangeFilter()}
+                ${this.createProfessorFilter()}
                 ${this.createRMPRatingFilter()}
             </div>
         `;

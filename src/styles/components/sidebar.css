@@ -20,10 +20,29 @@
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  cursor: pointer;
+  padding: 0.25rem;
+  margin-left: 0.5rem;
+  border-radius: var(--effect-border-radius);
+  transition: var(--effect-transition);
+  user-select: none;
+}
+
+.category-header:hover {
+  background: var(--color-surface-hover);
 }
 
 .department-list {
   list-style: none;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.department-list.expanded {
+  max-height: 2000px;
+  opacity: 1;
 }
 
 .department-item {

@@ -42,7 +42,8 @@
   --spacing-base-unit: 1rem;
   --spacing-header-height: 64px;
   --spacing-sidebar-width: 280px;
-  --spacing-right-panel-width: 320px;
+  --spacing-right-panel-width: 700px;
+  --spacing-schedule-sidebar-width: 400px;
 
   /* Effects */
   --effect-border-radius: 6px;

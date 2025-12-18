@@ -1646,8 +1646,8 @@ export class MainController {
                     handleSelector: '.resize-handle-right',
                     targetProperty: '--panel-right-width',
                     minWidth: 250,
-                    maxWidth: 500,
-                    defaultWidth: 320,
+                    maxWidth: 1000,
+                    defaultWidth: 700,
                     direction: 'right'
                 },
                 {

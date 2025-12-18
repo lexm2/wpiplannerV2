@@ -824,7 +824,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
 
         const isSelected = this.selections[this.currentStep]?.crn === section.crn;
         const seatsInfo = section.seatsAvailable > 0
-            ? `${section.seatsAvailable}/${section.seats} seats`
+            ? `${section.seatsAvailable}/${section.seats} seats remaining`
             : `Full (${section.actualWaitlist}/${section.maxWaitlist} waitlist)`;
 
         // Get Rate My Professor data for this professor

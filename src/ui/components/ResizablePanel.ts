@@ -37,6 +37,9 @@ export class ResizablePanel {
 
   private initialize(): void {
     this.options.panels.forEach((config) => {
+      // Set initial width from config
+      this.setWidth(config, config.defaultWidth);
+
       const handle = document.querySelector(
         config.handleSelector
       ) as HTMLElement;

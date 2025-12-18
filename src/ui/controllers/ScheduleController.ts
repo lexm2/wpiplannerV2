@@ -779,9 +779,6 @@ export class ScheduleController {
             selectedCoursesContainer.appendChild(sidebarPanel);
         }
 
-        // Initialize eraser icons
-        this.initializeEraserIcons(selectedCoursesContainer);
-
         // Set up DOM element mapping for course association
         if (!hasActiveFilters) {
             const sortedCourses = selectedCourses.sort((a, b) => {
@@ -1012,6 +1009,7 @@ export class ScheduleController {
         }
 
         const calendarName = this.currentSchedule.connectedCalendar.calendarName;
+        const calendarProvider = this.currentSchedule.connectedCalendar.providerId;
         const totalEvents = this.getTotalExternalEventCount();
 
         // Count only valid exclusions (IDs that actually exist in loaded events)
@@ -1025,16 +1023,12 @@ export class ScheduleController {
                 <button class="calendar-events-btn" id="calendar-events-btn">
                     <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
                     <span class="calendar-events-btn-info">
-                        <span class="calendar-events-btn-name">${Validators.escapeHtml(calendarName)}</span>
+                        <span class="calendar-events-btn-name">${Validators.escapeHtml(calendarName) + " (" + Validators.escapeHtml(calendarProvider) + ")"}</span>
                         <span class="calendar-events-btn-count">${visibleCount} of ${totalEvents} events visible</span>
                     </span>
                 </button>
             </div>
         `;
-    }
-    
-    private initializeEraserIcons(container: HTMLElement): void {
-        // No longer needed - icons are now inline SVG
     }
 
     private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: any[]): void {
