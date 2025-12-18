@@ -33,8 +33,8 @@ export interface AllTermsEventsResult {
 // =============================================================================
 
 const TERM_DATES = {
-    A: { startMonth: 7, startDay: 25, endMonth: 9, endDay: 13 },
-    B: { startMonth: 9, startDay: 21, endMonth: 11, endDay: 13 },
+    A: { startMonth: 7, startDay: 25, endMonth: 9, endDay: 13, nextYear: false },
+    B: { startMonth: 9, startDay: 21, endMonth: 11, endDay: 13, nextYear: false },
     C: { startMonth: 0, startDay: 6, endMonth: 2, endDay: 7, nextYear: true },
     D: { startMonth: 2, startDay: 17, endMonth: 4, endDay: 9, nextYear: true },
 } as const;

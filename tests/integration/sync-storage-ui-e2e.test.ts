@@ -7,6 +7,7 @@ import {
     resetMockUIComponents,
     assertScheduleUIUpdated,
     assertCourseSelectionUIUpdated,
+    assertUIHydrated,
     type MockUIContext
 } from '../mocks/MockUIComponents';
 
@@ -132,11 +133,13 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
             syncCtx.mockProvider.setCloudData(cloudData);
 
+            const profileManager = syncCtx.profileManager!;
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
+
             // Act: Sign in
             await syncCtx.syncManager.handleSignIn(cloudData);
 
             // Assert: All schedules in IndexedDB
-            const mockIndexedDB = syncCtx.mockIndexedDB!;
             expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'fall-2025')).toBe(true);
             expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'spring-2026')).toBe(true);
             expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'summer-2026')).toBe(true);
@@ -152,6 +155,8 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
         it('should handle initial sign-in with no cloud data', async () => {
             // Arrange: No cloud data (first time user)
             syncCtx.mockProvider.setCloudData(null);
+
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
 
             // Create local data to push
             const localData = await createSyncData({
@@ -183,6 +188,9 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
     describe('Conflict Resolution Flow', () => {
         it('should complete flow: conflict → keep local → UI update', async () => {
+            const profileManager = syncCtx.profileManager!;
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
+
             // Arrange: Create conflicting data
             const localData = await createSyncData({
                 schedules: [
@@ -236,6 +244,9 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
         });
 
         it('should complete flow: conflict → keep cloud → UI update', async () => {
+            const profileManager = syncCtx.profileManager!;
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
+
             // Arrange: Conflicting data
             const localData = await createSyncData({
                 schedules: [
@@ -280,6 +291,9 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
     describe('Push Flow with UI Updates', () => {
         it('should complete flow: local change → debounce → push → cloud', async () => {
+            const profileManager = syncCtx.profileManager!;
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
+
             // Arrange: Sign in first
             const initialData = await createSyncData({
                 schedules: [
@@ -329,6 +343,8 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
         });
 
         it('should debounce rapid changes before pushing', async () => {
+            const profileManager = syncCtx.profileManager!;
+
             // Arrange: Sign in
             const initialData = await createSyncData({
                 schedules: [createSchedule({ id: 'schedule-1', name: 'Initial' })],
@@ -364,6 +380,8 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
     describe('Multi-Device Sync Simulation', () => {
         it('should simulate Device A → Cloud → Device B flow', async () => {
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
+
             // ===== Device A =====
             // Arrange: Device A creates schedule
             const deviceAData = await createSyncData({
@@ -410,6 +428,8 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
     describe('Sign-Out Flow', () => {
         it('should complete flow: sign-out → clear auth → retain local data', async () => {
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
+
             // Arrange: Sign in with data
             const syncData = await createSyncData({
                 schedules: [createSchedule({ id: 'schedule-1', name: 'Test' })],
@@ -436,6 +456,8 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
     describe('Error Recovery Flow', () => {
         it('should recover from network error and complete flow', async () => {
+            const profileManager = syncCtx.profileManager!;
+
             // Arrange: Sign in successfully
             const syncData = await createSyncData({
                 schedules: [createSchedule({ id: 'schedule-1', name: 'Test' })],
@@ -482,6 +504,8 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
         });
 
         it('should handle corrupted cloud data gracefully', async () => {
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
+
             // Arrange: Set corrupted cloud data
             syncCtx.mockProvider.setConfig({ corruptChecksum: true });
 
@@ -508,6 +532,9 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
 
     describe('Data Integrity Across Flow', () => {
         it('should maintain data integrity through compression/decompression', async () => {
+            const profileManager = syncCtx.profileManager!;
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
+
             // Arrange: Create schedule with special characters and unicode
             const complexData = await createSyncData({
                 schedules: [
@@ -539,6 +566,8 @@ describe('End-to-End: Cloud Sync → Storage → UI', () => {
         });
 
         it('should handle large schedules efficiently', async () => {
+            const mockIndexedDB = syncCtx.mockIndexedDB!;
+
             // Arrange: Create large schedule
             const largeSchedule = createSchedule({
                 id: 'large-schedule',
