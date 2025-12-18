@@ -45,6 +45,7 @@ src/
 │   ├── storage/            # Persistence layer
 │   └── validation/         # Data validation
 ├── services/               # Application services
+│   ├── calendar/           # Calendar integration (Google Calendar, etc.)
 │   ├── data/               # Course data loading
 │   ├── external/           # Third-party integrations
 │   ├── filtering/          # High-level filtering
@@ -55,6 +56,7 @@ src/
 ├── ui/                     # User interface
 │   ├── controllers/        # View controllers
 │   ├── components/         # Reusable UI components
+│   ├── sidebar/            # Sidebar panel system
 │   └── utils/              # UI utilities
 ├── types/                  # TypeScript type definitions
 ├── config/                 # Configuration files
@@ -605,6 +607,77 @@ Fetches and caches professor ratings.
 
 ---
 
+### Calendar (`src/services/calendar/`)
+
+Calendar integration service for syncing schedules with external calendar providers.
+
+#### [CalendarService.ts](../src/services/calendar/CalendarService.ts)
+
+**Singleton** - Provider-agnostic calendar orchestration service.
+
+**Responsibilities:**
+- Manage active calendar provider
+- Convert schedules to calendar events
+- Handle recurring event generation (RRULE format)
+- Calculate term dates for WPI academic calendar (A/B/C/D terms)
+- Fetch and filter external calendar events for display
+
+**Key Methods:**
+- `exportSchedule()` - Export a schedule to the calendar provider
+- `getEventsForTerm()` - Fetch events for a specific term from connected calendar
+- `getEventsForAllTerms()` - Fetch events for all terms in parallel
+- `scheduleToEvents()` - Convert schedule courses to calendar events
+- `findOrCreateCalendar()` - Find existing or create new calendar
+
+**Connects to:**
+- [CalendarProvider](../src/services/calendar/types.ts) - Provider interface
+- [GoogleCalendarProvider](../src/services/calendar/providers/google/GoogleCalendarProvider.ts) - Google implementation
+- [ScheduleController](../src/ui/controllers/ScheduleController.ts) - UI integration
+- [MainController](../src/ui/controllers/MainController.ts) - Initialization
+
+#### [types.ts](../src/services/calendar/types.ts)
+
+Type definitions for calendar operations.
+
+**Key Types:**
+- `CalendarProvider` - Provider interface for calendar implementations
+- `CalendarEvent` - Provider-agnostic event representation
+- `ConnectedCalendar` - Calendar connection info stored on Schedule
+- `CalendarExportOptions` / `CalendarExportResult` - Export configuration
+- `CalendarInfo` - Calendar metadata
+
+#### [rruleExpander.ts](../src/services/calendar/rruleExpander.ts)
+
+Utility for expanding recurring events into individual instances.
+
+**Responsibilities:**
+- Parse RRULE recurrence rules
+- Expand recurring events within a date range
+- Generate unique IDs for expanded instances
+
+#### Cloud Providers
+
+##### [providers/google/GoogleCalendarProvider.ts](../src/services/calendar/providers/google/GoogleCalendarProvider.ts)
+
+Google Calendar API v3 implementation.
+
+**Responsibilities:**
+- Authenticate via shared OAuth token with GoogleDriveProvider
+- CRUD operations for calendars and events
+- Batch event creation with concurrency control
+- Auto-connect schedules to primary calendar on sign-in
+
+**Key Methods:**
+- `listCalendars()` / `createCalendar()` / `deleteCalendar()` - Calendar management
+- `getEvents()` / `createEvent()` / `createEvents()` / `deleteEvent()` - Event operations
+- `autoConnectSchedules()` - Connect schedules to default calendar on auth
+
+**Connects to:**
+- [CalendarService](../src/services/calendar/CalendarService.ts) - Used by
+- [GoogleDriveProvider](../src/services/sync/providers/googledrive/GoogleDriveProvider.ts) - Shares OAuth token
+
+---
+
 ### UI Services (`src/services/ui/`)
 
 #### [ModalService.ts](../src/services/ui/ModalService.ts)
@@ -809,6 +882,69 @@ Reusable filter UI components.
 
 Filter setup helpers.
 
+#### [CalendarEventsPanel.ts](../src/ui/components/CalendarEventsPanel.ts)
+
+Sidebar panel for managing external calendar event visibility.
+
+**Responsibilities:**
+- Display calendar events grouped by term (A/B/C/D)
+- Toggle individual event visibility on the schedule grid
+- Show/hide all events in bulk
+- Track excluded event IDs
+
+**Connects to:**
+- [BaseSidebarPanel](../src/ui/sidebar/BaseSidebarPanel.ts) - Extends base class
+- [CalendarService](../src/services/calendar/CalendarService.ts) - Event data
+- [ScheduleController](../src/ui/controllers/ScheduleController.ts) - Opens panel
+
+---
+
+### Sidebar (`src/ui/sidebar/`)
+
+Reusable sidebar panel system for overlay content.
+
+#### [BaseSidebarPanel.ts](../src/ui/sidebar/BaseSidebarPanel.ts)
+
+Abstract base class for sidebar overlay panels with animation support.
+
+**Responsibilities:**
+- Panel lifecycle (open, close, destroy)
+- Slide/fade animations with configurable duration
+- Escape key handling
+- Animated list rendering with stagger effects
+- DOM query helpers for subclasses
+
+**Key Methods:**
+- `open()` / `close()` - Panel lifecycle with animation
+- `isOpen()` - Check panel state
+- `rerender()` - Update content without closing
+- `renderAnimatedList()` - Render items with stagger animation
+
+**Abstract Methods (subclass must implement):**
+- `panelId` - Unique identifier
+- `panelClass` - CSS class for container
+- `renderContent()` - HTML content
+- `attachEventListeners()` - Event setup
+
+**Optional Hooks:**
+- `onOpen()` / `onClose()` - Lifecycle callbacks
+- `getListItems()` / `getListGroups()` - Animated list data
+- `attachItemListeners()` - Per-item event handlers
+
+**Connects to:**
+- [CalendarEventsPanel](../src/ui/components/CalendarEventsPanel.ts) - Implementation
+- [ComponentSelectionWizard](../src/ui/components/ComponentSelectionWizard.ts) - Implementation
+
+#### [types.ts](../src/ui/sidebar/types.ts)
+
+Type definitions for the sidebar panel system.
+
+**Key Types:**
+- `SidebarPanel` - Panel interface
+- `SidebarPanelOptions` - Configuration options
+- `PanelAnimationType` - Animation modes (fade, slide-left, slide-right)
+- `SidebarListItem` / `SidebarListGroup` - Animated list types
+
 ---
 
 ### Utils (`src/ui/utils/`)
@@ -836,12 +972,18 @@ Container for multiple schedules with version/timestamp.
 
 Single schedule with selectedCourses and generatedSchedules.
 
+**Key Properties:**
+- `id` / `name` - Schedule identification
+- `selectedCourses` - Courses added to this schedule
+- `generatedSchedules` - Auto-generated schedule combinations
+- `connectedCalendar` - Optional calendar connection for external event display
+
 **Key Methods:**
 - `toCloudFormat()` / `fromCloudFormat()` - Cloud boundary conversion
 - `calculateChecksum()` - Integrity verification
 - `with()` - Immutable updates
 
-**Used by:** [ApplicationState](../src/types/ApplicationState.ts)
+**Used by:** [ApplicationState](../src/types/ApplicationState.ts), [CalendarService](../src/services/calendar/CalendarService.ts)
 
 ### [filters.ts](../src/types/filters.ts)
 
@@ -991,19 +1133,46 @@ CourseController receives filtered courses
 UI updates
 ```
 
+### Calendar Event Display Flow
+
+```
+User signs in with Google
+    ↓
+GoogleDriveProvider.signIn() → GoogleCalendarProvider.setAccessToken()
+    ↓
+GoogleCalendarProvider.autoConnectSchedules()
+    ↓
+Schedules connected to primary calendar
+    ↓
+ScheduleController detects connectedCalendar
+    ↓
+CalendarService.getEventsForTerm() → GoogleCalendarProvider.getEvents()
+    ↓
+rruleExpander expands recurring events
+    ↓
+Events rendered on schedule grid
+    ↓
+User opens CalendarEventsPanel
+    ↓
+Toggle event visibility → excludedEventIds updated
+    ↓
+Grid re-renders without excluded events
+```
+
 ---
 
 ## Key Architectural Patterns
 
 | Pattern | Implementation |
 |---------|----------------|
-| **Singleton** | ProfileStateManager, SyncManager, SyncEventBus, ModalService |
+| **Singleton** | ProfileStateManager, SyncManager, SyncEventBus, ModalService, CalendarService |
 | **Observer/Pub-Sub** | StateChangeListener, SyncEventBus, SelectionChangeListener |
 | **Factory** | CloudSyncFactory, CloudProviderRegistry |
 | **Pipeline** | SectionFilterPipeline |
 | **Facade** | StorageService, MainController |
-| **Strategy** | Filter implementations, CloudProvider interface |
+| **Strategy** | Filter implementations, CloudProvider interface, CalendarProvider interface |
 | **Transaction** | TransactionalStorageManager |
+| **Template Method** | BaseSidebarPanel (abstract base with hooks) |
 
 ---
 
