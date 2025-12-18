@@ -164,6 +164,7 @@ export class FilterModalController extends BaseModal {
                 ${this.createGraduateLevelFilter()}
                 ${this.createSearchTextFilter()}
                 ${this.createTermFilter()}
+                ${this.createBookmarkFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createConflictFilter()}
                 ${this.createDepartmentFilter()}
@@ -307,6 +308,30 @@ export class FilterModalController extends BaseModal {
         });
     }
 
+    private createBookmarkFilter(): string {
+        if (!this.filterService) return '';
+
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'bookmark');
+        const criteria = activeFilter?.criteria as { showBookmarkedOnly?: boolean } | undefined;
+        const showBookmarkedOnly = criteria?.showBookmarkedOnly || false;
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Bookmarks</h4>
+                </div>
+                <div class="filter-section-content">
+                    <label class="filter-toggle-label">
+                        <input type="checkbox" class="filter-toggle" id="bookmarked-only-filter"
+                               ${showBookmarkedOnly ? 'checked' : ''}>
+                        <span class="filter-toggle-slider"></span>
+                        <span class="filter-toggle-text">Show only bookmarked courses</span>
+                    </label>
+                </div>
+            </div>
+        `;
+    }
+
     private createCreditRangeFilter(): string {
         if (!this.filterService) return '';
 
@@ -399,6 +424,7 @@ export class FilterModalController extends BaseModal {
         this.setupDepartmentFilter(modalElement);
         this.setupAvailabilityFilter(modalElement);
         this.setupConflictFilter(modalElement);
+        this.setupBookmarkFilter(modalElement);
         this.setupCreditRangeFilter(modalElement);
         this.setupTermFilter(modalElement);
         this.setupGraduateLevelFilter(modalElement);
@@ -511,6 +537,13 @@ export class FilterModalController extends BaseModal {
             idPrefix: '',
             updateFilter: () => this.updateConflictFilter(modalElement)
         });
+    }
+
+    private setupBookmarkFilter(modalElement: HTMLElement): void {
+        const checkbox = modalElement.querySelector('#bookmarked-only-filter') as HTMLInputElement;
+        if (checkbox) {
+            checkbox.addEventListener('change', () => this.updateBookmarkFilter(modalElement));
+        }
     }
 
     private setupCreditRangeFilter(modalElement: HTMLElement): void {
@@ -847,6 +880,18 @@ export class FilterModalController extends BaseModal {
             this.filterService?.addFilter('conflict', { avoidConflicts: true });
         } else {
             this.filterService?.removeFilter('conflict');
+        }
+        this.updatePreview(modalElement);
+    }
+
+    private updateBookmarkFilter(modalElement: HTMLElement): void {
+        const checkbox = modalElement.querySelector('#bookmarked-only-filter') as HTMLInputElement;
+        const showBookmarkedOnly = checkbox?.checked || false;
+
+        if (showBookmarkedOnly) {
+            this.filterService?.addFilter('bookmark', { showBookmarkedOnly: true });
+        } else {
+            this.filterService?.removeFilter('bookmark');
         }
         this.updatePreview(modalElement);
     }

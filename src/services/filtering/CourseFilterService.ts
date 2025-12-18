@@ -14,19 +14,12 @@ export class CourseFilterService {
     private searchService: SearchService;
     private debugLogging: boolean = false;
     private sectionPipeline: SectionFilterPipeline;
-    private getBookmarkedCourseIds: (() => string[]) | null = null;
+    private getBookmarkedCourseIds: () => string[];
 
-    constructor(searchService: SearchService) {
+    constructor(searchService: SearchService, getBookmarkedCourseIds: () => string[]) {
         this.filterState = new FilterState();
         this.searchService = searchService;
         this.sectionPipeline = new SectionFilterPipeline();
-    }
-
-    /**
-     * Set the function to retrieve bookmarked course IDs.
-     * This is used by the bookmark filter to access bookmarks from ProfileStateManager.
-     */
-    setBookmarkProvider(getBookmarkedCourseIds: () => string[]): void {
         this.getBookmarkedCourseIds = getBookmarkedCourseIds;
     }
 
@@ -192,7 +185,7 @@ export class CourseFilterService {
 
         // Apply bookmark filter at course level
         const bookmarkCriteria = criteriaMap.get('bookmark');
-        if (bookmarkCriteria && bookmarkCriteria.showBookmarkedOnly && this.getBookmarkedCourseIds) {
+        if (bookmarkCriteria && bookmarkCriteria.showBookmarkedOnly) {
             const bookmarkedIds = new Set(this.getBookmarkedCourseIds());
             filteredCourses = filteredCourses.filter(course => bookmarkedIds.has(course.id));
 

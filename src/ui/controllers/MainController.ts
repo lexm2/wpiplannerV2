@@ -96,7 +96,10 @@ export class MainController {
         
         // Initialize search and filter services
         this.searchService = new SearchService();
-        this.filterService = new CourseFilterService(this.searchService);
+        this.filterService = new CourseFilterService(
+            this.searchService,
+            () => this.profileStateManager.getBookmarkedCourseIds()
+        );
         this.scheduleFilterService = new ScheduleFilterService(rateMyProfessorService);
         
         // Initialize schedule management service with shared ProfileStateManager and CourseSelectionService
