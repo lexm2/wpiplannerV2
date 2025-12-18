@@ -7,7 +7,7 @@
  */
 
 import type { Section } from '../../types/types';
-import type { BlockedTimePeriod } from '../../types/schedule';
+import type { WeeklyTimeSlot } from '../../types/schedule';
 
 // Constants for time slot calculation
 const START_HOUR = 7;          // 7:00 AM
@@ -83,14 +83,14 @@ export function sectionToMask(section: Section): bigint {
   return mask;
 }
 
-export function blockedTimeToMask(blocked: BlockedTimePeriod): bigint {
+export function weeklySlotToMask(slot: WeeklyTimeSlot): bigint {
   let mask = 0n;
 
-  const dayIndex = DAY_INDEX[blocked.day];
+  const dayIndex = DAY_INDEX[slot.day];
   if (dayIndex === undefined || dayIndex >= DAYS_PER_WEEK) return mask;
 
-  const startSlot = timeToSlot(blocked.startTime.hours, blocked.startTime.minutes);
-  const endSlot = timeToSlot(blocked.endTime.hours, blocked.endTime.minutes);
+  const startSlot = timeToSlot(slot.startTime.hours, slot.startTime.minutes);
+  const endSlot = timeToSlot(slot.endTime.hours, slot.endTime.minutes);
 
   if (startSlot >= endSlot || startSlot < 0 || endSlot > SLOTS_PER_DAY) return mask;
 
@@ -103,6 +103,9 @@ export function blockedTimeToMask(blocked: BlockedTimePeriod): bigint {
 
   return mask;
 }
+
+/** @deprecated Use weeklySlotToMask instead */
+export const blockedTimeToMask = weeklySlotToMask;
 
 export function masksConflict(mask1: bigint, mask2: bigint): boolean {
   return (mask1 & mask2) !== 0n;
@@ -141,15 +144,15 @@ export class BitMaskEngine {
     return this.addSection(section);
   }
 
-  setBlockedTimes(blockedTimes: BlockedTimePeriod[]): void {
+  setBlockedTimes(blockedTimes: WeeklyTimeSlot[]): void {
     this.blockedMasksByTerm.clear();
 
-    for (const blocked of blockedTimes) {
-      const mask = blockedTimeToMask(blocked);
+    for (const slot of blockedTimes) {
+      const mask = weeklySlotToMask(slot);
       if (mask === 0n) continue;
 
       // Apply to specific term or all terms
-      const terms = blocked.term === 'ALL' ? ['A', 'B', 'C', 'D'] : [blocked.term];
+      const terms = slot.term === 'ALL' ? ['A', 'B', 'C', 'D'] : [slot.term];
 
       for (const term of terms) {
         const existing = this.blockedMasksByTerm.get(term) || 0n;

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { AutoScheduler } from '../../../src/services/scheduling/AutoScheduler'
-import type { AutoScheduleConfig, BlockedTimePeriod } from '../../../src/types/schedule'
+import type { AutoScheduleConfig, WeeklyTimeSlot } from '../../../src/types/schedule'
 import { AcademicTerm } from '../../../src/types/schedule'
 import { DayOfWeek } from '../../../src/types/types'
 import {
@@ -117,7 +117,7 @@ describe('AutoScheduler', () => {
       const selectedCourse = createMockSelectedCourse({ course })
 
       // Block 9-11am on Monday
-      const blockedTime: BlockedTimePeriod = {
+      const blockedTime: WeeklyTimeSlot = {
         id: 'block-1',
         day: DayOfWeek.MONDAY,
         startTime: { hours: 9, minutes: 0 },
@@ -158,7 +158,7 @@ describe('AutoScheduler', () => {
       const selectedCourse = createMockSelectedCourse({ course })
 
       // Block only in term B (section is in term A, so should NOT be blocked)
-      const blockedTime: BlockedTimePeriod = {
+      const blockedTime: WeeklyTimeSlot = {
         id: 'block-1',
         day: DayOfWeek.MONDAY,
         startTime: { hours: 9, minutes: 0 },
@@ -198,7 +198,7 @@ describe('AutoScheduler', () => {
       const selectedCourse = createMockSelectedCourse({ course })
 
       // Block the entire time slot
-      const blockedTime: BlockedTimePeriod = {
+      const blockedTime: WeeklyTimeSlot = {
         id: 'block-1',
         day: DayOfWeek.MONDAY,
         startTime: { hours: 8, minutes: 0 },

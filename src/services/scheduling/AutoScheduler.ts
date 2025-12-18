@@ -1,6 +1,6 @@
 import type { Course, Section, DayOfWeek } from '../../types/types';
-import type { SelectedCourse, BlockedTimePeriod, AutoScheduleConfig } from '../../types/schedule';
-import { sectionToMask, blockedTimeToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
+import type { SelectedCourse, WeeklyTimeSlot, AutoScheduleConfig } from '../../types/schedule';
+import { sectionToMask, weeklySlotToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { ScheduleFilterService } from '../filtering/ScheduleFilterService';
 
 interface SectionCombination {
@@ -109,19 +109,32 @@ export class AutoScheduler {
     return validSchedules;
   }
 
-  private precomputeBlockedMasks(blockedTimes: BlockedTimePeriod[]): Map<string, bigint> {
+  private precomputeBlockedMasks(blockedTimes: WeeklyTimeSlot[]): Map<string, bigint> {
     const masksByTerm = new Map<string, bigint>();
 
-    for (const blocked of blockedTimes) {
-      const mask = blockedTimeToMask(blocked);
+    console.log(`[AutoScheduler] precomputeBlockedMasks called with ${blockedTimes.length} blocked times`);
+
+    for (const slot of blockedTimes) {
+      const mask = weeklySlotToMask(slot);
+
+      // Debug: Log each blocked time and whether it produces a valid mask
+      const start = `${slot.startTime.hours}:${String(slot.startTime.minutes).padStart(2, '0')}`;
+      const end = `${slot.endTime.hours}:${String(slot.endTime.minutes).padStart(2, '0')}`;
+      console.log(`[AutoScheduler] Blocked: day=${slot.day} time=${start}-${end} term=${slot.term} → mask=${mask !== 0n ? 'SET' : 'EMPTY!'}`);
+
       if (mask === 0n) continue;
 
-      const terms = blocked.term === 'ALL' ? ['A', 'B', 'C', 'D'] : [blocked.term];
+      const terms = slot.term === 'ALL' ? ['A', 'B', 'C', 'D'] : [slot.term];
 
       for (const term of terms) {
         const existing = masksByTerm.get(term) || 0n;
         masksByTerm.set(term, existing | mask);
       }
+    }
+
+    // Debug: Log final masks per term
+    for (const [term, mask] of masksByTerm) {
+      console.log(`[AutoScheduler] Final blocked mask for term ${term}: ${mask !== 0n ? 'has blocks' : 'empty'}`);
     }
 
     return masksByTerm;
@@ -221,10 +234,12 @@ export class AutoScheduler {
 
       const lectureMask = sectionToMask(lecture);
 
-      // Get valid discussion candidates
+      // Get valid discussion candidates - must be same term as lecture
       const discussionCandidates: Array<{ section: Section | null; mask: bigint }> = [];
       if (typeInfo.hasDiscussions) {
         for (const d of lectureGroup.compatibleDiscussions || []) {
+          // Skip if different term than lecture
+          if (d.computedTerm !== lecture.computedTerm) continue;
           if (!this.isValidSection(d, blockedMasksByTerm, selectedCourse)) continue;
           const mask = sectionToMask(d);
           // Check lecture/discussion internal conflict
@@ -235,10 +250,12 @@ export class AutoScheduler {
         discussionCandidates.push({ section: null, mask: 0n });
       }
 
-      // Get valid lab candidates
+      // Get valid lab candidates - must be same term as lecture
       const labCandidates: Array<{ section: Section | null; mask: bigint }> = [];
       if (typeInfo.hasLabs) {
         for (const l of lectureGroup.compatibleLabs || []) {
+          // Skip if different term than lecture
+          if (l.computedTerm !== lecture.computedTerm) continue;
           if (!this.isValidSection(l, blockedMasksByTerm, selectedCourse)) continue;
           const mask = sectionToMask(l);
           // Check lecture/lab internal conflict

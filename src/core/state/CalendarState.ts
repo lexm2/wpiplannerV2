@@ -3,7 +3,7 @@
 // =============================================================================
 
 import type { ConnectedCalendar, CalendarEvent } from '../../services/calendar/types';
-import type { BlockedTimePeriod, WeeklyTimeSlot } from '../../types/schedule';
+import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule';
 import { AcademicTerm } from '../../types/schedule';
 import { DayOfWeek } from '../../types/types';
 import { calendarService } from '../../services/calendar/CalendarService';
@@ -35,11 +35,8 @@ export class CalendarState {
     private excludedEventIds: Set<string> = new Set();
 
     // Weekly slots (unified representation for display)
-    private weeklySlots: Map<string, WeeklyTimeSlot[]> = new Map();
+    private weeklySlots: Map<string, DisplayableTimeSlot[]> = new Map();
     private weeklySlotsDirty: boolean = true;
-
-    // Blocked times (derived from weekly slots)
-    private blockedTimesCache: Map<string, BlockedTimePeriod[]> = new Map();
 
     // Callbacks
     private exclusionChangeCallbacks: ExclusionChangeCallback[] = [];
@@ -122,7 +119,7 @@ export class CalendarState {
         this.eventInstances.clear();
         this.eventParents.clear();
         this.excludedEventIds.clear();
-        this.blockedTimesCache.clear();
+        this.weeklySlots.clear();
         this.weeklySlotsDirty = true;
     }
 
@@ -282,9 +279,9 @@ export class CalendarState {
 
     /**
      * Get weekly time slots for a term (for grid display).
-     * Returns deduplicated, non-excluded events as WeeklyTimeSlot objects.
+     * Returns deduplicated, non-excluded events as DisplayableTimeSlot objects.
      */
-    getWeeklySlotsForTerm(term: string): WeeklyTimeSlot[] {
+    getWeeklySlotsForTerm(term: string): DisplayableTimeSlot[] {
         this.ensureWeeklySlotsComputed();
         return this.weeklySlots.get(term) || [];
     }
@@ -292,7 +289,7 @@ export class CalendarState {
     /**
      * Get all weekly slots across all terms.
      */
-    getAllWeeklySlots(): Map<string, WeeklyTimeSlot[]> {
+    getAllWeeklySlots(): Map<string, DisplayableTimeSlot[]> {
         this.ensureWeeklySlotsComputed();
         return this.weeklySlots;
     }
@@ -314,7 +311,7 @@ export class CalendarState {
         this.weeklySlots.clear();
 
         for (const [term, events] of this.eventInstances) {
-            const slots: WeeklyTimeSlot[] = [];
+            const slots: DisplayableTimeSlot[] = [];
             const seen = new Set<string>(); // Dedupe key
 
             for (const event of events) {
@@ -335,16 +332,13 @@ export class CalendarState {
 
             this.weeklySlots.set(term, slots);
         }
-
-        // Also recompute blocked times (derived from weekly slots)
-        this.computeBlockedTimes();
     }
 
     /**
-     * Convert a CalendarEvent to a WeeklyTimeSlot.
+     * Convert a CalendarEvent to a DisplayableTimeSlot.
      * Returns null if the event is on a weekend or invalid.
      */
-    private eventToWeeklySlot(event: CalendarEvent, term: string): WeeklyTimeSlot | null {
+    private eventToWeeklySlot(event: CalendarEvent, term: string): DisplayableTimeSlot | null {
         const startDate = new Date(event.start.dateTime);
         const endDate = new Date(event.end.dateTime);
         const dayIndex = startDate.getDay();
@@ -384,38 +378,27 @@ export class CalendarState {
         };
     }
 
-    /**
-     * Convert a WeeklyTimeSlot to a BlockedTimePeriod.
-     */
-    private weeklySlotToBlockedTime(slot: WeeklyTimeSlot): BlockedTimePeriod {
-        return {
-            id: slot.id,
-            day: slot.day,
-            startTime: slot.startTime,
-            endTime: slot.endTime,
-            term: slot.term,
-        };
-    }
-
     // -------------------------------------------------------------------------
     // Blocked Times (for Auto-Scheduler)
     // -------------------------------------------------------------------------
 
     /**
-     * Get blocked times for a specific term
+     * Get blocked times for a specific term.
+     * Returns WeeklyTimeSlot[] (DisplayableTimeSlot extends WeeklyTimeSlot).
      */
-    getBlockedTimesForTerm(term: string): BlockedTimePeriod[] {
-        this.ensureBlockedTimesComputed();
-        return this.blockedTimesCache.get(term) || [];
+    getBlockedTimesForTerm(term: string): WeeklyTimeSlot[] {
+        this.ensureWeeklySlotsComputed();
+        return this.weeklySlots.get(term) || [];
     }
 
     /**
-     * Get all blocked times across all terms
+     * Get all blocked times across all terms.
+     * Returns WeeklyTimeSlot[] (DisplayableTimeSlot extends WeeklyTimeSlot).
      */
-    getAllBlockedTimes(): BlockedTimePeriod[] {
-        this.ensureBlockedTimesComputed();
-        const allTimes: BlockedTimePeriod[] = [];
-        for (const times of this.blockedTimesCache.values()) {
+    getAllBlockedTimes(): WeeklyTimeSlot[] {
+        this.ensureWeeklySlotsComputed();
+        const allTimes: WeeklyTimeSlot[] = [];
+        for (const times of this.weeklySlots.values()) {
             allTimes.push(...times);
         }
         return allTimes;
@@ -425,35 +408,12 @@ export class CalendarState {
      * Get count of events that will be blocked (non-excluded, weekday events)
      */
     getBlockableEventCount(): number {
-        this.ensureBlockedTimesComputed();
+        this.ensureWeeklySlotsComputed();
         let count = 0;
-        for (const times of this.blockedTimesCache.values()) {
+        for (const times of this.weeklySlots.values()) {
             count += times.length;
         }
         return count;
-    }
-
-    /**
-     * Ensure blocked times are computed (lazy computation).
-     * Blocked times are derived from weekly slots, so this just ensures
-     * weekly slots are computed.
-     */
-    private ensureBlockedTimesComputed(): void {
-        this.ensureWeeklySlotsComputed();
-    }
-
-    /**
-     * Compute blocked times from weekly slots.
-     * Since weekly slots are already deduplicated and filtered,
-     * this is a simple conversion.
-     */
-    private computeBlockedTimes(): void {
-        this.blockedTimesCache.clear();
-
-        for (const [term, slots] of this.weeklySlots) {
-            const blockedTimes = slots.map(slot => this.weeklySlotToBlockedTime(slot));
-            this.blockedTimesCache.set(term, blockedTimes);
-        }
     }
 
     // -------------------------------------------------------------------------

@@ -14,7 +14,7 @@ export type {
     ConnectedCalendar,
 } from './types';
 
-export { DAY_TO_RRULE, calendarEventToBlockedTime } from './types';
+export { DAY_TO_RRULE, calendarEventToWeeklySlot } from './types';
 
 // Service
 export { CalendarService, calendarService } from './CalendarService';

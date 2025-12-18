@@ -11,7 +11,8 @@ export type {
   TimeConflict,
   SchedulePreferences,
   UserScheduleState,
-  BlockedTimePeriod,
+  WeeklyTimeSlot,
+  DisplayableTimeSlot,
   AutoScheduleConfig,
 } from './schedule';
 export { ConflictType, AcademicTerm } from './schedule';

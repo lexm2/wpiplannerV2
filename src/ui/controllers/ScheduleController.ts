@@ -15,7 +15,7 @@ import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine'
 import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../../utils/typeGuards'
 import { AutoScheduler } from '../../services/scheduling/AutoScheduler'
-import type { AutoScheduleConfig, AutoScheduleSettings, BlockedTimePeriod, WeeklyTimeSlot } from '../../types/schedule'
+import type { AutoScheduleConfig, AutoScheduleSettings, WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
 import { AutoScheduleSettingsModal } from '../components/AutoScheduleSettingsModal'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
@@ -1314,7 +1314,7 @@ export class ScheduleController {
         }
     }
 
-    private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number, calendarSlots: WeeklyTimeSlot[] = []): { content: string, classes: string } {
+    private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number, calendarSlots: DisplayableTimeSlot[] = []): { content: string, classes: string } {
         // Find all sections that occupy this cell
         const occupyingSections: any[] = [];
         // Find calendar slots that occupy this cell
@@ -2034,6 +2034,31 @@ export class ScheduleController {
         if (!schedule) {
             console.warn(`[Auto-Schedule] No schedule found at index ${index}`);
             return;
+        }
+
+        // Debug: Log blocked times from calendar
+        const blockedTimes = this.calendarState.getAllBlockedTimes();
+        console.log('[AutoSchedule Debug] Blocked times from calendar:', blockedTimes.map(bt => ({
+            day: bt.day,
+            start: `${bt.startTime.hours}:${String(bt.startTime.minutes).padStart(2, '0')}`,
+            end: `${bt.endTime.hours}:${String(bt.endTime.minutes).padStart(2, '0')}`,
+            term: bt.term
+        })));
+
+        // Debug: Log section times for this schedule
+        console.log('[AutoSchedule Debug] Section times in this schedule:');
+        for (const result of schedule) {
+            const combo = result.combination;
+            const sections = [combo.lecture, combo.discussion, combo.lab].filter(Boolean);
+            for (const section of sections as any[]) {
+                console.log(`[AutoSchedule Debug] Section ${section.crn} (term ${section.computedTerm}):`, {
+                    periods: section.periods.map((p: any) => ({
+                        days: Array.from(p.days),
+                        start: `${p.startTime.hours}:${String(p.startTime.minutes).padStart(2, '0')}`,
+                        end: `${p.endTime.hours}:${String(p.endTime.minutes).padStart(2, '0')}`
+                    }))
+                });
+            }
         }
 
         this.isApplyingAutoSchedule = true;

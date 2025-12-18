@@ -259,20 +259,20 @@ export const DAY_TO_RRULE: Record<string, string> = {
 // -----------------------------------------------------------------------------
 
 import { DayOfWeek } from '../../types/types';
-import { AcademicTerm, BlockedTimePeriod } from '../../types/schedule';
+import { AcademicTerm, WeeklyTimeSlot } from '../../types/schedule';
 
 /**
- * Convert a calendar event to a blocked time period.
+ * Convert a calendar event to a WeeklyTimeSlot.
  * Returns null if the event is on a weekend or cannot be converted.
  *
  * @param event - The calendar event to convert
  * @param term - The academic term this event belongs to ('A', 'B', 'C', 'D')
- * @returns BlockedTimePeriod or null if conversion not possible
+ * @returns WeeklyTimeSlot or null if conversion not possible
  */
-export function calendarEventToBlockedTime(
+export function calendarEventToWeeklySlot(
     event: CalendarEvent,
     term: string
-): BlockedTimePeriod | null {
+): WeeklyTimeSlot | null {
     // Parse event datetime
     const startDate = new Date(event.start.dateTime);
     const endDate = new Date(event.end.dateTime);

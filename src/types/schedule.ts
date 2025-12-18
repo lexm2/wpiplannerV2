@@ -107,27 +107,8 @@ export enum AcademicTerm {
 }
 
 /**
- * A time period that the user wants to block off from scheduling.
- * Used for non-academic commitments like work, clubs, appointments, etc.
- *
- * All fields are strongly typed - no string parsing needed.
- */
-export interface BlockedTimePeriod {
-    /** Unique identifier for this blocked period */
-    id: string;
-    /** Day of the week this block applies to */
-    day: DayOfWeek;
-    /** Start time of the blocked period */
-    startTime: SimpleTime;
-    /** End time of the blocked period */
-    endTime: SimpleTime;
-    /** Which academic term(s) this block applies to */
-    term: AcademicTerm;
-}
-
-/**
- * Unified representation of a weekly time slot.
- * Used for calendar events, blocked times, and grid display.
+ * Base type for weekly time slots - core scheduling data only.
+ * Used for conflict detection, auto-scheduling, blocked times.
  *
  * This provides a single structure for anything that occupies
  * a day+time on the weekly schedule grid.
@@ -143,16 +124,19 @@ export interface WeeklyTimeSlot {
     endTime: SimpleTime;
     /** Which academic term this slot belongs to */
     term: AcademicTerm;
+}
 
-    // Display metadata
+/**
+ * Extended type with display metadata for UI rendering.
+ * Used for calendar events, grid display, visual components.
+ */
+export interface DisplayableTimeSlot extends WeeklyTimeSlot {
     /** Title to display (event name, course code, etc.) */
     title: string;
     /** Subtitle (location, description, etc.) */
     subtitle?: string;
     /** Color for visual styling */
     color?: string;
-
-    // Source tracking
     /** Where this slot came from */
     sourceType: 'calendar' | 'blocked' | 'course';
     /** Original ID from source (event ID, period ID, etc.) */
@@ -165,7 +149,7 @@ export interface WeeklyTimeSlot {
  */
 export interface AutoScheduleConfig {
     /** Time periods to avoid when scheduling */
-    blockedTimes: BlockedTimePeriod[];
+    blockedTimes: WeeklyTimeSlot[];
 }
 
 /**
