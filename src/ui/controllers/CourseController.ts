@@ -8,6 +8,7 @@ import { CancellationToken } from '../../utils/RequestCancellation'
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
+import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 
 // Course listing and interaction management with optimistic UI integration
 // Provides progressive rendering for large datasets with instant visual feedback
@@ -472,6 +473,37 @@ export class CourseController {
                 element.classList.remove('selected');
                 selectBtn.innerHTML = getInlineSVG('PLUS', 'plus-icon');
                 selectBtn.classList.remove('selected');
+            }
+        }
+    }
+
+    toggleCourseBookmark(element: HTMLElement): void {
+        const courseId = element.dataset.courseId;
+        if (!courseId) return;
+
+        const stateManager = ProfileStateManager.getInstance();
+        const isCurrentlyBookmarked = stateManager.isBookmarked(courseId);
+
+        if (isCurrentlyBookmarked) {
+            stateManager.unbookmarkCourse(courseId);
+        } else {
+            stateManager.bookmarkCourse(courseId);
+        }
+
+        this.updateCourseBookmarkUI(element, !isCurrentlyBookmarked);
+    }
+
+    private updateCourseBookmarkUI(element: HTMLElement, isBookmarked: boolean): void {
+        const bookmarkBtn = element.querySelector('.course-bookmark-btn');
+        if (bookmarkBtn) {
+            if (isBookmarked) {
+                bookmarkBtn.innerHTML = getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon');
+                bookmarkBtn.classList.add('bookmarked');
+                bookmarkBtn.setAttribute('title', 'Remove bookmark');
+            } else {
+                bookmarkBtn.innerHTML = getInlineSVG('BOOKMARK', 'bookmark-icon');
+                bookmarkBtn.classList.remove('bookmarked');
+                bookmarkBtn.setAttribute('title', 'Add bookmark');
             }
         }
     }

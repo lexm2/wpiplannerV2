@@ -90,6 +90,53 @@
   stroke: var(--color-primary);
 }
 
+/* Bookmark button */
+.course-bookmark-btn {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: var(--effect-transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.course-bookmark-btn:hover {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+  background: var(--color-warning-background);
+}
+
+.course-bookmark-btn.bookmarked {
+  border-color: var(--color-warning);
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+}
+
+.bookmark-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  pointer-events: none;
+}
+
+.course-bookmark-btn:not(.bookmarked) .bookmark-icon {
+  stroke: var(--color-text-secondary);
+}
+
+.course-bookmark-btn:not(.bookmarked):hover .bookmark-icon {
+  stroke: var(--color-warning);
+}
+
+.course-bookmark-btn.bookmarked .bookmark-icon {
+  fill: var(--color-text-inverse);
+}
+
 /* Check icon drawing animation */
 .check-icon path {
   stroke-dasharray: 30;

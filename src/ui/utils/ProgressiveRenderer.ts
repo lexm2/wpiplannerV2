@@ -5,6 +5,7 @@ import { getProfessorsByTerm, getAllSections } from '../../utils/courseUtils';
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { Validators } from '../../utils/validators';
+import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 
 export interface RenderBatchCallback {
     (batchIndex: number, batchCount: number, totalCount: number): void;
@@ -178,16 +179,21 @@ export class ProgressiveRenderer {
             }
 
             // Build HTML for this batch
+            const stateManager = ProfileStateManager.getInstance();
             const batchHtml = batchCourses.map(course => {
                 const isSelected = courseSelectionService.isCourseSelected(course);
+                const isBookmarked = stateManager.isBookmarked(course.id);
                 const hasWarning = this.courseHasWarning(course);
-                
+
                 return `
                     <div class="course-item ${isSelected ? 'selected' : ''}" data-course-id="${Validators.escapeHtml(course.id)}">
                         <div class="course-header">
                             <div class="course-header-controls">
                                 <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
                                     ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
+                                </button>
+                                <button class="course-bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" title="${isBookmarked ? 'Remove bookmark' : 'Add bookmark'}">
+                                    ${isBookmarked ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon') : getInlineSVG('BOOKMARK', 'bookmark-icon')}
                                 </button>
                                 <div class="course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
                                 <div class="course-name">
@@ -367,8 +373,10 @@ export class ProgressiveRenderer {
                 existingIndicators.forEach(indicator => indicator.remove());
             }
 
+            const stateManager = ProfileStateManager.getInstance();
             const batchHtml = batchCourses.map(course => {
                 const isSelected = courseSelectionService.isCourseSelected(course);
+                const isBookmarked = stateManager.isBookmarked(course.id);
                 const hasWarning = this.courseHasWarning(course);
 
                 // Get unique professors across all sections
@@ -399,6 +407,9 @@ export class ProgressiveRenderer {
                                 <div class="course-title-main">${Validators.escapeHtml(course.name)}</div>
                                 <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
                                     ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
+                                </button>
+                                <button class="course-bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" title="${isBookmarked ? 'Remove bookmark' : 'Add bookmark'}">
+                                    ${isBookmarked ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon') : getInlineSVG('BOOKMARK', 'bookmark-icon')}
                                 </button>
                             </div>
                         </div>

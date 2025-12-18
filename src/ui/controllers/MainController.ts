@@ -515,6 +515,13 @@ export class MainController {
                 }
             }
 
+            if (target.classList.contains('course-bookmark-btn')) {
+                const courseElement = target.closest('.course-item, .course-card') as HTMLElement;
+                if (courseElement) {
+                    this.courseController.toggleCourseBookmark(courseElement);
+                }
+            }
+
             if (target.classList.contains('load-more-button')) {
                 // Handle Load More button click
                 this.handleLoadMoreClick().catch(error => {
