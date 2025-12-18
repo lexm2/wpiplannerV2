@@ -13,6 +13,7 @@ import type {
 import type { CloudSyncService } from '../interfaces/CloudSyncService';
 import type { CloudAuthService } from '../interfaces/CloudAuthService';
 import { syncEventBus } from '../SyncEventBus';
+import { ProfileStateManager } from '../../../core/state/ProfileStateManager';
 
 declare const gapi: any;
 
@@ -126,7 +127,6 @@ export class GoogleDriveSyncService implements CloudSyncService {
         syncEventBus.on('local-save-completed', async () => {
             if (GOOGLE_DRIVE_CONFIG.autoSyncEnabled && this.isAuthenticated()) {
                 // Get data from ProfileStateManager and push directly
-                const { ProfileStateManager } = await import('../../../core/state/ProfileStateManager');
                 const stateManager = ProfileStateManager.getInstance();
                 const exportedData = await stateManager.exportData();
                 if (exportedData) {
@@ -215,7 +215,6 @@ export class GoogleDriveSyncService implements CloudSyncService {
         if (this.authService.isAuthenticated()) {
             this.updateStatus('idle');
             // Trigger initial sync after sign-in to check for conflicts
-            const { ProfileStateManager } = await import('../../../core/state/ProfileStateManager');
             const stateManager = ProfileStateManager.getInstance();
             const exportedData = await stateManager.exportData();
 

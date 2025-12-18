@@ -1,6 +1,7 @@
 import type { CloudProvider, SyncData, ConflictInfo, ConflictResolution, SyncStatus } from './types';
 import { syncEventBus } from './SyncEventBus';
 import { providerRegistry } from './ProviderRegistry';
+import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 
 /**
  * Interface for state manager dependency injection.
@@ -35,7 +36,6 @@ export class SyncManager {
      */
     private async getLocalSyncData(): Promise<SyncData | null> {
         try {
-            const { ProfileStateManager } = await import('../../core/state/ProfileStateManager');
             const stateManager = ProfileStateManager.getInstance();
             const exportedData = await stateManager.exportData();
 
