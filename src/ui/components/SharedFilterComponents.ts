@@ -22,6 +22,7 @@ export interface AvailabilityFilterOptions {
     filterId: string;
     availableOnly: boolean;
     minAvailable?: number;
+    avoidConflicts?: boolean;
 }
 
 export interface ConflictFilterOptions {
@@ -111,17 +112,17 @@ export class SharedFilterComponents {
             </span>
         `).join('');
 
+        // Only show section if there are selected professors
+        if (activeProfessors.length === 0) {
+            return `<div class="filter-selected-chips" id="${idPrefix}-professor-chips" style="display: none;"></div>`;
+        }
+
         return `
             <div class="filter-section">
                 <div class="filter-section-header">
-                    <h4 class="filter-section-title">Professors</h4>
+                    <h4 class="filter-section-title">Selected Professors</h4>
                 </div>
                 <div class="filter-section-content">
-                    <div class="filter-search-container">
-                        <input type="text" class="filter-search ${idPrefix}-professor-search"
-                               placeholder="Search professors..." data-filter="${filterId}">
-                        <div class="${idPrefix}-professor-dropdown" id="${idPrefix}-professor-dropdown" style="display: none;"></div>
-                    </div>
                     <div class="filter-selected-chips" id="${idPrefix}-professor-chips">
                         ${selectedProfessorsChips}
                     </div>
@@ -162,7 +163,7 @@ export class SharedFilterComponents {
     }
 
     static createAvailabilityFilter(options: AvailabilityFilterOptions): string {
-        const { idPrefix, availableOnly, minAvailable } = options;
+        const { idPrefix, availableOnly, minAvailable, avoidConflicts } = options;
 
         const prefix = idPrefix ? `${idPrefix}-` : '';
 
@@ -173,6 +174,12 @@ export class SharedFilterComponents {
                 </div>
                 <div class="filter-section-content">
                     <label class="filter-toggle-label">
+                        <input type="checkbox" class="filter-toggle" id="${prefix}avoid-conflicts-filter"
+                               ${avoidConflicts ? 'checked' : ''}>
+                        <span class="filter-toggle-slider"></span>
+                        <span class="filter-toggle-text">Hide periods that conflict with selected sections</span>
+                    </label>
+                    <label class="filter-toggle-label" style="margin-top: 0.75rem;">
                         <input type="checkbox" class="filter-toggle" id="${prefix}available-only-filter"
                                ${availableOnly ? 'checked' : ''}>
                         <span class="filter-toggle-slider"></span>

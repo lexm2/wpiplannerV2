@@ -318,8 +318,10 @@
   gap: 0.5rem;
   align-items: center;
   flex-wrap: wrap;
-  transition: opacity 0.2s ease;
-  margin-top: 0.5rem;
+  transition: opacity 0.2s ease, max-height 0.3s ease, padding-top 0.3s ease;
+  padding-top: 0;
+  max-height: 0;
+  overflow: hidden;
 }
 
 .term-badge.active {
@@ -402,6 +404,8 @@
 .course-card.active {
   border-color: var(--color-primary);
   box-shadow: var(--effect-shadow-hover);
+  height: auto;
+  overflow: visible;
 }
 
 .course-card.selected {

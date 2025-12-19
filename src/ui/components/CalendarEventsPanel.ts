@@ -55,6 +55,7 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
     /**
      * Update the excluded IDs with targeted DOM updates (no full re-render).
      * This preserves event listeners and provides smoother UI updates.
+     * Used for bulk operations like showAll/hideAll.
      */
     updateExcludedIds(excludedIds: Set<string>): void {
         const previousExcluded = this.panelOptions.excludedEventIds;
@@ -81,28 +82,45 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
     }
 
     /**
+     * Directly update a single event's exclusion state.
+     * Called by ScheduleController when a specific event is toggled.
+     * This mutates the existing Set to ensure click handlers see the updated state.
+     */
+    updateSingleEventExclusion(eventId: string, excluded: boolean): void {
+        // Update the internal state by mutating the existing Set
+        if (excluded) {
+            this.panelOptions.excludedEventIds.add(eventId);
+        } else {
+            this.panelOptions.excludedEventIds.delete(eventId);
+        }
+
+        // Update the visuals
+        this.updateEventItemVisual(eventId, excluded);
+        this.updateTermCounts();
+    }
+
+    /**
      * Update a single event item's visual state (targeted DOM update).
+     * Updates ALL instances of this event across terms (for multi-term events).
      */
     private updateEventItemVisual(eventId: string, isExcluded: boolean): void {
         if (!this.panel) return;
 
-        const item = this.panel.querySelector<HTMLElement>(`.calendar-event-item[data-event-id="${eventId}"]`);
-        if (!item) return;
+        // Use querySelectorAll to update ALL instances of this event across terms
+        const items = this.panel.querySelectorAll<HTMLElement>(`.calendar-event-item[data-event-id="${eventId}"]`);
 
-        // Update excluded class
-        if (isExcluded) {
-            item.classList.add('excluded');
-        } else {
-            item.classList.remove('excluded');
-        }
+        items.forEach(item => {
+            // Update excluded class
+            item.classList.toggle('excluded', isExcluded);
 
-        // Update the visibility icon
-        const iconContainer = item.querySelector('.event-visibility-toggle');
-        if (iconContainer) {
-            iconContainer.innerHTML = isExcluded
-                ? getInlineSVG('HEXAGON_MINUS', 'visibility-icon hidden')
-                : getInlineSVG('HEXAGON_PLUS', 'visibility-icon visible');
-        }
+            // Update the visibility icon
+            const iconContainer = item.querySelector('.event-visibility-toggle');
+            if (iconContainer) {
+                iconContainer.innerHTML = isExcluded
+                    ? getInlineSVG('HEXAGON_MINUS', 'visibility-icon hidden')
+                    : getInlineSVG('HEXAGON_PLUS', 'visibility-icon visible');
+            }
+        });
     }
 
     /**

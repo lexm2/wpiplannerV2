@@ -352,9 +352,9 @@ export class ScheduleController {
             connectedCalendar: updatedCalendar,
         };
 
-        // Update UI
+        // Update UI - use direct update to mutate the panel's Set in place
         if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateExcludedIds(this.calendarState.getExcludedIds());
+            this.calendarEventsPanel.updateSingleEventExclusion(eventId, excluded);
         }
         this.renderScheduleGrids();
 

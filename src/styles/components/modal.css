@@ -689,6 +689,8 @@
 }
 
 .search-text-section {
+  border: none;
+  border-radius: 0;
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 1rem;
   padding-bottom: 1rem;
@@ -698,6 +700,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: transparent;
+  border-bottom: none;
+  border-radius: 0;
+}
+
+.search-text-section .filter-section-content {
+  background: transparent;
+  border-radius: 0;
+  padding: 0.5rem 0 0 0;
 }
 
 .filter-clear-search {
@@ -1444,6 +1455,51 @@
   background: var(--color-primary);
   color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Term filter row (inline with course level) */
+.filter-term-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.filter-term-row .filter-term-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+}
+
+.filter-term-row .filter-term-label:hover {
+  border-color: var(--color-primary);
+}
+
+.filter-term-row .filter-toggle {
+  width: 44px;
+  height: 22px;
+}
+
+.filter-term-row .filter-toggle::before {
+  width: 18px;
+  height: 18px;
+}
+
+.filter-term-row .filter-toggle:checked::before {
+  transform: translateX(22px);
+}
+
+.filter-term-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  user-select: none;
 }
 
 /* ===== Auto Schedule Settings Modal ===== */

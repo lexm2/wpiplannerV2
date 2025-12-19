@@ -163,13 +163,10 @@ export class FilterModalController extends BaseModal {
             <div class="filter-sections">
                 ${this.createGraduateLevelFilter()}
                 ${this.createSearchTextFilter()}
-                ${this.createTermFilter()}
                 ${this.createBookmarkFilter()}
                 ${this.createAvailabilityFilter()}
-                ${this.createConflictFilter()}
                 ${this.createDepartmentFilter()}
                 ${this.createCreditRangeFilter()}
-                ${this.createProfessorFilter()}
                 ${this.createRMPRatingFilter()}
             </div>
         `;
@@ -182,6 +179,22 @@ export class FilterModalController extends BaseModal {
         const criteria = activeFilter?.criteria as GraduateLevelFilterCriteria | undefined;
         const currentLevel = criteria?.level || 'all';
 
+        // Get term filter state
+        const terms = this.filterService.getFilterOptions('term', this.allCourses) as string[];
+        const termFilter = this.filterService.getActiveFilters().find(f => f.id === 'term');
+        const termCriteria = termFilter?.criteria as TermFilterCriteria | undefined;
+        const activeTerms = termCriteria?.terms || [];
+
+        const termCheckboxes = terms.map(term => `
+            <label class="filter-term-label">
+                <input type="checkbox" class="filter-toggle"
+                       value="${term}"
+                       data-filter="term"
+                       ${activeTerms.includes(term) ? 'checked' : ''}>
+                <span class="filter-term-text">${term}</span>
+            </label>
+        `).join('');
+
         return `
             <div class="filter-section">
                 <div class="filter-section-header">
@@ -192,6 +205,9 @@ export class FilterModalController extends BaseModal {
                         <button class="segmented-btn ${currentLevel === 'all' ? 'active' : ''}" data-level="all">All</button>
                         <button class="segmented-btn ${currentLevel === 'undergraduate' ? 'active' : ''}" data-level="undergraduate">Undergrad</button>
                         <button class="segmented-btn ${currentLevel === 'graduate' ? 'active' : ''}" data-level="graduate">Graduate</button>
+                    </div>
+                    <div class="filter-term-row">
+                        ${termCheckboxes}
                     </div>
                 </div>
             </div>
@@ -205,18 +221,34 @@ export class FilterModalController extends BaseModal {
         const criteria = activeFilter?.criteria as SearchTextFilterCriteria | undefined;
         const currentQuery = criteria?.query || '';
 
+        // Get active professors for chips
+        const profFilter = this.filterService.getActiveFilters().find(f => f.id === 'professor');
+        const profCriteria = profFilter?.criteria as ProfessorFilterCriteria | undefined;
+        const activeProfessors = profCriteria?.professors || [];
+
+        const professorChips = activeProfessors.map((prof: string) => `
+            <span class="filter-chip">
+                ${this.escapeHtml(prof)}
+                <button class="filter-chip-remove" data-professor="${this.escapeHtml(prof)}" data-filter="professor">×</button>
+            </span>
+        `).join('');
+
         return `
             <div class="filter-section search-text-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Search Text</h4>
-                    <button class="filter-clear-search" ${currentQuery ? '' : 'style="display: none;"'}>Clear</button>
-                </div>
                 <div class="filter-section-content">
                     <div class="filter-search-container">
-                        <input type="text" class="filter-search search-text-input" 
-                               placeholder="Search courses..." 
+                        <input type="text" class="filter-search search-text-input"
+                               placeholder="Search courses..."
                                value="${this.escapeHtml(currentQuery)}"
                                data-filter="searchText">
+                    </div>
+                    <div class="filter-search-container">
+                        <input type="text" class="filter-search professor-search"
+                               placeholder="Search professors..." data-filter="professor">
+                        <div class="professor-dropdown" id="professor-dropdown" style="display: none;"></div>
+                    </div>
+                    <div class="filter-selected-chips" id="professor-chips" ${activeProfessors.length === 0 ? 'style="display: none;"' : ''}>
+                        ${professorChips}
                     </div>
                 </div>
             </div>
@@ -286,24 +318,16 @@ export class FilterModalController extends BaseModal {
         const availableOnly = criteria?.availableOnly || false;
         const minAvailable = criteria?.minAvailable;
 
+        // Get conflict filter state
+        const conflictFilter = this.filterService.getActiveFilters().find(f => f.id === 'conflict');
+        const conflictCriteria = conflictFilter?.criteria as { avoidConflicts?: boolean } | undefined;
+        const avoidConflicts = conflictCriteria?.avoidConflicts || false;
+
         return SharedFilterComponents.createAvailabilityFilter({
             idPrefix: '',
             filterId: 'availability',
             availableOnly,
-            minAvailable
-        });
-    }
-
-    private createConflictFilter(): string {
-        if (!this.filterService) return '';
-
-        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'conflict');
-        const criteria = activeFilter?.criteria as { avoidConflicts?: boolean } | undefined;
-        const avoidConflicts = criteria?.avoidConflicts || false;
-
-        return SharedFilterComponents.createConflictFilter({
-            idPrefix: '',
-            filterId: 'conflict',
+            minAvailable,
             avoidConflicts
         });
     }
@@ -338,7 +362,7 @@ export class FilterModalController extends BaseModal {
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'creditRange');
         const criteria = activeFilter?.criteria as CreditRangeFilterCriteria | undefined;
         const minCredits = criteria?.min || 1;
-        const maxCredits = criteria?.max || 4;
+        const maxCredits = criteria?.max || 3;
 
         return `
             <div class="filter-section">
@@ -355,7 +379,7 @@ export class FilterModalController extends BaseModal {
                             </div>
                             <div class="filter-range-input">
                                 <label>Max Credits</label>
-                                <input type="number" min="1" max="4" value="${maxCredits}" 
+                                <input type="number" min="1" max="3" value="${maxCredits}" 
                                        id="credit-max" data-filter="creditRange">
                             </div>
                         </div>
@@ -363,27 +387,11 @@ export class FilterModalController extends BaseModal {
                             <button class="filter-quick-btn" data-credits="1">1</button>
                             <button class="filter-quick-btn" data-credits="2">2</button>
                             <button class="filter-quick-btn" data-credits="3">3</button>
-                            <button class="filter-quick-btn" data-credits="4">4</button>
-                            <button class="filter-quick-btn" data-credits="3-4">3-4</button>
                         </div>
                     </div>
                 </div>
             </div>
         `;
-    }
-
-    private createProfessorFilter(): string {
-        if (!this.filterService) return '';
-
-        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'professor');
-        const criteria = activeFilter?.criteria as ProfessorFilterCriteria | undefined;
-        const activeProfessors = criteria?.professors || [];
-
-        return SharedFilterComponents.createProfessorFilter({
-            idPrefix: '',
-            filterId: 'professor',
-            activeProfessors
-        });
     }
 
     private createRMPRatingFilter(): string {
@@ -397,23 +405,6 @@ export class FilterModalController extends BaseModal {
             activeFilter
         });
     }
-
-    private createTermFilter(): string {
-        if (!this.filterService) return '';
-
-        const terms = this.filterService.getFilterOptions('term', this.allCourses) as string[];
-        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'term');
-        const criteria = activeFilter?.criteria as TermFilterCriteria | undefined;
-        const activeTerms = criteria?.terms || [];
-
-        return SharedFilterComponents.createTermFilter({
-            idPrefix: '',
-            filterId: 'term',
-            terms,
-            activeTerms
-        });
-    }
-
 
     private initializeFilterUI(modalElement: HTMLElement): void {
         if (!this.filterService) return;

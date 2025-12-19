@@ -185,75 +185,88 @@ export class SharedFilterSetup {
     static setupProfessorFilter(options: ProfessorSetupOptions): void {
         const { modalElement, filterService, idPrefix, filterId, professors, updateFilter } = options;
 
-        const searchInput = modalElement.querySelector(`.${idPrefix}-professor-search`) as HTMLInputElement;
-        const dropdown = modalElement.querySelector(`#${idPrefix}-professor-dropdown`) as HTMLElement;
-        const chipsContainer = modalElement.querySelector(`#${idPrefix}-professor-chips`) as HTMLElement;
+        const prefix = idPrefix ? `${idPrefix}-` : '';
+        const searchInput = modalElement.querySelector(`.${prefix}professor-search`) as HTMLInputElement;
+        const dropdown = modalElement.querySelector(`#${prefix}professor-dropdown`) as HTMLElement;
+        const chipsContainer = modalElement.querySelector(`#${prefix}professor-chips`) as HTMLElement;
 
-        if (searchInput) {
-            searchInput.addEventListener('input', () => {
-                const query = searchInput.value.toLowerCase();
-                if (query.length > 0) {
-                    const matches = professors.filter(prof =>
-                        prof.toLowerCase().includes(query) && prof !== 'TBA'
-                    ).slice(0, 10);
-
-                    dropdown.innerHTML = matches.map(prof =>
-                        `<div class="professor-option" data-professor="${prof}" data-filter="${filterId}">${prof}</div>`
-                    ).join('');
-                    dropdown.style.display = matches.length > 0 ? 'block' : 'none';
-                } else {
-                    dropdown.style.display = 'none';
-                }
-            });
-
-            dropdown.addEventListener('click', (e) => {
-                const target = e.target as HTMLElement;
-                if (target.classList.contains('professor-option')) {
-                    const professor = target.dataset.professor!;
-                    searchInput.value = '';
-                    dropdown.style.display = 'none';
-
-                    const currentFilterRaw = filterService.getActiveFilters?.().find((f: unknown) => {
-                        if (!f || typeof f !== 'object') return false;
-                        return (f as Record<string, unknown>).id === filterId;
-                    });
-                    const currentFilter = currentFilterRaw && typeof currentFilterRaw === 'object' ? currentFilterRaw as Record<string, unknown> : null;
-                    const criteriaObj = currentFilter?.criteria && typeof currentFilter.criteria === 'object' ? currentFilter.criteria as Record<string, unknown> : null;
-                    const activeProfessors = Array.isArray(criteriaObj?.professors) ? criteriaObj.professors as string[] : [];
-
-                    if (!activeProfessors.includes(professor)) {
-                        activeProfessors.push(professor);
-                        updateFilter(activeProfessors);
-
-                        const chip = document.createElement('span');
-                        chip.className = 'filter-chip';
-                        chip.innerHTML = `
-                            ${professor}
-                            <button class="filter-chip-remove" data-professor="${professor}" data-filter="${filterId}">×</button>
-                        `;
-                        chipsContainer?.appendChild(chip);
-                    }
-                }
-            });
-
-            chipsContainer?.addEventListener('click', (e) => {
-                const target = e.target as HTMLElement;
-                if (target.classList.contains('filter-chip-remove')) {
-                    const professor = target.dataset.professor!;
-                    const currentFilterRaw = filterService.getActiveFilters?.().find((f: unknown) => {
-                        if (!f || typeof f !== 'object') return false;
-                        return (f as Record<string, unknown>).id === filterId;
-                    });
-                    const currentFilter = currentFilterRaw && typeof currentFilterRaw === 'object' ? currentFilterRaw as Record<string, unknown> : null;
-                    const criteriaObj = currentFilter?.criteria && typeof currentFilter.criteria === 'object' ? currentFilter.criteria as Record<string, unknown> : null;
-                    const professorsArray = Array.isArray(criteriaObj?.professors) ? criteriaObj.professors as unknown[] : [];
-                    const activeProfessors = professorsArray.filter((p: unknown) => typeof p === 'string' && p !== professor) as string[];
-
-                    updateFilter(activeProfessors);
-                    target.closest('.filter-chip')?.remove();
-                }
-            });
+        if (!searchInput || !dropdown || !chipsContainer) {
+            console.warn('Professor filter elements not found', { prefix, searchInput: !!searchInput, dropdown: !!dropdown, chipsContainer: !!chipsContainer });
+            return;
         }
+
+        // Helper to get current active professors from filter service
+        const getActiveProfessors = (): string[] => {
+            const filter = filterService.getActiveFilters?.().find((f: unknown) => {
+                return f && typeof f === 'object' && (f as Record<string, unknown>).id === filterId;
+            });
+            if (!filter) return [];
+            const criteria = (filter as Record<string, unknown>).criteria as Record<string, unknown> | undefined;
+            return Array.isArray(criteria?.professors) ? criteria.professors as string[] : [];
+        };
+
+        // Helper to create a chip element
+        const createChip = (professor: string): HTMLSpanElement => {
+            const chip = document.createElement('span');
+            chip.className = 'filter-chip';
+            chip.innerHTML = `${professor}<button class="filter-chip-remove" data-professor="${professor}">×</button>`;
+            return chip;
+        };
+
+        // Search input - show dropdown with matching professors
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            if (query.length > 0) {
+                const matches = professors.filter(prof =>
+                    prof.toLowerCase().includes(query) && prof !== 'TBA'
+                ).slice(0, 10);
+
+                dropdown.innerHTML = matches.map(prof =>
+                    `<div class="professor-option" data-professor="${prof}">${prof}</div>`
+                ).join('');
+                dropdown.style.display = matches.length > 0 ? 'block' : 'none';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Dropdown click - add professor chip
+        dropdown.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            if (target.classList.contains('professor-option')) {
+                const professor = target.dataset.professor!;
+                searchInput.value = '';
+                dropdown.style.display = 'none';
+
+                const activeProfessors = getActiveProfessors();
+                if (!activeProfessors.includes(professor)) {
+                    activeProfessors.push(professor);
+                    updateFilter(activeProfessors);
+
+                    // Add chip to container and make visible
+                    const chip = createChip(professor);
+                    chipsContainer.appendChild(chip);
+                    chipsContainer.style.display = 'flex';
+                }
+            }
+        });
+
+        // Chips container click - remove professor chip
+        chipsContainer.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            if (target.classList.contains('filter-chip-remove')) {
+                const professor = target.dataset.professor!;
+                const activeProfessors = getActiveProfessors().filter(p => p !== professor);
+
+                updateFilter(activeProfessors);
+                target.closest('.filter-chip')?.remove();
+
+                // Hide container if empty
+                if (chipsContainer.children.length === 0) {
+                    chipsContainer.style.display = 'none';
+                }
+            }
+        });
     }
 
     static setupTermFilter(options: TermSetupOptions): void {
