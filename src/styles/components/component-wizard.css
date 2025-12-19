@@ -312,6 +312,27 @@
     height: 14px;
 }
 
+/* Interest List Badge */
+.section-card-interest-list-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.65rem;
+    background-color: transparent;
+    border: 1.5px solid var(--color-warning);
+    border-radius: 6px;
+    color: var(--color-warning);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 0.375rem;
+}
+
+.section-card-interest-list-badge svg {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+}
+
 .section-card-seats {
     font-size: 0.8rem;
     color: var(--color-success);

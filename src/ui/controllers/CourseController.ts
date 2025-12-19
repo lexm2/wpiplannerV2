@@ -719,9 +719,17 @@ export class CourseController {
 
         const escapedProfessor = Validators.escapeHtml(professor);
 
-        // Build time/location content based on async status
+        // Build time/location content based on section type
         let timeLocationContent: string;
-        if (isAsync) {
+        if (section.isInterestList) {
+            // Interest lists have 12:00-12:00 times but are not async courses
+            timeLocationContent = `
+                <div class="section-card-interest-list-badge">
+                    ${getInlineSVG('BOOKMARK', 'interest-list-icon')}
+                    Interest List
+                </div>
+            `;
+        } else if (isAsync) {
             timeLocationContent = `
                 <div class="section-card-async-badge">
                     ${getInlineSVG('CLOCK', 'async-icon')}
@@ -740,16 +748,20 @@ export class CourseController {
             `;
         }
 
+        // Hide type and professor for interest lists
+        const showType = !section.isInterestList;
+        const showProfessor = !section.isInterestList;
+
         return `
             <div class="section-card">
                 <div class="section-header">
                     <span class="section-number">${Validators.escapeHtml(section.number)}</span>
-                    <span class="section-type">${Validators.escapeHtml(type)}</span>
+                    ${showType ? `<span class="section-type">${Validators.escapeHtml(type)}</span>` : ''}
                     <span class="section-crn">CRN: ${section.crn}</span>
                 </div>
                 <div class="section-details">
                     ${timeLocationContent}
-                    <div class="section-professor">${rmpUrl ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProfessor}</a>` : escapedProfessor}</div>
+                    ${showProfessor ? `<div class="section-professor">${rmpUrl ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProfessor}</a>` : escapedProfessor}</div>` : ''}
                     <div class="section-seats">
                         Seats: ${section.seatsAvailable}/${section.seats} available
                         ${section.actualWaitlist > 0 ? `(Waitlist: ${section.actualWaitlist}/${section.maxWaitlist})` : ''}
