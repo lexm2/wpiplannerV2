@@ -19,9 +19,11 @@ export class ModalService {
         // Inject into DOM
         document.body.appendChild(modalElement);
 
-        // Trigger show animation
+        // Trigger show animation - double rAF ensures browser paints initial state first
         requestAnimationFrame(() => {
-            modalElement.classList.add('show');
+            requestAnimationFrame(() => {
+                modalElement.classList.add('show');
+            });
         });
     }
 
