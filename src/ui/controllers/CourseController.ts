@@ -598,6 +598,7 @@ export class CourseController {
         const showLectures = isHierarchical;
         const showDiscussions = isHierarchical && this.hasAnyDiscussions(course);
         const showLabs = isHierarchical ? this.hasAnyLabs(course) : isLabOnly;
+        const showInterestLists = isHierarchical && this.hasAnyInterestLists(course);
 
         // Render tab buttons
         if (showLectures) {
@@ -608,6 +609,9 @@ export class CourseController {
         }
         if (showLabs) {
             html += `<button class="component-tab" data-tab="labs">${isLabOnly ? 'Lab Sections' : 'Labs'}</button>`;
+        }
+        if (showInterestLists) {
+            html += '<button class="component-tab" data-tab="interest-lists">Interest Lists</button>';
         }
 
         html += '</div>'; // end component-tabs
@@ -624,6 +628,9 @@ export class CourseController {
         if (showLabs) {
             html += this.renderLabsTab(course, isLabOnly);
         }
+        if (showInterestLists) {
+            html += this.renderInterestListsTab(course);
+        }
 
         html += '</div>'; // end component-tab-content
         html += '</div>'; // end course-components-section
@@ -632,7 +639,9 @@ export class CourseController {
     }
 
     private renderLecturesTab(course: Course): string {
-        const lectures = this.courseDataService.getLecturesForCourse(course);
+        // Filter out interest lists - they have their own tab
+        const lectures = this.courseDataService.getLecturesForCourse(course)
+            .filter(lg => !lg.section.isInterestList);
 
         let html = '<div class="tab-panel active" data-panel="lectures">';
         html += `<h3>Available Lectures (${lectures.length})</h3>`;
@@ -640,6 +649,22 @@ export class CourseController {
 
         for (const lectureGroup of lectures) {
             html += this.renderSectionCard(lectureGroup.section, 'Lecture');
+        }
+
+        html += '</div></div>';
+        return html;
+    }
+
+    private renderInterestListsTab(course: Course): string {
+        const interestLists = this.courseDataService.getLecturesForCourse(course)
+            .filter(lg => lg.section.isInterestList);
+
+        let html = '<div class="tab-panel" data-panel="interest-lists">';
+        html += `<h3>Interest Lists (${interestLists.length})</h3>`;
+        html += '<div class="sections-list">';
+
+        for (const lectureGroup of interestLists) {
+            html += this.renderSectionCard(lectureGroup.section, 'Interest List');
         }
 
         html += '</div></div>';
@@ -779,6 +804,11 @@ export class CourseController {
     private hasAnyLabs(course: Course): boolean {
         const lectures = this.courseDataService.getLecturesForCourse(course);
         return lectures.some(lg => lg.compatibleLabs.length > 0);
+    }
+
+    private hasAnyInterestLists(course: Course): boolean {
+        const lectures = this.courseDataService.getLecturesForCourse(course);
+        return lectures.some(lg => lg.section.isInterestList);
     }
 
     private attachTabEventListeners(): void {
