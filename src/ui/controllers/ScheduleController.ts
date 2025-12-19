@@ -1595,6 +1595,15 @@ export class ScheduleController {
     }
 
     private getCourseColor(courseId: string): string {
+        // Check for persisted custom color first
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
+        if (selectedCourse?.customColor) {
+            // Cache it in the map for consistency
+            this.courseColorMap.set(courseId, selectedCourse.customColor);
+            return selectedCourse.customColor;
+        }
+
         // If this course already has a color assigned, return it
         if (this.courseColorMap.has(courseId)) {
             return this.courseColorMap.get(courseId)!;
@@ -1641,6 +1650,19 @@ export class ScheduleController {
             this.usedColors.delete(color);
             this.courseColorMap.delete(courseId);
         }
+    }
+
+    /**
+     * Set a custom color for a course and persist it
+     */
+    setCourseColor(courseId: string, color: string): void {
+        // Update local cache
+        this.courseColorMap.set(courseId, color);
+        this.usedColors.add(color);
+        // Persist via CourseSelectionService
+        this.courseSelectionService.setCourseColor(courseId, color);
+        // Re-render
+        this.renderScheduleGrids();
     }
 
     getCourseFromElement(element: HTMLElement): Course | undefined {
@@ -1741,7 +1763,10 @@ export class ScheduleController {
             courseCode: `${course.department.abbreviation}${course.number}`,
             courseName: course.name,
             section: section,
-            course: course
+            course: course,
+            courseId: courseId,
+            currentColor: this.getCourseColor(courseId),
+            onColorChange: (color: string) => this.setCourseColor(courseId, color)
         };
 
         // Show modal using the dedicated controller

@@ -522,6 +522,12 @@ export class CourseSelectionService {
         return this.profileStateManager.getLockedSections(course);
     }
 
+    setCourseColor(courseId: string, color: string): boolean {
+        if (!this.isInitialized) return false;
+        this.profileStateManager.setCourseColor(courseId, color, 'service');
+        return true;
+    }
+
     // Query methods
     isCourseSelected(course: Course): boolean {
         if (!this.isInitialized) return false;

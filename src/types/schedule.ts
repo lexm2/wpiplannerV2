@@ -10,6 +10,7 @@ export interface SelectedCourse {
     selectedSectionNumber: string | null;
     isRequired: boolean;
     lockedSections: Set<string>;
+    customColor?: string;
 }
 
 export interface CourseConflict {

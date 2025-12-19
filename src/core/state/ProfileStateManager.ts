@@ -287,6 +287,21 @@ export class ProfileStateManager {
         });
     }
 
+    setCourseColor(courseId: string, color: string, source: string = 'user'): void {
+        this.withStateUpdate(() => {
+            const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === courseId);
+            if (selectedCourse) {
+                selectedCourse.customColor = color;
+                this.updateActiveScheduleWithCurrentCourses();
+                this.emitEvent('courses_changed', {
+                    action: 'color_changed',
+                    courseId,
+                    color
+                }, source);
+            }
+        });
+    }
+
     isSectionLocked(course: Course, sectionCrn: string): boolean {
         const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
         return selectedCourse?.lockedSections?.has(sectionCrn) || false;

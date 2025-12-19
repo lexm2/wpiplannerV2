@@ -569,6 +569,38 @@
   line-height: 1.5;
 }
 
+/* Course Color Picker */
+.section-color-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(172, 43, 55, 0.08);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  border-left: 4px solid var(--color-primary);
+  width: 100%;
+}
+
+.course-color-input {
+  width: 50px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+  background: transparent;
+}
+
+.course-color-input::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.course-color-input::-webkit-color-swatch {
+  border-radius: calc(var(--effect-border-radius) - 2px);
+  border: none;
+}
+
 /* Responsive adjustments for section modal */
 @media (max-width: 768px) {
   .section-basic-info {

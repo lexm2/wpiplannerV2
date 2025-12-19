@@ -31,6 +31,9 @@ export interface SectionData {
         minCredits: number;
         maxCredits: number;
     };
+    courseId: string;
+    currentColor: string;
+    onColorChange?: (color: string) => void;
 }
 
 export class SectionInfoModalController extends BaseModal {
@@ -74,6 +77,14 @@ export class SectionInfoModalController extends BaseModal {
         backdrop.querySelectorAll('[data-modal-close]').forEach(btn => {
             btn.addEventListener('click', () => this.hide());
         });
+
+        // Add color picker event listener
+        const colorInput = backdrop.querySelector('.course-color-input');
+        if (colorInput && data.onColorChange) {
+            colorInput.addEventListener('input', (e) => {
+                data.onColorChange!((e.target as HTMLInputElement).value);
+            });
+        }
 
         return backdrop;
     }
@@ -144,7 +155,12 @@ export class SectionInfoModalController extends BaseModal {
                     <div class="section-detail"><strong>Term:</strong> ${data.section.term}</div>
                     <div class="section-detail"><strong>Credits:</strong> ${data.course.minCredits === data.course.maxCredits ? data.course.minCredits : `${data.course.minCredits}-${data.course.maxCredits}`}</div>
                 </div>
-                
+
+                <div class="section-color-picker">
+                    <label><strong>Course Color:</strong></label>
+                    <input type="color" class="course-color-input" value="${data.currentColor}" />
+                </div>
+
                 <div class="section-enrollment ${data.section.seatsAvailable > 0 ? '' : 'full'}">
                     <div class="enrollment-status ${data.section.seatsAvailable > 0 ? 'available' : 'full'}">
                         ${enrollmentStatus}
