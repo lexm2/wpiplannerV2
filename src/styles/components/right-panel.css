@@ -305,7 +305,7 @@
   gap: 0.75rem;
 }
 
-.section-card {
+.section-list-item {
   padding: 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
@@ -313,7 +313,7 @@
   transition: var(--effect-transition);
 }
 
-.section-card:hover {
+.section-list-item:hover {
   border-color: var(--color-primary);
   background: var(--color-primary-background);
 }

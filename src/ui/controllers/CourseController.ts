@@ -482,15 +482,23 @@ export class CourseController {
         if (!courseId) return;
 
         const stateManager = ProfileStateManager.getInstance();
-        const isCurrentlyBookmarked = stateManager.isBookmarked(courseId);
+        const wasBookmarked = stateManager.isBookmarked(courseId);
 
-        if (isCurrentlyBookmarked) {
-            stateManager.unbookmarkCourse(courseId);
-        } else {
-            stateManager.bookmarkCourse(courseId);
+        try {
+            // Show immediate optimistic feedback
+            this.updateCourseBookmarkUI(element, !wasBookmarked);
+
+            // Perform the state change
+            if (wasBookmarked) {
+                stateManager.unbookmarkCourse(courseId);
+            } else {
+                stateManager.bookmarkCourse(courseId);
+            }
+        } catch (error) {
+            console.error('Error toggling course bookmark:', error);
+            // Rollback optimistic change on error
+            this.updateCourseBookmarkUI(element, wasBookmarked);
         }
-
-        this.updateCourseBookmarkUI(element, !isCurrentlyBookmarked);
     }
 
     private updateCourseBookmarkUI(element: HTMLElement, isBookmarked: boolean): void {
@@ -778,7 +786,7 @@ export class CourseController {
         const showProfessor = !section.isInterestList;
 
         return `
-            <div class="section-card">
+            <div class="section-list-item">
                 <div class="section-header">
                     <span class="section-number">${Validators.escapeHtml(section.number)}</span>
                     ${showType ? `<span class="section-type">${Validators.escapeHtml(type)}</span>` : ''}
