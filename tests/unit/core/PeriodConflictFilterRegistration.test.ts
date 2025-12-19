@@ -15,7 +15,7 @@ describe('PeriodConflictFilter Registration', () => {
         conflictDetector = new ConflictDetector();
         periodConflictFilter = new PeriodConflictFilter(conflictDetector);
         searchService = new SearchService();
-        filterService = new CourseFilterService(searchService);
+        filterService = new CourseFilterService(searchService, () => []);
     });
 
     test('should implement CourseFilter interface correctly', () => {

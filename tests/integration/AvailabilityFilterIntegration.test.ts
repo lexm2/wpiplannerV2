@@ -28,7 +28,7 @@ describe('AvailabilityFilter Integration', () => {
     searchService = new SearchService()
     courseSelectionService = new CourseSelectionService()
     conflictDetector = new ConflictDetector()
-    filterService = new CourseFilterService(searchService)
+    filterService = new CourseFilterService(searchService, () => [])
 
     // Initialize course selection service
     await courseSelectionService.initialize()

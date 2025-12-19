@@ -74,7 +74,7 @@ describe('CourseFilterService', () => {
 
     beforeEach(() => {
         searchService = new SearchService();
-        courseFilterService = new CourseFilterService(searchService);
+        courseFilterService = new CourseFilterService(searchService, () => []);
 
         // Create a diverse set of test courses
         testCourses = [

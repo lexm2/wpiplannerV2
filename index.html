@@ -109,17 +109,19 @@
             <main class="main-content" role="main">
                 <div class="content-header">
                     <h2>Course Listings</h2>
-                    <div class="search-controls">
+                    <div class="content-controls">
                         <input type="text" id="search-input" placeholder="Search courses..." class="search-input" aria-label="Search courses">
-                        <button id="filter-btn" class="btn btn-secondary filter-btn" title="Filter courses" aria-label="Filter courses">
+                        <button id="clear-filters-btn" class="filter-btn" title="Clear all filters" aria-label="Clear all filters">
                         </button>
-                        <button id="clear-filters-btn" class="btn btn-secondary clear-filters-btn" title="Clear all filters" aria-label="Clear all filters">
-                        </button>
+                        <div class="filter-buttons">
+                            <button id="filter-btn" class="filter-btn" title="Filter courses" aria-label="Filter courses">
+                            </button>
+                            <button id="bookmark-filter-btn" class="filter-btn" title="Show bookmarked only" aria-label="Toggle bookmark filter">
+                            </button>
+                        </div>
+                        <button id="view-list" class="filter-btn filter-btn-wide active">List</button>
+                        <button id="view-grid" class="filter-btn filter-btn-wide">Grid</button>
                         <button id="mobile-menu-btn" class="btn btn-icon hamburger-btn" title="Menu" aria-label="Toggle menu"></button>
-                    </div>
-                    <div class="view-controls">
-                        <button id="view-list" class="btn btn-primary active">List View</button>
-                        <button id="view-grid" class="btn btn-secondary">Grid View</button>
                     </div>
                 </div>
                 <div class="course-container" id="course-container">

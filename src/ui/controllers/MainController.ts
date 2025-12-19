@@ -303,6 +303,7 @@ export class MainController {
         setTimeout(() => {
             this.updateFilterButtonState();
             this.updateScheduleFilterButtonState();
+            this.updateBookmarkFilterButtonState();
         }, 100);
     }
 
@@ -762,6 +763,20 @@ export class MainController {
             });
         }
 
+        // Bookmark filter toggle button
+        const bookmarkFilterButton = document.getElementById('bookmark-filter-btn');
+        if (bookmarkFilterButton) {
+            // Icon is set by updateBookmarkFilterButtonState during initialization
+            bookmarkFilterButton.addEventListener('click', () => {
+                if (this.filterService.hasFilter('bookmark')) {
+                    this.filterService.removeFilter('bookmark');
+                } else {
+                    this.filterService.addFilter('bookmark', { showBookmarkedOnly: true });
+                }
+                this.updateBookmarkFilterButtonState();
+            });
+        }
+
         // Clear filters button
         const clearFiltersButton = document.getElementById('clear-filters-btn');
         if (clearFiltersButton) {
@@ -771,6 +786,7 @@ export class MainController {
                     this.filterService.clearFilters();
                     this.updateFilterButtonState();
                     this.updateClearFiltersButtonState();
+                    this.updateBookmarkFilterButtonState();
                 }
             });
         }
@@ -1139,6 +1155,26 @@ export class MainController {
             } else {
                 clearFiltersButton.style.display = 'none';
             }
+        }
+    }
+
+    private updateBookmarkFilterButtonState(): void {
+        const button = document.getElementById('bookmark-filter-btn');
+        if (button && this.filterService) {
+            const isActive = this.filterService.hasFilter('bookmark');
+            button.classList.toggle('active', isActive);
+
+            // Swap icon between outline and filled
+            const iconClass = 'bookmark-icon';
+            const existingIcon = button.querySelector(`.${iconClass}`);
+            if (existingIcon) {
+                existingIcon.remove();
+            }
+            const icon = isActive ? 'BOOKMARK_FILLED' : 'BOOKMARK';
+            button.insertAdjacentHTML('afterbegin', getInlineSVG(icon, iconClass));
+
+            // Update title
+            button.title = isActive ? 'Show all courses' : 'Show bookmarked only';
         }
     }
 

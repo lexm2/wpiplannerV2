@@ -19,6 +19,7 @@
     padding: 0;
     max-height: 400px;
     overflow-y: auto;
+    width: 100%;
 }
 
 .calendar-list-item {

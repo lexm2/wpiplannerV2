@@ -1,7 +1,7 @@
 import { Course } from '../../types/types';
 import { CancellationToken, CancellationError } from '../../utils/RequestCancellation';
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics';
-import { getProfessorsByTerm, getAllSections } from '../../utils/courseUtils';
+import { getAllSections } from '../../utils/courseUtils';
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { Validators } from '../../utils/validators';
@@ -379,32 +379,17 @@ export class ProgressiveRenderer {
                 const isBookmarked = stateManager.isBookmarked(course.id);
                 const hasWarning = this.courseHasWarning(course);
 
-                // Get unique professors across all sections
-                const allSections = getAllSections(course);
-                const uniqueProfessors = [...new Set(
-                    allSections.flatMap(section =>
-                        section.periods
-                            .map(period => period.professor)
-                            .filter(prof => prof && prof.trim() && prof !== 'TBA' && prof !== 'Not Assigned')
-                    )
-                )].sort();
-
-                // Create professor links
-                const professorDisplay = uniqueProfessors.length > 0
-                    ? uniqueProfessors.map(prof => {
-                        const escapedProf = Validators.escapeHtml(prof);
-                        const rmpUrl = rateMyProfessorService.getProfessorRMPUrl(prof);
-                        return rmpUrl
-                            ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProf}</a>`
-                            : escapedProf;
-                    }).join(', ')
-                    : 'TBA';
-
                 return `
                     <div class="course-card ${isSelected ? 'selected' : ''}" data-course-id="${Validators.escapeHtml(course.id)}">
                         <div class="course-card-header">
-                            <div class="course-card-controls">
+                            <div class="course-card-info">
                                 <div class="course-title-main">${Validators.escapeHtml(course.name)}</div>
+                                <div class="course-code-row">
+                                    <div class="course-code-badge">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
+                                    ${hasWarning ? `<span class="capacity-badge">At capacity</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="course-card-buttons">
                                 <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
                                     ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
                                 </button>
@@ -412,11 +397,6 @@ export class ProgressiveRenderer {
                                     ${isBookmarked ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon') : getInlineSVG('BOOKMARK', 'bookmark-icon')}
                                 </button>
                             </div>
-                        </div>
-                        <div class="course-code-badge">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
-                        <div class="course-info">
-                            <div class="course-professors-list">${professorDisplay}</div>
-                            ${hasWarning ? `<span class="capacity-badge">At capacity</span>` : ''}
                         </div>
                     </div>
                 `;

@@ -15,15 +15,21 @@
   gap: 1rem;
 }
 
-.search-controls {
+.content-controls {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex: 1;
 }
 
-.content-header .search-input {
+.content-controls .search-input {
   flex: 1;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .filter-btn {
@@ -33,33 +39,41 @@
   align-items: center;
   justify-content: center;
   min-width: 40px;
-  height: 100%;
+  min-height: 36px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: var(--effect-transition);
 }
 
-.filter-icon {
-  width: 18px;
-  height: 18px;
-  display: block;
-  pointer-events: none;
-  color: inherit;
+.filter-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
-.clear-filters-btn {
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  height: 100%;
-  transition: opacity 0.2s ease;
+.filter-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
-.clear-filters-btn:disabled {
+.filter-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
+.filter-btn-wide {
+  padding: 0.5rem 1rem;
+  min-width: 80px;
+  font-size: 0.875rem;
+  line-height: 18px;
+}
+
+.filter-icon,
+.bookmark-icon,
 .eraser-icon {
   width: 18px;
   height: 18px;
@@ -81,10 +95,6 @@
   text-overflow: ellipsis;
 }
 
-.view-controls {
-  display: flex;
-  gap: 0.5rem;
-}
 
 .course-container {
   flex: 1;
@@ -120,7 +130,14 @@
     display: none;
   }
 
-  .view-controls {
+  #view-list,
+  #view-grid {
     display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-buttons {
+    gap: 0.25rem;
   }
 }
