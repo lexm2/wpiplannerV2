@@ -447,8 +447,28 @@ export class MainController {
                     // After transition, swap containers
                     setTimeout(() => {
                         termSectionsContainers.forEach(c => c.style.display = 'none');
+
+                        // Set initial state for term badges
+                        const termBadges = termBadgesContainer.querySelectorAll('.term-badge') as NodeListOf<HTMLElement>;
+                        termBadges.forEach(badge => {
+                            badge.style.opacity = '0';
+                            badge.style.transform = 'translateX(-10px)';
+                            badge.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+                        });
+
                         termBadgesContainer.style.display = 'flex';
                         termBadgesContainer.style.opacity = '1';
+
+                        // Stagger animate term badges in
+                        requestAnimationFrame(() => {
+                            termBadges.forEach((badge, i) => {
+                                setTimeout(() => {
+                                    badge.style.opacity = '1';
+                                    badge.style.transform = 'translateX(0)';
+                                }, i * 30);
+                            });
+                        });
+
                         courseSections.classList.remove('expanded');
                     }, badgeAnimTime + 300);
                 } else {
