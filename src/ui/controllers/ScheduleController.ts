@@ -1851,6 +1851,20 @@ export class ScheduleController {
 
         autoScheduleBtn.insertAdjacentHTML('afterbegin', getInlineSVG('WAND', 'auto-schedule-icon'));
         autoScheduleBtn.addEventListener('click', () => this.handleAutoSchedule());
+
+        // Setup navigation buttons
+        const prevBtn = document.getElementById('schedule-prev-btn');
+        const nextBtn = document.getElementById('schedule-next-btn');
+
+        if (prevBtn) {
+            prevBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_BAR_LEFT', 'schedule-nav-icon'));
+            prevBtn.addEventListener('click', () => this.handlePrevSchedule());
+        }
+
+        if (nextBtn) {
+            nextBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_BAR_RIGHT', 'schedule-nav-icon'));
+            nextBtn.addEventListener('click', () => this.handleNextSchedule());
+        }
     }
 
     setupClearAllSectionsButton(): void {
@@ -1902,22 +1916,51 @@ export class ScheduleController {
 
     private updateAutoScheduleButtonUI(): void {
         const btn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
+        const navButtons = document.getElementById('schedule-nav-buttons');
+        const counter = document.getElementById('schedule-counter');
         if (!btn) return;
 
         if (this.generatedSchedules.length === 0) {
+            // Show auto-schedule button, hide nav buttons
+            btn.style.display = '';
             btn.innerHTML = `${getInlineSVG('WAND', 'auto-schedule-icon')}<span>Auto-Schedule</span>`;
             btn.disabled = false;
             btn.title = 'Automatically generate a schedule';
-        } else if (this.currentScheduleIndex < this.generatedSchedules.length - 1) {
-            btn.innerHTML = `${getInlineSVG('CALENDAR_UP', 'auto-schedule-icon')}<span>${this.currentScheduleIndex + 1}/${this.generatedSchedules.length}</span>`;
-            btn.disabled = false;
-            btn.title = 'Show next schedule option';
+            if (navButtons) navButtons.style.display = 'none';
         } else {
-            // At last schedule - show CALENDAR_REPEAT icon to indicate looping back
-            btn.innerHTML = `${getInlineSVG('CALENDAR_REPEAT', 'auto-schedule-icon')}<span>${this.currentScheduleIndex + 1}/${this.generatedSchedules.length}</span>`;
-            btn.disabled = false;
-            btn.title = 'Loop back to first schedule';
+            // Hide auto-schedule button, show nav buttons
+            btn.style.display = 'none';
+            if (navButtons) navButtons.style.display = 'flex';
+            if (counter) counter.textContent = `${this.currentScheduleIndex + 1}/${this.generatedSchedules.length}`;
         }
+    }
+
+    private async handlePrevSchedule(): Promise<void> {
+        if (this.generatedSchedules.length === 0) return;
+
+        // Wrap to last if at first
+        if (this.currentScheduleIndex === 0) {
+            this.currentScheduleIndex = this.generatedSchedules.length - 1;
+        } else {
+            this.currentScheduleIndex--;
+        }
+
+        await this.applyScheduleAtIndex(this.currentScheduleIndex);
+        this.updateAutoScheduleButtonUI();
+    }
+
+    private async handleNextSchedule(): Promise<void> {
+        if (this.generatedSchedules.length === 0) return;
+
+        // Wrap to first if at last
+        if (this.currentScheduleIndex >= this.generatedSchedules.length - 1) {
+            this.currentScheduleIndex = 0;
+        } else {
+            this.currentScheduleIndex++;
+        }
+
+        await this.applyScheduleAtIndex(this.currentScheduleIndex);
+        this.updateAutoScheduleButtonUI();
     }
 
     private async handleAutoSchedule(): Promise<void> {
@@ -1948,20 +1991,6 @@ export class ScheduleController {
             if (selectedCourse.selectedLab) {
                 selectedCourse.lockedSections.add(String(selectedCourse.selectedLab.crn));
             }
-        }
-
-        // Simple logic: if schedules exist, cycle through them. Otherwise, generate new ones.
-        if (this.generatedSchedules.length > 0) {
-            // Cycle to next schedule (loop back to first if at end)
-            if (this.currentScheduleIndex < this.generatedSchedules.length - 1) {
-                this.currentScheduleIndex++;
-            } else {
-                // Loop back to first schedule
-                this.currentScheduleIndex = 0;
-            }
-            await this.applyScheduleAtIndex(this.currentScheduleIndex);
-            this.updateAutoScheduleButtonUI();
-            return;
         }
 
         // Generate new schedules - show settings modal first
