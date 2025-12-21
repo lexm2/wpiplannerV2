@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 21, 2025, 4:54 PM",
+  "generated": "Dec 21, 2025, 5:14 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -19588,7 +19588,7 @@
                 "crn": 336435,
                 "number": "CL01",
                 "seats": 64,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4354",
@@ -19607,7 +19607,7 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 64,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "CL01",
@@ -19729,7 +19729,7 @@
                   "crn": 336300,
                   "number": "CX04",
                   "seats": 16,
-                  "seatsAvailable": 2,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4354",
@@ -19748,7 +19748,7 @@
                       "building": "",
                       "room": "Kaven Hall 006 CE Lab",
                       "seats": 16,
-                      "seatsAvailable": 2,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX04",
