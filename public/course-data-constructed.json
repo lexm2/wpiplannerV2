@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 21, 2025, 12:31 PM",
+  "generated": "Dec 21, 2025, 1:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5410,7 +5410,7 @@
                 "crn": 337480,
                 "number": "D01",
                 "seats": 24,
-                "seatsAvailable": 2,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -5429,7 +5429,7 @@
                     "building": "",
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -15620,7 +15620,7 @@
               "crn": 336321,
               "number": "CX03",
               "seats": 12,
-              "seatsAvailable": 7,
+              "seatsAvailable": 6,
               "actualWaitlist": 0,
               "maxWaitlist": 5,
               "note": null,
@@ -15639,7 +15639,7 @@
                   "building": "",
                   "room": "Salisbury Labs 219 BB Lab",
                   "seats": 12,
-                  "seatsAvailable": 7,
+                  "seatsAvailable": 6,
                   "actualWaitlist": 0,
                   "maxWaitlist": 5,
                   "specificSection": "CX03",
