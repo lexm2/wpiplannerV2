@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 21, 2025, 5:43 AM",
+  "generated": "Dec 21, 2025, 5:52 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -75536,7 +75536,7 @@
                 "crn": 339448,
                 "number": "C01 - Topics In Medical Humanities",
                 "seats": 35,
-                "seatsAvailable": 6,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -75555,7 +75555,7 @@
                     "building": "",
                     "room": "Stratton Hall 207 (new)",
                     "seats": 35,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01 - Topics In Medical Humanities",
