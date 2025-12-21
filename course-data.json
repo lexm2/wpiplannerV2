@@ -33481,7 +33481,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Computer Science; Data Science",
-      "Waitlist_Waitlist_Capacity": "12/20",
+      "Waitlist_Waitlist_Capacity": "11/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337723"
     },
     {
@@ -35935,7 +35935,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Computer Science; Data Science",
-      "Waitlist_Waitlist_Capacity": "12/20",
+      "Waitlist_Waitlist_Capacity": "11/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337723"
     },
     {
@@ -83451,7 +83451,7 @@
       "Course_Title": "MA 511 - Applied Statistics For Engineers And Scientists",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "19/30",
+      "Enrolled_Capacity": "20/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Michael Johnson",
       "Locations": "Online-asynchronous",
