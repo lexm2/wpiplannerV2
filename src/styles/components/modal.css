@@ -459,8 +459,8 @@
   }
 }
 
-/* Card Header */
-.section-card-header {
+/* Card Header - scoped to section-info-modal to avoid wizard conflicts */
+.section-info-modal .section-card-header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -468,15 +468,16 @@
   background: var(--color-background);
   border-bottom: 1px solid var(--color-border);
   border-radius: 10px 10px 0 0;
+  margin-bottom: 0;
 }
 
-.section-card-header-icon {
+.section-info-modal .section-card-header-icon {
   width: 14px;
   height: 14px;
   opacity: 0.6;
 }
 
-.section-card-header-label {
+.section-info-modal .section-card-header-label {
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -749,11 +750,11 @@
   background: var(--color-warning-background, rgba(255, 149, 0, 0.06));
 }
 
-.section-card--note .section-card-header {
+.section-info-modal .section-card--note .section-card-header {
   background: var(--color-warning-background, rgba(255, 149, 0, 0.08));
 }
 
-.section-card--note .section-card-header-label {
+.section-info-modal .section-card--note .section-card-header-label {
   color: var(--color-warning);
 }
 

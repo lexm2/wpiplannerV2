@@ -1729,31 +1729,46 @@ export class ScheduleController {
             return;
         }
 
-        // Find the selected course and section
-        const selectedCourses = this.courseSelectionService.getSelectedCourses();
-        const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
-
-        if (!selectedCourse) {
-            console.warn('Course not found:', courseId);
-            return;
-        }
-
-        const course = selectedCourse.course;
-
-        // Find the section from component selections or legacy selectedSection
+        let course: Course | undefined;
         let section: Section | null = null;
 
-        if (selectedCourse.selectedLecture?.number === sectionNumber) {
-            section = selectedCourse.selectedLecture;
-        } else if (selectedCourse.selectedDiscussion?.number === sectionNumber) {
-            section = selectedCourse.selectedDiscussion;
-        } else if (selectedCourse.selectedLab?.number === sectionNumber) {
-            section = selectedCourse.selectedLab;
-        } else if (selectedCourse.selectedSection?.number === sectionNumber) {
-            section = selectedCourse.selectedSection;
+        // Check if this is the course being edited in wizard mode
+        if (this.wizardPreviewCourse?.id === courseId && this.wizardPreviewSelections) {
+            course = this.wizardPreviewCourse;
+
+            // Find section from wizard selections
+            if (this.wizardPreviewSelections.lecture?.number === sectionNumber) {
+                section = this.wizardPreviewSelections.lecture;
+            } else if (this.wizardPreviewSelections.discussion?.number === sectionNumber) {
+                section = this.wizardPreviewSelections.discussion;
+            } else if (this.wizardPreviewSelections.lab?.number === sectionNumber) {
+                section = this.wizardPreviewSelections.lab;
+            }
+        } else {
+            // Use existing logic for saved courses
+            const selectedCourses = this.courseSelectionService.getSelectedCourses();
+            const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
+
+            if (!selectedCourse) {
+                console.warn('Course not found:', courseId);
+                return;
+            }
+
+            course = selectedCourse.course;
+
+            // Find the section from component selections or legacy selectedSection
+            if (selectedCourse.selectedLecture?.number === sectionNumber) {
+                section = selectedCourse.selectedLecture;
+            } else if (selectedCourse.selectedDiscussion?.number === sectionNumber) {
+                section = selectedCourse.selectedDiscussion;
+            } else if (selectedCourse.selectedLab?.number === sectionNumber) {
+                section = selectedCourse.selectedLab;
+            } else if (selectedCourse.selectedSection?.number === sectionNumber) {
+                section = selectedCourse.selectedSection;
+            }
         }
 
-        if (!section) {
+        if (!section || !course) {
             console.warn('Section not found:', sectionNumber);
             return;
         }
