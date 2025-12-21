@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 21, 2025, 11:49 AM",
+  "generated": "Dec 21, 2025, 12:31 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -230236,7 +230236,7 @@
                 "number": "C02",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course provides an overview of key concepts, methods and authors in both fields. These introduce the student to the types of reasoning required for the pursuit of in-depth analysis in each discipline.Emphasis on topics and authors varies with the particular instructor.",
@@ -230255,7 +230255,7 @@
                     "room": "Olin Hall 109",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
@@ -235671,7 +235671,7 @@
                 "number": "C02",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course provides an overview of key concepts, methods and authors in both fields. These introduce the student to the types of reasoning required for the pursuit of in-depth analysis in each discipline.Emphasis on topics and authors varies with the particular instructor.",
@@ -235690,7 +235690,7 @@
                     "room": "Olin Hall 109",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
