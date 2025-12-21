@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 21, 2025, 1:43 PM",
+  "generated": "Dec 21, 2025, 1:52 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -6637,7 +6637,7 @@
                 "crn": 336091,
                 "number": "C01",
                 "seats": 40,
-                "seatsAvailable": 2,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -6656,7 +6656,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 40,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
