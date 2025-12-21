@@ -48,8 +48,10 @@
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
     <link rel="shortcut icon" href="./favicon.ico">
-  <script type="module" crossorigin src="/wpiplannerV2/assets/index-g98IGkhN.js"></script>
-  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-BJdDR0TJ.css">
+  <script type="module" crossorigin src="/wpiplannerV2/assets/index-BWZT3Yny.js"></script>
+  <link rel="modulepreload" crossorigin href="/wpiplannerV2/assets/vendor-microsoft-B_Z_Z_Y2.js">
+  <link rel="modulepreload" crossorigin href="/wpiplannerV2/assets/vendor-utils-C33H7qli.js">
+  <link rel="stylesheet" crossorigin href="/wpiplannerV2/assets/index-DmM0jNKj.css">
 </head>
 <body>
     <div id="app">
@@ -106,26 +108,32 @@
                 </div>
             </aside>
 
+            <div class="resize-handle resize-handle-left" data-resize="sidebar" role="separator" aria-orientation="vertical" aria-label="Resize left sidebar"></div>
+
             <main class="main-content" role="main">
                 <div class="content-header">
                     <h2>Course Listings</h2>
-                    <div class="search-controls">
+                    <div class="content-controls">
                         <input type="text" id="search-input" placeholder="Search courses..." class="search-input" aria-label="Search courses">
-                        <button id="filter-btn" class="btn btn-secondary filter-btn" title="Filter courses" aria-label="Filter courses">
+                        <button id="clear-filters-btn" class="filter-btn" title="Clear all filters" aria-label="Clear all filters">
                         </button>
-                        <button id="clear-filters-btn" class="btn btn-secondary clear-filters-btn" title="Clear all filters" aria-label="Clear all filters">
-                        </button>
+                        <div class="filter-buttons">
+                            <button id="filter-btn" class="filter-btn" title="Filter courses" aria-label="Filter courses">
+                            </button>
+                            <button id="bookmark-filter-btn" class="filter-btn" title="Show bookmarked only" aria-label="Toggle bookmark filter">
+                            </button>
+                        </div>
+                        <button id="view-list" class="filter-btn filter-btn-wide active">List</button>
+                        <button id="view-grid" class="filter-btn filter-btn-wide">Grid</button>
                         <button id="mobile-menu-btn" class="btn btn-icon hamburger-btn" title="Menu" aria-label="Toggle menu"></button>
-                    </div>
-                    <div class="view-controls">
-                        <button id="view-list" class="btn btn-primary active">List View</button>
-                        <button id="view-grid" class="btn btn-secondary">Grid View</button>
                     </div>
                 </div>
                 <div class="course-container" id="course-container">
                     <div class="loading-message">Loading courses...</div>
                 </div>
             </main>
+
+            <div class="resize-handle resize-handle-right" data-resize="right-panel" role="separator" aria-orientation="vertical" aria-label="Resize right panel"></div>
 
             <aside class="right-panel" role="complementary" aria-label="Course details and selection">
                 <button id="mobile-menu-close" class="mobile-menu-close-btn" title="Close menu" aria-label="Close menu"></button>
@@ -160,22 +168,30 @@
                             </button>
                             <button id="schedule-clear-filters-btn" class="btn btn-secondary clear-filters-btn" title="Clear all filters" aria-label="Clear all filters">
                             </button>
+                            <button id="clear-all-sections-btn" class="btn btn-secondary clear-all-sections-btn" title="Clear all selected sections" aria-label="Clear all sections">
+                            </button>
                         </div>
                         <button id="schedule-mobile-close" class="schedule-mobile-close-btn" title="Close menu" aria-label="Close menu"></button>
                     </div>
-                    <div class="schedule-selected-courses" id="schedule-selected-courses">
+                    <div class="schedule-sidebar-content" id="schedule-sidebar-content">
                         <div class="empty-state">No courses selected yet</div>
                     </div>
-                    <div class="schedule-selected-courses-footer">
-                        <button id="clear-all-sections-btn" class="btn btn-secondary clear-all-sections-btn" title="Clear all selected sections" aria-label="Clear all sections">
-                            <span>Clear All Sections</span>
-                        </button>
+                    <div class="schedule-sidebar-content-footer">
                         <button id="auto-schedule-btn" class="btn btn-primary auto-schedule-btn" title="Automatically generate a schedule" aria-label="Auto-generate schedule">
                             <span>Auto-Schedule</span>
                         </button>
+                        <div id="schedule-nav-buttons" class="schedule-nav-buttons" style="display: none;">
+                            <button id="schedule-prev-btn" class="btn btn-secondary schedule-nav-btn" title="Previous schedule" aria-label="Previous schedule">
+                            </button>
+                            <span id="schedule-counter" class="schedule-counter">1/1</span>
+                            <button id="schedule-next-btn" class="btn btn-secondary schedule-nav-btn" title="Next schedule" aria-label="Next schedule">
+                            </button>
+                        </div>
                     </div>
                 </aside>
-                
+
+                <div class="resize-handle resize-handle-schedule" data-resize="schedule-sidebar" role="separator" aria-orientation="vertical" aria-label="Resize schedule sidebar"></div>
+
                 <main class="schedule-main">
                     <div class="terms-grid">
                         <div class="term-graph" data-term="A">
