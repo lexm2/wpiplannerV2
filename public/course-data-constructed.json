@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 22, 2025, 6:52 PM",
+  "generated": "Dec 22, 2025, 7:14 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -93983,6 +93983,40 @@
                       "isAsync": false
                     }
                   ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
                 }
               ]
             },
@@ -94944,6 +94978,40 @@
                       "isAsync": false
                     }
                   ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
                 }
               ]
             },
@@ -95799,6 +95867,40 @@
                       "specificSection": "CX04",
                       "days": [
                         "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
                       ],
                       "isAsync": false
                     }
@@ -96692,6 +96794,40 @@
                       "specificSection": "CX04",
                       "days": [
                         "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
                       ],
                       "isAsync": false
                     }
@@ -97619,6 +97755,40 @@
                       "specificSection": "CX04",
                       "days": [
                         "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
                       ],
                       "isAsync": false
                     }
@@ -98552,6 +98722,40 @@
                       "isAsync": false
                     }
                   ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
                 }
               ]
             },
@@ -99475,6 +99679,40 @@
                       "specificSection": "CX04",
                       "days": [
                         "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
                       ],
                       "isAsync": false
                     }
@@ -100440,6 +100678,40 @@
                       "isAsync": false
                     }
                   ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
                 }
               ]
             },
@@ -101363,6 +101635,40 @@
                       "specificSection": "CX04",
                       "days": [
                         "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
                       ],
                       "isAsync": false
                     }
@@ -102294,6 +102600,40 @@
                       "isAsync": false
                     }
                   ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
                 }
               ]
             },
@@ -103215,6 +103555,40 @@
                       "specificSection": "CX04",
                       "days": [
                         "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
                       ],
                       "isAsync": false
                     }
@@ -104216,6 +104590,40 @@
                       "isAsync": false
                     }
                   ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
                 }
               ]
             },
@@ -105105,6 +105513,40 @@
                       "specificSection": "CX04",
                       "days": [
                         "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
                       ],
                       "isAsync": false
                     }
@@ -106034,6 +106476,40 @@
                       "specificSection": "CX04",
                       "days": [
                         "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 355303,
+                  "number": "CX05",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I, This course provides an introduction to integration and its applications. Topics covered include: inverse trigonometric functions, Riemann sums, fundamental theorem of calculus, basic techniques of integration, volumes of revolution, arc length, exponential and logarithmic functions, and applications. Recommended background: MA 1021. Although the course will make use of computers, no programming experience is assumed.",
+                  "term": "202201",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "08:00",
+                      "endTime": "08:50",
+                      "location": "Stratton Hall 116 Computer Lab",
+                      "building": "",
+                      "room": "Stratton Hall 116 Computer Lab",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "M"
                       ],
                       "isAsync": false
                     }
@@ -157928,7 +158404,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Bogdan Doytchinov",
+                    "professor": "William Martin",
                     "startTime": "16:00",
                     "endTime": "16:50",
                     "location": "Salisbury Labs 115 Kinnicutt Hall",
@@ -157966,7 +158442,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Bogdan Doytchinov",
+                      "professor": "William Martin",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 313",
@@ -158000,7 +158476,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Bogdan Doytchinov",
+                      "professor": "William Martin",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 313",
@@ -158034,7 +158510,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Bogdan Doytchinov",
+                      "professor": "William Martin",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 313",
@@ -158350,7 +158826,7 @@
                 "crn": 337021,
                 "number": "DL02",
                 "seats": 120,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4502",
@@ -158369,7 +158845,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 120,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL02",
@@ -158490,7 +158966,7 @@
                   "crn": 337524,
                   "number": "DD10",
                   "seats": 30,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4502",
@@ -158509,7 +158985,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 30,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD10",
@@ -158528,7 +159004,7 @@
                 "crn": 337152,
                 "number": "DL03",
                 "seats": 105,
-                "seatsAvailable": 23,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4486",
@@ -158547,7 +159023,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 105,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL03",
@@ -158566,7 +159042,7 @@
                   "crn": 336889,
                   "number": "DD11",
                   "seats": 35,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 6,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4486",
@@ -158585,7 +159061,7 @@
                       "building": "",
                       "room": "Olin Hall 223",
                       "seats": 35,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 6,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD11",
