@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 22, 2025, 8:54 PM",
+  "generated": "Dec 22, 2025, 9:14 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -159016,7 +159016,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "William Martin",
+                    "professor": "Marcus Sarkis-Martins",
                     "startTime": "15:00",
                     "endTime": "15:50",
                     "location": "Salisbury Labs 115 Kinnicutt Hall",
@@ -159054,7 +159054,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "William Martin",
+                      "professor": "Marcus Sarkis-Martins",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 223",
@@ -159088,7 +159088,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "William Martin",
+                      "professor": "Marcus Sarkis-Martins",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 313",
@@ -159122,7 +159122,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "William Martin",
+                      "professor": "Marcus Sarkis-Martins",
                       "startTime": "16:00",
                       "endTime": "16:50",
                       "location": "Stratton Hall 313",
