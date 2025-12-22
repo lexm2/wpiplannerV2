@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 22, 2025, 9:32 PM",
+  "generated": "Dec 22, 2025, 9:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -165225,7 +165225,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Bogdan Doytchinov",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Fuller Labs PHU Perreault Hall - Upper Section",
@@ -165263,7 +165263,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Bogdan Doytchinov",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 313",
@@ -165297,7 +165297,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Bogdan Doytchinov",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 313",
@@ -174933,7 +174933,7 @@
                 "crn": 339206,
                 "number": "C01",
                 "seats": 40,
-                "seatsAvailable": 22,
+                "seatsAvailable": 21,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -174952,7 +174952,7 @@
                     "building": "",
                     "room": "Stratton Hall 201",
                     "seats": 40,
-                    "seatsAvailable": 22,
+                    "seatsAvailable": 21,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -230787,7 +230787,7 @@
                 "number": "D01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course provides an overview of key concepts, methods and authors in both fields. These introduce the student to the types of reasoning required for the pursuit of in-depth analysis in each discipline. Emphasis on topics and authors varies with the particular instructor.",
@@ -230806,7 +230806,7 @@
                     "room": "Stratton Hall 201",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -236222,7 +236222,7 @@
                 "number": "D01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course provides an overview of key concepts, methods and authors in both fields. These introduce the student to the types of reasoning required for the pursuit of in-depth analysis in each discipline. Emphasis on topics and authors varies with the particular instructor.",
@@ -236241,7 +236241,7 @@
                     "room": "Stratton Hall 201",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
