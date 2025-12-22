@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 22, 2025, 10:45 AM",
+  "generated": "Dec 22, 2025, 11:15 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -85698,7 +85698,7 @@
                 "number": "S01",
                 "seats": 14,
                 "seatsAvailable": -3,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course covers methods and analysis for designing, implementing, and assessing games in serious, applied contexts. Often called “serious games” or “applied games”, these are game-based media that teach, engage with social issues, aim to increase empathy, or affect behavioral change. Students will read contemporary literature in the field of serious and applied games, design and implement their own games, and measure the effectiveness of those games in achieving educational or motivational goals.",
@@ -85717,7 +85717,7 @@
                     "room": "Other",
                     "seats": 14,
                     "seatsAvailable": -3,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
