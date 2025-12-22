@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 22, 2025, 1:50 PM",
+  "generated": "Dec 22, 2025, 2:17 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -3415,7 +3415,7 @@
                 "crn": 336512,
                 "number": "C02",
                 "seats": 50,
-                "seatsAvailable": 31,
+                "seatsAvailable": 30,
                 "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
@@ -3434,7 +3434,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seatsAvailable": 31,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
@@ -47922,7 +47922,7 @@
                 "number": "C01",
                 "seats": 60,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. II This Software Engineering course will focus on the process of Object-Oriented Analysis and Design. Students will be expected to complete a large number of exercises in Domain Modeling, Use Case Analysis, and Object-Oriented Design. In addition, the course will investigate Design Patterns, which are elements of reusable object-oriented software designs. This course will survey a set of design patterns and consider how these patterns are described and used to solve design problems. Recommended Background: CS 2303 and CS 3733. This course will be offered in 2020-21, and in alternating years thereafter.",
@@ -47941,7 +47941,7 @@
                     "room": "Salisbury Labs 305",
                     "seats": 60,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
@@ -69587,7 +69587,7 @@
                 "number": "D01",
                 "seats": 28,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course teaches students of different technical disciplines the fundamentals of fire protection engineering including combustion chemistry, fire behavior, compartment fire dynamics, toxicity, human behavior in fire, and fire modelling. Students have an opportunity to conduct and view fire experiments in both the WPI Fire Safety Engineering and the WPI Fire Fundamentals laboratories. Fire models are used to aid in use of the scientific method to determine cause and origin of a fire. This course is intended for both majors and non-majors as an introduction into Fire Protection Engineering (FPE) and how engineering knowledge can be used to save lives and property around the world.",
@@ -69606,7 +69606,7 @@
                     "room": "Gateway Park 2 Room 1226",
                     "seats": 28,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
