@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 22, 2025, 11:16 PM",
+  "generated": "Dec 22, 2025, 11:39 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4894,7 +4894,7 @@
                 "number": "C02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I 3D modeling is concerned with how to render created forms in a virtual environment. This course covers 3D modeling applications in video game development, film production, product design and fine art. Topics may include creating and armature, modeling organic and hard surfaces and sculpting using traditional techniques applied to a 3D model. Students will create works suitable for presentation in professional quality portfolio. Recommended background: AR1100 and AR1101.",
@@ -4913,7 +4913,7 @@
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
@@ -73976,7 +73976,7 @@
                 "number": "C03",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course surveys the transformation of the United States into an urban and industrial nation. Topics will include changes in the organization of business and labor, immigration and the development of cities, the peripheral role of the South and West in the industrial economy, politics and government in the age of \"laissez-faire,\" and the diverse sources and nature of late 19th- and early 20th century reform movements.",
@@ -73995,7 +73995,7 @@
                     "room": "Stratton Hall 205",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "C03",
                     "days": [
@@ -74154,7 +74154,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat II. This survey of American diplomatic history begins with World War I and World War II, continues through the early and later Cold War periods, including the Vietnam War, and concludes with an overview of 9/11 and wars in Iraq and Afghanistan. It includes traditional political and diplomatic history, but also broader conceptions of American foreign relations such as culture, economic development, and environment. It addresses the question of American empire, and stresses understanding U.S. policy and actions through a broad international perspective. This course is excellent preparation for any of WPI overseas project centers. Some sections of this course may be offered as Writing Intensive (WI).",
@@ -74173,7 +74173,7 @@
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -83471,7 +83471,7 @@
                 "number": "C02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I 3D modeling is concerned with how to render created forms in a virtual environment. This course covers 3D modeling applications in video game development, film production, product design and fine art. Topics may include creating and armature, modeling organic and hard surfaces and sculpting using traditional techniques applied to a 3D model. Students will create works suitable for presentation in professional quality portfolio. Recommended background: AR1100 and AR1101.",
@@ -83490,7 +83490,7 @@
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
