@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 22, 2025, 3:53 PM",
+  "generated": "Dec 22, 2025, 4:20 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -74293,7 +74293,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat I. A survey of the major developments in European history from the nineteenth century to the present. The course will focus upon those factors and events that led to the formation of modern European society: revolutions, nationalism, industrialization, world wars, the Cold War, the creation of the European Union. No prior knowledge of European history is required. Especially appropriate for students interested in WPI's global Project Centers in Europe. Students may not receive credit for HI 2320 and HI 2322.",
@@ -74312,7 +74312,7 @@
                     "room": "Stratton Hall 205",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
