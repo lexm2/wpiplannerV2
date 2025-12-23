@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 23, 2025, 8:52 PM",
+  "generated": "Dec 23, 2025, 9:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -46850,7 +46850,7 @@
                 "crn": 337440,
                 "number": "D01",
                 "seats": 75,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -46869,7 +46869,7 @@
                     "building": "",
                     "room": "Unity Hall 420",
                     "seats": 75,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -182998,7 +182998,7 @@
                 "number": "D01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. II Through an introduction to the musical contributions of Louis Armstrong, Duke Ellington, Charlie Parker, Miles Davis and others, students are exposed to the chronological development of the language of jazz. Each jazz era is examined in detail including the musical and social contexts which helped define it. Participants are expected to build aural skills with the goal of identifying specific historical periods through the recognition of particular musical characteristics. Students examine in depth one artist of their choice. This course will be offered in 2020-21, and in alternating years thereafter. [This replaces MU 4623. Credit is not allowed for both MU 4623 and MU 2719.]",
@@ -183017,7 +183017,7 @@
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
