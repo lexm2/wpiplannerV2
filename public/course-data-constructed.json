@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 23, 2025, 6:25 PM",
+  "generated": "Dec 23, 2025, 6:52 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -94012,7 +94012,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -95007,7 +95007,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -95900,7 +95900,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -96827,7 +96827,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -97788,7 +97788,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -98751,7 +98751,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -99712,7 +99712,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -100707,7 +100707,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -101668,7 +101668,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -102629,7 +102629,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -103588,7 +103588,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -104619,7 +104619,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -105546,7 +105546,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -106509,7 +106509,7 @@
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
                       "days": [
-                        "M"
+                        "W"
                       ],
                       "isAsync": false
                     }
@@ -161678,7 +161678,7 @@
                 "crn": 338917,
                 "number": "DL01",
                 "seats": 60,
-                "seatsAvailable": 3,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4577",
@@ -161697,7 +161697,7 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 60,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
@@ -161716,7 +161716,7 @@
                   "crn": 338924,
                   "number": "DD01",
                   "seats": 30,
-                  "seatsAvailable": 2,
+                  "seatsAvailable": 3,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4577",
@@ -161735,7 +161735,7 @@
                       "building": "",
                       "room": "Stratton Hall 205",
                       "seats": 30,
-                      "seatsAvailable": 2,
+                      "seatsAvailable": 3,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
@@ -161799,7 +161799,7 @@
                 "crn": 336456,
                 "number": "CL01",
                 "seats": 35,
-                "seatsAvailable": 19,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4381",
@@ -161818,7 +161818,7 @@
                     "building": "",
                     "room": "Stratton Hall 205",
                     "seats": 35,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "CL01",
@@ -161837,7 +161837,7 @@
                   "crn": 336455,
                   "number": "CD01",
                   "seats": 35,
-                  "seatsAvailable": 19,
+                  "seatsAvailable": 20,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4381",
@@ -161856,7 +161856,7 @@
                       "building": "",
                       "room": "Stratton Hall 205",
                       "seats": 35,
-                      "seatsAvailable": 19,
+                      "seatsAvailable": 20,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD01",
@@ -166441,7 +166441,7 @@
                 "crn": 336334,
                 "number": "CL01",
                 "seats": 25,
-                "seatsAvailable": 6,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4425",
@@ -166460,7 +166460,7 @@
                     "building": "",
                     "room": "Washburn 323",
                     "seats": 25,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "CL01",
@@ -166479,7 +166479,7 @@
                   "crn": 336774,
                   "number": "CD01",
                   "seats": 25,
-                  "seatsAvailable": 6,
+                  "seatsAvailable": 7,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4425",
@@ -166498,7 +166498,7 @@
                       "building": "",
                       "room": "Higgins Labs 114",
                       "seats": 25,
-                      "seatsAvailable": 6,
+                      "seatsAvailable": 7,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD01",
