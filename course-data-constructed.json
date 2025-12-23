@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 23, 2025, 3:54 PM",
+  "generated": "Dec 23, 2025, 4:22 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5311,7 +5311,7 @@
                 "number": "D01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course introduces design principles and their application to create effective forms of graphic communication. The students will learn the fundamentals of visual communication and will work on projects to analyze, organize, and solve design problems. Topics may include: the design process; figure/ground; shape; dynamic balance; Gestalt principles; typography; layout and composition; color; production and presentation in digital formats.",
@@ -5330,7 +5330,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -5410,7 +5410,7 @@
                 "crn": 337480,
                 "number": "D01",
                 "seats": 24,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -5429,7 +5429,7 @@
                     "building": "",
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -46238,7 +46238,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Akim Ndlovu",
                     "startTime": "14:00",
                     "endTime": "15:50",
                     "location": "Olin Hall 109",
@@ -46277,7 +46277,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Benjamin Nephew",
                     "startTime": "11:00",
                     "endTime": "12:50",
                     "location": "Unity Hall 520",
@@ -65934,7 +65934,7 @@
                   "crn": 337369,
                   "number": "DD02",
                   "seats": 90,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4527",
@@ -65953,7 +65953,7 @@
                       "building": "",
                       "room": "Salisbury Labs 115 Kinnicutt Hall",
                       "seats": 90,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -69940,7 +69940,7 @@
                 "crn": 337835,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 12,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -69959,7 +69959,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -238472,7 +238472,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Akim Ndlovu",
                     "startTime": "14:00",
                     "endTime": "15:50",
                     "location": "Olin Hall 109",
@@ -238511,7 +238511,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Benjamin Nephew",
                     "startTime": "11:00",
                     "endTime": "12:50",
                     "location": "Unity Hall 520",
