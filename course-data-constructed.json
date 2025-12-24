@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 24, 2025, 5:46 AM",
+  "generated": "Dec 24, 2025, 6:28 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -103709,7 +103709,7 @@
                   "crn": 336479,
                   "number": "CD04",
                   "seats": 35,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4323",
@@ -103728,7 +103728,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 35,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD04",
@@ -103743,7 +103743,7 @@
                   "crn": 355329,
                   "number": "CD05",
                   "seats": 35,
-                  "seatsAvailable": 35,
+                  "seatsAvailable": 34,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4323",
@@ -103762,7 +103762,7 @@
                       "building": "",
                       "room": "Stratton Hall 301",
                       "seats": 35,
-                      "seatsAvailable": 35,
+                      "seatsAvailable": 34,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD05",
