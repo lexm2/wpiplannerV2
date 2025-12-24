@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 24, 2025, 4:48 AM",
+  "generated": "Dec 24, 2025, 5:20 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -49979,7 +49979,7 @@
                 "crn": 338728,
                 "number": "S01",
                 "seats": 60,
-                "seatsAvailable": 46,
+                "seatsAvailable": 45,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -49998,7 +49998,7 @@
                     "building": "",
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 60,
-                    "seatsAvailable": 46,
+                    "seatsAvailable": 45,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S01",
@@ -50267,7 +50267,7 @@
                 "crn": 337850,
                 "number": "S03",
                 "seats": 30,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -50286,7 +50286,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S03",
