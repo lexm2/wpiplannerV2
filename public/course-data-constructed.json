@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 24, 2025, 6:50 PM",
+  "generated": "Dec 24, 2025, 7:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -38399,7 +38399,7 @@
                 "number": "C02",
                 "seats": 18,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "Cat. I A continuation of Elementary Chinese II, with progressive expansion of vocabulary and grammar. Pronunciation, basic grammar rules, and character recognition will continue to be the emphasis of the course. Handwriting of Chinese characters is not emphasized at this stage, and students are encouraged to typewrite the characters. Major aspects of Chinese culture will be introduced throughout the course. Recommended background: CN 1542. This course is closed to native speakers of Chinese and heritage speakers, except with written permission from the coordinator of the Chinese track.",
@@ -38418,7 +38418,7 @@
                     "room": "Salisbury Labs 407",
                     "seats": 18,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 5,
                     "specificSection": "C02",
                     "days": [
@@ -242267,7 +242267,7 @@
                 "number": "C01",
                 "seats": 18,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course will teach basic rowing training techniques and principles with the goal for students to develop and implement an individualized conditioning program for themselves. All classes will be conducted on-campus through the use of rowing machines located in the Sports and Recreation Center.",
@@ -242286,7 +242286,7 @@
                     "room": "Recreation Center Crew",
                     "seats": 18,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
