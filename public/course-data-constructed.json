@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 25, 2025, 5:49 PM",
+  "generated": "Dec 25, 2025, 6:24 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -245332,7 +245332,7 @@
                 "number": "C02 - Healthy Alternative: Zumba",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) In each term, specific PE courses are offered to provide a variety of wellness, dance and healthy alternatives to traditional PE sport-based classes . The specific courses are subject to change on a yearly basis in order to provide flexibility in the PE offerings based upon the latest trends in wellness and dance . The focus of these classes is more on individual fitness, wellness and education, with instruction provided to all students in the classes.",
@@ -245351,7 +245351,7 @@
                     "room": "Recreation Center Dance",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C02 - Healthy Alternative: Zumba",
                     "days": [
