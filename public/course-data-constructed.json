@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 25, 2025, 5:45 AM",
+  "generated": "Dec 25, 2025, 6:27 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -18067,7 +18067,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course is designed to broaden student perspectives on business through experiential learning in entrepreneurship, finance, strategy and marketing, organizational behavior, and operations. By exposing students to various business disciplines and a wide range of firms and business models, we intend to accelerate student impact through an engaging, immersive experience. During onand off-site situation workshops, students will engage with practitioners to discuss business challenges and decisions in a small-group format. Students will also be matched with alumni to de-brief topics related to cases and prepare a learning portfolio as a culminating assignment. By the end of the course students will have a broader understanding of business domains, increased business fluency, and a better understanding of decision-making within a relevant business context. Recommended background: None Anticipated",
@@ -18086,7 +18086,7 @@
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -48774,7 +48774,7 @@
                 "crn": 338754,
                 "number": "D01",
                 "seats": 80,
-                "seatsAvailable": 4,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -48793,7 +48793,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 80,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -242590,7 +242590,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 15,
+                "actualWaitlist": 14,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I This course will teach basic walking techniques and principles with the goal for students to develop and implement an individualized conditioning program for themselves.",
@@ -242609,7 +242609,7 @@
                     "room": "Recreation Center Track",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 15,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
                     "days": [
