@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 25, 2025, 2:16 PM",
+  "generated": "Dec 25, 2025, 2:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -65897,7 +65897,7 @@
                 "number": "DL02",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 16,
+                "actualWaitlist": 15,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4527",
                 "description": "Cat. I This is an introductory course in the engineering mechanics sequence that serves as a foundation for other courses in mechanical engineering. The course covers general two- and three-dimensional force and couple systems, distributed loads, resultant forces, moments of forces, free body diagrams, equilibrium of particles and finite sized bodies. Specific topics include friction, trusses, shear forces, bodies subjected to distributed loads, bending moments in beams, and first and second moments of plane areas. Recommended background: Differential (MA 1021) and integral (MA 1022) calculus, vector algebra (MA 1023), and double and triple integration (MA 1024).",
@@ -65916,7 +65916,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 16,
+                    "actualWaitlist": 15,
                     "maxWaitlist": 20,
                     "specificSection": "DL02",
                     "days": [
@@ -65934,7 +65934,7 @@
                   "crn": 337369,
                   "number": "DD02",
                   "seats": 90,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4527",
@@ -65953,7 +65953,7 @@
                       "building": "",
                       "room": "Salisbury Labs 115 Kinnicutt Hall",
                       "seats": 90,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
