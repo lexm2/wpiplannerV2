@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 25, 2025, 9:49 PM",
+  "generated": "Dec 25, 2025, 10:16 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -63937,7 +63937,7 @@
                 "number": "C01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. II This course introduces Geographic Information Systems (GIS) as a powerful mapping and analytical tool. Topics include GIS data structure, map projections, and fundamental GIS techniques for spatial analysis. Laboratory exercises concentrate on applying concepts presented in lectures and will focus on developing skills using ArcGIS. These exercises include examples of GIS applications in environmental modeling, socio-demographic change and site suitability analyses. Although the course is computer-intensive, no programming background is required. This course will be offered in 2019-20, and in alternating years thereafter. Note: Students may not receive credit for both ENV 150X and ENV 1500.",
@@ -63956,7 +63956,7 @@
                     "room": "Salisbury Labs 011",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
