@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 25, 2025, 9:52 AM",
+  "generated": "Dec 25, 2025, 10:18 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5094,7 +5094,7 @@
                 "number": "C01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 8,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "The focus of this course is in study of representational figure drawing. This course will cover drawing techniques, applied to study from a live model. Topics covered will be sight size measurement, study of form and light, copying from master drawings and applying these lessons to weekly sessions with a live model. Each class will feature a demonstration on the topic followed by individual critique and study.Recommended Background: AR1100",
@@ -5113,7 +5113,7 @@
                     "room": "Riley Commons",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
