@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 25, 2025, 10:18 AM",
+  "generated": "Dec 25, 2025, 10:44 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -227444,7 +227444,7 @@
                 "crn": 341855,
                 "number": "C01",
                 "seats": 35,
-                "seatsAvailable": 11,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -227463,7 +227463,7 @@
                     "building": "",
                     "room": "Olin Hall 223",
                     "seats": 35,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
