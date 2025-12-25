@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 25, 2025, 8:49 AM",
+  "generated": "Dec 25, 2025, 9:19 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8891,7 +8891,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 13,
+                "actualWaitlist": 12,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "BB 1102: Foundations of Ecology and Environmental Biology In this foundational course, students will explore our planet’s diversity of organisms and environments and the interactions among them. Lectures, discussion, and project work will address topics such as biodiversity, ecology, evolution, and animal behavior. Students will develop their communication skills and gain experience using primary literature to understand the process of biological research. This course is designed for BBT majors and minors, as well as others who plan further study in topics such as environmental biology, conservation, ecology, and evolution. Credit cannot be received for both BB 1102 and BB 1045. Units: 1/3 Category: Category I Recommended Background: a solid working knowledge of biological principles such as would be learned in a rigorous high school biology course",
@@ -8910,7 +8910,7 @@
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 13,
+                    "actualWaitlist": 12,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -8929,7 +8929,7 @@
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 13,
+                    "actualWaitlist": 12,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
