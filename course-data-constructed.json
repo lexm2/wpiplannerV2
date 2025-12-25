@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 25, 2025, 1:20 PM",
+  "generated": "Dec 25, 2025, 1:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -65426,7 +65426,7 @@
                 "number": "DL03",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4514",
                 "description": "Cat. I This beginning course provides important background for all science and engineering disciplines regarding the capabilities and limitations of materials in our everyday lives. Students are introduced to the fundamental theme of materials science-- structure-property-processing relationships—in metals, ceramics, and plastics. Aspects of material structure range from the atomic to microstructural and macroscopic scales. In turn, these structural features determine the properties of materials. In particular, this course investigates connections between structure and mechanical properties, and how working and thermal treatments may transform structure and thus alter material properties. This knowledge is then applied to material selection decisions. Recommended background: prior knowledge of college-level chemistry.",
@@ -65445,7 +65445,7 @@
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "DL03",
                     "days": [
@@ -65463,7 +65463,7 @@
                   "crn": 337585,
                   "number": "DD03",
                   "seats": 90,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4514",
@@ -65482,7 +65482,7 @@
                       "building": "",
                       "room": "Higgins Labs 218 Discovery Classroom",
                       "seats": 90,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD03",
