@@ -6285,7 +6285,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "18/20",
+      "Waitlist_Waitlist_Capacity": "17/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336860"
     },
     {
@@ -107166,7 +107166,7 @@
       "Course_Title": "PH 1140 - Oscillations, And Waves",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "70/80",
+      "Enrolled_Capacity": "69/80",
       "Instructional_Format": "Discussion",
       "Instructors": "Thomas Noviello",
       "Locations": "Unity Hall 500",
@@ -107196,7 +107196,7 @@
       "Course_Title": "PH 1140 - Oscillations, And Waves",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "70/80",
+      "Enrolled_Capacity": "69/80",
       "Instructional_Format": "Lecture",
       "Instructors": "Thomas Noviello",
       "Locations": "Unity Hall 500",
@@ -107284,14 +107284,14 @@
       "Course_Title": "PH 1140 - Oscillations, And Waves",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/20",
+      "Enrolled_Capacity": "19/20",
       "Instructional_Format": "Laboratory",
       "Locations": "Olin Hall 117 Physics Lab",
       "Meeting_Day_Patterns": "W",
       "Meeting_Patterns": "W | 1:00 PM - 2:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Olin Hall 117 Physics Lab | W | 1:00 PM - 2:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: PH 1140 - Oscillations, And Waves (a)",
       "Subject": "Physics",
@@ -119734,7 +119734,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336354"
     },
     {
@@ -119790,7 +119790,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "5/15",
+      "Waitlist_Waitlist_Capacity": "6/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337231"
     },
     {
