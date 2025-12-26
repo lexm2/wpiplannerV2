@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 26, 2025, 4:19 PM",
+  "generated": "Dec 26, 2025, 4:45 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -170708,7 +170708,7 @@
                 "number": "DL01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4495",
                 "description": "Cat. IAn introduction to material processing in manufacturing. This course providesimportant background for anyone interested in manufacturing, designengineering design, sales, or management.Processing of polymers, ceramics, metals and composites is discussed. Processescovered include: rolling, injection molding, forging, powder metallurgy, joiningand machining. The relationships between materials, processes, processingparameters and the properties of manufactured parts are developed. During thecourse the students should develop the ability to choose materials, processes, andprocessing parameters for designing manufacturing procedures to take aprototype part to production.Recommended background: ME 1800 Materials Selection and ManufacturingProcesses, and ES 2001 Introduction to Materials Science.",
@@ -170727,7 +170727,7 @@
                     "room": "Salisbury Labs 305",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 15,
                     "specificSection": "DL01",
                     "days": [
@@ -170745,7 +170745,7 @@
                   "crn": 337344,
                   "number": "DD01",
                   "seats": 50,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4495",
@@ -170764,7 +170764,7 @@
                       "building": "",
                       "room": "Salisbury Labs 305",
                       "seats": 50,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
