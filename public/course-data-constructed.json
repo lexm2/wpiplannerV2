@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 26, 2025, 2:43 PM",
+  "generated": "Dec 26, 2025, 2:53 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -48874,7 +48874,7 @@
                 "crn": 339885,
                 "number": "C01",
                 "seats": 70,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -48893,7 +48893,7 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 70,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -71876,7 +71876,7 @@
                 "number": "C01",
                 "seats": 120,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I Students of this course will examine the fundamental principles of physical geology including the materials, structures, and surface features of the earth and the processes which produced them. Emphasis will be placed on the interrelationship of people and environment and applications to various fields of technology. The course includes field trips and a significant laboratory component.",
@@ -71895,7 +71895,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 120,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
