@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 26, 2025, 4:47 AM",
+  "generated": "Dec 26, 2025, 5:18 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -70569,7 +70569,7 @@
                 "crn": 337767,
                 "number": "S01 - SP: Combustion",
                 "seats": 30,
-                "seatsAvailable": 28,
+                "seatsAvailable": 27,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -70588,7 +70588,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 28,
+                    "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01 - SP: Combustion",
