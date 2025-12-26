@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 26, 2025, 8:51 PM",
+  "generated": "Dec 26, 2025, 9:14 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -48189,7 +48189,7 @@
                 "number": "C01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course studies the problem of making computers act in ways which we call\"intelligent\". Topics include major theories, tools and applications of artificial intelligence, aspects of knowledge representation, searching and planning, and natural language understanding.Students will be expected to complete projects which express problems that require search in state spaces, and to propose appropriate methods for solving the problems.Undergraduate credit may not be earned both for this course and for CS 534.Recommended background: CS 2102 or CS 2103; CS 2223; and CS 3133.",
@@ -48208,7 +48208,7 @@
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
