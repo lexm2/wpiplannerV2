@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 26, 2025, 3:09 AM",
+  "generated": "Dec 26, 2025, 4:03 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -18982,7 +18982,7 @@
                 "crn": 336092,
                 "number": "C01",
                 "seats": 100,
-                "seatsAvailable": 9,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -19001,7 +19001,7 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 100,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
@@ -19380,7 +19380,7 @@
                 "crn": 337029,
                 "number": "D01",
                 "seats": 90,
-                "seatsAvailable": 7,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -19399,7 +19399,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 90,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
