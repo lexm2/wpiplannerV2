@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 26, 2025, 6:50 PM",
+  "generated": "Dec 26, 2025, 7:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -229397,7 +229397,7 @@
                 "crn": 338521,
                 "number": "C01",
                 "seats": 55,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -229416,7 +229416,7 @@
                     "building": "",
                     "room": "Salisbury Labs 104",
                     "seats": 55,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -243812,7 +243812,7 @@
                 "number": "D02",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -243831,7 +243831,7 @@
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
                     "days": [

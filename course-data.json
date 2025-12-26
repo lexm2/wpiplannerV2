@@ -109140,7 +109140,7 @@
       "Course_Title": "PSY 1504 - Strategies For Improving Cognitive Skills",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "54/55",
+      "Enrolled_Capacity": "55/55",
       "Instructional_Format": "Lecture",
       "Instructors": "Jim Doyle",
       "Locations": "Salisbury Labs 104",
@@ -109148,7 +109148,7 @@
       "Meeting_Patterns": "M-R | 1:00 PM - 2:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Salisbury Labs 104 | M-R | 1:00 PM - 2:50 PM",
-      "Section_Status": "Open",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Psychology",
       "Waitlist_Waitlist_Capacity": "0/10",
@@ -119818,7 +119818,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "10/15",
+      "Waitlist_Waitlist_Capacity": "9/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337282"
     },
     {
