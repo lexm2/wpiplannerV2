@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 26, 2025, 10:17 AM",
+  "generated": "Dec 26, 2025, 10:44 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -65198,7 +65198,7 @@
                 "number": "CL01",
                 "seats": 95,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4334",
                 "description": "Cat. I This beginning course provides important background for all science and engineering disciplines regarding the capabilities and limitations of materials in our everyday lives. Students are introduced to the fundamental theme of materials science-- structure-property-processing relationships—in metals, ceramics, and plastics. Aspects of material structure range from the atomic to microstructural and macroscopic scales. In turn, these structural features determine the properties of materials. In particular, this course investigates connections between structure and mechanical properties, and how working and thermal treatments may transform structure and thus alter material properties. This knowledge is then applied to material selection decisions. Recommended background: prior knowledge of college-level chemistry.",
@@ -65217,7 +65217,7 @@
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "seats": 95,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "CL01",
                     "days": [
@@ -65235,7 +65235,7 @@
                   "crn": 336537,
                   "number": "CD01",
                   "seats": 95,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4334",
@@ -65254,7 +65254,7 @@
                       "building": "",
                       "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                       "seats": 95,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD01",
