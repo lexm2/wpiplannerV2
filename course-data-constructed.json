@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 27, 2025, 6:48 PM",
+  "generated": "Dec 27, 2025, 7:12 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -11311,7 +11311,7 @@
                 "crn": 336815,
                 "number": "C01",
                 "seats": 40,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -11330,7 +11330,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 40,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
@@ -12260,7 +12260,7 @@
                 "crn": 341614,
                 "number": "S02 - ST: Advanced Topics in Biotechnology",
                 "seats": 30,
-                "seatsAvailable": 17,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -12279,7 +12279,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S02 - ST: Advanced Topics in Biotechnology",
