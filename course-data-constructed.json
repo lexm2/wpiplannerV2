@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 27, 2025, 7:12 PM",
+  "generated": "Dec 27, 2025, 7:26 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -13558,7 +13558,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 50,
                 "note": null,
                 "description": "Cat. I To learn the fundamentals of basic signal processing methods as well as linear time series analyses framework for modeling and mining biological data. Tools of data analysis include statistics for determining significance of a result, Laplace and Z transforms, convolution, correlation, sampling theorem, Fourier transform, transfer function, coherence function and various filtering techniques. The goal of this course is to offer the students an opportunity to learn and model and simulate static and dynamic physiological systems using linear systems theory. First principles of chemistry and physics are used to quantitatively model physiological systems. Most of the models are based on linear systems theory. Simulations and estimation are performed using Matlab and already-developed software. Recommended background: BME 2210, CS 1004 or equivalent.",
@@ -13577,7 +13577,7 @@
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 50,
                     "specificSection": "D01",
                     "days": [
