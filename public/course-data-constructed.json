@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 27, 2025, 5:54 AM",
+  "generated": "Dec 27, 2025, 6:25 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -2119,7 +2119,7 @@
                 "number": "C01",
                 "seats": 66,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "This course provides an overview of the processing techniques and mechanical behavior of composite materials relevant to aerospace applications. Topics in this course may include: classification of composites; elasticity of composite materials; the effect of reinforcements on strength and toughness; bonding mechanisms of interfaces in composite; fabrication methods for polymer-matrix composite materials; viscoelasticity and creep of composites; advanced composites materials (bio-composites, nano-composites). Recommended background: introductory material science (ES 2001), and introductory stress analysis (AE 2410 or equivalent). Students may not receive credit for both AE 3430 and AE 4717.",
@@ -2138,7 +2138,7 @@
                     "room": "Atwater Kent 233",
                     "seats": 66,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
                     "days": [
@@ -235254,7 +235254,7 @@
                 "crn": 337820,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 7,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -235273,7 +235273,7 @@
                     "building": "",
                     "room": "Unity Hall 420",
                     "seats": 30,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
