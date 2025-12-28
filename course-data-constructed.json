@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 28, 2025, 3:24 AM",
+  "generated": "Dec 28, 2025, 4:30 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -37293,7 +37293,7 @@
                 "crn": 336580,
                 "number": "CL01",
                 "seats": 60,
-                "seatsAvailable": 42,
+                "seatsAvailable": 41,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4375",
@@ -37312,7 +37312,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 60,
-                    "seatsAvailable": 42,
+                    "seatsAvailable": 41,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "CL01",
@@ -37331,7 +37331,7 @@
                   "crn": 336583,
                   "number": "CD01",
                   "seats": 60,
-                  "seatsAvailable": 42,
+                  "seatsAvailable": 41,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4375",
@@ -37350,7 +37350,7 @@
                       "building": "",
                       "room": "Higgins Labs 116",
                       "seats": 60,
-                      "seatsAvailable": 42,
+                      "seatsAvailable": 41,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD01",
