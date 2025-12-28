@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 28, 2025, 7:49 AM",
+  "generated": "Dec 28, 2025, 8:21 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -169998,7 +169998,7 @@
                 "number": "DL01",
                 "seats": 72,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4493",
                 "description": "Cat. IThis course introduces students to manufacturing science and engineering andprototype part production. It emphasizes CNC (computer-controlled)machining. Students will learn how to go from a solid (CAD, computer-aideddesign) model to a machined part, using CAM software (computer-aidedmanufacturing) and CNC machining. They will also be exposed to associatedissues in manufacturing process analysis, engineering design, material science,and in dimensional and surface metrology. Using machining as an example, thescience of manufacturing processes is developed in a combination of class workand laboratory experience. The laboratory experience includes an experimentalcomponent that relates process variables in machining with performance andmachined part quality. Students whose project work will necessitate fabricationof parts and those who want a background in manufacturing process science andengineering should take this course.",
@@ -170017,7 +170017,7 @@
                     "room": "Washburn 229",
                     "seats": 72,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 15,
                     "specificSection": "DL01",
                     "days": [
