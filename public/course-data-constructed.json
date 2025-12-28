@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 28, 2025, 4:30 AM",
+  "generated": "Dec 28, 2025, 5:00 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -55667,7 +55667,7 @@
                 "number": "DL01",
                 "seats": 180,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 25,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4437",
                 "description": "Cat. I The objective of this course is to introduce students to the broad field of electrical and computer engineering within the context of real world applications. This course is designed for first-year students who are considering ECE as a possible major or for non-ECE students fulfilling an out-of-major degree requirement. The course will introduce basic electrical circuit theory as well as analog and digital signal processing methods currently used to solve a variety of engineering design problems in areas such as entertainment and networking media, robotics, renewable energy and biomedical applications. Laboratory experiments based on these applications are used to reinforce basic concepts and develop laboratory skills, as well as to provide system-level understanding. Circuit and system simulation analysis tools are also introduced and emphasized. Topics: Basic concepts of AC/DC and Digital electrical circuits, power, linear circuit simulation and analysis, op-amp circuits, transducers, feedback, circuit equivalents and system models, first order transients, the description of sinusoidal signals and system response, analog/digital conversion, basic digital logic gates and combinatorial circuits. Recommended Background: high school physics, and MA 1022 (concurrent).",
@@ -55686,7 +55686,7 @@
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 180,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 25,
                     "specificSection": "DL01",
                     "days": [
