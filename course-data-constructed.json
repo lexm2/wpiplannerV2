@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 29, 2025, 10:51 PM",
+  "generated": "Dec 29, 2025, 11:16 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -2119,7 +2119,7 @@
                 "number": "C01",
                 "seats": 66,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "This course provides an overview of the processing techniques and mechanical behavior of composite materials relevant to aerospace applications. Topics in this course may include: classification of composites; elasticity of composite materials; the effect of reinforcements on strength and toughness; bonding mechanisms of interfaces in composite; fabrication methods for polymer-matrix composite materials; viscoelasticity and creep of composites; advanced composites materials (bio-composites, nano-composites). Recommended background: introductory material science (ES 2001), and introductory stress analysis (AE 2410 or equivalent). Students may not receive credit for both AE 3430 and AE 4717.",
@@ -2138,7 +2138,7 @@
                     "room": "Atwater Kent 233",
                     "seats": 66,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
                     "days": [
@@ -251037,7 +251037,7 @@
                 "number": "C03",
                 "seats": 15,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "WPE 1611 Introduction to Mindfulness (Cat. I, 1/12 unit) Introduction to Mindfulness is an evidence-based mindfulness curriculum designed for college aged adults by the Mindfulness Institute for Emerging Adults (MIEA). During this course, you will learn useful, practical tools to help manage your stress and increase self-compassion. Students will practice a variety of meditation skills, engage with the MIEA Mobile App, read the companion book, and participate in class discussion.",
@@ -251056,7 +251056,7 @@
                     "room": "Daniels Hall 102E",
                     "seats": 15,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "C03",
                     "days": [
@@ -251665,7 +251665,7 @@
                 "number": "C04",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "WPE 1612 Introductory Yoga Cat. I (1/12 unit) This yoga class focuses on connecting the mind, body, and spirit through an awareness of breath. Participating in yoga can improve core strength, flexibility, balance, mindfulness, and relaxation and decrease stress. Those with any level of yoga experience (including first timers) are welcome.",
@@ -251684,7 +251684,7 @@
                     "room": "Recreation Center Dance",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "C04",
                     "days": [
