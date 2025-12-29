@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 29, 2025, 7:49 PM",
+  "generated": "Dec 29, 2025, 8:19 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -49448,7 +49448,7 @@
                 "crn": 337774,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
@@ -49467,7 +49467,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -67997,7 +67997,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 6,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I Characteristics of control systems. Mathematical representation of control components and systems. Laplace transforms, transfer functions, block and signal flow diagrams. Transient response analysis. Introduction to the root-locus method and stability analysis. Frequency response techniques including Bode, polar, and Nichols plots. This sequence of courses in the field of control engineering (ES 3011) is generally available to all juniors and seniors regardless of department. A good background in mathematics is required; familiarity with Laplace transforms, complex variables and matrices is desirable but not mandatory. All students taking Control Engineering I should have an understanding of ordinary differential equations (MA 2051 or equivalent) and basic physics through electricity and magnetism (PH 1120/1121). Control Engineering I may be considered a terminal course, or it may be the first course for those students wishing to do extensive work in this field. Students taking the sequence of two courses will be prepared for graduate work in the field. Recommended background: Ordinary Differential Equations (MA 2051) and Electricity and Magnestism (PH 1120, PH 1121). Students may not receive credit for both ES 3011 and ECE 3012",
@@ -68016,7 +68016,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": [],
