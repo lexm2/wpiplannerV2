@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 29, 2025, 5:15 PM",
+  "generated": "Dec 29, 2025, 5:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -46644,7 +46644,7 @@
                 "crn": 338695,
                 "number": "C01",
                 "seats": 50,
-                "seatsAvailable": 2,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -46663,7 +46663,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 50,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
@@ -53129,7 +53129,7 @@
                 "crn": 336393,
                 "number": "C01",
                 "seats": 60,
-                "seatsAvailable": 27,
+                "seatsAvailable": 26,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -53148,7 +53148,7 @@
                     "building": "",
                     "room": "Unity Hall 420",
                     "seats": 60,
-                    "seatsAvailable": 27,
+                    "seatsAvailable": 26,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
