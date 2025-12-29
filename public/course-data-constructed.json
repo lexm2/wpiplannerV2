@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 29, 2025, 7:31 AM",
+  "generated": "Dec 29, 2025, 7:52 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -158213,7 +158213,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I, This course provides an introduction to the theory and techniques of matrix algebra and linear algebra. Topics covered include: operations on matrices, systems of linear equations, linear transformations, determinants, eigenvalues and eigenvectors, least squares, vector spaces, inner products, introduction to numerical techniques, and applications of linear algebra. Credit may not be earned for this course and MA 2072. Recommended background: None, although basic knowledge of equations for planes and lines in space would be helpful.",
@@ -158232,7 +158232,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": [],
