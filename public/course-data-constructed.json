@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 30, 2025, 12:36 PM",
+  "generated": "Dec 30, 2025, 1:24 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -10727,7 +10727,7 @@
               "number": "DX01",
               "seats": 5,
               "seatsAvailable": 0,
-              "actualWaitlist": 1,
+              "actualWaitlist": 2,
               "maxWaitlist": 2,
               "note": null,
               "description": "BB 3813 Animal Cell Culture Techniques Laboratory (Cat. I; 1/6 unit) Basic laboratory skills in mammalian cell culture including cell counting, freezing and thawing cell lines, and culture of suspension and attached cells. Recommended background: knowledge of aseptic technique (BB 1801 or 2815 or equivalent) and cell biology (BB 2550 or equivalent). Students may not receive credit for this course and BB 3513.",
@@ -10746,7 +10746,7 @@
                   "room": "Goddard Hall 212 BB Lab",
                   "seats": 5,
                   "seatsAvailable": 0,
-                  "actualWaitlist": 1,
+                  "actualWaitlist": 2,
                   "maxWaitlist": 2,
                   "specificSection": "DX01",
                   "days": [
@@ -34744,7 +34744,7 @@
                 "crn": 336972,
                 "number": "D01",
                 "seats": 54,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -34763,7 +34763,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 54,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
