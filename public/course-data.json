@@ -3214,7 +3214,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336465"
     },
     {
@@ -6203,10 +6203,10 @@
       "Meeting_Patterns": "M-T-R-F | 1:00 PM - 1:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Unity Hall 400 | M-T-R-F | 1:00 PM - 1:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "20/20",
+      "Waitlist_Waitlist_Capacity": "19/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339594"
     },
     {
@@ -38318,7 +38318,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "2/20",
+      "Waitlist_Waitlist_Capacity": "1/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336403"
     },
     {
@@ -44054,7 +44054,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Environmental Studies",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336149"
     },
     {
@@ -47433,7 +47433,7 @@
       "Course_Title": "ES 3004 - Fluid Mechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "75/75",
+      "Enrolled_Capacity": "74/75",
       "Instructional_Format": "Lecture",
       "Instructors": "Alireza Mahdavi Nejad",
       "Locations": "Higgins Labs 116",
@@ -47441,10 +47441,10 @@
       "Meeting_Patterns": "M-T-W-R-F | 2:00 PM - 2:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Higgins Labs 116 | M-T-W-R-F | 2:00 PM - 2:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "0/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336477"
     },
     {
@@ -60021,7 +60021,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Interactive Media and Game Development",
-      "Waitlist_Waitlist_Capacity": "7/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337500"
     },
     {
@@ -94757,7 +94757,7 @@
       "Course_Title": "MU 2020 - History Of American Popular Music",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "35/35",
+      "Enrolled_Capacity": "34/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Alan Vaudreuil",
       "Locations": "Alden Hall B06 Janet Earle Room",
@@ -94765,10 +94765,10 @@
       "Meeting_Patterns": "M-T-R-F | 4:00 PM - 4:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Alden Hall B06 Janet Earle Room | M-T-R-F | 4:00 PM - 4:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "1/15",
+      "Waitlist_Waitlist_Capacity": "0/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336195"
     },
     {
@@ -95061,7 +95061,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "7/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337485"
     },
     {
@@ -113895,7 +113895,7 @@
       "Course_Title": "RBE 502 - Robot Control",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "22/60",
+      "Enrolled_Capacity": "21/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Giovanni Pittiglio",
       "Locations": "Unity Hall 500",
