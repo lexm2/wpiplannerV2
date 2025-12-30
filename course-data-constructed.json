@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 30, 2025, 10:52 PM",
+  "generated": "Dec 30, 2025, 11:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4855,7 +4855,7 @@
                 "number": "C01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I 3D modeling is concerned with how to render created forms in a virtual environment. This course covers 3D modeling applications in video game development, film production, product design and fine art. Topics may include creating and armature, modeling organic and hard surfaces and sculpting using traditional techniques applied to a 3D model. Students will create works suitable for presentation in professional quality portfolio. Recommended background: AR1100 and AR1101.",
@@ -4874,7 +4874,7 @@
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -83432,7 +83432,7 @@
                 "number": "C01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I 3D modeling is concerned with how to render created forms in a virtual environment. This course covers 3D modeling applications in video game development, film production, product design and fine art. Topics may include creating and armature, modeling organic and hard surfaces and sculpting using traditional techniques applied to a 3D model. Students will create works suitable for presentation in professional quality portfolio. Recommended background: AR1100 and AR1101.",
@@ -83451,7 +83451,7 @@
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
