@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 30, 2025, 5:43 PM",
+  "generated": "Dec 30, 2025, 5:53 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -183219,7 +183219,7 @@
                 "number": "D01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course will investigate the sonic organization of musical works and performances, focusing on fundamental questions involved in the process of composition: How do I connect different ideas? How can I make a larger work out of smaller parts? How can I vary statements to create interest without compromising coherence? Where do I start? A progressive series of composition projects will build techniques in relevant areas including rhythm, harmony, melody, and form. Exercises in mechanics will be complemented by contemplation and discussion of artistic, aesthetic and philosophical ideas that are equally important in the compositional process. We will examine the relationship between musical works and how they are communicated as instructions to others (e.g. orally, as symbols, prose, graphic images, or computer programs). Weekly listening, reading, and composition assignments draw on a broad range of musical styles and intellectual traditions from various cultures and historical periods. Recommended background: understanding of basic music theory through coursework (e.g. MU 1511, Introduction to Music or MU 1611, Fundamentals of Music) or equivalent experience.",
@@ -183238,7 +183238,7 @@
                     "room": "Alden Hall B30 Music Technology Lab",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
