@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 30, 2025, 7:29 PM",
+  "generated": "Dec 30, 2025, 7:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -171483,7 +171483,7 @@
                 "number": "C02",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I A course designed to develop analytical and experimental skills in modern engineering measurement methods, based on electronic instrumentation and computer-based data acquisition systems. The lectures are concerned with the engineering analysis and design as well as the principles of instrumentation, whereas the laboratory periods afford the student an opportunity to use modern devices in actual experiments. Lecture topics include: review of engineering fundamentals and, among others, discussions of standards, measurement and sensing devices, experiment planning, data acquisition, analysis of experimental data, and report writing. Laboratory experiments address both mechanical and thermal systems and instrumentation in either traditional mechanical engineering (heat transfer, flow measurement/visualization, force/torque/strain measurement, motion/vibration measurement) or materials engineering (temperature and pressure measurements in materials processing, measurement of strain and position in mechanical testing of materials). Each year students will be notified which type of experiments will be used in each term offering. Students may also consult with their academic advisor or the Mechanical Engineering department office. Recommended background: mathematics (MA 2051), thermo-fluids (ES 3001, ES 3003, ES 3004), mechanics (ES 2501, ES 2502, ES 2503), materials (ES 2001).",
@@ -171502,7 +171502,7 @@
                     "room": "Higgins Labs 031 ME Computer Lab",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
