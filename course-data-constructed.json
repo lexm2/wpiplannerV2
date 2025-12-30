@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 30, 2025, 8:43 PM",
+  "generated": "Dec 30, 2025, 8:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -56067,7 +56067,7 @@
                 "crn": 336410,
                 "number": "CL01",
                 "seats": 66,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4348",
@@ -56086,7 +56086,7 @@
                     "building": "",
                     "room": "Atwater Kent 233",
                     "seats": 66,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "CL01",
@@ -56140,7 +56140,7 @@
                   "crn": 336400,
                   "number": "CX02",
                   "seats": 21,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4348",
@@ -56159,7 +56159,7 @@
                       "building": "",
                       "room": "Atwater Kent 317 ECE Lab",
                       "seats": 21,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX02",
