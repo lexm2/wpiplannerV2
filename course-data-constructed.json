@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 31, 2025, 8:18 PM",
+  "generated": "Dec 31, 2025, 8:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -75925,7 +75925,7 @@
                 "crn": 340331,
                 "number": "D01",
                 "seats": 20,
-                "seatsAvailable": 4,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -75944,7 +75944,7 @@
                     "building": "",
                     "room": "Stratton Hall 205",
                     "seats": 20,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
