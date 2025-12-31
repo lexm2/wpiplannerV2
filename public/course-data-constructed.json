@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 31, 2025, 9:55 AM",
+  "generated": "Dec 31, 2025, 10:18 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -16288,7 +16288,7 @@
                 "number": "C01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 40,
                 "note": null,
                 "description": "Cat. I This course emphasizes the applications of mechanics to describe the material properties of living tissues. It is concerned with the description and measurements of these properties as related to their physiological functions. Emphasis on the interrelationship between biomechanics and physiology in medicine, surgery, body injury and prostheses. Topics covered include: review of basic mechanics, stress, strain, constitutive equations and the field equations, viscoelastic behavior, and models of material behavior. The measurement and characterization of properties of tendons, skin, muscles and bone. Biomechanics as related to body injury and the design of prosthetic devices. Recommended background: Mechanics (ES 2501, ES 2502, ES 2503, ME 3501), Mathematics (MA 2051).",
@@ -16307,7 +16307,7 @@
                     "room": "Stratton Hall 201",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 40,
                     "specificSection": "C01",
                     "days": [
@@ -63886,8 +63886,8 @@
                 "crn": 340336,
                 "number": "D01",
                 "seats": 72,
-                "seatsAvailable": 1,
-                "actualWaitlist": 1,
+                "seatsAvailable": 2,
+                "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I The study of environmental problems and their solutions requires an interdisciplinary approach. This course will examine current environmental issues from the intersection of several key disciplines including: environmental philosophy and history, environmental policy, and science. The course will develop these different approaches for analyzing environmental problems, explore the tensions between them, and present a framework for integrating them. Topics such as environmental justice, developing nations, globalization, and climate change policy will be explored.",
@@ -63905,8 +63905,8 @@
                     "building": "",
                     "room": "Salisbury Labs 104",
                     "seats": 72,
-                    "seatsAvailable": 1,
-                    "actualWaitlist": 1,
+                    "seatsAvailable": 2,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
@@ -172986,7 +172986,7 @@
                 "number": "C01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 40,
                 "note": null,
                 "description": "Cat. I This course emphasizes the applications of mechanics to describe the material properties of living tissues. It is concerned with the description and measurements of these properties as related to their physiological functions. Emphasis on the interrelationship between biomechanics and physiology in medicine, surgery, body injury and prostheses. Topics covered include: review of basic mechanics, stress, strain, constitutive equations and the field equations, viscoelastic behavior, and models of material behavior. The measurement and characterization of properties of tendons, skin, muscles and bone. Biomechanics as related to body injury and the design of prosthetic devices. Recommended background: Mechanics (ES 2501, ES 2502, ES 2503, ME 3501), Mathematics (MA 2051).",
@@ -173005,7 +173005,7 @@
                     "room": "Stratton Hall 201",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 40,
                     "specificSection": "C01",
                     "days": [
