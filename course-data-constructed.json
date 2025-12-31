@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 31, 2025, 5:49 PM",
+  "generated": "Dec 31, 2025, 6:24 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -69976,7 +69976,7 @@
                 "crn": 337727,
                 "number": "S02",
                 "seats": 18,
-                "seatsAvailable": 4,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -69995,7 +69995,7 @@
                     "building": "",
                     "room": "Gateway Park 2 Room 1226",
                     "seats": 18,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S02",
