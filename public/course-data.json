@@ -3239,10 +3239,10 @@
       "Meeting_Patterns": "M-R | 12:00 PM - 1:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Riley Commons | M-R | 12:00 PM - 1:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336726"
     },
     {
@@ -3960,7 +3960,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "7/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336493"
     },
     {
@@ -40597,7 +40597,7 @@
       "Course_Title": "ECE 5512 - Electromechanical Energy Conversion",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "10/30",
+      "Enrolled_Capacity": "11/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Zeeshan Ahmed",
       "Locations": "Online-asynchronous",
@@ -44071,7 +44071,7 @@
       "Course_Title": "ENV 2201 - Planning For Sustainable Communities",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "31/35",
+      "Enrolled_Capacity": "32/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Derren Rosbach",
       "Locations": "Innovation Studio 105 Active Learning Classroom",
@@ -59842,7 +59842,7 @@
       "Course_Title": "IMGD 1000 - Critical Studies Of Interactive Media And Games",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "36/50",
+      "Enrolled_Capacity": "37/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Melissa Kagen",
       "Locations": "Fuller Labs 320",
