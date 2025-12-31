@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 31, 2025, 1:20 PM",
+  "generated": "Dec 31, 2025, 1:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -69587,7 +69587,7 @@
                 "number": "D01",
                 "seats": 28,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course teaches students of different technical disciplines the fundamentals of fire protection engineering including combustion chemistry, fire behavior, compartment fire dynamics, toxicity, human behavior in fire, and fire modelling. Students have an opportunity to conduct and view fire experiments in both the WPI Fire Safety Engineering and the WPI Fire Fundamentals laboratories. Fire models are used to aid in use of the scientific method to determine cause and origin of a fire. This course is intended for both majors and non-majors as an introduction into Fire Protection Engineering (FPE) and how engineering knowledge can be used to save lives and property around the world.",
@@ -69606,7 +69606,7 @@
                     "room": "Gateway Park 2 Room 1226",
                     "seats": 28,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
