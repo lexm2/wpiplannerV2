@@ -1,5 +1,5 @@
 {
-  "generated": "Dec 31, 2025, 6:50 PM",
+  "generated": "Dec 31, 2025, 7:13 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -82858,7 +82858,7 @@
                 "number": "D02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course explores different types of story within gaming and other interactivemedia. It delineates between linear, branching, and emergent storytelling,identifies hybrids, and finds new modes of making compelling narrative. Avariety of games are discussed, including early text-based adventures, role-playinggames, shooters, and strategy games. Students will construct characters situations, and narratives through game play and scripted cut scenes. Studentswill explore and use visual storytelling techniques.",
@@ -82877,7 +82877,7 @@
                     "room": "Olin Hall 223",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
