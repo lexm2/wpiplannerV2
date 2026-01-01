@@ -251,7 +251,10 @@ export class CloudStatusButton {
             }
         } else {
             try {
-                // Get local data for initial sync/conflict check
+                // Step 1: Authenticate and handle first-time sync
+                await syncManager.signIn();
+
+                // Step 2: Get local data for conflict check
                 const stateManager = ProfileStateManager.getInstance();
                 const exportedData = await stateManager.exportData();
 
@@ -259,7 +262,7 @@ export class CloudStatusButton {
                     const data = JSON.parse(exportedData);
                     // Convert to SyncData format
                     const syncData = {
-                        version: data.version || '1.0',
+                        version: data.version || '3.0',
                         timestamp: Date.now(),
                         checksum: data.checksum || '',
                         activeScheduleId: data.activeScheduleId || null,
@@ -267,9 +270,11 @@ export class CloudStatusButton {
                         preferences: data.preferences,
                     };
 
-                    await syncManager.handleSignIn(syncData);
-                    logger.log('[CloudStatusButton] Signed in successfully');
+                    // Step 3: Check for conflicts (unified path - same as Mock)
+                    await syncManager.checkConflicts(syncData);
                 }
+
+                logger.log('[CloudStatusButton] Signed in successfully');
             } catch (error) {
                 logger.error('[CloudStatusButton] Sign in failed:', error);
                 this.setState('error');
