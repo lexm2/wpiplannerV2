@@ -418,7 +418,7 @@ export class MockCloudProviderUI {
     }
 
     /**
-     * Handle inject conflict
+     * Handle inject conflict by modifying actual data and recalculating checksum
      */
     private async handleInjectConflict(): Promise<void> {
         const cloudData = this.mockProvider.getSharedCloudData();
@@ -428,12 +428,33 @@ export class MockCloudProviderUI {
         }
 
         if (confirm('Inject a conflict by modifying cloud data?')) {
-            // Modify the cloud data to create a conflict
+            // Modify actual data to create a real conflict
+            const modifiedSchedules = cloudData.schedules.map((schedule, index) => {
+                if (index === 0 && schedule.name) {
+                    return {
+                        ...schedule,
+                        name: schedule.name + ' (Cloud Modified)',  // Visible change
+                    };
+                }
+                return schedule;
+            });
+
             const modifiedData: SyncData = {
                 ...cloudData,
                 timestamp: Date.now(),
-                checksum: this.createConflictingChecksum(cloudData.checksum),
+                schedules: modifiedSchedules,
             };
+
+            // Import checksumCalculator to recalculate checksum
+            const { checksumCalculator } = await import('../services/sync/checksum');
+
+            // Recalculate checksum for modified data
+            modifiedData.checksum = await checksumCalculator.calculateChecksum({
+                version: modifiedData.version,
+                activeScheduleId: modifiedData.activeScheduleId,
+                schedules: modifiedData.schedules,
+                preferences: modifiedData.preferences,
+            });
 
             // Save directly to cloud storage
             const cloudState = {
@@ -443,29 +464,10 @@ export class MockCloudProviderUI {
             };
 
             localStorage.setItem(this.getCloudStorageKey(), JSON.stringify(cloudState));
-            this.addLogEntry('injectConflict', 'success');
+            this.addLogEntry('injectConflict', 'success',
+                `Modified: "${modifiedSchedules[0]?.name}" | Checksum: ${modifiedData.checksum.substring(0, 8)}...`);
             this.refresh();
         }
-    }
-
-    /**
-     * Create a valid but different checksum for conflict simulation
-     */
-    private createConflictingChecksum(originalChecksum: string): string {
-        // Flip hex characters to create different but valid checksum
-        const flipHexChar = (char: string): string => {
-            const value = parseInt(char, 16);
-            return (15 - value).toString(16);
-        };
-
-        // Flip first 8 characters to create noticeable difference
-        const flipped = originalChecksum
-            .substring(0, 8)
-            .split('')
-            .map(flipHexChar)
-            .join('');
-
-        return flipped + originalChecksum.substring(8);
     }
 
     /**
