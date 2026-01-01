@@ -282,6 +282,23 @@ export class SyncManager {
     }
 
     /**
+     * Push local data to cloud immediately (no debounce)
+     * Convenience method for manual/UI-triggered pushes
+     */
+    async pushLocalDataImmediately(): Promise<void> {
+        if (!this.isAuthenticated()) {
+            throw new Error('Not authenticated');
+        }
+
+        const data = await this.getLocalSyncData();
+        if (!data) {
+            throw new Error('No local data to push');
+        }
+
+        await this.pushToCloud(data);
+    }
+
+    /**
      * Check if current provider is authenticated
      */
     isAuthenticated(): boolean {
