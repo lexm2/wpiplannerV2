@@ -9,3 +9,15 @@ const mainController = new MainController();
 
 // Expose main controller globally for development/testing
 (window as any).mainController = mainController;
+
+// Development-only: Enable mock cloud provider if requested
+if (import.meta.env.DEV) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const useMockProvider = urlParams.has('mock') || localStorage.getItem('use-mock-provider') === 'true';
+
+    if (useMockProvider) {
+        import('./dev/enableMockProvider').then(async ({ enableMockProvider }) => {
+            await enableMockProvider();
+        });
+    }
+}
