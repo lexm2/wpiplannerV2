@@ -19,7 +19,7 @@ export class SyncManager {
     private static instance: SyncManager;
     private currentProviderId: string | null = null;
     private status: SyncStatus = 'not_authenticated';
-    private pushDebounceMs = 3000;
+    private pushDebounceMs = 0;
     private pushTimeout: number | null = null;
     private pendingConflict: ConflictInfo | null = null;
     private stateManager: StateManagerInterface | null = null;

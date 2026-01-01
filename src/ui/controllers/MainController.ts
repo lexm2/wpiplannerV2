@@ -703,8 +703,12 @@ export class MainController {
                 });
                 console.log('=== END SCHEDULE SECTION DATA ===\n');
 
-                this.scheduleController.displayScheduleSelectedCourses();
-                this.scheduleController.renderScheduleGrids();
+                // Wrap display operations in batch mode to prevent multiple saves
+                const stateManager = ProfileStateManager.getInstance();
+                stateManager.withBatchSync(() => {
+                    this.scheduleController.displayScheduleSelectedCourses();
+                    this.scheduleController.renderScheduleGrids();
+                });
             });
         }
 

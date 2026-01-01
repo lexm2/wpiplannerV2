@@ -9,6 +9,7 @@ import type {
     ConnectedCalendar,
 } from '../../types';
 import type { Schedule } from '../../../../types/schedule';
+import { ProfileStateManager } from '../../../../core/state/ProfileStateManager';
 
 declare const gapi: any;
 
@@ -107,19 +108,22 @@ export class GoogleCalendarProvider implements CalendarProvider {
             schedulesWithoutCalendar: schedules.filter(s => !s.connectedCalendar).length,
         });
 
-        for (const schedule of schedules) {
-            console.log(`[GoogleCalendarProvider] Schedule "${schedule.name}":`, {
-                id: schedule.id,
-                hasConnectedCalendar: !!schedule.connectedCalendar,
-                connectedCalendar: schedule.connectedCalendar,
-            });
+        const stateManager = ProfileStateManager.getInstance();
+        stateManager.withBatchSync(() => {
+            for (const schedule of schedules) {
+                console.log(`[GoogleCalendarProvider] Schedule "${schedule.name}":`, {
+                    id: schedule.id,
+                    hasConnectedCalendar: !!schedule.connectedCalendar,
+                    connectedCalendar: schedule.connectedCalendar,
+                });
 
-            if (!schedule.connectedCalendar) {
-                updateSchedule(schedule.id, { connectedCalendar: defaultCalendar });
-                connectedCount++;
-                console.log(`[GoogleCalendarProvider] Connected calendar to schedule "${schedule.name}"`);
+                if (!schedule.connectedCalendar) {
+                    updateSchedule(schedule.id, { connectedCalendar: defaultCalendar });
+                    connectedCount++;
+                    console.log(`[GoogleCalendarProvider] Connected calendar to schedule "${schedule.name}"`);
+                }
             }
-        }
+        });
 
         if (connectedCount > 0) {
             console.log(`[GoogleCalendarProvider] Auto-connected ${connectedCount} schedule(s)`);

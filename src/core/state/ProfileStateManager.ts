@@ -926,6 +926,69 @@ export class ProfileStateManager {
         return result;
     }
 
+    /**
+     * Execute multiple state updates in batch mode (single save at end).
+     * Automatically manages batch flag, saves once at completion, and emits sync event.
+     *
+     * @param fn - Function containing batch updates
+     * @returns Result of the batch function
+     *
+     * @example
+     * await profileStateManager.withBatch(async () => {
+     *     for (const course of courses) {
+     *         profileStateManager.selectCourse(course);
+     *     }
+     * });
+     */
+    async withBatch<T>(fn: () => Promise<T>): Promise<T> {
+        const wasBatch = this.isBatchUpdate;
+        if (!wasBatch) {
+            this.isBatchUpdate = true;
+        }
+
+        try {
+            const result = await fn();
+            return result;
+        } finally {
+            if (!wasBatch) {
+                this.isBatchUpdate = false;
+                // Single save after all operations
+                await this.save();
+            }
+        }
+    }
+
+    /**
+     * Synchronous version of withBatch for non-async batch operations.
+     *
+     * @param fn - Function containing batch updates
+     * @returns Result of the batch function
+     *
+     * @example
+     * profileStateManager.withBatchSync(() => {
+     *     for (const course of courses) {
+     *         profileStateManager.selectCourse(course);
+     *     }
+     * });
+     */
+    withBatchSync<T>(fn: () => T): T {
+        const wasBatch = this.isBatchUpdate;
+        if (!wasBatch) {
+            this.isBatchUpdate = true;
+        }
+
+        try {
+            const result = fn();
+            return result;
+        } finally {
+            if (!wasBatch) {
+                this.isBatchUpdate = false;
+                // Fire-and-forget save (non-blocking for sync context)
+                this.save().catch(error => logger.error('Batch save failed:', error));
+            }
+        }
+    }
+
     private updateActiveScheduleWithCurrentCourses(): void {
         if (this.state.activeScheduleId) {
             const activeScheduleIndex = this.state.schedules.findIndex(s => s.id === this.state.activeScheduleId);

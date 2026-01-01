@@ -375,4 +375,231 @@ describe('ProfileStateManager', () => {
       expect(state.selectedCourses.length).toBe(10)
     })
   })
+
+  describe('Batch Operations API', () => {
+    it('withBatch should execute multiple operations with single save', async () => {
+      const saveSpy = spyOn(profileStateManager, 'save')
+
+      await profileStateManager.withBatch(async () => {
+        // Select multiple courses
+        profileStateManager.selectCourse(mockCourse, false, 'test')
+        profileStateManager.selectCourse({
+          ...mockCourse,
+          id: 'CS-102',
+          number: '102'
+        }, false, 'test')
+        profileStateManager.selectCourse({
+          ...mockCourse,
+          id: 'CS-103',
+          number: '103'
+        }, false, 'test')
+      })
+
+      // Should have 3 courses selected
+      const state = profileStateManager.getState()
+      expect(state.selectedCourses.length).toBe(3)
+
+      // Should have called save exactly once (at the end)
+      expect(saveSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('withBatch should return value from batch function', async () => {
+      const result = await profileStateManager.withBatch(async () => {
+        profileStateManager.selectCourse(mockCourse, false, 'test')
+        return 'test-result'
+      })
+
+      expect(result).toBe('test-result')
+    })
+
+    it('withBatch should handle errors and still restore batch flag', async () => {
+      const saveSpy = spyOn(profileStateManager, 'save')
+
+      await expect(async () => {
+        await profileStateManager.withBatch(async () => {
+          profileStateManager.selectCourse(mockCourse, false, 'test')
+          throw new Error('Test error')
+        })
+      }).toThrow('Test error')
+
+      // Should have selected the course before error
+      const state = profileStateManager.getState()
+      expect(state.selectedCourses.length).toBe(1)
+
+      // Save should still be called despite error
+      expect(saveSpy).toHaveBeenCalled()
+    })
+
+    it('withBatchSync should execute synchronous batch operations', () => {
+      const saveSpy = spyOn(profileStateManager, 'save')
+
+      const result = profileStateManager.withBatchSync(() => {
+        // Select multiple courses synchronously
+        profileStateManager.selectCourse(mockCourse, false, 'test')
+        profileStateManager.selectCourse({
+          ...mockCourse,
+          id: 'CS-102',
+          number: '102'
+        }, false, 'test')
+        return 42
+      })
+
+      // Should return value
+      expect(result).toBe(42)
+
+      // Should have 2 courses selected
+      const state = profileStateManager.getState()
+      expect(state.selectedCourses.length).toBe(2)
+
+      // Save should be called (fire-and-forget for sync)
+      expect(saveSpy).toHaveBeenCalled()
+    })
+
+    it('nested withBatch calls should work correctly', async () => {
+      const saveSpy = spyOn(profileStateManager, 'save')
+
+      await profileStateManager.withBatch(async () => {
+        profileStateManager.selectCourse(mockCourse, false, 'test')
+
+        // Nested batch should not trigger additional saves
+        await profileStateManager.withBatch(async () => {
+          profileStateManager.selectCourse({
+            ...mockCourse,
+            id: 'CS-102',
+            number: '102'
+          }, false, 'test')
+        })
+
+        profileStateManager.selectCourse({
+          ...mockCourse,
+          id: 'CS-103',
+          number: '103'
+        }, false, 'test')
+      })
+
+      // Should have 3 courses
+      const state = profileStateManager.getState()
+      expect(state.selectedCourses.length).toBe(3)
+
+      // Should only save once (outer batch)
+      expect(saveSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('withBatch should suppress individual save events during batch', async () => {
+      const syncEventBusSpy = spyOn(require('../../../src/services/sync/SyncEventBus').syncEventBus, 'emitEvent')
+
+      await profileStateManager.withBatch(async () => {
+        profileStateManager.selectCourse(mockCourse, false, 'test')
+        profileStateManager.selectCourse({
+          ...mockCourse,
+          id: 'CS-102',
+          number: '102'
+        }, false, 'test')
+      })
+
+      // Should only emit sync event once at the end
+      const saveCompletedEvents = syncEventBusSpy.mock.calls.filter(
+        call => call[0] === 'local-save-completed'
+      )
+      expect(saveCompletedEvents.length).toBe(1)
+    })
+
+    it('withBatch with complex operations should maintain data integrity', async () => {
+      const schedule1 = profileStateManager.createSchedule('Schedule 1', 'test')
+      const schedule2 = profileStateManager.createSchedule('Schedule 2', 'test')
+
+      const result = await profileStateManager.withBatch(async () => {
+        // Switch schedules
+        profileStateManager.setActiveSchedule(schedule1.id, 'test')
+
+        // Add courses
+        profileStateManager.selectCourse(mockCourse, true, 'test')
+        profileStateManager.selectCourse({
+          ...mockCourse,
+          id: 'CS-102',
+          number: '102'
+        }, false, 'test')
+
+        // Switch to another schedule
+        profileStateManager.setActiveSchedule(schedule2.id, 'test')
+
+        // Add different course
+        profileStateManager.selectCourse({
+          ...mockCourse,
+          id: 'CS-103',
+          number: '103'
+        }, true, 'test')
+
+        return 'batch-completed'
+      })
+
+      expect(result).toBe('batch-completed')
+
+      const state = profileStateManager.getState()
+
+      // Should be on schedule2
+      expect(state.activeScheduleId).toBe(schedule2.id)
+
+      // Current courses should be from schedule2
+      expect(state.selectedCourses.length).toBe(1)
+      expect(state.selectedCourses[0].course.id).toBe('CS-103')
+
+      // Schedule1 should have its own courses stored
+      const storedSchedule1 = state.schedules.find(s => s.id === schedule1.id)
+      expect(storedSchedule1?.selectedCourses.length).toBe(2)
+    })
+
+    it('withBatchSync should handle errors gracefully', () => {
+      const saveSpy = spyOn(profileStateManager, 'save')
+
+      expect(() => {
+        profileStateManager.withBatchSync(() => {
+          profileStateManager.selectCourse(mockCourse, false, 'test')
+          throw new Error('Sync error')
+        })
+      }).toThrow('Sync error')
+
+      // Course should still be selected
+      const state = profileStateManager.getState()
+      expect(state.selectedCourses.length).toBe(1)
+
+      // Save should be called despite error
+      expect(saveSpy).toHaveBeenCalled()
+    })
+
+    it('empty batch should not trigger unnecessary saves', async () => {
+      const saveSpy = spyOn(profileStateManager, 'save')
+
+      await profileStateManager.withBatch(async () => {
+        // Do nothing
+      })
+
+      // Save should still be called once (for consistency)
+      expect(saveSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('batch operations should emit state change events correctly', async () => {
+      const listeners: StateChangeEvent[] = []
+      profileStateManager.addListener((event) => listeners.push(event))
+
+      await profileStateManager.withBatch(async () => {
+        profileStateManager.selectCourse(mockCourse, false, 'test')
+        profileStateManager.selectCourse({
+          ...mockCourse,
+          id: 'CS-102',
+          number: '102'
+        }, false, 'test')
+      })
+
+      await waitForEvents()
+
+      // Should have received course change events
+      const courseChangeEvents = listeners.filter(e => e.type === 'courses_changed')
+      expect(courseChangeEvents.length).toBeGreaterThan(0)
+
+      // Should have received save state changed event
+      const saveStateEvents = listeners.filter(e => e.type === 'save_state_changed')
+      expect(saveStateEvents.length).toBeGreaterThan(0)
+    })
+  })
 })
