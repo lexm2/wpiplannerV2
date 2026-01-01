@@ -99,28 +99,74 @@ export class SyncManager {
     }
 
     /**
-     * Handle sign-in: check for conflicts and resolve
-     * Returns the conflict info if there's a conflict, null otherwise
+     * Sign in to cloud provider and handle first-time sync
      */
-    async handleSignIn(localData: SyncData): Promise<ConflictInfo | null> {
+    async signIn(): Promise<void> {
         const provider = this.getCurrentProvider();
         if (!provider) {
             throw new Error('No provider set');
         }
 
         try {
+            // Authenticate
             await provider.signIn();
             this.updateStatus();
 
+            // Check if cloud has data
+            const cloudData = await provider.pullData();
+            console.log('[SyncManager] Pulled cloud data:', cloudData);
+
+            // If no cloud file exists (first time), push local data
+            if (!cloudData) {
+                console.log('[SyncManager] No cloud file found, pushing local for first time');
+                const localData = await this.getLocalSyncData();
+                if (localData) {
+                    await provider.pushData(localData);
+                    syncEventBus.emitEvent('sync-pushed', { source: 'initial' });
+                }
+            }
+
+        } catch (error) {
+            this.status = 'error';
+            syncEventBus.emitEvent('sync-failed', undefined, error as Error);
+            throw error;
+        }
+    }
+
+    /**
+     * Handle sign-in with conflict detection (unified flow)
+     * @deprecated Use signIn() followed by checkConflicts() for better separation
+     */
+    async handleSignIn(localData: SyncData): Promise<ConflictInfo | null> {
+        // Sign in first
+        await this.signIn();
+
+        // Then check for conflicts
+        return await this.checkConflicts(localData);
+    }
+
+    /**
+     * Check for conflicts between local and cloud data (pull-based workflow)
+     * Returns the conflict info if there's a conflict, null otherwise
+     */
+    async checkConflicts(localData: SyncData): Promise<ConflictInfo | null> {
+        const provider = this.getCurrentProvider();
+        if (!provider) {
+            throw new Error('No provider set');
+        }
+
+        if (!provider.isAuthenticated()) {
+            throw new Error('Not authenticated');
+        }
+
+        try {
             // Pull cloud data to check for conflicts
             const cloudData = await provider.pullData();
             console.log('[SyncManager] Pulled cloud data:', cloudData);
 
-            // If no cloud file exists (first time), just push local
+            // If no cloud file exists, no conflict
             if (!cloudData) {
-                console.log('[SyncManager] No cloud file found, pushing local for first time');
-                await provider.pushData(localData);
-                syncEventBus.emitEvent('sync-pushed', { source: 'initial' });
+                console.log('[SyncManager] No cloud file found');
                 return null;
             }
 
@@ -136,10 +182,8 @@ export class SyncManager {
             }
 
             // Checksums match - data is identical, already synced
-            // No need to push, just update status
             console.log('[SyncManager] Checksums match, data already synced');
             this.status = 'idle';
-            syncEventBus.emitEvent('sync-pushed', { source: 'already-synced', skipped: true });
             return null;
 
         } catch (error) {

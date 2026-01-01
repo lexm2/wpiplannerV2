@@ -2,6 +2,7 @@ import type { MockCloudProvider } from '../../tests/mocks/MockCloudProvider';
 import type { SyncManager } from '../services/sync/SyncManager';
 import { syncEventBus } from '../services/sync/SyncEventBus';
 import type { SyncEvent, SyncData } from '../services/sync/types';
+import { ProfileStateManager } from '../core/state/ProfileStateManager';
 
 interface OperationLogEntry {
     timestamp: number;
@@ -355,12 +356,37 @@ export class MockCloudProviderUI {
     }
 
     /**
-     * Handle pull data
+     * Handle pull data with conflict detection
      */
     private async handlePullData(): Promise<void> {
         try {
-            const data = await this.mockProvider.pullData();
-            this.addLogEntry('pullData', 'success', data ? 'Data retrieved' : 'No cloud data');
+            // Get local data from ProfileStateManager
+            const stateManager = ProfileStateManager.getInstance();
+            const exportedData = await stateManager.exportData();
+
+            if (!exportedData) {
+                this.addLogEntry('pullData', 'error', 'No local data to compare');
+                return;
+            }
+
+            const data = JSON.parse(exportedData);
+            const localData: SyncData = {
+                version: data.version || '3.0',
+                timestamp: Date.now(),
+                checksum: data.checksum || '',
+                activeScheduleId: data.activeScheduleId || null,
+                schedules: data.schedules || [],
+                preferences: data.preferences,
+            };
+
+            // Check for conflicts on pull
+            const conflictInfo = await this.syncManager.checkConflicts(localData);
+
+            if (conflictInfo) {
+                this.addLogEntry('pullData', 'success', `Conflict detected! Local: ${localData.checksum.substring(0, 8)}... vs Cloud: ${conflictInfo.cloudData.checksum.substring(0, 8)}...`);
+            } else {
+                this.addLogEntry('pullData', 'success', 'No conflicts - data in sync');
+            }
         } catch (error) {
             this.addLogEntry('pullData', 'error', error instanceof Error ? error.message : 'Unknown error');
         }
