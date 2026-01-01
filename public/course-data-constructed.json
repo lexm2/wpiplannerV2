@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 1, 2026, 10:53 PM",
+  "generated": "Jan 1, 2026, 11:16 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -62800,7 +62800,7 @@
                 "number": "D02",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course introduces the student to a variety of critical perspectives necessary to an understanding and appreciation of the major forms, or genres, of literary expression (e.g., novel, short story, poetry, drama, and essay). Writing and class discussion will be integral parts of this course.",
@@ -62819,7 +62819,7 @@
                     "room": "Higgins Labs 114",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
