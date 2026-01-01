@@ -197,7 +197,7 @@ export class ProgressiveRenderer {
                                 </button>
                                 <div class="course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
                                 <div class="course-name">
-                                    ${Validators.escapeHtml(course.name)}
+                                    <span class="course-name-text">${Validators.escapeHtml(course.name)}</span>
                                     ${hasWarning ? `<span class="capacity-badge">At capacity</span>` : ''}
                                 </div>
                             </div>
