@@ -6935,7 +6935,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336931"
     },
     {
@@ -34075,7 +34075,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Computer Science; Data Science",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338751"
     },
     {
@@ -35319,7 +35319,7 @@
       "Course_Title": "DS 1010 - Data Science I: Introduction To Data Science",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "33/50",
+      "Enrolled_Capacity": "34/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Torumoy Ghoshal",
       "Locations": "Salisbury Labs 402",
@@ -36149,7 +36149,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Computer Science; Data Science",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338751"
     },
     {
@@ -100698,7 +100698,7 @@
       "Course_Title": "PH 1110 - General Physics-Mechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "30/30",
+      "Enrolled_Capacity": "29/30",
       "Instructional_Format": "Discussion",
       "Instructors": "Qi Wen",
       "Locations": "Olin Hall 126",
@@ -100706,7 +100706,7 @@
       "Meeting_Patterns": "T-R | 2:00 PM - 2:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Olin Hall 126 | T-R | 2:00 PM - 2:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: PH 1110 - General Physics-Mechanics (b)",
       "Subject": "Physics",
@@ -100815,7 +100815,7 @@
       "Course_Title": "PH 1110 - General Physics-Mechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "17/30",
+      "Enrolled_Capacity": "18/30",
       "Instructional_Format": "Discussion",
       "Instructors": "Qi Wen",
       "Locations": "Olin Hall 126",
@@ -109197,7 +109197,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Psychology",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338521"
     },
     {
