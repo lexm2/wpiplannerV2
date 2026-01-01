@@ -916,6 +916,27 @@ export class CourseSelectionService {
                         });
                     }, 10);
                     break;
+                case 'schedule_changed':
+                    // Handle imported data - trigger complete UI refresh
+                    if (event.data?.action === 'imported') {
+                        const importedCourses = this.profileStateManager.getSelectedCourses();
+
+                        // Clear and reload pattern for complete sync
+                        this.notifySelectionListeners({
+                            type: 'selection_cleared',
+                            selectedCourses: [],
+                            timestamp: event.timestamp
+                        });
+
+                        setTimeout(() => {
+                            this.notifySelectionListeners({
+                                type: 'data_loaded',
+                                selectedCourses: importedCourses,
+                                timestamp: event.timestamp + 1
+                            });
+                        }, 10);
+                    }
+                    break;
             }
         };
 
