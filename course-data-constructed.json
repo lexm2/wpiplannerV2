@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 1, 2026, 4:21 PM",
+  "generated": "Jan 1, 2026, 4:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -49029,7 +49029,7 @@
                 "number": "D01",
                 "seats": 95,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course provides an introduction to modern cryptography and communication security. It focuses on how cryptographic algorithms and protocols work and how to use them. The course covers the concepts of block ciphers and message authentication codes, public key encryption, digital signatures, and key establishment, as well as common examples and uses of such schemes, including the AES, RSA-OAEP, and the Digital Signature Algorithm. Basic cryptanalytic techniques and examples of practical security solutions are explored to understand how to design and evaluate modern security solutions. The course is suited for students interested in cryptography or other security related fields such as trusted computing, network and OS security, or general IT security. Recommended background: Experience in expressing algorithms in a modern programming language (e.g., ECE 2049 or CS 2301). Suggested background: Discrete mathematics (CS 2022/MA 2201 or equivalent).",
@@ -49048,7 +49048,7 @@
                     "room": "Unity Hall 500",
                     "seats": 95,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -59399,7 +59399,7 @@
                 "number": "D01",
                 "seats": 95,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course provides an introduction to modern cryptography and communication security. It focuses on how cryptographic algorithms and protocols work and how to use them. The course covers the concepts of block ciphers and message authentication codes, public key encryption, digital signatures, and key establishment, as well as common examples and uses of such schemes, including the AES, RSA-OAEP, and the Digital Signature Algorithm. Basic cryptanalytic techniques and examples of practical security solutions are explored to understand how to design and evaluate modern security solutions. The course is suited for students interested in cryptography or other security related fields such as trusted computing, network and OS security, or general IT security. Recommended background: Experience in expressing algorithms in a modern programming language (e.g., ECE 2049 or CS 2301). Suggested background: Discrete mathematics (CS 2022/MA 2201 or equivalent).",
@@ -59418,7 +59418,7 @@
                     "room": "Unity Hall 500",
                     "seats": 95,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -177733,7 +177733,7 @@
                 "crn": 337645,
                 "number": "S01",
                 "seats": 50,
-                "seatsAvailable": 35,
+                "seatsAvailable": 34,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -177752,7 +177752,7 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 50,
-                    "seatsAvailable": 35,
+                    "seatsAvailable": 34,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
