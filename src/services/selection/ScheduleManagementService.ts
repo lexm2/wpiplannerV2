@@ -651,56 +651,53 @@ export class ScheduleManagementService {
             const importedSchedules: any[] = [];
             const errors: string[] = [];
 
-            // Import each schedule
-            for (const scheduleData of schedulesToImport) {
-                // Validate imported schedule
-                const validation = this.dataValidator.validateSchedule(scheduleData);
-                if (!validation.valid) {
-                    errors.push(`Schedule "${scheduleData.name}" validation failed: ${validation.errors.map(e => e.message).join(', ')}`);
-                    continue;
-                }
-
-                // Resolve name conflicts automatically
-                const uniqueName = this.generateUniqueScheduleName(scheduleData.name);
-
-                // Create schedule
-                let importedSchedule;
-                try {
-                    importedSchedule = this.profileStateManager.createSchedule(uniqueName, 'api');
-                } catch (createError) {
-                    errors.push(`Failed to import schedule "${scheduleData.name}": ${createError}`);
-                    continue;
-                }
-
-                // Update with imported courses and generated schedules
-                if (scheduleData.selectedCourses && scheduleData.selectedCourses.length > 0) {
-                    const updateResult = await this.updateScheduleCourses(importedSchedule.id, scheduleData.selectedCourses);
-                    if (!updateResult.success) {
-                        errors.push(`Schedule "${scheduleData.name}" imported but failed to add courses: ${updateResult.error}`);
+            await this.profileStateManager.withBatch(async () => {
+                // Import each schedule
+                for (const scheduleData of schedulesToImport) {
+                    // Validate imported schedule
+                    const validation = this.dataValidator.validateSchedule(scheduleData);
+                    if (!validation.valid) {
+                        errors.push(`Schedule "${scheduleData.name}" validation failed: ${validation.errors.map(e => e.message).join(', ')}`);
                         continue;
                     }
+
+                    // Resolve name conflicts automatically
+                    const uniqueName = this.generateUniqueScheduleName(scheduleData.name);
+
+                    // Create schedule
+                    let importedSchedule;
+                    try {
+                        importedSchedule = this.profileStateManager.createSchedule(uniqueName, 'api');
+                    } catch (createError) {
+                        errors.push(`Failed to import schedule "${scheduleData.name}": ${createError}`);
+                        continue;
+                    }
+
+                    // Update with imported courses and generated schedules
+                    if (scheduleData.selectedCourses && scheduleData.selectedCourses.length > 0) {
+                        const updateResult = await this.updateScheduleCourses(importedSchedule.id, scheduleData.selectedCourses);
+                        if (!updateResult.success) {
+                            errors.push(`Schedule "${scheduleData.name}" imported but failed to add courses: ${updateResult.error}`);
+                            continue;
+                        }
+                    }
+
+                    // Copy generated schedules if present
+                    if (scheduleData.generatedSchedules && scheduleData.generatedSchedules.length > 0) {
+                        importedSchedule.generatedSchedules = [...scheduleData.generatedSchedules];
+                    }
+
+                    importedSchedules.push(importedSchedule);
                 }
+            });
 
-                // Copy generated schedules if present
-                if (scheduleData.generatedSchedules && scheduleData.generatedSchedules.length > 0) {
-                    importedSchedule.generatedSchedules = [...scheduleData.generatedSchedules];
-                }
-
-                importedSchedules.push(importedSchedule);
-
-                // Notify listeners
+            // Single listener notification for all imported schedules
+            for (const schedule of importedSchedules) {
                 this.notifyScheduleListeners({
                     type: 'schedule_created',
-                    schedule: importedSchedule,
+                    schedule: schedule,
                     timestamp: Date.now()
                 });
-            }
-
-            // Auto-save
-            try {
-                await this.profileStateManager.save();
-            } catch (error) {
-                console.warn('Failed to auto-save after schedule import:', error);
             }
 
             if (importedSchedules.length === 0) {

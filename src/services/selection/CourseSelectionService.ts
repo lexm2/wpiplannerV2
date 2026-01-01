@@ -303,16 +303,19 @@ export class CourseSelectionService {
         try {
             const selectedCourses = this.profileStateManager.getSelectedCourses();
 
-            for (const selectedCourse of selectedCourses) {
-                this.profileStateManager.setSelectedComponents(
-                    selectedCourse.course,
-                    null,
-                    null,
-                    null,
-                    'service'
-                );
-            }
+            await this.profileStateManager.withBatch(async () => {
+                for (const selectedCourse of selectedCourses) {
+                    this.profileStateManager.setSelectedComponents(
+                        selectedCourse.course,
+                        null,
+                        null,
+                        null,
+                        'service'
+                    );
+                }
+            });
 
+            // Single listener notification
             this.notifySelectionListeners({
                 type: 'components_cleared',
                 selectedCourses: this.profileStateManager.getSelectedCourses(),
@@ -404,13 +407,7 @@ export class CourseSelectionService {
                 }
             }
 
-            // Track if we're in a batch update (suspend individual listener notifications)
-            const wasBatchUpdate = (this.profileStateManager as any).isBatchUpdate;
-            if (!wasBatchUpdate) {
-                (this.profileStateManager as any).isBatchUpdate = true;
-            }
-
-            try {
+            await this.profileStateManager.withBatch(async () => {
                 // Apply all component updates
                 for (const selection of selections) {
                     this.profileStateManager.setSelectedComponents(
@@ -421,12 +418,7 @@ export class CourseSelectionService {
                         'service'
                     );
                 }
-            } finally {
-                // Restore batch update flag
-                if (!wasBatchUpdate) {
-                    (this.profileStateManager as any).isBatchUpdate = false;
-                }
-            }
+            });
 
             // Emit a single event for all changes
             this.notifySelectionListeners({
@@ -434,15 +426,6 @@ export class CourseSelectionService {
                 selectedCourses: this.profileStateManager.getSelectedCourses(),
                 timestamp: Date.now()
             });
-
-            // Trigger a single save after batch completes (which will emit sync event)
-            // Fire and forget - don't block UI waiting for save to complete
-            // This ensures cloud sync only happens once per batch instead of N times
-            if (!wasBatchUpdate) {
-                this.profileStateManager.save().catch(error =>
-                    console.error('Error saving after batch update:', error)
-                );
-            }
 
             return {
                 success: true
