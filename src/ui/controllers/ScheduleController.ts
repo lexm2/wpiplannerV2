@@ -55,6 +55,10 @@ export class ScheduleController {
     private sidebarManager: SidebarManager;
     private modalService: ModalService | null = null;
 
+    // Performance optimization: Caching infrastructure for grid rendering
+    private cellContentCache: Map<string, any> = new Map();
+    private currentCacheKey: string = '';
+
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
         this.sidebarManager = new SidebarManager('schedule-sidebar-content');
@@ -1193,9 +1197,17 @@ export class ScheduleController {
         this.syncSectionObjects(rawSelectedCourses);
 
         const selectedCourses = validateSelectedCourses(rawSelectedCourses);
+
+        // Performance optimization: Invalidate cache if schedule changed
+        const cacheKey = this.generateCacheKey(selectedCourses);
+        if (cacheKey !== this.currentCacheKey) {
+            this.cellContentCache.clear();
+            this.currentCacheKey = cacheKey;
+        }
+
         const grids = ['A', 'B', 'C', 'D'];
-        
-        
+
+
         grids.forEach(term => {
             const gridContainer = document.getElementById(`schedule-grid-${term}`);
             if (!gridContainer) return;
@@ -1315,6 +1327,14 @@ export class ScheduleController {
     }
 
     private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number, calendarSlots: DisplayableTimeSlot[] = []): { content: string, classes: string } {
+        // Performance optimization: Check cache first
+        const calendarKey = calendarSlots.map(cs => cs.id).sort().join(',');
+        const cacheKey = `${day}-${timeSlot}-${calendarKey}`;
+
+        if (this.cellContentCache.has(cacheKey)) {
+            return this.cellContentCache.get(cacheKey);
+        }
+
         // Find all sections that occupy this cell
         const occupyingSections: any[] = [];
         // Find calendar slots that occupy this cell
@@ -1591,7 +1611,12 @@ export class ScheduleController {
             `occupied section-start ${hasConflict ? 'has-conflict' : ''}` :
             '';
 
-        return { content: contentBlocks, classes };
+        const result = { content: contentBlocks, classes };
+
+        // Performance optimization: Store result in cache
+        this.cellContentCache.set(cacheKey, result);
+
+        return result;
     }
 
     private getCourseColor(courseId: string): string {
@@ -1953,6 +1978,8 @@ export class ScheduleController {
     private async handlePrevSchedule(): Promise<void> {
         if (this.generatedSchedules.length === 0) return;
 
+        const startTime = performance.now();
+
         // Wrap to last if at first
         if (this.currentScheduleIndex === 0) {
             this.currentScheduleIndex = this.generatedSchedules.length - 1;
@@ -1962,10 +1989,15 @@ export class ScheduleController {
 
         await this.applyScheduleAtIndex(this.currentScheduleIndex);
         this.updateAutoScheduleButtonUI();
+
+        const totalTime = performance.now() - startTime;
+        console.log(`[PERF] handlePrevSchedule total: ${totalTime.toFixed(2)}ms`);
     }
 
     private async handleNextSchedule(): Promise<void> {
         if (this.generatedSchedules.length === 0) return;
+
+        const startTime = performance.now();
 
         // Wrap to first if at last
         if (this.currentScheduleIndex >= this.generatedSchedules.length - 1) {
@@ -1976,6 +2008,9 @@ export class ScheduleController {
 
         await this.applyScheduleAtIndex(this.currentScheduleIndex);
         this.updateAutoScheduleButtonUI();
+
+        const totalTime = performance.now() - startTime;
+        console.log(`[PERF] handleNextSchedule total: ${totalTime.toFixed(2)}ms`);
     }
 
     private async handleAutoSchedule(): Promise<void> {
@@ -2135,6 +2170,16 @@ export class ScheduleController {
             let autoFilledCount = 0;
             let lockedCount = 0;
 
+            const batchStartTime = performance.now();
+
+            // Collect all component selections for batch update
+            const selections: Array<{
+                course: any;
+                lecture: any;
+                discussion: any;
+                lab: any;
+            }> = [];
+
             for (const result of schedule) {
                 const courseName = `${result.course.department.abbreviation}${result.course.number}`;
                 const lectureInfo = result.combination.lecture
@@ -2155,22 +2200,54 @@ export class ScheduleController {
                     continue;
                 }
 
-                await this.courseSelectionService.setSelectedComponents(
-                    result.course,
-                    result.combination.lecture,
-                    result.combination.discussion,
-                    result.combination.lab
-                );
+                // Add to batch instead of updating individually
+                selections.push({
+                    course: result.course,
+                    lecture: result.combination.lecture,
+                    discussion: result.combination.discussion,
+                    lab: result.combination.lab
+                });
                 autoFilledCount++;
             }
 
+            // Apply all selections in a single batch
+            if (selections.length > 0) {
+                await this.courseSelectionService.batchSetSelectedComponents(selections);
+            }
+
+            const batchTime = performance.now() - batchStartTime;
+            console.log(`[PERF] Batch update: ${batchTime.toFixed(2)}ms`);
+
             console.log(`[Auto-Schedule] COMPLETE: ${autoFilledCount} auto-filled, ${lockedCount} locked`);
 
+            const sidebarStartTime = performance.now();
             this.displayScheduleSelectedCourses();
+            const sidebarTime = performance.now() - sidebarStartTime;
+            console.log(`[PERF] displayScheduleSelectedCourses: ${sidebarTime.toFixed(2)}ms`);
+
+            const gridStartTime = performance.now();
             this.renderScheduleGrids();
+            const gridTime = performance.now() - gridStartTime;
+            console.log(`[PERF] renderScheduleGrids: ${gridTime.toFixed(2)}ms`);
         } finally {
             this.isApplyingAutoSchedule = false;
         }
+    }
+
+    // Performance optimization: Generate cache key for invalidation
+    private generateCacheKey(selectedCourses: SelectedCourse[]): string {
+        const courseKeys = selectedCourses
+            .map(sc => {
+                const lectureId = sc.selectedLecture?.crn || 'none';
+                const discussionId = sc.selectedDiscussion?.crn || 'none';
+                const labId = sc.selectedLab?.crn || 'none';
+                const sectionId = sc.selectedSectionNumber || 'none';
+                return `${sc.course.id}-${lectureId}-${discussionId}-${labId}-${sectionId}`;
+            })
+            .sort()
+            .join('|');
+
+        return courseKeys;
     }
 
 }
