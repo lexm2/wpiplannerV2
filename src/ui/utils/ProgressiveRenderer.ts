@@ -198,7 +198,6 @@ export class ProgressiveRenderer {
                                 <div class="course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
                                 <div class="course-name">
                                     <span class="course-name-text">${Validators.escapeHtml(course.name)}</span>
-                                    ${hasWarning ? `<span class="capacity-badge">At capacity</span>` : ''}
                                 </div>
                             </div>
                             ${(() => {
@@ -273,8 +272,11 @@ export class ProgressiveRenderer {
                                     </div>`;
                                 }).join('');
 
+                                const capacityBadgeHtml = hasWarning ? `<span class="capacity-badge">At capacity</span>` : '';
+
                                 return `<div class="course-sections" data-course-id="${Validators.escapeHtml(course.id)}">
                                     <div class="term-badges-container" style="opacity: 1; transform: translateX(0);">
+                                        ${capacityBadgeHtml}
                                         ${termBadgesHtml}
                                     </div>
                                     ${termSectionsHtml}
