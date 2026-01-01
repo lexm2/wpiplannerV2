@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 1, 2026, 9:54 AM",
+  "generated": "Jan 1, 2026, 10:19 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -73270,7 +73270,7 @@
                 "number": "C01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IAn introduction to historical analysis through selected periods or themes in thehistory of America before the Civil War. A variety of readings will reflect thevarious ways that historians have attempted to understand the development ofAmerica.",
@@ -73289,7 +73289,7 @@
                     "room": "Kaven Hall 115",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -237634,8 +237634,8 @@
                 "crn": 336218,
                 "number": "C05",
                 "seats": 25,
-                "seatsAvailable": 5,
-                "actualWaitlist": 1,
+                "seatsAvailable": 6,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Students at the Advanced level will explore a wider variety of literature (poetry, biographies, short stories), cultural readings, and short films produced in Spanish-speaking contexts to study critical historical, cultural, and social events related to the Hispanic world. Students will also review advanced vocabulary and grammar structures to connect and express ideas into a paragraph length in both oral and written discourses. At the end of the course, students will be able to produce basic academic texts and presentations to summarize, narrate, describe, and express their opinions about different topics and social issues. This course is closed to native speakers of Spanish and heritage speakers except with written permission from the instructor. Recommended background SP 2522",
@@ -237653,8 +237653,8 @@
                     "building": "",
                     "room": "Higgins Labs 114",
                     "seats": 25,
-                    "seatsAvailable": 5,
-                    "actualWaitlist": 1,
+                    "seatsAvailable": 6,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C05",
                     "days": [

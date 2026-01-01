@@ -52179,10 +52179,10 @@
       "Meeting_Patterns": "M-T-R-F | 3:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Kaven Hall 115 | M-T-R-F | 3:00 PM - 3:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "History",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336545"
     },
     {
@@ -116320,7 +116320,7 @@
       "Course_Title": "SP 3521 - Advanced Spanish I: Exploring Complex Language and Culture",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/25",
+      "Enrolled_Capacity": "19/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Ingrid Matos-Nin",
       "Locations": "Higgins Labs 114",
@@ -116331,7 +116331,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Spanish",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336218"
     },
     {
