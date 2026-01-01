@@ -428,12 +428,17 @@ export class MockCloudProviderUI {
         }
 
         if (confirm('Inject a conflict by modifying cloud data?')) {
-            // Modify actual data to create a real conflict
+            // Toggle "(Cloud Modified)" suffix on the first schedule's name
+            const suffix = ' (Cloud Modified)';
             const modifiedSchedules = cloudData.schedules.map((schedule, index) => {
                 if (index === 0 && schedule.name) {
+                    const newName = schedule.name.endsWith(suffix)
+                        ? schedule.name.slice(0, -suffix.length)  // Remove suffix if present
+                        : schedule.name + suffix;                 // Add suffix if not present
+
                     return {
                         ...schedule,
-                        name: schedule.name + ' (Cloud Modified)',  // Visible change
+                        name: newName,
                     };
                 }
                 return schedule;
@@ -464,8 +469,9 @@ export class MockCloudProviderUI {
             };
 
             localStorage.setItem(this.getCloudStorageKey(), JSON.stringify(cloudState));
+            const action = modifiedSchedules[0]?.name?.endsWith(suffix) ? 'Added' : 'Removed';
             this.addLogEntry('injectConflict', 'success',
-                `Modified: "${modifiedSchedules[0]?.name}" | Checksum: ${modifiedData.checksum.substring(0, 8)}...`);
+                `${action} "${suffix.trim()}" | Checksum: ${modifiedData.checksum.substring(0, 8)}...`);
             this.refresh();
         }
     }

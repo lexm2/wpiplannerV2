@@ -89,6 +89,11 @@ export class MockCloudProvider implements CloudProvider {
         this.callHistory.initialize++;
         await this.simulateNetworkDelay();
         this.initialized = true;
+
+        // If we restored authentication state from localStorage, notify subscribers
+        if (this.config.useLocalStorage && this.authenticated) {
+            syncEventBus.emitEvent('auth-changed', { authenticated: true });
+        }
     }
 
     dispose(): void {

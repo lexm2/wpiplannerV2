@@ -45,7 +45,7 @@ interface StateConfig {
  */
 export class CloudStatusButton {
     private buttonElement: HTMLButtonElement | null = null;
-    private currentState: ButtonState = 'unauthenticated';
+    private currentState: ButtonState;
     private transitionTimer: number | null = null;
     private pendingState: ButtonState | null = null;
 
@@ -115,6 +115,9 @@ export class CloudStatusButton {
     };
 
     constructor(containerId: string) {
+        // Set initial state based on actual authentication status
+        this.currentState = this.getInitialState();
+
         this.updateStateConfigsForProvider();
         this.render(containerId);
         this.setupEventListeners();
@@ -303,6 +306,25 @@ export class CloudStatusButton {
                 this.transitionToIdleState();
             }, config.timeout);
         }
+    }
+
+    /**
+     * Determine initial button state based on current provider authentication
+     */
+    private getInitialState(): ButtonState {
+        const provider = syncManager.getCurrentProvider();
+
+        // No provider configured
+        if (!provider) {
+            return 'unauthenticated';
+        }
+
+        // Check if authenticated
+        if (syncManager.isAuthenticated()) {
+            return 'authenticated-idle';
+        }
+
+        return 'unauthenticated';
     }
 
     /**
