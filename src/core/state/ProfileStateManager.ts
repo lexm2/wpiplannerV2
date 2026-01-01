@@ -45,6 +45,7 @@ export class ProfileStateManager {
     private pendingSavePromises = new Set<Promise<void>>();
     private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
     private modalService: ModalService | null = null;
+    public isBatchUpdate = false; // Flag to suppress individual event emissions during batch updates
 
     private constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
@@ -579,27 +580,6 @@ export class ProfileStateManager {
                 );
             }
 
-            logger.log('%cSAVING TO STORAGE', 'color: #4CAF50; font-weight: bold; font-size: 14px');
-            logger.log('Active Schedule ID:', this.state.activeScheduleId);
-            logger.log('Number of Schedules:', this.state.schedules.length);
-
-            // Log what we're about to save
-            const dataToSave = {
-                activeScheduleId: this.state.activeScheduleId,
-                schedules: this.state.schedules.map(s => ({
-                    id: s.id,
-                    name: s.name,
-                    selectedCourses: s.selectedCourses.map(sc => ({
-                        courseId: sc.course.id,
-                        courseName: `${sc.course.department.abbreviation}${sc.course.number}`,
-                        selectedSection: sc.selectedSectionNumber,
-                        isRequired: sc.isRequired
-                    }))
-                })),
-                preferences: this.state.preferences
-            };
-            logger.log('Data being saved:', JSON.stringify(dataToSave, null, 2));
-
             this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
 
             // Await all schedule saves (async for IndexedDB)
@@ -613,16 +593,17 @@ export class ProfileStateManager {
             this.state.hasUnsavedChanges = false;
             this.state.lastSaved = Date.now();
 
-            logger.log('%cSAVED - All data persisted to storage', 'color: #4CAF50; font-weight: bold');
-
             if (previousUnsavedState) {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
             }
 
-            // Emit event for sync service to handle
-            syncEventBus.emitEvent('local-save-completed', {
-                timestamp: Date.now()
-            });
+            // Only emit sync event if NOT in batch mode
+            // During batch updates, sync will be triggered once after batch completes
+            if (!this.isBatchUpdate) {
+                syncEventBus.emitEvent('local-save-completed', {
+                    timestamp: Date.now()
+                });
+            }
         } catch (error) {
             logger.error('Save failed:', error);
         }
@@ -905,8 +886,10 @@ export class ProfileStateManager {
             this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
         }
 
-        // Fire and forget - save happens in background
-        this.save().catch(error => logger.error('Save failed:', error));
+        // Skip save if in batch mode - batch will handle save at the end
+        if (!this.isBatchUpdate) {
+            this.save().catch(error => logger.error('Save failed:', error));
+        }
     }
 
     private async withStateUpdateAsync<T>(updateFn: () => Promise<T>): Promise<T> {
@@ -919,7 +902,10 @@ export class ProfileStateManager {
             this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
         }
 
-        await this.save();
+        // Skip save if in batch mode - batch will handle save at the end
+        if (!this.isBatchUpdate) {
+            await this.save();
+        }
         return result;
     }
 
@@ -933,8 +919,10 @@ export class ProfileStateManager {
             this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
         }
 
-        // Fire and forget - save happens in background
-        this.save().catch(error => logger.error('Save failed:', error));
+        // Skip save if in batch mode - batch will handle save at the end
+        if (!this.isBatchUpdate) {
+            this.save().catch(error => logger.error('Save failed:', error));
+        }
         return result;
     }
 
@@ -948,6 +936,11 @@ export class ProfileStateManager {
     }
 
     private emitEvent(type: StateChangeEvent['type'], data: any, source: string): void {
+        // Skip event emission if we're in batch update mode
+        if (this.isBatchUpdate) {
+            return;
+        }
+
         const event: StateChangeEvent = {
             type,
             data,

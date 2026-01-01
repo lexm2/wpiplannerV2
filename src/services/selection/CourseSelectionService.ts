@@ -380,6 +380,84 @@ export class CourseSelectionService {
     }
 
     /**
+     * Batch set selected components for multiple courses
+     * This is optimized for auto-scheduler to avoid triggering listeners on each update
+     */
+    async batchSetSelectedComponents(
+        selections: Array<{
+            course: Course;
+            lecture: Section | null;
+            discussion: Section | null;
+            lab: Section | null;
+        }>
+    ): Promise<CourseSelectionResult> {
+        await this.ensureInitialized();
+
+        try {
+            // Validate all courses are selected before making any changes
+            for (const selection of selections) {
+                if (!this.isCourseSelected(selection.course)) {
+                    return {
+                        success: false,
+                        error: `Course ${selection.course.id} must be selected before setting components`
+                    };
+                }
+            }
+
+            // Track if we're in a batch update (suspend individual listener notifications)
+            const wasBatchUpdate = (this.profileStateManager as any).isBatchUpdate;
+            if (!wasBatchUpdate) {
+                (this.profileStateManager as any).isBatchUpdate = true;
+            }
+
+            try {
+                // Apply all component updates
+                for (const selection of selections) {
+                    this.profileStateManager.setSelectedComponents(
+                        selection.course,
+                        selection.lecture,
+                        selection.discussion,
+                        selection.lab,
+                        'service'
+                    );
+                }
+            } finally {
+                // Restore batch update flag
+                if (!wasBatchUpdate) {
+                    (this.profileStateManager as any).isBatchUpdate = false;
+                }
+            }
+
+            // Emit a single event for all changes
+            this.notifySelectionListeners({
+                type: 'components_changed',
+                selectedCourses: this.profileStateManager.getSelectedCourses(),
+                timestamp: Date.now()
+            });
+
+            // Trigger a single save after batch completes (which will emit sync event)
+            // Fire and forget - don't block UI waiting for save to complete
+            // This ensures cloud sync only happens once per batch instead of N times
+            if (!wasBatchUpdate) {
+                this.profileStateManager.save().catch(error =>
+                    console.error('Error saving after batch update:', error)
+                );
+            }
+
+            return {
+                success: true
+            };
+
+        } catch (error) {
+            console.error('Error batch setting selected components:', error);
+            return {
+                success: false,
+                error: `Error batch setting selected components: ${error}`
+            };
+        }
+    }
+
+    /**
      * Get the currently selected components for a course
      */
     getSelectedComponents(course: Course): {

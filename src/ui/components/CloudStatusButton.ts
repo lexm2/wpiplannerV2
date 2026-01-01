@@ -148,7 +148,6 @@ export class CloudStatusButton {
     private render(containerId: string): void {
         const container = document.getElementById(containerId);
         if (!container) {
-            logger.error('[CloudStatusButton] Container not found:', containerId);
             return;
         }
 
@@ -170,16 +169,13 @@ export class CloudStatusButton {
         // Explicit listeners for clarity (plus wildcard for comprehensive monitoring)
         syncEventBus.on('sync-started', () => {
             // Could show syncing indicator
-            logger.log('[CloudStatusButton] Sync started');
         });
 
         syncEventBus.on('offline-mode', () => {
-            logger.log('[CloudStatusButton] Browser went offline');
             // Could show offline indicator in UI
         });
 
         syncEventBus.on('online-mode', () => {
-            logger.log('[CloudStatusButton] Browser back online');
             // Could hide offline indicator
         });
 
@@ -203,8 +199,6 @@ export class CloudStatusButton {
     }
 
     private handleSyncEvent(event: SyncEvent): void {
-        logger.log('[CloudStatusButton] Received sync event:', event.type);
-
         switch (event.type) {
             case 'auth-changed': {
                 const data = event.data as { authenticated: boolean } | undefined;
@@ -240,16 +234,13 @@ export class CloudStatusButton {
     private async handleClick(): Promise<void> {
         const provider = syncManager.getCurrentProvider();
         if (!provider) {
-            logger.warn('[CloudStatusButton] No provider available');
             return;
         }
 
         if (syncManager.isAuthenticated()) {
             try {
                 await syncManager.signOut();
-                logger.log('[CloudStatusButton] Signed out successfully');
             } catch (error) {
-                logger.error('[CloudStatusButton] Sign out failed:', error);
                 this.setState('error');
             }
         } else {
@@ -276,10 +267,7 @@ export class CloudStatusButton {
                     // Step 3: Check for conflicts (unified path - same as Mock)
                     await syncManager.checkConflicts(syncData);
                 }
-
-                logger.log('[CloudStatusButton] Signed in successfully');
             } catch (error) {
-                logger.error('[CloudStatusButton] Sign in failed:', error);
                 this.setState('error');
             }
         }
@@ -289,8 +277,6 @@ export class CloudStatusButton {
      * Set state immediately, overriding any current state (used for auth changes)
      */
     private setStateImmediate(newState: ButtonState): void {
-        logger.log('[CloudStatusButton] setStateImmediate called:', newState);
-
         if (this.transitionTimer !== null) {
             clearTimeout(this.transitionTimer);
             this.transitionTimer = null;
@@ -331,8 +317,6 @@ export class CloudStatusButton {
      * Set button state with priority handling
      */
     private setState(newState: ButtonState): void {
-        logger.log('[CloudStatusButton] setState called:', newState, 'current:', this.currentState);
-
         if (this.transitionTimer !== null) {
             clearTimeout(this.transitionTimer);
             this.transitionTimer = null;
@@ -366,7 +350,6 @@ export class CloudStatusButton {
                     }, config.timeout);
                 }
             } else {
-                logger.log('[CloudStatusButton] Pending state set:', newState);
                 this.pendingState = newState;
             }
         }
@@ -411,8 +394,6 @@ export class CloudStatusButton {
     }
 
     private transitionToIdleState(): void {
-        logger.log('[CloudStatusButton] transitionToIdleState called, current:', this.currentState, 'pending:', this.pendingState);
-
         if (this.transitionTimer !== null) {
             clearTimeout(this.transitionTimer);
             this.transitionTimer = null;
@@ -421,14 +402,12 @@ export class CloudStatusButton {
         if (this.pendingState) {
             const state = this.pendingState;
             this.pendingState = null;
-            logger.log('[CloudStatusButton] Processing pending state:', state);
             this.setState(state);
             return;
         }
 
         const isAuthenticated = syncManager.isAuthenticated();
         this.currentState = isAuthenticated ? 'authenticated-idle' : 'unauthenticated';
-        logger.log('[CloudStatusButton] Transitioning to idle:', this.currentState);
         this.updateUI();
     }
 
