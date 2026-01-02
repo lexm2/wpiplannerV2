@@ -1109,17 +1109,6 @@
   font-weight: var(--font-weight-normal);
 }
 
-.term-checkbox {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  padding: 0.5rem 0.75rem;
-}
-
-.term-checkbox:hover {
-  border-color: var(--color-primary);
-}
-
 /* Availability Filter Toggle */
 .filter-toggle-label {
   display: flex;
@@ -1857,3 +1846,76 @@
   font-style: italic;
 }
 
+
+/* =============================================================================
+   Event Modal Term Toggles
+   ============================================================================= */
+
+.event-term-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.event-term-checkboxes.form-error {
+  padding: 0.25rem;
+  border: 1px solid var(--color-danger, #ef4444);
+  border-radius: var(--effect-border-radius);
+}
+
+.event-term-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  transition: var(--effect-transition);
+}
+
+.event-term-label:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.event-term-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  user-select: none;
+}
+
+.event-term-toggle {
+  position: relative;
+  width: 44px;
+  height: 22px;
+  appearance: none;
+  background: var(--color-border);
+  border-radius: 11px;
+  outline: none;
+  cursor: pointer;
+  transition: var(--effect-transition);
+  margin: 0;
+}
+
+.event-term-toggle:checked {
+  background: var(--color-primary);
+}
+
+.event-term-toggle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  transition: var(--effect-transition);
+}
+
+.event-term-toggle:checked::before {
+  transform: translateX(22px);
+}

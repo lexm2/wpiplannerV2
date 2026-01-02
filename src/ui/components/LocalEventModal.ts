@@ -152,7 +152,7 @@ export class LocalEventModal extends BaseModal {
 
                             <div class="form-group">
                                 <label>Terms</label>
-                                <div class="term-checkboxes">
+                                <div class="event-term-checkboxes">
                                     ${this.renderTermCheckboxes(terms)}
                                 </div>
                             </div>
@@ -215,10 +215,10 @@ export class LocalEventModal extends BaseModal {
     private renderTermCheckboxes(selectedTerms: string[]): string {
         const terms = ['A', 'B', 'C', 'D'];
         return terms.map(term => `
-            <label class="term-checkbox">
-                <input type="checkbox" name="terms" value="${term}"
+            <label class="event-term-label">
+                <span class="event-term-text">Term ${term}</span>
+                <input type="checkbox" class="event-term-toggle" name="terms" value="${term}"
                        ${selectedTerms.includes(term) ? 'checked' : ''}>
-                <span class="term-label">Term ${term}</span>
             </label>
         `).join('');
     }
@@ -361,7 +361,7 @@ export class LocalEventModal extends BaseModal {
             // Check at least one term is selected
             const termCheckboxes = this.modalElement.querySelectorAll('input[name="terms"]:checked');
             if (termCheckboxes.length === 0) {
-                const termContainer = this.modalElement.querySelector('.term-checkboxes');
+                const termContainer = this.modalElement.querySelector('.event-term-checkboxes');
                 termContainer?.classList.add('form-error');
                 return false;
             }
