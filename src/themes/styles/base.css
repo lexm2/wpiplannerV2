@@ -53,11 +53,6 @@
   --effect-transition: all 0.2s ease;
 }
 
-/* Theme transition animation */
-* {
-  transition: var(--effect-transition);
-}
-
 /* Ensure smooth theme transitions */
 body {
   background-color: var(--color-background);
