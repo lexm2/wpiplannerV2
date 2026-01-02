@@ -20,7 +20,7 @@
 /* dual-range-slider.css migrated to CSS Module - imported directly in DualRangeSlider.ts */
 @import url('./styles/components/component-wizard.css');
 @import url('./styles/components/sidebar-panel.css'); /* Base sidebar panel styles */
-@import url('./styles/components/calendar-events-panel.css');
+/* calendar-events-panel.css migrated to CSS Module - imported directly in CalendarEventsPanel.ts */
 @import url('./styles/components/calendar-select-modal.css');
 @import url('./styles/components/buttons.css');
 @import url('./styles/components/states.css');
