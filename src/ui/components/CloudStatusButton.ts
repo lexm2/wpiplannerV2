@@ -5,6 +5,7 @@ import { ProfileStateManager, type StateChangeEvent, type ProfileState } from '.
 import { getInlineSVG, type IconName } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
 import { syncEventBus } from '../../services/sync/SyncEventBus';
+import styles from '../../styles/components/cloud-status-button.module.css';
 
 /**
  * Button states in priority order (highest to lowest)
@@ -153,7 +154,7 @@ export class CloudStatusButton {
 
         this.buttonElement = document.createElement('button');
         this.buttonElement.id = 'cloud-status-button';
-        this.buttonElement.className = 'cloud-status-button';
+        this.buttonElement.className = styles['cloud-status-button'];
         this.buttonElement.setAttribute('aria-live', 'polite');
 
         this.buttonElement.addEventListener('click', () => this.handleClick());
@@ -416,10 +417,10 @@ export class CloudStatusButton {
 
         const config = this.stateConfigs[this.currentState];
 
-        const iconHtml = config.icon ? getInlineSVG(config.icon, 'cloud-status-icon') : '';
-        this.buttonElement.innerHTML = `${iconHtml}<span class="cloud-status-text">${config.text}</span>`;
+        const iconHtml = config.icon ? getInlineSVG(config.icon, styles['cloud-status-icon']) : '';
+        this.buttonElement.innerHTML = `${iconHtml}<span class="${styles['cloud-status-text']}">${config.text}</span>`;
 
-        this.buttonElement.className = `cloud-status-button ${config.className}`;
+        this.buttonElement.className = `${styles['cloud-status-button']} ${styles[config.className]}`;
 
         if (this.currentState === 'unauthenticated') {
             this.buttonElement.setAttribute('aria-label', 'Sign in to enable cloud sync');

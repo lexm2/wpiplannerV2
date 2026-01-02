@@ -1,3 +1,5 @@
+import styles from '../../styles/components/resize-handle.module.css';
+
 export interface ResizablePanelConfig {
   handleSelector: string;
   targetProperty: string;
@@ -82,8 +84,8 @@ export class ResizablePanel {
     this.startX = clientX;
     this.startWidth = this.getCurrentWidth(config);
 
-    handle.classList.add('dragging');
-    document.body.classList.add('resizing');
+    handle.classList.add(styles.dragging);
+    document.body.classList.add(styles.resizing);
   }
 
   private onDocumentMouseMove(e: MouseEvent): void {
@@ -127,9 +129,9 @@ export class ResizablePanel {
 
   private endDrag(): void {
     if (this.activeHandle) {
-      this.activeHandle.classList.remove('dragging');
+      this.activeHandle.classList.remove(styles.dragging);
     }
-    document.body.classList.remove('resizing');
+    document.body.classList.remove(styles.resizing);
 
     this.activeHandle = null;
     this.activeConfig = null;
