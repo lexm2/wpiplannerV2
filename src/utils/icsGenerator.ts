@@ -1,6 +1,6 @@
 // Exports WPI course schedules to iCalendar (.ics) format compatible with Google Calendar, Outlook, and Apple Calendar.
 
-import { Schedule, SelectedCourse } from '../types/schedule';
+import { Schedule, SelectedCourse, LocalCalendarEvent } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';
 import { getAllSections } from './courseUtils';
 
@@ -293,6 +293,29 @@ END:VTIMEZONE`;
             }
         }
 
+        // Add visible local events
+        if (schedule.localEvents?.length) {
+            for (const localEvent of schedule.localEvents) {
+                if (!localEvent.visible) continue;
+
+                if (localEvent.eventType === 'one-time') {
+                    // One-time event: single VEVENT on specific date
+                    const event = this.generateOneTimeLocalEvent(localEvent, timezone);
+                    if (event) events.push(event);
+                } else {
+                    // Recurring event: generate for each term
+                    const terms = localEvent.terms || [];
+                    for (const term of terms) {
+                        const termDates = this.getTermDates(term, academicYear);
+                        if (!termDates) continue;
+
+                        const event = this.generateRecurringLocalEvent(localEvent, term, termDates, timezone);
+                        if (event) events.push(event);
+                    }
+                }
+            }
+        }
+
         if (events.length === 0) {
             return {
                 success: false,
@@ -325,5 +348,121 @@ END:VTIMEZONE`;
             skippedCourses,
             totalCourses
         };
+    }
+
+    /**
+     * Generate ICS VEVENT for a one-time local calendar event.
+     */
+    private static generateOneTimeLocalEvent(
+        localEvent: LocalCalendarEvent,
+        timezone: string
+    ): string | null {
+        if (!localEvent.date) return null;
+
+        // Parse the date
+        const eventDate = new Date(localEvent.date);
+
+        // Set start time
+        const startDateTime = new Date(eventDate);
+        startDateTime.setHours(localEvent.startTime.hours, localEvent.startTime.minutes, 0, 0);
+
+        // Set end time
+        const endDateTime = new Date(eventDate);
+        endDateTime.setHours(localEvent.endTime.hours, localEvent.endTime.minutes, 0, 0);
+
+        // Format dates for ICS
+        const dtstart = this.formatICSDate(startDateTime, true);
+        const dtend = this.formatICSDate(endDateTime, true);
+
+        // Generate UID
+        const uid = `local-${localEvent.id}@wpiplannerv2`;
+
+        const lines: string[] = [
+            'BEGIN:VEVENT',
+            `UID:${uid}`,
+            `DTSTAMP:${this.formatICSDate(new Date(), true)}Z`,
+            `DTSTART;TZID=${timezone}:${dtstart}`,
+            `DTEND;TZID=${timezone}:${dtend}`,
+            `SUMMARY:${this.escapeICSText(localEvent.title)}`
+        ];
+
+        if (localEvent.description) {
+            lines.push(`DESCRIPTION:${this.escapeICSText(localEvent.description)}`);
+        }
+
+        lines.push('END:VEVENT');
+
+        return lines.join('\r\n');
+    }
+
+    /**
+     * Generate ICS VEVENT for a recurring local calendar event.
+     */
+    private static generateRecurringLocalEvent(
+        localEvent: LocalCalendarEvent,
+        term: string,
+        termDates: { start: Date; end: Date },
+        timezone: string
+    ): string | null {
+        const { start: termStart, end: termEnd } = termDates;
+
+        // Get all days for this event (support both old `day` and new `days` fields)
+        const days = localEvent.days || (localEvent.day ? [localEvent.day] : []);
+        if (days.length === 0) return null;
+
+        // Find the first occurrence - use the earliest day of the week
+        const firstDay = days.reduce((earliest, day) => {
+            const dayNum = this.DAY_TO_NUMBER[day];
+            const earliestNum = this.DAY_TO_NUMBER[earliest];
+            return dayNum < earliestNum ? day : earliest;
+        });
+
+        const dayNumber = this.DAY_TO_NUMBER[firstDay];
+        const firstOccurrence = new Date(termStart);
+
+        // Adjust to the first occurrence of the weekday
+        const daysUntilTarget = (dayNumber - termStart.getDay() + this.DAYS_IN_WEEK) % this.DAYS_IN_WEEK;
+        firstOccurrence.setDate(firstOccurrence.getDate() + daysUntilTarget);
+
+        // Set start time
+        firstOccurrence.setHours(localEvent.startTime.hours, localEvent.startTime.minutes, 0, 0);
+
+        // Calculate end time (same day)
+        const endTime = new Date(firstOccurrence);
+        endTime.setHours(localEvent.endTime.hours, localEvent.endTime.minutes, 0, 0);
+
+        // Format dates for ICS
+        const dtstart = this.formatICSDate(firstOccurrence, true);
+        const dtend = this.formatICSDate(endTime, true);
+
+        // Set until date (end of term at end of day)
+        const untilDate = new Date(termEnd);
+        untilDate.setHours(this.END_OF_DAY_HOUR, this.END_OF_DAY_MINUTE, this.END_OF_DAY_SECOND);
+        const until = this.formatICSDate(untilDate, true);
+
+        // Generate UID
+        const uid = `local-${localEvent.id}-${term}@wpiplannerv2`;
+
+        // Build RRULE with all selected days
+        const icsDays = days.map(day => this.DAY_TO_ICS[day]).join(',');
+        const rrule = `RRULE:FREQ=WEEKLY;BYDAY=${icsDays};UNTIL=${until}`;
+
+        const lines: string[] = [
+            'BEGIN:VEVENT',
+            `UID:${uid}`,
+            `DTSTAMP:${this.formatICSDate(new Date(), true)}Z`,
+            `DTSTART;TZID=${timezone}:${dtstart}`,
+            `DTEND;TZID=${timezone}:${dtend}`,
+            rrule,
+            `SUMMARY:${this.escapeICSText(localEvent.title)}`
+        ];
+
+        if (localEvent.description) {
+            lines.push(`DESCRIPTION:${this.escapeICSText(localEvent.description)}`);
+        }
+
+        lines.push('END:VEVENT');
+
+        return lines.join('\r\n');
     }
 }

@@ -1,27 +1,39 @@
 // =============================================================================
-// Calendar Events Panel - Manage external calendar event visibility
+// Calendar Events Panel - Manage local and external calendar events
 // =============================================================================
 
 import type { CalendarEvent } from '../../services/calendar';
+import type { LocalCalendarEvent } from '../../types/schedule';
+import { DayOfWeek } from '../../types/types';
 import { BaseSidebarPanel } from '../sidebar/BaseSidebarPanel';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { Validators } from '../../utils/validators';
 
 export interface CalendarEventsPanelOptions {
-    calendarName: string;
-    events: Map<string, CalendarEvent[]>; // term -> events
-    excludedEventIds: Set<string>;
-    onExclusionChange: (eventId: string, excluded: boolean) => void;
-    onShowAll: () => void;
-    onHideAll: () => void;
-    onClose: () => void;
+    // External calendar options (optional - may not have connected calendar)
+    calendarName?: string;
+    events?: Map<string, CalendarEvent[]>; // term -> events
+    excludedEventIds?: Set<string>;
+    onExclusionChange?: (eventId: string, excluded: boolean) => void;
+    onShowAll?: () => void;
+    onHideAll?: () => void;
     /** Callback when user clicks to change calendar source */
-    onChangeCalendar: () => void;
+    onChangeCalendar?: () => void;
+
+    // Local events options
+    localEvents: LocalCalendarEvent[];
+    onAddLocalEvent: () => void;
+    onEditLocalEvent: (id: string) => void;
+    onDeleteLocalEvent: (id: string) => void;
+    onToggleLocalEventVisibility: (id: string) => void;
+
+    // Common
+    onClose: () => void;
 }
 
 /**
- * Sidebar panel for managing external calendar event visibility.
- * Users can click events to toggle their visibility on the schedule grid.
+ * Sidebar panel for managing local and external calendar events.
+ * Users can add local events and toggle visibility on the schedule grid.
  * Extends BaseSidebarPanel for consistent panel behavior.
  */
 export class CalendarEventsPanel extends BaseSidebarPanel {
@@ -29,8 +41,12 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
     readonly panelClass = 'calendar-panel-active';
 
     private panelOptions: CalendarEventsPanelOptions;
-    /** Local copy of events to avoid being affected by external Map clearing */
+    /** Local copy of external events to avoid being affected by external Map clearing */
     private eventsCopy: Map<string, CalendarEvent[]>;
+    /** Local copy of local events */
+    private localEventsCopy: LocalCalendarEvent[];
+    /** Whether we have external calendar events */
+    private hasExternalEvents: boolean;
 
     constructor(options: CalendarEventsPanelOptions) {
         super({
@@ -41,11 +57,17 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         });
         this.panelOptions = options;
 
-        // Deep copy the events Map so we're not affected by external clears
+        // Deep copy the external events Map so we're not affected by external clears
         this.eventsCopy = new Map();
-        for (const [term, events] of options.events) {
-            this.eventsCopy.set(term, [...events]);
+        if (options.events) {
+            for (const [term, events] of options.events) {
+                this.eventsCopy.set(term, [...events]);
+            }
         }
+        this.hasExternalEvents = this.eventsCopy.size > 0 && this.getTotalExternalEventCount() > 0;
+
+        // Copy local events
+        this.localEventsCopy = [...options.localEvents];
     }
 
     // =========================================================================
@@ -58,6 +80,8 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
      * Used for bulk operations like showAll/hideAll.
      */
     updateExcludedIds(excludedIds: Set<string>): void {
+        if (!this.panelOptions.excludedEventIds) return;
+
         const previousExcluded = this.panelOptions.excludedEventIds;
         this.panelOptions.excludedEventIds = excludedIds;
 
@@ -74,19 +98,21 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
 
         // Update each changed event item
         for (const eventId of changedIds) {
-            this.updateEventItemVisual(eventId, excludedIds.has(eventId));
+            this.updateExternalEventItemVisual(eventId, excludedIds.has(eventId));
         }
 
         // Update term counts
-        this.updateTermCounts();
+        this.updateExternalTermCounts();
     }
 
     /**
-     * Directly update a single event's exclusion state.
+     * Directly update a single external event's exclusion state.
      * Called by ScheduleController when a specific event is toggled.
      * This mutates the existing Set to ensure click handlers see the updated state.
      */
     updateSingleEventExclusion(eventId: string, excluded: boolean): void {
+        if (!this.panelOptions.excludedEventIds) return;
+
         // Update the internal state by mutating the existing Set
         if (excluded) {
             this.panelOptions.excludedEventIds.add(eventId);
@@ -95,19 +121,27 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         }
 
         // Update the visuals
-        this.updateEventItemVisual(eventId, excluded);
-        this.updateTermCounts();
+        this.updateExternalEventItemVisual(eventId, excluded);
+        this.updateExternalTermCounts();
     }
 
     /**
-     * Update a single event item's visual state (targeted DOM update).
+     * Update local events list (for re-rendering after add/edit/delete)
+     */
+    updateLocalEvents(events: LocalCalendarEvent[]): void {
+        this.localEventsCopy = [...events];
+        this.rerender();
+    }
+
+    /**
+     * Update a single external event item's visual state (targeted DOM update).
      * Updates ALL instances of this event across terms (for multi-term events).
      */
-    private updateEventItemVisual(eventId: string, isExcluded: boolean): void {
+    private updateExternalEventItemVisual(eventId: string, isExcluded: boolean): void {
         if (!this.panel) return;
 
         // Use querySelectorAll to update ALL instances of this event across terms
-        const items = this.panel.querySelectorAll<HTMLElement>(`.calendar-event-item[data-event-id="${eventId}"]`);
+        const items = this.panel.querySelectorAll<HTMLElement>(`.external-event-item[data-event-id="${eventId}"]`);
 
         items.forEach(item => {
             // Update excluded class
@@ -124,21 +158,24 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
     }
 
     /**
-     * Update all term count displays based on current excluded IDs.
+     * Update all external term count displays based on current excluded IDs.
      */
-    private updateTermCounts(): void {
-        if (!this.panel) return;
+    private updateExternalTermCounts(): void {
+        if (!this.panel || !this.panelOptions.excludedEventIds) return;
 
         const terms = ['A', 'B', 'C', 'D'];
         for (const term of terms) {
             const events = this.eventsCopy.get(term) || [];
             if (events.length === 0) continue;
 
-            const hiddenCount = events.filter(e => e.id && this.panelOptions.excludedEventIds.has(e.id)).length;
+            const hiddenCount = events.filter(e => e.id && this.panelOptions.excludedEventIds!.has(e.id)).length;
             const countText = `${events.length} event${events.length !== 1 ? 's' : ''}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ''}`;
 
-            // Find the term header and update the count
-            const termGroups = this.panel.querySelectorAll('.calendar-term-group');
+            // Find the term header and update the count (in external events section)
+            const externalSection = this.panel.querySelector('.external-events-section');
+            if (!externalSection) continue;
+
+            const termGroups = externalSection.querySelectorAll('.calendar-term-group');
             for (const group of termGroups) {
                 const termLabel = group.querySelector('.term-label');
                 if (termLabel?.textContent === `Term ${term}`) {
@@ -160,26 +197,22 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
      * Render the full panel content
      */
     protected renderContent(): string {
-        const totalEvents = this.getTotalEventCount();
+        const totalLocalEvents = this.localEventsCopy.length;
+        const totalExternalEvents = this.getTotalExternalEventCount();
+        const totalEvents = totalLocalEvents + totalExternalEvents;
 
         return `
             <div class="calendar-events-header">
                 <div class="calendar-events-title">
                     <span class="calendar-events-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-icon')}</span>
                     <div class="calendar-events-info">
-                        <span class="calendar-name">${Validators.escapeHtml(this.panelOptions.calendarName)}</span>
+                        <span class="calendar-name">Calendar Events</span>
                         <span class="events-count">${totalEvents} event${totalEvents !== 1 ? 's' : ''}</span>
                     </div>
                 </div>
                 <div class="calendar-events-actions">
-                    <button class="calendar-events-action-btn" id="calendar-change-btn" title="Change calendar">
-                        ${getInlineSVG('CALENDAR_REPEAT', 'action-icon')}
-                    </button>
-                    <button class="calendar-events-action-btn" id="calendar-show-all-btn" title="Show all events">
-                        ${getInlineSVG('HEXAGON_PLUS', 'action-icon')}
-                    </button>
-                    <button class="calendar-events-action-btn" id="calendar-hide-all-btn" title="Hide all events">
-                        ${getInlineSVG('HEXAGON_MINUS', 'action-icon')}
+                    <button class="calendar-events-action-btn" id="add-local-event-btn" title="Add event">
+                        ${getInlineSVG('PLUS', 'action-icon')}
                     </button>
                     <button class="calendar-events-close-btn" title="Close">
                         ${getInlineSVG('X', 'close-icon')}
@@ -187,10 +220,11 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
                 </div>
             </div>
             <div class="calendar-events-instructions">
-                Click an event to show/hide it on the schedule
+                Add events to block time on your schedule
             </div>
             <div class="calendar-events-content">
-                ${this.renderEventsList()}
+                ${this.renderLocalEventsSection()}
+                ${this.renderExternalEventsSection()}
             </div>
         `;
     }
@@ -205,35 +239,82 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
             closeBtn.addEventListener('click', () => this.close());
         }
 
-        // Show all button
-        const showAllBtn = this.querySelector<HTMLButtonElement>('#calendar-show-all-btn');
-        if (showAllBtn) {
-            showAllBtn.addEventListener('click', () => this.panelOptions.onShowAll());
+        // Add local event button
+        const addBtn = this.querySelector<HTMLButtonElement>('#add-local-event-btn');
+        if (addBtn) {
+            addBtn.addEventListener('click', () => this.panelOptions.onAddLocalEvent());
         }
 
-        // Hide all button
-        const hideAllBtn = this.querySelector<HTMLButtonElement>('#calendar-hide-all-btn');
-        if (hideAllBtn) {
-            hideAllBtn.addEventListener('click', () => this.panelOptions.onHideAll());
-        }
+        // Local event items - visibility toggle (click on item)
+        const localEventItems = this.querySelectorAll<HTMLElement>('.local-event-item');
+        localEventItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Don't toggle if clicking edit/delete buttons
+                if ((e.target as HTMLElement).closest('.local-event-actions')) return;
 
-        // Change calendar button
-        const changeBtn = this.querySelector<HTMLButtonElement>('#calendar-change-btn');
-        if (changeBtn) {
-            changeBtn.addEventListener('click', () => this.panelOptions.onChangeCalendar());
-        }
-
-        // Event items
-        const eventItems = this.querySelectorAll<HTMLElement>('.calendar-event-item');
-        eventItems.forEach(item => {
-            item.addEventListener('click', () => {
                 const eventId = item.dataset.eventId;
                 if (eventId) {
-                    const isCurrentlyExcluded = this.panelOptions.excludedEventIds.has(eventId);
-                    this.panelOptions.onExclusionChange(eventId, !isCurrentlyExcluded);
+                    this.panelOptions.onToggleLocalEventVisibility(eventId);
                 }
             });
         });
+
+        // Local event edit buttons
+        const editBtns = this.querySelectorAll<HTMLButtonElement>('.local-event-edit-btn');
+        editBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const eventId = btn.dataset.eventId;
+                if (eventId) {
+                    this.panelOptions.onEditLocalEvent(eventId);
+                }
+            });
+        });
+
+        // Local event delete buttons
+        const deleteBtns = this.querySelectorAll<HTMLButtonElement>('.local-event-delete-btn');
+        deleteBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const eventId = btn.dataset.eventId;
+                if (eventId) {
+                    this.panelOptions.onDeleteLocalEvent(eventId);
+                }
+            });
+        });
+
+        // External calendar section buttons (if present)
+        if (this.hasExternalEvents) {
+            // Show all button
+            const showAllBtn = this.querySelector<HTMLButtonElement>('#calendar-show-all-btn');
+            if (showAllBtn && this.panelOptions.onShowAll) {
+                showAllBtn.addEventListener('click', () => this.panelOptions.onShowAll!());
+            }
+
+            // Hide all button
+            const hideAllBtn = this.querySelector<HTMLButtonElement>('#calendar-hide-all-btn');
+            if (hideAllBtn && this.panelOptions.onHideAll) {
+                hideAllBtn.addEventListener('click', () => this.panelOptions.onHideAll!());
+            }
+
+            // Change calendar button
+            const changeBtn = this.querySelector<HTMLButtonElement>('#calendar-change-btn');
+            if (changeBtn && this.panelOptions.onChangeCalendar) {
+                changeBtn.addEventListener('click', () => this.panelOptions.onChangeCalendar!());
+            }
+
+            // External event items
+            const externalEventItems = this.querySelectorAll<HTMLElement>('.external-event-item');
+            externalEventItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const eventId = item.dataset.eventId;
+                    if (eventId && this.panelOptions.excludedEventIds && this.panelOptions.onExclusionChange) {
+                        const isCurrentlyExcluded = this.panelOptions.excludedEventIds.has(eventId);
+                        this.panelOptions.onExclusionChange(eventId, !isCurrentlyExcluded);
+                    }
+                });
+            });
+        }
     }
 
     /**
@@ -248,18 +329,145 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
     // =========================================================================
 
     /**
-     * Render the events list grouped by term
+     * Render the local events section
      */
-    private renderEventsList(): string {
+    private renderLocalEventsSection(): string {
+        const localEvents = this.localEventsCopy;
+        const hiddenCount = localEvents.filter(e => !e.visible).length;
+
+        return `
+            <div class="local-events-section">
+                <div class="section-header">
+                    <span class="section-title">Your Events</span>
+                    <span class="section-count">${localEvents.length} event${localEvents.length !== 1 ? 's' : ''}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ''}</span>
+                </div>
+                <div class="local-events-list">
+                    ${localEvents.length > 0
+                        ? localEvents.map(event => this.renderLocalEventItem(event)).join('')
+                        : '<div class="no-events-message">No events yet. Click + to add one.</div>'
+                    }
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render a single local event item
+     */
+    private renderLocalEventItem(event: LocalCalendarEvent): string {
+        const dayNames: Record<DayOfWeek, string> = {
+            [DayOfWeek.MONDAY]: 'Mon',
+            [DayOfWeek.TUESDAY]: 'Tue',
+            [DayOfWeek.WEDNESDAY]: 'Wed',
+            [DayOfWeek.THURSDAY]: 'Thu',
+            [DayOfWeek.FRIDAY]: 'Fri',
+            [DayOfWeek.SATURDAY]: 'Sat',
+            [DayOfWeek.SUNDAY]: 'Sun',
+        };
+
+        const startTime = this.formatTime(event.startTime.hours, event.startTime.minutes);
+        const endTime = this.formatTime(event.endTime.hours, event.endTime.minutes);
+
+        // Build schedule info based on event type
+        let scheduleInfo: string;
+        if (event.eventType === 'one-time' && event.date) {
+            // One-time: show the date
+            const date = new Date(event.date);
+            const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            scheduleInfo = dateStr;
+        } else {
+            // Recurring: show days and terms
+            const days = event.days || (event.day ? [event.day] : []);
+            const daysStr = days.map(d => dayNames[d] || '?').join(', ') || 'No days';
+            const termsStr = event.terms?.join(', ') || '';
+            scheduleInfo = termsStr ? `${daysStr} • Terms: ${termsStr}` : daysStr;
+        }
+
+        return `
+            <div class="local-event-item calendar-event-item ${event.visible ? '' : 'excluded'}"
+                 data-event-id="${event.id}">
+                <div class="event-visibility-toggle">
+                    ${event.visible
+                        ? getInlineSVG('HEXAGON_PLUS', 'visibility-icon visible')
+                        : getInlineSVG('HEXAGON_MINUS', 'visibility-icon hidden')
+                    }
+                </div>
+                <div class="event-details">
+                    <div class="event-summary">${Validators.escapeHtml(event.title)}</div>
+                    <div class="event-datetime">${scheduleInfo}</div>
+                    <div class="event-time">${startTime} - ${endTime}</div>
+                </div>
+                <div class="local-event-actions">
+                    <button class="local-event-edit-btn" data-event-id="${event.id}" title="Edit">
+                        ${getInlineSVG('SETTINGS', 'action-icon')}
+                    </button>
+                    <button class="local-event-delete-btn" data-event-id="${event.id}" title="Delete">
+                        ${getInlineSVG('TRASH', 'action-icon')}
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Format time for display
+     */
+    private formatTime(hours: number, minutes: number): string {
+        const h = hours % 12 || 12;
+        const m = minutes.toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        return `${h}:${m} ${ampm}`;
+    }
+
+    /**
+     * Render the external events section (only if connected)
+     */
+    private renderExternalEventsSection(): string {
+        if (!this.hasExternalEvents) {
+            return '';
+        }
+
+        const totalEvents = this.getTotalExternalEventCount();
+        const calendarName = this.panelOptions.calendarName || 'External Calendar';
+
+        return `
+            <div class="external-events-section">
+                <div class="section-header external-section-header">
+                    <div class="section-title-row">
+                        <span class="section-title">${Validators.escapeHtml(calendarName)}</span>
+                        <span class="section-count">${totalEvents} event${totalEvents !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div class="section-actions">
+                        <button class="calendar-events-action-btn" id="calendar-change-btn" title="Change calendar">
+                            ${getInlineSVG('CALENDAR_REPEAT', 'action-icon')}
+                        </button>
+                        <button class="calendar-events-action-btn" id="calendar-show-all-btn" title="Show all">
+                            ${getInlineSVG('HEXAGON_PLUS', 'action-icon')}
+                        </button>
+                        <button class="calendar-events-action-btn" id="calendar-hide-all-btn" title="Hide all">
+                            ${getInlineSVG('HEXAGON_MINUS', 'action-icon')}
+                        </button>
+                    </div>
+                </div>
+                ${this.renderExternalEventsList()}
+            </div>
+        `;
+    }
+
+    /**
+     * Render the external events list grouped by term
+     */
+    private renderExternalEventsList(): string {
         const terms = ['A', 'B', 'C', 'D'];
         let html = '';
 
         for (const term of terms) {
-            // Use local eventsCopy instead of panelOptions.events to avoid race conditions
             const events = this.eventsCopy.get(term) || [];
             if (events.length === 0) continue;
 
-            const hiddenCount = events.filter(e => e.id && this.panelOptions.excludedEventIds.has(e.id)).length;
+            const hiddenCount = this.panelOptions.excludedEventIds
+                ? events.filter(e => e.id && this.panelOptions.excludedEventIds!.has(e.id)).length
+                : 0;
 
             html += `
                 <div class="calendar-term-group">
@@ -268,24 +476,26 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
                         <span class="term-count">${events.length} event${events.length !== 1 ? 's' : ''}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ''}</span>
                     </div>
                     <div class="calendar-term-events">
-                        ${events.map(event => this.renderEventItem(event, term)).join('')}
+                        ${events.map(event => this.renderExternalEventItem(event, term)).join('')}
                     </div>
                 </div>
             `;
         }
 
         if (!html) {
-            html = '<div class="no-events-message">No calendar events found for any term</div>';
+            html = '<div class="no-events-message">No external calendar events found</div>';
         }
 
         return html;
     }
 
     /**
-     * Render a single event item (parent event with optional recurrence info)
+     * Render a single external event item
      */
-    private renderEventItem(event: CalendarEvent, term: string): string {
-        const isExcluded = event.id ? this.panelOptions.excludedEventIds.has(event.id) : false;
+    private renderExternalEventItem(event: CalendarEvent, term: string): string {
+        const isExcluded = event.id && this.panelOptions.excludedEventIds
+            ? this.panelOptions.excludedEventIds.has(event.id)
+            : false;
         const eventDate = new Date(event.start.dateTime);
         const dayName = eventDate.toLocaleDateString('en-US', { weekday: 'short' });
         const time = eventDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
@@ -308,7 +518,7 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
             : `<div class="event-datetime">${dayName}, ${dateStr} at ${time}</div>`;
 
         return `
-            <div class="calendar-event-item ${isExcluded ? 'excluded' : ''} ${isRecurring ? 'recurring' : ''}"
+            <div class="external-event-item calendar-event-item ${isExcluded ? 'excluded' : ''} ${isRecurring ? 'recurring' : ''}"
                  data-event-id="${event.id || ''}"
                  data-term="${term}">
                 <div class="event-visibility-toggle">
@@ -327,11 +537,10 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
     }
 
     /**
-     * Get total event count across all terms
+     * Get total external event count across all terms
      */
-    private getTotalEventCount(): number {
+    private getTotalExternalEventCount(): number {
         let total = 0;
-        // Use local eventsCopy instead of panelOptions.events
         for (const events of this.eventsCopy.values()) {
             total += events.length;
         }
