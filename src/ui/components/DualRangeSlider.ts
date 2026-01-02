@@ -1,3 +1,5 @@
+import styles from '../../styles/components/dual-range-slider.module.css';
+
 export interface DualRangeSliderOptions {
     min: number;
     max: number;
@@ -55,25 +57,25 @@ export class DualRangeSlider {
 
     private createContainer(): HTMLElement {
         const container = document.createElement('div');
-        container.className = 'dual-range-slider';
+        container.className = styles['dual-range-slider'];
         return container;
     }
 
     private createTrack(): HTMLElement {
         const track = document.createElement('div');
-        track.className = 'dual-range-track';
+        track.className = styles['dual-range-track'];
         return track;
     }
 
     private createRangeBar(): HTMLElement {
         const bar = document.createElement('div');
-        bar.className = 'dual-range-bar';
+        bar.className = styles['dual-range-bar'];
         return bar;
     }
 
     private createThumb(side: 'left' | 'right'): HTMLElement {
         const thumb = document.createElement('div');
-        thumb.className = `dual-range-thumb dual-range-thumb-${side}`;
+        thumb.className = `${styles['dual-range-thumb']} ${styles[`dual-range-thumb-${side}`]}`;
         thumb.setAttribute('role', 'slider');
         thumb.setAttribute('tabindex', '0');
         thumb.setAttribute('aria-valuemin', this.options.min.toString());
@@ -89,7 +91,7 @@ export class DualRangeSlider {
 
     private createTooltip(side: 'left' | 'right'): HTMLElement {
         const tooltip = document.createElement('div');
-        tooltip.className = `dual-range-tooltip dual-range-tooltip-${side}`;
+        tooltip.className = `${styles['dual-range-tooltip']} ${styles[`dual-range-tooltip-${side}`]}`;
         tooltip.style.display = 'none';
         return tooltip;
     }

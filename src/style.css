@@ -7,9 +7,9 @@
 /* Import component styles */
 @import url('./styles/components/reset.css');
 @import url('./styles/components/header.css');
-@import url('./styles/components/theme-selector.css');
+/* theme-selector.css migrated to CSS Module - imported directly in ThemeSelector.ts */
 @import url('./styles/components/layout.css');
-@import url('./styles/components/resize-handle.css');
+/* resize-handle.css migrated to CSS Module - imported directly in ResizablePanel.ts */
 @import url('./styles/components/sidebar.css');
 @import url('./styles/components/main-content.css');
 @import url('./styles/components/course-list.css');
@@ -17,14 +17,14 @@
 @import url('./styles/components/schedule-page.css');
 @import url('./styles/components/schedule-picker-modal.css');
 @import url('./styles/components/modal.css');
-@import url('./styles/components/dual-range-slider.css');
+/* dual-range-slider.css migrated to CSS Module - imported directly in DualRangeSlider.ts */
 @import url('./styles/components/component-wizard.css');
 @import url('./styles/components/sidebar-panel.css'); /* Base sidebar panel styles */
 @import url('./styles/components/calendar-events-panel.css');
 @import url('./styles/components/calendar-select-modal.css');
 @import url('./styles/components/buttons.css');
 @import url('./styles/components/states.css');
-@import url('./styles/components/cloud-status-button.css'); /* Unified cloud status and auth button */
+/* cloud-status-button.css migrated to CSS Module - imported directly in CloudStatusButton.ts */
 @import url('./styles/components/conflict-modal.css'); /* Schedule conflict resolution modal */
 @import url('./styles/components/sync-modals.css'); /* Cloud sync conflict modals */
 @import url('./styles/components/responsive.css');

@@ -1,6 +1,7 @@
 import { ThemeManager } from '../../themes/ThemeManager'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { getInlineSVG } from '../../utils/iconPaths'
+import styles from '../../styles/components/theme-selector.module.css';
 
 // UI component for theme switching with dropdown interface and persistent storage
 // Coordinates theme selection through ThemeManager and ProfileStateManager
@@ -73,7 +74,7 @@ export class ThemeSelector {
 
         this.optionsElement.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
-            const themeOption = target.closest('.theme-option') as HTMLElement;
+            const themeOption = target.closest(`.${styles['theme-option']}`) as HTMLElement;
             if (themeOption) {
                 const themeId = themeOption.dataset.themeId;
                 if (themeId) {
@@ -93,18 +94,18 @@ export class ThemeSelector {
 
     private openDropdown(): void {
         if (!this.dropdownElement || !this.optionsElement) return;
-        
+
         this.isOpen = true;
-        this.dropdownElement.classList.add('open');
-        this.optionsElement.classList.add('show');
+        this.dropdownElement.classList.add(styles.open);
+        this.optionsElement.classList.add(styles.show);
     }
 
     private closeDropdown(): void {
         if (!this.dropdownElement || !this.optionsElement) return;
-        
+
         this.isOpen = false;
-        this.dropdownElement.classList.remove('open');
-        this.optionsElement.classList.remove('show');
+        this.dropdownElement.classList.remove(styles.open);
+        this.optionsElement.classList.remove(styles.show);
     }
 
     private renderThemeOptions(): void {
@@ -117,9 +118,9 @@ export class ThemeSelector {
         availableThemes.forEach(theme => {
             const isActive = theme.id === currentThemeId;
             html += `
-                <div class="theme-option ${isActive ? 'active' : ''}" data-theme-id="${theme.id}">
-                    <div class="theme-option-name">${theme.name}</div>
-                    <div class="theme-option-description">${theme.description}</div>
+                <div class="${styles['theme-option']} ${isActive ? styles.active : ''}" data-theme-id="${theme.id}">
+                    <div class="${styles['theme-option-name']}">${theme.name}</div>
+                    <div class="${styles['theme-option-description']}">${theme.description}</div>
                 </div>
             `;
         });
@@ -151,14 +152,14 @@ export class ThemeSelector {
         if (!this.optionsElement) return;
 
         // Remove active class from all options
-        this.optionsElement.querySelectorAll('.theme-option').forEach(option => {
-            option.classList.remove('active');
+        this.optionsElement.querySelectorAll(`.${styles['theme-option']}`).forEach(option => {
+            option.classList.remove(styles.active);
         });
 
         // Add active class to selected option
         const selectedOption = this.optionsElement.querySelector(`[data-theme-id="${selectedThemeId}"]`);
         if (selectedOption) {
-            selectedOption.classList.add('active');
+            selectedOption.classList.add(styles.active);
         }
     }
 
