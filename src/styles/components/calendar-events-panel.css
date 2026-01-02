@@ -378,15 +378,17 @@
    Local Event Modal Form
    ============================================================================= */
 
-.local-event-modal .modal-dialog {
-    max-width: 420px;
+.modal-dialog.local-event-modal {
+    max-width: 37.5rem;
+    width: 95%;
 }
 
 .local-event-form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    padding: 1rem 0;
+    padding: 1rem 1.5rem;
+    width: 100%;
 }
 
 .local-event-form .form-group {
@@ -406,6 +408,7 @@
 }
 
 .local-event-form .form-input {
+    width: 100%;
     padding: 0.5rem 0.75rem;
     border: 1px solid var(--color-border);
     border-radius: var(--effect-border-radius);
@@ -427,7 +430,7 @@
 
 .local-event-form .form-textarea {
     min-height: 60px;
-    resize: vertical;
+    resize: none;
 }
 
 .local-event-form .form-select {
@@ -441,38 +444,6 @@
 
 .local-event-form .form-group-half {
     flex: 1;
-}
-
-/* Term checkboxes */
-.term-checkboxes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
-.term-checkboxes.form-error {
-    padding: 0.25rem;
-    border: 1px solid var(--color-danger, #ef4444);
-    border-radius: var(--effect-border-radius);
-}
-
-.term-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    cursor: pointer;
-}
-
-.term-checkbox input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--color-primary);
-    cursor: pointer;
-}
-
-.term-label {
-    font-size: 0.85rem;
-    color: var(--color-text);
 }
 
 /* =============================================================================
@@ -598,5 +569,18 @@
 .time-separator {
     color: var(--color-text-secondary);
     font-size: 0.9rem;
-    padding-top: 1.5rem;
+}
+
+/* Button Icon Styling */
+.modal-dialog.local-event-modal .modal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-dialog.local-event-modal .btn-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-right: 0.35rem;
 }
