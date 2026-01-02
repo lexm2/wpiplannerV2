@@ -1,0 +1,51 @@
+/* Theme Selector - Global Base Styles */
+/* Applied to static HTML structure in index.html lines 87-95 */
+
+.theme-selector {
+  position: relative;
+  display: inline-block;
+}
+
+.theme-dropdown {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: var(--effect-transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-dropdown:hover {
+  border-color: var(--color-border-hover);
+  background: var(--color-surface-hover);
+}
+
+.dropdown-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdown-arrow svg {
+  transform-origin: center;
+  display: block;
+}
+
+.theme-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  box-shadow: var(--effect-shadow);
+  min-width: 200px;
+  z-index: 1000;
+  display: none;
+}
