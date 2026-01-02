@@ -3,7 +3,7 @@
 // =============================================================================
 
 import type { ConnectedCalendar, CalendarEvent } from '../../services/calendar/types';
-import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule';
+import type { WeeklyTimeSlot, DisplayableTimeSlot, LocalCalendarEvent } from '../../types/schedule';
 import { AcademicTerm } from '../../types/schedule';
 import { DayOfWeek } from '../../types/types';
 import { calendarService } from '../../services/calendar/CalendarService';
@@ -12,6 +12,11 @@ import { calendarService } from '../../services/calendar/CalendarService';
  * Callback for when exclusions change
  */
 type ExclusionChangeCallback = () => void;
+
+/**
+ * Callback for when local events change
+ */
+type LocalEventsChangeCallback = (events: LocalCalendarEvent[]) => void;
 
 /**
  * CalendarState - Single source of truth for all calendar-related state.
@@ -40,6 +45,10 @@ export class CalendarState {
 
     // Callbacks
     private exclusionChangeCallbacks: ExclusionChangeCallback[] = [];
+    private localEventsChangeCallbacks: LocalEventsChangeCallback[] = [];
+
+    // Local events (stored per-schedule, not synced to cloud)
+    private localEvents: LocalCalendarEvent[] = [];
 
     // -------------------------------------------------------------------------
     // Connection State
@@ -444,5 +453,300 @@ export class CalendarState {
         for (const callback of this.exclusionChangeCallbacks) {
             callback();
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Local Events (stored locally, not synced to cloud)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Set all local events (typically called when loading a schedule)
+     */
+    setLocalEvents(events: LocalCalendarEvent[]): void {
+        this.localEvents = [...events];
+        this.weeklySlotsDirty = true;
+        this.notifyLocalEventsChange();
+    }
+
+    /**
+     * Get all local events
+     */
+    getLocalEvents(): LocalCalendarEvent[] {
+        return [...this.localEvents];
+    }
+
+    /**
+     * Get local events for a specific term
+     */
+    getLocalEventsForTerm(term: string): LocalCalendarEvent[] {
+        return this.localEvents.filter(e => this.eventAppliesToTerm(e, term));
+    }
+
+    /**
+     * Get visible local events for a term (for grid display)
+     */
+    getVisibleLocalEventsForTerm(term: string): LocalCalendarEvent[] {
+        return this.localEvents.filter(e => e.visible && this.eventAppliesToTerm(e, term));
+    }
+
+    /**
+     * Check if an event applies to a given term
+     */
+    private eventAppliesToTerm(event: LocalCalendarEvent, term: string): boolean {
+        if (event.eventType === 'one-time') {
+            // One-time events: check if date falls within term
+            return this.isDateInTerm(event.date, term);
+        } else {
+            // Recurring events: check terms array
+            return event.terms?.includes(term) ?? false;
+        }
+    }
+
+    /**
+     * Check if a date string (YYYY-MM-DD) falls within a term
+     */
+    private isDateInTerm(dateStr: string | undefined, term: string): boolean {
+        if (!dateStr) return false;
+
+        const date = new Date(dateStr);
+        const year = date.getFullYear();
+        const termDates = this.getTermDates(term, year);
+        if (!termDates) return false;
+
+        return date >= termDates.start && date <= termDates.end;
+    }
+
+    /**
+     * Get term start/end dates for a given academic year
+     */
+    private getTermDates(term: string, year: number): { start: Date, end: Date } | null {
+        // Term dates (month is 0-indexed)
+        // A: Late Aug - Mid Oct
+        // B: Late Oct - Mid Dec
+        // C: Early Jan - Early Mar (next year)
+        // D: Mid Mar - Early May (next year)
+        switch (term.charAt(0).toUpperCase()) {
+            case 'A':
+                return {
+                    start: new Date(year, 7, 25), // Aug 25
+                    end: new Date(year, 9, 13)    // Oct 13
+                };
+            case 'B':
+                return {
+                    start: new Date(year, 9, 21),  // Oct 21
+                    end: new Date(year, 11, 13)    // Dec 13
+                };
+            case 'C':
+                return {
+                    start: new Date(year, 0, 6),   // Jan 6
+                    end: new Date(year, 2, 7)      // Mar 7
+                };
+            case 'D':
+                return {
+                    start: new Date(year, 2, 17),  // Mar 17
+                    end: new Date(year, 4, 9)      // May 9
+                };
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Get day of week from date string
+     */
+    private getDayOfWeekFromDate(dateStr: string): DayOfWeek | null {
+        const date = new Date(dateStr);
+        const dayIndex = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        const dayMap: Record<number, DayOfWeek> = {
+            0: DayOfWeek.SUNDAY,
+            1: DayOfWeek.MONDAY,
+            2: DayOfWeek.TUESDAY,
+            3: DayOfWeek.WEDNESDAY,
+            4: DayOfWeek.THURSDAY,
+            5: DayOfWeek.FRIDAY,
+            6: DayOfWeek.SATURDAY
+        };
+        return dayMap[dayIndex] ?? null;
+    }
+
+    /**
+     * Add a new local event
+     */
+    addLocalEvent(event: LocalCalendarEvent): void {
+        this.localEvents.push(event);
+        this.weeklySlotsDirty = true;
+        this.notifyLocalEventsChange();
+    }
+
+    /**
+     * Update an existing local event
+     */
+    updateLocalEvent(id: string, updates: Partial<LocalCalendarEvent>): void {
+        const index = this.localEvents.findIndex(e => e.id === id);
+        if (index === -1) return;
+
+        const existing = this.localEvents[index];
+        const updated: LocalCalendarEvent = {
+            ...existing,
+            ...updates,
+            updatedAt: Date.now()
+        };
+
+        // Clear type-specific fields when switching event types
+        if (updated.eventType === 'one-time') {
+            // One-time events don't have days/terms
+            delete (updated as Partial<LocalCalendarEvent>).days;
+            delete (updated as Partial<LocalCalendarEvent>).day;
+            delete (updated as Partial<LocalCalendarEvent>).terms;
+        } else {
+            // Recurring events don't have date
+            delete (updated as Partial<LocalCalendarEvent>).date;
+        }
+
+        this.localEvents[index] = updated;
+        this.weeklySlotsDirty = true;
+        this.notifyLocalEventsChange();
+    }
+
+    /**
+     * Delete a local event
+     */
+    deleteLocalEvent(id: string): void {
+        const index = this.localEvents.findIndex(e => e.id === id);
+        if (index === -1) return;
+
+        this.localEvents.splice(index, 1);
+        this.weeklySlotsDirty = true;
+        this.notifyLocalEventsChange();
+    }
+
+    /**
+     * Toggle visibility of a local event
+     */
+    toggleLocalEventVisibility(id: string): void {
+        const event = this.localEvents.find(e => e.id === id);
+        if (!event) return;
+
+        event.visible = !event.visible;
+        event.updatedAt = Date.now();
+        this.weeklySlotsDirty = true;
+        this.notifyLocalEventsChange();
+    }
+
+    /**
+     * Get local events as weekly slots for grid display
+     */
+    getLocalEventSlotsForTerm(term: string): DisplayableTimeSlot[] {
+        const events = this.getVisibleLocalEventsForTerm(term);
+        const slots: DisplayableTimeSlot[] = [];
+
+        for (const event of events) {
+            if (event.eventType === 'one-time') {
+                // One-time event: single slot on the date's day of week
+                const slot = this.oneTimeEventToSlot(event, term);
+                if (slot) slots.push(slot);
+            } else {
+                // Recurring event: create a slot for each day in the days array
+                const days = event.days || (event.day ? [event.day] : []);
+                for (const day of days) {
+                    const slot = this.recurringEventToSlot(event, day, term);
+                    if (slot) slots.push(slot);
+                }
+            }
+        }
+
+        return slots;
+    }
+
+    /**
+     * Convert a one-time LocalCalendarEvent to a DisplayableTimeSlot
+     */
+    private oneTimeEventToSlot(event: LocalCalendarEvent, term: string): DisplayableTimeSlot | null {
+        if (!event.date) return null;
+
+        const day = this.getDayOfWeekFromDate(event.date);
+        if (!day) return null;
+
+        const termMap: Record<string, AcademicTerm> = {
+            'A': AcademicTerm.A,
+            'B': AcademicTerm.B,
+            'C': AcademicTerm.C,
+            'D': AcademicTerm.D
+        };
+        const academicTerm = termMap[term];
+        if (!academicTerm) return null;
+
+        return {
+            id: `local-${event.id}`,
+            day,
+            startTime: event.startTime,
+            endTime: event.endTime,
+            term: academicTerm,
+            title: event.title,
+            subtitle: event.description,
+            sourceType: 'blocked',
+            sourceId: event.id,
+        };
+    }
+
+    /**
+     * Convert a recurring LocalCalendarEvent to a DisplayableTimeSlot for a specific day
+     */
+    private recurringEventToSlot(event: LocalCalendarEvent, day: DayOfWeek, term: string): DisplayableTimeSlot | null {
+        const termMap: Record<string, AcademicTerm> = {
+            'A': AcademicTerm.A,
+            'B': AcademicTerm.B,
+            'C': AcademicTerm.C,
+            'D': AcademicTerm.D
+        };
+        const academicTerm = termMap[term];
+        if (!academicTerm) return null;
+
+        return {
+            id: `local-${event.id}-${day}`,
+            day,
+            startTime: event.startTime,
+            endTime: event.endTime,
+            term: academicTerm,
+            title: event.title,
+            subtitle: event.description,
+            sourceType: 'blocked',
+            sourceId: event.id,
+        };
+    }
+
+    /**
+     * Register callback for local events changes
+     */
+    onLocalEventsChange(callback: LocalEventsChangeCallback): void {
+        this.localEventsChangeCallbacks.push(callback);
+    }
+
+    /**
+     * Remove local events change callback
+     */
+    offLocalEventsChange(callback: LocalEventsChangeCallback): void {
+        const index = this.localEventsChangeCallbacks.indexOf(callback);
+        if (index !== -1) {
+            this.localEventsChangeCallbacks.splice(index, 1);
+        }
+    }
+
+    /**
+     * Notify all local events change listeners
+     */
+    private notifyLocalEventsChange(): void {
+        for (const callback of this.localEventsChangeCallbacks) {
+            callback(this.localEvents);
+        }
+    }
+
+    /**
+     * Clear local events
+     */
+    clearLocalEvents(): void {
+        this.localEvents = [];
+        this.weeklySlotsDirty = true;
+        this.notifyLocalEventsChange();
     }
 }

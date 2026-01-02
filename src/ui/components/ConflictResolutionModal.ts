@@ -127,12 +127,6 @@ export class ConflictResolutionModal extends BaseModal {
         this.showModal(element, { closeOnBackdrop: false });
     }
 
-    private escapeHtml(text: string): string {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     private renderSchedulesList(schedules: any[], activeScheduleId?: string | null): string {
         if (!schedules || schedules.length === 0) {
             return `

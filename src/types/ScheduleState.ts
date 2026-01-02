@@ -1,5 +1,5 @@
 import type { Course, Section, Department } from './types';
-import type { SelectedCourse, ScheduleCombination, Schedule } from './schedule';
+import type { SelectedCourse, ScheduleCombination, Schedule, LocalCalendarEvent } from './schedule';
 import type { ScheduleData, SelectedCourseData } from '../services/sync/types';
 import type { ConnectedCalendar } from '../services/calendar/types';
 import { checksumCalculator } from '../services/sync/checksum';
@@ -26,6 +26,8 @@ export class ScheduleState {
     readonly generatedSchedules: ScheduleCombination[];
     readonly timestamp: number;
     readonly connectedCalendar?: ConnectedCalendar;
+    /** Locally-stored calendar events (not synced to cloud) */
+    readonly localEvents: LocalCalendarEvent[];
 
     constructor(
         id: string,
@@ -33,7 +35,8 @@ export class ScheduleState {
         selectedCourses: SelectedCourse[] = [],
         generatedSchedules: ScheduleCombination[] = [],
         timestamp: number = Date.now(),
-        connectedCalendar?: ConnectedCalendar
+        connectedCalendar?: ConnectedCalendar,
+        localEvents: LocalCalendarEvent[] = []
     ) {
         this.id = id;
         this.name = name;
@@ -41,6 +44,7 @@ export class ScheduleState {
         this.generatedSchedules = generatedSchedules;
         this.timestamp = timestamp;
         this.connectedCalendar = connectedCalendar;
+        this.localEvents = localEvents;
     }
 
     /**
@@ -75,10 +79,12 @@ export class ScheduleState {
      * Convert to cloud format (IDs only) for efficient storage
      *
      * This is the boundary where full objects → IDs conversion happens.
+     * NOTE: localEvents are intentionally excluded - they are stored locally only.
      *
      * @returns ScheduleData with IDs only
      */
     toCloudFormat(): ScheduleData {
+        // NOTE: localEvents intentionally omitted - not synced to cloud
         return {
             id: this.id,
             name: this.name,
@@ -157,7 +163,8 @@ export class ScheduleState {
             selectedCourses,
             [], // generatedSchedules not synced to cloud
             cloudData.timestamp || Date.now(),
-            cloudData.connectedCalendar
+            cloudData.connectedCalendar,
+            [] // localEvents not synced to cloud - they stay local
         );
     }
 
@@ -172,6 +179,7 @@ export class ScheduleState {
         selectedCourses: SelectedCourse[];
         generatedSchedules: ScheduleCombination[];
         connectedCalendar: ConnectedCalendar;
+        localEvents: LocalCalendarEvent[];
     }>): ScheduleState {
         return new ScheduleState(
             this.id,
@@ -179,7 +187,8 @@ export class ScheduleState {
             updates.selectedCourses ?? this.selectedCourses,
             updates.generatedSchedules ?? this.generatedSchedules,
             Date.now(), // Update timestamp on any change
-            updates.connectedCalendar ?? this.connectedCalendar
+            updates.connectedCalendar ?? this.connectedCalendar,
+            updates.localEvents ?? this.localEvents
         );
     }
 
@@ -387,7 +396,8 @@ export class ScheduleState {
             schedule.selectedCourses,
             schedule.generatedSchedules,
             schedule.timestamp || Date.now(),
-            schedule.connectedCalendar
+            schedule.connectedCalendar,
+            schedule.localEvents || []
         );
     }
 
@@ -403,7 +413,8 @@ export class ScheduleState {
             selectedCourses: this.selectedCourses,
             generatedSchedules: this.generatedSchedules,
             timestamp: this.timestamp,
-            connectedCalendar: this.connectedCalendar
+            connectedCalendar: this.connectedCalendar,
+            localEvents: this.localEvents
         };
     }
 }

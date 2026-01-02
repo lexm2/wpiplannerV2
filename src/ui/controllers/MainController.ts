@@ -328,6 +328,13 @@ export class MainController {
             this.setupCloudStatusButtonListener();
             this.setupCourseSelectionListener();
             this.setupScheduleChangeListener();
+
+            // Load active schedule into ScheduleController (for local events, etc.)
+            const activeSchedule = this.scheduleManagementService.getActiveSchedule();
+            if (activeSchedule) {
+                this.scheduleController.loadExternalEvents(activeSchedule);
+            }
+
             this.scheduleController.setupAutoScheduleButton();
             this.scheduleController.setupClearAllSectionsButton();
             this.scheduleController.setupCourseSelectionChangeListener();
@@ -1222,10 +1229,10 @@ export class MainController {
                 return;
             }
 
-            // Load external calendar events for the new active schedule
+            // Load schedule data (including local events) for the new active schedule
             const activeSchedule = this.scheduleManagementService.getActiveSchedule();
-            if (activeSchedule && calendarService.isReady()) {
-                console.log('[MainController] Loading external events after schedule change');
+            if (activeSchedule) {
+                console.log('[MainController] Loading schedule data after schedule change');
                 this.scheduleController.loadExternalEvents(activeSchedule);
             }
         });
