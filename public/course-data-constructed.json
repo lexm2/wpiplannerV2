@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 2, 2026, 4:11 AM",
+  "generated": "Jan 2, 2026, 4:52 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -172801,7 +172801,7 @@
                 "number": "C01",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. IThis course integrates thermodynamics, fluid mechanics and heat transferthrough the use of design projects involving modern technologies, such aselectronic cooling, vapor compression power and refrigeration cycles. Activitiesinclude problem definition, design creation and analysis, mathematicalmodeling, cost analysis and optimization.Recommended background: knowledge in thermodynamics, fluid mechanics,heat transfer and introduction to design (ES 3001, ES 3004 and ES 3003,ME 2300 or equivalent).",
@@ -172820,7 +172820,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
