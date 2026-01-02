@@ -8,6 +8,7 @@ import { DayOfWeek } from '../../types/types';
 import { BaseSidebarPanel } from '../sidebar/BaseSidebarPanel';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { Validators } from '../../utils/validators';
+import styles from '../../styles/components/calendar-events-panel.module.css';
 
 export interface CalendarEventsPanelOptions {
     // External calendar options (optional - may not have connected calendar)
@@ -141,18 +142,18 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         if (!this.panel) return;
 
         // Use querySelectorAll to update ALL instances of this event across terms
-        const items = this.panel.querySelectorAll<HTMLElement>(`.external-event-item[data-event-id="${eventId}"]`);
+        const items = this.panel.querySelectorAll<HTMLElement>(`.${styles['external-event-item']}[data-event-id="${eventId}"]`);
 
         items.forEach(item => {
             // Update excluded class
-            item.classList.toggle('excluded', isExcluded);
+            item.classList.toggle(styles.excluded, isExcluded);
 
             // Update the visibility icon
-            const iconContainer = item.querySelector('.event-visibility-toggle');
+            const iconContainer = item.querySelector(`.${styles['event-visibility-toggle']}`);
             if (iconContainer) {
                 iconContainer.innerHTML = isExcluded
-                    ? getInlineSVG('HEXAGON_MINUS', 'visibility-icon hidden')
-                    : getInlineSVG('HEXAGON_PLUS', 'visibility-icon visible');
+                    ? getInlineSVG('HEXAGON_MINUS', `${styles['visibility-icon']} ${styles.hidden}`)
+                    : getInlineSVG('HEXAGON_PLUS', `${styles['visibility-icon']} ${styles.visible}`);
             }
         });
     }
@@ -172,14 +173,14 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
             const countText = `${events.length} event${events.length !== 1 ? 's' : ''}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ''}`;
 
             // Find the term header and update the count (in external events section)
-            const externalSection = this.panel.querySelector('.external-events-section');
+            const externalSection = this.panel.querySelector(`.${styles['external-events-section']}`);
             if (!externalSection) continue;
 
-            const termGroups = externalSection.querySelectorAll('.calendar-term-group');
+            const termGroups = externalSection.querySelectorAll(`.${styles['calendar-term-group']}`);
             for (const group of termGroups) {
-                const termLabel = group.querySelector('.term-label');
+                const termLabel = group.querySelector(`.${styles['term-label']}`);
                 if (termLabel?.textContent === `Term ${term}`) {
-                    const termCount = group.querySelector('.term-count');
+                    const termCount = group.querySelector(`.${styles['term-count']}`);
                     if (termCount) {
                         termCount.textContent = countText;
                     }
@@ -202,27 +203,27 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         const totalEvents = totalLocalEvents + totalExternalEvents;
 
         return `
-            <div class="calendar-events-header">
-                <div class="calendar-events-title">
-                    <span class="calendar-events-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-icon')}</span>
-                    <div class="calendar-events-info">
-                        <span class="calendar-name">Calendar Events</span>
-                        <span class="events-count">${totalEvents} event${totalEvents !== 1 ? 's' : ''}</span>
+            <div class="${styles['calendar-events-header']}">
+                <div class="${styles['calendar-events-title']}">
+                    <span class="${styles['calendar-events-icon']}">${getInlineSVG('CALENDAR_DOWN', 'calendar-icon')}</span>
+                    <div class="${styles['calendar-events-info']}">
+                        <span class="${styles['calendar-name']}">Calendar Events</span>
+                        <span class="${styles['events-count']}">${totalEvents} event${totalEvents !== 1 ? 's' : ''}</span>
                     </div>
                 </div>
-                <div class="calendar-events-actions">
-                    <button class="calendar-events-action-btn" id="add-local-event-btn" title="Add event">
+                <div class="${styles['calendar-events-actions']}">
+                    <button class="${styles['calendar-events-action-btn']}" id="add-local-event-btn" title="Add event">
                         ${getInlineSVG('PLUS', 'action-icon')}
                     </button>
-                    <button class="calendar-events-close-btn" title="Close">
+                    <button class="${styles['calendar-events-close-btn']}" title="Close">
                         ${getInlineSVG('X', 'close-icon')}
                     </button>
                 </div>
             </div>
-            <div class="calendar-events-instructions">
+            <div class="${styles['calendar-events-instructions']}">
                 Add events to block time on your schedule
             </div>
-            <div class="calendar-events-content">
+            <div class="${styles['calendar-events-content']}">
                 ${this.renderLocalEventsSection()}
                 ${this.renderExternalEventsSection()}
             </div>
@@ -234,7 +235,7 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
      */
     protected attachEventListeners(): void {
         // Close button
-        const closeBtn = this.querySelector<HTMLButtonElement>('.calendar-events-close-btn');
+        const closeBtn = this.querySelector<HTMLButtonElement>(`.${styles['calendar-events-close-btn']}`);
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.close());
         }
@@ -246,11 +247,11 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         }
 
         // Local event items - visibility toggle (click on item)
-        const localEventItems = this.querySelectorAll<HTMLElement>('.local-event-item');
+        const localEventItems = this.querySelectorAll<HTMLElement>(`.${styles['local-event-item']}`);
         localEventItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 // Don't toggle if clicking edit/delete buttons
-                if ((e.target as HTMLElement).closest('.local-event-actions')) return;
+                if ((e.target as HTMLElement).closest(`.${styles['local-event-actions']}`)) return;
 
                 const eventId = item.dataset.eventId;
                 if (eventId) {
@@ -260,7 +261,7 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         });
 
         // Local event edit buttons
-        const editBtns = this.querySelectorAll<HTMLButtonElement>('.local-event-edit-btn');
+        const editBtns = this.querySelectorAll<HTMLButtonElement>(`.${styles['local-event-edit-btn']}`);
         editBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -272,7 +273,7 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         });
 
         // Local event delete buttons
-        const deleteBtns = this.querySelectorAll<HTMLButtonElement>('.local-event-delete-btn');
+        const deleteBtns = this.querySelectorAll<HTMLButtonElement>(`.${styles['local-event-delete-btn']}`);
         deleteBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -304,7 +305,7 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
             }
 
             // External event items
-            const externalEventItems = this.querySelectorAll<HTMLElement>('.external-event-item');
+            const externalEventItems = this.querySelectorAll<HTMLElement>(`.${styles['external-event-item']}`);
             externalEventItems.forEach(item => {
                 item.addEventListener('click', () => {
                     const eventId = item.dataset.eventId;
@@ -336,15 +337,15 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         const hiddenCount = localEvents.filter(e => !e.visible).length;
 
         return `
-            <div class="local-events-section">
-                <div class="section-header">
-                    <span class="section-title">Your Events</span>
-                    <span class="section-count">${localEvents.length} event${localEvents.length !== 1 ? 's' : ''}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ''}</span>
+            <div class="${styles['local-events-section']}">
+                <div class="${styles['section-header']}">
+                    <span class="${styles['section-title']}">Your Events</span>
+                    <span class="${styles['section-count']}">${localEvents.length} event${localEvents.length !== 1 ? 's' : ''}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ''}</span>
                 </div>
-                <div class="local-events-list">
+                <div class="${styles['local-events-list']}">
                     ${localEvents.length > 0
                         ? localEvents.map(event => this.renderLocalEventItem(event)).join('')
-                        : '<div class="no-events-message">No events yet. Click + to add one.</div>'
+                        : `<div class="${styles['no-events-message']}">No events yet. Click + to add one.</div>`
                     }
                 </div>
             </div>
@@ -384,24 +385,24 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         }
 
         return `
-            <div class="local-event-item calendar-event-item ${event.visible ? '' : 'excluded'}"
+            <div class="${styles['local-event-item']} ${styles['calendar-event-item']} ${event.visible ? '' : styles.excluded}"
                  data-event-id="${event.id}">
-                <div class="event-visibility-toggle">
+                <div class="${styles['event-visibility-toggle']}">
                     ${event.visible
                         ? getInlineSVG('HEXAGON_PLUS', 'visibility-icon visible')
                         : getInlineSVG('HEXAGON_MINUS', 'visibility-icon hidden')
                     }
                 </div>
-                <div class="event-details">
-                    <div class="event-summary">${Validators.escapeHtml(event.title)}</div>
-                    <div class="event-datetime">${scheduleInfo}</div>
-                    <div class="event-time">${startTime} - ${endTime}</div>
+                <div class="${styles['event-details']}">
+                    <div class="${styles['event-summary']}">${Validators.escapeHtml(event.title)}</div>
+                    <div class="${styles['event-datetime']}">${scheduleInfo}</div>
+                    <div class="${styles['event-time']}">${startTime} - ${endTime}</div>
                 </div>
-                <div class="local-event-actions">
-                    <button class="local-event-edit-btn" data-event-id="${event.id}" title="Edit">
+                <div class="${styles['local-event-actions']}">
+                    <button class="${styles['local-event-edit-btn']}" data-event-id="${event.id}" title="Edit">
                         ${getInlineSVG('SETTINGS', 'action-icon')}
                     </button>
-                    <button class="local-event-delete-btn" data-event-id="${event.id}" title="Delete">
+                    <button class="${styles['local-event-delete-btn']}" data-event-id="${event.id}" title="Delete">
                         ${getInlineSVG('TRASH', 'action-icon')}
                     </button>
                 </div>
@@ -431,20 +432,20 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         const calendarName = this.panelOptions.calendarName || 'External Calendar';
 
         return `
-            <div class="external-events-section">
-                <div class="section-header external-section-header">
-                    <div class="section-title-row">
-                        <span class="section-title">${Validators.escapeHtml(calendarName)}</span>
-                        <span class="section-count">${totalEvents} event${totalEvents !== 1 ? 's' : ''}</span>
+            <div class="${styles['external-events-section']}">
+                <div class="${styles['section-header']} ${styles['external-section-header']}">
+                    <div class="${styles['section-title-row']}">
+                        <span class="${styles['section-title']}">${Validators.escapeHtml(calendarName)}</span>
+                        <span class="${styles['section-count']}">${totalEvents} event${totalEvents !== 1 ? 's' : ''}</span>
                     </div>
-                    <div class="section-actions">
-                        <button class="calendar-events-action-btn" id="calendar-change-btn" title="Change calendar">
+                    <div class="${styles['section-actions']}">
+                        <button class="${styles['calendar-events-action-btn']}" id="calendar-change-btn" title="Change calendar">
                             ${getInlineSVG('CALENDAR_REPEAT', 'action-icon')}
                         </button>
-                        <button class="calendar-events-action-btn" id="calendar-show-all-btn" title="Show all">
+                        <button class="${styles['calendar-events-action-btn']}" id="calendar-show-all-btn" title="Show all">
                             ${getInlineSVG('HEXAGON_PLUS', 'action-icon')}
                         </button>
-                        <button class="calendar-events-action-btn" id="calendar-hide-all-btn" title="Hide all">
+                        <button class="${styles['calendar-events-action-btn']}" id="calendar-hide-all-btn" title="Hide all">
                             ${getInlineSVG('HEXAGON_MINUS', 'action-icon')}
                         </button>
                     </div>
@@ -470,12 +471,12 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
                 : 0;
 
             html += `
-                <div class="calendar-term-group">
-                    <div class="calendar-term-header">
-                        <span class="term-label">Term ${term}</span>
-                        <span class="term-count">${events.length} event${events.length !== 1 ? 's' : ''}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ''}</span>
+                <div class="${styles['calendar-term-group']}">
+                    <div class="${styles['calendar-term-header']}">
+                        <span class="${styles['term-label']}">Term ${term}</span>
+                        <span class="${styles['term-count']}">${events.length} event${events.length !== 1 ? 's' : ''}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ''}</span>
                     </div>
-                    <div class="calendar-term-events">
+                    <div class="${styles['calendar-term-events']}">
                         ${events.map(event => this.renderExternalEventItem(event, term)).join('')}
                     </div>
                 </div>
@@ -483,7 +484,7 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         }
 
         if (!html) {
-            html = '<div class="no-events-message">No external calendar events found</div>';
+            html = `<div class="${styles['no-events-message']}">No external calendar events found</div>`;
         }
 
         return html;
@@ -504,31 +505,31 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
         // For recurring events, show recurrence description instead of specific date
         const isRecurring = !!event.recurrenceDescription;
         const recurrenceHtml = isRecurring
-            ? `<div class="event-recurrence">${Validators.escapeHtml(event.recurrenceDescription!)}</div>`
+            ? `<div class="${styles['event-recurrence']}">${Validators.escapeHtml(event.recurrenceDescription!)}</div>`
             : '';
 
         // Show occurrence count for recurring events
         const occurrenceHtml = event.occurrenceCount && event.occurrenceCount > 1
-            ? `<span class="occurrence-count">${event.occurrenceCount} occurrences</span>`
+            ? `<span class="${styles['occurrence-count']}">${event.occurrenceCount} occurrences</span>`
             : '';
 
         // Show start time and first date (or just time for recurring)
         const datetimeHtml = isRecurring
-            ? `<div class="event-datetime">${time}${occurrenceHtml ? ` · ${occurrenceHtml}` : ''}</div>`
-            : `<div class="event-datetime">${dayName}, ${dateStr} at ${time}</div>`;
+            ? `<div class="${styles['event-datetime']}">${time}${occurrenceHtml ? ` · ${occurrenceHtml}` : ''}</div>`
+            : `<div class="${styles['event-datetime']}">${dayName}, ${dateStr} at ${time}</div>`;
 
         return `
-            <div class="external-event-item calendar-event-item ${isExcluded ? 'excluded' : ''} ${isRecurring ? 'recurring' : ''}"
+            <div class="${styles['external-event-item']} ${styles['calendar-event-item']} ${isExcluded ? styles.excluded : ''} ${isRecurring ? styles.recurring : ''}"
                  data-event-id="${event.id || ''}"
                  data-term="${term}">
-                <div class="event-visibility-toggle">
+                <div class="${styles['event-visibility-toggle']}">
                     ${isExcluded
-                        ? getInlineSVG('HEXAGON_MINUS', 'visibility-icon hidden')
-                        : getInlineSVG('HEXAGON_PLUS', 'visibility-icon visible')
+                        ? getInlineSVG('HEXAGON_MINUS', `${styles['visibility-icon']} ${styles.hidden}`)
+                        : getInlineSVG('HEXAGON_PLUS', `${styles['visibility-icon']} ${styles.visible}`)
                     }
                 </div>
-                <div class="event-details">
-                    <div class="event-summary">${Validators.escapeHtml(event.summary || 'Untitled Event')}</div>
+                <div class="${styles['event-details']}">
+                    <div class="${styles['event-summary']}">${Validators.escapeHtml(event.summary || 'Untitled Event')}</div>
                     ${recurrenceHtml}
                     ${datetimeHtml}
                 </div>
