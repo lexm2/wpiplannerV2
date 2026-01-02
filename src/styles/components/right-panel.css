@@ -261,7 +261,6 @@
 
 .component-tab:hover {
   color: var(--color-text);
-  background: var(--color-surface);
 }
 
 .component-tab.active {
