@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 2, 2026, 10:43 PM",
+  "generated": "Jan 2, 2026, 10:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -227236,7 +227236,7 @@
                 "crn": 336112,
                 "number": "C01",
                 "seats": 75,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -227255,7 +227255,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 75,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
