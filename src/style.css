@@ -17,7 +17,7 @@
 @import url('./styles/components/right-panel.css');
 @import url('./styles/components/schedule-page.css');
 @import url('./styles/components/schedule-picker-modal.css');
-@import url('./styles/components/modal.css');
+@import url('./styles/components/modal.css'); /* BaseModal framework - LocalEventModal migrated to local-event-modal.module.css */
 /* dual-range-slider.css migrated to CSS Module - imported directly in DualRangeSlider.ts */
 /* component-wizard.css migrated to CSS Module - imported directly in ComponentSelectionWizard.ts */
 @import url('./styles/components/sidebar-panel.css'); /* Base sidebar panel styles */

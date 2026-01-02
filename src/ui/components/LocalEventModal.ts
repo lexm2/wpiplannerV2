@@ -7,6 +7,7 @@ import { BaseModal } from './BaseModal';
 import type { LocalCalendarEvent } from '../../types/schedule';
 import { DayOfWeek } from '../../types/types';
 import { getInlineSVG } from '../../utils/iconPaths';
+import styles from '../../styles/components/local-event-modal.module.css';
 
 export interface LocalEventModalOptions {
     /** Callback when event is saved */
@@ -95,13 +96,13 @@ export class LocalEventModal extends BaseModal {
         const terms = event?.terms || ['A', 'B', 'C', 'D'];
 
         backdrop.innerHTML = `
-            <div class="modal-dialog local-event-modal">
+            <div class="modal-dialog ${styles['local-event-modal']}">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="modal-title">${this.isEditMode ? 'Edit Event' : 'Add Event'}</h3>
                         <button class="modal-close" data-modal-close>&times;</button>
                     </div>
-                    <div class="modal-body local-event-form" data-type="${eventType}">
+                    <div class="modal-body ${styles['local-event-form']}" data-type="${eventType}">
                         <!-- Title -->
                         <div class="form-group">
                             <label for="event-title">Title <span class="required">*</span></label>
@@ -119,13 +120,13 @@ export class LocalEventModal extends BaseModal {
                         <!-- Event Type Selector -->
                         <div class="form-group">
                             <label>Event Type</label>
-                            <div class="event-type-selector">
-                                <button type="button" class="event-type-option ${eventType === 'one-time' ? 'selected' : ''}"
+                            <div class="${styles['event-type-selector']}">
+                                <button type="button" class="${styles['event-type-option']} ${eventType === 'one-time' ? styles.selected : ''}"
                                         data-type="one-time">
                                     ${getInlineSVG('CALENDAR_DOWN', 'type-icon')}
                                     One-time
                                 </button>
-                                <button type="button" class="event-type-option ${eventType === 'recurring' ? 'selected' : ''}"
+                                <button type="button" class="${styles['event-type-option']} ${eventType === 'recurring' ? styles.selected : ''}"
                                         data-type="recurring">
                                     ${getInlineSVG('CALENDAR_REPEAT', 'type-icon')}
                                     Recurring
@@ -134,7 +135,7 @@ export class LocalEventModal extends BaseModal {
                         </div>
 
                         <!-- One-time: Date picker -->
-                        <div class="one-time-fields">
+                        <div class="${styles['one-time-fields']}">
                             <div class="form-group">
                                 <label for="event-date">Date</label>
                                 <input type="date" id="event-date" class="form-input" value="${date}">
@@ -142,17 +143,17 @@ export class LocalEventModal extends BaseModal {
                         </div>
 
                         <!-- Recurring: Day selector -->
-                        <div class="recurring-fields">
+                        <div class="${styles['recurring-fields']}">
                             <div class="form-group">
                                 <label>Days <span class="required">*</span></label>
-                                <div class="day-selector">
+                                <div class="${styles['day-selector']}">
                                     ${this.renderDayPills()}
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label>Terms</label>
-                                <div class="event-term-checkboxes">
+                                <div class="${styles['event-term-checkboxes']}">
                                     ${this.renderTermCheckboxes(terms)}
                                 </div>
                             </div>
@@ -161,13 +162,13 @@ export class LocalEventModal extends BaseModal {
                         <!-- Time (shared) -->
                         <div class="form-group">
                             <label>Time</label>
-                            <div class="time-row">
-                                <div class="form-group-time">
+                            <div class="${styles['time-row']}">
+                                <div class="${styles['form-group-time']}">
                                     <input type="time" id="event-start" class="form-input"
                                            value="${this.formatTime(startHour, startMin)}">
                                 </div>
-                                <span class="time-separator">to</span>
-                                <div class="form-group-time">
+                                <span class="${styles['time-separator']}">to</span>
+                                <div class="${styles['form-group-time']}">
                                     <input type="time" id="event-end" class="form-input"
                                            value="${this.formatTime(endHour, endMin)}">
                                 </div>
@@ -202,7 +203,7 @@ export class LocalEventModal extends BaseModal {
      */
     private renderDayPills(): string {
         return WEEKDAYS.map(day => `
-            <button type="button" class="day-pill ${this.selectedDays.has(day.value) ? 'selected' : ''}"
+            <button type="button" class="${styles['day-pill']} ${this.selectedDays.has(day.value) ? styles.selected : ''}"
                     data-day="${day.value}" title="${day.label}">
                 ${day.short}
             </button>
@@ -215,9 +216,9 @@ export class LocalEventModal extends BaseModal {
     private renderTermCheckboxes(selectedTerms: string[]): string {
         const terms = ['A', 'B', 'C', 'D'];
         return terms.map(term => `
-            <label class="event-term-label">
-                <span class="event-term-text">Term ${term}</span>
-                <input type="checkbox" class="event-term-toggle" name="terms" value="${term}"
+            <label class="${styles['event-term-label']}">
+                <span class="${styles['event-term-text']}">Term ${term}</span>
+                <input type="checkbox" class="${styles['event-term-toggle']}" name="terms" value="${term}"
                        ${selectedTerms.includes(term) ? 'checked' : ''}>
             </label>
         `).join('');
@@ -274,7 +275,7 @@ export class LocalEventModal extends BaseModal {
         }
 
         // Event type selector
-        this.modalElement.querySelectorAll('.event-type-option').forEach(btn => {
+        this.modalElement.querySelectorAll(`.${styles['event-type-option']}`).forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const target = e.currentTarget as HTMLElement;
                 const type = target.dataset.type as EventType;
@@ -283,7 +284,7 @@ export class LocalEventModal extends BaseModal {
         });
 
         // Day pill selector
-        this.modalElement.querySelectorAll('.day-pill').forEach(btn => {
+        this.modalElement.querySelectorAll(`.${styles['day-pill']}`).forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const target = e.currentTarget as HTMLElement;
                 const day = target.dataset.day as DayOfWeek;
@@ -301,15 +302,15 @@ export class LocalEventModal extends BaseModal {
         if (!this.modalElement) return;
 
         // Update form data attribute
-        const form = this.modalElement.querySelector('.local-event-form');
+        const form = this.modalElement.querySelector(`.${styles['local-event-form']}`);
         if (form) {
             form.setAttribute('data-type', type);
         }
 
         // Update selector buttons
-        this.modalElement.querySelectorAll('.event-type-option').forEach(btn => {
+        this.modalElement.querySelectorAll(`.${styles['event-type-option']}`).forEach(btn => {
             const btnType = (btn as HTMLElement).dataset.type;
-            btn.classList.toggle('selected', btnType === type);
+            btn.classList.toggle(styles.selected, btnType === type);
         });
     }
 
@@ -321,15 +322,15 @@ export class LocalEventModal extends BaseModal {
             // Don't allow deselecting if it's the last one
             if (this.selectedDays.size > 1) {
                 this.selectedDays.delete(day);
-                element.classList.remove('selected');
+                element.classList.remove(styles.selected);
             }
         } else {
             this.selectedDays.add(day);
-            element.classList.add('selected');
+            element.classList.add(styles.selected);
         }
 
         // Clear any error state
-        const daySelector = this.modalElement?.querySelector('.day-selector');
+        const daySelector = this.modalElement?.querySelector(`.${styles['day-selector']}`);
         daySelector?.classList.remove('form-error');
     }
 
@@ -353,7 +354,7 @@ export class LocalEventModal extends BaseModal {
         if (this.currentEventType === 'recurring') {
             // Check at least one day is selected
             if (this.selectedDays.size === 0) {
-                const daySelector = this.modalElement.querySelector('.day-selector');
+                const daySelector = this.modalElement.querySelector(`.${styles['day-selector']}`);
                 daySelector?.classList.add('form-error');
                 return false;
             }
@@ -361,7 +362,7 @@ export class LocalEventModal extends BaseModal {
             // Check at least one term is selected
             const termCheckboxes = this.modalElement.querySelectorAll('input[name="terms"]:checked');
             if (termCheckboxes.length === 0) {
-                const termContainer = this.modalElement.querySelector('.event-term-checkboxes');
+                const termContainer = this.modalElement.querySelector(`.${styles['event-term-checkboxes']}`);
                 termContainer?.classList.add('form-error');
                 return false;
             }
