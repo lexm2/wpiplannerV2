@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 2, 2026, 10:44 AM",
+  "generated": "Jan 2, 2026, 10:54 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -67682,7 +67682,7 @@
                 "number": "C02",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I A study of the fundamental laws of statics, kinematics, and dynamics applied to fluid mechanics. The course will include fluid properties, conservation of mass, momentum, and energy as applied to real and ideal fluids. Laminar and turbulent flows, fluid resistance, and basic boundary layer theory will also be considered. Recommended background: basic physics, basic differential equations, and vectors.",
@@ -67701,7 +67701,7 @@
                     "room": "Kaven Hall 116",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 20,
                     "specificSection": "C02",
                     "days": [
