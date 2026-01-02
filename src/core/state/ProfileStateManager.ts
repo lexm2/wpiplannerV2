@@ -499,7 +499,7 @@ export class ProfileStateManager {
         try {
             this.restoreFromSnapshot(snapshot);
             this.emitEvent('courses_changed', { action: 'undo' }, 'system');
-            await this.save();
+            this.save();
             return true;
         } finally {
             this.isRestoringState = false;
@@ -514,7 +514,7 @@ export class ProfileStateManager {
         try {
             this.restoreFromSnapshot(snapshot);
             this.emitEvent('courses_changed', { action: 'redo' }, 'system');
-            await this.save();
+            this.save();
             return true;
         } finally {
             this.isRestoringState = false;
@@ -556,16 +556,13 @@ export class ProfileStateManager {
         return this.undoRedoManager.onChange(listener);
     }
 
-    // Persistence methods - All saves are immediate (async for IndexedDB compatibility)
-    async save(): Promise<void> {
+    save(): void {
         const savePromise = this.executeSave();
         this.pendingSavePromises.add(savePromise);
 
-        try {
-            await savePromise;
-        } finally {
-            this.pendingSavePromises.delete(savePromise);
-        }
+        savePromise
+            .catch(error => logger.error('Save failed:', error))
+            .finally(() => this.pendingSavePromises.delete(savePromise));
     }
 
     private async executeSave(): Promise<void> {
@@ -888,7 +885,7 @@ export class ProfileStateManager {
 
         // Skip save if in batch mode - batch will handle save at the end
         if (!this.isBatchUpdate) {
-            this.save().catch(error => logger.error('Save failed:', error));
+            this.save();
         }
     }
 
@@ -904,7 +901,7 @@ export class ProfileStateManager {
 
         // Skip save if in batch mode - batch will handle save at the end
         if (!this.isBatchUpdate) {
-            await this.save();
+            this.save();
         }
         return result;
     }
@@ -921,7 +918,7 @@ export class ProfileStateManager {
 
         // Skip save if in batch mode - batch will handle save at the end
         if (!this.isBatchUpdate) {
-            this.save().catch(error => logger.error('Save failed:', error));
+            this.save();
         }
         return result;
     }
@@ -953,7 +950,7 @@ export class ProfileStateManager {
             if (!wasBatch) {
                 this.isBatchUpdate = false;
                 // Single save after all operations
-                await this.save();
+                this.save();
             }
         }
     }
@@ -983,8 +980,7 @@ export class ProfileStateManager {
         } finally {
             if (!wasBatch) {
                 this.isBatchUpdate = false;
-                // Fire-and-forget save (non-blocking for sync context)
-                this.save().catch(error => logger.error('Batch save failed:', error));
+                this.save();
             }
         }
     }
