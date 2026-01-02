@@ -2008,7 +2008,7 @@ export class ScheduleController {
             const target = e.target as HTMLElement;
 
             // Check if back button was clicked
-            if (target.classList.contains('term-back-btn')) {
+            if (target.closest('.term-back-btn')) {
                 e.stopPropagation();
                 this.unfocusTerm();
                 return;
