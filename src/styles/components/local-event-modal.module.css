@@ -1,0 +1,214 @@
+/* =============================================================================
+   Local Event Modal - Add/Edit local calendar events (CSS Module)
+   ============================================================================= */
+
+.local-event-modal {
+  max-width: 500px;
+}
+
+.local-event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* =============================================================================
+   Event Type Selector
+   ============================================================================= */
+
+.event-type-selector {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.event-type-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+  transition: var(--effect-transition);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.event-type-option:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.event-type-option.selected {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.event-type-option :global(.type-icon) {
+  width: 20px;
+  height: 20px;
+}
+
+/* =============================================================================
+   Conditional Field Visibility
+   ============================================================================= */
+
+.local-event-form[data-type="one-time"] .recurring-fields {
+  display: none;
+}
+
+.local-event-form[data-type="recurring"] .one-time-fields {
+  display: none;
+}
+
+.one-time-fields,
+.recurring-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* =============================================================================
+   Day Selector (Multi-select Pills)
+   ============================================================================= */
+
+.day-selector {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.day-selector.form-error {
+  padding: 0.25rem;
+  border: 1px solid var(--color-danger, #ef4444);
+  border-radius: var(--effect-border-radius);
+}
+
+.day-pill {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--effect-transition);
+  user-select: none;
+}
+
+.day-pill:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.day-pill.selected {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+/* =============================================================================
+   Event Term Toggles
+   ============================================================================= */
+
+.event-term-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.event-term-checkboxes.form-error {
+  padding: 0.25rem;
+  border: 1px solid var(--color-danger, #ef4444);
+  border-radius: var(--effect-border-radius);
+}
+
+.event-term-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  transition: var(--effect-transition);
+}
+
+.event-term-label:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.event-term-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  user-select: none;
+}
+
+.event-term-toggle {
+  position: relative;
+  width: 44px;
+  height: 22px;
+  appearance: none;
+  background: var(--color-border);
+  border-radius: 11px;
+  outline: none;
+  cursor: pointer;
+  transition: var(--effect-transition);
+  margin: 0;
+}
+
+.event-term-toggle:checked {
+  background: var(--color-primary);
+}
+
+.event-term-toggle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  transition: var(--effect-transition);
+}
+
+.event-term-toggle:checked::before {
+  transform: translateX(22px);
+}
+
+/* =============================================================================
+   Time Row
+   ============================================================================= */
+
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-group-time {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.time-separator {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  padding-top: 0.25rem;
+  user-select: none;
+}
