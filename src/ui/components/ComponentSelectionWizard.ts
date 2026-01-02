@@ -11,6 +11,7 @@ import { logger } from '../../utils/logger';
 import { Validators } from '../../utils/validators';
 import { BaseSidebarPanel } from '../sidebar/BaseSidebarPanel';
 import type { SidebarListItem, SidebarListGroup } from '../sidebar/types';
+import styles from '../../styles/components/component-wizard.module.css';
 
 type WizardStep = 'lecture' | 'discussion' | 'lab';
 
@@ -415,23 +416,23 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         // Update visual selection state without re-rendering
         if (this.panel) {
             // Remove 'selected' class and badges from all section cards
-            const allSections = this.panel.querySelectorAll('.wizard-section-card');
+            const allSections = this.panel.querySelectorAll(`.${styles['wizard-section-card']}`);
             allSections.forEach(el => {
-                el.classList.remove('selected');
+                el.classList.remove(styles.selected);
                 // Remove any existing selected badge
-                const badge = el.querySelector('.section-card-selected-badge');
+                const badge = el.querySelector(`.${styles['section-card-selected-badge']}`);
                 if (badge) {
                     badge.remove();
                 }
             });
 
             // Add 'selected' class to the newly selected section and add badge
-            const selectedSection = this.panel.querySelector(`.wizard-section-card[data-crn="${section.crn}"]`);
+            const selectedSection = this.panel.querySelector(`.${styles['wizard-section-card']}[data-crn="${section.crn}"]`);
             if (selectedSection) {
-                selectedSection.classList.add('selected');
+                selectedSection.classList.add(styles.selected);
                 // Add selected badge
                 const badge = document.createElement('div');
-                badge.className = 'section-card-selected-badge';
+                badge.className = styles['section-card-selected-badge'];
                 badge.textContent = '✓ Selected';
                 selectedSection.appendChild(badge);
             }
@@ -599,20 +600,20 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      */
     protected renderContent(): string {
         return `
-            <div class="wizard-header">
-                <button class="wizard-close-btn" id="wizard-close-btn">&times;</button>
+            <div class="${styles['wizard-header']}">
+                <button class="${styles['wizard-close-btn']}" id="wizard-close-btn">&times;</button>
                 <h2>${Validators.escapeHtml(this.course.department.abbreviation)} ${Validators.escapeHtml(this.course.number)}</h2>
-                <div class="wizard-course-name">${Validators.escapeHtml(this.course.name)}</div>
+                <div class="${styles['wizard-course-name']}">${Validators.escapeHtml(this.course.name)}</div>
             </div>
 
             ${this.renderFilterStatus()}
             ${this.renderBreadcrumbs()}
 
-            <div class="wizard-content">
+            <div class="${styles['wizard-content']}">
                 ${this.renderCurrentStep()}
             </div>
 
-            <div class="wizard-footer">
+            <div class="${styles['wizard-footer']}">
                 ${this.renderFooter()}
             </div>
         `;
@@ -657,7 +658,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
                 }
 
                 if (parts.length > 0) {
-                    filterDescriptions.push(`RMP: ${parts.join('<span class="filter-separator">●</span>')}`);
+                    filterDescriptions.push(`RMP: ${parts.join(`<span class="${styles['filter-separator']}">●</span>`)}`);
                 }
             } else if (filter.id !== 'searchText') {
                 // Add other filters (excluding search text which is shown elsewhere)
@@ -674,16 +675,16 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             if (index === 0) {
                 return desc;
             }
-            return `<span class="filter-separator">●</span>${desc}`;
+            return `<span class="${styles['filter-separator']}">●</span>${desc}`;
         }).join('');
 
         return `
-            <div class="wizard-filter-status">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="filter-icon">
+            <div class="${styles['wizard-filter-status']}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="${styles['filter-icon']}">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                     <path d="M20 3h-16a1 1 0 0 0 -1 1v2.227l.008 .223a3 3 0 0 0 .772 1.795l4.22 4.641v8.114a1 1 0 0 0 1.316 .949l6 -2l.108 -.043a1 1 0 0 0 .576 -.906v-6.586l4.121 -4.12a3 3 0 0 0 .879 -2.123v-2.171a1 1 0 0 0 -1 -1z" />
                 </svg>
-                <span class="filter-text">Filters: ${filterItems}</span>
+                <span class="${styles['filter-text']}">Filters: ${filterItems}</span>
             </div>
         `;
     }
@@ -706,18 +707,18 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
 
             return `
                 <button
-                    class="wizard-breadcrumb ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}"
+                    class="${styles['wizard-breadcrumb']} ${isActive ? styles.active : ''} ${isCompleted ? styles.completed : ''}"
                     data-step="${step}"
                     ${isActive ? 'disabled' : ''}
                 >
-                    <span class="breadcrumb-label">${stepLabels[step]}</span>
-                    ${isCompleted ? '<span class="breadcrumb-check">✓</span>' : ''}
+                    <span class="${styles['breadcrumb-label']}">${stepLabels[step]}</span>
+                    ${isCompleted ? `<span class="${styles['breadcrumb-check']}">✓</span>` : ''}
                 </button>
             `;
-        }).join(`<span class="breadcrumb-arrow">${getInlineSVG('ARROW_BAR_RIGHT', 'breadcrumb-arrow-icon')}</span>`);
+        }).join(`<span class="${styles['breadcrumb-arrow']}">${getInlineSVG('ARROW_BAR_RIGHT', `${styles['breadcrumb-arrow-icon']}`)}</span>`);
 
         return `
-            <div class="wizard-breadcrumbs">
+            <div class="${styles['wizard-breadcrumbs']}">
                 ${breadcrumbs}
             </div>
         `;
@@ -731,8 +732,8 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
 
         if (options.length === 0) {
             return `
-                <div class="wizard-step" data-step="${this.currentStep}">
-                    <div class="wizard-empty-state">
+                <div class="${styles['wizard-step']}" data-step="${this.currentStep}">
+                    <div class="${styles['wizard-empty-state']}">
                         <p>No ${this.currentStep}s available for this course.</p>
                     </div>
                 </div>
@@ -754,16 +755,16 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         for (const [term, sections] of sectionsByTerm) {
             const termName = this.getTermName(term);
             sectionsHTML += `
-                <div class="wizard-term-separator">${termName}</div>
-                <div class="wizard-sections-grid">
+                <div class="${styles['wizard-term-separator']}">${termName}</div>
+                <div class="${styles['wizard-sections-grid']}">
                     ${sections.map(section => this.renderSectionCard(section, cardIndex++)).join('')}
                 </div>
             `;
         }
 
         return `
-            <div class="wizard-step active slide-in-right" data-step="${this.currentStep}">
-                <h3 class="wizard-step-title">${stepTitles[this.currentStep]}</h3>
+            <div class="${styles['wizard-step']} ${styles.active} ${styles['slide-in-right']}" data-step="${this.currentStep}">
+                <h3 class="${styles['wizard-step-title']}">${stepTitles[this.currentStep]}</h3>
                 ${sectionsHTML}
             </div>
         `;
@@ -837,7 +838,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         let timeLocationContent: string;
         if (isAsync) {
             timeLocationContent = `
-                <div class="section-card-async-badge">
+                <div class="${styles['section-card-async-badge']}">
                     ${getInlineSVG('CLOCK', 'async-icon')}
                     Asynchronous
                 </div>
@@ -847,34 +848,34 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             const time = period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
             const location = period?.location || 'TBA';
             timeLocationContent = `
-                <div class="section-card-time">
+                <div class="${styles['section-card-time']}">
                     <strong>${Validators.escapeHtml(days)}</strong> ${Validators.escapeHtml(time)}
                 </div>
-                <div class="section-card-location">${Validators.escapeHtml(location)}</div>
+                <div class="${styles['section-card-location']}">${Validators.escapeHtml(location)}</div>
             `;
         }
 
         return `
             <div
-                class="wizard-section-card ${isSelected ? 'selected' : ''}"
+                class="${styles['wizard-section-card']} ${isSelected ? styles.selected : ''}"
                 data-crn="${section.crn}"
                 style="--card-index: ${cardIndex}"
             >
-                <div class="section-card-header">
-                    <span class="section-card-number">${Validators.escapeHtml(section.number)}</span>
+                <div class="${styles['section-card-header']}">
+                    <span class="${styles['section-card-number']}">${Validators.escapeHtml(section.number)}</span>
                 </div>
                 ${timeLocationContent}
-                <div class="section-card-professor">
-                    ${rmpUrl ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProfessor}</a>` : escapedProfessor}
+                <div class="${styles['section-card-professor']}">
+                    ${rmpUrl ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="${styles['professor-link']}">${escapedProfessor}</a>` : escapedProfessor}
                     ${rmpData ? this.renderRMPBadge(rmpData) : ''}
                 </div>
-                <div class="section-card-footer">
-                    <span class="section-card-seats ${section.seatsAvailable === 0 ? 'full' : ''}">
+                <div class="${styles['section-card-footer']}">
+                    <span class="${styles['section-card-seats']} ${section.seatsAvailable === 0 ? styles.full : ''}">
                         ${seatsInfo}
                     </span>
-                    <span class="section-card-crn">CRN: ${section.crn}</span>
+                    <span class="${styles['section-card-crn']}">CRN: ${section.crn}</span>
                 </div>
-                ${isSelected ? '<div class="section-card-selected-badge">✓ Selected</div>' : ''}
+                ${isSelected ? `<div class="${styles['section-card-selected-badge']}">✓ Selected</div>` : ''}
             </div>
         `;
     }
@@ -890,12 +891,12 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         hasData: boolean;
     }): string {
         const ratingNum = parseFloat(rmpData.rating);
-        const ratingClass = ratingNum >= 4.0 ? 'excellent' : ratingNum >= 3.0 ? 'good' : 'poor';
+        const ratingClass = ratingNum >= 4.0 ? styles.excellent : ratingNum >= 3.0 ? styles.good : styles.poor;
 
         return `
-            <div class="rmp-badge" title="Rate My Professor: ${rmpData.rating}/5.0 (${rmpData.numRatings} ratings)">
-                <span class="rmp-rating ${ratingClass}">★ ${rmpData.rating}</span>
-                <span class="rmp-details">
+            <div class="${styles['rmp-badge']}" title="Rate My Professor: ${rmpData.rating}/5.0 (${rmpData.numRatings} ratings)">
+                <span class="${styles['rmp-rating']} ${ratingClass}">★ ${rmpData.rating}</span>
+                <span class="${styles['rmp-details']}">
                     ${rmpData.difficulty}/5 difficulty
                     ${rmpData.wouldTakeAgain ? ` • ${rmpData.wouldTakeAgain} would take again` : ''}
                 </span>
@@ -914,21 +915,21 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
 
         return `
             <button
-                class="wizard-btn wizard-btn-secondary"
+                class="${styles['wizard-btn']} ${styles['wizard-btn-secondary']}"
                 id="wizard-back-btn"
                 ${isFirstStep ? 'style="visibility: hidden"' : ''}
             >
                 Back
             </button>
-            <button class="wizard-btn wizard-btn-text" id="wizard-cancel-btn">
+            <button class="${styles['wizard-btn']} ${styles['wizard-btn-text']}" id="wizard-cancel-btn">
                 Cancel
             </button>
             ${hasSelection ? `
-                <button class="wizard-btn wizard-btn-primary" id="wizard-next-btn">
+                <button class="${styles['wizard-btn']} ${styles['wizard-btn-primary']}" id="wizard-next-btn">
                     ${isLastStep ? 'Finish' : 'Next'}
                 </button>
             ` : !isLastStep ? `
-                <button class="wizard-btn wizard-btn-secondary" id="wizard-skip-btn">
+                <button class="${styles['wizard-btn']} ${styles['wizard-btn-secondary']}" id="wizard-skip-btn">
                     Skip
                 </button>
             ` : ''}
@@ -982,7 +983,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         });
 
         // Section cards
-        const sectionCards = this.panel.querySelectorAll('.wizard-section-card');
+        const sectionCards = this.panel.querySelectorAll(`.${styles['wizard-section-card']}`);
         sectionCards.forEach(card => {
             card.addEventListener('click', (e) => {
                 const crn = parseInt((e.currentTarget as HTMLElement).dataset.crn || '0');
