@@ -23,6 +23,11 @@ export class ModalService {
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 modalElement.classList.add('show');
+                // Also apply show class to dialog for animation (CSS Modules compatibility)
+                const dialog = modalElement.querySelector('.modal-dialog');
+                if (dialog) {
+                    dialog.classList.add('show');
+                }
             });
         });
     }
@@ -31,7 +36,12 @@ export class ModalService {
         const modalElement = this.modals.get(id);
         if (modalElement) {
             modalElement.classList.add('hide');
-            
+            // Also apply hide class to dialog for animation (CSS Modules compatibility)
+            const dialog = modalElement.querySelector('.modal-dialog');
+            if (dialog) {
+                dialog.classList.add('hide');
+            }
+
             setTimeout(() => {
                 if (modalElement.parentNode) {
                     modalElement.parentNode.removeChild(modalElement);
