@@ -30,7 +30,7 @@
     justify-content: center;
 }
 
-.calendar-events-icon .calendar-icon {
+.calendar-events-icon :global(.calendar-icon) {
     width: 24px;
     height: 24px;
     color: var(--color-primary);
@@ -77,13 +77,13 @@
     background: var(--color-surface);
 }
 
-.calendar-events-action-btn .action-icon {
+.calendar-events-action-btn :global(.action-icon) {
     width: 18px;
     height: 18px;
     color: var(--color-text-secondary);
 }
 
-.calendar-events-action-btn:hover .action-icon {
+.calendar-events-action-btn:hover :global(.action-icon) {
     color: var(--color-text);
 }
 
@@ -104,7 +104,7 @@
     background: var(--color-surface);
 }
 
-.calendar-events-close-btn .close-icon {
+.calendar-events-close-btn :global(.close-icon) {
     width: 20px;
     height: 20px;
     color: var(--color-text-secondary);
@@ -195,16 +195,16 @@
     flex-shrink: 0;
 }
 
-.event-visibility-toggle .visibility-icon {
+.event-visibility-toggle :global(.visibility-icon) {
     width: 20px;
     height: 20px;
 }
 
-.event-visibility-toggle .visibility-icon.visible {
+.event-visibility-toggle :global(.visibility-icon.visible) {
     color: var(--color-success, #10b981);
 }
 
-.event-visibility-toggle .visibility-icon.hidden {
+.event-visibility-toggle :global(.visibility-icon.hidden) {
     color: var(--color-text-secondary);
 }
 
@@ -225,6 +225,11 @@
 }
 
 .event-datetime {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.event-time {
     font-size: 0.75rem;
     color: var(--color-text-secondary);
 }
@@ -363,14 +368,14 @@
     background: var(--color-danger-bg, rgba(239, 68, 68, 0.1));
 }
 
-.local-event-edit-btn .action-icon,
-.local-event-delete-btn .action-icon {
+.local-event-edit-btn :global(.action-icon),
+.local-event-delete-btn :global(.action-icon) {
     width: 16px;
     height: 16px;
     color: var(--color-text-secondary);
 }
 
-.local-event-delete-btn:hover .action-icon {
+.local-event-delete-btn:hover :global(.action-icon) {
     color: var(--color-danger, #ef4444);
 }
 
@@ -391,23 +396,23 @@
     width: 100%;
 }
 
-.local-event-form .form-group {
+.local-event-form :global(.form-group) {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
 }
 
-.local-event-form .form-group label {
+.local-event-form :global(.form-group) :global(label) {
     font-size: 0.85rem;
     font-weight: var(--font-weight-medium);
     color: var(--color-text);
 }
 
-.local-event-form .form-group label .required {
+.local-event-form :global(.form-group) :global(label) :global(.required) {
     color: var(--color-danger, #ef4444);
 }
 
-.local-event-form .form-input {
+.local-event-form :global(.form-input) {
     width: 100%;
     padding: 0.5rem 0.75rem;
     border: 1px solid var(--color-border);
@@ -418,31 +423,31 @@
     transition: var(--effect-transition);
 }
 
-.local-event-form .form-input:focus {
+.local-event-form :global(.form-input:focus) {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 2px var(--color-primary-alpha, rgba(var(--color-primary-rgb), 0.2));
 }
 
-.local-event-form .form-input.form-error {
+.local-event-form :global(.form-input.form-error) {
     border-color: var(--color-danger, #ef4444);
 }
 
-.local-event-form .form-textarea {
+.local-event-form :global(.form-textarea) {
     min-height: 60px;
     resize: none;
 }
 
-.local-event-form .form-select {
+.local-event-form :global(.form-select) {
     cursor: pointer;
 }
 
-.local-event-form .form-row {
+.local-event-form :global(.form-row) {
     display: flex;
     gap: 1rem;
 }
 
-.local-event-form .form-group-half {
+.local-event-form :global(.form-group-half) {
     flex: 1;
 }
 
@@ -487,7 +492,7 @@
     color: white;
 }
 
-.event-type-option .type-icon {
+.event-type-option :global(.type-icon) {
     width: 16px;
     height: 16px;
 }
@@ -578,7 +583,7 @@
     justify-content: center;
 }
 
-.modal-dialog.local-event-modal .btn-icon {
+.modal-dialog.local-event-modal :global(.btn-icon) {
     width: 16px;
     height: 16px;
     flex-shrink: 0;

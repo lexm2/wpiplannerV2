@@ -524,8 +524,8 @@ export class CalendarEventsPanel extends BaseSidebarPanel {
                  data-term="${term}">
                 <div class="${styles['event-visibility-toggle']}">
                     ${isExcluded
-                        ? getInlineSVG('HEXAGON_MINUS', `${styles['visibility-icon']} ${styles.hidden}`)
-                        : getInlineSVG('HEXAGON_PLUS', `${styles['visibility-icon']} ${styles.visible}`)
+                        ? getInlineSVG('HEXAGON_MINUS', 'visibility-icon hidden')
+                        : getInlineSVG('HEXAGON_PLUS', 'visibility-icon visible')
                     }
                 </div>
                 <div class="${styles['event-details']}">
