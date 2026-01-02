@@ -2432,7 +2432,8 @@ export class ScheduleController {
                 const discussionId = sc.selectedDiscussion?.crn || 'none';
                 const labId = sc.selectedLab?.crn || 'none';
                 const sectionId = sc.selectedSectionNumber || 'none';
-                return `${sc.course.id}-${lectureId}-${discussionId}-${labId}-${sectionId}`;
+                const color = this.getCourseColor(sc.course.id) || 'default';
+                return `${sc.course.id}-${lectureId}-${discussionId}-${labId}-${sectionId}-${color}`;
             })
             .sort()
             .join('|');
