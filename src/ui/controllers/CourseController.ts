@@ -756,12 +756,7 @@ export class CourseController {
         let timeLocationContent: string;
         if (section.isInterestList) {
             // Interest lists have 12:00-12:00 times but are not async courses
-            timeLocationContent = `
-                <div class="section-card-interest-list-badge">
-                    ${getInlineSVG('BOOKMARK', 'interest-list-icon')}
-                    Interest List
-                </div>
-            `;
+            timeLocationContent = ``;
         } else if (isAsync) {
             timeLocationContent = `
                 <div class="section-card-async-badge">
