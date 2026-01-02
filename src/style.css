@@ -18,7 +18,7 @@
 @import url('./styles/components/schedule-picker-modal.css');
 @import url('./styles/components/modal.css');
 /* dual-range-slider.css migrated to CSS Module - imported directly in DualRangeSlider.ts */
-@import url('./styles/components/component-wizard.css');
+/* component-wizard.css migrated to CSS Module - imported directly in ComponentSelectionWizard.ts */
 @import url('./styles/components/sidebar-panel.css'); /* Base sidebar panel styles */
 /* calendar-events-panel.css migrated to CSS Module - imported directly in CalendarEventsPanel.ts */
 @import url('./styles/components/calendar-select-modal.css');
