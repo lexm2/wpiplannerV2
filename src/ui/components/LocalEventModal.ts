@@ -291,6 +291,18 @@ export class LocalEventModal extends BaseModal {
                 this.toggleDay(day, target);
             });
         });
+
+        // Auto-resize description textarea
+        const descriptionTextarea = this.modalElement.querySelector('#event-description') as HTMLTextAreaElement;
+        if (descriptionTextarea) {
+            const autoResize = () => {
+                descriptionTextarea.style.height = 'auto';
+                descriptionTextarea.style.height = descriptionTextarea.scrollHeight + 'px';
+            };
+
+            descriptionTextarea.addEventListener('input', autoResize);
+            setTimeout(autoResize, 0);
+        }
     }
 
     /**

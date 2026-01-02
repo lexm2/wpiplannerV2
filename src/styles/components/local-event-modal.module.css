@@ -3,13 +3,62 @@
    ============================================================================= */
 
 .local-event-modal {
-  max-width: 500px;
+  max-width: 600px;
 }
 
 .local-event-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+/* =============================================================================
+   Form Inputs
+   ============================================================================= */
+
+.local-event-form :global(.form-group) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.local-event-form :global(.form-group) :global(label) {
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
+}
+
+.local-event-form :global(.form-group) :global(label) :global(.required) {
+    color: var(--color-danger, #ef4444);
+}
+
+.local-event-form :global(.form-input) {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--effect-border-radius);
+    background: var(--color-background);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    transition: var(--effect-transition);
+}
+
+.local-event-form :global(.form-input:focus) {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-alpha, rgba(var(--color-primary-rgb), 0.2));
+}
+
+.local-event-form :global(.form-input.form-error) {
+    border-color: var(--color-danger, #ef4444);
+}
+
+.local-event-form :global(.form-textarea) {
+    min-height: 60px;
+    max-height: 300px;
+    resize: none;
+    overflow: hidden;
+    width: 100%;
 }
 
 /* =============================================================================
@@ -74,7 +123,7 @@
 }
 
 /* =============================================================================
-   Day Selector (Multi-select Pills)
+   Day Selector
    ============================================================================= */
 
 .day-selector {
@@ -152,7 +201,7 @@
 
 .event-term-text {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: normal;
   color: var(--color-text);
   user-select: none;
 }
@@ -211,4 +260,21 @@
   font-size: 0.95rem;
   padding-top: 0.25rem;
   user-select: none;
+}
+
+/* =============================================================================
+   Modal Button Icons
+   ============================================================================= */
+
+:global(.modal-dialog).local-event-modal :global(.modal-btn) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:global(.modal-dialog).local-event-modal :global(.btn-icon) {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-right: 0.35rem;
 }
