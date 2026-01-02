@@ -185,11 +185,17 @@ export class ThemeManager {
             root.style.setProperty(`--effect-${this.kebabCase(key)}`, value);
         });
 
-        // Add theme class to body for theme-specific styling
-        document.body.className = document.body.className
-            .replace(/theme-[\w-]+/g, '')
-            .trim();
-        document.body.classList.add(`theme-${themeId}`);
+        const classList = Array.from(document.body.classList);
+        const oldThemeClass = classList.find(cls => cls.startsWith('theme-'));
+        if (oldThemeClass) {
+            document.body.classList.remove(oldThemeClass);
+        }
+
+        // Force reflow then defer class addition to enable CSS transitions
+        void document.documentElement.offsetHeight;
+        requestAnimationFrame(() => {
+            document.body.classList.add(`theme-${themeId}`);
+        });
     }
 
     private kebabCase(str: string): string {
