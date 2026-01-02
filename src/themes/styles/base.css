@@ -1,32 +1,32 @@
-/* Theme CSS Custom Properties */
+/* Theme CSS Custom Properties - Default to WPI Dark */
 :root {
   /* Colors */
-  --color-primary: #ac2b37;
-  --color-primary-hover: #8e2329;
-  --color-primary-light: #d4424f;
-  --color-primary-background: rgba(172, 43, 55, 0.1);
-  --color-secondary: #f5f5f7;
-  --color-secondary-hover: #e5e5e7;
-  --color-background: #f5f5f7;
-  --color-background-alt: #ffffff;
-  --color-surface: #ffffff;
-  --color-surface-hover: #fbfbfd;
-  --color-surface-elevated: #f8f8f8;
-  --color-text: #1d1d1f;
-  --color-text-secondary: #86868b;
-  --color-text-inverse: #ffffff;
-  --color-border: #e5e5e7;
-  --color-border-hover: #d2d2d7;
+  --color-primary: #d4424f;
+  --color-primary-hover: #ac2b37;
+  --color-primary-light: #e85a66;
+  --color-primary-background: rgba(212, 66, 79, 0.15);
+  --color-secondary: #2c2c2e;
+  --color-secondary-hover: #3a3a3c;
+  --color-background: #1c1c1e;
+  --color-background-alt: #2c2c2e;
+  --color-surface: #2c2c2e;
+  --color-surface-hover: #3a3a3c;
+  --color-surface-elevated: #3a3a3c;
+  --color-text: #ffffff;
+  --color-text-secondary: #98989d;
+  --color-text-inverse: #1d1d1f;
+  --color-border: #3a3a3c;
+  --color-border-hover: #48484a;
   --color-success: #30d158;
-  --color-warning: #ff9500;
-  --color-error: #d32f2f;
-  --color-danger: #d32f2f;
-  --color-danger-background: rgba(211, 47, 47, 0.1);
-  --color-info: #007aff;
+  --color-warning: #ff9f0a;
+  --color-error: #ff453a;
+  --color-danger: #ff453a;
+  --color-danger-background: rgba(255, 69, 58, 0.15);
+  --color-info: #64d2ff;
 
   /* Gradient colors */
-  --gradient-start: rgba(172, 43, 55, 0.05);
-  --gradient-end: rgba(172, 43, 55, 0.15);
+  --gradient-start: rgba(212, 66, 79, 0.15);
+  --gradient-end: rgba(212, 66, 79, 0.35);
 
   /* Typography - WPI Official */
   --font-family: 'Myriad Pro', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -48,8 +48,8 @@
   /* Effects */
   --effect-border-radius: 6px;
   --effect-border-radius-large: 8px;
-  --effect-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  --effect-shadow-hover: 0 2px 8px rgba(172, 43, 55, 0.1);
+  --effect-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --effect-shadow-hover: 0 4px 16px rgba(212, 66, 79, 0.2);
   --effect-transition: all 0.2s ease;
 }
 
