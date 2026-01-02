@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 2, 2026, 9:13 PM",
+  "generated": "Jan 2, 2026, 9:28 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -234528,7 +234528,7 @@
                 "crn": 337698,
                 "number": "S02",
                 "seats": 60,
-                "seatsAvailable": 39,
+                "seatsAvailable": 40,
                 "actualWaitlist": 0,
                 "maxWaitlist": 40,
                 "note": null,
@@ -234547,7 +234547,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 60,
-                    "seatsAvailable": 39,
+                    "seatsAvailable": 40,
                     "actualWaitlist": 0,
                     "maxWaitlist": 40,
                     "specificSection": "S02",
@@ -250961,7 +250961,7 @@
                 "number": "C01",
                 "seats": 15,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "WPE 1611 Introduction to Mindfulness (Cat. I, 1/12 unit) Introduction to Mindfulness is an evidence-based mindfulness curriculum designed for college aged adults by the Mindfulness Institute for Emerging Adults (MIEA). During this course, you will learn useful, practical tools to help manage your stress and increase self-compassion. Students will practice a variety of meditation skills, engage with the MIEA Mobile App, read the companion book, and participate in class discussion.",
@@ -250980,7 +250980,7 @@
                     "room": "Daniels Hall 102E",
                     "seats": 15,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
