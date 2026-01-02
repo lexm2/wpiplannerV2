@@ -2,13 +2,15 @@
 /* These classes are added dynamically by JavaScript in ThemeSelector.ts */
 
 /* Dropdown open state - rotates the arrow */
-.open .dropdown-arrow {
+.open :global(.dropdown-arrow) {
   transform: rotate(180deg);
 }
 
 /* Menu visible state - shows the options dropdown */
 .show {
-  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* Individual theme option */
