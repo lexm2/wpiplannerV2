@@ -1999,6 +1999,11 @@ export class ScheduleController {
     }
 
     private setupTermFocusHandlers(): void {
+        const backButtons = document.querySelectorAll('.term-back-btn');
+        backButtons.forEach(btn => {
+            btn.innerHTML = getInlineSVG('ARROW_FORWARD_UP', 'term-back-icon');
+        });
+
         document.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
 
