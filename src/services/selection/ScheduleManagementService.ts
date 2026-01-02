@@ -160,11 +160,7 @@ export class ScheduleManagementService {
 
             // Auto-save if requested
             if (autoSave) {
-                try {
-                    await this.profileStateManager.save();
-                } catch (error) {
-                    console.warn('Failed to auto-save after schedule creation:', error);
-                }
+                this.profileStateManager.save();
             }
 
             // Notify listeners
@@ -281,11 +277,7 @@ export class ScheduleManagementService {
 
             // Auto-save if requested
             if (autoSave) {
-                try {
-                    await this.profileStateManager.save();
-                } catch (error) {
-                    console.warn('Failed to auto-save after schedule update:', error);
-                }
+                this.profileStateManager.save();
             }
 
             // Get updated schedule
@@ -352,12 +344,7 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Auto-save
-            try {
-                await this.profileStateManager.save();
-            } catch (error) {
-                console.warn('Failed to auto-save after schedule duplication:', error);
-            }
+            this.profileStateManager.save();
 
             // Notify listeners
             this.notifyScheduleListeners({
@@ -406,12 +393,7 @@ export class ScheduleManagementService {
 
             this.profileStateManager.deleteSchedule(scheduleId, 'api');
 
-            // Force immediate save for critical delete operation
-            try {
-                await this.profileStateManager.save();
-            } catch (error) {
-                console.warn('Failed to auto-save after schedule deletion:', error);
-            }
+            this.profileStateManager.save();
 
             // Notify listeners
             this.notifyScheduleListeners({
@@ -521,7 +503,7 @@ export class ScheduleManagementService {
     async save(): Promise<{ success: boolean; error?: string }> {
         try {
             await this.ensureInitialized();
-            await this.profileStateManager.save();
+            this.profileStateManager.save();
             return {
                 success: true
             };
@@ -864,12 +846,7 @@ export class ScheduleManagementService {
             // Set as active
             this.profileStateManager.setActiveSchedule(defaultSchedule.id, 'system');
             
-            // Save the changes
-            try {
-                await this.profileStateManager.save();
-            } catch (error) {
-                console.warn('Failed to save default schedule:', error);
-            }
+            this.profileStateManager.save();
         } else if (!this.getActiveScheduleId()) {
             // Activate last schedule if no active one
             this.profileStateManager.setActiveSchedule(existingSchedules[existingSchedules.length - 1].id, 'system');

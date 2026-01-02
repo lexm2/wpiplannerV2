@@ -812,7 +812,7 @@ export class CourseSelectionService {
     async save(): Promise<{ success: boolean; error?: string }> {
         try {
             await this.ensureInitialized();
-            await this.profileStateManager.save();
+            this.profileStateManager.save();
             return { success: true };
         } catch (error: any) {
             return {
@@ -967,7 +967,7 @@ export class CourseSelectionService {
 
             if (repairedCount > 0) {
                 console.log(`Repaired ${repairedCount} selected courses`);
-                await this.profileStateManager.save();
+                this.profileStateManager.save();
             }
 
             return true;
