@@ -24,6 +24,7 @@ import { getAllSections } from '../../utils/courseUtils'
 import { calendarService, type CalendarEvent, type CalendarInfo, type ConnectedCalendar } from '../../services/calendar'
 import { CalendarState } from '../../core/state/CalendarState'
 import { ModalService } from '../../services/ui/ModalService'
+import styles from '../../styles/components/calendar-events-section.module.css'
 
 interface WizardSelections {
     lecture: Section | null;
@@ -898,9 +899,17 @@ export class ScheduleController {
      * Set up click handler for the calendar events button.
      */
     private setupCalendarEventsButtonHandler(container: HTMLElement): void {
+        const calendarHeader = container.querySelector(`.${styles.header}`);
+        if (calendarHeader) {
+            calendarHeader.addEventListener('click', () => {
+                this.toggleCalendarEventsSection();
+            });
+        }
+
         const calendarBtn = container.querySelector('#calendar-events-btn');
         if (calendarBtn) {
-            calendarBtn.addEventListener('click', () => {
+            calendarBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.openCalendarEventsPanel();
             });
         }
@@ -1125,15 +1134,42 @@ export class ScheduleController {
 
         return `
             <div class="sidebar-content-item calendar-events-section">
-                <button class="calendar-events-btn" id="calendar-events-btn">
-                    <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
-                    <span class="calendar-events-btn-info">
-                        <span class="calendar-events-btn-name">Calendar Events</span>
-                        <span class="calendar-events-btn-count">${buttonText}</span>
-                    </span>
-                </button>
+                <div class="${styles.header}" aria-expanded="false">
+                    <span class="${styles.chevron}">${getInlineSVG('CHEVRON_DOWN', 'chevron-icon')}</span>
+                    <span>Calendar Events</span>
+                </div>
+                <div class="${styles.content}">
+                    <button class="calendar-events-btn" id="calendar-events-btn">
+                        <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
+                        <span class="calendar-events-btn-info">
+                            <span class="calendar-events-btn-name">Calendar Events</span>
+                            <span class="calendar-events-btn-count">${buttonText}</span>
+                        </span>
+                    </button>
+                </div>
             </div>
         `;
+    }
+
+    /**
+     * Toggle the calendar events section expansion
+     */
+    private toggleCalendarEventsSection(): void {
+        const header = document.querySelector(`.${styles.header}`);
+        if (!header) return;
+
+        const content = document.querySelector(`.${styles.content}`) as HTMLElement;
+        if (!content) return;
+
+        const isExpanded = header.getAttribute('aria-expanded') === 'true';
+
+        if (isExpanded) {
+            header.setAttribute('aria-expanded', 'false');
+            content.classList.remove(styles.expanded);
+        } else {
+            header.setAttribute('aria-expanded', 'true');
+            content.classList.add(styles.expanded);
+        }
     }
 
     private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: any[]): void {
