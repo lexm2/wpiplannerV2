@@ -1,6 +1,8 @@
 /* Resize Handle Component */
-.resize-handle {
+/* Global class - referenced in HTML */
+:global(.resize-handle) {
   width: 8px;
+  min-width: 8px;
   background: transparent;
   cursor: col-resize;
   position: relative;
@@ -10,7 +12,7 @@
 }
 
 /* Visual indicator line */
-.resize-handle::after {
+:global(.resize-handle)::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -25,21 +27,21 @@
 }
 
 /* Hover state */
-.resize-handle:hover {
+:global(.resize-handle):hover {
   background: var(--color-primary-background);
 }
 
-.resize-handle:hover::after {
+:global(.resize-handle):hover::after {
   opacity: 1;
   background: var(--color-primary);
 }
 
-/* Active/dragging state */
-.resize-handle.dragging {
+/* Active/dragging state - combines global class with module class */
+:global(.resize-handle).dragging {
   background: var(--color-primary-background);
 }
 
-.resize-handle.dragging::after {
+:global(.resize-handle).dragging::after {
   opacity: 1;
   background: var(--color-primary);
   height: 100%;
@@ -57,15 +59,15 @@ body.resizing * {
 
 /* Hide resize handles on mobile - planner page */
 @media (max-width: 1200px) {
-  .resize-handle-left,
-  .resize-handle-right {
+  :global(.resize-handle-left),
+  :global(.resize-handle-right) {
     display: none;
   }
 }
 
 /* Hide resize handle on mobile - schedule page */
 @media (max-width: 1024px) {
-  .resize-handle-schedule {
+  :global(.resize-handle-schedule) {
     display: none;
   }
 }
