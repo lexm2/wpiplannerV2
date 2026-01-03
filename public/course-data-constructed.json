@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 3, 2026, 7:12 PM",
+  "generated": "Jan 3, 2026, 7:27 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -72821,7 +72821,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Alma Richeh",
                     "startTime": "12:00",
                     "endTime": "13:50",
                     "location": "Innovation Studio 105 Active Learning Classroom",
@@ -178354,7 +178354,7 @@
                 "crn": 337632,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 24,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -178373,7 +178373,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 30,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S01",
