@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 3, 2026, 8:48 AM",
+  "generated": "Jan 3, 2026, 9:16 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -46939,7 +46939,7 @@
                 "crn": 336768,
                 "number": "C01",
                 "seats": 60,
-                "seatsAvailable": 4,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -46958,7 +46958,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 60,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "C01",
