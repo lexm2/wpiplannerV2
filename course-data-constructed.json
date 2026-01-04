@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 4, 2026, 5:54 AM",
+  "generated": "Jan 4, 2026, 6:26 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -66946,7 +66946,7 @@
                 "crn": 336470,
                 "number": "CL01",
                 "seats": 60,
-                "seatsAvailable": 29,
+                "seatsAvailable": 28,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4319",
@@ -66965,7 +66965,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 60,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 28,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "CL01",
@@ -66984,7 +66984,7 @@
                   "crn": 336471,
                   "number": "CD01",
                   "seats": 60,
-                  "seatsAvailable": 29,
+                  "seatsAvailable": 28,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4319",
@@ -67003,7 +67003,7 @@
                       "building": "",
                       "room": "Goddard Hall 227 Classroom",
                       "seats": 60,
-                      "seatsAvailable": 29,
+                      "seatsAvailable": 28,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD01",
