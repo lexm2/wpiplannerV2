@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 4, 2026, 1:18 PM",
+  "generated": "Jan 4, 2026, 1:45 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -47368,7 +47368,7 @@
                 "crn": 337590,
                 "number": "DL02",
                 "seats": 75,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4440",
@@ -47387,7 +47387,7 @@
                     "building": "",
                     "room": "Unity Hall 420",
                     "seats": 75,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "DL02",
@@ -47407,7 +47407,7 @@
                   "crn": 337204,
                   "number": "DX02",
                   "seats": 75,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 2,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4440",
@@ -47426,7 +47426,7 @@
                       "building": "",
                       "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                       "seats": 75,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 2,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX02",
