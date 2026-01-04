@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 4, 2026, 5:05 AM",
+  "generated": "Jan 4, 2026, 5:41 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -85549,7 +85549,7 @@
                 "number": "S01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course will familiarize students with the history of the development, deployment, commercialization, and evolution of immersive and active media . The lesson plan will cover a broad range of enabling technologies, such as geometric perspective drawing, pre-20th-century panoramic displays, photography and the stereoscope, sound recording and reproduction, motion pictures, radio and television, the planetarium, immersive and 3-dimensional cinema, and special attraction venues, with a particular focus on digital games . Current trends and future directions will also be considered . Students will attend seminars and lectures, read and discuss texts on media history and aesthetics, and write an original research paper . Midterm and final exams test students’ knowledge and understanding of important events and develop ments . A student may not receive credit for both IMGD 5200 and IMGD 4200 . (Prerequisites: An understanding of dominant themes and genres in video games)",
@@ -85568,7 +85568,7 @@
                     "room": "Stratton Hall 202 (new)",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
@@ -85698,7 +85698,7 @@
                 "number": "S01",
                 "seats": 14,
                 "seatsAvailable": -2,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course covers methods and analysis for designing, implementing, and assessing games in serious, applied contexts. Often called “serious games” or “applied games”, these are game-based media that teach, engage with social issues, aim to increase empathy, or affect behavioral change. Students will read contemporary literature in the field of serious and applied games, design and implement their own games, and measure the effectiveness of those games in achieving educational or motivational goals.",
@@ -85717,7 +85717,7 @@
                     "room": "Other",
                     "seats": 14,
                     "seatsAvailable": -2,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
