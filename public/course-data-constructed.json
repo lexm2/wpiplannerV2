@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 4, 2026, 7:27 PM",
+  "generated": "Jan 4, 2026, 7:38 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -53581,7 +53581,7 @@
                 "crn": 346996,
                 "number": "S01",
                 "seats": 50,
-                "seatsAvailable": 29,
+                "seatsAvailable": 30,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -53600,7 +53600,7 @@
                     "building": "",
                     "room": "Salisbury Labs 402",
                     "seats": 50,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -61888,17 +61888,16 @@
                     "professor": "Noemi Robertson; Jillian DiBonaventura; Kathy Chen",
                     "startTime": "15:00",
                     "endTime": "16:50",
-                    "location": "Stratton Hall 201",
+                    "location": "Innovation Studio 203 Active Learning Classroom South",
                     "building": "",
-                    "room": "Stratton Hall 201",
+                    "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 28,
                     "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "D01",
                     "days": [
-                      "M",
-                      "R"
+                      "M"
                     ],
                     "isAsync": false
                   }
