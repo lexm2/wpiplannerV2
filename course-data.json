@@ -3214,7 +3214,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "4/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336465"
     },
     {
@@ -3517,7 +3517,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "7/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336316"
     },
     {
@@ -3820,7 +3820,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336503"
     },
     {
@@ -3960,7 +3960,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "7/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336493"
     },
     {
@@ -12964,7 +12964,7 @@
       "Course_Title": "BME 4504 - Biomechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "40/40",
+      "Enrolled_Capacity": "39/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Zhenglun Alan Wei",
       "Locations": "Stratton Hall 201",
@@ -12972,10 +12972,10 @@
       "Meeting_Patterns": "M-T-W-R-F | 2:00 PM - 2:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Stratton Hall 201 | M-T-W-R-F | 2:00 PM - 2:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Mechanical Engineering; Biomedical Engineering",
-      "Waitlist_Waitlist_Capacity": "1/40",
+      "Waitlist_Waitlist_Capacity": "0/40",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336566"
     },
     {
@@ -21030,7 +21030,7 @@
       "Course_Title": "CH 2320 - Organic Chemistry II",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "104/110",
+      "Enrolled_Capacity": "103/110",
       "Instructional_Format": "Lecture",
       "Instructors": "John MacDonald",
       "Locations": "Atwater Kent 116 Newell Hall",
@@ -21041,7 +21041,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336116"
     },
     {
@@ -25560,7 +25560,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: CS 1004 - Introduction To Programming For Non-Majors (a)",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "15/20",
+      "Waitlist_Waitlist_Capacity": "14/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337143"
     },
     {
@@ -38307,7 +38307,7 @@
       "Course_Title": "ECE 2112 - Electromagnetic Fields",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "66/66",
+      "Enrolled_Capacity": "65/66",
       "Instructional_Format": "Lecture",
       "Instructors": "Reinhold Ludwig",
       "Locations": "Atwater Kent 233",
@@ -38315,10 +38315,10 @@
       "Meeting_Patterns": "M-T-W-R-F | 10:00 AM - 10:50 AM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Atwater Kent 233 | M-T-W-R-F | 10:00 AM - 10:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "0/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336403"
     },
     {
@@ -44054,7 +44054,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Environmental Studies",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336149"
     },
     {
@@ -45139,7 +45139,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "3/5",
+      "Waitlist_Waitlist_Capacity": "2/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336428"
     },
     {
@@ -48273,7 +48273,7 @@
       "Course_Title": "ETR 1100 - Engineering Innovation And Entrepreneurship",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "50/50",
+      "Enrolled_Capacity": "49/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Sandhya Balasubramanian",
       "Locations": "Salisbury Labs 411",
@@ -48281,10 +48281,10 @@
       "Meeting_Patterns": "M-R | 12:00 PM - 1:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Salisbury Labs 411 | M-R | 12:00 PM - 1:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Entrepreneurship",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337469"
     },
     {
@@ -52183,7 +52183,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "History",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "8/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336545"
     },
     {
@@ -60476,7 +60476,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336503"
     },
     {
@@ -87450,7 +87450,7 @@
       "Course_Title": "ME 4504 - Biomechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "40/40",
+      "Enrolled_Capacity": "39/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Zhenglun Alan Wei",
       "Locations": "Stratton Hall 201",
@@ -87458,10 +87458,10 @@
       "Meeting_Patterns": "M-T-W-R-F | 2:00 PM - 2:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Stratton Hall 201 | M-T-W-R-F | 2:00 PM - 2:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Mechanical Engineering; Biomedical Engineering",
-      "Waitlist_Waitlist_Capacity": "1/40",
+      "Waitlist_Waitlist_Capacity": "0/40",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336566"
     },
     {
@@ -91120,7 +91120,7 @@
       "Course_Title": "MIS 587 - Business Applications In Machine Learning",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "18/30",
+      "Enrolled_Capacity": "17/30",
       "Instructional_Format": "Lecture",
       "Instructors": "ZQ Cheng",
       "Locations": "Kaven Hall 116",
@@ -91131,7 +91131,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Management Information Systems",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337800"
     },
     {
@@ -94573,7 +94573,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337323"
     },
     {
@@ -94713,7 +94713,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337357"
     },
     {
@@ -94932,7 +94932,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "8/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336308"
     },
     {
@@ -95062,7 +95062,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "7/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337485"
     },
     {
@@ -118984,7 +118984,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "13/15",
+      "Waitlist_Waitlist_Capacity": "12/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336275"
     },
     {
