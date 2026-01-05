@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 5, 2026, 11:40 AM",
+  "generated": "Jan 5, 2026, 11:50 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -53041,7 +53041,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. IThis course provides an introduction to the core concepts in Data Science. It covers a broad range of methodologies for working with and making informed decisions based on real-world data. Core topics introduced in this course include basic statistics, data exploration, data cleaning, data visualization, business intelligence, and data analysis. Students will utilize various techniques and tools to explore, understand and visualize real-world data sets from various domains and learn how to communicate data results to decision makers.Recommended background: None",
@@ -53060,7 +53060,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
@@ -77112,7 +77112,7 @@
                 "crn": 336183,
                 "number": "C16 - INQ SEM: Loaded Language",
                 "seats": 12,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -77131,7 +77131,7 @@
                     "building": "",
                     "room": "Salisbury Labs 226 HUA Seminar Room",
                     "seats": 12,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "C16 - INQ SEM: Loaded Language",
