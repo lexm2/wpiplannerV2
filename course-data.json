@@ -17980,7 +17980,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: CH 1010 - Chemical Properties, Bonding, And Forces ()",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "44/999",
+      "Waitlist_Waitlist_Capacity": "43/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336253"
     },
     {
@@ -18178,7 +18178,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: CH 1010 - Chemical Properties, Bonding, And Forces ()",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "44/999",
+      "Waitlist_Waitlist_Capacity": "43/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336240"
     },
     {
@@ -18293,7 +18293,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: CH 1010 - Chemical Properties, Bonding, And Forces ()",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "44/999",
+      "Waitlist_Waitlist_Capacity": "43/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336684"
     },
     {
@@ -54507,7 +54507,7 @@
       "Course_Title": "HU 2901 - Topics in Sexuality and LGBTQ+ Studies",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "14/20",
+      "Enrolled_Capacity": "16/20",
       "Instructional_Format": "Lecture",
       "Instructors": "Elizabeth Victor",
       "Locations": "Atwater Kent 232",
@@ -110867,7 +110867,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "8/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337251"
     },
     {
@@ -111116,7 +111116,7 @@
       "Course_Title": "PY 2713 - Bioethics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "34/35",
+      "Enrolled_Capacity": "35/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Elizabeth Victor",
       "Locations": "Salisbury Labs 407",
@@ -111124,7 +111124,7 @@
       "Meeting_Patterns": "M-R | 3:00 PM - 4:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Salisbury Labs 407 | M-R | 3:00 PM - 4:50 PM",
-      "Section_Status": "Open",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Philosophy",
       "Waitlist_Waitlist_Capacity": "0/10",
@@ -111144,7 +111144,7 @@
       "Course_Title": "PY 2716 - Gender, Race, and Class",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "8/35",
+      "Enrolled_Capacity": "9/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Haley Anderson",
       "Locations": "Stratton Hall 201",
@@ -115052,7 +115052,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "8/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337251"
     },
     {
@@ -115120,7 +115120,7 @@
       "Course_Title": "RE 2716 - Gender, Race, and Class",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "8/35",
+      "Enrolled_Capacity": "9/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Haley Anderson",
       "Locations": "Stratton Hall 201",
