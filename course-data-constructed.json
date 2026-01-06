@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 6, 2026, 8:44 PM",
+  "generated": "Jan 6, 2026, 8:53 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -3975,7 +3975,7 @@
                 "number": "C01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course provides an introduction to the basic principles of two and three-dimensionalvisual organization. The course focuses on graphic expression, ideadevelopment, and visual literacy. Students will be expected to master basicrendering skills, perspective drawing, concept art, and storyboarding throughtraditional and/or computer-based tools.",
@@ -3994,7 +3994,7 @@
                     "room": "Salisbury Labs 406",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -57051,7 +57051,7 @@
                 "crn": 336403,
                 "number": "C01",
                 "seats": 66,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -57070,7 +57070,7 @@
                     "building": "",
                     "room": "Atwater Kent 233",
                     "seats": 66,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
@@ -235456,40 +235456,18 @@
                   {
                     "type": "Lecture",
                     "professor": "Jane Li",
-                    "startTime": "09:00",
-                    "endTime": "10:50",
-                    "location": "Stratton Hall 202 (new)",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
                     "building": "",
-                    "room": "Stratton Hall 202 (new)",
+                    "room": "Unknown",
                     "seats": 20,
                     "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S02",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  },
-                  {
-                    "type": "Lecture",
-                    "professor": "Jane Li",
-                    "startTime": "09:00",
-                    "endTime": "10:50",
-                    "location": "Salisbury Labs 104",
-                    "building": "",
-                    "room": "Salisbury Labs 104",
-                    "seats": 20,
-                    "seatsAvailable": 8,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 5,
-                    "specificSection": "S02",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
+                    "days": [],
+                    "isAsync": true
                   }
                 ]
               },
@@ -240906,7 +240884,7 @@
                 "number": "C01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "Cat. I This course will examine the appropriate dissemination of scientific information in common science writing genres such as science journalism, consulting reports and white papers, and policy and procedure documents . In a workshop setting, students will write and revise documents that promote broad understanding of scientific research and analysis of specialized knowledge . Course lectures and discussions investigate ethics of scientific reporting and teach students how to recognize deceptive texts and arguments (both quantitative and qualitative) . The course is reading and writing intensive and is intended for students with backgrounds in a scientific discipline who are interested in applying their disciplinary knowledge .",
@@ -240925,7 +240903,7 @@
                     "room": "Atwater Kent 232",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
                     "days": [
