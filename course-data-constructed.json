@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 7, 2026, 12:37 PM",
+  "generated": "Jan 7, 2026, 1:26 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -2794,7 +2794,7 @@
                     "maxWaitlist": 30,
                     "specificSection": "D01",
                     "days": [
-                      "F"
+                      "W"
                     ],
                     "isAsync": false
                   }
@@ -2896,7 +2896,7 @@
                 "crn": 336127,
                 "number": "C02",
                 "seats": 50,
-                "seatsAvailable": 35,
+                "seatsAvailable": 34,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -2915,7 +2915,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seatsAvailable": 35,
+                    "seatsAvailable": 34,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "C02",
@@ -3749,6 +3749,56 @@
                     "days": [
                       "T",
                       "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "AE-6532",
+          "number": "6532",
+          "name": "Computational Solid Mechanics",
+          "description": "This course presents finite element methods with applications to structures and structural dynamics at introductory graduate level. It focuses on linear elasticity and topics covered will be chosen from: introduction on numerical methods in solids mechanics; variational methods of approximation; formulation of finite elements and interpolation functions; assembly and solution processes; isoparametric formulation; stress recovery procedures; locking phenomenon; and dynamic problems. The course requires completion of several FEM projects and knowledge of a computer programming language.",
+          "minCredits": 2,
+          "maxCredits": 2,
+          "isGraduate": true,
+          "lectures": [
+            {
+              "section": {
+                "crn": 355480,
+                "number": "D01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "description": "This course presents finite element methods with applications to structures and structural dynamics at introductory graduate level. It focuses on linear elasticity and topics covered will be chosen from: introduction on numerical methods in solids mechanics; variational methods of approximation; formulation of finite elements and interpolation functions; assembly and solution processes; isoparametric formulation; stress recovery procedures; locking phenomenon; and dynamic problems. The course requires completion of several FEM projects and knowledge of a computer programming language.",
+                "term": "202201",
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Not Assigned",
+                    "startTime": "16:00",
+                    "endTime": "17:50",
+                    "location": "Olin Hall 218",
+                    "building": "",
+                    "room": "Olin Hall 218",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "D01",
+                    "days": [
+                      "T",
+                      "F"
                     ],
                     "isAsync": false
                   }
@@ -50189,7 +50239,7 @@
                 "crn": 337618,
                 "number": "S01",
                 "seats": 40,
-                "seatsAvailable": 21,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -50208,7 +50258,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 40,
-                    "seatsAvailable": 21,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -63903,7 +63953,7 @@
                 "crn": 340336,
                 "number": "D01",
                 "seats": 72,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -63922,7 +63972,7 @@
                     "building": "",
                     "room": "Salisbury Labs 104",
                     "seats": 72,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
