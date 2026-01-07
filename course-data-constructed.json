@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 7, 2026, 1:26 PM",
+  "generated": "Jan 7, 2026, 1:55 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -2709,16 +2709,16 @@
                     "professor": "Ameya Jagtap",
                     "startTime": "14:00",
                     "endTime": "14:50",
-                    "location": "Higgins Labs 218 Discovery Classroom",
+                    "location": "Atwater Kent 233",
                     "building": "",
-                    "room": "Higgins Labs 218 Discovery Classroom",
+                    "room": "Atwater Kent 233",
                     "seats": 50,
                     "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
-                      "F"
+                      "W"
                     ],
                     "isAsync": false
                   }
@@ -2833,6 +2833,56 @@
                     "specificSection": "D03",
                     "days": [
                       "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "AE-5093",
+          "number": "5093",
+          "name": "Special Topics",
+          "description": "(2 credits) Arranged by individual faculty with special expertise, these courses survey fundamentals in areas that are not covered by the regular aerospace engineering course offerings. Exact course descriptions are disseminated by the Aerospace Engineering Program in advance of the offering. (Prerequisite: Consent of instructor.)",
+          "minCredits": 2,
+          "maxCredits": 2,
+          "isGraduate": true,
+          "lectures": [
+            {
+              "section": {
+                "crn": 355496,
+                "number": "C01 - ST: Aerospace System Design",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "description": "(2 credits) Arranged by individual faculty with special expertise, these courses survey fundamentals in areas that are not covered by the regular aerospace engineering course offerings. Exact course descriptions are disseminated by the Aerospace Engineering Program in advance of the offering. (Prerequisite: Consent of instructor.)",
+                "term": "202201",
+                "computedTerm": "C",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Not Assigned",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Fuller Labs 311",
+                    "building": "",
+                    "room": "Fuller Labs 311",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "C01 - ST: Aerospace System Design",
+                    "days": [
+                      "M",
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -4386,7 +4436,7 @@
                 "crn": 336502,
                 "number": "C01",
                 "seats": 24,
-                "seatsAvailable": 0,
+                "seatsAvailable": -1,
                 "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
@@ -4405,7 +4455,7 @@
                     "building": "",
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": -1,
                     "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -74598,7 +74648,7 @@
                 "crn": 336817,
                 "number": "C01",
                 "seats": 35,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -74617,7 +74667,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 35,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -183374,7 +183424,7 @@
                 "crn": 336308,
                 "number": "C01",
                 "seats": 20,
-                "seatsAvailable": 0,
+                "seatsAvailable": -1,
                 "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
@@ -183393,7 +183443,7 @@
                     "building": "",
                     "room": "Alden Hall B30 Music Technology Lab",
                     "seats": 20,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": -1,
                     "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
