@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 7, 2026, 6:28 AM",
+  "generated": "Jan 7, 2026, 6:57 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -54774,7 +54774,7 @@
                 "crn": 346444,
                 "number": "S01 - ST: Stochastic Processes for Generative AI",
                 "seats": 10,
-                "seatsAvailable": 8,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -54793,7 +54793,7 @@
                     "building": "",
                     "room": "Higgins Labs 202",
                     "seats": 10,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S01 - ST: Stochastic Processes for Generative AI",
@@ -54812,7 +54812,7 @@
                 "crn": 353476,
                 "number": "S02 - ST: Human-AI Interaction -Thinking with AI",
                 "seats": 10,
-                "seatsAvailable": 10,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -54831,7 +54831,7 @@
                     "building": "",
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 10,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S02 - ST: Human-AI Interaction -Thinking with AI",
