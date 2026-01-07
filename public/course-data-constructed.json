@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 7, 2026, 11:50 AM",
+  "generated": "Jan 7, 2026, 12:37 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -230722,7 +230722,7 @@
                 "number": "C01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course provides an overview of key concepts, methods and authors in both fields. These introduce the student to the types of reasoning required for the pursuit of in-depth analysis in each discipline.Emphasis on topics and authors varies with the particular instructor.",
@@ -230741,7 +230741,7 @@
                     "room": "Atwater Kent 232",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -236099,7 +236099,7 @@
                 "number": "C01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IThis course provides an overview of key concepts, methods and authors in both fields. These introduce the student to the types of reasoning required for the pursuit of in-depth analysis in each discipline.Emphasis on topics and authors varies with the particular instructor.",
@@ -236118,7 +236118,7 @@
                     "room": "Atwater Kent 232",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
