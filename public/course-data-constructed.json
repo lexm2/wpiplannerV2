@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 8, 2026, 1:57 PM",
+  "generated": "Jan 8, 2026, 2:26 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -545,7 +545,7 @@
                 "number": "D01",
                 "seats": 80,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 8,
                 "maxWaitlist": 30,
                 "note": null,
                 "description": "AE 2210: Introduction to Thermal Engineering (1/3 units; Cat. I) Thermal engineering encompasses a broad range of topics that include the behavior of matter and energy and their interaction as part of a system with the surrounding environment. This course covers topics from the fields of thermodynamics and heat transfer. You will learn how to identify systems and to use thermodynamic analysis to describe the behavior of the system in terms of properties and processes. Heat transfer between systems is a fundamental part of many engineering disciplines. While thermodynamics provides the foundation for understanding the energy distribution in a system in equilibrium, heat transfer provides a means for determining the rates of energy transfer under a variety of conditions. Understanding how to apply these concepts is a powerful tool for the engineer, enabling the evaluation of material states (phases) under different conditions and the maximum efficiency achievable with various power cycles. After completing this course, you should be able to define and describe properties and processes used in thermodynamic analysis and the governing laws. You should also be able to define and describe the phenomena of conduction, convection, and radiation and apply the heat diffusion equation to determine the temperature distribution in objects subject to different thermal boundary conditions. Finally, you should be able to calculate the heat transfer rates for objects subject to different (and combined) modes of heat transfer. Recommended background: basic physics, (PH 1110, PH 1111) elementary differential and integral calculus (MA 1021, MA 1022), ordinary differential equations (MA2051) or equivalent.",
@@ -564,7 +564,7 @@
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 80,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 30,
                     "specificSection": "D01",
                     "days": [
@@ -5407,7 +5407,7 @@
                 "crn": 336508,
                 "number": "C01",
                 "seats": 24,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -5426,7 +5426,7 @@
                     "building": "",
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -8568,7 +8568,7 @@
                 "crn": 336860,
                 "number": "C01",
                 "seats": 120,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": null,
@@ -8587,7 +8587,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 120,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
@@ -21119,8 +21119,8 @@
                 "crn": 338989,
                 "number": "S01",
                 "seats": 20,
-                "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "seatsAvailable": -1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "The development of structural analysis and design methods for steel and reinforced concrete members subjected to elevated temperatures caused by building fires. Beams, columns and rigid frames will be covered. The course is based on research conducted during the past three decades in Europe, Canada and the United States. Course may be offered by special arrangement. (Prerequisites: Knowledge of statically indeterminate structural analysis, structural steel design and reinforced concrete design.)",
@@ -21138,8 +21138,8 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 20,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "seatsAvailable": -1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
                     "days": [
@@ -75699,7 +75699,7 @@
                 "crn": 336126,
                 "number": "C01",
                 "seats": 35,
-                "seatsAvailable": 7,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -75718,7 +75718,7 @@
                     "building": "",
                     "room": "Higgins Labs 114",
                     "seats": 35,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
@@ -80819,9 +80819,9 @@
                     "professor": "Kent Rissmiller",
                     "startTime": "18:30",
                     "endTime": "20:20",
-                    "location": "Innovation Studio 203 Active Learning Classroom South",
+                    "location": "Salisbury Labs 407",
                     "building": "",
-                    "room": "Innovation Studio 203 Active Learning Classroom South",
+                    "room": "Salisbury Labs 407",
                     "seats": 30,
                     "seatsAvailable": 5,
                     "actualWaitlist": 0,
@@ -81209,9 +81209,9 @@
                     "professor": "Melissa Butler",
                     "startTime": "18:30",
                     "endTime": "20:20",
-                    "location": "Salisbury Labs 411",
+                    "location": "Innovation Studio 203 Active Learning Classroom South",
                     "building": "",
-                    "room": "Salisbury Labs 411",
+                    "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 30,
                     "seatsAvailable": 6,
                     "actualWaitlist": 0,
@@ -83761,7 +83761,7 @@
                 "crn": 336508,
                 "number": "C01",
                 "seats": 24,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -83780,7 +83780,7 @@
                     "building": "",
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -189341,6 +189341,38 @@
                       "isAsync": false
                     }
                   ]
+                },
+                {
+                  "crn": 336565,
+                  "number": "X cancel 1.8.26",
+                  "seats": 0,
+                  "seatsAvailable": 0,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I Introductory course in Newtonian mechanics . Topics include: kinematics of motion, vectors, Newton’s laws, friction, work-energy, impulse-momentum, for both translational and rotational motion . Recommended background: concurrent study of MA 1021 . Students may not receive credit for both PH 1110 and PH 1111 .",
+                  "term": "202201",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Not Assigned",
+                      "startTime": "12:00",
+                      "endTime": "12:00",
+                      "location": "Unknown",
+                      "building": "",
+                      "room": "Unknown",
+                      "seats": 0,
+                      "seatsAvailable": 0,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "X cancel 1.8.26",
+                      "days": [],
+                      "isAsync": true
+                    }
+                  ]
                 }
               ],
               "compatibleLabs": [
@@ -191053,6 +191085,38 @@
                       "isAsync": false
                     }
                   ]
+                },
+                {
+                  "crn": 336565,
+                  "number": "X cancel 1.8.26",
+                  "seats": 0,
+                  "seatsAvailable": 0,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I Introductory course in Newtonian mechanics . Topics include: kinematics of motion, vectors, Newton’s laws, friction, work-energy, impulse-momentum, for both translational and rotational motion . Recommended background: concurrent study of MA 1021 . Students may not receive credit for both PH 1110 and PH 1111 .",
+                  "term": "202201",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Not Assigned",
+                      "startTime": "12:00",
+                      "endTime": "12:00",
+                      "location": "Unknown",
+                      "building": "",
+                      "room": "Unknown",
+                      "seats": 0,
+                      "seatsAvailable": 0,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "X cancel 1.8.26",
+                      "days": [],
+                      "isAsync": true
+                    }
+                  ]
                 }
               ],
               "compatibleLabs": [
@@ -192658,6 +192722,38 @@
                         "R"
                       ],
                       "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 336565,
+                  "number": "X cancel 1.8.26",
+                  "seats": 0,
+                  "seatsAvailable": 0,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I Introductory course in Newtonian mechanics . Topics include: kinematics of motion, vectors, Newton’s laws, friction, work-energy, impulse-momentum, for both translational and rotational motion . Recommended background: concurrent study of MA 1021 . Students may not receive credit for both PH 1110 and PH 1111 .",
+                  "term": "202201",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Not Assigned",
+                      "startTime": "12:00",
+                      "endTime": "12:00",
+                      "location": "Unknown",
+                      "building": "",
+                      "room": "Unknown",
+                      "seats": 0,
+                      "seatsAvailable": 0,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "X cancel 1.8.26",
+                      "days": [],
+                      "isAsync": true
                     }
                   ]
                 }
@@ -194297,6 +194393,38 @@
                         "W"
                       ],
                       "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 336565,
+                  "number": "X cancel 1.8.26",
+                  "seats": 0,
+                  "seatsAvailable": 0,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I Introductory course in Newtonian mechanics . Topics include: kinematics of motion, vectors, Newton’s laws, friction, work-energy, impulse-momentum, for both translational and rotational motion . Recommended background: concurrent study of MA 1021 . Students may not receive credit for both PH 1110 and PH 1111 .",
+                  "term": "202201",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Not Assigned",
+                      "startTime": "12:00",
+                      "endTime": "12:00",
+                      "location": "Unknown",
+                      "building": "",
+                      "room": "Unknown",
+                      "seats": 0,
+                      "seatsAvailable": 0,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "X cancel 1.8.26",
+                      "days": [],
+                      "isAsync": true
                     }
                   ]
                 }
@@ -196004,6 +196132,38 @@
                         "W"
                       ],
                       "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 336565,
+                  "number": "X cancel 1.8.26",
+                  "seats": 0,
+                  "seatsAvailable": 0,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I Introductory course in Newtonian mechanics . Topics include: kinematics of motion, vectors, Newton’s laws, friction, work-energy, impulse-momentum, for both translational and rotational motion . Recommended background: concurrent study of MA 1021 . Students may not receive credit for both PH 1110 and PH 1111 .",
+                  "term": "202201",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Not Assigned",
+                      "startTime": "12:00",
+                      "endTime": "12:00",
+                      "location": "Unknown",
+                      "building": "",
+                      "room": "Unknown",
+                      "seats": 0,
+                      "seatsAvailable": 0,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "X cancel 1.8.26",
+                      "days": [],
+                      "isAsync": true
                     }
                   ]
                 }
@@ -197793,7 +197953,7 @@
                   "crn": 336099,
                   "number": "CD05",
                   "seats": 30,
-                  "seatsAvailable": 11,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4359",
@@ -197812,7 +197972,7 @@
                       "building": "",
                       "room": "Olin Hall 126",
                       "seats": 30,
-                      "seatsAvailable": 11,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD05",
@@ -197826,36 +197986,33 @@
                 },
                 {
                   "crn": 336565,
-                  "number": "CD06",
-                  "seats": 30,
-                  "seatsAvailable": 20,
+                  "number": "X cancel 1.8.26",
+                  "seats": 0,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4359",
+                  "note": null,
                   "description": "Cat. I Introductory course in Newtonian mechanics . Topics include: kinematics of motion, vectors, Newton’s laws, friction, work-energy, impulse-momentum, for both translational and rotational motion . Recommended background: concurrent study of MA 1021 . Students may not receive credit for both PH 1110 and PH 1111 .",
                   "term": "202201",
-                  "computedTerm": "C",
+                  "computedTerm": "A",
                   "isGps": false,
                   "isInterestList": false,
                   "periods": [
                     {
                       "type": "Discussion",
                       "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "13:50",
-                      "location": "Salisbury Labs 407",
+                      "startTime": "12:00",
+                      "endTime": "12:00",
+                      "location": "Unknown",
                       "building": "",
-                      "room": "Salisbury Labs 407",
-                      "seats": 30,
-                      "seatsAvailable": 20,
+                      "room": "Unknown",
+                      "seats": 0,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "CD06",
-                      "days": [
-                        "T",
-                        "R"
-                      ],
-                      "isAsync": false
+                      "specificSection": "X cancel 1.8.26",
+                      "days": [],
+                      "isAsync": true
                     }
                   ]
                 }
@@ -199465,6 +199622,38 @@
                       "isAsync": false
                     }
                   ]
+                },
+                {
+                  "crn": 336565,
+                  "number": "X cancel 1.8.26",
+                  "seats": 0,
+                  "seatsAvailable": 0,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I Introductory course in Newtonian mechanics . Topics include: kinematics of motion, vectors, Newton’s laws, friction, work-energy, impulse-momentum, for both translational and rotational motion . Recommended background: concurrent study of MA 1021 . Students may not receive credit for both PH 1110 and PH 1111 .",
+                  "term": "202201",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Not Assigned",
+                      "startTime": "12:00",
+                      "endTime": "12:00",
+                      "location": "Unknown",
+                      "building": "",
+                      "room": "Unknown",
+                      "seats": 0,
+                      "seatsAvailable": 0,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "X cancel 1.8.26",
+                      "days": [],
+                      "isAsync": true
+                    }
+                  ]
                 }
               ],
               "compatibleLabs": [
@@ -201068,6 +201257,38 @@
                         "W"
                       ],
                       "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 336565,
+                  "number": "X cancel 1.8.26",
+                  "seats": 0,
+                  "seatsAvailable": 0,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I Introductory course in Newtonian mechanics . Topics include: kinematics of motion, vectors, Newton’s laws, friction, work-energy, impulse-momentum, for both translational and rotational motion . Recommended background: concurrent study of MA 1021 . Students may not receive credit for both PH 1110 and PH 1111 .",
+                  "term": "202201",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Not Assigned",
+                      "startTime": "12:00",
+                      "endTime": "12:00",
+                      "location": "Unknown",
+                      "building": "",
+                      "room": "Unknown",
+                      "seats": 0,
+                      "seatsAvailable": 0,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "X cancel 1.8.26",
+                      "days": [],
+                      "isAsync": true
                     }
                   ]
                 }
@@ -202775,6 +202996,38 @@
                         "W"
                       ],
                       "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 336565,
+                  "number": "X cancel 1.8.26",
+                  "seats": 0,
+                  "seatsAvailable": 0,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "description": "Cat. I Introductory course in Newtonian mechanics . Topics include: kinematics of motion, vectors, Newton’s laws, friction, work-energy, impulse-momentum, for both translational and rotational motion . Recommended background: concurrent study of MA 1021 . Students may not receive credit for both PH 1110 and PH 1111 .",
+                  "term": "202201",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Not Assigned",
+                      "startTime": "12:00",
+                      "endTime": "12:00",
+                      "location": "Unknown",
+                      "building": "",
+                      "room": "Unknown",
+                      "seats": 0,
+                      "seatsAvailable": 0,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "X cancel 1.8.26",
+                      "days": [],
+                      "isAsync": true
                     }
                   ]
                 }
@@ -233388,7 +233641,7 @@
                 "number": "DL01",
                 "seats": 72,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 5,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4456",
                 "description": "Cat. IFourth of a four-course sequence introducing foundational theory and practiceof robotics engineering from the fields of computer science, electrical engineeringand mechanical engineering. The focus of this course is navigation, positionestimation and communications. Concepts of dead reckoning, landmarkupdates, inertial sensors, and radio location will be explored. Control systems asapplied to navigation will be presented. Communication, remote control andremote sensing for mobile robots and tele-robotic systems will be introduced.Wireless communications including wireless networks and typical local and widearea networking protocols will be discussed. Considerations will be discussedregarding operation in difficult environments such as underwater, aerospace,hazardous, etc. Laboratory sessions will be directed towards the solution of anopen-ended problem over the course of the entire term.Recommended background: RBE 3001, ES 3011, MA 2621, or MA 2631.",
@@ -233407,7 +233660,7 @@
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "seats": 72,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 5,
                     "specificSection": "DL01",
                     "days": [
