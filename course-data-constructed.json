@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 8, 2026, 9:42 PM",
+  "generated": "Jan 8, 2026, 9:52 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4100,7 +4100,7 @@
                 "number": "C04",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course provides an introduction to the basic principles of two and three-dimensional visual organization. The course focuses on graphic expression, idea development, and visual literacy. Students will be expected to master basic rendering skills, perspective drawing, concept art, and storyboarding through traditional and/or computer-based tools.",
@@ -4119,7 +4119,7 @@
                     "room": "Riley Commons",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C04",
                     "days": [
@@ -82412,7 +82412,7 @@
                 "number": "S01",
                 "seats": 36,
                 "seatsAvailable": 13,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "The purpose of this zero credit course is to familiarize pre-doctoral and postdoctoral trainees with basic ethical issues in research confronting scientists and engineers. The course includes five lectures and five student-led discussion sessions on topics such as experimental design best practices, research involving animal subjects, authorship, and research misconduct. Student learning will be assessed through in-class formative assessments as well as small group presentations during the discussion sessions. The course is recommended for all graduate students and postdocs who are engaged in research and will be offered in 2018 and each year thereafter.",
@@ -82431,7 +82431,7 @@
                     "room": "Washburn 323",
                     "seats": 36,
                     "seatsAvailable": 13,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
                     "days": [
