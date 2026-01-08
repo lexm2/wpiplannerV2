@@ -6307,7 +6307,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "6/20",
+      "Waitlist_Waitlist_Capacity": "7/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336860"
     },
     {
@@ -48780,7 +48780,7 @@
       "Course_Title": "FIN 3330 - Financial Analytics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "17/35",
+      "Enrolled_Capacity": "18/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Xin Gao",
       "Locations": "Olin Hall 109",
@@ -52208,7 +52208,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "History",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336545"
     },
     {
@@ -98159,7 +98159,7 @@
       "Course_Title": "OIE 2081 - Introduction To Prescriptive Analytics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "16/40",
+      "Enrolled_Capacity": "17/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Andrew Trapp",
       "Locations": "Olin Hall 223",
