@@ -3236,7 +3236,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336465"
     },
     {
@@ -3842,7 +3842,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336503"
     },
     {
@@ -3982,7 +3982,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "7/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336493"
     },
     {
@@ -6296,7 +6296,7 @@
       "Course_Title": "BB 1002 - Environmental Biology",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "120/120",
+      "Enrolled_Capacity": "117/120",
       "Instructional_Format": "Lecture",
       "Instructors": "Michael Buckholt",
       "Locations": "Unity Hall 500",
@@ -6304,10 +6304,10 @@
       "Meeting_Patterns": "M-T-R-F | 12:00 PM - 12:50 PM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Unity Hall 500 | M-T-R-F | 12:00 PM - 12:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "7/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336860"
     },
     {
@@ -10261,7 +10261,7 @@
       "Course_Title": "BME 2001 - Introduction To Biomaterials",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "49/50",
+      "Enrolled_Capacity": "48/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Zoe Reidinger",
       "Locations": "Salisbury Labs 104",
@@ -10272,7 +10272,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biomedical Engineering",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "0/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337385"
     },
     {
@@ -25584,7 +25584,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: CS 1004 - Introduction To Programming For Non-Majors (a)",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "15/20",
+      "Waitlist_Waitlist_Capacity": "14/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337143"
     },
     {
@@ -29192,7 +29192,7 @@
       "Course_Title": "CS 2223 - Algorithms",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "70/70",
+      "Enrolled_Capacity": "69/70",
       "Instructional_Format": "Lecture",
       "Instructors": "Michael Engling",
       "Locations": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -29200,10 +29200,10 @@
       "Meeting_Patterns": "M-T-R-F | 3:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Fuller Labs PHL Perreault Hall - Lower Section | M-T-R-F | 3:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "1/15",
+      "Waitlist_Waitlist_Capacity": "0/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336930"
     },
     {
@@ -30309,7 +30309,7 @@
       "Course_Title": "CS 3041 - Human-Computer Interaction",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "54/54",
+      "Enrolled_Capacity": "53/54",
       "Instructional_Format": "Lecture",
       "Instructors": "Erin Solovey",
       "Locations": "Innovation Studio 205 Active Learning Classroom North",
@@ -30317,10 +30317,10 @@
       "Meeting_Patterns": "M-R | 11:00 AM - 12:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Innovation Studio 205 Active Learning Classroom North | M-R | 11:00 AM - 12:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "1/5",
+      "Waitlist_Waitlist_Capacity": "0/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338752"
     },
     {
@@ -31975,7 +31975,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336389"
     },
     {
@@ -34099,7 +34099,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Computer Science; Data Science",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338751"
     },
     {
@@ -36174,7 +36174,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Computer Science; Data Science",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338751"
     },
     {
@@ -38451,7 +38451,7 @@
       "Course_Title": "ECE 2201 - Microelectronic Circuits I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "83/86",
+      "Enrolled_Capacity": "82/86",
       "Instructional_Format": "Lecture",
       "Instructors": "John McNeill",
       "Locations": "Atwater Kent 219",
@@ -38463,7 +38463,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: ECE 2201 - Microelectronic Circuits I (a)",
       "Subject": "Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "2/15",
+      "Waitlist_Waitlist_Capacity": "1/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336414"
     },
     {
@@ -44068,7 +44068,7 @@
       "Course_Title": "ENV 1500 - Introductions To Geographical Information Systems",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "26/25",
+      "Enrolled_Capacity": "25/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Stephen McCauley",
       "Locations": "Salisbury Labs 011",
@@ -44079,7 +44079,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Environmental Studies",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336149"
     },
     {
@@ -45164,7 +45164,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "2/5",
+      "Waitlist_Waitlist_Capacity": "1/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336428"
     },
     {
@@ -48309,7 +48309,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Entrepreneurship",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337469"
     },
     {
@@ -52208,7 +52208,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "History",
-      "Waitlist_Waitlist_Capacity": "9/10",
+      "Waitlist_Waitlist_Capacity": "8/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336545"
     },
     {
@@ -60500,7 +60500,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336503"
     },
     {
@@ -95089,7 +95089,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "5/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337485"
     },
     {
@@ -126455,7 +126455,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Writing",
-      "Waitlist_Waitlist_Capacity": "2/5",
+      "Waitlist_Waitlist_Capacity": "1/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336352"
     },
     {
@@ -127357,7 +127357,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Writing",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339293"
     },
     {
