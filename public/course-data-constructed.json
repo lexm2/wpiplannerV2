@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 8, 2026, 2:26 PM",
+  "generated": "Jan 8, 2026, 2:51 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -63949,7 +63949,7 @@
                 "crn": 340336,
                 "number": "D01",
                 "seats": 72,
-                "seatsAvailable": 2,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -63968,7 +63968,7 @@
                     "building": "",
                     "room": "Salisbury Labs 104",
                     "seats": 72,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
@@ -80819,9 +80819,9 @@
                     "professor": "Kent Rissmiller",
                     "startTime": "18:30",
                     "endTime": "20:20",
-                    "location": "Salisbury Labs 407",
+                    "location": "Salisbury Labs 411",
                     "building": "",
-                    "room": "Salisbury Labs 407",
+                    "room": "Salisbury Labs 411",
                     "seats": 30,
                     "seatsAvailable": 5,
                     "actualWaitlist": 0,
@@ -187644,7 +187644,7 @@
                 "crn": 337786,
                 "number": "S01",
                 "seats": 50,
-                "seatsAvailable": 29,
+                "seatsAvailable": 28,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -187663,7 +187663,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 28,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S01",
@@ -251266,7 +251266,7 @@
                 "periods": [
                   {
                     "type": "Workshop",
-                    "professor": "Paula Fitzpatrick; Robin Benoit",
+                    "professor": "Robin Benoit",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Daniels Hall 102E",
@@ -251304,7 +251304,7 @@
                 "periods": [
                   {
                     "type": "Workshop",
-                    "professor": "Diana Fiorentino; Paula Fitzpatrick",
+                    "professor": "Diana Fiorentino",
                     "startTime": "13:00",
                     "endTime": "13:50",
                     "location": "Daniels Hall 102E",
@@ -251342,7 +251342,7 @@
                 "periods": [
                   {
                     "type": "Workshop",
-                    "professor": "Paula Fitzpatrick; Catherine Flayhan",
+                    "professor": "Catherine Flayhan",
                     "startTime": "16:00",
                     "endTime": "16:50",
                     "location": "Daniels Hall 102E",
@@ -251815,7 +251815,7 @@
                 "periods": [
                   {
                     "type": "Workshop",
-                    "professor": "Kathryn Moncrief; Paula Fitzpatrick",
+                    "professor": "Kathryn Moncrief",
                     "startTime": "15:00",
                     "endTime": "15:50",
                     "location": "Recreation Center Dance",
@@ -251854,7 +251854,7 @@
                 "periods": [
                   {
                     "type": "Workshop",
-                    "professor": "Paula Fitzpatrick; Meng Le",
+                    "professor": "Meng Le",
                     "startTime": "18:00",
                     "endTime": "18:50",
                     "location": "Recreation Center Dance",
@@ -252460,7 +252460,7 @@
                 "periods": [
                   {
                     "type": "Workshop",
-                    "professor": "Paula Fitzpatrick; Shavaun Cloran",
+                    "professor": "Shavaun Cloran",
                     "startTime": "10:00",
                     "endTime": "10:50",
                     "location": "Daniels Hall 102E",
@@ -252499,7 +252499,7 @@
                 "periods": [
                   {
                     "type": "Workshop",
-                    "professor": "Paula Fitzpatrick; Katherine Foo",
+                    "professor": "Katherine Foo",
                     "startTime": "12:00",
                     "endTime": "12:50",
                     "location": "Daniels Hall 102E",
