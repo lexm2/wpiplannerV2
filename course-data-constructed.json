@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 8, 2026, 11:52 AM",
+  "generated": "Jan 8, 2026, 12:38 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8569,7 +8569,7 @@
                 "number": "C01",
                 "seats": 120,
                 "seatsAvailable": 3,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course is designed for students seeking a broad overview of ecological systems and the effect of humans on the ecosystems. It provides an introduction to natural ecosystems, population growth, and the interaction between human populations and our environment. It is conducted in an active style including the use of case studies, class discussion/participation, and classroom polling systems. The major goal of this course is to help students become more informed environmental citizens, skeptical when presented with data in the media, and knowledgeable enough to question and make informed decisions about the environment. It will primarily focus on current topics but areas of discussion likely to be covered include ecosystems, populations, biodiversity, pollution, environmental economics and climate change. This course is intended for non- life science majors. Recommended background: High School Biology",
@@ -8588,7 +8588,7 @@
                     "room": "Unity Hall 500",
                     "seats": 120,
                     "seatsAvailable": 3,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
@@ -71938,7 +71938,7 @@
                 "crn": 336372,
                 "number": "C01",
                 "seats": 120,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -71957,7 +71957,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 120,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
