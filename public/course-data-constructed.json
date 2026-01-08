@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 8, 2026, 4:50 AM",
+  "generated": "Jan 8, 2026, 5:21 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -13186,7 +13186,7 @@
                 "crn": 336940,
                 "number": "DL01",
                 "seats": 60,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4528",
@@ -13205,7 +13205,7 @@
                     "building": "",
                     "room": "Salisbury Labs 402",
                     "seats": 60,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
@@ -13223,7 +13223,7 @@
                   "crn": 336933,
                   "number": "DX01",
                   "seats": 30,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4528",
@@ -13242,7 +13242,7 @@
                       "building": "",
                       "room": "Atwater Kent 013 Computer Lab",
                       "seats": 30,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
