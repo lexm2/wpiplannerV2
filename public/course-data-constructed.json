@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 8, 2026, 8:44 PM",
+  "generated": "Jan 8, 2026, 8:56 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -66274,7 +66274,7 @@
                 "crn": 337447,
                 "number": "DL01",
                 "seats": 80,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4433",
@@ -66293,7 +66293,7 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 80,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "DL01",
@@ -66312,7 +66312,7 @@
                   "crn": 337576,
                   "number": "DD01",
                   "seats": 80,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4433",
@@ -66331,7 +66331,7 @@
                       "building": "",
                       "room": "Atwater Kent 219",
                       "seats": 80,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
