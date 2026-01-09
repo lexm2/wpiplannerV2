@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 9, 2026, 1:25 PM",
+  "generated": "Jan 9, 2026, 1:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -177543,7 +177543,7 @@
                 "crn": 337734,
                 "number": "S01",
                 "seats": 50,
-                "seatsAvailable": 33,
+                "seatsAvailable": 34,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -177562,7 +177562,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seatsAvailable": 33,
+                    "seatsAvailable": 34,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -252603,7 +252603,7 @@
                 "crn": 353573,
                 "number": "S01 - ST Holistic Well-Being: Strategies for College Learning and Productivity",
                 "seats": 20,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -252622,7 +252622,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 20,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S01 - ST Holistic Well-Being: Strategies for College Learning and Productivity",
