@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 9, 2026, 10:18 AM",
+  "generated": "Jan 9, 2026, 10:47 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -235212,7 +235212,7 @@
                 "crn": 341867,
                 "number": "C01",
                 "seats": 30,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -235231,7 +235231,7 @@
                     "building": "",
                     "room": "Fuller Labs 311",
                     "seats": 30,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -245292,7 +245292,7 @@
                 "crn": 336361,
                 "number": "C01",
                 "seats": 20,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -245311,7 +245311,7 @@
                     "building": "",
                     "room": "Recreation Center Pool Lanes 1-3",
                     "seats": 20,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
