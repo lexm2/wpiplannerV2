@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 9, 2026, 6:57 AM",
+  "generated": "Jan 9, 2026, 7:28 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -142657,7 +142657,7 @@
                   "crn": 336227,
                   "number": "CD04",
                   "seats": 35,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 2,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4333",
@@ -142676,7 +142676,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 35,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 2,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD04",
@@ -142691,7 +142691,7 @@
                   "crn": 336184,
                   "number": "CD06",
                   "seats": 35,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4333",
@@ -142710,7 +142710,7 @@
                       "building": "",
                       "room": "Fuller Labs 311",
                       "seats": 35,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD06",
