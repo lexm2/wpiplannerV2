@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 10, 2026, 4:19 PM",
+  "generated": "Jan 10, 2026, 4:46 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -52114,7 +52114,7 @@
                 "number": "S01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Big Data Analytics addresses the obstacle that innovation and discoveries are no longer hindered by the ability to collect data, but by the ability to summarize, analyze, and discover knowledge from the collected data in a scalable fashion. This course covers computational techniques and algorithms for analyzing and mining patterns in large-scale datasets. Techniques studied address data analysis issues related to data volume (scalable and distributed analysis), data velocity (high-speed data streams), data variety (complex, heterogeneous, or unstructured data), and data veracity (data uncertainty). Techniques include mining and machine learning techniques for complex data types, and scale-up and scale-out strategies that leverage big data infrastructures. Real-world applications using these techniques, for instance social media analysis and scientific data mining, are selectively discussed. Students are expected to engage in hands-on projects using one or more of these technologies. Prerequisites: A beginning course in databases and a beginning course in data mining, or equivalent knowledge, and programming experience.",
@@ -52133,7 +52133,7 @@
                     "room": "Higgins Labs 154",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 15,
                     "specificSection": "S01",
                     "days": [
@@ -53976,7 +53976,7 @@
                 "number": "S01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Big Data Analytics addresses the obstacle that innovation and discoveries are no longer hindered by the ability to collect data, but by the ability to summarize, analyze, and discover knowledge from the collected data in a scalable fashion. This course covers computational techniques and algorithms for analyzing and mining patterns in large-scale datasets. Techniques studied address data analysis issues related to data volume (scalable and distributed analysis), data velocity (high-speed data streams), data variety (complex, heterogeneous, or unstructured data), and data veracity (data uncertainty). Techniques include mining and machine learning techniques for complex data types, and scale-up and scale-out strategies that leverage big data infrastructures. Real-world applications using these techniques, for instance social media analysis and scientific data mining, are selectively discussed. Students are expected to engage in hands-on projects using one or more of these technologies. Prerequisites: A beginning course in databases and a beginning course in data mining, or equivalent knowledge, and programming experience.",
@@ -53995,7 +53995,7 @@
                     "room": "Higgins Labs 154",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 15,
                     "specificSection": "S01",
                     "days": [
@@ -65996,7 +65996,7 @@
                 "number": "DL02",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 12,
+                "actualWaitlist": 11,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4527",
                 "description": "Cat. I This is an introductory course in the engineering mechanics sequence that serves as a foundation for other courses in mechanical engineering. The course covers general two- and three-dimensional force and couple systems, distributed loads, resultant forces, moments of forces, free body diagrams, equilibrium of particles and finite sized bodies. Specific topics include friction, trusses, shear forces, bodies subjected to distributed loads, bending moments in beams, and first and second moments of plane areas. Recommended background: Differential (MA 1021) and integral (MA 1022) calculus, vector algebra (MA 1023), and double and triple integration (MA 1024).",
@@ -66015,7 +66015,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 12,
+                    "actualWaitlist": 11,
                     "maxWaitlist": 20,
                     "specificSection": "DL02",
                     "days": [
@@ -172579,7 +172579,7 @@
                 "number": "C01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "ME 4323. Fundamentals of Vehicle Drivetrain Systems. Cat I This product-oriented course focuses on engineering fundamentals of ground vehicle drivetrain systems with application to automobiles, commercial and off-road vehicles as well as autonomous and electrically driven ground vehicles. The course focuses on “theory and practice” aspects of engineering design of vehicle transmissions, transfer cases, open and limited slip differentials, etc. A term project integrates design principles with materials selection to improve a drivetrain component for a given vehicle. Project steps include: problem definition and analysis, development of design specifications, development and analysis of alternative designs, conceptual design and material analysis, and a CAE design. Recommended Background: materials science (ES 2001), stress analysis (ES 2502), dynamics (ES 2503) or equivalents.",
@@ -172598,7 +172598,7 @@
                     "room": "Unity Hall 405",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
