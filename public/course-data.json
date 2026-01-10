@@ -8926,7 +8926,7 @@
       "Starting_Academic_Period_Type": "Spring",
       "Student_Course_Section_Cluster": "2026 Spring Semester: BB 508 - Animal Cell Culture ()",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "2/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337868"
     },
     {
@@ -8955,7 +8955,7 @@
       "Starting_Academic_Period_Type": "Spring",
       "Student_Course_Section_Cluster": "2026 Spring Semester: BB 508 - Animal Cell Culture ()",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337867"
     },
     {
@@ -10307,7 +10307,7 @@
       "Course_Title": "BME 2001 - Introduction To Biomaterials",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "48/50",
+      "Enrolled_Capacity": "49/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Zoe Reidinger",
       "Locations": "Salisbury Labs 104",
@@ -14143,7 +14143,7 @@
       "Course_Title": "BME 591 - Graduate Seminar",
       "Credits": "0",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "34/40",
+      "Enrolled_Capacity": "33/40",
       "Instructional_Format": "Seminar",
       "Instructors": "Catherine Whittington",
       "Locations": "Gateway Park 1 Room 1002",
