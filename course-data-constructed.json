@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 10, 2026, 6:49 PM",
+  "generated": "Jan 10, 2026, 7:12 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -85984,7 +85984,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IAn introduction to the main concepts, tools, fields of study, global problems, and cross-cultural perspectives that comprise international and global studies. No prior background is required. Especially appropriate for students interested in any of WPI's global Project Centers.",
@@ -86003,7 +86003,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
