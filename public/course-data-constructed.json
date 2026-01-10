@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 10, 2026, 7:12 PM",
+  "generated": "Jan 10, 2026, 7:27 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -245240,7 +245240,7 @@
                 "number": "D02",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introductory course designed to explore various leisure education alternatives.",
@@ -245259,7 +245259,7 @@
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
                     "days": [
