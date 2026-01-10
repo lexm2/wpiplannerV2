@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 10, 2026, 1:17 PM",
+  "generated": "Jan 10, 2026, 1:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -172579,7 +172579,7 @@
                 "number": "C01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "ME 4323. Fundamentals of Vehicle Drivetrain Systems. Cat I This product-oriented course focuses on engineering fundamentals of ground vehicle drivetrain systems with application to automobiles, commercial and off-road vehicles as well as autonomous and electrically driven ground vehicles. The course focuses on “theory and practice” aspects of engineering design of vehicle transmissions, transfer cases, open and limited slip differentials, etc. A term project integrates design principles with materials selection to improve a drivetrain component for a given vehicle. Project steps include: problem definition and analysis, development of design specifications, development and analysis of alternative designs, conceptual design and material analysis, and a CAE design. Recommended Background: materials science (ES 2001), stress analysis (ES 2502), dynamics (ES 2503) or equivalents.",
@@ -172598,7 +172598,7 @@
                     "room": "Unity Hall 405",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -172672,7 +172672,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "ME 4324 Integrated Design of Mechanical System. Cat I This course develops student capabilities to conduct the detailed design of mechanical components integrated into a complete mechanical system. Topics covered include kinematic syntheses and analysis and detailed design of mechanical components under dynamic loading using the fatigue-life method. These topics are developed through a guided design project. Computer software packages such as Mathcad and Linkages are used. Recommended Background: ES 2001 (Introduction to Materials Science), ES 1310 (Introduction to Computer Aided Design), ES2501 (Introduction to Static Systems), ES2502 (Stress Analysis), and ES2503 (Introduction to Dynamic Systems).",
@@ -172691,7 +172691,7 @@
                     "room": "Higgins Labs 154",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
