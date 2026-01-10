@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 10, 2026, 9:49 AM",
+  "generated": "Jan 10, 2026, 10:17 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -167678,7 +167678,7 @@
                 "crn": 340332,
                 "number": "C01 - Topics In Mathematics: Introduction to Stochastic Processes",
                 "seats": 35,
-                "seatsAvailable": 25,
+                "seatsAvailable": 26,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -167697,7 +167697,7 @@
                     "building": "",
                     "room": "Stratton Hall 207 (new)",
                     "seats": 35,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 26,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01 - Topics In Mathematics: Introduction to Stochastic Processes",
