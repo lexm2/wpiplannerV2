@@ -6353,7 +6353,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336860"
     },
     {
@@ -6549,7 +6549,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "11/20",
+      "Waitlist_Waitlist_Capacity": "10/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336906"
     },
     {
@@ -30405,7 +30405,7 @@
       "Course_Title": "CS 3041 - Human-Computer Interaction",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "53/54",
+      "Enrolled_Capacity": "54/54",
       "Instructional_Format": "Lecture",
       "Instructors": "Erin Solovey",
       "Locations": "Innovation Studio 205 Active Learning Classroom North",
@@ -30413,7 +30413,7 @@
       "Meeting_Patterns": "M-R | 11:00 AM - 12:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Innovation Studio 205 Active Learning Classroom North | M-R | 11:00 AM - 12:50 PM",
-      "Section_Status": "Open",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
       "Waitlist_Waitlist_Capacity": "0/5",
@@ -46075,7 +46075,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ES 2501 - Introduction To Static Systems ()",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "11/20",
+      "Waitlist_Waitlist_Capacity": "10/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337370"
     },
     {
@@ -82567,7 +82567,7 @@
       "Course_Title": "MA 3627 - Introduction To The Design And Analysis Of Experiments",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/42",
+      "Enrolled_Capacity": "21/42",
       "Instructional_Format": "Lecture",
       "Instructors": "Carly Thorp",
       "Locations": "Salisbury Labs 406",
@@ -94734,7 +94734,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "7/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337396"
     },
     {
@@ -118637,7 +118637,7 @@
       "Course_Title": "TH 2100 - Fundamentals of Acting",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "14/20",
+      "Enrolled_Capacity": "13/20",
       "Instructional_Format": "Lecture",
       "Instructors": "Olivia Scanlon",
       "Locations": "Little Theatre",
