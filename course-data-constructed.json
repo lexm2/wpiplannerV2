@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 11, 2026, 9:38 PM",
+  "generated": "Jan 11, 2026, 9:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -19287,7 +19287,7 @@
                 "crn": 336373,
                 "number": "CL01",
                 "seats": 60,
-                "seatsAvailable": 14,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4342",
@@ -19306,7 +19306,7 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 60,
-                    "seatsAvailable": 14,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "CL01",
@@ -19326,7 +19326,7 @@
                   "crn": 336374,
                   "number": "CX01",
                   "seats": 60,
-                  "seatsAvailable": 14,
+                  "seatsAvailable": 13,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4342",
@@ -19345,7 +19345,7 @@
                       "building": "",
                       "room": "Kaven Hall 116",
                       "seats": 60,
-                      "seatsAvailable": 14,
+                      "seatsAvailable": 13,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX01",
