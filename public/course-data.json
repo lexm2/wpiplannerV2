@@ -33423,7 +33423,7 @@
       "Course_Title": "CS 536 - Programming Language Design",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "21/30",
+      "Enrolled_Capacity": "22/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Cheng Zhang",
       "Locations": "Higgins Labs 114",
@@ -33505,7 +33505,7 @@
       "Course_Title": "CS 539 - Machine Learning",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "15/40",
+      "Enrolled_Capacity": "16/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Ethan Prihar",
       "Locations": "Fuller Labs 320",
@@ -34765,7 +34765,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Computer Science; Data Science",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338759"
     },
     {
@@ -36021,7 +36021,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Computer Science; Data Science",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-338759"
     },
     {
