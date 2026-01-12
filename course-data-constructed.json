@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 12, 2026, 10:42 PM",
+  "generated": "Jan 12, 2026, 10:52 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -11204,7 +11204,7 @@
                 "crn": 338642,
                 "number": "C01",
                 "seats": 50,
-                "seatsAvailable": 24,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -11223,7 +11223,7 @@
                     "building": "",
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 50,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
@@ -244029,7 +244029,7 @@
                 "number": "C01",
                 "seats": 28,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -244048,7 +244048,7 @@
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 28,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
