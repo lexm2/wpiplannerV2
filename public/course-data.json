@@ -27391,7 +27391,7 @@
       "Course_Title": "CS 2011 - Introduction To Machine Organization And Assembly Language",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "111/135",
+      "Enrolled_Capacity": "112/135",
       "Instructional_Format": "Lecture",
       "Instructors": "Taylor Andrews",
       "Locations": "Salisbury Labs 115 Kinnicutt Hall",
@@ -27451,7 +27451,7 @@
       "Course_Title": "CS 2011 - Introduction To Machine Organization And Assembly Language",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "26/27",
+      "Enrolled_Capacity": "27/27",
       "Instructional_Format": "Laboratory",
       "Instructors": "Taylor Andrews",
       "Locations": "Salisbury Labs 123 Computer Lab",
@@ -27459,7 +27459,7 @@
       "Meeting_Patterns": "W | 9:00 AM - 9:50 AM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Salisbury Labs 123 Computer Lab | W | 9:00 AM - 9:50 AM",
-      "Section_Status": "Open",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: CS 2011 - Introduction To Machine Organization And Assembly Language ()",
       "Subject": "Computer Science",
@@ -53649,7 +53649,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "History",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-340350"
     },
     {
@@ -85923,7 +85923,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ME 2820 - Materials Processing ()",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "3/15",
+      "Waitlist_Waitlist_Capacity": "4/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337342"
     },
     {
@@ -86110,7 +86110,7 @@
       "Course_Title": "ME 3311 - Dynamics of Mechanisms and Machines",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "21/30",
+      "Enrolled_Capacity": "22/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Mustapha Fofana",
       "Locations": "Higgins Labs 154",
@@ -86909,10 +86909,10 @@
       "Meeting_Patterns": "T-R | 1:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Higgins Labs 031 ME Computer Lab | T-R | 1:00 PM - 3:50 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339229"
     },
     {
