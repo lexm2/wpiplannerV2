@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 13, 2026, 8:25 AM",
+  "generated": "Jan 13, 2026, 8:54 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -235562,7 +235562,7 @@
                 "crn": 337837,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 23,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -235581,7 +235581,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -239755,7 +239755,7 @@
                 "crn": 344760,
                 "number": "S02 - ST: Technical Decision and Risk Analysis",
                 "seats": 30,
-                "seatsAvailable": 12,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -239774,7 +239774,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S02 - ST: Technical Decision and Risk Analysis",
