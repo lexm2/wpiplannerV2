@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 14, 2026, 8:25 AM",
+  "generated": "Jan 14, 2026, 8:53 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -9093,7 +9093,7 @@
               "number": "CX01",
               "seats": 20,
               "seatsAvailable": 0,
-              "actualWaitlist": 2,
+              "actualWaitlist": 3,
               "maxWaitlist": 10,
               "note": null,
               "description": "BB 1801 Foundations of Biology and Biotechnology Laboratory (Cat. I; 1/3 unit) This course will provide a foundational experience by exposing students to how research questions are identified and addressed via biological experimentation. Importantly, the lab will also serve as a unifying experience for biology majors, providing a framework that will allow them to identify as contributing members of a scientific community. This lab will convey the breadth of biological systems from organismal to molecular scales, and the overarching principles of evolution and effects of environment on behavior. Focus areas may include how resistance to antibiotics arises, how ecosystems and organisms are adversely affected by pollution, and how experiments can be designed to identify strategies to overcome global problems. This introductory biology lab experience is intended for first-year Biology & Biotechnology majors, and anyone intending to take 3800 level biology laboratories. Recommended background: High school biology. No previous laboratory experience is assumed.",
@@ -9112,7 +9112,7 @@
                   "room": "Goddard Hall 206 BB Lab",
                   "seats": 20,
                   "seatsAvailable": 0,
-                  "actualWaitlist": 2,
+                  "actualWaitlist": 3,
                   "maxWaitlist": 10,
                   "specificSection": "CX01",
                   "days": [
@@ -53158,7 +53158,7 @@
                 "crn": 336392,
                 "number": "C01",
                 "seats": 50,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -53177,7 +53177,7 @@
                     "building": "",
                     "room": "Salisbury Labs 402",
                     "seats": 50,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
