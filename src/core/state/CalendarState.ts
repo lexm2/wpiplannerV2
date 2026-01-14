@@ -314,11 +314,13 @@ export class CalendarState {
 
     /**
      * Compute weekly slots from event instances.
+     * Merges both cloud calendar events and local calendar events.
      * Handles deduplication and exclusion filtering.
      */
     private computeWeeklySlots(): void {
         this.weeklySlots.clear();
 
+        // Phase 1: Process cloud calendar events
         for (const [term, events] of this.eventInstances) {
             const slots: DisplayableTimeSlot[] = [];
             const seen = new Set<string>(); // Dedupe key
@@ -340,6 +342,21 @@ export class CalendarState {
             }
 
             this.weeklySlots.set(term, slots);
+        }
+
+        // Phase 2: Add local calendar events to weeklySlots
+        const terms = ['A', 'B', 'C', 'D'];
+        for (const term of terms) {
+            const existingSlots = this.weeklySlots.get(term) || [];
+            const localSlots = this.getLocalEventSlotsForTerm(term);
+
+            // Merge: existing cloud slots + local slots
+            // getLocalEventSlotsForTerm() already filters by:
+            //   - visible: true
+            //   - term applicability
+            const allSlots = [...existingSlots, ...localSlots];
+
+            this.weeklySlots.set(term, allSlots);
         }
     }
 
@@ -403,6 +420,10 @@ export class CalendarState {
     /**
      * Get all blocked times across all terms.
      * Returns WeeklyTimeSlot[] (DisplayableTimeSlot extends WeeklyTimeSlot).
+     *
+     * Includes BOTH:
+     * - Cloud calendar events (from connected calendar, non-excluded, weekdays only)
+     * - Local calendar events (stored locally, visible only, weekdays only)
      */
     getAllBlockedTimes(): WeeklyTimeSlot[] {
         this.ensureWeeklySlotsComputed();
@@ -414,7 +435,9 @@ export class CalendarState {
     }
 
     /**
-     * Get count of events that will be blocked (non-excluded, weekday events)
+     * Get count of events that will be blocked during auto-scheduling.
+     * Includes both cloud calendar events (non-excluded) and visible local events.
+     * Count automatically reflects weeklySlots contents after computeWeeklySlots().
      */
     getBlockableEventCount(): number {
         this.ensureWeeklySlotsComputed();

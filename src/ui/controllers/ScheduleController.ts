@@ -2281,7 +2281,11 @@ export class ScheduleController {
         const hasConnectedCalendar = !!this.currentSchedule?.connectedCalendar;
         const calendarName = this.currentSchedule?.connectedCalendar?.calendarName;
         const calendarProvider = this.currentSchedule?.connectedCalendar?.providerId;
-        const calendarEventCount = this.calendarState.getBlockableEventCount();
+
+        // Calculate counts separately for display breakdown
+        const totalBlockableCount = this.calendarState.getBlockableEventCount();
+        const localEventCount = this.calendarState.getLocalEvents().filter(e => e.visible).length;
+        const cloudEventCount = totalBlockableCount - localEventCount;
 
         const settingsModal = new AutoScheduleSettingsModal(this.modalService, {
             onNext: async (settings: AutoScheduleSettings) => {
@@ -2293,7 +2297,8 @@ export class ScheduleController {
             hasConnectedCalendar,
             calendarName,
             calendarProvider,
-            calendarEventCount
+            calendarEventCount: cloudEventCount,
+            localEventCount: localEventCount
         });
         settingsModal.show();
     }
@@ -2322,7 +2327,7 @@ export class ScheduleController {
             if (settings.avoidCalendarEvents) {
                 const calendarBlockedTimes = this.calendarState.getAllBlockedTimes();
                 blockedTimes = [...blockedTimes, ...calendarBlockedTimes];
-                console.log(`[Auto-Schedule] Added ${calendarBlockedTimes.length} blocked times from calendar events`);
+                console.log(`[Auto-Schedule] Added ${calendarBlockedTimes.length} blocked times from calendar events (cloud + local)`);
             }
 
             const config: AutoScheduleConfig = {
