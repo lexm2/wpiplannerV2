@@ -2,9 +2,14 @@ import { BaseModal } from './BaseModal';
 import { ModalService } from '../../services/ui/ModalService';
 import changelogMarkdown from '../../../CHANGELOG.md?raw';
 
+interface ChangelogSection {
+    title: string;
+    items: string[];
+}
+
 interface ChangelogEntry {
     date: string;
-    changes: string[];
+    sections: ChangelogSection[];
 }
 
 export class ChangelogModal extends BaseModal {
@@ -28,7 +33,7 @@ export class ChangelogModal extends BaseModal {
         const lines = markdown.split('\n');
 
         let currentEntry: ChangelogEntry | null = null;
-        let currentSection: string | null = null;
+        let currentSection: ChangelogSection | null = null;
 
         for (const line of lines) {
             const dateMatch = line.match(/^## \[([^\]]+)\]/);
@@ -36,21 +41,25 @@ export class ChangelogModal extends BaseModal {
                 if (currentEntry) {
                     entries.push(currentEntry);
                 }
-                currentEntry = { date: dateMatch[1], changes: [] };
+                currentEntry = { date: dateMatch[1], sections: [] };
                 currentSection = null;
                 continue;
             }
 
             const sectionMatch = line.match(/^### (.+)/);
             if (sectionMatch && currentEntry) {
-                currentSection = sectionMatch[1];
+                currentSection = { title: sectionMatch[1], items: [] };
+                currentEntry.sections.push(currentSection);
                 continue;
             }
 
             const itemMatch = line.match(/^- (.+)/);
-            if (itemMatch && currentEntry && currentSection) {
-                const change = `${currentSection}: ${itemMatch[1]}`;
-                currentEntry.changes.push(change);
+            if (itemMatch && currentEntry) {
+                if (!currentSection) {
+                    currentSection = { title: '', items: [] };
+                    currentEntry.sections.push(currentSection);
+                }
+                currentSection.items.push(itemMatch[1]);
             }
         }
 
@@ -96,15 +105,32 @@ export class ChangelogModal extends BaseModal {
 
     private renderEntry(entry: ChangelogEntry): string {
         const formattedDate = this.formatDate(entry.date);
-        const changesList = entry.changes
-            .map(change => `<li class="changelog-item">${this.escapeHtml(change)}</li>`)
+        const sectionsHtml = entry.sections
+            .map(section => this.renderSection(section))
             .join('');
 
         return `
             <div class="changelog-entry">
                 <h3 class="changelog-date">${formattedDate}</h3>
+                ${sectionsHtml}
+            </div>
+        `;
+    }
+
+    private renderSection(section: ChangelogSection): string {
+        const itemsList = section.items
+            .map(item => `<li class="changelog-item">${this.escapeHtml(item)}</li>`)
+            .join('');
+
+        const titleHtml = section.title
+            ? `<h4 class="changelog-section-title">${this.escapeHtml(section.title)}</h4>`
+            : '';
+
+        return `
+            <div class="changelog-section">
+                ${titleHtml}
                 <ul class="changelog-list">
-                    ${changesList}
+                    ${itemsList}
                 </ul>
             </div>
         `;

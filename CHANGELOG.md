@@ -2,9 +2,11 @@
 
 ## [2026-01-14]
 
+- A bunch of stuff was fixed before I added in the changelog. Im not going over it here but there was a bunch of other bug fixes.
+
 ### Removed
 - Removed cloud sync provider implementations (Google Drive, OneDrive, Google Calendar)
-- Cloud sync feature was buggy and unreliable. IT WILL NOT WORK UNTIL REIMPLEMENTED
+- Cloud sync WILL NOT WORK UNTIL REIMPLEMENTED
 
 
 ### Added
