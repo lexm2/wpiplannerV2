@@ -1,5 +1,6 @@
 import { ModalService } from '../../services/ui/ModalService';
 import { CourseFilterService } from '../../services/filtering/CourseFilterService';
+import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
 import { Course, Department } from '../../types/types';
 import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
@@ -9,6 +10,7 @@ import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterC
 
 export class FilterModalController extends BaseModal {
     private filterService: CourseFilterService | null = null;
+    private courseSelectionService: CourseSelectionService | null = null;
     private allCourses: Course[] = [];
     private isCategoryMode: boolean = false;
     private isUpdatingFilter: boolean = false;
@@ -19,6 +21,10 @@ export class FilterModalController extends BaseModal {
 
     setFilterService(filterService: CourseFilterService): void {
         this.filterService = filterService;
+    }
+
+    setCourseSelectionService(courseSelectionService: CourseSelectionService): void {
+        this.courseSelectionService = courseSelectionService;
     }
 
     setCourseData(departments: Department[]): void {
@@ -319,7 +325,7 @@ export class FilterModalController extends BaseModal {
         const minAvailable = criteria?.minAvailable;
 
         // Get conflict filter state
-        const conflictFilter = this.filterService.getActiveFilters().find(f => f.id === 'conflict');
+        const conflictFilter = this.filterService.getActiveFilters().find(f => f.id === 'periodConflict');
         const conflictCriteria = conflictFilter?.criteria as { avoidConflicts?: boolean } | undefined;
         const avoidConflicts = conflictCriteria?.avoidConflicts || false;
 
@@ -868,9 +874,13 @@ export class FilterModalController extends BaseModal {
         const avoidConflictsCheckbox = modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement;
 
         if (avoidConflictsCheckbox?.checked) {
-            this.filterService?.addFilter('conflict', { avoidConflicts: true });
+            const selectedCourses = this.courseSelectionService?.getAllSelectedCourses() || [];
+            this.filterService?.addFilter('periodConflict', {
+                avoidConflicts: true,
+                selectedCourses: selectedCourses
+            });
         } else {
-            this.filterService?.removeFilter('conflict');
+            this.filterService?.removeFilter('periodConflict');
         }
         this.updatePreview(modalElement);
     }

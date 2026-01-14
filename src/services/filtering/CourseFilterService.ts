@@ -4,10 +4,8 @@ import { FilterState } from '../../core/filtering/FilterState';
 import { SearchService } from './searchService';
 import { getAllSections } from '../../utils/courseUtils';
 import { SectionFilterPipeline, SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
-
-/**
- * Orchestrates 15+ specialized course filters with priority-based execution, event-driven state management, and selective persistence
- */
+import { PeriodConflictFilter } from '../../core/filtering/filters/PeriodConflictFilter';
+import { ConflictDetector } from '../../core/scheduling/ConflictEngine';
 export class CourseFilterService {
     private filterState: FilterState;
     private registeredFilters: Map<string, SectionBasedFilter> = new Map();
@@ -21,6 +19,11 @@ export class CourseFilterService {
         this.searchService = searchService;
         this.sectionPipeline = new SectionFilterPipeline();
         this.getBookmarkedCourseIds = getBookmarkedCourseIds;
+    }
+
+    setConflictDetector(conflictDetector: ConflictDetector): void {
+        const periodConflictFilter = new PeriodConflictFilter(conflictDetector);
+        this.registerFilter(periodConflictFilter);
     }
 
     // Filter Registration

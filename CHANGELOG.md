@@ -8,4 +8,5 @@
 
 
 ### Fixed
+- Fixed availability filter "hide conflicting periods" toggle - now properly persists and filters out courses that conflict with selected sections
 - Fixed term-badges-container not reappearing after filtering/unfiltering

@@ -132,6 +132,7 @@ export class MainController {
 
         // Connect filter service and course data to filter modal
         this.filterModalController.setFilterService(this.filterService);
+        this.filterModalController.setCourseSelectionService(this.courseSelectionService);
         
         // Connect schedule filter service to controllers
         this.scheduleFilterModalController.setScheduleFilterService(this.scheduleFilterService);
@@ -215,6 +216,9 @@ export class MainController {
         // Register SearchTextFilter
         const searchTextFilter = new SearchTextFilter();
         this.filterService.registerFilter(searchTextFilter);
+
+        // Register PeriodConflictFilter
+        this.filterService.setConflictDetector(this.conflictDetector);
 
         // Set up filter change listener to refresh UI
         this.filterService.addEventListener((_event) => {
