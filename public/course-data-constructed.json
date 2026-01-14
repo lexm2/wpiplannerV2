@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 14, 2026, 10:20 AM",
+  "generated": "Jan 14, 2026, 10:50 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -245074,7 +245074,7 @@
                 "number": "C02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I (1/12 unit) This course will teach basic strength training principles and techniques. Students will develop and implement an individualized conditioning program.",
@@ -245093,7 +245093,7 @@
                     "room": "Harrington Auditorium 102",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
                     "days": [
@@ -251553,7 +251553,7 @@
                 "number": "D01",
                 "seats": 15,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "WPE 1611 Introduction to Mindfulness (Cat. I, 1/12 unit) Introduction to Mindfulness is an evidence-based mindfulness curriculum designed for college aged adults by the Mindfulness Institute for Emerging Adults (MIEA). During this course, you will learn useful, practical tools to help manage your stress and increase self-compassion. Students will practice a variety of meditation skills, engage with the MIEA Mobile App, read the companion book, and participate in class discussion.",
@@ -251572,7 +251572,7 @@
                     "room": "Daniels Hall 102E",
                     "seats": 15,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -252672,7 +252672,7 @@
                 "number": "D02 - ST in Holistic Well-Being: Pranayama",
                 "seats": 15,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "WPE 1699 Special Topics in Holistic Well-Being, Cat. I (1/12 unit) This course provides an opportunity for students to learn about a special topic in holistic wellbeing. The topics are subject to change on a rotating basis to provide flexibility in the offerings based upon student interest and the latest practice and science of well-being.",
@@ -252691,7 +252691,7 @@
                     "room": "Daniels Hall 102E",
                     "seats": 15,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "D02 - ST in Holistic Well-Being: Pranayama",
                     "days": [
