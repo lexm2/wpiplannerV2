@@ -941,6 +941,8 @@ export class MainController {
     }
 
     private refreshCurrentView(): void {
+        this.expandedTerms.clear();
+
         const hasFilters = !this.filterService.isEmpty();
 
         // Check if department filter is active
