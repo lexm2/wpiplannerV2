@@ -1886,6 +1886,17 @@
   font-size: 0.95rem;
 }
 
+.changelog-section {
+  margin-bottom: 1rem;
+}
+
+.changelog-section-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
 .changelog-empty {
   text-align: center;
   color: var(--color-text-secondary);
