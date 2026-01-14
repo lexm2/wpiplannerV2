@@ -38159,7 +38159,7 @@
       "Course_Title": "ECE 2039 - Computational Engineering",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "65/64",
+      "Enrolled_Capacity": "64/64",
       "Instructional_Format": "Lecture",
       "Instructors": "Zane Weissman",
       "Locations": "Atwater Kent 116 Newell Hall",
@@ -38189,7 +38189,7 @@
       "Course_Title": "ECE 2039 - Computational Engineering",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "33/32",
+      "Enrolled_Capacity": "32/32",
       "Instructional_Format": "Laboratory",
       "Instructors": "Zane Weissman",
       "Locations": "Unity Hall 420",
@@ -120807,7 +120807,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "0/15",
+      "Waitlist_Waitlist_Capacity": "1/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337239"
     },
     {
@@ -121059,7 +121059,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "1/15",
+      "Waitlist_Waitlist_Capacity": "2/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337289"
     },
     {
@@ -125099,7 +125099,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "7/10",
+      "Waitlist_Waitlist_Capacity": "8/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-340236"
     },
     {
