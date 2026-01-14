@@ -20,6 +20,8 @@ export interface AutoScheduleSettingsModalOptions {
     calendarProvider?: string;
     /** Number of calendar events that will be blocked */
     calendarEventCount?: number;
+    /** Number of local events that will be blocked */
+    localEventCount?: number;
 }
 
 /**
@@ -82,31 +84,55 @@ export class AutoScheduleSettingsModal extends BaseModal {
     }
 
     /**
-     * Render the calendar events section (only if calendar is connected)
+     * Render the calendar events section (if calendar connected or local events exist)
      */
     private renderCalendarSection(): string {
-        if (!this.options.hasConnectedCalendar) {
+        const cloudCount = this.options.calendarEventCount || 0;
+        const localCount = this.options.localEventCount || 0;
+        const totalCount = cloudCount + localCount;
+
+        // Show section if there are ANY events (cloud OR local) OR if calendar connected
+        if (totalCount === 0 && !this.options.hasConnectedCalendar) {
             return '';
         }
 
-        const calendarName = this.options.calendarName || 'Calendar';
-        const calendarProvider = this.options.calendarProvider || '';
-        const eventCount = this.options.calendarEventCount || 0;
-        const displayName = calendarProvider
-            ? `${this.escapeHtml(calendarName)} (${this.escapeHtml(calendarProvider)})`
-            : this.escapeHtml(calendarName);
+        // Build display name
+        let displayName = 'Calendar Events';
+        if (this.options.hasConnectedCalendar && this.options.calendarName) {
+            const calendarName = this.escapeHtml(this.options.calendarName);
+            const calendarProvider = this.options.calendarProvider || '';
+            displayName = calendarProvider
+                ? `${calendarName} (${calendarProvider})`
+                : calendarName;
+        }
+
+        // Build count message with smart formatting
+        let countMessage: string;
+        if (cloudCount > 0 && localCount > 0) {
+            // Both types present
+            countMessage = `${cloudCount} cloud + ${localCount} local event${totalCount !== 1 ? 's' : ''} will be blocked`;
+        } else if (localCount > 0) {
+            // Only local events
+            countMessage = `${localCount} local event${localCount !== 1 ? 's' : ''} will be blocked`;
+        } else if (cloudCount > 0) {
+            // Only cloud events
+            countMessage = `${cloudCount} event${cloudCount !== 1 ? 's' : ''} will be blocked`;
+        } else {
+            // No events (but calendar might be connected)
+            countMessage = 'No events to block';
+        }
 
         return `
             <div class="settings-section calendar-section">
                 <label class="settings-toggle-label">
                     <input type="checkbox" class="settings-toggle" id="avoid-calendar-toggle" ${this.avoidCalendarEvents ? 'checked' : ''}>
-                    <span class="settings-toggle-text">Avoid events in calendar</span>
+                    <span class="settings-toggle-text">Avoid calendar events</span>
                 </label>
                 <button class="calendar-events-btn modal-calendar-btn" id="modal-calendar-btn" style="display: ${this.avoidCalendarEvents ? 'flex' : 'none'}">
                     <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
                     <span class="calendar-events-btn-info">
                         <span class="calendar-events-btn-name">${displayName}</span>
-                        <span class="calendar-events-btn-count">${eventCount} event${eventCount !== 1 ? 's' : ''} will be blocked</span>
+                        <span class="calendar-events-btn-count">${countMessage}</span>
                     </span>
                 </button>
             </div>
@@ -117,8 +143,12 @@ export class AutoScheduleSettingsModal extends BaseModal {
      * Render placeholder section for future settings
      */
     private renderPlaceholderSection(): string {
-        // Only show placeholder if no calendar section
-        if (this.options.hasConnectedCalendar) {
+        const cloudCount = this.options.calendarEventCount || 0;
+        const localCount = this.options.localEventCount || 0;
+        const totalCount = cloudCount + localCount;
+
+        // Only show placeholder if NO events at all AND no calendar connected
+        if (totalCount > 0 || this.options.hasConnectedCalendar) {
             return '';
         }
 
