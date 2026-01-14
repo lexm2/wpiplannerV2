@@ -34,6 +34,7 @@ import { GoogleDriveProvider } from '../../services/sync/providers/googledrive/G
 import { syncEventBus } from '../../services/sync/SyncEventBus'
 import type { ConflictInfo, SyncData } from '../../services/sync/types'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
+import { ChangelogModal } from '../components/ChangelogModal'
 import { calendarService, GoogleCalendarProvider } from '../../services/calendar'
 import { ResizablePanel } from '../components/ResizablePanel'
 
@@ -69,6 +70,7 @@ export class MainController {
     private googleDriveProvider: GoogleDriveProvider;
     private googleCalendarProvider: GoogleCalendarProvider;
     private conflictResolutionModal: ConflictResolutionModal;
+    private changelogModal: ChangelogModal;
     private cloudSyncMenuItem: HTMLButtonElement | null = null;
     private resizablePanel: ResizablePanel | null = null;
     private allDepartments: Department[] = [];
@@ -161,6 +163,9 @@ export class MainController {
 
         // Initialize conflict resolution modal
         this.conflictResolutionModal = new ConflictResolutionModal(this.modalService);
+
+        // Initialize changelog modal
+        this.changelogModal = new ChangelogModal(this.modalService);
 
         // Listen for sync conflicts to show resolution modal
         syncEventBus.on('sync-conflict', (event) => {
@@ -319,6 +324,12 @@ export class MainController {
             await this.scheduleManagementService.initialize();
             
             await this.loadCourseData();
+
+            // Show changelog modal after data loads
+            setTimeout(() => {
+                this.changelogModal.show();
+            }, 500);
+
             this.departmentController.displayDepartments();
 
             // Set "All Departments" as the default selection on startup
