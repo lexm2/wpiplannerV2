@@ -404,6 +404,13 @@ export class CloudStatusButton {
             return;
         }
 
+        const provider = syncManager.getCurrentProvider();
+        if (!provider) {
+            this.currentState = 'unavailable';
+            this.updateUI();
+            return;
+        }
+
         const isAuthenticated = syncManager.isAuthenticated();
         this.currentState = isAuthenticated ? 'authenticated-idle' : 'unauthenticated';
         this.updateUI();
