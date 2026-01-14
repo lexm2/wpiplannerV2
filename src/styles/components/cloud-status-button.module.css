@@ -196,6 +196,23 @@
     color: #721c24;
 }
 
+/* Conflict State */
+.cloud-status-conflict {
+    background: #fff3cd;
+    color: #856404;
+    border-color: #ffc107;
+    cursor: pointer;
+}
+
+.cloud-status-conflict:hover {
+    background: #ffe69c;
+    border-color: #ffb300;
+}
+
+.cloud-status-conflict .cloud-status-icon {
+    color: #856404;
+}
+
 /* Animations */
 @keyframes pulse {
     0%, 100% {
@@ -272,7 +289,8 @@
     .cloud-status-synced,
     .cloud-status-signed-out,
     .cloud-status-signed-in,
-    .cloud-status-error {
+    .cloud-status-error,
+    .cloud-status-conflict {
         font-weight: var(--font-weight-bold);
     }
 }

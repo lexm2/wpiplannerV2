@@ -18,7 +18,7 @@ This document describes how all files in the codebase work together.
 
 ## Project Overview
 
-WPI Planner V2 is a course planning application for WPI students that allows browsing courses, building schedules, detecting conflicts, and syncing to cloud storage.
+WPI Planner V2 is a course planning application for WPI students that allows browsing courses, building schedules, detecting conflicts, and local data persistence.
 
 **Tech Stack:**
 - TypeScript 5.0
@@ -26,7 +26,6 @@ WPI Planner V2 is a course planning application for WPI students that allows bro
 - Bun (runtime & testing)
 - Vanilla DOM (no framework)
 - IndexedDB + localStorage (persistence)
-- Google Drive / OneDrive (cloud sync)
 
 **Architecture Pattern:** Layered architecture with Core -> Services -> UI
 
@@ -484,19 +483,24 @@ Scores schedules based on user preferences.
 
 #### [SyncManager.ts](../src/services/sync/SyncManager.ts)
 
-**Singleton** - Main orchestrator for cloud sync.
+**Singleton** - Main orchestrator for cloud sync infrastructure.
+
+**Status:** Provider implementations removed. Infrastructure preserved for future use.
 
 **Responsibilities:**
 - SSO conflict check on sign-in
 - Push-only sync model (local → cloud)
 - Debounced push (3 second delay)
 - Conflict detection and resolution
+- Ready to accept any CloudProvider implementation
 
 **Key Methods:**
 - `handleSignIn()` - Check for conflicts on login
 - `resolveConflict()` - Handle user conflict choice
 - `schedulePush()` - Debounced cloud push
 - `pushToCloud()` - Immediate push
+- `setProvider()` - Set active cloud provider
+- `getCurrentProvider()` - Get current provider
 
 **Conflict Resolution Options:**
 - `cancel` - Sign out, discard changes
@@ -513,6 +517,8 @@ Scores schedules based on user preferences.
 
 **Singleton** - Pub/Sub event system for sync operations.
 
+**Status:** Active infrastructure, provider-agnostic.
+
 **Event Types:**
 - `auth-changed` - Authentication status changed
 - `sync-conflict` - Conflict detected during sign-in
@@ -523,6 +529,7 @@ Scores schedules based on user preferences.
 - `local-save-completed` - Local data saved (triggers push)
 - `offline-mode` - Browser went offline
 - `online-mode` - Browser back online
+- `silent-auth-completed` - Silent auth on startup
 
 **Key Methods:**
 - `on(eventType, listener)` - Subscribe (returns unsubscribe)
@@ -535,27 +542,28 @@ Scores schedules based on user preferences.
 - [ProfileStateManager](../src/core/state/ProfileStateManager.ts) - Emits `local-save-completed`
 - [CloudStatusButton](../src/ui/components/CloudStatusButton.ts) - UI status
 
-#### [CloudProviderRegistry.ts](../src/services/sync/CloudProviderRegistry.ts)
+#### [ProviderRegistry.ts](../src/services/sync/ProviderRegistry.ts)
 
 Registry pattern for cloud providers.
+
+**Status:** Active infrastructure, no providers currently registered.
 
 **Responsibilities:**
 - Register cloud providers by ID
 - Provider lookup
 - Support multiple providers
+- Ready to accept any CloudProvider implementation
 
 **Connects to:**
-- [GoogleDriveProvider](../src/services/sync/providers/googledrive/) - Google Drive
-- [OneDriveProvider](../src/services/sync/onedrive/) - Microsoft OneDrive
 - [SyncManager](../src/services/sync/SyncManager.ts) - Uses providers
 
-#### [CloudSyncFactory.ts](../src/services/sync/CloudSyncFactory.ts)
-
-Factory for creating cloud provider instances.
+**Note:** Provider implementations removed. To re-enable cloud sync, implement the CloudProvider interface and register it with this registry.
 
 #### [checksum.ts](../src/services/sync/checksum.ts)
 
 SHA-256 checksum calculation for sync data integrity.
+
+**Status:** Active infrastructure, provider-agnostic.
 
 **Connects to:**
 - [SyncManager](../src/services/sync/SyncManager.ts) - Conflict detection
@@ -565,28 +573,25 @@ SHA-256 checksum calculation for sync data integrity.
 
 Zod validation schemas for sync data.
 
+**Status:** Active infrastructure, provider-agnostic.
+
 #### Cloud Providers
 
-##### [googledrive/](../src/services/sync/providers/googledrive/)
+**Status:** All provider implementations removed.
 
-Google Drive integration for cloud sync.
+The cloud sync infrastructure is fully preserved but no provider implementations currently exist. To re-enable cloud sync:
 
-**Files:**
-- `GoogleDriveProvider.ts` - Main provider implementation
-- `GoogleDriveAuth.ts` - OAuth authentication
-- `GoogleDriveStorage.ts` - File operations
+1. Create a provider implementation at `/src/services/sync/providers/[name]/[Name]Provider.ts`
+2. Implement the `CloudProvider` interface from `/src/services/sync/types.ts`
+3. Create provider config at `/src/config/[name].config.ts`
+4. Register in MainController:
+   ```typescript
+   const provider = new [Name]Provider();
+   providerRegistry.register(provider);
+   syncManager.setProvider('[name]');
+   ```
 
-**Connects to:**
-- [CloudProviderRegistry](../src/services/sync/CloudProviderRegistry.ts) - Registered provider
-- [googledrive.config.ts](../src/config/googledrive.config.ts) - API configuration
-
-##### [onedrive/](../src/services/sync/onedrive/)
-
-Microsoft OneDrive integration.
-
-**Connects to:**
-- [CloudProviderRegistry](../src/services/sync/CloudProviderRegistry.ts) - Registered provider
-- [onedrive.config.ts](../src/config/onedrive.config.ts) - API configuration
+All infrastructure (SyncManager, SyncEventBus, UI components, conflict resolution) will work immediately.
 
 ---
 
@@ -655,26 +660,11 @@ Utility for expanding recurring events into individual instances.
 - Expand recurring events within a date range
 - Generate unique IDs for expanded instances
 
-#### Cloud Providers
+#### Calendar Providers
 
-##### [providers/google/GoogleCalendarProvider.ts](../src/services/calendar/providers/google/GoogleCalendarProvider.ts)
+**Status:** Google Calendar provider removed (was tightly coupled to Google Drive auth).
 
-Google Calendar API v3 implementation.
-
-**Responsibilities:**
-- Authenticate via shared OAuth token with GoogleDriveProvider
-- CRUD operations for calendars and events
-- Batch event creation with concurrency control
-- Auto-connect schedules to primary calendar on sign-in
-
-**Key Methods:**
-- `listCalendars()` / `createCalendar()` / `deleteCalendar()` - Calendar management
-- `getEvents()` / `createEvent()` / `createEvents()` / `deleteEvent()` - Event operations
-- `autoConnectSchedules()` - Connect schedules to default calendar on auth
-
-**Connects to:**
-- [CalendarService](../src/services/calendar/CalendarService.ts) - Used by
-- [GoogleDriveProvider](../src/services/sync/providers/googledrive/GoogleDriveProvider.ts) - Shares OAuth token
+The calendar service infrastructure remains and can work with any calendar provider implementation. To re-enable calendar integration, implement the `CalendarProvider` interface and register it with `CalendarService`.
 
 ---
 
@@ -715,7 +705,7 @@ Application orchestrator - initializes and wires all services.
 3. ThemeManager
 4. CourseDataService
 5. CourseSelectionService + ScheduleManagementService
-6. GoogleDriveProvider → ProviderRegistry → SyncManager
+6. CloudStatusButton + ConflictResolutionModal (sync UI components)
 7. All UI controllers
 
 **Connects to:**
@@ -832,10 +822,20 @@ Theme switching UI.
 
 Cloud sync status indicator.
 
+**Status:** Active, shows "unavailable" state when no provider is configured.
+
 **Responsibilities:**
-- Display sync status (synced, syncing, offline)
+- Display sync status (synced, syncing, offline, unavailable)
 - Handle sign in/out clicks
 - Show last sync time
+- Provider-agnostic design
+
+**Button States:**
+- `unavailable` - No provider configured (button disabled)
+- `unauthenticated` - Provider available, not signed in
+- `authenticated-idle` - Signed in, no operations
+- `local-saving` / `cloud-uploading` / `cloud-downloading` - Active operations
+- `error` / `conflict-pending` - Error states
 
 **Connects to:**
 - [SyncEventBus](../src/services/sync/SyncEventBus.ts) - Sync events
@@ -1041,21 +1041,9 @@ Modal-related type definitions.
 
 ### Config (`src/config/`)
 
-#### [googledrive.config.ts](../src/config/googledrive.config.ts)
+**Status:** Cloud provider configs removed.
 
-Google Drive API configuration (client ID, scopes).
-
-**Connects to:** [GoogleDriveProvider](../src/services/sync/providers/googledrive/)
-
-#### [onedrive.config.ts](../src/config/onedrive.config.ts)
-
-OneDrive API configuration.
-
-**Connects to:** [OneDriveProvider](../src/services/sync/onedrive/)
-
-#### [index.ts](../src/config/index.ts)
-
-Config barrel exports.
+Previously contained configuration files for cloud providers (Google Drive, OneDrive). These have been removed along with their implementations. Future cloud provider implementations should add their config files here.
 
 ### Themes (`src/themes/`)
 
@@ -1117,14 +1105,18 @@ UI Controllers render with loaded data
 
 ### Cloud Sync Flow
 
+**Status:** Infrastructure preserved, no active provider.
+
+When a cloud provider is implemented and registered, the flow would be:
+
 ```
 User signs in
     ↓
-GoogleDriveProvider.signIn()
+CloudProvider.signIn()
     ↓
-SyncManager.handleSignIn()
+SyncManager.signIn() - Authenticate only
     ↓
-Pull cloud data + compare checksums
+SyncManager.performInitialSync() - Pull cloud data + compare checksums
     ↓
 If conflict: emit 'sync-conflict' → ConflictResolutionModal
     ↓
@@ -1136,6 +1128,8 @@ Push/import data accordingly
     ↓
 SyncEventBus.emit('sync-resolved')
 ```
+
+Currently, CloudStatusButton displays "Cloud sync unavailable" since no provider is registered.
 
 ### Filter Application Flow
 

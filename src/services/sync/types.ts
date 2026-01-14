@@ -16,7 +16,7 @@ export type SyncStatus =
     | 'not_authenticated';
 
 /**
- * Optimized event types (9 core events).
+ * Optimized event types (10 core events).
  * Removed unused events: sync-completed, sync-uploaded (duplicate),
  * sync-conflict-resolved (use sync-resolved), sync-cancelled,
  * cloud-data-applied, provider-changed
@@ -30,7 +30,8 @@ export type SyncEventType =
     | 'sync-started'           // Sync operation started
     | 'local-save-completed'   // Local save completed (triggers cloud sync)
     | 'offline-mode'           // Browser went offline
-    | 'online-mode';           // Browser came back online
+    | 'online-mode'            // Browser came back online
+    | 'silent-auth-completed'; // Silent authentication completed on app startup
 
 export interface SyncEvent {
     type: SyncEventType;

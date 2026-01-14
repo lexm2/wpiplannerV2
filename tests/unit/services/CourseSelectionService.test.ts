@@ -345,7 +345,7 @@ describe('CourseSelectionService', () => {
 
 
     it('should handle save failures', async () => {
-      spyOn(mockProfileStateManager, 'save').mockRejectedValue(
+      spyOn(mockProfileStateManager as any, 'executeSave').mockRejectedValue(
         new Error('Save failed')
       )
 

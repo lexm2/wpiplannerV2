@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach, mock, jest } from 'bun:test';
+import { describe, it, expect, beforeEach, afterEach, mock, jest, spyOn } from 'bun:test';
 import { syncEventBus } from '../../../src/services/sync/SyncEventBus';
 import {
     setupSyncTest,
     setupSyncTestWithAuth,
+    setupSyncTestWithStorage,
     cleanupSyncTest,
     recreateProviderWithConfig,
     type SyncTestContext,
@@ -10,6 +11,7 @@ import {
 import {
     createSyncData,
     createConflictingData,
+    createSchedule,
 } from '../../helpers/sync-test-utils';
 
 describe('SyncManager (Unified)', () => {
@@ -342,6 +344,190 @@ describe('SyncManager (Unified)', () => {
             await ctx.syncManager.handleSignIn(ctx.testData);
 
             expect(ctx.syncManager.isAuthenticated()).toBe(true);
+        });
+    });
+
+    describe('performInitialSync() - New Sign-In Flow', () => {
+        describe('Authentication Separation', () => {
+            beforeEach(async () => {
+                ctx = await setupSyncTest();
+            });
+
+            afterEach(() => {
+                cleanupSyncTest(ctx);
+            });
+
+            it('should only authenticate without data operations', async () => {
+                const cloudData = await createSyncData();
+                ctx.mockProvider.setCloudData(cloudData);
+
+                await ctx.syncManager.signIn();
+
+                expect(ctx.mockProvider.isAuthenticated()).toBe(true);
+                expect(ctx.mockProvider.callHistory.signIn).toBe(1);
+                expect(ctx.mockProvider.callHistory.pullData).toBe(0);
+                expect(ctx.mockProvider.callHistory.pushData).toBe(0);
+                expect(ctx.syncManager.isAuthenticated()).toBe(true);
+            });
+        });
+
+        describe('First-Time Cloud Sync', () => {
+            beforeEach(async () => {
+                ctx = await setupSyncTest();
+                await ctx.syncManager.signIn();
+            });
+
+            afterEach(() => {
+                cleanupSyncTest(ctx);
+            });
+
+            it('should push local data when cloud is empty', async () => {
+                const result = await ctx.syncManager.performInitialSync();
+
+                expect(result).toBeNull();
+                expect(ctx.mockProvider.callHistory.pullData).toBe(1);
+                expect(ctx.mockProvider.callHistory.pushData).toBe(1);
+                expect(ctx.eventSpy.hasEvent('sync-pushed')).toBe(true);
+
+                const cloudData = ctx.mockProvider.getCloudData();
+                expect(cloudData).not.toBeNull();
+                expect(cloudData?.checksum).toBe(ctx.testData.checksum);
+            });
+        });
+
+        describe('First-Time Device Sign-In', () => {
+            beforeEach(async () => {
+                ctx = await setupSyncTestWithStorage();
+                await ctx.syncManager.signIn();
+            });
+
+            afterEach(() => {
+                cleanupSyncTest(ctx);
+            });
+
+            it('should auto-import cloud data when local has no schedules', async () => {
+                const cloudData = await createSyncData({
+                    schedules: [createSchedule({ name: 'Cloud Schedule' })]
+                });
+                ctx.mockProvider.setCloudData(cloudData);
+
+                const emptyLocalData = await createSyncData({ schedules: [] });
+                const getLocalSpy = mock(() => Promise.resolve(emptyLocalData));
+                ctx.syncManager['getLocalSyncData'] = getLocalSpy;
+
+                ctx.syncManager.setStateManager(ctx.profileManager!);
+
+                const result = await ctx.syncManager.performInitialSync();
+
+                expect(result).toBeNull();
+                expect(ctx.eventSpy.hasEvent('sync-resolved')).toBe(true);
+                expect(ctx.eventSpy.getLatestEvent('sync-resolved')?.data).toEqual({
+                    resolution: 'cloud'
+                });
+                expect(ctx.syncManager.getStatus()).toBe('idle');
+                expect(ctx.mockProvider.callHistory.pushData).toBe(0);
+            });
+        });
+
+        describe('Conflict Detection', () => {
+            beforeEach(async () => {
+                ctx = await setupSyncTest();
+                await ctx.syncManager.signIn();
+            });
+
+            afterEach(() => {
+                cleanupSyncTest(ctx);
+            });
+
+            it('should detect conflicts when both have different data', async () => {
+                const { localData, cloudData } = await createConflictingData();
+                ctx.mockProvider.setCloudData(cloudData);
+
+                const getLocalSpy = mock(() => Promise.resolve(localData));
+                ctx.syncManager['getLocalSyncData'] = getLocalSpy;
+
+                const result = await ctx.syncManager.performInitialSync();
+
+                expect(result).not.toBeNull();
+                expect(result?.hasConflict).toBe(true);
+                expect(ctx.eventSpy.hasEvent('sync-conflict')).toBe(true);
+                expect(ctx.syncManager.getStatus()).toBe('conflict');
+                expect(ctx.mockProvider.callHistory.pushData).toBe(0);
+            });
+
+            it('should not show conflict when checksums match', async () => {
+                const matchingData = await createSyncData();
+                ctx.mockProvider.setCloudData(matchingData);
+
+                const getLocalSpy = mock(() => Promise.resolve(matchingData));
+                ctx.syncManager['getLocalSyncData'] = getLocalSpy;
+
+                const result = await ctx.syncManager.performInitialSync();
+
+                expect(result).toBeNull();
+                expect(ctx.eventSpy.hasEvent('sync-conflict')).toBe(false);
+                expect(ctx.syncManager.getStatus()).toBe('idle');
+            });
+        });
+
+        describe('Error Handling', () => {
+            beforeEach(async () => {
+                ctx = await setupSyncTest({ mockLocalSyncData: false });
+            });
+
+            afterEach(() => {
+                cleanupSyncTest(ctx);
+            });
+
+            it('should throw error if called without authentication', async () => {
+                await expect(ctx.syncManager.performInitialSync()).rejects.toThrow(
+                    'Not authenticated'
+                );
+            });
+
+            it('should throw error if state manager not set for first-time import', async () => {
+                await ctx.syncManager.signIn();
+
+                // Ensure state manager is explicitly not set
+                (ctx.syncManager as any).stateManager = null;
+
+                const cloudData = await createSyncData({
+                    schedules: [createSchedule()]
+                });
+                ctx.mockProvider.setCloudData(cloudData);
+
+                const emptyLocalData = await createSyncData({ schedules: [] });
+                spyOn(ctx.syncManager as any, 'getLocalSyncData').mockResolvedValue(emptyLocalData);
+
+                await expect(ctx.syncManager.performInitialSync()).rejects.toThrow(
+                    'State manager not set'
+                );
+            });
+        });
+
+        describe('Silent Auth Integration', () => {
+            beforeEach(async () => {
+                ctx = await setupSyncTest();
+                await ctx.syncManager.signIn();
+            });
+
+            afterEach(() => {
+                cleanupSyncTest(ctx);
+            });
+
+            it('should be callable after silent-auth-completed event', async () => {
+                const cloudData = await createSyncData();
+                ctx.mockProvider.setCloudData(cloudData);
+
+                const getLocalSpy = mock(() => Promise.resolve(ctx.testData));
+                ctx.syncManager['getLocalSyncData'] = getLocalSpy;
+
+                syncEventBus.emitEvent('silent-auth-completed', {});
+
+                await ctx.syncManager.performInitialSync();
+
+                expect(ctx.mockProvider.callHistory.pullData).toBe(1);
+            });
         });
     });
 });
