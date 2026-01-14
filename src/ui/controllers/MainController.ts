@@ -33,6 +33,7 @@ import { providerRegistry } from '../../services/sync/ProviderRegistry'
 import { syncEventBus } from '../../services/sync/SyncEventBus'
 import type { ConflictInfo, SyncData } from '../../services/sync/types'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
+import { ChangelogModal } from '../components/ChangelogModal'
 import { ResizablePanel } from '../components/ResizablePanel'
 
 /**
@@ -65,6 +66,7 @@ export class MainController {
     private scheduleManagementService: ScheduleManagementService;
     private cloudStatusButton: CloudStatusButton;
     private conflictResolutionModal: ConflictResolutionModal;
+    private changelogModal: ChangelogModal;
     private cloudSyncMenuItem: HTMLButtonElement | null = null;
     private resizablePanel: ResizablePanel | null = null;
     private allDepartments: Department[] = [];
@@ -110,6 +112,7 @@ export class MainController {
         // Sync UI components (no provider currently configured)
         this.cloudStatusButton = new CloudStatusButton('cloud-status-button-container');
         this.conflictResolutionModal = new ConflictResolutionModal(this.modalService);
+        this.changelogModal = new ChangelogModal(this.modalService);
 
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
@@ -255,7 +258,11 @@ export class MainController {
 
             // Set "All Departments" as the default selection on startup
             this.initializeDefaultDepartmentView();
-            
+
+            setTimeout(() => {
+                this.changelogModal.show();
+            }, 500);
+
             this.setupEventListeners();
             this.setupCloudStatusButtonListener();
             this.setupCourseSelectionListener();
