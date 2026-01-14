@@ -12,6 +12,7 @@ import styles from '../../styles/components/cloud-status-button.module.css';
  */
 type ButtonState =
     | 'error'                    // Error occurred
+    | 'conflict-pending'         // Conflict detected, waiting for user resolution
     | 'local-saving'             // Saving to localStorage
     | 'cloud-uploading'          // Uploading to cloud
     | 'cloud-downloading'        // Downloading from cloud
@@ -21,7 +22,8 @@ type ButtonState =
     | 'cloud-uploaded'           // Uploaded to cloud (transient)
     | 'cloud-downloaded'         // Downloaded from cloud (transient)
     | 'authenticated-idle'       // Signed in, no operations
-    | 'unauthenticated';         // Not signed in
+    | 'unauthenticated'          // Not signed in
+    | 'unavailable';             // No cloud provider configured
 
 interface StateConfig {
     text: string;
@@ -57,6 +59,11 @@ export class CloudStatusButton {
             className: 'cloud-status-error',
             icon: 'ALERT_CIRCLE',
             timeout: 3000
+        },
+        'conflict-pending': {
+            text: 'Conflict detected',
+            className: 'cloud-status-conflict',
+            icon: 'ALERT_CIRCLE'
         },
         'local-saving': {
             text: 'Saving...',
@@ -112,6 +119,11 @@ export class CloudStatusButton {
             text: 'Sync with cloud',
             className: 'cloud-status-signin',
             icon: 'CALENDAR_UP'
+        },
+        'unavailable': {
+            text: 'Cloud sync unavailable',
+            className: 'cloud-status-unavailable',
+            icon: 'ALERT_CIRCLE'
         }
     };
 
@@ -223,10 +235,11 @@ export class CloudStatusButton {
                 break;
 
             case 'sync-conflict':
-                this.setState('error');
+                this.setState('conflict-pending');
                 break;
 
             case 'sync-resolved':
+                this.pendingState = null;
                 this.transitionToIdleState();
                 break;
         }
@@ -246,28 +259,12 @@ export class CloudStatusButton {
             }
         } else {
             try {
-                // Step 1: Authenticate and handle first-time sync
+                // Step 1: Authenticate only
                 await syncManager.signIn();
 
-                // Step 2: Get local data for conflict check
-                const stateManager = ProfileStateManager.getInstance();
-                const exportedData = await stateManager.exportData();
+                // Step 2: Perform initial sync (will trigger conflict modal if needed)
+                await syncManager.performInitialSync();
 
-                if (exportedData) {
-                    const data = JSON.parse(exportedData);
-                    // Convert to SyncData format
-                    const syncData = {
-                        version: data.version || '3.0',
-                        timestamp: Date.now(),
-                        checksum: data.checksum || '',
-                        activeScheduleId: data.activeScheduleId || null,
-                        schedules: data.schedules || [],
-                        preferences: data.preferences,
-                    };
-
-                    // Step 3: Check for conflicts (unified path - same as Mock)
-                    await syncManager.checkConflicts(syncData);
-                }
             } catch (error) {
                 this.setState('error');
             }
@@ -301,12 +298,10 @@ export class CloudStatusButton {
     private getInitialState(): ButtonState {
         const provider = syncManager.getCurrentProvider();
 
-        // No provider configured
         if (!provider) {
-            return 'unauthenticated';
+            return 'unavailable';
         }
 
-        // Check if authenticated
         if (syncManager.isAuthenticated()) {
             return 'authenticated-idle';
         }
@@ -380,6 +375,7 @@ export class CloudStatusButton {
     private getStatePriority(state: ButtonState): number {
         const priorities: Record<ButtonState, number> = {
             'error': 100,
+            'conflict-pending': 90,
             'cloud-uploading': 80,
             'cloud-downloading': 80,
             'local-saving': 70,
@@ -389,7 +385,8 @@ export class CloudStatusButton {
             'cloud-downloaded': 60,
             'local-saved': 50,
             'authenticated-idle': 20,
-            'unauthenticated': 10
+            'unauthenticated': 10,
+            'unavailable': 5
         };
         return priorities[state];
     }
@@ -422,12 +419,18 @@ export class CloudStatusButton {
 
         this.buttonElement.className = `${styles['cloud-status-button']} ${styles[config.className]}`;
 
-        if (this.currentState === 'unauthenticated') {
-            this.buttonElement.setAttribute('aria-label', 'Sign in to enable cloud sync');
-        } else if (this.currentState === 'authenticated-idle') {
-            this.buttonElement.setAttribute('aria-label', 'Connected to cloud. Click to sign out.');
+        if (this.currentState === 'unavailable') {
+            this.buttonElement.setAttribute('aria-label', 'Cloud sync is currently unavailable');
+            this.buttonElement.disabled = true;
         } else {
-            this.buttonElement.setAttribute('aria-label', config.text);
+            this.buttonElement.disabled = false;
+            if (this.currentState === 'unauthenticated') {
+                this.buttonElement.setAttribute('aria-label', 'Sign in to enable cloud sync');
+            } else if (this.currentState === 'authenticated-idle') {
+                this.buttonElement.setAttribute('aria-label', 'Connected to cloud. Click to sign out.');
+            } else {
+                this.buttonElement.setAttribute('aria-label', config.text);
+            }
         }
     }
 

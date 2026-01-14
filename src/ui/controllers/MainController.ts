@@ -30,12 +30,9 @@ import { getInlineSVG } from '../../utils/iconPaths'
 import { CloudStatusButton } from '../components/CloudStatusButton'
 import { syncManager } from '../../services/sync/SyncManager'
 import { providerRegistry } from '../../services/sync/ProviderRegistry'
-import { GoogleDriveProvider } from '../../services/sync/providers/googledrive/GoogleDriveProvider'
 import { syncEventBus } from '../../services/sync/SyncEventBus'
 import type { ConflictInfo, SyncData } from '../../services/sync/types'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
-import { ChangelogModal } from '../components/ChangelogModal'
-import { calendarService, GoogleCalendarProvider } from '../../services/calendar'
 import { ResizablePanel } from '../components/ResizablePanel'
 
 /**
@@ -67,10 +64,7 @@ export class MainController {
     private debouncedSearch: DebouncedOperation;
     private scheduleManagementService: ScheduleManagementService;
     private cloudStatusButton: CloudStatusButton;
-    private googleDriveProvider: GoogleDriveProvider;
-    private googleCalendarProvider: GoogleCalendarProvider;
     private conflictResolutionModal: ConflictResolutionModal;
-    private changelogModal: ChangelogModal;
     private cloudSyncMenuItem: HTMLButtonElement | null = null;
     private resizablePanel: ResizablePanel | null = null;
     private allDepartments: Department[] = [];
@@ -113,81 +107,9 @@ export class MainController {
         this.operationManager = new OperationManager();
         this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
 
-        // Initialize new sync system
-        this.googleDriveProvider = new GoogleDriveProvider();
-        providerRegistry.register(this.googleDriveProvider);
-        syncManager.setProvider('googledrive');
-        syncManager.setStateManager(this.profileStateManager);
-
-        // Initialize Google Drive provider (loads GIS token client)
-        this.googleDriveProvider.initialize().catch(error => {
-            console.warn('[MainController] Google Drive initialization failed:', error);
-        });
-
-        // Initialize Google Calendar provider
-        this.googleCalendarProvider = new GoogleCalendarProvider();
-        this.googleCalendarProvider.initialize().catch(error => {
-            console.warn('[MainController] Google Calendar initialization failed:', error);
-        });
-        calendarService.setProvider(this.googleCalendarProvider);
-
-        // Register callback for when Google Calendar auth is ready
-        this.googleCalendarProvider.onAuthenticated((provider) => {
-            // Auto-connect schedules to default Google Calendar
-            const schedules = this.profileStateManager.getAllSchedules();
-            provider.autoConnectSchedules(schedules, (scheduleId, updates) => {
-                this.profileStateManager.updateSchedule(scheduleId, updates, 'calendar-auto-connect');
-            });
-
-            // Load external events for the active schedule
-            const activeSchedule = this.scheduleManagementService.getActiveSchedule();
-            if (activeSchedule) {
-                console.log('[MainController] Loading external events after calendar auth');
-                this.scheduleController.loadExternalEvents(activeSchedule);
-            }
-        });
-
-        // Sync calendar auth with Drive auth
-        syncEventBus.on('auth-changed', (event) => {
-            const { authenticated } = event.data as { authenticated: boolean };
-            if (authenticated) {
-                const token = this.googleDriveProvider.getAccessToken();
-                if (token) {
-                    this.googleCalendarProvider.setAccessToken(token);
-                }
-            }
-        });
-
-        // Initialize unified cloud status button
+        // Sync UI components (no provider currently configured)
         this.cloudStatusButton = new CloudStatusButton('cloud-status-button-container');
-
-        // Initialize conflict resolution modal
         this.conflictResolutionModal = new ConflictResolutionModal(this.modalService);
-
-        // Initialize changelog modal
-        this.changelogModal = new ChangelogModal(this.modalService);
-
-        // Listen for sync conflicts to show resolution modal
-        syncEventBus.on('sync-conflict', (event) => {
-            console.log('[MainController] Received sync-conflict event', event);
-            const conflictInfo = event.data as ConflictInfo;
-            this.conflictResolutionModal.show(conflictInfo, async (resolution) => {
-                console.log('[MainController] Conflict resolution:', resolution);
-
-                // SyncManager handles data injection via the injected state manager
-                await syncManager.resolveConflict(resolution);
-
-                // Notify consumers after cloud resolution
-                if (resolution === 'cloud') {
-                    this.courseDataService.notifyDataRefreshed();
-                    console.log('[MainController] All consumers refreshed after cloud sync');
-                }
-            });
-        });
-
-        // Note: sync-resolved listener removed - importData() already handles
-        // reloading from storage and emitting 'schedule_changed' event
-        // UI updates happen through normal event-driven flow
 
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
@@ -324,11 +246,6 @@ export class MainController {
             await this.scheduleManagementService.initialize();
             
             await this.loadCourseData();
-
-            // Show changelog modal after data loads
-            setTimeout(() => {
-                this.changelogModal.show();
-            }, 500);
 
             this.departmentController.displayDepartments();
 

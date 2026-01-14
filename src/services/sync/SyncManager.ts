@@ -99,7 +99,8 @@ export class SyncManager {
     }
 
     /**
-     * Sign in to cloud provider and handle first-time sync
+     * Sign in to cloud provider (authentication only).
+     * After signing in, call performInitialSync() to sync data.
      */
     async signIn(): Promise<void> {
         const provider = this.getCurrentProvider();
@@ -108,15 +109,35 @@ export class SyncManager {
         }
 
         try {
-            // Authenticate
             await provider.signIn();
             this.updateStatus();
 
-            // Check if cloud has data
+        } catch (error) {
+            this.status = 'error';
+            syncEventBus.emitEvent('sync-failed', undefined, error as Error);
+            throw error;
+        }
+    }
+
+    /**
+     * Perform initial sync after authentication.
+     * Pulls cloud data and either:
+     * - Pushes local data if cloud is empty (first-time cloud sync)
+     * - Imports cloud data if local is empty (first-time device sign-in)
+     * - Checks for conflicts if both have data
+     * - Returns conflict info if checksums differ
+     */
+    async performInitialSync(): Promise<ConflictInfo | null> {
+        const provider = this.getCurrentProvider();
+        if (!provider?.isAuthenticated()) {
+            throw new Error('Not authenticated');
+        }
+
+        try {
             const cloudData = await provider.pullData();
             console.log('[SyncManager] Pulled cloud data:', cloudData);
 
-            // If no cloud file exists (first time), push local data
+            // Case 1: No cloud file exists - push local data
             if (!cloudData) {
                 console.log('[SyncManager] No cloud file found, pushing local for first time');
                 const localData = await this.getLocalSyncData();
@@ -124,7 +145,40 @@ export class SyncManager {
                     await provider.pushData(localData);
                     syncEventBus.emitEvent('sync-pushed', { source: 'initial' });
                 }
+                return null;
             }
+
+            // Case 2: Cloud file exists - get local data
+            const localData = await this.getLocalSyncData();
+            if (!localData) {
+                throw new Error('No local data available');
+            }
+
+            // Case 3: First-time sign-in on this device (no local schedules) - just import cloud data
+            if (!localData.schedules || localData.schedules.length === 0) {
+                console.log('[SyncManager] First-time sign-in detected, importing cloud data without conflict check');
+                if (!this.stateManager) {
+                    throw new Error('State manager not set');
+                }
+                await this.stateManager.importData(cloudData);
+                this.status = 'idle';
+                syncEventBus.emitEvent('sync-resolved', { resolution: 'cloud' });
+                return null;
+            }
+
+            // Case 4: Both local and cloud have data - check for conflicts
+            const conflictInfo = this.detectConflict(localData, cloudData);
+
+            if (conflictInfo.hasConflict) {
+                this.status = 'conflict';
+                this.pendingConflict = conflictInfo;
+                syncEventBus.emitEvent('sync-conflict', conflictInfo);
+                return conflictInfo;
+            }
+
+            console.log('[SyncManager] Checksums match, data already synced');
+            this.status = 'idle';
+            return null;
 
         } catch (error) {
             this.status = 'error';
@@ -135,19 +189,24 @@ export class SyncManager {
 
     /**
      * Handle sign-in with conflict detection (unified flow)
-     * @deprecated Use signIn() followed by checkConflicts() for better separation
+     * @deprecated Use signIn() followed by performInitialSync() for better separation
      */
     async handleSignIn(localData: SyncData): Promise<ConflictInfo | null> {
         // Sign in first
         await this.signIn();
 
-        // Then check for conflicts
-        return await this.checkConflicts(localData);
+        // Then perform initial sync
+        return await this.performInitialSync();
     }
 
     /**
-     * Check for conflicts between local and cloud data (pull-based workflow)
-     * Returns the conflict info if there's a conflict, null otherwise
+     * Check for conflicts between local and cloud data (pull-based workflow).
+     * This pulls cloud data fresh and compares with local.
+     *
+     * NOTE: For sign-in flow, use performInitialSync() instead.
+     * This method is for manual refresh/pull scenarios.
+     *
+     * Returns the conflict info if there's a conflict, null otherwise.
      */
     async checkConflicts(localData: SyncData): Promise<ConflictInfo | null> {
         const provider = this.getCurrentProvider();
@@ -355,7 +414,21 @@ export class SyncManager {
      * Simple checksum comparison - if checksums differ, data is different
      */
     private detectConflict(local: SyncData, cloud: SyncData): ConflictInfo {
+        console.log('[SyncManager] Conflict detection:');
+        console.log('  Local checksum:', local.checksum);
+        console.log('  Cloud checksum:', cloud.checksum);
+        console.log('  Local timestamp:', local.timestamp);
+        console.log('  Cloud timestamp:', cloud.timestamp);
+        console.log('  Local schedules:', local.schedules.length);
+        console.log('  Cloud schedules:', cloud.schedules.length);
+
         const hasConflict = local.checksum !== cloud.checksum;
+
+        if (hasConflict) {
+            console.log('[SyncManager] ❌ CONFLICT DETECTED - checksums differ');
+        } else {
+            console.log('[SyncManager] ✅ No conflict - checksums match');
+        }
 
         return {
             hasConflict,
