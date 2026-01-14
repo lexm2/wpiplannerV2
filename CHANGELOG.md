@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2026-01-14]
 
 ### Removed
 - **Removed cloud sync provider implementations** (Google Drive, OneDrive, Google Calendar)

@@ -874,7 +874,7 @@ export class FilterModalController extends BaseModal {
         const avoidConflictsCheckbox = modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement;
 
         if (avoidConflictsCheckbox?.checked) {
-            const selectedCourses = this.courseSelectionService?.getAllSelectedCourses() || [];
+            const selectedCourses = this.courseSelectionService?.getSelectedCourses() || [];
             this.filterService?.addFilter('periodConflict', {
                 avoidConflicts: true,
                 selectedCourses: selectedCourses
