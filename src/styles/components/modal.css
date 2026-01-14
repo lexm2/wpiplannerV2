@@ -1846,3 +1846,61 @@
   font-size: 0.85rem;
   font-style: italic;
 }
+
+/* ===== Changelog Modal ===== */
+.changelog-modal-dialog {
+  max-width: 600px;
+  max-height: 80vh;
+}
+
+.changelog-modal-body {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.changelog-entry {
+  width: 100%;
+}
+
+.changelog-date {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: 0.5rem;
+}
+
+.changelog-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+
+.changelog-item {
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.changelog-empty {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .changelog-modal-dialog {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .changelog-modal-body {
+    padding: 1rem;
+    gap: 1rem;
+  }
+}
