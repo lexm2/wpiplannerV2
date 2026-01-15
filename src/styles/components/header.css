@@ -342,7 +342,7 @@
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1250px) {
   .header-left {
     display: none;
   }
@@ -368,7 +368,7 @@
   }
 }
 
-@media (max-width: 1200px) and (min-width: 769px) {
+@media (max-width: 1250px) and (min-width: 769px) {
   .header-navigation {
     max-width: calc(100% - 200px);
   }
