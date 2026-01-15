@@ -192,7 +192,7 @@ export class SchedulePickerModal extends BaseModal {
         document.addEventListener('click', (e) => {
             if (modal.contains(e.target as Node)) {
                 const target = e.target as HTMLElement;
-                if (!target.closest('.schedule-item-menu') && !target.classList.contains('menu-btn')) {
+                if (!target.closest('.schedule-item-menu') && !target.closest('.menu-btn')) {
                     this.closeAllScheduleMenus();
                 }
             }
