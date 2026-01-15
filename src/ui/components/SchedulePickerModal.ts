@@ -3,6 +3,7 @@ import { ModalService } from '../../services/ui/ModalService';
 import { Schedule } from '../../types/schedule';
 import { BaseModal } from './BaseModal';
 import { getInlineSVG } from '../../utils/iconPaths';
+import styles from '../../styles/components/schedule-picker-modal.module.css';
 
 export class SchedulePickerModal extends BaseModal {
     private static readonly MENU_WIDTH = 120;
@@ -53,7 +54,7 @@ export class SchedulePickerModal extends BaseModal {
         const backdrop = document.createElement('div');
         backdrop.className = 'modal-backdrop';
         backdrop.innerHTML = `
-            <div class="modal-dialog schedule-picker-modal-dialog">
+            <div class="modal-dialog schedule-picker-modal-dialog no-transform">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2 class="modal-title">Schedules</h2>
@@ -112,14 +113,14 @@ export class SchedulePickerModal extends BaseModal {
                         <button class="btn-link inline-action-btn" data-action="export">Export</button>
                         <button class="btn-link inline-action-btn" data-action="export-ics">Export ICS</button>
                         ${schedules.length > 1 ? '<button class="btn-link inline-action-btn danger" data-action="delete">Delete</button>' : ''}
-                        <button class="btn-link menu-btn" title="More options">⋮</button>
+                        <button class="btn-link ${styles['menuBtn']}" title="More options">⋮</button>
                     </div>
-                    <div class="schedule-item-menu" style="display: none;">
-                        <button class="menu-action" data-action="rename">Rename</button>
-                        <button class="menu-action" data-action="duplicate">Duplicate</button>
-                        <button class="menu-action" data-action="export">Export</button>
-                        <button class="menu-action" data-action="export-ics">Export ICS</button>
-                        ${schedules.length > 1 ? '<button class="menu-action danger" data-action="delete">Delete</button>' : ''}
+                    <div class="${styles['scheduleItemMenu']}" data-visible="false">
+                        <button class="${styles['menuAction']}" data-action="rename">Rename</button>
+                        <button class="${styles['menuAction']}" data-action="duplicate">Duplicate</button>
+                        <button class="${styles['menuAction']}" data-action="export">Export</button>
+                        <button class="${styles['menuAction']}" data-action="export-ics">Export ICS</button>
+                        ${schedules.length > 1 ? `<button class="${styles['menuAction']} danger" data-action="delete">Delete</button>` : ''}
                     </div>
                 </div>
             `;
@@ -192,7 +193,10 @@ export class SchedulePickerModal extends BaseModal {
         document.addEventListener('click', (e) => {
             if (modal.contains(e.target as Node)) {
                 const target = e.target as HTMLElement;
-                if (!target.closest('.schedule-item-menu') && !target.closest('.menu-btn')) {
+                const isInMenu = target.closest('.schedule-item-menu') || target.closest(`.${styles['scheduleItemMenu']}`);
+                const isMenuBtn = target.closest('.menu-btn') || target.closest(`.${styles['menuBtn']}`);
+
+                if (!isInMenu && !isMenuBtn) {
                     this.closeAllScheduleMenus();
                 }
             }
@@ -211,14 +215,14 @@ export class SchedulePickerModal extends BaseModal {
             const target = e.target as HTMLElement;
 
             // Handle menu button click
-            if (target.classList.contains('menu-btn')) {
+            if (target.classList.contains('menu-btn') || target.classList.contains(styles['menuBtn'])) {
                 e.stopPropagation();
                 this.toggleScheduleMenu(target);
                 return;
             }
 
             // Handle action button clicks
-            if (target.classList.contains('menu-action') || target.classList.contains('inline-action-btn')) {
+            if (target.classList.contains('menu-action') || target.classList.contains(styles['menuAction']) || target.classList.contains('inline-action-btn')) {
                 const action = target.getAttribute('data-action');
                 const scheduleId = target.closest('.schedule-item')?.getAttribute('data-schedule-id');
                 if (action && scheduleId) {
@@ -274,19 +278,19 @@ export class SchedulePickerModal extends BaseModal {
     private toggleScheduleMenu(menuBtn: HTMLElement): void {
         if (!this.modalElement) return;
 
-        this.modalElement.querySelectorAll('.schedule-item-menu').forEach(menu => {
-            const currentMenu = menuBtn.closest('.schedule-item')?.querySelector('.schedule-item-menu');
+        this.modalElement.querySelectorAll(`.schedule-item-menu, .${styles['scheduleItemMenu']}`).forEach(menu => {
+            const currentMenu = menuBtn.closest('.schedule-item')?.querySelector(`.schedule-item-menu, .${styles['scheduleItemMenu']}`);
             if (menu !== currentMenu) {
-                (menu as HTMLElement).style.display = 'none';
+                (menu as HTMLElement).setAttribute('data-visible', 'false');
             }
         });
 
         const scheduleItem = menuBtn.closest('.schedule-item');
         if (!scheduleItem) return;
 
-        const menu = scheduleItem.querySelector('.schedule-item-menu') as HTMLElement;
+        const menu = scheduleItem.querySelector(`.schedule-item-menu, .${styles['scheduleItemMenu']}`) as HTMLElement;
         if (menu) {
-            const isCurrentlyHidden = menu.style.display === 'none' || menu.style.display === '';
+            const isCurrentlyHidden = menu.getAttribute('data-visible') !== 'true';
 
             if (isCurrentlyHidden) {
                 const btnRect = menuBtn.getBoundingClientRect();
@@ -311,9 +315,9 @@ export class SchedulePickerModal extends BaseModal {
 
                 menu.style.left = `${left}px`;
                 menu.style.top = `${top}px`;
-                menu.style.display = 'block';
+                menu.setAttribute('data-visible', 'true');
             } else {
-                menu.style.display = 'none';
+                menu.setAttribute('data-visible', 'false');
             }
         }
     }
@@ -321,8 +325,8 @@ export class SchedulePickerModal extends BaseModal {
     private closeAllScheduleMenus(): void {
         if (!this.modalElement) return;
 
-        this.modalElement.querySelectorAll('.schedule-item-menu').forEach(menu => {
-            (menu as HTMLElement).style.display = 'none';
+        this.modalElement.querySelectorAll(`.schedule-item-menu, .${styles['scheduleItemMenu']}`).forEach(menu => {
+            (menu as HTMLElement).setAttribute('data-visible', 'false');
         });
     }
 

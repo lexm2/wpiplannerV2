@@ -5,6 +5,7 @@
 ### Fixed
 - Fixed ICS calendar export generating blank files or "no courses found" error
 - Fixed header navigation and controls overlapping on smaller screens
+- Fixed schedule menu positioning and implemented CSS modules
 
 ## [2026-01-14]
 
