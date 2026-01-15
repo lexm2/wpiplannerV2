@@ -1,5 +1,11 @@
 # Changelog
 
+## [2026-01-15]
+
+### Fixed
+- Fixed ICS calendar export generating blank files or "no courses found" error
+- Fixed header navigation and controls overlapping on smaller screens
+
 ## [2026-01-14]
 
 - A bunch of stuff was fixed before I added in the changelog. Im not going over it here but there was a bunch of other bug fixes.

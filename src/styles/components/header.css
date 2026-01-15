@@ -65,6 +65,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 0.5rem;
+  max-width: calc(100% - 400px);
 }
 
 /* Pill-style navigation tabs */
@@ -106,6 +108,8 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .header-controls .btn {
@@ -170,6 +174,8 @@
   align-items: center;
   justify-content: center;
   min-width: 160px;
+  flex-shrink: 0;
+  transition: min-width 0.3s ease;
 }
 
 .undo-redo-controls {
@@ -318,6 +324,24 @@
   }
 }
 
+@media (max-width: 1400px) {
+  .header-navigation {
+    max-width: calc(100% - 350px);
+  }
+
+  #schedule-picker-label {
+    display: none;
+  }
+
+  .header-controls {
+    gap: 0.75rem;
+  }
+
+  #cloud-status-button-container {
+    min-width: 140px;
+  }
+}
+
 @media (max-width: 1200px) {
   .header-left {
     display: none;
@@ -341,6 +365,20 @@
 
   .settings-menu-btn {
     display: flex;
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 769px) {
+  .header-navigation {
+    max-width: calc(100% - 200px);
+  }
+}
+
+@media (max-width: 768px) {
+  .header-navigation {
+    position: static;
+    transform: none;
+    max-width: none;
   }
 }
 
