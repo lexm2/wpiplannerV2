@@ -254,42 +254,73 @@ END:VTIMEZONE`;
         const totalCourses = schedule.selectedCourses.length;
 
         for (const selectedCourse of schedule.selectedCourses) {
-            if (!selectedCourse.selectedSection) {
+            const componentsToExport: Section[] = [];
+
+            if (selectedCourse.selectedLecture) {
+                componentsToExport.push(selectedCourse.selectedLecture);
+            }
+            if (selectedCourse.selectedDiscussion) {
+                componentsToExport.push(selectedCourse.selectedDiscussion);
+            }
+            if (selectedCourse.selectedLab) {
+                componentsToExport.push(selectedCourse.selectedLab);
+            }
+
+            if (componentsToExport.length === 0 && selectedCourse.selectedSection) {
+                componentsToExport.push(selectedCourse.selectedSection);
+            }
+
+            if (componentsToExport.length === 0) {
                 skippedCourses++;
                 continue;
             }
 
-            const sections = getAllSections(selectedCourse.course);
-            const section = sections.find(
-                (s: Section) => s.number === selectedCourse.selectedSectionNumber
-            );
-
-            if (!section) {
-                skippedCourses++;
-                continue;
-            }
-
-            const termDates = this.getTermDates(section.computedTerm, academicYear);
-            if (!termDates) {
-                skippedCourses++;
-                continue;
-            }
-
-            for (const period of section.periods) {
-                if (period.days.size === 0) {
+            for (const section of componentsToExport) {
+                const termDates = this.getTermDates(section.computedTerm, academicYear);
+                if (!termDates) {
                     continue;
                 }
 
-                const event = this.generateEvent(
-                    selectedCourse,
-                    section,
-                    period,
-                    termDates,
-                    timezone,
-                    options
-                );
+                for (const period of section.periods) {
+                    if (period.days.size === 0) {
+                        continue;
+                    }
 
-                events.push(event);
+                    const event = this.generateEvent(
+                        selectedCourse,
+                        section,
+                        period,
+                        termDates,
+                        timezone,
+                        options
+                    );
+
+                    events.push(event);
+                }
+            }
+        }
+
+        if (schedule.localEvents?.length) {
+            for (const localEvent of schedule.localEvents) {
+                if (!localEvent.visible) continue;
+
+                if (localEvent.eventType === 'one-time') {
+                    const event = this.generateOneTimeLocalEvent(localEvent, timezone);
+                    if (event) {
+                        events.push(event);
+                    }
+                } else {
+                    const terms = localEvent.terms || [];
+                    for (const term of terms) {
+                        const termDates = this.getTermDates(term, academicYear);
+                        if (!termDates) continue;
+
+                        const event = this.generateRecurringLocalEvent(localEvent, term, termDates, timezone);
+                        if (event) {
+                            events.push(event);
+                        }
+                    }
+                }
             }
         }
 
