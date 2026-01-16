@@ -1,5 +1,15 @@
 # Changelog
 
+## [2026-01-16]
+
+### Changed
+- Replaced custom ICS generator with ical-generator library for improved calendar compatibility
+- Calendar exports now use actual term dates from course data instead of approximations
+
+### Fixed
+- Fixed ICS calendar export not importing into Google Calendar and other calendar apps
+- Fixed ICS export RRULE format to be RFC 5545 compliant with UTC timestamps
+
 ## [2026-01-15]
 
 ### Fixed

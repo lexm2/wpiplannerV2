@@ -35,6 +35,7 @@ import type { ConflictInfo, SyncData } from '../../services/sync/types'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
 import { ChangelogModal } from '../components/ChangelogModal'
 import { ResizablePanel } from '../components/ResizablePanel'
+import { calendarService } from '../../services/calendar'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -251,7 +252,9 @@ export class MainController {
             await rateMyProfessorService.loadData();
             await this.courseSelectionService.initialize();
             await this.scheduleManagementService.initialize();
-            
+
+            await calendarService.loadTermBounds();
+
             await this.loadCourseData();
 
             this.departmentController.displayDepartments();

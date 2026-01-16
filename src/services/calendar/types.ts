@@ -316,3 +316,25 @@ export function calendarEventToWeeklySlot(
         term: academicTerm
     };
 }
+
+// -----------------------------------------------------------------------------
+// Term Bounds Types
+// -----------------------------------------------------------------------------
+
+export interface TermBoundsData {
+    academicYear: string;
+    generated: string;
+    terms: {
+        A: TermBoundInfo;
+        B: TermBoundInfo;
+        C: TermBoundInfo;
+        D: TermBoundInfo;
+    };
+}
+
+export interface TermBoundInfo {
+    startDate: string;
+    endDate: string;
+    offeringPeriod: string;
+    sampleSize: number;
+}
