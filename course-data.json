@@ -33060,7 +33060,7 @@
       "Course_Title": "CS 509 - Design Of Software Systems",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "7/30",
+      "Enrolled_Capacity": "8/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Larz White",
       "Locations": "Online-asynchronous",
@@ -39148,7 +39148,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ECE 3204 - Microelectronic Circuits II (a)",
       "Subject": "Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "0/15",
+      "Waitlist_Waitlist_Capacity": "1/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337568"
     },
     {
@@ -46082,7 +46082,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ES 2501 - Introduction To Static Systems ()",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "7/20",
+      "Waitlist_Waitlist_Capacity": "6/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337370"
     },
     {
@@ -46959,7 +46959,7 @@
       "Course_Title": "ES 3001 - Introduction To Thermodynamics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "71/80",
+      "Enrolled_Capacity": "70/80",
       "Instructional_Format": "Lecture",
       "Instructors": "Yu Zhong",
       "Locations": "Higgins Labs 116",
@@ -50919,7 +50919,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Geology",
-      "Waitlist_Waitlist_Capacity": "8/20",
+      "Waitlist_Waitlist_Capacity": "7/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336372"
     },
     {
@@ -52741,7 +52741,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "History",
-      "Waitlist_Waitlist_Capacity": "9/15",
+      "Waitlist_Waitlist_Capacity": "8/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336514"
     },
     {
@@ -63059,7 +63059,7 @@
       "Course_Title": "IMGD 5500 - Serious and Applied Games",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "16/14",
+      "Enrolled_Capacity": "15/14",
       "Instructional_Format": "Lecture",
       "Instructors": "Gillian Smith",
       "Locations": "Fuller Labs 311; Salisbury Labs 406",
@@ -88407,7 +88407,7 @@
       "Course_Title": "ME 516 - Heat Transfer",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/35",
+      "Enrolled_Capacity": "19/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Jamal Yagoobi",
       "Locations": "Stratton Hall 207 (new)",
@@ -89272,7 +89272,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Manufacturing Engineering; Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336427"
     },
     {
@@ -90193,7 +90193,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Manufacturing Engineering; Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336427"
     },
     {
@@ -93902,7 +93902,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Manufacturing Engineering; Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "6/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336427"
     },
     {
@@ -101343,7 +101343,7 @@
       "Course_Title": "PH 1110 - General Physics-Mechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "39/80",
+      "Enrolled_Capacity": "40/80",
       "Instructional_Format": "Lecture",
       "Instructors": "Veneta Tountcheva",
       "Locations": "Unity Hall 520",
@@ -101373,7 +101373,7 @@
       "Course_Title": "PH 1110 - General Physics-Mechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "39/80",
+      "Enrolled_Capacity": "40/80",
       "Instructional_Format": "Discussion",
       "Instructors": "Veneta Tountcheva",
       "Locations": "Fuller Labs PHU Perreault Hall - Upper Section",
@@ -101589,7 +101589,7 @@
       "Course_Title": "PH 1110 - General Physics-Mechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "14/24",
+      "Enrolled_Capacity": "15/24",
       "Instructional_Format": "Laboratory",
       "Locations": "Olin Hall 208 Physics Lab",
       "Meeting_Day_Patterns": "R",
@@ -113488,11 +113488,11 @@
       "Meeting_Patterns": "M-T-R-F | 11:00 AM - 11:50 AM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Fuller Labs PHU Perreault Hall - Upper Section | M-T-R-F | 11:00 AM - 11:50 AM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: RBE 3002 - Unified Robotics IV ()",
       "Subject": "Robotics Engineering",
-      "Waitlist_Waitlist_Capacity": "5/5",
+      "Waitlist_Waitlist_Capacity": "4/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337181"
     },
     {
@@ -113540,7 +113540,7 @@
       "Course_Title": "RBE 3002 - Unified Robotics IV",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "35/36",
+      "Enrolled_Capacity": "36/36",
       "Instructional_Format": "Laboratory",
       "Instructors": "Griffin Tabor",
       "Locations": "Atwater Kent 120D Robotics Lab",
@@ -113548,7 +113548,7 @@
       "Meeting_Patterns": "W | 3:00 PM - 4:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Atwater Kent 120D Robotics Lab | W | 3:00 PM - 4:50 PM",
-      "Section_Status": "Open",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: RBE 3002 - Unified Robotics IV ()",
       "Subject": "Robotics Engineering",
@@ -126750,7 +126750,7 @@
       "Course_Title": "WR 1010 - Elements Of Writing",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/20",
+      "Enrolled_Capacity": "19/20",
       "Instructional_Format": "Lecture",
       "Instructors": "Erica Brozovsky",
       "Locations": "Stratton Hall 311",
@@ -126758,7 +126758,7 @@
       "Meeting_Patterns": "T-F | 9:00 AM - 10:50 AM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Stratton Hall 311 | T-F | 9:00 AM - 10:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Writing",
       "Waitlist_Waitlist_Capacity": "0/5",
@@ -126778,7 +126778,7 @@
       "Course_Title": "WR 1010 - Elements Of Writing",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/20",
+      "Enrolled_Capacity": "21/20",
       "Instructional_Format": "Lecture",
       "Instructors": "Erica Brozovsky",
       "Locations": "Stratton Hall 202 (new)",
@@ -126789,7 +126789,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Writing",
-      "Waitlist_Waitlist_Capacity": "1/5",
+      "Waitlist_Waitlist_Capacity": "0/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336290"
     },
     {
