@@ -33,6 +33,7 @@
   "dependencies": {
     "@azure/msal-browser": "^4.26.1",
     "@microsoft/microsoft-graph-client": "^3.0.7",
+    "ical-generator": "^10.0.0",
     "lz-string": "^1.5.0",
     "rrule": "^2.8.1",
     "zod": "^4.1.13"
