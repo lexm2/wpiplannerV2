@@ -60,7 +60,7 @@ jobs:
 
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add public/course-data.json public/course-data-constructed.json public/last-updated.json
+          git add public/course-data.json public/course-data-constructed.json public/last-updated.json public/term-bounds.json
           git commit -m "Update course data $(date -u +%Y-%m-%d\ %H:%M\ UTC)"
           git pull --rebase origin master
           git push
@@ -75,6 +75,7 @@ jobs:
           cp public/course-data.json dist/
           cp public/course-data-constructed.json dist/
           cp public/last-updated.json dist/
+          cp public/term-bounds.json dist/
           echo "Course data files copied to dist/"
           ls -la dist/*.json
       

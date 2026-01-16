@@ -4,11 +4,14 @@
  */
 
 import { readFile, writeFile, stat } from 'fs/promises';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { WorkdayFeed, WorkdaySection } from './types/workdayTypes.js';
 import { PlannerOutput } from './types/outputTypes.js';
 import { ConverterConfig, isValidAcademicPeriod } from './ConverterConfig.js';
 import { transformCourse } from './transformers/courseTransformer.js';
 import { initializeDepartments, getDepartment } from './transformers/departmentTransformer.js';
+import { TermBoundsOutput } from './types/termBoundsTypes.js';
 
 export class WorkdayConverter {
     constructor(private config: ConverterConfig) {}
@@ -29,6 +32,11 @@ export class WorkdayConverter {
         // Pre-filter: Remove canceled sections
         const validSections = this.preFilterSections(workdayData.Report_Entry);
         console.log(`${validSections.length} sections after filtering canceled courses`);
+
+        // Calculate and write term bounds
+        const termBounds = this.calculateTermBounds(validSections);
+        const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
+        await this.writeTermBounds(termBounds, projectRoot);
 
         // Group sections by course (all terms combined)
         const courseGroups = this.groupSectionsByCourse(validSections);
@@ -207,5 +215,110 @@ export class WorkdayConverter {
         console.log(`Standalone labs: ${totalStandaloneLabs}`);
         console.log(`Generated: ${output.generated}`);
         console.log('----------------------------\n');
+    }
+
+    /**
+     * Calculates term bounds from Workday sections using mode (most common dates)
+     */
+    private calculateTermBounds(sections: WorkdaySection[]): TermBoundsOutput {
+        const academicYear = `${this.config.fallYear}-${this.config.springYear}`;
+
+        const FALLBACK_DATES = {
+            A: { start: `${this.config.fallYear}-07-25`, end: `${this.config.fallYear}-09-13`, period: `${this.config.fallYear} Fall A Term` },
+            B: { start: `${this.config.fallYear}-09-21`, end: `${this.config.fallYear}-11-13`, period: `${this.config.fallYear} Fall B Term` },
+            C: { start: `${this.config.springYear}-01-06`, end: `${this.config.springYear}-03-07`, period: `${this.config.springYear} Spring C Term` },
+            D: { start: `${this.config.springYear}-03-17`, end: `${this.config.springYear}-05-09`, period: `${this.config.springYear} Spring D Term` },
+        };
+
+        const terms = ['A', 'B', 'C', 'D'] as const;
+        const result: any = {
+            academicYear,
+            generated: new Date().toISOString(),
+            terms: {}
+        };
+
+        for (const term of terms) {
+            const termSections = sections.filter(s => {
+                const extracted = this.extractTermFromOfferingPeriod(s.Offering_Period);
+                return extracted === term;
+            });
+
+            if (termSections.length === 0) {
+                console.warn(`[TermBounds] No sections found for term ${term}, using fallback`);
+                result.terms[term] = {
+                    startDate: FALLBACK_DATES[term].start,
+                    endDate: FALLBACK_DATES[term].end,
+                    offeringPeriod: FALLBACK_DATES[term].period,
+                    sampleSize: 0
+                };
+                continue;
+            }
+
+            const datePairs = new Map<string, number>();
+            for (const section of termSections) {
+                const start = section.Course_Section_Start_Date;
+                const end = section.Course_Section_End_Date;
+
+                if (!start || !end || !/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) {
+                    continue;
+                }
+
+                const key = `${start}|${end}`;
+                datePairs.set(key, (datePairs.get(key) || 0) + 1);
+            }
+
+            if (datePairs.size === 0) {
+                console.warn(`[TermBounds] No valid dates for term ${term}, using fallback`);
+                result.terms[term] = {
+                    startDate: FALLBACK_DATES[term].start,
+                    endDate: FALLBACK_DATES[term].end,
+                    offeringPeriod: FALLBACK_DATES[term].period,
+                    sampleSize: 0
+                };
+                continue;
+            }
+
+            let maxCount = 0;
+            let modeKey = '';
+            for (const [key, count] of datePairs.entries()) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    modeKey = key;
+                }
+            }
+
+            const [startDate, endDate] = modeKey.split('|');
+            const sampleSection = termSections.find(s =>
+                s.Course_Section_Start_Date === startDate &&
+                s.Course_Section_End_Date === endDate
+            );
+
+            result.terms[term] = {
+                startDate,
+                endDate,
+                offeringPeriod: sampleSection?.Offering_Period || FALLBACK_DATES[term].period,
+                sampleSize: maxCount
+            };
+
+            console.log(`[TermBounds] Term ${term}: ${startDate} to ${endDate} (${maxCount}/${termSections.length} sections)`);
+        }
+
+        return result as TermBoundsOutput;
+    }
+
+    /**
+     * Extracts term letter from Offering_Period
+     * Examples: "2025 Fall A Term" -> "A", "2026 Spring C Term" -> "C"
+     */
+    private extractTermFromOfferingPeriod(offeringPeriod: string): string | null {
+        const match = offeringPeriod.match(/\b([ABCD])\s+Term$/);
+        return match ? match[1] : null;
+    }
+
+    private async writeTermBounds(data: TermBoundsOutput, projectRoot: string): Promise<void> {
+        const outputPath = join(projectRoot, 'public', 'term-bounds.json');
+        const json = JSON.stringify(data, null, 2);
+        await writeFile(outputPath, json, 'utf-8');
+        console.log(`[TermBounds] Wrote term bounds to ${outputPath}`);
     }
 }
