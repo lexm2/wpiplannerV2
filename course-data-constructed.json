@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 17, 2026, 10:51 PM",
+  "generated": "Jan 17, 2026, 11:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -243741,7 +243741,7 @@
                 "number": "D02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -243760,7 +243760,7 @@
                     "room": "Athletics Rooftop Softball Field",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
                     "days": [
