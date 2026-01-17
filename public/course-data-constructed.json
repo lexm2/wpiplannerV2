@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 17, 2026, 6:49 PM",
+  "generated": "Jan 17, 2026, 7:12 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -46383,7 +46383,7 @@
                 "crn": 336385,
                 "number": "C02",
                 "seats": 30,
-                "seatsAvailable": 3,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -46402,7 +46402,7 @@
                     "building": "",
                     "room": "Olin Hall 109",
                     "seats": 30,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
@@ -238811,7 +238811,7 @@
                 "crn": 336385,
                 "number": "C02",
                 "seats": 30,
-                "seatsAvailable": 3,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -238830,7 +238830,7 @@
                     "building": "",
                     "room": "Olin Hall 109",
                     "seats": 30,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
