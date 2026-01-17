@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 17, 2026, 4:59 AM",
+  "generated": "Jan 17, 2026, 5:26 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -60537,7 +60537,7 @@
                 "number": "S01",
                 "seats": 30,
                 "seatsAvailable": 7,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This graduate level course introduces the student to the effects of electromagnetic transients in distribution systems. Topics include transient analysis, lightning and switching surges, mechanisms of transient generation, insulation coordination, grounding, surge protection devices, and shielding. Prerequisite: ECE 5500 Power System Analysis.",
@@ -60556,7 +60556,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 7,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [],
@@ -188765,7 +188765,7 @@
                 "crn": 337744,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 8,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -188784,7 +188784,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",

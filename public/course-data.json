@@ -40732,7 +40732,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "Spring",
       "Subject": "Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337763"
     },
     {
@@ -99152,7 +99152,7 @@
       "Course_Title": "OIE 548 - Performance Analytics",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "22/30",
+      "Enrolled_Capacity": "21/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Joe Zhu",
       "Locations": "Online-asynchronous",
