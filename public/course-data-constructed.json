@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 18, 2026, 6:52 AM",
+  "generated": "Jan 18, 2026, 7:16 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5703,7 +5703,7 @@
                 "number": "C02 - Topics In Studio Art: Aesthetics, Visual Design, and UI",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course explores design principles to create accessible and interactive digital interfaces. Students will develop skills in utilizing design elements—such as grids, space, and color—to craft engaging interfaces for digital platforms, including websites, smartphone apps, and e-books. Topics may include social media ads, visual cues, Gestalt theory, and semiotics.",
@@ -5722,7 +5722,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C02 - Topics In Studio Art: Aesthetics, Visual Design, and UI",
                     "days": [
