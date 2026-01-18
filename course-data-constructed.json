@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 18, 2026, 5:33 PM",
+  "generated": "Jan 18, 2026, 5:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -11375,7 +11375,7 @@
                 "crn": 336815,
                 "number": "C01",
                 "seats": 40,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -11394,7 +11394,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 40,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
@@ -186634,7 +186634,7 @@
                 "crn": 336197,
                 "number": "C01",
                 "seats": 20,
-                "seatsAvailable": 12,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -186653,7 +186653,7 @@
                     "building": "",
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 20,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
