@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 19, 2026, 9:03 AM",
+  "generated": "Jan 19, 2026, 9:48 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -49518,7 +49518,7 @@
                 "number": "S01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This is the study of mathematical foundations of computing. Topics include finite automataand regular languages, pushdown automata and context-free languages, Turing machines and decidability, and an introduction to computational complexity. (Prerequisites: Knowledge of discretemathematics and algorithms at the undergraduate level, and some facility with reading and writingmathematical proofs.)",
@@ -49537,7 +49537,7 @@
                     "room": "Washburn 229",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
