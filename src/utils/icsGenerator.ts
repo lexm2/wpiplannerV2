@@ -1,6 +1,7 @@
 import ical, { ICalEventRepeatingFreq, ICalWeekday } from 'ical-generator';
 import { Schedule, SelectedCourse, LocalCalendarEvent } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';
+import { TermBoundsService } from '../services/data/TermBoundsService';
 
 export interface ICSExportOptions {
     academicYear?: number;
@@ -19,26 +20,6 @@ export interface ICSExportResult {
 
 export class ICSGenerator {
     private static readonly DEFAULT_TIMEZONE = 'America/New_York';
-    private static readonly TERM_A_START_MONTH = 7;
-    private static readonly TERM_A_START_DAY = 25;
-    private static readonly TERM_A_END_MONTH = 9;
-    private static readonly TERM_A_END_DAY = 13;
-    private static readonly TERM_B_START_MONTH = 9;
-    private static readonly TERM_B_START_DAY = 21;
-    private static readonly TERM_B_END_MONTH = 11;
-    private static readonly TERM_B_END_DAY = 13;
-    private static readonly TERM_C_START_MONTH = 0;
-    private static readonly TERM_C_START_DAY = 6;
-    private static readonly TERM_C_END_MONTH = 2;
-    private static readonly TERM_C_END_DAY = 7;
-    private static readonly TERM_D_START_MONTH = 2;
-    private static readonly TERM_D_START_DAY = 17;
-    private static readonly TERM_D_END_MONTH = 4;
-    private static readonly TERM_D_END_DAY = 9;
-    private static readonly DAYS_IN_WEEK = 7;
-    private static readonly END_OF_DAY_HOUR = 23;
-    private static readonly END_OF_DAY_MINUTE = 59;
-    private static readonly END_OF_DAY_SECOND = 59;
 
     private static readonly DAY_TO_ICAL: Record<DayOfWeek, ICalWeekday> = {
         [DayOfWeek.MONDAY]: ICalWeekday.MO,
@@ -65,28 +46,35 @@ export class ICSGenerator {
             return null;
         }
 
-        const termLetter = term.charAt(0).toUpperCase();
+        const termLetter = term.charAt(0).toUpperCase() as 'A' | 'B' | 'C' | 'D';
+
+        const termBoundsService = TermBoundsService.getInstance();
+        const boundsFromService = termBoundsService.getTermDates(termLetter);
+
+        if (boundsFromService) {
+            return boundsFromService;
+        }
 
         switch (termLetter) {
             case 'A':
                 return {
-                    start: new Date(year, ICSGenerator.TERM_A_START_MONTH, ICSGenerator.TERM_A_START_DAY),
-                    end: new Date(year, ICSGenerator.TERM_A_END_MONTH, ICSGenerator.TERM_A_END_DAY)
+                    start: new Date(year, 7, 21),
+                    end: new Date(year, 9, 10)
                 };
             case 'B':
                 return {
-                    start: new Date(year, ICSGenerator.TERM_B_START_MONTH, ICSGenerator.TERM_B_START_DAY),
-                    end: new Date(year, ICSGenerator.TERM_B_END_MONTH, ICSGenerator.TERM_B_END_DAY)
+                    start: new Date(year, 9, 20),
+                    end: new Date(year, 11, 12)
                 };
             case 'C':
                 return {
-                    start: new Date(year + 1, ICSGenerator.TERM_C_START_MONTH, ICSGenerator.TERM_C_START_DAY),
-                    end: new Date(year + 1, ICSGenerator.TERM_C_END_MONTH, ICSGenerator.TERM_C_END_DAY)
+                    start: new Date(year + 1, 0, 14),
+                    end: new Date(year + 1, 2, 6)
                 };
             case 'D':
                 return {
-                    start: new Date(year + 1, ICSGenerator.TERM_D_START_MONTH, ICSGenerator.TERM_D_START_DAY),
-                    end: new Date(year + 1, ICSGenerator.TERM_D_END_MONTH, ICSGenerator.TERM_D_END_DAY)
+                    start: new Date(year + 1, 2, 16),
+                    end: new Date(year + 1, 4, 6)
                 };
             default:
                 return null;
@@ -105,7 +93,7 @@ export class ICSGenerator {
         let daysToAdd = targetDayNum - currentDayNum;
 
         if (daysToAdd < 0) {
-            daysToAdd += ICSGenerator.DAYS_IN_WEEK;
+            daysToAdd += 7;
         }
 
         const result = new Date(startDate);
@@ -183,12 +171,7 @@ export class ICSGenerator {
                     const summary = `${periodTypePrefix}: ${courseId} ${selectedCourse.course.name}`;
 
                     const untilDate = new Date(termDates.end);
-                    untilDate.setHours(
-                        ICSGenerator.END_OF_DAY_HOUR,
-                        ICSGenerator.END_OF_DAY_MINUTE,
-                        ICSGenerator.END_OF_DAY_SECOND,
-                        0
-                    );
+                    untilDate.setHours(23, 59, 59, 0);
 
                     const byDay = Array.from(period.days).map(day => this.DAY_TO_ICAL[day]);
 
@@ -273,7 +256,7 @@ export class ICSGenerator {
                         const dayNumber = this.DAY_TO_NUMBER[firstDay];
                         const firstOccurrence = new Date(termDates.start);
 
-                        const daysUntilTarget = (dayNumber - termDates.start.getDay() + this.DAYS_IN_WEEK) % this.DAYS_IN_WEEK;
+                        const daysUntilTarget = (dayNumber - termDates.start.getDay() + 7) % 7;
                         firstOccurrence.setDate(firstOccurrence.getDate() + daysUntilTarget);
 
                         firstOccurrence.setHours(localEvent.startTime.hours, localEvent.startTime.minutes, 0, 0);
@@ -282,7 +265,7 @@ export class ICSGenerator {
                         endTime.setHours(localEvent.endTime.hours, localEvent.endTime.minutes, 0, 0);
 
                         const untilDate = new Date(termDates.end);
-                        untilDate.setHours(this.END_OF_DAY_HOUR, this.END_OF_DAY_MINUTE, this.END_OF_DAY_SECOND, 0);
+                        untilDate.setHours(23, 59, 59, 0);
 
                         const uid = `local-${localEvent.id}-${term}@wpiplannerv2`;
 

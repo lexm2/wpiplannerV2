@@ -5,6 +5,7 @@
 ### Changed
 - Replaced custom ICS generator with ical-generator library for improved calendar compatibility
 - Calendar exports now use actual term dates from course data instead of approximations
+- Centralized term date management for consistent dates across calendar and ICS exports
 
 ### Fixed
 - Fixed ICS calendar export not importing into Google Calendar and other calendar apps
