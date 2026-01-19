@@ -6993,7 +6993,7 @@
       "Course_Title": "BB 2550 - Cell Biology",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "97/100",
+      "Enrolled_Capacity": "98/100",
       "Instructional_Format": "Lecture",
       "Instructors": "Shane McInally",
       "Locations": "Unity Hall 400",
@@ -10356,7 +10356,7 @@
       "Course_Title": "BME 2001 - Introduction To Biomaterials",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "49/50",
+      "Enrolled_Capacity": "48/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Zoe Reidinger",
       "Locations": "Salisbury Labs 104",
@@ -79817,7 +79817,7 @@
       "Course_Title": "MA 2611 - Applied Statistics I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "87/84",
+      "Enrolled_Capacity": "86/84",
       "Instructional_Format": "Lecture",
       "Instructors": "Adam Sales",
       "Locations": "Washburn 229",
@@ -80052,7 +80052,7 @@
       "Course_Title": "MA 2611 - Applied Statistics I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "29/28",
+      "Enrolled_Capacity": "28/28",
       "Instructional_Format": "Laboratory",
       "Instructors": "Adam Sales",
       "Locations": "Stratton Hall 116 Computer Lab",
@@ -89455,7 +89455,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Manufacturing Engineering; Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "3/5",
+      "Waitlist_Waitlist_Capacity": "2/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336406"
     },
     {
@@ -90345,7 +90345,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Manufacturing Engineering; Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "3/5",
+      "Waitlist_Waitlist_Capacity": "2/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336406"
     },
     {
@@ -94125,7 +94125,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Manufacturing Engineering; Mechanical Engineering; Material Science and Engineering",
-      "Waitlist_Waitlist_Capacity": "3/5",
+      "Waitlist_Waitlist_Capacity": "2/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336406"
     },
     {
@@ -112635,7 +112635,7 @@
       "Course_Title": "RBE 1001 - Introduction To Robotics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "58/60",
+      "Enrolled_Capacity": "57/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Nicholas Bertozzi",
       "Locations": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -112665,7 +112665,7 @@
       "Course_Title": "RBE 1001 - Introduction To Robotics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "30/30",
+      "Enrolled_Capacity": "29/30",
       "Instructional_Format": "Laboratory",
       "Instructors": "Nicholas Bertozzi",
       "Locations": "Innovation Studio 103 Robotics Lab",
@@ -112673,7 +112673,7 @@
       "Meeting_Patterns": "W | 8:00 AM - 9:50 AM",
       "Offering_Period": "2026 Spring C Term",
       "Section_Details": "Innovation Studio 103 Robotics Lab | W | 8:00 AM - 9:50 AM",
-      "Section_Status": "Closed",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: RBE 1001 - Introduction To Robotics (a)",
       "Subject": "Robotics Engineering",
@@ -125942,7 +125942,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-354240"
     },
     {
