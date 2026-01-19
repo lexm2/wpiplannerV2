@@ -1,4 +1,4 @@
-import ical, { ICalEventRepeatingFreq, ICalWeekday } from 'ical-generator';
+import ical, { ICalEventRepeatingFreq, ICalWeekday, ICalCalendarMethod } from 'ical-generator';
 import { Schedule, SelectedCourse, LocalCalendarEvent } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';
 import { TermBoundsService } from '../services/data/TermBoundsService';
@@ -119,7 +119,7 @@ export class ICSGenerator {
             name: schedule.name,
             timezone: timezone,
             prodId: '-//WPI Course Planner V2//EN',
-            method: 'PUBLISH'
+            method: ICalCalendarMethod.PUBLISH
         });
 
         let skippedCourses = 0;
