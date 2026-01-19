@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 19, 2026, 10:23 AM",
+  "generated": "Jan 19, 2026, 10:53 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -74035,7 +74035,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 7,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. IThis course surveys the transformation of the United States into an urban and industrial nation. Topics will include changes in the organization of business and labor, immigration and the development of cities, the peripheral role of theSouth and West in the industrial economy, politics and government in the age of \"laissez-faire,\" and the diverse sources and nature of late 19th- and early 20th century reform movements.",
@@ -74054,7 +74054,7 @@
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
                     "days": [
