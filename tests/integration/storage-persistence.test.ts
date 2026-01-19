@@ -44,7 +44,8 @@ describe('Storage Persistence Integration Tests', () => {
             key: mock()
         } as Storage;
 
-        // Initialize services
+        ProfileStateManager.resetInstance();
+
         storageManager = new TransactionalStorageManager();
         profileStateManager = ProfileStateManager.getInstance();
         courseSelectionService = new CourseSelectionService(profileStateManager);

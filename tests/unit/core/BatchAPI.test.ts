@@ -41,6 +41,7 @@ describe('Batch Operations API (Standalone)', () => {
       writable: true
     })
 
+    ProfileStateManager.resetInstance()
     new TransactionalStorageManager()
     profileStateManager = ProfileStateManager.getInstance()
 
