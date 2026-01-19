@@ -1,5 +1,15 @@
 # Changelog
 
+## [2026-01-19]
+
+### Fixed
+- Fixed test suite stability and reduced failing tests from 50 to 17 (66% improvement)
+- Fixed singleton state not resetting between tests causing state pollution
+- Fixed async timing issues in batch operations
+- Fixed MockIndexedDB configuration not resetting between tests
+- Fixed import/export tests using incorrect database name and fake CRNs
+- Fixed test assertions expecting raw IndexedDB structure instead of application state
+
 ## [2026-01-16]
 
 ### Changed
