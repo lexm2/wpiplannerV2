@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 19, 2026, 3:22 PM",
+  "generated": "Jan 19, 2026, 3:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8586,7 +8586,7 @@
                 "number": "C01",
                 "seats": 120,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I This course is designed for students seeking a broad overview of ecological systems and the effect of humans on the ecosystems. It provides an introduction to natural ecosystems, population growth, and the interaction between human populations and our environment. It is conducted in an active style including the use of case studies, class discussion/participation, and classroom polling systems. The major goal of this course is to help students become more informed environmental citizens, skeptical when presented with data in the media, and knowledgeable enough to question and make informed decisions about the environment. It will primarily focus on current topics but areas of discussion likely to be covered include ecosystems, populations, biodiversity, pollution, environmental economics and climate change. This course is intended for non- life science majors. Recommended background: High School Biology",
@@ -8605,7 +8605,7 @@
                     "room": "Unity Hall 500",
                     "seats": 120,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
@@ -49518,7 +49518,7 @@
                 "number": "S01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This is the study of mathematical foundations of computing. Topics include finite automataand regular languages, pushdown automata and context-free languages, Turing machines and decidability, and an introduction to computational complexity. (Prerequisites: Knowledge of discretemathematics and algorithms at the undergraduate level, and some facility with reading and writingmathematical proofs.)",
@@ -49537,7 +49537,7 @@
                     "room": "Washburn 229",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
@@ -86002,7 +86002,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": -1,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IAn introduction to the main concepts, tools, fields of study, global problems, and cross-cultural perspectives that comprise international and global studies. No prior background is required. Especially appropriate for students interested in any of WPI's global Project Centers.",
@@ -86021,7 +86021,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 35,
                     "seatsAvailable": -1,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -230334,7 +230334,7 @@
                 "crn": 341537,
                 "number": "C01",
                 "seats": 35,
-                "seatsAvailable": 19,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -230353,7 +230353,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 35,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
