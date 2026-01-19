@@ -35,7 +35,6 @@ import type { ConflictInfo, SyncData } from '../../services/sync/types'
 import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
 import { ChangelogModal } from '../components/ChangelogModal'
 import { ResizablePanel } from '../components/ResizablePanel'
-import { calendarService } from '../../services/calendar'
 import { TermBoundsService } from '../../services/data/TermBoundsService'
 
 /**

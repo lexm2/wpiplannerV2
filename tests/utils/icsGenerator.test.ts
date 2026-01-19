@@ -182,6 +182,8 @@ describe('ICSGenerator', () => {
                         startTime: createMockTime(10, 0),
                         endTime: createMockTime(15, 0),
                         visible: true,
+                        createdAt: Date.now(),
+                        updatedAt: Date.now(),
                     },
                 ],
             });
@@ -212,6 +214,8 @@ describe('ICSGenerator', () => {
                         endTime: createMockTime(17, 0),
                         terms: ['A', 'B'],
                         visible: true,
+                        createdAt: Date.now(),
+                        updatedAt: Date.now(),
                     },
                 ],
             });
