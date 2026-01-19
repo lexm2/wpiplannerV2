@@ -73,12 +73,13 @@ describe('CourseSelectionService', () => {
   beforeEach(() => {
     mockStorage = mockLocalStorage()
     consoleSpy = spyOn(console, 'warn').mockImplementation(() => {})
-    
+
     Object.defineProperty(window, 'localStorage', {
       value: mockStorage,
       writable: true
     })
 
+    ProfileStateManager.resetInstance()
     mockProfileStateManager = ProfileStateManager.getInstance()
     mockDataValidator = new DataValidator()
 
@@ -308,13 +309,14 @@ describe('CourseSelectionService', () => {
     it('should handle listener errors gracefully', async () => {
       const errorListener = () => { throw new Error('Listener error') }
       const normalListener = mock()
-      
+
       courseSelectionService.addSelectionListener(errorListener)
       courseSelectionService.addSelectionListener(normalListener)
-      
-      // Should not throw despite error in first listener
-      await expect(courseSelectionService.selectCourse(mockCourse)).resolves.not.toThrow()
-      
+
+      // Should succeed despite error in first listener
+      const result = await courseSelectionService.selectCourse(mockCourse)
+      expect(result.success).toBe(true)
+
       expect(normalListener).toHaveBeenCalled()
     })
 
@@ -345,9 +347,9 @@ describe('CourseSelectionService', () => {
 
 
     it('should handle save failures', async () => {
-      spyOn(mockProfileStateManager as any, 'executeSave').mockRejectedValue(
-        new Error('Save failed')
-      )
+      spyOn(mockProfileStateManager, 'save').mockImplementation(() => {
+        throw new Error('Save failed')
+      })
 
       const result = await courseSelectionService.save()
       expect(result.success).toBe(false)

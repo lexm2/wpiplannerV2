@@ -12,6 +12,7 @@ import {
     assertCourseSelectionUIUpdated,
     type MockUIContext
 } from '../mocks/MockUIComponents';
+import { loadCourseCatalog } from '../helpers/loadCourseCatalog';
 
 /**
  * Integration Tests: UI Hydration After Cloud Sync Import
@@ -37,8 +38,11 @@ describe('UI Hydration After Sync Import', () => {
         mockIndexedDB = (global as any).__mockIndexedDB__;
         mockIndexedDB.reset();
 
-        // Create ProfileStateManager
+        ProfileStateManager.resetInstance();
         profileManager = ProfileStateManager.getInstance();
+
+        const departments = await loadCourseCatalog();
+        profileManager.setCourseData(departments);
 
         // Create mock UI components
         mockUI = createMockUIComponents();
@@ -63,7 +67,9 @@ describe('UI Hydration After Sync Import', () => {
     });
 
     afterEach(() => {
-        resetMockUIComponents(mockUI);
+        if (mockUI) {
+            resetMockUIComponents(mockUI);
+        }
         mockIndexedDB.reset();
     });
 

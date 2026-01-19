@@ -40,19 +40,20 @@ describe('ProfileStateManager', () => {
   beforeEach(() => {
     mockStorage = mockLocalStorage()
     consoleSpy = spyOn(console, 'warn').mockImplementation(() => {})
-    
+
     Object.defineProperty(window, 'localStorage', {
       value: mockStorage,
       writable: true
     })
 
+    ProfileStateManager.resetInstance()
     mockStorageManager = new TransactionalStorageManager()
     profileStateManager = ProfileStateManager.getInstance()
-    
+
     // Create a default schedule for tests that need an active schedule
     const defaultSchedule = profileStateManager.createSchedule('Test Schedule', 'test')
     profileStateManager.setActiveSchedule(defaultSchedule.id, 'test')
-    
+
     // Clear any courses that might have been set during setup
     profileStateManager.clearAllSelections('test')
   })
@@ -63,7 +64,7 @@ describe('ProfileStateManager', () => {
 
   describe('Initialization and State Management', () => {
     it('should initialize with default state', () => {
-      // Use the singleton instance
+      ProfileStateManager.resetInstance()
       const freshProfileManager = ProfileStateManager.getInstance()
       const state = freshProfileManager.getState()
 
