@@ -36,6 +36,7 @@ import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
 import { ChangelogModal } from '../components/ChangelogModal'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { calendarService } from '../../services/calendar'
+import { TermBoundsService } from '../../services/data/TermBoundsService'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -253,7 +254,7 @@ export class MainController {
             await this.courseSelectionService.initialize();
             await this.scheduleManagementService.initialize();
 
-            await calendarService.loadTermBounds();
+            await TermBoundsService.getInstance().loadTermBounds();
 
             await this.loadCourseData();
 

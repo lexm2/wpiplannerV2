@@ -13,11 +13,10 @@ import type {
     CalendarExportResult,
     TermDates,
     ConnectedCalendar,
-    TermBoundsData,
 } from './types';
 import { DAY_TO_RRULE } from './types';
 import { expandRecurringEvents, type ExpandedEventsResult } from './rruleExpander';
-import { TermBoundsDataSchema } from './schemas';
+import { TermBoundsService } from '../data/TermBoundsService';
 
 /**
  * Result of fetching events for all terms.
@@ -35,10 +34,10 @@ export interface AllTermsEventsResult {
 // =============================================================================
 
 const TERM_DATES = {
-    A: { startMonth: 7, startDay: 25, endMonth: 9, endDay: 13, nextYear: false },
-    B: { startMonth: 9, startDay: 21, endMonth: 11, endDay: 13, nextYear: false },
-    C: { startMonth: 0, startDay: 6, endMonth: 2, endDay: 7, nextYear: true },
-    D: { startMonth: 2, startDay: 17, endMonth: 4, endDay: 9, nextYear: true },
+    A: { startMonth: 7, startDay: 21, endMonth: 9, endDay: 10, nextYear: false },
+    B: { startMonth: 9, startDay: 20, endMonth: 11, endDay: 12, nextYear: false },
+    C: { startMonth: 0, startDay: 14, endMonth: 2, endDay: 6, nextYear: true },
+    D: { startMonth: 2, startDay: 16, endMonth: 4, endDay: 6, nextYear: true },
 } as const;
 
 const DAY_TO_NUMBER: Record<string, number> = {
@@ -62,7 +61,6 @@ const DAY_TO_NUMBER: Record<string, number> = {
  */
 export class CalendarService {
     private provider: CalendarProvider | null = null;
-    private termBoundsCache: TermBoundsData | null = null;
     private static instance: CalendarService;
 
     private constructor() {}
@@ -97,21 +95,6 @@ export class CalendarService {
      */
     isReady(): boolean {
         return this.provider !== null && this.provider.isAuthenticated();
-    }
-
-    async loadTermBounds(): Promise<void> {
-        try {
-            const response = await fetch('/term-bounds.json');
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            const data = await response.json();
-            this.termBoundsCache = TermBoundsDataSchema.parse(data);
-            console.log('[CalendarService] Loaded term bounds:', this.termBoundsCache.academicYear);
-        } catch (error) {
-            console.warn('[CalendarService] Failed to load term-bounds.json, using fallback:', error);
-            this.termBoundsCache = null;
-        }
     }
 
     // =========================================================================
@@ -541,12 +524,11 @@ export class CalendarService {
 
         const termLetter = term.charAt(0).toUpperCase() as 'A' | 'B' | 'C' | 'D';
 
-        if (this.termBoundsCache?.terms[termLetter]) {
-            const bounds = this.termBoundsCache.terms[termLetter];
-            return {
-                start: new Date(bounds.startDate),
-                end: new Date(bounds.endDate)
-            };
+        const termBoundsService = TermBoundsService.getInstance();
+        const boundsFromService = termBoundsService.getTermDates(termLetter);
+
+        if (boundsFromService) {
+            return boundsFromService;
         }
 
         console.warn(`[CalendarService] Using fallback TERM_DATES for term ${termLetter}`);
