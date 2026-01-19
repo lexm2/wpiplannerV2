@@ -477,6 +477,13 @@ export class MockIndexedDB {
             clear: 0,
             getAll: 0,
         };
+        this.config = {
+            operationDelay: 0,
+            quotaExceeded: false,
+            transactionFails: false,
+            useCompression: true,
+            maxStorageSize: 50 * 1024 * 1024,
+        };
     }
 
     /**

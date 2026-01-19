@@ -61,6 +61,13 @@ export class ProfileStateManager {
         return ProfileStateManager.instance;
     }
 
+    public static resetInstance(): void {
+        if (ProfileStateManager.instance) {
+            ProfileStateManager.instance.destroy();
+            ProfileStateManager.instance = null;
+        }
+    }
+
     setModalService(modalService: ModalService): void {
         this.modalService = modalService;
     }
@@ -951,6 +958,8 @@ export class ProfileStateManager {
                 this.isBatchUpdate = false;
                 // Single save after all operations
                 this.save();
+                // Wait for save to complete
+                await Promise.all(this.pendingSavePromises);
             }
         }
     }
