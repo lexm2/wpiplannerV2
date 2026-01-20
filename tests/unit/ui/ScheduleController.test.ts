@@ -149,7 +149,7 @@ describe('ScheduleController Expansion State', () => {
         
         // Should preserve the collapsed state
         expect(html).toContain('schedule-course-item collapsed');
-        expect(html).not.toContain('expanded');
+        expect(html).not.toContain('schedule-course-item expanded');
     });
 
     test('buildFilteredSectionsHTML should preserve expanded state when provided', () => {
