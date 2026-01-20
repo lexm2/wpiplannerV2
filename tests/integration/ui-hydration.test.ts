@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
 import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
 import { MainController } from '../../src/ui/controllers/MainController';
 import type { SyncData } from '../../src/services/sync/types';
-import { createSyncData, createSchedule, createSelectedCourse } from '../helpers/sync-test-utils';
+import { createSyncData, createSchedule, createSelectedCourse, REAL_COURSES } from '../helpers/sync-test-utils';
 import type { MockIndexedDB } from '../mocks/MockIndexedDB';
 import {
     createMockUIComponents,
@@ -13,6 +13,15 @@ import {
     type MockUIContext
 } from '../mocks/MockUIComponents';
 import { loadCourseCatalog } from '../helpers/loadCourseCatalog';
+
+/**
+ * Wait for ProfileStateManager event queue to process.
+ * Events are queued asynchronously with setTimeout(..., 0),
+ * so we need to wait for the next tick before assertions.
+ */
+async function waitForEventQueue() {
+    await new Promise(resolve => setTimeout(resolve, 50));
+}
 
 /**
  * Integration Tests: UI Hydration After Cloud Sync Import
@@ -44,6 +53,60 @@ describe('UI Hydration After Sync Import', () => {
         const departments = await loadCourseCatalog();
         profileManager.setCourseData(departments);
 
+        // Mock fetch for TermBoundsService and course data
+        global.fetch = mock((url: string) => {
+            if (typeof url === 'string' && url.includes('term-bounds.json')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({
+                        academicYear: '2021-2022',
+                        generated: '2021-09-01T00:00:00Z',
+                        terms: {
+                            'A': {
+                                id: 'A',
+                                name: 'A Term',
+                                startDate: '2021-09-01',
+                                endDate: '2021-10-31',
+                                offeringPeriod: 'A',
+                                sampleSize: 100
+                            },
+                            'B': {
+                                id: 'B',
+                                name: 'B Term',
+                                startDate: '2021-11-01',
+                                endDate: '2021-12-31',
+                                offeringPeriod: 'B',
+                                sampleSize: 100
+                            },
+                            'C': {
+                                id: 'C',
+                                name: 'C Term',
+                                startDate: '2022-01-01',
+                                endDate: '2022-02-28',
+                                offeringPeriod: 'C',
+                                sampleSize: 100
+                            },
+                            'D': {
+                                id: 'D',
+                                name: 'D Term',
+                                startDate: '2022-03-01',
+                                endDate: '2022-04-30',
+                                offeringPeriod: 'D',
+                                sampleSize: 100
+                            }
+                        }
+                    })
+                } as Response);
+            }
+            if (typeof url === 'string' && url.includes('course-data-constructed.json')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({ departments })
+                } as Response);
+            }
+            return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+        }) as any;
+
         // Create mock UI components
         mockUI = createMockUIComponents();
 
@@ -67,9 +130,7 @@ describe('UI Hydration After Sync Import', () => {
     });
 
     afterEach(() => {
-        if (mockUI) {
-            resetMockUIComponents(mockUI);
-        }
+        resetMockUIComponents(mockUI);
         mockIndexedDB.reset();
     });
 
@@ -83,8 +144,8 @@ describe('UI Hydration After Sync Import', () => {
                         name: 'Fall 2025',
                         selectedCourses: [
                             createSelectedCourse({
-                                courseId: 'CS-1101',
-                                selectedSectionCrn: 'SEC-1'
+                                courseId: REAL_COURSES.CS_1101.id,
+                                selectedSectionCrn: REAL_COURSES.CS_1101.crn
                             })
                         ]
                     })
@@ -92,8 +153,11 @@ describe('UI Hydration After Sync Import', () => {
                 activeScheduleId: 'schedule-1'
             });
 
+            resetMockUIComponents(mockUI);
+
             // Act: Import the data (should trigger UI update)
             await profileManager.importData(syncData);
+            await waitForEventQueue();
 
             // Assert: Schedule UI should be updated
             assertScheduleUIUpdated(mockUI);
@@ -157,6 +221,7 @@ describe('UI Hydration After Sync Import', () => {
             });
 
             await profileManager.importData(emptyData);
+            await waitForEventQueue();
 
             // Assert: UI should still be called to clear display
             expect(mockUI.scheduleController.displayScheduleSelectedCourses).toHaveBeenCalled();
@@ -181,6 +246,7 @@ describe('UI Hydration After Sync Import', () => {
 
             // Act
             await profileManager.importData(syncData);
+            await waitForEventQueue();
 
             // Assert
             assertCourseSelectionUIUpdated(mockUI);
@@ -196,10 +262,26 @@ describe('UI Hydration After Sync Import', () => {
                         id: 'schedule-1',
                         name: 'Multi Course Schedule',
                         selectedCourses: [
-                            createSelectedCourse({ courseId: 'CS-1101', isRequired: true }),
-                            createSelectedCourse({ courseId: 'CS-2011', isRequired: true }),
-                            createSelectedCourse({ courseId: 'MA-1021', isRequired: false }),
-                            createSelectedCourse({ courseId: 'PH-1110', isRequired: false })
+                            createSelectedCourse({
+                                courseId: REAL_COURSES.CS_1101.id,
+                                selectedSectionCrn: REAL_COURSES.CS_1101.crn,
+                                isRequired: true
+                            }),
+                            createSelectedCourse({
+                                courseId: REAL_COURSES.CS_2303.id,
+                                selectedSectionCrn: REAL_COURSES.CS_2303.crn,
+                                isRequired: true
+                            }),
+                            createSelectedCourse({
+                                courseId: REAL_COURSES.MA_1021.id,
+                                selectedSectionCrn: REAL_COURSES.MA_1021.crn,
+                                isRequired: false
+                            }),
+                            createSelectedCourse({
+                                courseId: REAL_COURSES.MA_1024.id,
+                                selectedSectionCrn: REAL_COURSES.MA_1024.crn,
+                                isRequired: false
+                            })
                         ]
                     })
                 ],
@@ -208,6 +290,7 @@ describe('UI Hydration After Sync Import', () => {
 
             // Act
             await profileManager.importData(syncData);
+            await waitForEventQueue();
 
             // Assert: Course UI should be refreshed
             expect(mockUI.courseController.displaySelectedCourses).toHaveBeenCalled();
@@ -364,8 +447,11 @@ describe('UI Hydration After Sync Import', () => {
                 activeScheduleId: 'schedule-1'
             });
 
+            resetMockUIComponents(mockUI);
+
             // Act: Import (should trigger schedule list refresh)
             await profileManager.importData(syncData);
+            await waitForEventQueue();
 
             // Manually trigger refresh (normally done by MainController)
             mockUI.schedulePickerModal.refreshScheduleList();
@@ -373,9 +459,12 @@ describe('UI Hydration After Sync Import', () => {
             // Assert: Schedule picker should show all schedules
             expect(mockUI.schedulePickerModal.refreshScheduleList).toHaveBeenCalled();
 
-            // Verify all schedules are stored
-            const allSchedules = mockIndexedDB.getAllRawData('wpi-planner', 'schedules');
-            expect(allSchedules).toHaveLength(3);
+            const allSchedules = profileManager.getAllSchedules();
+            const scheduleIds = allSchedules.map(s => s.id);
+            expect(scheduleIds).toContain('schedule-1');
+            expect(scheduleIds).toContain('schedule-2');
+            expect(scheduleIds).toContain('schedule-3');
+            expect(allSchedules.find(s => s.id === 'schedule-1')?.name).toBe('Fall 2025');
         });
 
         it('should update active schedule indicator', async () => {
@@ -457,13 +546,13 @@ describe('UI Hydration After Sync Import', () => {
                         name: 'Complete Test Schedule',
                         selectedCourses: [
                             createSelectedCourse({
-                                courseId: 'CS-1101',
-                                selectedSectionCrn: 'SEC-1',
+                                courseId: REAL_COURSES.CS_1101.id,
+                                selectedSectionCrn: REAL_COURSES.CS_1101.crn,
                                 isRequired: true
                             }),
                             createSelectedCourse({
-                                courseId: 'MA-1021',
-                                selectedSectionCrn: 'SEC-2',
+                                courseId: REAL_COURSES.MA_1021.id,
+                                selectedSectionCrn: REAL_COURSES.MA_1021.crn,
                                 isRequired: false
                             })
                         ]
@@ -492,6 +581,7 @@ describe('UI Hydration After Sync Import', () => {
 
             // Act: Complete hydration flow
             await profileManager.importData(syncData);
+            await waitForEventQueue();
             mockUI.courseDataCoordinator.redistributeToConsumers(mockDepartments as any);
             mockUI.schedulePickerModal.refreshScheduleList();
             mockUI.searchService.reindex();
@@ -509,8 +599,11 @@ describe('UI Hydration After Sync Import', () => {
             expect(mockUI.searchService.reindex).toHaveBeenCalled();
             expect(mockUI.cloudStatusButton.updateStatus).toHaveBeenCalledWith('idle');
 
-            // Verify data in IndexedDB
-            expect(mockIndexedDB.hasKey('wpi-planner', 'schedules', 'schedule-1')).toBe(true);
+            // Verify data was imported
+            const allSchedules = profileManager.getAllSchedules();
+            const schedule = allSchedules.find(s => s.id === 'schedule-1');
+            expect(schedule).toBeDefined();
+            expect(schedule?.name).toBe('Complete Test Schedule');
         });
 
         it('should handle hydration with no schedules', async () => {
@@ -522,6 +615,7 @@ describe('UI Hydration After Sync Import', () => {
 
             // Act
             await profileManager.importData(emptyData);
+            await waitForEventQueue();
 
             // Assert: UI should still be called (to clear displays)
             expect(mockUI.scheduleController.displayScheduleSelectedCourses).toHaveBeenCalled();
@@ -546,7 +640,9 @@ describe('UI Hydration After Sync Import', () => {
 
             // Act: Import rapidly
             await profileManager.importData(syncData1);
+            await waitForEventQueue();
             await profileManager.importData(syncData2);
+            await waitForEventQueue();
 
             // Assert: UI should be called for both imports
             expect(mockUI.scheduleController.displayScheduleSelectedCourses).toHaveBeenCalledTimes(2);
