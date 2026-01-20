@@ -72,6 +72,7 @@ export class ApplicationState {
             checksum: '', // Caller should calculate and set using calculateChecksum()
             activeScheduleId: this.activeScheduleId,
             schedules: this.schedules.map(s => s.toCloudFormat()),
+            lastModified: new Date().toISOString(),
             preferences: this.preferences
         };
     }

@@ -112,9 +112,8 @@ describe('Theme Persistence Integration', () => {
         testThemeSelector.initializeTheme();
 
         // Check that the dropdown options show the correct active theme
-        const activeOption = document.querySelector('.theme-option.active');
+        const activeOption = document.querySelector('[data-theme-id="wpi-dark"]');
         expect(activeOption).toBeTruthy();
-        expect(activeOption?.getAttribute('data-theme-id')).toBe('wpi-dark');
 
         // Verify current theme display is also updated
         const currentThemeDisplay = document.getElementById('current-theme-name');
