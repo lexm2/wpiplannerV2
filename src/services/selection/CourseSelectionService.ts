@@ -64,6 +64,8 @@ export class CourseSelectionService {
             // NOTE: ProfileStateManager is already initialized by StorageService before this service
             // Redundant loadFromStorage() call removed to prevent duplicate schedule creation race condition
 
+            this.isInitialized = true;
+
             // Validate loaded data
             const healthCheck = await this.performHealthCheck();
             if (!healthCheck.healthy) {
@@ -72,7 +74,6 @@ export class CourseSelectionService {
                 await this.attemptDataRepair();
             }
 
-            this.isInitialized = true;
             console.log('CourseSelectionService initialized successfully');
             return true;
 
