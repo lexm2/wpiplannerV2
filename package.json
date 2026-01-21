@@ -13,7 +13,8 @@
     "test:run": "bun test",
     "test:coverage": "bun test --coverage",
     "fetch-data": "bun run scripts/fetch-course-data.ts",
-    "fetch-rmp-data": "bun run scripts/rateMyProfessor/fetchRateMyProfessor.ts"
+    "fetch-rmp-data": "bun run scripts/rateMyProfessor/fetchRateMyProfessor.ts",
+    "merge-to-master": "bun run scripts/merge-to-master.ts"
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "^16.6.0",
