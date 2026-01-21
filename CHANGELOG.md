@@ -3,6 +3,7 @@
 ## [2026-01-20]
 
 ### Fixed
+- Fixed false-positive "Service not initialized" warning during initialization
 - Fixed all remaining test failures achieving 100% test pass rate (447/447 tests passing)
 - Improved test reliability for UI hydration after cloud sync imports
 - Fixed 8 additional failing tests reducing total from 16 to 8 (50% improvement)
