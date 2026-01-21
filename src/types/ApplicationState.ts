@@ -1,9 +1,11 @@
 import type { Department } from './types';
 import type { SchedulePreferences } from './schedule';
-import type { SyncData } from '../services/sync/types';
-import { ScheduleState } from './ScheduleState';
+import type { SyncData, MinimalSyncData } from '../services/sync/types';
+import { ScheduleState, findCourseById, findSectionByCRN } from './ScheduleState';
 import { checksumCalculator } from '../services/sync/checksum';
 import LZString from 'lz-string';
+import { dayToNumber, numberToDay, minutesToTime } from '../services/sync/utils';
+import type { SelectedCourse } from './schedule';
 
 /**
  * Application-level state containing multiple schedules and preferences
@@ -89,6 +91,35 @@ export class ApplicationState {
     }
 
     /**
+     * Convert to minimal format for export
+     *
+     * @returns MinimalSyncData
+     */
+    toMinimalFormat(): MinimalSyncData {
+        return {
+            v: "4",
+            a: this.getActiveScheduleIndex(),
+            s: this.schedules.map(schedule => [
+                schedule.name,
+                schedule.selectedCourses.flatMap(course => [
+                    course.course.id,
+                    course.selectedSection?.crn.toString() ?? null
+                ])
+            ]),
+            p: this.preferences ? {
+                t: [
+                    this.preferences.preferredTimeRange.startTime.hours * 60 +
+                        this.preferences.preferredTimeRange.startTime.minutes,
+                    this.preferences.preferredTimeRange.endTime.hours * 60 +
+                        this.preferences.preferredTimeRange.endTime.minutes
+                ],
+                d: Array.from(this.preferences.preferredDays).map(dayToNumber),
+                th: this.preferences.theme
+            } : undefined
+        };
+    }
+
+    /**
      * Create from cloud format (hydrate IDs → full objects)
      *
      * @param syncData - Cloud data with IDs only
@@ -109,6 +140,75 @@ export class ApplicationState {
             syncData.preferences as SchedulePreferences | undefined,
             syncData.version,
             syncData.timestamp
+        );
+    }
+
+    /**
+     * Create from minimal format
+     *
+     * @param data - Minimal sync data
+     * @param courseCatalog - Department catalog for hydration
+     * @returns ApplicationState with full objects
+     */
+    static fromMinimalFormat(
+        data: MinimalSyncData,
+        courseCatalog: Department[]
+    ): ApplicationState {
+        const schedules = data.s.map(([name, coursesArray]) => {
+            const selectedCourses: SelectedCourse[] = [];
+
+            for (let i = 0; i < coursesArray.length; i += 2) {
+                const courseId = coursesArray[i];
+                const crn = coursesArray[i + 1];
+
+                if (!courseId) continue;
+
+                const course = findCourseById(courseId, courseCatalog);
+                if (!course) {
+                    throw new Error(`Course ${courseId} not found in catalog`);
+                }
+
+                const section = crn ? findSectionByCRN(course, crn) : null;
+
+                selectedCourses.push({
+                    course,
+                    selectedLecture: null,
+                    selectedDiscussion: null,
+                    selectedLab: null,
+                    selectedSection: section,
+                    selectedSectionNumber: section?.number || null,
+                    isRequired: false,
+                    lockedSections: new Set()
+                });
+            }
+
+            return new ScheduleState(
+                `schedule_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+                name,
+                selectedCourses,
+                []
+            );
+        });
+
+        const activeScheduleId = schedules[data.a]?.id ?? null;
+
+        const preferences: SchedulePreferences | undefined = data.p ? {
+            preferredTimeRange: {
+                startTime: minutesToTime(data.p.t?.[0] ?? 480),
+                endTime: minutesToTime(data.p.t?.[1] ?? 1200)
+            },
+            preferredDays: new Set(data.p.d?.map(numberToDay) ?? ['mon', 'tue', 'wed', 'thu', 'fri']),
+            avoidBackToBackClasses: false,
+            theme: data.p.th,
+            bookmarkedCourseIds: []
+        } : undefined;
+
+        return new ApplicationState(
+            activeScheduleId,
+            schedules,
+            preferences,
+            data.v,
+            Date.now()
         );
     }
 
@@ -140,6 +240,17 @@ export class ApplicationState {
     getActiveSchedule(): ScheduleState | null {
         if (!this.activeScheduleId) return null;
         return this.schedules.find(s => s.id === this.activeScheduleId) || null;
+    }
+
+    /**
+     * Get active schedule index
+     *
+     * @returns Active schedule index or 0 if no active schedule
+     */
+    getActiveScheduleIndex(): number {
+        if (!this.activeScheduleId) return 0;
+        const index = this.schedules.findIndex(s => s.id === this.activeScheduleId);
+        return index >= 0 ? index : 0;
     }
 
     /**

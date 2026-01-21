@@ -1,5 +1,14 @@
 # Changelog
 
+## [2026-01-21]
+
+### Changed
+- **BREAKING**: Replaced export format with compact format reducing file size by 75-80%
+- Old exports are no longer importable
+
+### Developer Tools
+- Added merge script to simplify merging Development into master with automatic handling of auto-generated files
+
 ## [2026-01-20]
 
 ### Fixed

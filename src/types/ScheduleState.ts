@@ -426,7 +426,7 @@ export class ScheduleState {
  * @param departments - Department catalog
  * @returns Course object or null
  */
-function findCourseById(courseId: string, departments: Department[]): Course | null {
+export function findCourseById(courseId: string, departments: Department[]): Course | null {
     for (const dept of departments) {
         const course = dept.courses.find(c => c.id === courseId);
         if (course) return course;
@@ -441,7 +441,7 @@ function findCourseById(courseId: string, departments: Department[]): Course | n
  * @param crn - Section CRN
  * @returns Section object or null
  */
-function findSectionByCRN(course: Course, crn: string): Section | null {
+export function findSectionByCRN(course: Course, crn: string): Section | null {
     const allSections = getAllSections(course);
     return allSections.find(s => s.crn.toString() === crn) || null;
 }

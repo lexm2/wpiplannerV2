@@ -6,8 +6,6 @@ import { getAllSections, createJSONReplacer, createJSONReviver, logger } from '.
 import { UndoRedoManager } from './UndoRedoManager'
 import { syncEventBus } from '../../services/sync/SyncEventBus'
 import { ModalService } from '../../services/ui'
-import type { SyncData } from '../../services/sync/types'
-import { parseSyncData } from '../../services/sync/schemas'
 
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
@@ -716,34 +714,27 @@ export class ProfileStateManager {
         }
     }
 
-    // Export/Import functionality
     async exportData(): Promise<string | null> {
-        const exportResult = await this.storageManager.exportData();
-        return exportResult.valid ? exportResult.data : null;
+        const appState = this.createApplicationState();
+        const minimalData = appState.toMinimalFormat();
+        return JSON.stringify(minimalData, null, 2);
     }
 
-    /**
-     * Import cloud data and convert to full Schedule objects
-     *
-     * This is the conversion boundary between cloud sync (IDs only) and
-     * application state (full objects).
-     *
-     * @param data - SyncData object or JSON string containing SyncData
-     */
-    async importData(data: SyncData | string): Promise<TransactionResult> {
+    private createApplicationState(): ApplicationState {
+        const schedules = this.state.schedules.map(s => ScheduleState.fromLegacySchedule(s));
+        return new ApplicationState(
+            this.state.activeScheduleId,
+            schedules,
+            this.state.preferences
+        );
+    }
+
+    async importData(data: string): Promise<TransactionResult> {
         try {
-            // Parse and validate as SyncData (with IDs only)
-            const syncData: SyncData = typeof data === 'string'
-                ? parseSyncData(JSON.parse(data), 'ProfileStateManager.importData')
-                : data;
-
-            // Convert to ApplicationState (IDs → full objects)
-            const appState = ApplicationState.fromCloudFormat(syncData, this.allDepartments);
-
-            // Convert to legacy Schedule objects for storage
+            const parsed = JSON.parse(data);
+            const appState = ApplicationState.fromMinimalFormat(parsed, this.allDepartments);
             const legacySchedules = appState.schedules.map(s => s.toLegacySchedule());
 
-            // Import to storage
             const result = await this.storageManager.importData(
                 legacySchedules,
                 appState.activeScheduleId,
@@ -751,14 +742,10 @@ export class ProfileStateManager {
             );
 
             if (result.success) {
-                // Clear in-memory state to force reload
                 this.state.schedules = [];
                 this.state.selectedCourses = [];
                 this.state.activeScheduleId = null;
-
-                // Reload from storage
                 await this.loadFromStorage();
-
                 this.emitEvent('schedule_changed', { action: 'imported' }, 'system');
             } else {
                 console.error('[ProfileStateManager] Import failed:', result.error);
