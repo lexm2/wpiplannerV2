@@ -4,9 +4,10 @@
 
 ### Changed
 - Replaced export format with new compact format reducing file size
-- BREAKING:Old exports are no longer importable
+- BREAKING: Old exports (v3 and earlier) are no longer supported
 
 ### Fixed
+- Fixed schedule imports failing with "Import data does not contain valid schedules array" error
 - Fixed schedule exports using bloated format instead of compact format
 - Fixed import/export unit tests to work with new compact format
 
