@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
 import type { SyncData } from '../../src/services/sync/types';
-import { createSyncData, createSchedule, createSelectedCourse, REAL_COURSES } from '../helpers/sync-test-utils';
+import { createSyncData, createSchedule, createSelectedCourse, createMinimalSyncData, REAL_COURSES } from '../helpers/sync-test-utils';
 import type { MockIndexedDB } from '../mocks/MockIndexedDB';
 import { createMockUIComponents, resetMockUIComponents, assertUIHydrated, type MockUIContext } from '../mocks/MockUIComponents';
 import { loadCourseCatalog } from '../helpers/loadCourseCatalog';
+import type { Department } from '../../src/types/types';
 
 /**
  * Integration Tests: ProfileStateManager Import/Export with IndexedDB
@@ -19,6 +20,7 @@ describe('ProfileStateManager Import/Export Integration', () => {
     let profileManager: ProfileStateManager;
     let mockIndexedDB: MockIndexedDB;
     let mockUI: MockUIContext;
+    let departments: Department[];
 
     beforeEach(async () => {
         // Get global mock IndexedDB instance
@@ -28,7 +30,7 @@ describe('ProfileStateManager Import/Export Integration', () => {
         ProfileStateManager.resetInstance();
         profileManager = ProfileStateManager.getInstance();
 
-        const departments = await loadCourseCatalog();
+        departments = await loadCourseCatalog();
         profileManager.setCourseData(departments);
 
         // Create mock UI components
@@ -64,57 +66,53 @@ describe('ProfileStateManager Import/Export Integration', () => {
                 ]
             });
 
-            const syncData = await createSyncData({
+            const jsonData = await createMinimalSyncData({
                 schedules: [schedule1, schedule2],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             // Act: Import the data
-            await profileManager.importData(syncData);
+            await profileManager.importData(jsonData);
 
-            // Assert: Verify data is in IndexedDB
-            expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'schedule-1')).toBe(true);
-            expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'schedule-2')).toBe(true);
-
+            // Assert: Verify data is imported correctly
             const importedSchedules = profileManager.getAllSchedules();
             expect(importedSchedules).toHaveLength(2);
 
-            const loadedSchedule1 = importedSchedules.find(s => s.id === 'schedule-1');
+            const loadedSchedule1 = importedSchedules.find(s => s.name === 'Fall 2025');
             expect(loadedSchedule1).toBeDefined();
             expect(loadedSchedule1!.name).toBe('Fall 2025');
             expect(loadedSchedule1!.selectedCourses).toHaveLength(1);
 
-            const loadedSchedule2 = importedSchedules.find(s => s.id === 'schedule-2');
+            const loadedSchedule2 = importedSchedules.find(s => s.name === 'Spring 2026');
             expect(loadedSchedule2).toBeDefined();
             expect(loadedSchedule2!.name).toBe('Spring 2026');
         });
 
         it('should set active schedule after import', async () => {
             // Arrange
-            const syncData = await createSyncData({
+            const jsonData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({ id: 'schedule-1', name: 'Schedule 1' }),
                     createSchedule({ id: 'schedule-2', name: 'Schedule 2' })
                 ],
                 activeScheduleId: 'schedule-2'
-            });
+            }, departments);
 
             // Act
-            await profileManager.importData(syncData);
+            await profileManager.importData(jsonData);
 
-            // Assert: Active schedule should be set
+            // Assert: Active schedule should be set (schedule-2 is second, so index 1)
             const activeSchedule = profileManager.getActiveSchedule();
             expect(activeSchedule).toBeDefined();
-            expect(activeSchedule?.id).toBe('schedule-2');
             expect(activeSchedule?.name).toBe('Schedule 2');
         });
 
         it('should emit schedule_changed event after import', async () => {
             // Arrange
-            const syncData = await createSyncData({
+            const jsonData = await createMinimalSyncData({
                 schedules: [createSchedule({ id: 'schedule-1', name: 'Test Schedule' })],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             let eventEmitted = false;
             const eventListener = (event: any) => {
@@ -127,7 +125,7 @@ describe('ProfileStateManager Import/Export Integration', () => {
             profileManager.addListener(eventListener);
 
             // Act
-            await profileManager.importData(syncData);
+            await profileManager.importData(jsonData);
 
             // Wait for async event emission
             await new Promise(resolve => setTimeout(resolve, 50));
@@ -141,13 +139,13 @@ describe('ProfileStateManager Import/Export Integration', () => {
 
         it('should handle empty schedules', async () => {
             // Arrange: Sync data with no schedules
-            const syncData = await createSyncData({
+            const jsonData = await createMinimalSyncData({
                 schedules: [],
                 activeScheduleId: null
-            });
+            }, departments);
 
             // Act
-            await profileManager.importData(syncData);
+            await profileManager.importData(jsonData);
 
             // Assert: ProfileStateManager creates a default schedule when none exist
             const allSchedules = profileManager.getAllSchedules();
@@ -178,7 +176,7 @@ describe('ProfileStateManager Import/Export Integration', () => {
                 });
             });
 
-            const syncData = await createSyncData({
+            const jsonData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'large-schedule',
@@ -187,14 +185,14 @@ describe('ProfileStateManager Import/Export Integration', () => {
                     })
                 ],
                 activeScheduleId: 'large-schedule'
-            });
+            }, departments);
 
             // Act
-            await profileManager.importData(syncData);
+            await profileManager.importData(jsonData);
 
             // Assert: All courses should be stored
             const schedules = profileManager.getAllSchedules();
-            const largeSchedule = schedules.find(s => s.id === 'large-schedule');
+            const largeSchedule = schedules.find(s => s.name === 'Large Schedule');
             expect(largeSchedule).toBeDefined();
             expect(largeSchedule!.selectedCourses).toHaveLength(30);
 
@@ -203,30 +201,13 @@ describe('ProfileStateManager Import/Export Integration', () => {
             expect(storageSize).toBeGreaterThan(0);
         });
 
-        it('should overwrite existing schedules with same ID', async () => {
-            // Arrange: Import initial data
-            const initialData = await createSyncData({
+        it('should import schedules with multiple courses', async () => {
+            // Arrange: Create data with multiple courses
+            const jsonData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'schedule-1',
-                        name: 'Original Name',
-                        selectedCourses: [createSelectedCourse({
-                            courseId: REAL_COURSES.CS_1101.id,
-                            selectedSectionCrn: REAL_COURSES.CS_1101.crn
-                        })]
-                    })
-                ],
-                activeScheduleId: 'schedule-1'
-            });
-
-            await profileManager.importData(initialData);
-
-            // Act: Import updated data with same schedule ID
-            const updatedData = await createSyncData({
-                schedules: [
-                    createSchedule({
-                        id: 'schedule-1',
-                        name: 'Updated Name',
+                        name: 'Multi-Course Schedule',
                         selectedCourses: [
                             createSelectedCourse({
                                 courseId: REAL_COURSES.CS_1101.id,
@@ -240,37 +221,37 @@ describe('ProfileStateManager Import/Export Integration', () => {
                     })
                 ],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
-            await profileManager.importData(updatedData);
+            // Act: Import data
+            await profileManager.importData(jsonData);
 
-            // Assert: Should have updated schedule
+            // Assert: Should have imported schedule with all courses
             const schedules = profileManager.getAllSchedules();
-            const updated = schedules.find(s => s.id === 'schedule-1');
-            expect(updated).toBeDefined();
-            expect(updated!.name).toBe('Updated Name');
-            expect(updated!.selectedCourses).toHaveLength(2);
+            const schedule = schedules.find(s => s.name === 'Multi-Course Schedule');
+            expect(schedule).toBeDefined();
+            expect(schedule!.selectedCourses).toHaveLength(2);
         });
 
         it('should handle import with missing optional fields', async () => {
             // Arrange: Create minimal valid sync data
-            const minimalSyncData = await createSyncData({
+            const jsonData = await createMinimalSyncData({
                 schedules: [createSchedule({ id: 'schedule-1', name: 'Minimal' })],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             // Act: Import should succeed with minimal data
-            const result = await profileManager.importData(minimalSyncData);
+            const result = await profileManager.importData(jsonData);
 
             // Assert: System handles gracefully
             expect(result.success).toBe(true);
             const schedules = profileManager.getAllSchedules();
-            expect(schedules.find(s => s.id === 'schedule-1')).toBeDefined();
+            expect(schedules.find(s => s.name === 'Minimal')).toBeDefined();
         });
     });
 
     describe('Export Flow', () => {
-        it('should export current state as SyncData', async () => {
+        it('should export current state in minimal format', async () => {
             // Arrange: Import initial data
             const schedule1 = createSchedule({
                 id: 'schedule-1',
@@ -290,10 +271,10 @@ describe('ProfileStateManager Import/Export Integration', () => {
                 })]
             });
 
-            const importData = await createSyncData({
+            const importData = await createMinimalSyncData({
                 schedules: [schedule1, schedule2],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             await profileManager.importData(importData);
 
@@ -305,54 +286,32 @@ describe('ProfileStateManager Import/Export Integration', () => {
             expect(typeof exportedDataString).toBe('string');
 
             // Parse the exported data
-            const exportedData = JSON.parse(exportedDataString!);
-            expect(exportedData.schedules).toHaveLength(2);
-            expect(exportedData.activeScheduleId).toBe('schedule-1');
-            expect(exportedData.checksum).toBeDefined();
-            expect(exportedData.lastModified).toBeDefined();
-            expect(typeof exportedData.lastModified).toBe('string');
+            const exported = JSON.parse(exportedDataString!);
+            expect(exported.v).toBe("4");  // version 4
+            expect(exported.s).toHaveLength(2);  // schedules array
+            expect(exported.a).toBe(0);  // active schedule index (schedule-1 is first)
 
             // Verify schedule content
-            const exportedSchedule1 = exportedData.schedules.find((s: any) => s.id === 'schedule-1');
-            expect(exportedSchedule1).toBeDefined();
-            expect(exportedSchedule1?.name).toBe('Fall 2025');
-            expect(exportedSchedule1?.selectedCourses).toHaveLength(1);
-        });
-
-        it('should generate valid checksum on export', async () => {
-            // Arrange
-            const syncData = await createSyncData({
-                schedules: [createSchedule({ id: 'schedule-1', name: 'Test' })],
-                activeScheduleId: 'schedule-1'
-            });
-
-            await profileManager.importData(syncData);
-
-            // Act
-            const exportedString = await profileManager.exportData();
-            const exported = JSON.parse(exportedString!);
-
-            // Assert: Checksum should be valid SHA-256 (64 hex chars)
-            expect(exported.checksum).toMatch(/^[a-f0-9]{64}$/);
+            expect(exported.s[0][0]).toBe('Fall 2025');  // first schedule name
+            expect(exported.s[1][0]).toBe('Spring 2026');  // second schedule name
         });
 
         it('should export empty state', async () => {
             // Arrange: Start with empty profile
-            // getInstance() already initializes, no need to call initialize()
 
             // Act
             const exportedString = await profileManager.exportData();
             const exported = JSON.parse(exportedString!);
 
             // Assert
-            expect(exported.schedules).toHaveLength(0);
-            expect(exported.activeScheduleId).toBeNull();
-            expect(exported.checksum).toBeDefined();
+            expect(exported.v).toBe("4");  // version 4
+            expect(exported.s).toHaveLength(0);  // no schedules
+            expect(exported.a).toBe(0);  // no active schedule (defaults to 0)
         });
 
         it('should round-trip import/export without data loss', async () => {
-            // Arrange: Create complex sync data
-            const originalData = await createSyncData({
+            // Arrange: Create complex data
+            const importData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'schedule-1',
@@ -372,31 +331,27 @@ describe('ProfileStateManager Import/Export Integration', () => {
                     })
                 ],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             // Act: Import then export
-            await profileManager.importData(originalData);
+            await profileManager.importData(importData);
             const exportedString = await profileManager.exportData();
             const exported = JSON.parse(exportedString!);
 
-            // Assert: Data should be preserved (ignoring checksum/timestamp)
-            expect(exported.schedules).toHaveLength(originalData.schedules.length);
-            expect(exported.activeScheduleId).toBe(originalData.activeScheduleId);
+            // Assert: Minimal format structure
+            expect(exported.v).toBe("4");
+            expect(exported.s).toHaveLength(1);
+            expect(exported.a).toBe(0);  // active schedule index
 
-            const exportedSchedule = exported.schedules[0];
-            const originalSchedule = originalData.schedules[0];
+            // Verify schedule content
+            expect(exported.s[0][0]).toBe('Complex Schedule');  // schedule name
 
-            expect(exportedSchedule.id).toBe(originalSchedule.id);
-            expect(exportedSchedule.name).toBe(originalSchedule.name);
-            expect(exportedSchedule.selectedCourses).toHaveLength(originalSchedule.selectedCourses.length);
-
-            // Check course details preserved
-            const exportedCourse = exportedSchedule.selectedCourses[0];
-            const originalCourse = originalSchedule.selectedCourses[0];
-
-            expect(exportedCourse.courseId).toBe(originalCourse.courseId);
-            expect(exportedCourse.selectedSectionCrn).toEqual(originalCourse.selectedSectionCrn);
-            expect(exportedCourse.isRequired).toBe(originalCourse.isRequired);
+            // Verify courses in flat array format [courseId, crn, courseId, crn, ...]
+            const coursesArray = exported.s[0][1];
+            expect(coursesArray).toContain(REAL_COURSES.CS_1101.id);
+            expect(coursesArray).toContain(REAL_COURSES.CS_1101.crn);
+            expect(coursesArray).toContain(REAL_COURSES.MA_1021.id);
+            expect(coursesArray).toContain(REAL_COURSES.MA_1021.crn);
         });
     });
 
@@ -419,7 +374,7 @@ describe('ProfileStateManager Import/Export Integration', () => {
                 });
             });
 
-            const syncData = await createSyncData({
+            const jsonData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'compress-test',
@@ -428,24 +383,21 @@ describe('ProfileStateManager Import/Export Integration', () => {
                     })
                 ],
                 activeScheduleId: 'compress-test'
-            });
+            }, departments);
 
             // Act
-            await profileManager.importData(syncData);
+            await profileManager.importData(jsonData);
 
-            // Assert: Data should be stored (compression is internal to IndexedDB mock)
-            expect(mockIndexedDB.hasKey('wpi-planner-db', 'schedules', 'compress-test')).toBe(true);
-
-            // Verify we can retrieve the data correctly
+            // Assert: Verify we can retrieve the data correctly
             const schedules = profileManager.getAllSchedules();
-            const compressed = schedules.find(s => s.id === 'compress-test');
+            const compressed = schedules.find(s => s.name === 'Compression Test Schedule');
             expect(compressed).toBeDefined();
             expect(compressed!.selectedCourses).toHaveLength(20);
         });
 
         it('should decompress data when loading from IndexedDB', async () => {
             // Arrange: Import data (stored compressed)
-            const syncData = await createSyncData({
+            const jsonData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'decompress-test',
@@ -459,16 +411,15 @@ describe('ProfileStateManager Import/Export Integration', () => {
                     })
                 ],
                 activeScheduleId: 'decompress-test'
-            });
+            }, departments);
 
-            await profileManager.importData(syncData);
+            await profileManager.importData(jsonData);
 
             // Act: Get active schedule (data is already loaded)
             const loaded = profileManager.getActiveSchedule();
 
             // Assert: Data should be correctly decompressed
             expect(loaded).toBeDefined();
-            expect(loaded?.id).toBe('decompress-test');
             expect(loaded?.name).toBe('Decompression Test');
         });
     });
@@ -503,7 +454,7 @@ describe('ProfileStateManager Import/Export Integration', () => {
                 REAL_COURSES.CS_2102,
             ];
 
-            const largeData = await createSyncData({
+            const largeData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'large-schedule',
@@ -518,7 +469,7 @@ describe('ProfileStateManager Import/Export Integration', () => {
                     })
                 ],
                 activeScheduleId: 'large-schedule'
-            });
+            }, departments);
 
             // Act: Should import successfully
             const result = await profileManager.importData(largeData);
@@ -526,24 +477,26 @@ describe('ProfileStateManager Import/Export Integration', () => {
             // Assert
             expect(result.success).toBe(true);
             const schedules = profileManager.getAllSchedules();
-            expect(schedules.find(s => s.id === 'large-schedule')).toBeDefined();
+            expect(schedules.find(s => s.name === 'Large Schedule')).toBeDefined();
         });
 
-        it('should handle missing active schedule ID', async () => {
+        it('should handle invalid active schedule ID by defaulting to first schedule', async () => {
             // Arrange: Import data with invalid active schedule reference
-            const syncData = await createSyncData({
+            // In minimal format, invalid IDs default to index 0
+            const jsonData = await createMinimalSyncData({
                 schedules: [createSchedule({ id: 'schedule-1', name: 'Test' })],
                 activeScheduleId: 'non-existent-schedule-id'
-            });
+            }, departments);
 
             // Act
-            await profileManager.importData(syncData);
+            await profileManager.importData(jsonData);
 
-            // Assert: Should handle gracefully by setting activeSchedule to null when ID is invalid
+            // Assert: Should handle gracefully by setting first schedule as active
             const activeSchedule = profileManager.getActiveSchedule();
-            expect(activeSchedule).toBeNull();
+            expect(activeSchedule).toBeDefined();
+            expect(activeSchedule?.name).toBe('Test');
 
-            // But schedules should still be imported successfully
+            // Schedules should still be imported successfully
             const allSchedules = profileManager.getAllSchedules();
             expect(allSchedules.length).toBeGreaterThan(0);
         });

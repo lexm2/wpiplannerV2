@@ -1,6 +1,9 @@
 import { expect } from 'bun:test';
 import type { SyncData, ScheduleData, SelectedCourseData, SyncEvent } from '../../src/services/sync/types';
 import { checksumCalculator } from '../../src/services/sync/checksum';
+import { ApplicationState } from '../../src/types/ApplicationState';
+import { ScheduleState } from '../../src/types/ScheduleState';
+import type { Department } from '../../src/types/types';
 
 /**
  * Test Utilities for Cloud Sync Testing
@@ -90,6 +93,27 @@ export async function createSyncData(overrides?: Partial<SyncData>): Promise<Syn
         preferences,
         ...overrides,
     };
+}
+
+/**
+ * Convert SyncData to minimal format JSON string (v4)
+ *
+ * @param overrides - Optional overrides for SyncData
+ * @param courseCatalog - Course catalog for hydration
+ * @returns Minimal format JSON string
+ */
+export async function createMinimalSyncData(
+    overrides?: Partial<SyncData>,
+    courseCatalog?: Department[]
+): Promise<string> {
+    const syncData = await createSyncData(overrides);
+
+    if (!courseCatalog || courseCatalog.length === 0) {
+        throw new Error('Course catalog required for minimal format conversion');
+    }
+
+    const appState = ApplicationState.fromCloudFormat(syncData, courseCatalog);
+    return JSON.stringify(appState.toMinimalFormat(), null, 2);
 }
 
 /**
