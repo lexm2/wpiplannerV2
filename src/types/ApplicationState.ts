@@ -106,7 +106,7 @@ export class ApplicationState {
                     course.selectedSection?.crn.toString() ?? null
                 ])
             ]),
-            p: this.preferences ? {
+            p: this.preferences && this.preferences.preferredTimeRange ? {
                 t: [
                     this.preferences.preferredTimeRange.startTime.hours * 60 +
                         this.preferences.preferredTimeRange.startTime.minutes,

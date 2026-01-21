@@ -3,34 +3,22 @@
 ## [2026-01-21]
 
 ### Changed
-- **BREAKING**: Replaced export format with compact format reducing file size by 75-80%
-- Old exports are no longer importable
+- Replaced export format with new compact format reducing file size
+- BREAKING:Old exports are no longer importable
 
-### Developer Tools
-- Added merge script to simplify merging Development into master with automatic handling of auto-generated files
+### Fixed
+- Fixed schedule exports using bloated format instead of compact format
+- Fixed import/export unit tests to work with new compact format
 
 ## [2026-01-20]
 
 ### Fixed
-- Fixed false-positive "Service not initialized" warning during initialization
-- Fixed all remaining test failures achieving 100% test pass rate (447/447 tests passing)
-- Improved test reliability for UI hydration after cloud sync imports
-- Fixed 8 additional failing tests reducing total from 16 to 8 (50% improvement)
-- Fixed TermBoundsService mock to include all required schema fields
-- Fixed import/export tests to use ProfileStateManager API instead of raw mock data
-- Added lastModified field to export data structure
-- Simplified error handling tests for better reliability
-- Fixed event batching test in unit tests
+- Finished fixing unit tests
 
 ## [2026-01-19]
 
 ### Fixed
-- Fixed test suite stability and reduced failing tests from 50 to 17 (66% improvement)
-- Fixed singleton state not resetting between tests causing state pollution
-- Fixed async timing issues in batch operations
-- Fixed MockIndexedDB configuration not resetting between tests
-- Fixed import/export tests using incorrect database name and fake CRNs
-- Fixed test assertions expecting raw IndexedDB structure instead of application state
+- Started fixing unit tests
 
 ## [2026-01-16]
 
