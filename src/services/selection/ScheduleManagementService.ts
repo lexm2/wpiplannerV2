@@ -3,7 +3,6 @@ import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../.
 import { DataValidator } from '../../core/validation/DataValidator'
 import { CourseSelectionService } from './CourseSelectionService'
 import { ICSGenerator, ICSExportOptions, ICSExportResult } from '../../utils/icsGenerator'
-import { safeStringify } from '../../utils/jsonSerializer'
 
 export interface ScheduleOperationResult {
     success: boolean;
@@ -523,23 +522,35 @@ export class ScheduleManagementService {
     // Export/Import
     async exportSchedule(scheduleId: string): Promise<{ success: boolean; data?: string; error?: string }> {
         try {
-            const schedule = this.getScheduleById(scheduleId);
-            if (!schedule) {
+            const data = await this.profileStateManager.exportData();
+            if (!data) {
+                return {
+                    success: false,
+                    error: 'Export failed'
+                };
+            }
+
+            const parsed = JSON.parse(data);
+            const scheduleIndex = this.profileStateManager.getAllSchedules()
+                .findIndex(s => s.id === scheduleId);
+
+            if (scheduleIndex === -1) {
                 return {
                     success: false,
                     error: `Schedule with ID "${scheduleId}" not found`
                 };
             }
 
-            const exportData = {
-                version: '2.0',
-                timestamp: new Date().toISOString(),
-                schedule: schedule
+            const singleScheduleExport = {
+                v: parsed.v,
+                a: 0,
+                s: [parsed.s[scheduleIndex]],
+                p: parsed.p
             };
 
             return {
                 success: true,
-                data: safeStringify(exportData, 2)
+                data: JSON.stringify(singleScheduleExport, null, 2)
             };
         } catch (error) {
             return {
@@ -551,25 +562,16 @@ export class ScheduleManagementService {
 
     async exportAllSchedules(): Promise<{ success: boolean; data?: string; error?: string }> {
         try {
-            const state = this.profileStateManager.getState();
-            const allSchedules = state.schedules || [];
-
-            if (allSchedules.length === 0) {
+            const data = await this.profileStateManager.exportData();
+            if (!data) {
                 return {
                     success: false,
-                    error: 'No schedules to export'
+                    error: 'Export failed'
                 };
             }
-
-            const exportData = {
-                version: '2.0',
-                timestamp: new Date().toISOString(),
-                schedules: allSchedules
-            };
-
             return {
                 success: true,
-                data: safeStringify(exportData, 2)
+                data
             };
         } catch (error) {
             return {

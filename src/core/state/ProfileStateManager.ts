@@ -1,5 +1,6 @@
 import type { Schedule, SchedulePreferences, SelectedCourse, Course, Section, Department } from '../../types'
 import { ApplicationState } from '../../types'
+import { ScheduleState } from '../../types/ScheduleState'
 import type { TransactionResult } from '../storage'
 import { TransactionalStorageManager } from '../storage'
 import { getAllSections, createJSONReplacer, createJSONReviver, logger } from '../../utils'
