@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 21, 2026, 4:29 AM",
+  "generated": "Jan 21, 2026, 5:02 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -177074,7 +177074,7 @@
                 "crn": 340563,
                 "number": "S01",
                 "seats": 60,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -177093,7 +177093,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S01",
@@ -239909,7 +239909,7 @@
                 "number": "C01",
                 "seats": 18,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "TH 2500: Fundamentals of Technical Theatre. Cat I (1/3 units) This course introduces students to a variety of technical theatre disciplines, including scenery, lighting, sound, props, and costumes. Students will explore each technical element through a combination of lectures, demonstrations, and workshops, and will demonstrate their learning through group projects and other hands-on activities. Students may not receive credit for TH 2500 and either EN 2222 or TH 2222.",
@@ -239928,7 +239928,7 @@
                     "room": "Alden Hall GR Green Room",
                     "seats": 18,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -239947,7 +239947,7 @@
                     "room": "Little Theatre",
                     "seats": 18,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
