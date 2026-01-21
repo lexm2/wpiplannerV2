@@ -550,7 +550,7 @@ export class ScheduleManagementService {
 
             return {
                 success: true,
-                data: JSON.stringify(singleScheduleExport, null, 2)
+                data: JSON.stringify(singleScheduleExport)
             };
         } catch (error) {
             return {

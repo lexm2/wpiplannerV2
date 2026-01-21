@@ -113,7 +113,7 @@ export async function createMinimalSyncData(
     }
 
     const appState = ApplicationState.fromCloudFormat(syncData, courseCatalog);
-    return JSON.stringify(appState.toMinimalFormat(), null, 2);
+    return JSON.stringify(appState.toMinimalFormat());
 }
 
 /**

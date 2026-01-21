@@ -718,7 +718,7 @@ export class ProfileStateManager {
     async exportData(): Promise<string | null> {
         const appState = this.createApplicationState();
         const minimalData = appState.toMinimalFormat();
-        return JSON.stringify(minimalData, null, 2);
+        return JSON.stringify(minimalData);
     }
 
     private createApplicationState(): ApplicationState {
