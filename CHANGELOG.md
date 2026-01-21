@@ -7,6 +7,8 @@
 - BREAKING: Old exports (v3 and earlier) are no longer supported
 
 ### Fixed
+- Fixed term bounds data not loading correctly
+- Fixed ICS calendar events appearing one year in the future
 - Fixed schedule imports failing with "Import data does not contain valid schedules array" error
 - Fixed schedule exports using bloated format instead of compact format
 - Fixed import/export unit tests to work with new compact format
@@ -36,7 +38,7 @@
 ## [2026-01-15]
 
 ### Fixed
-- Fixed ICS calendar export generating blank files or "no courses found" error
+- Identified ICS calendar export generating blank files or "no courses found" error
 - Fixed header navigation and controls overlapping on smaller screens
 - Fixed schedule menu positioning and implemented CSS modules
 
