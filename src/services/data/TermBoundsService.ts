@@ -16,7 +16,7 @@ export class TermBoundsService {
 
     public async loadTermBounds(): Promise<void> {
         try {
-            const response = await fetch('/term-bounds.json');
+            const response = await fetch('./term-bounds.json');
             if (!response.ok) {
                 console.warn('[TermBoundsService] Failed to fetch term-bounds.json:', response.statusText);
                 return;

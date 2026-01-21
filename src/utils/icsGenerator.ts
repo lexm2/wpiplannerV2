@@ -113,7 +113,19 @@ export class ICSGenerator {
 
     static generateICS(schedule: Schedule, options: ICSExportOptions = {}): ICSExportResult {
         const timezone = options.timezone || this.DEFAULT_TIMEZONE;
-        const academicYear = options.academicYear || new Date().getFullYear();
+        let academicYear = options.academicYear;
+        if (!academicYear) {
+            const service = TermBoundsService.getInstance();
+            const data = service.getTermBoundsData();
+            if (data) {
+                academicYear = parseInt(data.academicYear.split('-')[0]);
+            } else {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth();
+                academicYear = month >= 7 ? year : year - 1;
+            }
+        }
 
         const calendar = ical({
             name: schedule.name,
