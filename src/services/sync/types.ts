@@ -195,3 +195,25 @@ export function toLegacyData(data: SyncData, deviceId: string): LegacyCloudState
         },
     };
 }
+
+// -----------------------------------------------------------------------------
+// Minimal Sync Format
+// -----------------------------------------------------------------------------
+
+export interface MinimalSyncData {
+    v: string;
+    a: number;
+    s: MinimalSchedule[];
+    p?: MinimalPreferences;
+}
+
+export type MinimalSchedule = [
+    string,
+    (string | null)[]
+];
+
+export interface MinimalPreferences {
+    t?: [number, number];
+    d?: number[];
+    th?: string;
+}
