@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
 import { ProfileStateManager } from '../../src/core/state/ProfileStateManager';
 import { MainController } from '../../src/ui/controllers/MainController';
 import type { SyncData } from '../../src/services/sync/types';
-import { createSyncData, createSchedule, createSelectedCourse, REAL_COURSES } from '../helpers/sync-test-utils';
+import { createSyncData, createMinimalSyncData, createSchedule, createSelectedCourse, REAL_COURSES } from '../helpers/sync-test-utils';
 import type { MockIndexedDB } from '../mocks/MockIndexedDB';
 import {
     createMockUIComponents,
@@ -41,6 +41,7 @@ describe('UI Hydration After Sync Import', () => {
     let mainController: MainController;
     let mockIndexedDB: MockIndexedDB;
     let mockUI: MockUIContext;
+    let departments: any[];
 
     beforeEach(async () => {
         // Get global mock IndexedDB
@@ -50,7 +51,7 @@ describe('UI Hydration After Sync Import', () => {
         ProfileStateManager.resetInstance();
         profileManager = ProfileStateManager.getInstance();
 
-        const departments = await loadCourseCatalog();
+        departments = await loadCourseCatalog();
         profileManager.setCourseData(departments);
 
         // Mock fetch for TermBoundsService and course data
@@ -137,7 +138,7 @@ describe('UI Hydration After Sync Import', () => {
     describe('Schedule UI Hydration', () => {
         it('should hydrate schedule UI after import', async () => {
             // Arrange: Create sync data with courses
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'schedule-1',
@@ -151,7 +152,7 @@ describe('UI Hydration After Sync Import', () => {
                     })
                 ],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             resetMockUIComponents(mockUI);
 
@@ -166,19 +167,25 @@ describe('UI Hydration After Sync Import', () => {
 
         it('should update schedule grid after import', async () => {
             // Arrange
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'schedule-1',
                         name: 'Test Schedule',
                         selectedCourses: [
-                            createSelectedCourse({ courseId: 'CS-1101' }),
-                            createSelectedCourse({ courseId: 'MA-1021' })
+                            createSelectedCourse({
+                                courseId: REAL_COURSES.CS_1101.id,
+                                selectedSectionCrn: REAL_COURSES.CS_1101.crn
+                            }),
+                            createSelectedCourse({
+                                courseId: REAL_COURSES.MA_1021.id,
+                                selectedSectionCrn: REAL_COURSES.MA_1021.crn
+                            })
                         ]
                     })
                 ],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             // Act
             await profileManager.importData(syncData);
@@ -192,16 +199,19 @@ describe('UI Hydration After Sync Import', () => {
 
         it('should clear schedule UI when importing empty schedule', async () => {
             // Arrange: Import schedule with courses first
-            const initialData = await createSyncData({
+            const initialData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'schedule-1',
                         name: 'Initial',
-                        selectedCourses: [createSelectedCourse({ courseId: 'CS-1101' })]
+                        selectedCourses: [createSelectedCourse({
+                            courseId: REAL_COURSES.CS_1101.id,
+                            selectedSectionCrn: REAL_COURSES.CS_1101.crn
+                        })]
                     })
                 ],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             await profileManager.importData(initialData);
 
@@ -209,7 +219,7 @@ describe('UI Hydration After Sync Import', () => {
             resetMockUIComponents(mockUI);
 
             // Act: Import empty schedule
-            const emptyData = await createSyncData({
+            const emptyData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'schedule-2',
@@ -218,7 +228,7 @@ describe('UI Hydration After Sync Import', () => {
                     })
                 ],
                 activeScheduleId: 'schedule-2'
-            });
+            }, departments);
 
             await profileManager.importData(emptyData);
             await waitForEventQueue();
@@ -231,18 +241,21 @@ describe('UI Hydration After Sync Import', () => {
     describe('Course Selection UI Hydration', () => {
         it('should hydrate course selection UI after import', async () => {
             // Arrange
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'schedule-1',
                         name: 'Test',
                         selectedCourses: [
-                            createSelectedCourse({ courseId: 'CS-1101' })
+                            createSelectedCourse({
+                                courseId: REAL_COURSES.CS_1101.id,
+                                selectedSectionCrn: REAL_COURSES.CS_1101.crn
+                            })
                         ]
                     })
                 ],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             // Act
             await profileManager.importData(syncData);
@@ -256,7 +269,7 @@ describe('UI Hydration After Sync Import', () => {
 
         it('should update course selection UI with multiple courses', async () => {
             // Arrange: Multiple selected courses
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'schedule-1',
@@ -286,7 +299,7 @@ describe('UI Hydration After Sync Import', () => {
                     })
                 ],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             // Act
             await profileManager.importData(syncData);
@@ -348,10 +361,10 @@ describe('UI Hydration After Sync Import', () => {
 
         it('should handle consumers added after initial data load', async () => {
             // Arrange: Import data first
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [createSchedule({ id: 'schedule-1', name: 'Test' })],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             await profileManager.importData(syncData);
 
@@ -376,16 +389,19 @@ describe('UI Hydration After Sync Import', () => {
     describe('Search and Filter UI Hydration', () => {
         it('should update search index after import', async () => {
             // Arrange
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'schedule-1',
                         name: 'Test',
-                        selectedCourses: [createSelectedCourse({ courseId: 'CS-1101' })]
+                        selectedCourses: [createSelectedCourse({
+                            courseId: REAL_COURSES.CS_1101.id,
+                            selectedSectionCrn: REAL_COURSES.CS_1101.crn
+                        })]
                     })
                 ],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             // Act: Import data
             await profileManager.importData(syncData);
@@ -399,10 +415,10 @@ describe('UI Hydration After Sync Import', () => {
 
         it('should reset filters after import', async () => {
             // Arrange
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [createSchedule({ id: 'schedule-1', name: 'Test' })],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             // Act
             await profileManager.importData(syncData);
@@ -438,14 +454,14 @@ describe('UI Hydration After Sync Import', () => {
     describe('Schedule Picker Modal Hydration', () => {
         it('should refresh schedule list after import', async () => {
             // Arrange: Import multiple schedules
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({ id: 'schedule-1', name: 'Fall 2025' }),
                     createSchedule({ id: 'schedule-2', name: 'Spring 2026' }),
                     createSchedule({ id: 'schedule-3', name: 'Summer 2026' })
                 ],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             resetMockUIComponents(mockUI);
 
@@ -460,41 +476,41 @@ describe('UI Hydration After Sync Import', () => {
             expect(mockUI.schedulePickerModal.refreshScheduleList).toHaveBeenCalled();
 
             const allSchedules = profileManager.getAllSchedules();
-            const scheduleIds = allSchedules.map(s => s.id);
-            expect(scheduleIds).toContain('schedule-1');
-            expect(scheduleIds).toContain('schedule-2');
-            expect(scheduleIds).toContain('schedule-3');
-            expect(allSchedules.find(s => s.id === 'schedule-1')?.name).toBe('Fall 2025');
+            const importedSchedules = allSchedules.filter(s => s.name !== 'My Schedule');
+            expect(importedSchedules).toHaveLength(3);
+            expect(importedSchedules.map(s => s.name)).toEqual(['Fall 2025', 'Spring 2026', 'Summer 2026']);
         });
 
         it('should update active schedule indicator', async () => {
             // Arrange
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({ id: 'schedule-1', name: 'Schedule 1' }),
                     createSchedule({ id: 'schedule-2', name: 'Schedule 2' })
                 ],
                 activeScheduleId: 'schedule-2'
-            });
+            }, departments);
 
             // Act
             await profileManager.importData(syncData);
 
-            // Manually notify of active schedule change
-            mockUI.schedulePickerModal.onActiveScheduleChange('schedule-2');
+            const activeSchedule = profileManager.getActiveSchedule();
+            expect(activeSchedule?.name).toBe('Schedule 2');
+
+            mockUI.schedulePickerModal.onActiveScheduleChange(activeSchedule!.id);
 
             // Assert
-            expect(mockUI.schedulePickerModal.onActiveScheduleChange).toHaveBeenCalledWith('schedule-2');
+            expect(mockUI.schedulePickerModal.onActiveScheduleChange).toHaveBeenCalledWith(activeSchedule!.id);
         });
     });
 
     describe('Cloud Status Button Hydration', () => {
         it('should update cloud status after successful import', async () => {
             // Arrange
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [createSchedule({ id: 'schedule-1', name: 'Test' })],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             // Act: Import data
             await profileManager.importData(syncData);
@@ -539,7 +555,7 @@ describe('UI Hydration After Sync Import', () => {
     describe('Complete UI Hydration Flow', () => {
         it('should hydrate all UI components after sync import', async () => {
             // Arrange: Complete sync data
-            const syncData = await createSyncData({
+            const syncData = await createMinimalSyncData({
                 schedules: [
                     createSchedule({
                         id: 'schedule-1',
@@ -559,7 +575,7 @@ describe('UI Hydration After Sync Import', () => {
                     })
                 ],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
             // Mock course data
             const mockDepartments = [
@@ -601,17 +617,17 @@ describe('UI Hydration After Sync Import', () => {
 
             // Verify data was imported
             const allSchedules = profileManager.getAllSchedules();
-            const schedule = allSchedules.find(s => s.id === 'schedule-1');
-            expect(schedule).toBeDefined();
-            expect(schedule?.name).toBe('Complete Test Schedule');
+            const importedSchedule = allSchedules.find(s => s.name === 'Complete Test Schedule');
+            expect(importedSchedule).toBeDefined();
+            expect(importedSchedule?.name).toBe('Complete Test Schedule');
         });
 
         it('should handle hydration with no schedules', async () => {
             // Arrange: Empty sync data
-            const emptyData = await createSyncData({
+            const emptyData = await createMinimalSyncData({
                 schedules: [],
                 activeScheduleId: null
-            });
+            }, departments);
 
             // Act
             await profileManager.importData(emptyData);
@@ -628,15 +644,15 @@ describe('UI Hydration After Sync Import', () => {
 
         it('should handle rapid successive imports', async () => {
             // Arrange: Two different sync data sets
-            const syncData1 = await createSyncData({
+            const syncData1 = await createMinimalSyncData({
                 schedules: [createSchedule({ id: 'schedule-1', name: 'First' })],
                 activeScheduleId: 'schedule-1'
-            });
+            }, departments);
 
-            const syncData2 = await createSyncData({
+            const syncData2 = await createMinimalSyncData({
                 schedules: [createSchedule({ id: 'schedule-2', name: 'Second' })],
                 activeScheduleId: 'schedule-2'
-            });
+            }, departments);
 
             // Act: Import rapidly
             await profileManager.importData(syncData1);
@@ -649,7 +665,6 @@ describe('UI Hydration After Sync Import', () => {
 
             // Final state should be from second import
             const activeSchedule = profileManager.getActiveSchedule();
-            expect(activeSchedule?.id).toBe('schedule-2');
             expect(activeSchedule?.name).toBe('Second');
         });
     });

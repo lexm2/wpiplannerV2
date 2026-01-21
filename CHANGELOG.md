@@ -10,6 +10,7 @@
 - Fixed schedule imports failing with "Import data does not contain valid schedules array" error
 - Fixed schedule exports using bloated format instead of compact format
 - Fixed import/export unit tests to work with new compact format
+- Fixed UI hydration tests to work with v4 minimal format
 
 ## [2026-01-20]
 
