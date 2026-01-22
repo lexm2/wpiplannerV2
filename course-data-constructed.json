@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 22, 2026, 9:36 AM",
+  "generated": "Jan 22, 2026, 9:58 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -52505,7 +52505,7 @@
                 "crn": 343107,
                 "number": "S01",
                 "seats": 20,
-                "seatsAvailable": 4,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -52524,7 +52524,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 20,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
@@ -54872,7 +54872,7 @@
                 "crn": 343107,
                 "number": "S01",
                 "seats": 20,
-                "seatsAvailable": 4,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -54891,7 +54891,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 20,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
