@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 22, 2026, 9:18 PM",
+  "generated": "Jan 22, 2026, 9:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -206305,7 +206305,7 @@
                 "crn": 336754,
                 "number": "C01",
                 "seats": 40,
-                "seatsAvailable": 30,
+                "seatsAvailable": 31,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -206324,7 +206324,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 40,
-                    "seatsAvailable": 30,
+                    "seatsAvailable": 31,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
@@ -248194,7 +248194,7 @@
                 "crn": 337798,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -248213,7 +248213,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
