@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 22, 2026, 11:46 AM",
+  "generated": "Jan 22, 2026, 12:40 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -50701,7 +50701,7 @@
                 "number": "S01",
                 "seats": 30,
                 "seatsAvailable": 10,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "An introduction to the theory and design of database management systems. Topics covered include internals of database management systems, fundamental concepts in database theory, and database application design and development. In particular, logical design and conceptual modeling, physical database design strategies, relational data model and query languages, query optimization, transaction management and distributed databases. Typically there are hands-on assignments and/or a course project. Selected topics from the current database research literature may be touched upon as well. (Prerequisite: CS 5084 would be helpful.)",
@@ -50720,7 +50720,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 10,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [],
