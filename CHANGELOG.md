@@ -2,8 +2,12 @@
 
 ## [2026-01-23]
 
+### Improved
+- Right panel now adjusts its width based on screen size for better proportions on smaller displays
+- Panel width preferences are saved and persist across sessions
+
 ### Removed
-- Removed all cloud sync functionality and infrastructure 
+- Removed all cloud sync functionality and infrastructure
 - Im just trying to get a clean product that I would be happy putting on the offical site so cloud save will return eventually
 
 ## [2026-01-21]
