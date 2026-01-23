@@ -8,6 +8,7 @@
 ### Improved
 - Right panel now adjusts its width based on screen size for better proportions on smaller displays
 - Panel width preferences are saved and persist across sessions
+- Added tooltip to full term badges
 
 ### Fixed
 - Course select button now reliably shows checkmark icon when selected

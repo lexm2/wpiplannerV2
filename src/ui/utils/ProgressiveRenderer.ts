@@ -226,7 +226,7 @@ export class ProgressiveRenderer {
                                         </span>`;
                                     }
                                     const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
-                                    return `<span class="term-badge ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}">
+                                    return `<span class="term-badge ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}"${allFull ? ' title="All sections full"' : ''}>
                                         <span class="term-letter">${Validators.escapeHtml(term)}</span>
                                         ${getInlineSVG('PLUS', 'term-icon')}
                                     </span>`;
@@ -264,7 +264,7 @@ export class ProgressiveRenderer {
 
                                     const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
                                     return `<div class="term-sections-container" data-term="${Validators.escapeHtml(term)}" style="display: none;">
-                                        <span class="term-badge active ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}">
+                                        <span class="term-badge active ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}"${allFull ? ' title="All sections full"' : ''}>
                                             <span class="term-letter">${Validators.escapeHtml(term)}</span>
                                             ${getInlineSVG('PLUS', 'term-icon')}
                                         </span>
