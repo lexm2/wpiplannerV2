@@ -1,8 +1,8 @@
 import type { Course, Section, Department } from './types';
 import type { SelectedCourse, ScheduleCombination, Schedule, LocalCalendarEvent } from './schedule';
-import type { ScheduleData, SelectedCourseData } from '../services/sync/types';
 import type { ConnectedCalendar } from '../services/calendar/types';
-import { checksumCalculator } from '../services/sync/checksum';
+import type { ScheduleData, SelectedCourseData } from './sync-stubs';
+import { checksumCalculator } from './sync-stubs';
 import { getAllSections } from '../utils/courseUtils';
 
 /**
@@ -10,14 +10,7 @@ import { getAllSections } from '../utils/courseUtils';
  *
  * This class provides:
  * - Storage of full objects (Course, Section) for app use
- * - Built-in checksum calculation methods (object-oriented)
- * - Cloud serialization (IDs only) for efficient sync
  * - Single source of truth for schedule data
- *
- * Data Flow:
- * - Cloud stores IDs only (ScheduleData)
- * - App uses full objects (ScheduleState)
- * - Conversion happens at cloud boundary via toCloudFormat/fromCloudFormat
  */
 export class ScheduleState {
     readonly id: string;
@@ -48,72 +41,34 @@ export class ScheduleState {
     }
 
     /**
-     * Calculate checksum for this schedule's data
-     *
-     * Uses cloud format (IDs only) for consistent checksums across devices.
-     *
-     * @returns 64-character SHA-256 hash
-     */
-    async calculateChecksum(): Promise<string> {
-        const cloudData = this.toCloudFormat();
-        return checksumCalculator.calculateChecksum({
-            version: '3.0',
-            activeScheduleId: null, // Not included in schedule-level checksum
-            schedules: [cloudData],
-            preferences: undefined
-        });
-    }
-
-    /**
-     * Verify checksum matches expected value
-     *
-     * @param expectedChecksum - Expected checksum to compare against
-     * @returns True if checksum matches
-     */
-    async verifyChecksum(expectedChecksum: string): Promise<boolean> {
-        const calculated = await this.calculateChecksum();
-        return calculated === expectedChecksum;
-    }
-
-    /**
-     * Convert to cloud format (IDs only) for efficient storage
-     *
-     * This is the boundary where full objects → IDs conversion happens.
-     * NOTE: localEvents are intentionally excluded - they are stored locally only.
+     * Convert to export format (IDs only) for local storage
      *
      * @returns ScheduleData with IDs only
      */
     toCloudFormat(): ScheduleData {
-        // NOTE: localEvents intentionally omitted - not synced to cloud
         return {
             id: this.id,
             name: this.name,
             timestamp: this.timestamp,
-            selectedCourses: this.selectedCourses.map(sc => {
-                const courseData: SelectedCourseData = {
-                    courseId: sc.course.id,
-                    selectedSectionCrn: sc.selectedSection?.crn.toString(),
-                    lockedSectionCrn: sc.lockedSections.size > 0
-                        ? Array.from(sc.lockedSections)[0]
-                        : undefined,
-                    isRequired: sc.isRequired,
-                    timestamp: this.timestamp
-                };
-                return courseData;
-            }),
+            selectedCourses: this.selectedCourses.map(sc => ({
+                courseId: sc.course.id,
+                selectedSectionCrn: sc.selectedSection?.crn.toString(),
+                lockedSectionCrn: sc.lockedSections.size > 0
+                    ? Array.from(sc.lockedSections)[0]
+                    : undefined,
+                isRequired: sc.isRequired,
+                timestamp: this.timestamp
+            })),
             connectedCalendar: this.connectedCalendar
         };
     }
 
     /**
-     * Create from cloud format (IDs) by hydrating with full objects
+     * Create from export format (IDs) by hydrating with full objects
      *
-     * This is the boundary where IDs → full objects conversion happens.
-     *
-     * @param cloudData - Cloud format with IDs only
+     * @param cloudData - Export format with IDs only
      * @param courseCatalog - Department catalog to resolve course references
      * @returns ScheduleState with full objects
-     * @throws Error if course/section not found in catalog
      */
     static fromCloudFormat(
         cloudData: ScheduleData,
@@ -125,8 +80,7 @@ export class ScheduleState {
             const course = findCourseById(courseData.courseId, courseCatalog);
             if (!course) {
                 throw new Error(
-                    `Course ${courseData.courseId} not found in catalog. ` +
-                    `The course may have been removed or catalog needs updating.`
+                    `Course ${courseData.courseId} not found in catalog`
                 );
             }
 
@@ -135,8 +89,7 @@ export class ScheduleState {
                 section = findSectionByCRN(course, courseData.selectedSectionCrn);
                 if (!section) {
                     throw new Error(
-                        `Section CRN ${courseData.selectedSectionCrn} not found for ` +
-                        `course ${courseData.courseId}. Section may no longer be offered.`
+                        `Section CRN ${courseData.selectedSectionCrn} not found`
                     );
                 }
             }
@@ -161,10 +114,10 @@ export class ScheduleState {
             cloudData.id,
             cloudData.name,
             selectedCourses,
-            [], // generatedSchedules not synced to cloud
+            [],
             cloudData.timestamp || Date.now(),
             cloudData.connectedCalendar,
-            [] // localEvents not synced to cloud - they stay local
+            []
         );
     }
 

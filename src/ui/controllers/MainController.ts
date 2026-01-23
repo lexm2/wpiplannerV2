@@ -27,12 +27,6 @@ import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { StorageService } from '../../services/selection/StorageService'
 import { ThemeManager } from '../../themes/ThemeManager'
 import { getInlineSVG } from '../../utils/iconPaths'
-import { CloudStatusButton } from '../components/CloudStatusButton'
-import { syncManager } from '../../services/sync/SyncManager'
-import { providerRegistry } from '../../services/sync/ProviderRegistry'
-import { syncEventBus } from '../../services/sync/SyncEventBus'
-import type { ConflictInfo, SyncData } from '../../services/sync/types'
-import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
 import { ChangelogModal } from '../components/ChangelogModal'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { TermBoundsService } from '../../services/data/TermBoundsService'
@@ -65,10 +59,7 @@ export class MainController {
     private operationManager: OperationManager;
     private debouncedSearch: DebouncedOperation;
     private scheduleManagementService: ScheduleManagementService;
-    private cloudStatusButton: CloudStatusButton;
-    private conflictResolutionModal: ConflictResolutionModal;
     private changelogModal: ChangelogModal;
-    private cloudSyncMenuItem: HTMLButtonElement | null = null;
     private resizablePanel: ResizablePanel | null = null;
     private allDepartments: Department[] = [];
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
@@ -110,9 +101,6 @@ export class MainController {
         this.operationManager = new OperationManager();
         this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
 
-        // Sync UI components (no provider currently configured)
-        this.cloudStatusButton = new CloudStatusButton('cloud-status-button-container');
-        this.conflictResolutionModal = new ConflictResolutionModal(this.modalService);
         this.changelogModal = new ChangelogModal(this.modalService);
 
         // Initialize controllers
@@ -267,7 +255,6 @@ export class MainController {
             }, 500);
 
             this.setupEventListeners();
-            this.setupCloudStatusButtonListener();
             this.setupCourseSelectionListener();
             this.setupScheduleChangeListener();
 
@@ -1137,31 +1124,6 @@ export class MainController {
     private previousSelectedCoursesCount = 0;
     private previousSelectedCoursesMap = new Map<string, string | null>();
 
-    private setupCloudStatusButtonListener(): void {
-        this.profileStateManager.addListener((event, state) => {
-            this.cloudStatusButton.onStateChange(event, state);
-            this.updateCloudSyncMenuItem();
-        });
-    }
-
-    private updateCloudSyncMenuItem(): void {
-        if (!this.cloudSyncMenuItem) return;
-
-        const icon = this.cloudStatusButton.getCurrentIcon() || 'CALENDAR_UP';
-        const text = this.cloudStatusButton.getCurrentText();
-
-        const iconElement = this.cloudSyncMenuItem.querySelector('.menu-item-icon');
-        const textElement = this.cloudSyncMenuItem.querySelector('span');
-
-        if (iconElement) {
-            iconElement.outerHTML = getInlineSVG(icon, 'menu-item-icon');
-        }
-
-        if (textElement) {
-            textElement.textContent = text;
-        }
-    }
-
     private setupScheduleChangeListener(): void {
         this.scheduleManagementService.onActiveScheduleChange((_activeSchedule, event) => {
             this.updateSchedulePickerButton();
@@ -1499,16 +1461,6 @@ export class MainController {
                     this.closeSettingsMenu();
                 },
                 checkDisabled: () => !this.profileStateManager.canRedo()
-            },
-            {
-                icon: this.cloudStatusButton.getCurrentIcon() || 'CALENDAR_UP',
-                label: this.cloudStatusButton.getCurrentText(),
-                id: 'settings-cloud-sync-btn',
-                action: async () => {
-                    await this.cloudStatusButton.triggerClick();
-                    this.closeSettingsMenu();
-                },
-                isCloudSync: true
             }
         ];
 
@@ -1528,11 +1480,6 @@ export class MainController {
             // Check if should be disabled
             if (item.checkDisabled && item.checkDisabled()) {
                 menuItem.disabled = true;
-            }
-
-            // Store reference to cloud sync menu item
-            if ((item as any).isCloudSync) {
-                this.cloudSyncMenuItem = menuItem;
             }
 
             // Add click handler

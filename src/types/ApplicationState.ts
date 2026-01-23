@@ -1,10 +1,11 @@
 import type { Department } from './types';
 import type { SchedulePreferences } from './schedule';
-import type { SyncData, MinimalSyncData } from '../services/sync/types';
+import type { MinimalSyncData } from './export';
+import { dayToNumber, numberToDay, minutesToTime } from './export';
+import type { SyncData } from './sync-stubs';
+import { checksumCalculator } from './sync-stubs';
 import { ScheduleState, findCourseById, findSectionByCRN } from './ScheduleState';
-import { checksumCalculator } from '../services/sync/checksum';
 import LZString from 'lz-string';
-import { dayToNumber, numberToDay, minutesToTime } from '../services/sync/utils';
 import type { SelectedCourse } from './schedule';
 
 /**
@@ -12,8 +13,7 @@ import type { SelectedCourse } from './schedule';
  *
  * This class:
  * - Wraps multiple ScheduleState instances
- * - Manages application-wide checksum
- * - Provides conversion to/from cloud SyncData format
+ * - Provides conversion to/from compact export format
  * - Represents the complete exportable/importable state
  */
 export class ApplicationState {

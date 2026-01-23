@@ -50,7 +50,6 @@ src/
 │   ├── filtering/          # High-level filtering
 │   ├── scheduling/         # Schedule generation
 │   ├── selection/          # Course/schedule selection
-│   ├── sync/               # Cloud synchronization
 │   └── ui/                 # UI services
 ├── ui/                     # User interface
 │   ├── controllers/        # View controllers
@@ -76,7 +75,6 @@ Application bootstrapper that initializes the entire application.
 **Responsibilities:**
 - Imports global styles
 - Creates [MainController](../src/ui/controllers/MainController.ts) instance
-- Initializes [SyncEventBus](../src/services/sync/SyncEventBus.ts) with debug logging
 - Exposes `mainController` to window for development/testing
 
 **Connects to:**
@@ -158,7 +156,6 @@ Low-level IndexedDB operations wrapper.
 **Connects to:**
 - [TransactionalStorageManager](../src/core/storage/TransactionalStorageManager.ts) - Persistence backend
 - [UndoRedoManager](../src/core/state/UndoRedoManager.ts) - History management
-- [SyncEventBus](../src/services/sync/SyncEventBus.ts) - Emits `local-save-completed`
 - [CourseSelectionService](../src/services/selection/CourseSelectionService.ts) - Consumes state
 - [ScheduleManagementService](../src/services/selection/ScheduleManagementService.ts) - Consumes state
 
@@ -479,122 +476,6 @@ Scores schedules based on user preferences.
 
 ---
 
-### Sync (`src/services/sync/`)
-
-#### [SyncManager.ts](../src/services/sync/SyncManager.ts)
-
-**Singleton** - Main orchestrator for cloud sync infrastructure.
-
-**Status:** Provider implementations removed. Infrastructure preserved for future use.
-
-**Responsibilities:**
-- SSO conflict check on sign-in
-- Push-only sync model (local → cloud)
-- Debounced push (3 second delay)
-- Conflict detection and resolution
-- Ready to accept any CloudProvider implementation
-
-**Key Methods:**
-- `handleSignIn()` - Check for conflicts on login
-- `resolveConflict()` - Handle user conflict choice
-- `schedulePush()` - Debounced cloud push
-- `pushToCloud()` - Immediate push
-- `setProvider()` - Set active cloud provider
-- `getCurrentProvider()` - Get current provider
-
-**Conflict Resolution Options:**
-- `cancel` - Sign out, discard changes
-- `local` - Push local data (overwrite cloud)
-- `cloud` - Import cloud data locally
-
-**Connects to:**
-- [SyncEventBus](../src/services/sync/SyncEventBus.ts) - Event communication
-- [CloudProviderRegistry](../src/services/sync/CloudProviderRegistry.ts) - Provider access
-- [ProfileStateManager](../src/core/state/ProfileStateManager.ts) - State access
-- [ConflictResolutionModal](../src/ui/components/ConflictResolutionModal.ts) - UI
-
-#### [SyncEventBus.ts](../src/services/sync/SyncEventBus.ts)
-
-**Singleton** - Pub/Sub event system for sync operations.
-
-**Status:** Active infrastructure, provider-agnostic.
-
-**Event Types:**
-- `auth-changed` - Authentication status changed
-- `sync-conflict` - Conflict detected during sign-in
-- `sync-resolved` - User resolved conflict
-- `sync-pushed` - Successful push to cloud
-- `sync-failed` - Sync operation failed
-- `sync-started` - Sync started
-- `local-save-completed` - Local data saved (triggers push)
-- `offline-mode` - Browser went offline
-- `online-mode` - Browser back online
-- `silent-auth-completed` - Silent auth on startup
-
-**Key Methods:**
-- `on(eventType, listener)` - Subscribe (returns unsubscribe)
-- `off(eventType, listener)` - Unsubscribe
-- `emit(event)` - Emit to subscribers
-- Wildcard `'*'` for all events
-
-**Connects to:**
-- [SyncManager](../src/services/sync/SyncManager.ts) - Emits/listens events
-- [ProfileStateManager](../src/core/state/ProfileStateManager.ts) - Emits `local-save-completed`
-- [CloudStatusButton](../src/ui/components/CloudStatusButton.ts) - UI status
-
-#### [ProviderRegistry.ts](../src/services/sync/ProviderRegistry.ts)
-
-Registry pattern for cloud providers.
-
-**Status:** Active infrastructure, no providers currently registered.
-
-**Responsibilities:**
-- Register cloud providers by ID
-- Provider lookup
-- Support multiple providers
-- Ready to accept any CloudProvider implementation
-
-**Connects to:**
-- [SyncManager](../src/services/sync/SyncManager.ts) - Uses providers
-
-**Note:** Provider implementations removed. To re-enable cloud sync, implement the CloudProvider interface and register it with this registry.
-
-#### [checksum.ts](../src/services/sync/checksum.ts)
-
-SHA-256 checksum calculation for sync data integrity.
-
-**Status:** Active infrastructure, provider-agnostic.
-
-**Connects to:**
-- [SyncManager](../src/services/sync/SyncManager.ts) - Conflict detection
-- [ApplicationState](../src/types/ApplicationState.ts) - Checksum methods
-
-#### [schemas.ts](../src/services/sync/schemas.ts)
-
-Zod validation schemas for sync data.
-
-**Status:** Active infrastructure, provider-agnostic.
-
-#### Cloud Providers
-
-**Status:** All provider implementations removed.
-
-The cloud sync infrastructure is fully preserved but no provider implementations currently exist. To re-enable cloud sync:
-
-1. Create a provider implementation at `/src/services/sync/providers/[name]/[Name]Provider.ts`
-2. Implement the `CloudProvider` interface from `/src/services/sync/types.ts`
-3. Create provider config at `/src/config/[name].config.ts`
-4. Register in MainController:
-   ```typescript
-   const provider = new [Name]Provider();
-   providerRegistry.register(provider);
-   syncManager.setProvider('[name]');
-   ```
-
-All infrastructure (SyncManager, SyncEventBus, UI components, conflict resolution) will work immediately.
-
----
-
 ### External (`src/services/external/`)
 
 #### [RateMyProfessorService.ts](../src/services/external/RateMyProfessorService.ts)
@@ -705,8 +586,7 @@ Application orchestrator - initializes and wires all services.
 3. ThemeManager
 4. CourseDataService
 5. CourseSelectionService + ScheduleManagementService
-6. CloudStatusButton + ConflictResolutionModal (sync UI components)
-7. All UI controllers
+6. All UI controllers
 
 **Connects to:**
 - All services and controllers (orchestrator)
@@ -795,10 +675,7 @@ Transient UI state management.
 
 #### [TimestampManager.ts](../src/ui/controllers/TimestampManager.ts)
 
-Sync timestamp tracking and display.
-
-**Connects to:**
-- [SyncEventBus](../src/services/sync/SyncEventBus.ts) - Sync events
+Timestamp tracking and display for course data updates.
 
 ---
 
@@ -818,42 +695,12 @@ Theme switching UI.
 - [ThemeManager](../src/themes/) - Theme state
 - [StorageService](../src/services/selection/StorageService.ts) - Theme persistence
 
-#### [CloudStatusButton.ts](../src/ui/components/CloudStatusButton.ts)
-
-Cloud sync status indicator.
-
-**Status:** Active, shows "unavailable" state when no provider is configured.
-
-**Responsibilities:**
-- Display sync status (synced, syncing, offline, unavailable)
-- Handle sign in/out clicks
-- Show last sync time
-- Provider-agnostic design
-
-**Button States:**
-- `unavailable` - No provider configured (button disabled)
-- `unauthenticated` - Provider available, not signed in
-- `authenticated-idle` - Signed in, no operations
-- `local-saving` / `cloud-uploading` / `cloud-downloading` - Active operations
-- `error` / `conflict-pending` - Error states
-
-**Connects to:**
-- [SyncEventBus](../src/services/sync/SyncEventBus.ts) - Sync events
-- [SyncManager](../src/services/sync/SyncManager.ts) - Sync operations
-
 #### [SchedulePickerModal.ts](../src/ui/components/SchedulePickerModal.ts)
 
 Multi-schedule selection dialog.
 
 **Connects to:**
 - [ScheduleManagementService](../src/services/selection/ScheduleManagementService.ts) - Schedule list
-
-#### [ConflictResolutionModal.ts](../src/ui/components/ConflictResolutionModal.ts)
-
-Sync conflict resolution UI.
-
-**Connects to:**
-- [SyncManager](../src/services/sync/SyncManager.ts) - Resolution handling
 
 #### [CourseConflictModal.ts](../src/ui/components/CourseConflictModal.ts)
 
@@ -988,7 +835,7 @@ Container for multiple schedules with version/timestamp.
 - `upsertSchedule()` / `removeSchedule()` - Immutable updates
 - `getActiveSchedule()` - Query methods
 
-**Used by:** [ProfileStateManager](../src/core/state/ProfileStateManager.ts), [SyncManager](../src/services/sync/SyncManager.ts)
+**Used by:** [ProfileStateManager](../src/core/state/ProfileStateManager.ts)
 
 ### [ScheduleState.ts](../src/types/ScheduleState.ts)
 
@@ -1041,9 +888,7 @@ Modal-related type definitions.
 
 ### Config (`src/config/`)
 
-**Status:** Cloud provider configs removed.
-
-Previously contained configuration files for cloud providers (Google Drive, OneDrive). These have been removed along with their implementations. Future cloud provider implementations should add their config files here.
+Configuration files for the application.
 
 ### Themes (`src/themes/`)
 
@@ -1079,12 +924,6 @@ ProfileStateManager.withStateUpdate()
 State updated + emitEvent('courses_changed')
     ↓
 TransactionalStorageManager.save()
-    ↓
-SyncEventBus.emit('local-save-completed')
-    ↓
-SyncManager.schedulePush() (debounced 3s)
-    ↓
-CloudProvider.pushData() → Cloud
 ```
 
 ### Data Loading Flow
@@ -1102,34 +941,6 @@ CourseSelectionService.initialize() + health check
     ↓
 UI Controllers render with loaded data
 ```
-
-### Cloud Sync Flow
-
-**Status:** Infrastructure preserved, no active provider.
-
-When a cloud provider is implemented and registered, the flow would be:
-
-```
-User signs in
-    ↓
-CloudProvider.signIn()
-    ↓
-SyncManager.signIn() - Authenticate only
-    ↓
-SyncManager.performInitialSync() - Pull cloud data + compare checksums
-    ↓
-If conflict: emit 'sync-conflict' → ConflictResolutionModal
-    ↓
-User resolves: local/cloud/cancel
-    ↓
-SyncManager.resolveConflict()
-    ↓
-Push/import data accordingly
-    ↓
-SyncEventBus.emit('sync-resolved')
-```
-
-Currently, CloudStatusButton displays "Cloud sync unavailable" since no provider is registered.
 
 ### Filter Application Flow
 
@@ -1181,12 +992,11 @@ Grid re-renders without excluded events
 
 | Pattern | Implementation |
 |---------|----------------|
-| **Singleton** | ProfileStateManager, SyncManager, SyncEventBus, ModalService, CalendarService |
-| **Observer/Pub-Sub** | StateChangeListener, SyncEventBus, SelectionChangeListener |
-| **Factory** | CloudSyncFactory, CloudProviderRegistry |
+| **Singleton** | ProfileStateManager, ModalService, CalendarService |
+| **Observer/Pub-Sub** | StateChangeListener, SelectionChangeListener |
 | **Pipeline** | SectionFilterPipeline |
 | **Facade** | StorageService, MainController |
-| **Strategy** | Filter implementations, CloudProvider interface, CalendarProvider interface |
+| **Strategy** | Filter implementations, CalendarProvider interface |
 | **Transaction** | TransactionalStorageManager |
 | **Template Method** | BaseSidebarPanel (abstract base with hooks) |
 

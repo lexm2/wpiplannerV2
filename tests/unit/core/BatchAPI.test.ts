@@ -118,31 +118,6 @@ describe('Batch Operations API (Standalone)', () => {
     expect(saveSpy).toHaveBeenCalled()
   })
 
-  it('✅ batch suppresses sync events during operation', async () => {
-    const syncEventBusSpy = spyOn(require('../../../src/services/sync/SyncEventBus').syncEventBus, 'emitEvent')
-
-    await profileStateManager.withBatch(async () => {
-      profileStateManager.selectCourse(mockCourse, false, 'test')
-      profileStateManager.selectCourse({
-        ...mockCourse,
-        id: 'CS-102',
-        number: '102'
-      }, false, 'test')
-      profileStateManager.selectCourse({
-        ...mockCourse,
-        id: 'CS-103',
-        number: '103'
-      }, false, 'test')
-    })
-
-    const saveCompletedEvents = syncEventBusSpy.mock.calls.filter(
-      call => call[0] === 'local-save-completed'
-    )
-
-    // Should only emit once at the end
-    expect(saveCompletedEvents.length).toBe(1)
-  })
-
   it('✅ complex batch operations maintain integrity', async () => {
     const schedule1 = profileStateManager.createSchedule('Schedule 1', 'test')
     const schedule2 = profileStateManager.createSchedule('Schedule 2', 'test')

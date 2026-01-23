@@ -20,8 +20,5 @@ export type {
 } from './SharedFilterSetup';
 export { SharedFilterSetup } from './SharedFilterSetup';
 export { ComponentSelectionWizard } from './ComponentSelectionWizard';
-export type { ConflictResolveCallback } from './ConflictResolutionModal';
-export { ConflictResolutionModal } from './ConflictResolutionModal';
-export { CloudStatusButton } from './CloudStatusButton';
 export { SchedulePickerModal } from './SchedulePickerModal';
 export { CourseConflictModal } from './CourseConflictModal';

@@ -5,7 +5,6 @@ import type { TransactionResult } from '../storage'
 import { TransactionalStorageManager } from '../storage'
 import { getAllSections, createJSONReplacer, createJSONReviver, logger } from '../../utils'
 import { UndoRedoManager } from './UndoRedoManager'
-import { syncEventBus } from '../../services/sync/SyncEventBus'
 import { ModalService } from '../../services/ui'
 
 export interface StateChangeEvent {
@@ -598,14 +597,6 @@ export class ProfileStateManager {
 
             if (previousUnsavedState) {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
-            }
-
-            // Only emit sync event if NOT in batch mode
-            // During batch updates, sync will be triggered once after batch completes
-            if (!this.isBatchUpdate) {
-                syncEventBus.emitEvent('local-save-completed', {
-                    timestamp: Date.now()
-                });
             }
         } catch (error) {
             logger.error('Save failed:', error);

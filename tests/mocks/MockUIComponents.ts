@@ -67,19 +67,6 @@ export class MockCourseDataCoordinator {
 }
 
 /**
- * Mock CloudStatusButton
- */
-export class MockCloudStatusButton {
-    public onStateChange = mock();
-    public updateStatus = mock();
-
-    reset() {
-        this.onStateChange.mockClear();
-        this.updateStatus.mockClear();
-    }
-}
-
-/**
  * Mock SchedulePickerModal
  */
 export class MockSchedulePickerModal {
@@ -138,7 +125,6 @@ export interface MockUIContext {
     courseController: MockCourseController;
     scheduleController: MockScheduleController;
     courseDataCoordinator: MockCourseDataCoordinator;
-    cloudStatusButton: MockCloudStatusButton;
     schedulePickerModal: MockSchedulePickerModal;
     departmentController: MockDepartmentController;
     searchService: MockSearchService;
@@ -153,7 +139,6 @@ export function createMockUIComponents(): MockUIContext {
         courseController: new MockCourseController(),
         scheduleController: new MockScheduleController(),
         courseDataCoordinator: new MockCourseDataCoordinator(),
-        cloudStatusButton: new MockCloudStatusButton(),
         schedulePickerModal: new MockSchedulePickerModal(),
         departmentController: new MockDepartmentController(),
         searchService: new MockSearchService(),
@@ -168,7 +153,6 @@ export function resetMockUIComponents(ctx: MockUIContext): void {
     ctx.courseController.reset();
     ctx.scheduleController.reset();
     ctx.courseDataCoordinator.reset();
-    ctx.cloudStatusButton.reset();
     ctx.schedulePickerModal.reset();
     ctx.departmentController.reset();
     ctx.searchService.reset();
