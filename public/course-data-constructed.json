@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 23, 2026, 6:58 PM",
+  "generated": "Jan 23, 2026, 7:27 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -11837,7 +11837,7 @@
                   "number": "SX01",
                   "seats": 20,
                   "seatsAvailable": 1,
-                  "actualWaitlist": 1,
+                  "actualWaitlist": 0,
                   "maxWaitlist": 10,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4541",
                   "description": "Animal cell culture technology is about maintaining cells in vitro under controlled conditions. In recent decades this technology has advanced significantly, and animal cells are used in variety of application both in research and product development. The students in this course will be exposed to the different methodologies utilized to grow cells and how this technology is becoming critical in production of many of the health care products used to control human diseases. The course is covers four general skills (1) Basic techniques for culturing and sub-culturing animal cells and growth parameters, (2) Quality control of a cell culture laboratory/How to control contamination, (3) Primary cell culture and development of cell lines, and (4) Scale-up of cell culture from a T-Flask to a bioreactor. Note: Students may not receive credit for BB508 and BB570-198",
@@ -11856,7 +11856,7 @@
                       "room": "Unknown",
                       "seats": 20,
                       "seatsAvailable": 1,
-                      "actualWaitlist": 1,
+                      "actualWaitlist": 0,
                       "maxWaitlist": 10,
                       "specificSection": "SX01",
                       "days": [],
@@ -53227,7 +53227,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. IThis course provides an introduction to the core concepts in Data Science. It covers a broad range of methodologies for working with and making informed decisions based on real-world data. Core topics introduced in this course include basic statistics, data exploration, data cleaning, data visualization, business intelligence, and data analysis. Students will utilize various techniques and tools to explore, understand and visualize real-world data sets from various domains and learn how to communicate data results to decision makers.Recommended background: None",
@@ -53246,7 +53246,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
