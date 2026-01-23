@@ -2,13 +2,19 @@
 
 ## [2026-01-23]
 
+### Why I removed cloud sync
+- Im just trying to get a clean product that I would be happy putting on the offical site so cloud save will return eventually, but for now it is gone.
+
 ### Improved
 - Right panel now adjusts its width based on screen size for better proportions on smaller displays
 - Panel width preferences are saved and persist across sessions
 
+### Fixed
+- Course select button now reliably shows checkmark icon when selected
+- Removed staggered animations from checkmark for instant appearance
+
 ### Removed
 - Removed all cloud sync functionality and infrastructure
-- Im just trying to get a clean product that I would be happy putting on the offical site so cloud save will return eventually
 
 ## [2026-01-21]
 

@@ -465,13 +465,15 @@ export class CourseController {
         const selectBtn = element.querySelector('.course-select-btn');
 
         if (selectBtn) {
+            selectBtn.innerHTML = isSelected
+                ? getInlineSVG('CHECK', 'check-icon')
+                : getInlineSVG('PLUS', 'plus-icon');
+
             if (isSelected) {
                 element.classList.add('selected');
-                selectBtn.innerHTML = getInlineSVG('CHECK', 'check-icon');
                 selectBtn.classList.add('selected');
             } else {
                 element.classList.remove('selected');
-                selectBtn.innerHTML = getInlineSVG('PLUS', 'plus-icon');
                 selectBtn.classList.remove('selected');
             }
         }
