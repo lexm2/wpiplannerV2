@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 23, 2026, 9:52 PM",
+  "generated": "Jan 23, 2026, 10:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -35040,81 +35040,6 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 5,
                       "specificSection": "CX01",
-                      "days": [
-                        "M",
-                        "W",
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "section": {
-                "crn": 341238,
-                "number": "DL01",
-                "seats": 24,
-                "seatsAvailable": 9,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4793",
-                "description": "Cat. I The experiments in this laboratory course have been designed to acquaint the students with the basic skills necessary to perform biochemical studies. The course will cover, for instance, protein purification, subcellular fractionation, enzyme kinetics (Km, Vmax, specific activity, effector-protein interaction, etc.), exclusion and ion exchange chromatography, and electrophoresis. Recommended background: Knowledge of organic chemistry fundamentals as well as concepts including protein structure and folding, catalytic mechanics, enzyme kinetics, and ATP synthesis and hydrolysis mechanisms. See CH 2310, BB 2550, and CH 4110 or equivalent.",
-                "term": "202201",
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Ceren Yilmaz Akkaya",
-                    "startTime": "11:00",
-                    "endTime": "11:50",
-                    "location": "Atwater Kent 232",
-                    "building": "",
-                    "room": "Atwater Kent 232",
-                    "seats": 24,
-                    "seatsAvailable": 9,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "DL01",
-                    "days": [
-                      "W"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": [
-                {
-                  "crn": 341383,
-                  "number": "DX01",
-                  "seats": 24,
-                  "seatsAvailable": 9,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4793",
-                  "description": "Cat. I The experiments in this laboratory course have been designed to acquaint the students with the basic skills necessary to perform biochemical studies. The course will cover, for instance, protein purification, subcellular fractionation, enzyme kinetics (Km, Vmax, specific activity, effector-protein interaction, etc.), exclusion and ion exchange chromatography, and electrophoresis. Recommended background: Knowledge of organic chemistry fundamentals as well as concepts including protein structure and folding, catalytic mechanics, enzyme kinetics, and ATP synthesis and hydrolysis mechanisms. See CH 2310, BB 2550, and CH 4110 or equivalent.",
-                  "term": "202201",
-                  "computedTerm": "D",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Ceren Yilmaz Akkaya",
-                      "startTime": "08:00",
-                      "endTime": "10:50",
-                      "location": "Goddard Hall 306 CH Lab",
-                      "building": "",
-                      "room": "Goddard Hall 306 CH Lab",
-                      "seats": 24,
-                      "seatsAvailable": 9,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "DX01",
                       "days": [
                         "M",
                         "W",
@@ -158487,7 +158412,7 @@
                 "crn": 337021,
                 "number": "DL02",
                 "seats": 120,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4502",
@@ -158506,7 +158431,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 120,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL02",
@@ -158525,7 +158450,7 @@
                   "crn": 337520,
                   "number": "DD07",
                   "seats": 30,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4502",
@@ -158544,7 +158469,7 @@
                       "building": "",
                       "room": "Unity Hall 405",
                       "seats": 30,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD07",
@@ -162968,7 +162893,7 @@
                 "crn": 337050,
                 "number": "DL02",
                 "seats": 78,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4517",
@@ -162987,7 +162912,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 78,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL02",
@@ -163007,7 +162932,7 @@
                   "crn": 337055,
                   "number": "DX03",
                   "seats": 26,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 2,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4517",
@@ -163026,7 +162951,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 26,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 2,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX03",
