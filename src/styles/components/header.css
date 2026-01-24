@@ -351,7 +351,7 @@
     margin-left: auto;
   }
 
-  .app-header .header-controls > :not(.settings-menu-btn) {
+  .app-header .header-controls > :not(.settings-menu-btn):not(.hamburger-btn) {
     display: none;
   }
 

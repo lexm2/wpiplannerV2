@@ -144,7 +144,7 @@ html.is-mobile .schedule-sidebar.mobile-open .schedule-mobile-close-btn {
 }
 
 html.is-mobile .header-controls {
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.5rem;
 }
 

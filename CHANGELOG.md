@@ -13,7 +13,7 @@
 - Mobile detection now uses device type instead of screen width for more reliable phone vs tablet distinction
 - Added swipe navigation on mobile phones to switch between Classes and Schedule pages
 - Mobile menus can now be closed by swiping in the opposite direction they opened from
-- Schedule mobile menu button moved to header for consistency with planner page
+- Schedule mobile menu button moved to header
 
 ### Fixed
 - Course select button now reliably shows checkmark icon when selected
@@ -21,6 +21,7 @@
 - Fixed header navigation layout issues at specific screen widths by using device detection
 - Fixed mobile menu panels not appearing when hamburger button is clicked
 - Fixed header navigation being left-aligned instead of centered on mobile devices
+- Schedule mobile menu button now visible on screens smaller than 1250px
 
 ### Removed
 - Removed all cloud sync functionality and infrastructure
