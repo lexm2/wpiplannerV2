@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 23, 2026, 11:52 PM",
+  "generated": "Jan 24, 2026, 1:20 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -46533,7 +46533,7 @@
                 "number": "D04",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course makes the student aware of the social, moral, ethical, and philosophical impact of computers and computer-based systems on society, both now and in the future. Topics include major computer-based applications and their impact, human machine relationships, and the major problems of controlling the use of computers. Students will be expected to contribute to classroom discussions and to complete a number of significant writing assignments. This course is recommended for juniors and seniors. The Social Science Requirement cannot be satisfied by this course. Undergraduate credit may not be earned both for this course and for CS 505. Recommended background: a general knowledge of computers and computer systems",
@@ -46552,7 +46552,7 @@
                     "room": "Fuller Labs 311",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 10,
                     "specificSection": "D04",
                     "days": [
@@ -51007,7 +51007,7 @@
                 "crn": 337773,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 19,
+                "seatsAvailable": 18,
                 "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
@@ -51026,7 +51026,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -238521,7 +238521,7 @@
                 "number": "D04",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course makes the student aware of the social, moral, ethical, and philosophical impact of computers and computer-based systems on society, both now and in the future. Topics include major computer-based applications and their impact, human machine relationships, and the major problems of controlling the use of computers. Students will be expected to contribute to classroom discussions and to complete a number of significant writing assignments. This course is recommended for juniors and seniors. The Social Science Requirement cannot be satisfied by this course. Undergraduate credit may not be earned both for this course and for CS 505. Recommended background: a general knowledge of computers and computer systems",
@@ -238540,7 +238540,7 @@
                     "room": "Fuller Labs 311",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 10,
                     "specificSection": "D04",
                     "days": [
