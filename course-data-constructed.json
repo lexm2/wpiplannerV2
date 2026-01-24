@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 24, 2026, 3:40 PM",
+  "generated": "Jan 24, 2026, 3:50 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -85199,7 +85199,7 @@
                 "crn": 341655,
                 "number": "D01",
                 "seats": 20,
-                "seatsAvailable": 2,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -85218,7 +85218,7 @@
                     "building": "",
                     "room": "Kaven Hall 203 CARS Computer Lab",
                     "seats": 20,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
