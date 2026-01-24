@@ -1709,6 +1709,7 @@ html.is-mobile .filter-actions {
   background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
+  transition: var(--effect-transition);
 }
 
 .filter-term-row .filter-term-label:hover {
@@ -1734,6 +1735,29 @@ html.is-mobile .filter-actions {
   font-weight: 600;
   color: var(--color-text);
   user-select: none;
+}
+
+@media (max-width: 700px) {
+  .filter-term-row .filter-toggle {
+    display: none;
+  }
+
+  .filter-term-row .filter-term-label {
+    gap: 0;
+  }
+
+  .filter-term-row .filter-toggle:checked + .filter-term-text {
+    color: var(--color-text-inverse);
+  }
+
+  .filter-term-row .filter-term-label:has(input:checked) {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .filter-term-row .filter-term-label:has(input:checked) .filter-term-text {
+    color: var(--color-text-inverse);
+  }
 }
 
 /* ===== Auto Schedule Settings Modal ===== */

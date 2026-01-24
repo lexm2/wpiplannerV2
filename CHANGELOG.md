@@ -15,6 +15,7 @@
 - Mobile menus can now be closed by swiping in the opposite direction they opened from
 - Schedule mobile menu button moved to header
 - Disabled term focus mode on mobile for better viewing experience
+- Term filter toggles now display as colored buttons at narrow widths
 
 ### Fixed
 - Course select button now reliably shows checkmark icon when selected
