@@ -2052,7 +2052,8 @@ export class ScheduleController {
 
             // Check if term-graph or its header was clicked (but not the schedule grid)
             const termGraph = target.closest('.term-graph');
-            if (termGraph && !target.closest('.schedule-grid')) {
+            const isMobile = document.documentElement.classList.contains('is-mobile');
+            if (termGraph && !target.closest('.schedule-grid') && !isMobile) {
                 const termsGrid = document.querySelector('.terms-grid');
                 // Only focus if not already focused
                 if (termsGrid && !termsGrid.classList.contains('focused')) {

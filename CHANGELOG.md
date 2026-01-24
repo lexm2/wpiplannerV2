@@ -14,6 +14,7 @@
 - Added swipe navigation on mobile phones to switch between Classes and Schedule pages
 - Mobile menus can now be closed by swiping in the opposite direction they opened from
 - Schedule mobile menu button moved to header
+- Disabled term focus mode on mobile for better viewing experience
 
 ### Fixed
 - Course select button now reliably shows checkmark icon when selected
