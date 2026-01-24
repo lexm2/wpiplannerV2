@@ -375,8 +375,6 @@
 }
 
 html.is-mobile .header-navigation {
-  position: static;
-  transform: none;
   max-width: none;
 }
 

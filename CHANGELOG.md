@@ -11,11 +11,15 @@
 - Added tooltip to full term badges
 - Schedules modal now shows inline actions at lower screen widths and displays icon-only buttons on smaller screens
 - Mobile detection now uses device type instead of screen width for more reliable phone vs tablet distinction
+- Added swipe navigation on mobile phones to switch between Classes and Schedule pages
+- Mobile menus can now be closed by swiping in the opposite direction they opened from
 
 ### Fixed
 - Course select button now reliably shows checkmark icon when selected
 - Removed staggered animations from checkmark for instant appearance
 - Fixed header navigation layout issues at specific screen widths by using device detection
+- Fixed mobile menu panels not appearing when hamburger button is clicked
+- Fixed header navigation being left-aligned instead of centered on mobile devices
 
 ### Removed
 - Removed all cloud sync functionality and infrastructure

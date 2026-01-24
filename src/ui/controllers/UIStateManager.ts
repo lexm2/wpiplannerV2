@@ -31,6 +31,10 @@ export class UIStateManager {
         this.switchToPage(nextPage);
     }
 
+    getCurrentPage(): 'planner' | 'schedule' {
+        return this.currentPage;
+    }
+
     switchToPage(page: 'planner' | 'schedule'): void {
         if (page === this.currentPage) return;
 

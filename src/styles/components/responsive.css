@@ -60,9 +60,87 @@ html.is-mobile .right-panel {
   display: none;
 }
 
-html.is-mobile .header-navigation {
-  margin-left: 1rem;
-  min-width: 140px;
+html.is-mobile .sidebar.mobile-open {
+  display: block;
+  position: fixed;
+  top: var(--spacing-header-height);
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  z-index: 1000;
+  background: var(--color-background-alt);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+  animation: slideInLeft 0.3s ease;
+  overflow-y: auto;
+}
+
+html.is-mobile .right-panel.mobile-open {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+  background: var(--color-background);
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+  animation: slideInRight 0.3s ease;
+  overflow-y: auto;
+}
+
+html.is-mobile .right-panel.mobile-open .mobile-menu-close-btn {
+  display: flex;
+}
+
+html.is-mobile .schedule-sidebar.mobile-open {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+  background: var(--color-background-alt);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+  animation: slideInLeft 0.3s ease;
+}
+
+html.is-mobile .schedule-sidebar.mobile-open .schedule-sidebar-content-footer {
+  padding: 0.5rem 1rem;
+}
+
+html.is-mobile .schedule-sidebar.mobile-open .schedule-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+html.is-mobile .schedule-sidebar.mobile-open .schedule-filter-controls {
+  flex: 1;
+}
+
+html.is-mobile .schedule-sidebar.mobile-open .schedule-mobile-close-btn {
+  display: flex;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 html.is-mobile .header-controls {
@@ -93,7 +171,7 @@ html.is-mobile .content-header .search-input {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  z-index: 500;
   backdrop-filter: blur(2px);
 }
 
@@ -174,24 +252,6 @@ html.is-mobile .content-header .search-input {
   /* Hide selected courses section on mobile */
   .right-panel .selected-courses-section {
     display: none;
-  }
-
-  @keyframes slideInLeft {
-    from {
-      transform: translateX(-100%);
-    }
-    to {
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes slideInRight {
-    from {
-      transform: translateX(100%);
-    }
-    to {
-      transform: translateX(0);
-    }
   }
 }
 

@@ -30,6 +30,8 @@ import { getInlineSVG } from '../../utils/iconPaths'
 import { ChangelogModal } from '../components/ChangelogModal'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { TermBoundsService } from '../../services/data/TermBoundsService'
+import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
+import { DeviceDetection } from '../../utils/deviceDetection'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -159,7 +161,7 @@ export class MainController {
         
         // IMPORTANT: Initialize filters LAST (triggers events that use operationManager)
         this.initializeFilters();
-        
+
         this.init();
     }
 
@@ -257,6 +259,7 @@ export class MainController {
             this.setupEventListeners();
             this.setupCourseSelectionListener();
             this.setupScheduleChangeListener();
+            this.initializeSwipeNavigation();
 
             // Load active schedule into ScheduleController (for local events, etc.)
             const activeSchedule = this.scheduleManagementService.getActiveSchedule();
@@ -289,6 +292,44 @@ export class MainController {
         } catch (error) {
             console.error('Failed to load course data:', error);
             this.uiStateManager.showErrorMessage('Failed to load course data. Please try refreshing the page.');
+        }
+    }
+
+    private initializeSwipeNavigation(): void {
+        if (!DeviceDetection.isMobilePhone()) return;
+
+        const plannerPage = document.getElementById('planner-page');
+        const schedulePage = document.getElementById('schedule-page');
+
+        if (plannerPage) {
+            new SwipeGestureHandler(
+                plannerPage,
+                () => this.handleSwipeLeft(),
+                () => this.handleSwipeRight()
+            );
+        }
+
+        if (schedulePage) {
+            new SwipeGestureHandler(
+                schedulePage,
+                () => this.handleSwipeLeft(),
+                () => this.handleSwipeRight()
+            );
+        }
+    }
+
+    private handleSwipeLeft(): void {
+        if (this.uiStateManager.getCurrentPage() === 'planner') {
+            this.uiStateManager.switchToPage('schedule');
+            this.scheduleController.displayScheduleSelectedCourses();
+            this.scheduleController.renderScheduleGrids();
+        }
+    }
+
+    private handleSwipeRight(): void {
+        if (this.uiStateManager.getCurrentPage() === 'schedule') {
+            this.scheduleController.closeComponentWizard();
+            this.uiStateManager.switchToPage('planner');
         }
     }
 
@@ -1319,6 +1360,8 @@ export class MainController {
         this.mobileMenuBackdrop.addEventListener('click', () => {
             this.closeMobileMenu();
         });
+
+        this.setupMobilePanelSwipeGestures();
     }
 
     private toggleMobileMenu(panel: 'sidebar' | 'right-panel'): void {
@@ -1361,6 +1404,29 @@ export class MainController {
         }
 
         this.mobileMenuOpen = null;
+    }
+
+    private setupMobilePanelSwipeGestures(): void {
+        const sidebar = document.querySelector('.sidebar') as HTMLElement;
+        const rightPanel = document.querySelector('.right-panel') as HTMLElement;
+
+        if (sidebar) {
+            new SwipeGestureHandler(
+                sidebar,
+                () => this.closeMobileMenu(),
+                () => {},
+                false
+            );
+        }
+
+        if (rightPanel) {
+            new SwipeGestureHandler(
+                rightPanel,
+                () => {},
+                () => this.closeMobileMenu(),
+                false
+            );
+        }
     }
 
     private setupScheduleMobileMenu(): void {
@@ -1410,6 +1476,25 @@ export class MainController {
                 }
             });
         }
+
+        this.setupScheduleSidebarSwipeGesture();
+    }
+
+    private setupScheduleSidebarSwipeGesture(): void {
+        const scheduleSidebar = document.querySelector('.schedule-sidebar') as HTMLElement;
+        if (!scheduleSidebar) return;
+
+        new SwipeGestureHandler(
+            scheduleSidebar,
+            () => {
+                scheduleSidebar.classList.remove('mobile-open');
+                if (this.mobileMenuBackdrop) {
+                    this.mobileMenuBackdrop.classList.remove('active');
+                }
+            },
+            () => {},
+            false
+        );
     }
 
     private setupSettingsMenu(): void {
