@@ -73,10 +73,9 @@ export class SchedulePickerModal extends BaseModal {
                             </div>
                         </div>
                         <div class="modal-footer-buttons">
-                            <button class="btn btn-primary" id="new-schedule-btn-modal">${getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')} New Schedule</button>
-                            <button class="btn btn-secondary" id="import-schedule-btn-modal">${getInlineSVG('CALENDAR_DOWN', 'modal-footer-icon')} Import</button>
-                            <button class="btn btn-secondary" id="export-schedule-btn-modal">${getInlineSVG('CALENDAR_UP', 'modal-footer-icon')} Export All</button>
-                            <button class="btn btn-secondary" id="export-ics-btn-modal">${getInlineSVG('CALENDAR_SHARE', 'modal-footer-icon')} Export ICS</button>
+                            <button class="btn btn-primary" id="new-schedule-btn-modal">${getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')}<span class="btn-text"> New Schedule</span></button>
+                            <button class="btn btn-secondary" id="import-schedule-btn-modal">${getInlineSVG('CALENDAR_DOWN', 'modal-footer-icon')}<span class="btn-text"> Import</span></button>
+                            <button class="btn btn-secondary" id="export-schedule-btn-modal">${getInlineSVG('CALENDAR_UP', 'modal-footer-icon')}<span class="btn-text"> Export All</span></button>
                         </div>
                     </div>
                 </div>
@@ -180,14 +179,12 @@ export class SchedulePickerModal extends BaseModal {
         const newScheduleBtnHeader = modal.querySelector('#new-schedule-btn-header-modal');
         const importBtn = modal.querySelector('#import-schedule-btn-modal');
         const exportBtn = modal.querySelector('#export-schedule-btn-modal');
-        const exportIcsBtn = modal.querySelector('#export-ics-btn-modal');
         const closeBtn = modal.querySelector(`[data-modal-close="${this.modalId}"]`);
 
         newScheduleBtn?.addEventListener('click', () => this.createNewSchedule());
         newScheduleBtnHeader?.addEventListener('click', () => this.createNewSchedule());
         importBtn?.addEventListener('click', () => this.importSchedule());
         exportBtn?.addEventListener('click', () => this.exportActiveSchedule());
-        exportIcsBtn?.addEventListener('click', () => this.exportActiveScheduleICS());
         closeBtn?.addEventListener('click', () => this.hide());
 
         document.addEventListener('click', (e) => {
