@@ -13,7 +13,7 @@
 - Mobile detection now uses device type instead of screen width for more reliable phone vs tablet distinction
 - Added swipe navigation on mobile phones to switch between Classes and Schedule pages
 - Mobile menus can now be closed by swiping in the opposite direction they opened from
-- Schedule mobile menu button moved to left side of screen for better accessibility
+- Schedule mobile menu button moved to header for consistency with planner page
 
 ### Fixed
 - Course select button now reliably shows checkmark icon when selected

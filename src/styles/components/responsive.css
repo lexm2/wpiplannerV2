@@ -256,42 +256,6 @@ html.is-mobile .content-header .search-input {
 }
 
 /* Schedule page responsive breakpoints */
-.schedule-floating-btn {
-  display: none;
-  position: fixed;
-  top: calc(var(--spacing-header-height) + 0.25rem);
-  left: 1rem;
-  z-index: 100;
-  padding: 0.75rem 1rem;
-  gap: 0.5rem;
-  align-items: center;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.schedule-floating-btn:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-  transform: translateY(-2px);
-}
-
-.schedule-floating-btn:hover svg {
-  stroke: var(--color-text-inverse);
-}
-
-.schedule-floating-btn svg {
-  display: block;
-  width: 20px;
-  height: 20px;
-  stroke: var(--color-primary);
-  transition: stroke 0.2s ease;
-}
-
 .schedule-mobile-close-btn {
   display: none;
   padding: 0.5rem;
@@ -325,10 +289,6 @@ html.is-mobile .content-header .search-input {
 @media (max-width: 1024px) {
   .schedule-sidebar {
     display: none;
-  }
-
-  .schedule-floating-btn {
-    display: flex;
   }
 
   .schedule-page-layout {

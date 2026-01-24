@@ -60,18 +60,25 @@ export class UIStateManager {
     private showPlannerPage(): void {
         const plannerPage = document.getElementById('planner-page');
         const schedulePage = document.getElementById('schedule-page');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const scheduleMobileMenuBtn = document.getElementById('schedule-mobile-menu-btn');
 
         if (plannerPage) plannerPage.style.display = 'grid';
         if (schedulePage) schedulePage.style.display = 'none';
+        if (mobileMenuBtn) mobileMenuBtn.style.display = '';
+        if (scheduleMobileMenuBtn) scheduleMobileMenuBtn.style.display = 'none';
     }
 
     private showSchedulePage(): void {
         const plannerPage = document.getElementById('planner-page');
         const schedulePage = document.getElementById('schedule-page');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const scheduleMobileMenuBtn = document.getElementById('schedule-mobile-menu-btn');
 
         if (plannerPage) plannerPage.style.display = 'none';
         if (schedulePage) schedulePage.style.display = 'flex';
-        
+        if (mobileMenuBtn) mobileMenuBtn.style.display = 'none';
+        if (scheduleMobileMenuBtn) scheduleMobileMenuBtn.style.display = '';
     }
 
 
