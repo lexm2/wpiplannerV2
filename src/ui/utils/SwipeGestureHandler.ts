@@ -37,6 +37,9 @@ export class SwipeGestureHandler {
   }
 
   private handleTouchEnd(e: TouchEvent): void {
+    if (this.ignoreWhenMenuOpen && this.isSidebarOpen()) return;
+    if (this.shouldIgnoreTouch(e.target as HTMLElement)) return;
+
     this.touchEndX = e.changedTouches[0].screenX;
     this.touchEndY = e.changedTouches[0].screenY;
     this.detectSwipe();

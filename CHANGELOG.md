@@ -23,6 +23,7 @@
 - Fixed mobile menu panels not appearing when hamburger button is clicked
 - Fixed header navigation being left-aligned instead of centered on mobile devices
 - Schedule mobile menu button now visible on screens smaller than 1250px
+- Fixed unintended page switches after using header navigation following swipe gestures
 
 ### Removed
 - Removed all cloud sync functionality and infrastructure
