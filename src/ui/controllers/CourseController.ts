@@ -435,29 +435,24 @@ export class CourseController {
     }
 
 
-    async toggleCourseSelection(element: HTMLElement): Promise<boolean> {
+    toggleCourseSelection(element: HTMLElement): void {
         const course = this.elementToCourseMap.get(element);
-        if (!course) return false;
+        if (!course) return;
 
         const wasSelected = this.courseSelectionService.isCourseSelected(course);
 
-        try {
-            // Show immediate optimistic feedback
-            this.updateCourseUIById(course.id, !wasSelected);
-            
-            const result = await this.courseSelectionService.toggleCourseSelection(course);
-            const newSelection = result.success && result.course !== undefined;
-            
-            // Update to final state (removes optimistic feedback)
-            this.updateCourseUIById(course.id, newSelection);
-            
-            return newSelection;
-        } catch (error) {
-            console.error('Error toggling course selection:', error);
-            // Rollback optimistic change on error
-            this.updateCourseUIById(course.id, wasSelected);
-            return false;
-        }
+        this.updateCourseUIById(course.id, !wasSelected);
+
+        this.courseSelectionService.toggleCourseSelection(course)
+            .then(result => {
+                if (!result.success) {
+                    this.updateCourseUIById(course.id, wasSelected);
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling course selection:', error);
+                this.updateCourseUIById(course.id, wasSelected);
+            });
     }
 
 

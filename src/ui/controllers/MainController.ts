@@ -460,11 +460,12 @@ export class MainController {
             if (target.classList.contains('course-select-btn')) {
                 const courseElement = target.closest('.course-item, .course-card') as HTMLElement;
                 if (courseElement) {
-                    // Make async call and handle potential errors
-                    this.courseController.toggleCourseSelection(courseElement).catch(error => {
+                    try {
+                        this.courseController.toggleCourseSelection(courseElement);
+                    } catch (error) {
                         console.error('Failed to toggle course selection:', error);
                         this.uiStateManager.showErrorMessage('Failed to update course selection. Please try again.');
-                    });
+                    }
                 }
             }
 

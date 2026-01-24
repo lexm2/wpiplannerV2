@@ -1,5 +1,13 @@
 # Changelog
 
+## [2026-01-24]
+
+### Added
+- Wake up time preference in auto-schedule settings to prioritize schedules without early morning classes
+
+### Improved
+- Course selection button is now more responsive with optimistic UI updates
+
 ## [2026-01-23]
 
 ### Why I removed cloud sync
