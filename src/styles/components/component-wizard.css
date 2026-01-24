@@ -480,22 +480,20 @@
     }
 }
 
-@media (max-width: 768px) {
-    .wizard-header h2 {
-        font-size: 1.1rem;
-    }
+html.is-mobile .wizard-header h2 {
+    font-size: 1.1rem;
+}
 
-    .wizard-step-title {
-        font-size: 1rem;
-    }
+html.is-mobile .wizard-step-title {
+    font-size: 1rem;
+}
 
-    .wizard-content {
-        padding: 1rem;
-    }
+html.is-mobile .wizard-content {
+    padding: 1rem;
+}
 
-    .wizard-sections-grid {
-        gap: 0.75rem;
-    }
+html.is-mobile .wizard-sections-grid {
+    gap: 0.75rem;
 }
 
 /* Filter Status Indicator */

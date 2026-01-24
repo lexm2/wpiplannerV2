@@ -1084,12 +1084,10 @@
   }
 }
 
-@media (max-width: 768px) {
-  .schedule-page-layout {
-    grid-template-columns: 1fr;
-  }
+html.is-mobile .schedule-page-layout {
+  grid-template-columns: 1fr;
+}
 
-  .schedule-sidebar {
-    display: none;
-  }
+html.is-mobile .schedule-sidebar {
+  display: none;
 }

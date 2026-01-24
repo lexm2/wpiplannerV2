@@ -50,39 +50,38 @@
   }
 }
 
-@media (max-width: 768px) {
-  .app-body {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
-  }
+html.is-mobile .app-body {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+}
 
-  .sidebar, .right-panel {
-    display: none;
-  }
+html.is-mobile .sidebar,
+html.is-mobile .right-panel {
+  display: none;
+}
 
-  .header-navigation {
-    margin-left: 1rem;
-    min-width: 140px;
-  }
+html.is-mobile .header-navigation {
+  margin-left: 1rem;
+  min-width: 140px;
+}
 
-  .header-controls {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+html.is-mobile .header-controls {
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-  .content-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
-  }
+html.is-mobile .content-header {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+}
 
-  .search-controls {
-    max-width: none;
-  }
+html.is-mobile .search-controls {
+  max-width: none;
+}
 
-  .content-header .search-input {
-    max-width: none;
-  }
+html.is-mobile .content-header .search-input {
+  max-width: none;
 }
 
 /* Mobile menu overlay styles */

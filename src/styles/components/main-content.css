@@ -136,8 +136,6 @@
   }
 }
 
-@media (max-width: 768px) {
-  .filter-buttons {
-    gap: 0.25rem;
-  }
+html.is-mobile .filter-buttons {
+  gap: 0.25rem;
 }

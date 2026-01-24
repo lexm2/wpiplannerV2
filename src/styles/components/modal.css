@@ -319,39 +319,37 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-  .modal-backdrop {
-    padding: 0.5rem;
-  }
-  
-  .modal-dialog {
-    max-width: 100%;
-    margin: 0;
-  }
-  
-  .modal-header {
-    padding: 1rem 1rem 0.75rem 1rem;
-  }
-  
-  .modal-body {
-    padding: 0.75rem 1rem;
-  }
-  
-  .modal-footer {
-    padding: 0.75rem 1rem 1rem 1rem;
-    flex-direction: column-reverse;
-  }
-  
-  .modal-btn {
-    width: 100%;
-    margin: 0;
-  }
-  
-  .modal-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.25rem;
-  }
+html.is-mobile .modal-backdrop {
+  padding: 0.5rem;
+}
+
+html.is-mobile .modal-dialog {
+  max-width: 100%;
+  margin: 0;
+}
+
+html.is-mobile .modal-header {
+  padding: 1rem 1rem 0.75rem 1rem;
+}
+
+html.is-mobile .modal-body {
+  padding: 0.75rem 1rem;
+}
+
+html.is-mobile .modal-footer {
+  padding: 0.75rem 1rem 1rem 1rem;
+  flex-direction: column-reverse;
+}
+
+html.is-mobile .modal-btn {
+  width: 100%;
+  margin: 0;
+}
+
+html.is-mobile .modal-icon {
+  width: 40px;
+  height: 40px;
+  font-size: 1.25rem;
 }
 
 /* High Contrast Mode Support */
@@ -771,46 +769,43 @@
 }
 
 /* ===== Responsive Design ===== */
-@media (max-width: 768px) {
-  .section-info-modal .modal-dialog {
-    max-width: 100%;
-    margin: 0;
-    border-radius: 0;
-  }
+html.is-mobile .section-info-modal .modal-dialog {
+  max-width: 100%;
+  margin: 0;
+  border-radius: 0;
+}
 
-  .section-info-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.875rem 0.5rem;
-  }
+html.is-mobile .section-info-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.875rem 0.5rem;
+}
 
-  /* Stack the last item (color) full width */
-  .section-info-item:last-child {
-    grid-column: span 2;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.75rem;
-  }
+html.is-mobile .section-info-item:last-child {
+  grid-column: span 2;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+}
 
-  .section-period {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+html.is-mobile .section-period {
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-  .section-period-type {
-    align-self: flex-start;
-  }
+html.is-mobile .section-period-type {
+  align-self: flex-start;
+}
 
-  .section-enrollment-badge {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
+html.is-mobile .section-enrollment-badge {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 
-  .section-enrollment-waitlist {
-    margin-left: 0;
-    width: 100%;
-    padding-top: 0.25rem;
-    border-top: 1px solid var(--color-border);
-  }
+html.is-mobile .section-enrollment-waitlist {
+  margin-left: 0;
+  width: 100%;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--color-border);
 }
 
 /* ===== Accessibility ===== */
@@ -1348,52 +1343,50 @@
 }
 
 /* Responsive adjustments for filter modal */
-@media (max-width: 768px) {
-  .filter-modal .modal-dialog {
-    max-width: 100%;
-    width: 100%;
-    margin: 0;
-    height: 100vh;
-    max-height: 100vh;
-  }
-  
-  .filter-modal .modal-content {
-    height: 100vh;
-    max-height: 100vh;
-    border-radius: 0;
-  }
-  
-  .filter-modal-body {
-    max-height: calc(100vh - 120px);
-  }
-  
-  .filter-checkbox-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 0.25rem;
-  }
-  
-  .filter-range-inputs {
-    flex-direction: column;
-  }
-  
-  .filter-section-header {
-    padding: 0.5rem 0.75rem;
-  }
-  
-  .filter-section-content {
-    padding: 0.75rem;
-  }
-  
-  .filter-modal .modal-footer {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-  
-  .filter-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
+html.is-mobile .filter-modal .modal-dialog {
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+  height: 100vh;
+  max-height: 100vh;
+}
+
+html.is-mobile .filter-modal .modal-content {
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0;
+}
+
+html.is-mobile .filter-modal-body {
+  max-height: calc(100vh - 120px);
+}
+
+html.is-mobile .filter-checkbox-grid {
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.25rem;
+}
+
+html.is-mobile .filter-range-inputs {
+  flex-direction: column;
+}
+
+html.is-mobile .filter-section-header {
+  padding: 0.5rem 0.75rem;
+}
+
+html.is-mobile .filter-section-content {
+  padding: 0.75rem;
+}
+
+html.is-mobile .filter-modal .modal-footer {
+  flex-direction: column;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+html.is-mobile .filter-actions {
+  width: 100%;
+  justify-content: space-between;
 }
 
 /* Schedule Filter Modal Styles */
@@ -1908,14 +1901,12 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .changelog-modal-dialog {
-    max-width: 100%;
-    margin: 0;
-  }
+html.is-mobile .changelog-modal-dialog {
+  max-width: 100%;
+  margin: 0;
+}
 
-  .changelog-modal-body {
-    padding: 1rem;
-    gap: 1rem;
-  }
+html.is-mobile .changelog-modal-body {
+  padding: 1rem;
+  gap: 1rem;
 }

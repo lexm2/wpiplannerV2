@@ -374,11 +374,9 @@
   }
 }
 
-@media (max-width: 768px) {
-  .header-navigation {
-    position: static;
-    transform: none;
-    max-width: none;
-  }
+html.is-mobile .header-navigation {
+  position: static;
+  transform: none;
+  max-width: none;
 }
 

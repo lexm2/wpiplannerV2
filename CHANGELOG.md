@@ -9,13 +9,17 @@
 - Right panel now adjusts its width based on screen size for better proportions on smaller displays
 - Panel width preferences are saved and persist across sessions
 - Added tooltip to full term badges
+- Schedules modal now shows inline actions at lower screen widths and displays icon-only buttons on smaller screens
+- Mobile detection now uses device type instead of screen width for more reliable phone vs tablet distinction
 
 ### Fixed
 - Course select button now reliably shows checkmark icon when selected
 - Removed staggered animations from checkmark for instant appearance
+- Fixed header navigation layout issues at specific screen widths by using device detection
 
 ### Removed
 - Removed all cloud sync functionality and infrastructure
+- Removed Export ICS button from schedules modal footer
 
 ## [2026-01-21]
 

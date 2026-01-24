@@ -9,6 +9,7 @@ import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
+import { DeviceDetection } from '../../utils/deviceDetection'
 
 // Course listing and interaction management with optimistic UI integration
 // Provides progressive rendering for large datasets with instant visual feedback
@@ -107,9 +108,8 @@ export class CourseController {
             return document.querySelector('.mobile-backdrop');
         };
 
-        // Check if mobile mode
         const isMobile = (): boolean => {
-            return window.innerWidth <= 1200;
+            return DeviceDetection.isMobilePhone();
         };
 
         // Mobile overlay toggle

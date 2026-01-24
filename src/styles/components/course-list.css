@@ -493,15 +493,13 @@
 }
 
 /* Responsive grid adjustments */
-@media (max-width: 768px) {
-  .course-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .course-card {
-    padding: 1rem;
-  }
+html.is-mobile .course-grid {
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+html.is-mobile .course-card {
+  padding: 1rem;
 }
 
 @media (min-width: 1200px) {
