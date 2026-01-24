@@ -21,4 +21,3 @@ export type {
 export { SharedFilterSetup } from './SharedFilterSetup';
 export { ComponentSelectionWizard } from './ComponentSelectionWizard';
 export { SchedulePickerModal } from './SchedulePickerModal';
-export { CourseConflictModal } from './CourseConflictModal';

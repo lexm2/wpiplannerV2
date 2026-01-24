@@ -271,40 +271,20 @@ export class TransactionalStorageManager {
                 preferences
             );
 
-            if (options.compressed) {
-                // Export as compressed string
-                const compressed = await appState.toCompressedJSONWithChecksum();
+            // Export as minimal JSON format
+            const minimalData = appState.toMinimalFormat();
 
-                const stats = appState.getCompressionStats();
-                console.log('[TransactionalStorageManager] Exported compressed data:', {
-                    originalBytes: stats.originalBytes,
-                    compressedBytes: stats.compressedBytes,
-                    compressionRatio: `${(stats.ratio * 100).toFixed(1)}%`,
-                    savings: `${((1 - stats.ratio) * 100).toFixed(1)}%`
-                });
+            console.log('[TransactionalStorageManager] Exported minimal data:', {
+                version: minimalData.v,
+                activeScheduleIndex: minimalData.a,
+                scheduleCount: minimalData.s.length,
+                totalCourses: minimalData.s.reduce((sum, [_, courses]) => sum + courses.length / 2, 0)
+            });
 
-                return {
-                    data: compressed,
-                    valid: true
-                };
-            } else {
-                // Export as JSON (default, for backward compatibility)
-                const syncData = await appState.toCloudFormatWithChecksum();
-
-                console.log('[TransactionalStorageManager] Exported SyncData:', {
-                    version: syncData.version,
-                    timestamp: syncData.timestamp,
-                    checksum: syncData.checksum.substring(0, 16) + '...',
-                    activeScheduleId: syncData.activeScheduleId,
-                    scheduleCount: syncData.schedules.length,
-                    totalCourses: syncData.schedules.reduce((sum, s) => sum + s.selectedCourses.length, 0)
-                });
-
-                return {
-                    data: JSON.stringify(syncData, this.replacer, 2),
-                    valid: true
-                };
-            }
+            return {
+                data: JSON.stringify(minimalData, this.replacer, 2),
+                valid: true
+            };
         } catch (error) {
             console.error('[TransactionalStorageManager] Export failed:', error);
             return {

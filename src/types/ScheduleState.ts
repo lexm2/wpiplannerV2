@@ -1,8 +1,5 @@
 import type { Course, Section, Department } from './types';
 import type { SelectedCourse, ScheduleCombination, Schedule, LocalCalendarEvent } from './schedule';
-import type { ConnectedCalendar } from '../services/calendar/types';
-import type { ScheduleData, SelectedCourseData } from './sync-stubs';
-import { checksumCalculator } from './sync-stubs';
 import { getAllSections } from '../utils/courseUtils';
 
 /**
@@ -18,7 +15,6 @@ export class ScheduleState {
     readonly selectedCourses: SelectedCourse[];
     readonly generatedSchedules: ScheduleCombination[];
     readonly timestamp: number;
-    readonly connectedCalendar?: ConnectedCalendar;
     /** Locally-stored calendar events (not synced to cloud) */
     readonly localEvents: LocalCalendarEvent[];
 
@@ -28,7 +24,6 @@ export class ScheduleState {
         selectedCourses: SelectedCourse[] = [],
         generatedSchedules: ScheduleCombination[] = [],
         timestamp: number = Date.now(),
-        connectedCalendar?: ConnectedCalendar,
         localEvents: LocalCalendarEvent[] = []
     ) {
         this.id = id;
@@ -36,90 +31,9 @@ export class ScheduleState {
         this.selectedCourses = selectedCourses;
         this.generatedSchedules = generatedSchedules;
         this.timestamp = timestamp;
-        this.connectedCalendar = connectedCalendar;
         this.localEvents = localEvents;
     }
 
-    /**
-     * Convert to export format (IDs only) for local storage
-     *
-     * @returns ScheduleData with IDs only
-     */
-    toCloudFormat(): ScheduleData {
-        return {
-            id: this.id,
-            name: this.name,
-            timestamp: this.timestamp,
-            selectedCourses: this.selectedCourses.map(sc => ({
-                courseId: sc.course.id,
-                selectedSectionCrn: sc.selectedSection?.crn.toString(),
-                lockedSectionCrn: sc.lockedSections.size > 0
-                    ? Array.from(sc.lockedSections)[0]
-                    : undefined,
-                isRequired: sc.isRequired,
-                timestamp: this.timestamp
-            })),
-            connectedCalendar: this.connectedCalendar
-        };
-    }
-
-    /**
-     * Create from export format (IDs) by hydrating with full objects
-     *
-     * @param cloudData - Export format with IDs only
-     * @param courseCatalog - Department catalog to resolve course references
-     * @returns ScheduleState with full objects
-     */
-    static fromCloudFormat(
-        cloudData: ScheduleData,
-        courseCatalog: Department[]
-    ): ScheduleState {
-        const selectedCourses: SelectedCourse[] = [];
-
-        for (const courseData of cloudData.selectedCourses) {
-            const course = findCourseById(courseData.courseId, courseCatalog);
-            if (!course) {
-                throw new Error(
-                    `Course ${courseData.courseId} not found in catalog`
-                );
-            }
-
-            let section: Section | null = null;
-            if (courseData.selectedSectionCrn) {
-                section = findSectionByCRN(course, courseData.selectedSectionCrn);
-                if (!section) {
-                    throw new Error(
-                        `Section CRN ${courseData.selectedSectionCrn} not found`
-                    );
-                }
-            }
-
-            const lockedSections = courseData.lockedSectionCrn
-                ? new Set([courseData.lockedSectionCrn])
-                : new Set<string>();
-
-            selectedCourses.push({
-                course,
-                selectedLecture: null,
-                selectedDiscussion: null,
-                selectedLab: null,
-                selectedSection: section,
-                selectedSectionNumber: section?.number || null,
-                isRequired: courseData.isRequired,
-                lockedSections
-            });
-        }
-
-        return new ScheduleState(
-            cloudData.id,
-            cloudData.name,
-            selectedCourses,
-            [],
-            cloudData.timestamp || Date.now(),
-            cloudData.connectedCalendar,
-            []
-        );
-    }
 
     /**
      * Create a copy with updated fields (immutable update)
@@ -131,7 +45,6 @@ export class ScheduleState {
         name: string;
         selectedCourses: SelectedCourse[];
         generatedSchedules: ScheduleCombination[];
-        connectedCalendar: ConnectedCalendar;
         localEvents: LocalCalendarEvent[];
     }>): ScheduleState {
         return new ScheduleState(
@@ -140,7 +53,6 @@ export class ScheduleState {
             updates.selectedCourses ?? this.selectedCourses,
             updates.generatedSchedules ?? this.generatedSchedules,
             Date.now(), // Update timestamp on any change
-            updates.connectedCalendar ?? this.connectedCalendar,
             updates.localEvents ?? this.localEvents
         );
     }
@@ -349,7 +261,6 @@ export class ScheduleState {
             schedule.selectedCourses,
             schedule.generatedSchedules,
             schedule.timestamp || Date.now(),
-            schedule.connectedCalendar,
             schedule.localEvents || []
         );
     }
@@ -366,7 +277,6 @@ export class ScheduleState {
             selectedCourses: this.selectedCourses,
             generatedSchedules: this.generatedSchedules,
             timestamp: this.timestamp,
-            connectedCalendar: this.connectedCalendar,
             localEvents: this.localEvents
         };
     }

@@ -1,5 +1,40 @@
-import { TermBoundsData } from '../calendar/types';
-import { TermBoundsDataSchema } from '../calendar/schemas';
+import { z } from 'zod';
+
+export interface TermBoundInfo {
+    startDate: string;
+    endDate: string;
+    offeringPeriod: string;
+    sampleSize: number;
+}
+
+export interface TermBoundsData {
+    academicYear: string;
+    generated: string;
+    terms: {
+        A: TermBoundInfo;
+        B: TermBoundInfo;
+        C: TermBoundInfo;
+        D: TermBoundInfo;
+    };
+}
+
+const TermBoundInfoSchema = z.object({
+    startDate: z.string().date(),
+    endDate: z.string().date(),
+    offeringPeriod: z.string(),
+    sampleSize: z.number().int().nonnegative(),
+}) satisfies z.ZodType<TermBoundInfo>;
+
+const TermBoundsDataSchema = z.object({
+    academicYear: z.string(),
+    generated: z.string().datetime(),
+    terms: z.object({
+        A: TermBoundInfoSchema,
+        B: TermBoundInfoSchema,
+        C: TermBoundInfoSchema,
+        D: TermBoundInfoSchema,
+    }),
+}) satisfies z.ZodType<TermBoundsData>;
 
 export class TermBoundsService {
     private static instance: TermBoundsService | null = null;

@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, mock } from 'bun:test';
-import { TermBoundsService } from '../../../src/services/data/TermBoundsService';
-import type { TermBoundsData } from '../../../src/services/calendar/types';
+import { TermBoundsService, type TermBoundsData } from '../../../src/services/data/TermBoundsService';
 
 describe('TermBoundsService', () => {
     let service: TermBoundsService;

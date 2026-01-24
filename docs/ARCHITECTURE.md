@@ -493,61 +493,6 @@ Fetches and caches professor ratings.
 
 ---
 
-### Calendar (`src/services/calendar/`)
-
-Calendar integration service for syncing schedules with external calendar providers.
-
-#### [CalendarService.ts](../src/services/calendar/CalendarService.ts)
-
-**Singleton** - Provider-agnostic calendar orchestration service.
-
-**Responsibilities:**
-- Manage active calendar provider
-- Convert schedules to calendar events
-- Handle recurring event generation (RRULE format)
-- Calculate term dates for WPI academic calendar (A/B/C/D terms)
-- Fetch and filter external calendar events for display
-
-**Key Methods:**
-- `exportSchedule()` - Export a schedule to the calendar provider
-- `getEventsForTerm()` - Fetch events for a specific term from connected calendar
-- `getEventsForAllTerms()` - Fetch events for all terms in parallel
-- `scheduleToEvents()` - Convert schedule courses to calendar events
-- `findOrCreateCalendar()` - Find existing or create new calendar
-
-**Connects to:**
-- [CalendarProvider](../src/services/calendar/types.ts) - Provider interface
-- [GoogleCalendarProvider](../src/services/calendar/providers/google/GoogleCalendarProvider.ts) - Google implementation
-- [ScheduleController](../src/ui/controllers/ScheduleController.ts) - UI integration
-- [MainController](../src/ui/controllers/MainController.ts) - Initialization
-
-#### [types.ts](../src/services/calendar/types.ts)
-
-Type definitions for calendar operations.
-
-**Key Types:**
-- `CalendarProvider` - Provider interface for calendar implementations
-- `CalendarEvent` - Provider-agnostic event representation
-- `ConnectedCalendar` - Calendar connection info stored on Schedule
-- `CalendarExportOptions` / `CalendarExportResult` - Export configuration
-- `CalendarInfo` - Calendar metadata
-
-#### [rruleExpander.ts](../src/services/calendar/rruleExpander.ts)
-
-Utility for expanding recurring events into individual instances.
-
-**Responsibilities:**
-- Parse RRULE recurrence rules
-- Expand recurring events within a date range
-- Generate unique IDs for expanded instances
-
-#### Calendar Providers
-
-**Status:** Google Calendar provider removed (was tightly coupled to Google Drive auth).
-
-The calendar service infrastructure remains and can work with any calendar provider implementation. To re-enable calendar integration, implement the `CalendarProvider` interface and register it with `CalendarService`.
-
----
 
 ### UI Services (`src/services/ui/`)
 
@@ -751,22 +696,6 @@ Reusable filter UI components.
 
 Filter setup helpers.
 
-#### [CalendarEventsPanel.ts](../src/ui/components/CalendarEventsPanel.ts)
-
-Sidebar panel for managing external calendar event visibility.
-
-**Responsibilities:**
-- Display calendar events grouped by term (A/B/C/D)
-- Toggle individual event visibility on the schedule grid
-- Show/hide all events in bulk
-- Track excluded event IDs
-
-**Connects to:**
-- [BaseSidebarPanel](../src/ui/sidebar/BaseSidebarPanel.ts) - Extends base class
-- [CalendarService](../src/services/calendar/CalendarService.ts) - Event data
-- [ScheduleController](../src/ui/controllers/ScheduleController.ts) - Opens panel
-
----
 
 ### Sidebar (`src/ui/sidebar/`)
 
@@ -801,7 +730,6 @@ Abstract base class for sidebar overlay panels with animation support.
 - `attachItemListeners()` - Per-item event handlers
 
 **Connects to:**
-- [CalendarEventsPanel](../src/ui/components/CalendarEventsPanel.ts) - Implementation
 - [ComponentSelectionWizard](../src/ui/components/ComponentSelectionWizard.ts) - Implementation
 
 #### [types.ts](../src/ui/sidebar/types.ts)
@@ -829,9 +757,7 @@ UI utility functions for rendering and time handling.
 Container for multiple schedules with version/timestamp.
 
 **Key Methods:**
-- `toCloudFormat()` / `fromCloudFormat()` - Cloud serialization (IDs only)
-- `toCompressedJSON()` / `fromCompressedJSON()` - LZ-String compression
-- `calculateChecksum()` / `verifyChecksum()` - SHA-256 integrity
+- `toMinimalFormat()` / `fromMinimalFormat()` - Minimal format for local export/import
 - `upsertSchedule()` / `removeSchedule()` - Immutable updates
 - `getActiveSchedule()` - Query methods
 
@@ -845,14 +771,13 @@ Single schedule with selectedCourses and generatedSchedules.
 - `id` / `name` - Schedule identification
 - `selectedCourses` - Courses added to this schedule
 - `generatedSchedules` - Auto-generated schedule combinations
-- `connectedCalendar` - Optional calendar connection for external event display
+- `localEvents` - Locally-stored calendar events
 
 **Key Methods:**
-- `toCloudFormat()` / `fromCloudFormat()` - Cloud boundary conversion
-- `calculateChecksum()` - Integrity verification
 - `with()` - Immutable updates
+- `fromLegacySchedule()` / `toLegacySchedule()` - Migration helpers
 
-**Used by:** [ApplicationState](../src/types/ApplicationState.ts), [CalendarService](../src/services/calendar/CalendarService.ts)
+**Used by:** [ApplicationState](../src/types/ApplicationState.ts)
 
 ### [filters.ts](../src/types/filters.ts)
 
@@ -960,39 +885,12 @@ CourseController receives filtered courses
 UI updates
 ```
 
-### Calendar Event Display Flow
-
-```
-User signs in with Google
-    ↓
-GoogleDriveProvider.signIn() → GoogleCalendarProvider.setAccessToken()
-    ↓
-GoogleCalendarProvider.autoConnectSchedules()
-    ↓
-Schedules connected to primary calendar
-    ↓
-ScheduleController detects connectedCalendar
-    ↓
-CalendarService.getEventsForTerm() → GoogleCalendarProvider.getEvents()
-    ↓
-rruleExpander expands recurring events
-    ↓
-Events rendered on schedule grid
-    ↓
-User opens CalendarEventsPanel
-    ↓
-Toggle event visibility → excludedEventIds updated
-    ↓
-Grid re-renders without excluded events
-```
-
----
 
 ## Key Architectural Patterns
 
 | Pattern | Implementation |
 |---------|----------------|
-| **Singleton** | ProfileStateManager, ModalService, CalendarService |
+| **Singleton** | ProfileStateManager, ModalService |
 | **Observer/Pub-Sub** | StateChangeListener, SelectionChangeListener |
 | **Pipeline** | SectionFilterPipeline |
 | **Facade** | StorageService, MainController |

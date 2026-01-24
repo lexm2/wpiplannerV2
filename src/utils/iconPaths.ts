@@ -18,8 +18,6 @@ import arrowForwardUpIcon from '../assets/icons/arrow-forward-up.svg?url';
 import bookmarkFilledIcon from '../assets/icons/bookmark-filled.svg?url';
 import bookmarkIcon from '../assets/icons/bookmark.svg?url';
 import brandAppleIcon from '../assets/icons/brand-apple.svg?url';
-import brandGoogleDriveIcon from '../assets/icons/brand-google-drive.svg?url';
-import brandOnedriveIcon from '../assets/icons/brand-onedrive.svg?url';
 import brightnessIcon from '../assets/icons/brightness.svg?url';
 import calendarDownIcon from '../assets/icons/calendar-down.svg?url';
 import calendarPlusIcon from '../assets/icons/calendar-plus.svg?url';
@@ -57,8 +55,6 @@ export type IconName =
   | 'BOOKMARK_FILLED'
   | 'BOOKMARK'
   | 'BRAND_APPLE'
-  | 'BRAND_GOOGLE_DRIVE'
-  | 'BRAND_ONEDRIVE'
   | 'BRIGHTNESS'
   | 'CALENDAR_DOWN'
   | 'CALENDAR_PLUS'
@@ -99,8 +95,6 @@ export type IconName =
  * - BOOKMARK_FILLED: bookmark-filled.svg
  * - BOOKMARK: bookmark.svg
  * - BRAND_APPLE: brand-apple.svg
- * - BRAND_GOOGLE_DRIVE: brand-google-drive.svg
- * - BRAND_ONEDRIVE: brand-onedrive.svg
  * - BRIGHTNESS: brightness.svg
  * - CALENDAR_DOWN: calendar-down.svg
  * - CALENDAR_PLUS: calendar-plus.svg
@@ -138,8 +132,6 @@ export const ICONS: Record<IconName, string> = {
   BOOKMARK_FILLED: bookmarkFilledIcon,
   BOOKMARK: bookmarkIcon,
   BRAND_APPLE: brandAppleIcon,
-  BRAND_GOOGLE_DRIVE: brandGoogleDriveIcon,
-  BRAND_ONEDRIVE: brandOnedriveIcon,
   BRIGHTNESS: brightnessIcon,
   CALENDAR_DOWN: calendarDownIcon,
   CALENDAR_PLUS: calendarPlusIcon,
@@ -182,8 +174,6 @@ export const INLINE_SVGS: Record<IconName, string> = {
   BOOKMARK_FILLED: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 2a5 5 0 0 1 5 5v14a1 1 0 0 1 -1.555 .832l-5.445 -3.63l-5.444 3.63a1 1 0 0 1 -1.55 -.72l-.006 -.112v-14a5 5 0 0 1 5 -5h4z" /></svg>`,
   BOOKMARK: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 7v14l-6 -4l-6 4v-14a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4z" /></svg>`,
   BRAND_APPLE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15.079 5.999l.239 .012c1.43 .097 3.434 1.013 4.508 2.586a1 1 0 0 1 -.344 1.44c-.05 .028 -.372 .158 -.497 .217a4.15 4.15 0 0 0 -.722 .431c-.614 .461 -.948 1.009 -.942 1.694c.01 .885 .339 1.454 .907 1.846c.208 .143 .436 .253 .666 .33c.126 .043 .426 .116 .444 .122a1 1 0 0 1 .662 .942c0 2.621 -3.04 6.381 -5.286 6.381c-.79 0 -1.272 -.091 -1.983 -.315l-.098 -.031c-.463 -.146 -.702 -.192 -1.133 -.192c-.52 0 -.863 .06 -1.518 .237l-.197 .053c-.575 .153 -.964 .226 -1.5 .248c-2.749 0 -5.285 -5.093 -5.285 -9.072c0 -3.87 1.786 -6.92 5.286 -6.92c.297 0 .598 .045 .909 .128c.403 .107 .774 .26 1.296 .508c.787 .374 .948 .44 1.009 .44h.016c.03 -.003 .128 -.047 1.056 -.457c1.061 -.467 1.864 -.685 2.746 -.616l-.24 -.012z" /><path d="M14 1a1 1 0 0 1 1 1a3 3 0 0 1 -3 3a1 1 0 0 1 -1 -1a3 3 0 0 1 3 -3z" /></svg>`,
-  BRAND_GOOGLE_DRIVE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 10l-6 10l-3 -5l6 -10z" /><path d="M9 15h12l-3 5h-12" /><path d="M15 15l-6 -10h6l6 10z" /></svg>`,
-  BRAND_ONEDRIVE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18.456 10.45a6.45 6.45 0 0 0 -12 -2.151a4.857 4.857 0 0 0 -4.44 5.241a4.856 4.856 0 0 0 5.236 4.444h10.751a3.771 3.771 0 0 0 3.99 -3.54a3.772 3.772 0 0 0 -3.538 -3.992z" /></svg>`,
   BRIGHTNESS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -15 8.66l.005 -.324a10 10 0 0 1 14.995 -8.336m-9 1.732a8 8 0 0 0 4.001 14.928l-.001 -16a8 8 0 0 0 -4 1.072" /></svg>`,
   CALENDAR_DOWN: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" /><path d="M19 16v6" /><path d="M22 19l-3 3l-3 -3" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /></svg>`,
   CALENDAR_PLUS: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M16 19h6" /><path d="M19 16v6" /></svg>`,

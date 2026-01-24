@@ -27,7 +27,9 @@
 
 ### Removed
 - Removed all cloud sync functionality and infrastructure
+- Removed all calendar integration features
 - Removed Export ICS button from schedules modal footer
+- Removed cloud calendar integration - local events continue to work
 
 ## [2026-01-21]
 

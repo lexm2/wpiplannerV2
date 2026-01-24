@@ -2,10 +2,7 @@ import type { Department } from './types';
 import type { SchedulePreferences } from './schedule';
 import type { MinimalSyncData } from './export';
 import { dayToNumber, numberToDay, minutesToTime } from './export';
-import type { SyncData } from './sync-stubs';
-import { checksumCalculator } from './sync-stubs';
 import { ScheduleState, findCourseById, findSectionByCRN } from './ScheduleState';
-import LZString from 'lz-string';
 import type { SelectedCourse } from './schedule';
 
 /**
@@ -37,58 +34,6 @@ export class ApplicationState {
         this.preferences = preferences;
     }
 
-    /**
-     * Calculate checksum for entire application state
-     *
-     * @returns 64-character SHA-256 hash
-     */
-    async calculateChecksum(): Promise<string> {
-        return checksumCalculator.calculateChecksum({
-            version: this.version,
-            activeScheduleId: this.activeScheduleId,
-            schedules: this.schedules.map(s => s.toCloudFormat()),
-            preferences: this.preferences
-        });
-    }
-
-    /**
-     * Verify checksum matches expected value
-     *
-     * @param expectedChecksum - Expected checksum
-     * @returns True if checksum matches
-     */
-    async verifyChecksum(expectedChecksum: string): Promise<boolean> {
-        const calculated = await this.calculateChecksum();
-        return calculated === expectedChecksum;
-    }
-
-    /**
-     * Convert to cloud format (IDs only)
-     *
-     * @returns SyncData with IDs only (no checksum calculated yet)
-     */
-    toCloudFormat(): SyncData {
-        return {
-            version: this.version,
-            timestamp: this.timestamp,
-            checksum: '', // Caller should calculate and set using calculateChecksum()
-            activeScheduleId: this.activeScheduleId,
-            schedules: this.schedules.map(s => s.toCloudFormat()),
-            lastModified: new Date().toISOString(),
-            preferences: this.preferences
-        };
-    }
-
-    /**
-     * Convert to cloud format with checksum calculated
-     *
-     * @returns SyncData with checksum
-     */
-    async toCloudFormatWithChecksum(): Promise<SyncData> {
-        const syncData = this.toCloudFormat();
-        syncData.checksum = await this.calculateChecksum();
-        return syncData;
-    }
 
     /**
      * Convert to minimal format for export
@@ -119,29 +64,6 @@ export class ApplicationState {
         };
     }
 
-    /**
-     * Create from cloud format (hydrate IDs → full objects)
-     *
-     * @param syncData - Cloud data with IDs only
-     * @param courseCatalog - Department catalog for hydration
-     * @returns ApplicationState with full objects
-     */
-    static fromCloudFormat(
-        syncData: SyncData,
-        courseCatalog: Department[]
-    ): ApplicationState {
-        const schedules = syncData.schedules.map(scheduleData =>
-            ScheduleState.fromCloudFormat(scheduleData, courseCatalog)
-        );
-
-        return new ApplicationState(
-            syncData.activeScheduleId,
-            schedules,
-            syncData.preferences as SchedulePreferences | undefined,
-            syncData.version,
-            syncData.timestamp
-        );
-    }
 
     /**
      * Create from minimal format
@@ -419,77 +341,5 @@ export class ApplicationState {
      */
     getEmptySchedules(): ScheduleState[] {
         return this.schedules.filter(s => s.isEmpty());
-    }
-
-    // =========================================================================
-    // Compression & Storage Optimization
-    // =========================================================================
-
-    /**
-     * Serialize to compressed JSON string for efficient storage
-     *
-     * Uses LZ-String compression to reduce storage size by ~70%
-     *
-     * @returns Compressed string suitable for IndexedDB storage
-     */
-    toCompressedJSON(): string {
-        const syncData = this.toCloudFormat();
-        const json = JSON.stringify(syncData);
-        return LZString.compress(json);
-    }
-
-    /**
-     * Serialize to compressed JSON string with checksum
-     *
-     * @returns Compressed string with checksum included
-     */
-    async toCompressedJSONWithChecksum(): Promise<string> {
-        const syncData = await this.toCloudFormatWithChecksum();
-        const json = JSON.stringify(syncData);
-        return LZString.compress(json);
-    }
-
-    /**
-     * Deserialize from compressed JSON string
-     *
-     * Handles both compressed and uncompressed formats for backward compatibility
-     *
-     * @param compressedData - Compressed or uncompressed JSON string
-     * @param courseCatalog - Department catalog for hydration
-     * @returns ApplicationState instance
-     */
-    static fromCompressedJSON(
-        compressedData: string,
-        courseCatalog: Department[]
-    ): ApplicationState {
-        // Try to decompress (will return null if not LZ-compressed)
-        const decompressed = LZString.decompress(compressedData);
-
-        // If decompression returns null, assume it's uncompressed JSON
-        const json = decompressed || compressedData;
-
-        const syncData: SyncData = JSON.parse(json);
-        return ApplicationState.fromCloudFormat(syncData, courseCatalog);
-    }
-
-    /**
-     * Calculate compression ratio for monitoring
-     *
-     * @returns Object with original size, compressed size, and ratio
-     */
-    getCompressionStats(): { originalBytes: number; compressedBytes: number; ratio: number } {
-        const syncData = this.toCloudFormat();
-        const json = JSON.stringify(syncData);
-        const compressed = LZString.compress(json);
-
-        const originalBytes = new Blob([json]).size;
-        const compressedBytes = new Blob([compressed]).size;
-        const ratio = compressedBytes / originalBytes;
-
-        return {
-            originalBytes,
-            compressedBytes,
-            ratio
-        };
     }
 }

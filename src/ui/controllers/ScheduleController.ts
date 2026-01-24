@@ -1,5 +1,5 @@
 import { DayOfWeek, Course, Section } from '../../types/types'
-import { SelectedCourse, Schedule, LocalCalendarEvent } from '../../types/schedule'
+import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
 import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService'
@@ -7,8 +7,6 @@ import { ScheduleManagementService } from '../../services/selection/ScheduleMana
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
-import { CalendarEventsPanel } from '../components/CalendarEventsPanel'
-import { CalendarSelectModal } from '../components/CalendarSelectModal'
 import { LocalEventModal } from '../components/LocalEventModal'
 import { SidebarManager } from '../sidebar/SidebarManager'
 import type { SidebarPanel } from '../sidebar/types'
@@ -21,10 +19,7 @@ import { AutoScheduleSettingsModal } from '../components/AutoScheduleSettingsMod
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { getAllSections } from '../../utils/courseUtils'
-import { calendarService, type CalendarEvent, type CalendarInfo, type ConnectedCalendar } from '../../services/calendar'
-import { CalendarState } from '../../core/state/CalendarState'
 import { ModalService } from '../../services/ui/ModalService'
-import styles from '../../styles/components/calendar-events-section.module.css'
 
 interface WizardSelections {
     lecture: Section | null;
@@ -50,9 +45,7 @@ export class ScheduleController {
     private generatedSchedules: any[][] = [];
     private currentScheduleIndex: number = 0;
     private isApplyingAutoSchedule: boolean = false;
-    private calendarState: CalendarState = new CalendarState();
     private currentSchedule: Schedule | null = null;
-    private calendarEventsPanel: CalendarEventsPanel | null = null;
     private onScheduleUpdate: ((scheduleId: string, updates: Partial<Schedule>) => void) | null = null;
     private sidebarManager: SidebarManager;
     private modalService: ModalService | null = null;
@@ -130,97 +123,29 @@ export class ScheduleController {
     }
 
     // =========================================================================
-    // External Calendar Events
+    // Schedule Loading
     // =========================================================================
 
     /**
-     * Load external calendar events for a schedule.
-     * Should be called when the active schedule changes or calendar auth completes.
+     * Load a schedule for display.
+     * Should be called when the active schedule changes.
      */
     async loadExternalEvents(schedule: Schedule): Promise<void> {
-        console.log('[ScheduleController] loadExternalEvents called with schedule:', {
+        console.log('[ScheduleController] Loading schedule:', {
             name: schedule.name,
             id: schedule.id,
-            connectedCalendar: schedule.connectedCalendar,
             localEventsCount: schedule.localEvents?.length || 0,
         });
 
         this.currentSchedule = schedule;
-
-        // Always load local events from schedule
-        this.calendarState.setLocalEvents(schedule.localEvents || []);
-
-        if (!schedule.connectedCalendar) {
-            console.log('[ScheduleController] No connected calendar, skipping external events load');
-            this.calendarState.clearEvents();
-            this.renderScheduleGrids();
-            this.displayScheduleSelectedCourses(); // Show calendar button for local events
-            return;
-        }
-
-        if (!calendarService.isReady()) {
-            console.log('[ScheduleController] Calendar service not ready, skipping external events load');
-            this.calendarState.clearEvents();
-            this.renderScheduleGrids();
-            return;
-        }
-
-        try {
-            console.log('[ScheduleController] Loading external events for schedule:', schedule.name);
-
-            // Use CalendarState to load events
-            await this.calendarState.loadEvents(schedule.connectedCalendar);
-
-            console.log('[ScheduleController] Loaded external events via CalendarState');
-
-            // Clean up stale exclusion IDs (IDs that no longer exist in calendar events)
-            if (schedule.connectedCalendar?.excludedEventIds?.length) {
-                const validEventIds = this.calendarState.collectAllEventIds();
-                const currentExclusions = schedule.connectedCalendar.excludedEventIds;
-                const validExclusions = currentExclusions.filter(id => validEventIds.has(id));
-
-                // If any stale IDs were removed, update and persist
-                if (validExclusions.length !== currentExclusions.length) {
-                    const staleCount = currentExclusions.length - validExclusions.length;
-                    console.log(`[ScheduleController] Removed ${staleCount} stale exclusion IDs`);
-
-                    // Update CalendarState with valid exclusions
-                    this.calendarState.setExcludedIds(validExclusions);
-
-                    const updatedCalendar = {
-                        ...schedule.connectedCalendar,
-                        excludedEventIds: validExclusions,
-                    };
-
-                    // Update local state
-                    this.currentSchedule = {
-                        ...schedule,
-                        connectedCalendar: updatedCalendar,
-                    };
-
-                    // Persist to backend
-                    if (this.onScheduleUpdate) {
-                        this.onScheduleUpdate(schedule.id, {
-                            connectedCalendar: updatedCalendar,
-                        });
-                    }
-                }
-            }
-
-            // Re-render grids with external events
-            this.renderScheduleGrids();
-            // Re-render sidebar to show calendar button
-            this.displayScheduleSelectedCourses();
-        } catch (error) {
-            console.error('[ScheduleController] Failed to load external events:', error);
-        }
+        this.renderScheduleGrids();
+        this.displayScheduleSelectedCourses();
     }
 
     /**
-     * Clear external events (e.g., when signing out or disconnecting calendar).
+     * Clear the current schedule.
      */
     clearExternalEvents(): void {
-        this.calendarState.clearEvents();
         this.currentSchedule = null;
         this.renderScheduleGrids();
     }
@@ -232,243 +157,118 @@ export class ScheduleController {
         this.onScheduleUpdate = callback;
     }
 
+    // =========================================================================
+    // Local Event Helper Methods
+    // =========================================================================
+
+    /**
+     * Get local events for a specific term.
+     */
+    private getLocalEventsForTerm(term: string): LocalCalendarEvent[] {
+        if (!this.currentSchedule?.localEvents) return [];
+
+        return this.currentSchedule.localEvents.filter(event => {
+            if (event.eventType === 'one-time') {
+                return false;
+            }
+
+            return event.terms?.includes(term) || event.terms?.includes('ALL');
+        });
+    }
+
+    /**
+     * Get visible local events for a specific term.
+     */
+    private getVisibleLocalEventsForTerm(term: string): LocalCalendarEvent[] {
+        return this.getLocalEventsForTerm(term).filter(event => event.visible);
+    }
+
+    /**
+     * Convert a local event to displayable time slots.
+     */
+    private localEventToSlots(event: LocalCalendarEvent): DisplayableTimeSlot[] {
+        const slots: DisplayableTimeSlot[] = [];
+
+        if (event.eventType === 'one-time') {
+            return slots;
+        }
+
+        const days = event.days || (event.day ? [event.day] : []);
+        const terms = event.terms || ['ALL'];
+
+        for (const term of terms) {
+            const academicTerm = term as AcademicTerm;
+            for (const day of days) {
+                slots.push({
+                    id: `${event.id}-${term}-${day}`,
+                    day,
+                    startTime: event.startTime,
+                    endTime: event.endTime,
+                    term: academicTerm,
+                    title: event.title,
+                    subtitle: event.description,
+                    color: '#6B7280',
+                    sourceType: 'blocked',
+                    sourceId: event.id,
+                });
+            }
+        }
+
+        return slots;
+    }
+
+    /**
+     * Get all local event slots for a specific term (visible only).
+     */
+    private getLocalEventSlotsForTerm(term: string): DisplayableTimeSlot[] {
+        const visibleEvents = this.getVisibleLocalEventsForTerm(term);
+        const slots: DisplayableTimeSlot[] = [];
+
+        for (const event of visibleEvents) {
+            const eventSlots = this.localEventToSlots(event);
+            const termSlots = eventSlots.filter(slot => slot.term === term);
+            slots.push(...termSlots);
+        }
+
+        return slots;
+    }
+
+    /**
+     * Get all blocked times from local events for auto-scheduler.
+     */
+    private getAllLocalEventBlockedTimes(): WeeklyTimeSlot[] {
+        if (!this.currentSchedule?.localEvents) return [];
+
+        const blockedTimes: WeeklyTimeSlot[] = [];
+        const visibleEvents = this.currentSchedule.localEvents.filter(e => e.visible);
+
+        for (const event of visibleEvents) {
+            if (event.eventType === 'one-time') continue;
+
+            const days = event.days || (event.day ? [event.day] : []);
+            const terms = event.terms || ['ALL'];
+
+            for (const term of terms) {
+                const academicTerm = term as AcademicTerm;
+                for (const day of days) {
+                    blockedTimes.push({
+                        id: `${event.id}-${term}-${day}`,
+                        day,
+                        startTime: event.startTime,
+                        endTime: event.endTime,
+                        term: academicTerm,
+                    });
+                }
+            }
+        }
+
+        return blockedTimes;
+    }
+
     /**
      * Open the calendar events panel to manage local and external events.
      * Uses SidebarManager for consistent panel management.
      */
-    openCalendarEventsPanel(): void {
-        if (!this.currentSchedule) {
-            console.warn('[ScheduleController] Cannot open calendar panel - no schedule');
-            return;
-        }
-
-        // Get local events
-        const localEvents = this.calendarState.getLocalEvents();
-
-        // Get external calendar data (if connected)
-        const hasConnectedCalendar = !!this.currentSchedule.connectedCalendar;
-        const excludedIds = hasConnectedCalendar ? this.calendarState.getExcludedIds() : undefined;
-        const eventsByTerm = hasConnectedCalendar ? this.calendarState.getAllParents() : undefined;
-
-        this.calendarEventsPanel = new CalendarEventsPanel({
-            // External calendar options (optional)
-            calendarName: this.currentSchedule.connectedCalendar?.calendarName,
-            events: eventsByTerm,
-            excludedEventIds: excludedIds,
-            onExclusionChange: hasConnectedCalendar
-                ? (eventId, excluded) => this.handleEventExclusionChange(eventId, excluded)
-                : undefined,
-            onShowAll: hasConnectedCalendar ? () => this.handleShowAllEvents() : undefined,
-            onHideAll: hasConnectedCalendar ? () => this.handleHideAllEvents() : undefined,
-            onChangeCalendar: hasConnectedCalendar ? () => this.openCalendarSelectModal() : undefined,
-
-            // Local events options
-            localEvents,
-            onAddLocalEvent: () => this.openAddLocalEventModal(),
-            onEditLocalEvent: (id) => this.openEditLocalEventModal(id),
-            onDeleteLocalEvent: (id) => this.deleteLocalEvent(id),
-            onToggleLocalEventVisibility: (id) => this.toggleLocalEventVisibility(id),
-
-            // Common
-            onClose: () => this.closeCalendarEventsPanel(),
-        });
-
-        // Use SidebarManager to open the panel (handles closing existing panels)
-        this.sidebarManager.openPanel(this.calendarEventsPanel);
-    }
-
-    /**
-     * Close the calendar events panel.
-     * Note: Don't call sidebarManager.closePanel() here - this method is called
-     * from the panel's onClose callback, so the panel is already closing.
-     */
-    closeCalendarEventsPanel(): void {
-        this.calendarEventsPanel = null;
-        this.displayScheduleSelectedCourses();
-    }
-
-    /**
-     * Open the calendar selection modal to choose a different calendar.
-     */
-    private openCalendarSelectModal(): void {
-        if (!this.modalService) {
-            console.warn('[ScheduleController] Cannot open calendar select modal - no modal service');
-            return;
-        }
-
-        const provider = calendarService.getProvider();
-        if (!provider) {
-            console.warn('[ScheduleController] Cannot open calendar select modal - no calendar provider');
-            return;
-        }
-
-        const currentCalendarId = this.currentSchedule?.connectedCalendar?.calendarId || 'primary';
-
-        const modal = new CalendarSelectModal(this.modalService, {
-            currentCalendarId,
-            onSelect: async (calendar: CalendarInfo) => {
-                // Only change if different calendar selected
-                if (calendar.id !== currentCalendarId) {
-                    await this.changeConnectedCalendar(calendar);
-                }
-                modal.hide();
-            },
-        });
-
-        modal.show(provider);
-    }
-
-    /**
-     * Change the connected calendar and reload events.
-     */
-    private async changeConnectedCalendar(calendar: CalendarInfo): Promise<void> {
-        if (!this.currentSchedule || !this.onScheduleUpdate) {
-            console.warn('[ScheduleController] Cannot change calendar - no schedule or callback');
-            return;
-        }
-
-        // Build new connected calendar object (clear exclusions for new calendar)
-        const connectedCalendar: ConnectedCalendar = {
-            providerId: 'google',
-            calendarId: calendar.id,
-            calendarName: calendar.name,
-            excludedEventIds: [],
-        };
-
-        // Update local state
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            connectedCalendar,
-        };
-
-        // Persist to backend
-        this.onScheduleUpdate(this.currentSchedule.id, { connectedCalendar });
-
-        // Clear old events and reload from new calendar
-        this.calendarState.clearEvents();
-        await this.loadExternalEvents(this.currentSchedule);
-
-        // Close and re-open the panel to show new calendar events
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.close();
-            this.calendarEventsPanel = null;
-            this.openCalendarEventsPanel();
-        }
-    }
-
-    /**
-     * Handle toggling an event's exclusion status.
-     * Uses optimistic UI updates - updates UI first, then persists to backend.
-     */
-    private handleEventExclusionChange(eventId: string, excluded: boolean): void {
-        if (!this.currentSchedule?.connectedCalendar || !this.onScheduleUpdate) {
-            console.warn('[ScheduleController] Cannot update exclusion - no schedule or callback');
-            return;
-        }
-
-        // Update CalendarState (triggers recompute of blocked times)
-        this.calendarState.setExcluded(eventId, excluded);
-
-        // Persist to schedule
-        const newExcludedArray = this.calendarState.getExcludedIdsArray();
-        const updatedCalendar = {
-            ...this.currentSchedule.connectedCalendar,
-            excludedEventIds: newExcludedArray,
-        };
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            connectedCalendar: updatedCalendar,
-        };
-
-        // Update UI - use direct update to mutate the panel's Set in place
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateSingleEventExclusion(eventId, excluded);
-        }
-        this.renderScheduleGrids();
-
-        // Persist to backend
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            connectedCalendar: updatedCalendar,
-        });
-    }
-
-    /**
-     * Handle showing all events (removes all exclusions).
-     */
-    private handleShowAllEvents(): void {
-        if (!this.currentSchedule?.connectedCalendar || !this.onScheduleUpdate) {
-            return;
-        }
-
-        // Clear all exclusions in CalendarState
-        this.calendarState.showAll();
-
-        // Update local state
-        const updatedCalendar = {
-            ...this.currentSchedule.connectedCalendar,
-            excludedEventIds: [],
-        };
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            connectedCalendar: updatedCalendar,
-        };
-
-        // Update UI
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateExcludedIds(this.calendarState.getExcludedIds());
-        }
-        this.renderScheduleGrids();
-
-        // Persist to backend
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            connectedCalendar: updatedCalendar,
-        });
-    }
-
-    /**
-     * Handle hiding all events (adds all event IDs to exclusions).
-     */
-    private handleHideAllEvents(): void {
-        if (!this.currentSchedule?.connectedCalendar || !this.onScheduleUpdate) {
-            return;
-        }
-
-        // Hide all events in CalendarState
-        this.calendarState.hideAll();
-
-        // Update local state
-        const updatedCalendar = {
-            ...this.currentSchedule.connectedCalendar,
-            excludedEventIds: this.calendarState.getExcludedIdsArray(),
-        };
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            connectedCalendar: updatedCalendar,
-        };
-
-        // Update UI
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateExcludedIds(this.calendarState.getExcludedIds());
-        }
-        this.renderScheduleGrids();
-
-        // Persist to backend
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            connectedCalendar: updatedCalendar,
-        });
-    }
-
-    /**
-     * Get total count of external parent events across all terms.
-     * Returns the count of unique events (not expanded instances).
-     */
-    getTotalExternalEventCount(): number {
-        let total = 0;
-        for (const events of this.calendarState.getAllParents().values()) {
-            total += events.length;
-        }
-        return total;
-    }
 
     // =========================================================================
     // Local Event CRUD Methods
@@ -498,7 +298,8 @@ export class ScheduleController {
             return;
         }
 
-        const existingEvent = this.calendarState.getLocalEvents().find(e => e.id === eventId);
+        const localEvents = this.currentSchedule.localEvents || [];
+        const existingEvent = localEvents.find(e => e.id === eventId);
         if (!existingEvent) {
             console.warn('[ScheduleController] Cannot find event to edit:', eventId);
             return;
@@ -525,25 +326,16 @@ export class ScheduleController {
             updatedAt: now,
         };
 
-        // Update CalendarState
-        this.calendarState.addLocalEvent(newEvent);
+        const currentEvents = this.currentSchedule.localEvents || [];
+        const updatedLocalEvents = [...currentEvents, newEvent];
 
-        // Update schedule and persist
-        const updatedLocalEvents = this.calendarState.getLocalEvents();
         this.currentSchedule = {
             ...this.currentSchedule,
             localEvents: updatedLocalEvents,
         };
 
-        // Update panel if open
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateLocalEvents(updatedLocalEvents);
-        }
-
-        // Re-render grids to show new event
         this.renderScheduleGrids();
 
-        // Persist
         this.onScheduleUpdate(this.currentSchedule.id, {
             localEvents: updatedLocalEvents,
         });
@@ -555,25 +347,35 @@ export class ScheduleController {
     private updateLocalEvent(eventId: string, eventData: Omit<LocalCalendarEvent, 'id' | 'createdAt' | 'updatedAt'>): void {
         if (!this.currentSchedule || !this.onScheduleUpdate) return;
 
-        // Update CalendarState
-        this.calendarState.updateLocalEvent(eventId, eventData);
+        const currentEvents = this.currentSchedule.localEvents || [];
+        const eventIndex = currentEvents.findIndex(e => e.id === eventId);
 
-        // Update schedule and persist
-        const updatedLocalEvents = this.calendarState.getLocalEvents();
+        if (eventIndex === -1) {
+            console.warn('[ScheduleController] Event not found for update:', eventId);
+            return;
+        }
+
+        const existingEvent = currentEvents[eventIndex];
+        const updatedEvent: LocalCalendarEvent = {
+            ...eventData,
+            id: eventId,
+            createdAt: existingEvent.createdAt,
+            updatedAt: Date.now(),
+        };
+
+        const updatedLocalEvents = [
+            ...currentEvents.slice(0, eventIndex),
+            updatedEvent,
+            ...currentEvents.slice(eventIndex + 1),
+        ];
+
         this.currentSchedule = {
             ...this.currentSchedule,
             localEvents: updatedLocalEvents,
         };
 
-        // Update panel if open
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateLocalEvents(updatedLocalEvents);
-        }
-
-        // Re-render grids
         this.renderScheduleGrids();
 
-        // Persist
         this.onScheduleUpdate(this.currentSchedule.id, {
             localEvents: updatedLocalEvents,
         });
@@ -585,25 +387,16 @@ export class ScheduleController {
     private deleteLocalEvent(eventId: string): void {
         if (!this.currentSchedule || !this.onScheduleUpdate) return;
 
-        // Update CalendarState
-        this.calendarState.deleteLocalEvent(eventId);
+        const currentEvents = this.currentSchedule.localEvents || [];
+        const updatedLocalEvents = currentEvents.filter(e => e.id !== eventId);
 
-        // Update schedule and persist
-        const updatedLocalEvents = this.calendarState.getLocalEvents();
         this.currentSchedule = {
             ...this.currentSchedule,
             localEvents: updatedLocalEvents,
         };
 
-        // Update panel if open
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateLocalEvents(updatedLocalEvents);
-        }
-
-        // Re-render grids
         this.renderScheduleGrids();
 
-        // Persist
         this.onScheduleUpdate(this.currentSchedule.id, {
             localEvents: updatedLocalEvents,
         });
@@ -615,25 +408,20 @@ export class ScheduleController {
     private toggleLocalEventVisibility(eventId: string): void {
         if (!this.currentSchedule || !this.onScheduleUpdate) return;
 
-        // Toggle in CalendarState
-        this.calendarState.toggleLocalEventVisibility(eventId);
+        const currentEvents = this.currentSchedule.localEvents || [];
+        const updatedLocalEvents = currentEvents.map(event =>
+            event.id === eventId
+                ? { ...event, visible: !event.visible }
+                : event
+        );
 
-        // Update schedule and persist
-        const updatedLocalEvents = this.calendarState.getLocalEvents();
         this.currentSchedule = {
             ...this.currentSchedule,
             localEvents: updatedLocalEvents,
         };
 
-        // Update panel if open
-        if (this.calendarEventsPanel) {
-            this.calendarEventsPanel.updateLocalEvents(updatedLocalEvents);
-        }
-
-        // Re-render grids
         this.renderScheduleGrids();
 
-        // Persist
         this.onScheduleUpdate(this.currentSchedule.id, {
             localEvents: updatedLocalEvents,
         });
@@ -899,18 +687,11 @@ export class ScheduleController {
      * Set up click handler for the calendar events button.
      */
     private setupCalendarEventsButtonHandler(container: HTMLElement): void {
-        const calendarHeader = container.querySelector(`.${styles.header}`);
-        if (calendarHeader) {
-            calendarHeader.addEventListener('click', () => {
-                this.toggleCalendarEventsSection();
-            });
-        }
-
         const calendarBtn = container.querySelector('#calendar-events-btn');
         if (calendarBtn) {
             calendarBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.openCalendarEventsPanel();
+                this.openAddLocalEventModal();
             });
         }
     }
@@ -1110,67 +891,27 @@ export class ScheduleController {
      * Build HTML for the calendar events button (always shown for local events).
      */
     private buildCalendarEventsButtonHTML(): string {
-        // Always show the button - users can add local events even without cloud calendar
-        const localEvents = this.calendarState.getLocalEvents();
+        const localEvents = this.currentSchedule?.localEvents || [];
         const localEventCount = localEvents.length;
         const visibleLocalCount = localEvents.filter(e => e.visible).length;
 
-        const hasConnectedCalendar = !!this.currentSchedule?.connectedCalendar;
-        let externalEventInfo = '';
-
-        if (hasConnectedCalendar) {
-            const calendarName = this.currentSchedule!.connectedCalendar!.calendarName;
-            const totalExternalEvents = this.getTotalExternalEventCount();
-            const allEventIds = this.calendarState.collectAllEventIds();
-            const excludedIds = this.currentSchedule!.connectedCalendar!.excludedEventIds || [];
-            const validExcludedCount = excludedIds.filter(id => allEventIds.has(id)).length;
-            const visibleExternalCount = totalExternalEvents - validExcludedCount;
-            externalEventInfo = ` + ${visibleExternalCount} from ${Validators.escapeHtml(calendarName)}`;
-        }
-
-        const buttonText = localEventCount > 0 || hasConnectedCalendar
-            ? `${visibleLocalCount} local event${visibleLocalCount !== 1 ? 's' : ''}${externalEventInfo}`
+        const buttonText = localEventCount > 0
+            ? `${visibleLocalCount} local event${visibleLocalCount !== 1 ? 's' : ''}`
             : 'Add events to avoid';
 
         return `
             <div class="sidebar-content-item calendar-events-section">
-                <div class="${styles.header}" aria-expanded="false">
-                    <span class="${styles.chevron}">${getInlineSVG('CHEVRON_DOWN', 'chevron-icon')}</span>
-                    <span>Calendar Events</span>
-                </div>
-                <div class="${styles.content}">
-                    <button class="calendar-events-btn" id="calendar-events-btn">
-                        <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
-                        <span class="calendar-events-btn-info">
-                            <span class="calendar-events-btn-name">Calendar Events</span>
-                            <span class="calendar-events-btn-count">${buttonText}</span>
-                        </span>
-                    </button>
-                </div>
+                <button class="calendar-events-btn" id="calendar-events-btn">
+                    <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
+                    <span class="calendar-events-btn-info">
+                        <span class="calendar-events-btn-name">Calendar Events</span>
+                        <span class="calendar-events-btn-count">${buttonText}</span>
+                    </span>
+                </button>
             </div>
         `;
     }
 
-    /**
-     * Toggle the calendar events section expansion
-     */
-    private toggleCalendarEventsSection(): void {
-        const header = document.querySelector(`.${styles.header}`);
-        if (!header) return;
-
-        const content = document.querySelector(`.${styles.content}`) as HTMLElement;
-        if (!content) return;
-
-        const isExpanded = header.getAttribute('aria-expanded') === 'true';
-
-        if (isExpanded) {
-            header.setAttribute('aria-expanded', 'false');
-            content.classList.remove(styles.expanded);
-        } else {
-            header.setAttribute('aria-expanded', 'true');
-            content.classList.add(styles.expanded);
-        }
-    }
 
     private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: any[]): void {
         // Associate DOM elements with Course objects
@@ -1445,11 +1186,9 @@ export class ScheduleController {
                 return displayTerms.includes(term);
             });
             
-            // Check if we have calendar events for this term
-            const hasExternalEvents = this.calendarState.getInstancesForTerm(term).length > 0;
-            const hasLocalEvents = this.calendarState.getLocalEventSlotsForTerm(term).length > 0;
+            const hasLocalEvents = this.getLocalEventSlotsForTerm(term).length > 0;
 
-            if (termCourses.length === 0 && !hasExternalEvents && !hasLocalEvents) {
+            if (termCourses.length === 0 && !hasLocalEvents) {
                 this.renderEmptyGrid(gridContainer);
                 return;
             }
@@ -1487,13 +1226,9 @@ export class ScheduleController {
             html += `<div class="day-header">${TimeUtils.getDayAbbr(day)}</div>`;
         });
 
-        // Get weekly slots (pre-computed, deduplicated, filtered) from CalendarState
-        const externalCalendarSlots = this.calendarState.getWeeklySlotsForTerm(term);
-        // Get local event slots for this term
-        const localEventSlots = this.calendarState.getLocalEventSlotsForTerm(term);
-        // Combine both types of calendar slots
-        const calendarSlotsForTerm = [...externalCalendarSlots, ...localEventSlots];
-        console.log(`[ScheduleController] Rendering term ${term} with ${externalCalendarSlots.length} external + ${localEventSlots.length} local calendar slots`);
+        const localEventSlots = this.getLocalEventSlotsForTerm(term);
+        const calendarSlotsForTerm = localEventSlots;
+        console.log(`[ScheduleController] Rendering term ${term} with ${localEventSlots.length} local calendar slots`);
 
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {
@@ -2278,27 +2013,17 @@ export class ScheduleController {
             return;
         }
 
-        // Show the settings modal with calendar info if connected
-        const hasConnectedCalendar = !!this.currentSchedule?.connectedCalendar;
-        const calendarName = this.currentSchedule?.connectedCalendar?.calendarName;
-        const calendarProvider = this.currentSchedule?.connectedCalendar?.providerId;
-
-        // Calculate counts separately for display breakdown
-        const totalBlockableCount = this.calendarState.getBlockableEventCount();
-        const localEventCount = this.calendarState.getLocalEvents().filter(e => e.visible).length;
-        const cloudEventCount = totalBlockableCount - localEventCount;
+        const localEvents = this.currentSchedule?.localEvents || [];
+        const localEventCount = localEvents.filter(e => e.visible).length;
 
         const settingsModal = new AutoScheduleSettingsModal(this.modalService, {
             onNext: async (settings: AutoScheduleSettings) => {
                 await this.generateSchedulesWithSettings(settings, selectedCourses);
             },
             onOpenCalendarPanel: () => {
-                this.openCalendarEventsPanel();
+                this.openAddLocalEventModal();
             },
-            hasConnectedCalendar,
-            calendarName,
-            calendarProvider,
-            calendarEventCount: cloudEventCount,
+            hasConnectedCalendar: false,
             localEventCount: localEventCount
         });
         settingsModal.show();
@@ -2323,12 +2048,11 @@ export class ScheduleController {
         try {
             const autoScheduler = new AutoScheduler(this.scheduleFilterService!);
 
-            // Merge calendar events into blocked times if enabled
             let blockedTimes = [...settings.blockedTimes];
             if (settings.avoidCalendarEvents) {
-                const calendarBlockedTimes = this.calendarState.getAllBlockedTimes();
+                const calendarBlockedTimes = this.getAllLocalEventBlockedTimes();
                 blockedTimes = [...blockedTimes, ...calendarBlockedTimes];
-                console.log(`[Auto-Schedule] Added ${calendarBlockedTimes.length} blocked times from calendar events (cloud + local)`);
+                console.log(`[Auto-Schedule] Added ${calendarBlockedTimes.length} blocked times from local events`);
             }
 
             const config: AutoScheduleConfig = {
@@ -2372,9 +2096,8 @@ export class ScheduleController {
             return;
         }
 
-        // Debug: Log blocked times from calendar
-        const blockedTimes = this.calendarState.getAllBlockedTimes();
-        console.log('[AutoSchedule Debug] Blocked times from calendar:', blockedTimes.map(bt => ({
+        const blockedTimes = this.getAllLocalEventBlockedTimes();
+        console.log('[AutoSchedule Debug] Blocked times from local events:', blockedTimes.map(bt => ({
             day: bt.day,
             start: `${bt.startTime.hours}:${String(bt.startTime.minutes).padStart(2, '0')}`,
             end: `${bt.endTime.hours}:${String(bt.endTime.minutes).padStart(2, '0')}`,
