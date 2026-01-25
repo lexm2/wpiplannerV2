@@ -1299,6 +1299,7 @@ export class ScheduleController {
         const termsToRender = new Set<string>();
         for (const selectedCourse of affectedCourses) {
             const computedTerm = getComputedTerm(selectedCourse);
+            if (!computedTerm) continue;
             const displayTerms = getDisplayTerms(computedTerm);
             displayTerms.forEach(term => termsToRender.add(term));
         }
@@ -1312,6 +1313,7 @@ export class ScheduleController {
 
                 const termCourses = selectedCourses.filter(sc => {
                     const computedTerm = getComputedTerm(sc);
+                    if (!computedTerm) return false;
                     const displayTerms = getDisplayTerms(computedTerm);
                     return displayTerms.includes(term);
                 });
@@ -2200,6 +2202,8 @@ export class ScheduleController {
 
             if (selections.length > 0) {
                 await this.courseSelectionService.batchSetSelectedComponents(selections, true);
+                // Render all grids to clear stale course data from previous schedule
+                this.renderScheduleGrids();
             }
         } finally {
             this.isApplyingAutoSchedule = false;

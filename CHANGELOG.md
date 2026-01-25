@@ -10,7 +10,10 @@
 - Auto-schedule navigation is now significantly faster with optimized rendering (90% faster)
 
 ### Fixed
+- Fixed grid cells not clearing properly when navigating between auto-generated schedules
+- Fixed auto-schedule generation failing after worker pool optimization
 - Fixed failing TermBoundsService test
+- Fixed type errors in course selection and schedule rendering
 
 ## [2026-01-24]
 
