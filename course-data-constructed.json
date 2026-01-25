@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 25, 2026, 11:17 PM",
+  "generated": "Jan 25, 2026, 11:40 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -227748,7 +227748,7 @@
                 "crn": 337197,
                 "number": "DL01",
                 "seats": 40,
-                "seatsAvailable": 18,
+                "seatsAvailable": 17,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4431",
@@ -227767,7 +227767,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 40,
-                    "seatsAvailable": 18,
+                    "seatsAvailable": 17,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL01",
@@ -227784,7 +227784,7 @@
                   "crn": 337039,
                   "number": "DX01",
                   "seats": 10,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4431",
@@ -227803,7 +227803,7 @@
                       "building": "",
                       "room": "Olin Hall 010R Physics Lab",
                       "seats": 10,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
