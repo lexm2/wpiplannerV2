@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 25, 2026, 7:50 PM",
+  "generated": "Jan 25, 2026, 8:19 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -19823,7 +19823,7 @@
                 "crn": 336798,
                 "number": "C01",
                 "seats": 25,
-                "seatsAvailable": 8,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -19842,7 +19842,7 @@
                     "building": "",
                     "room": "Kaven Hall 202 Stats Computer Lab",
                     "seats": 25,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
