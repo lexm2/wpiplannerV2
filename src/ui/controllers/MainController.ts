@@ -1196,14 +1196,25 @@ export class MainController {
             // Handle schedule changes and data loads with full refresh
             const requiresFullRefresh = event.type === 'data_loaded'
                 || event.type === 'selection_cleared'
-                || event.type === 'components_cleared'
-                || event.type === 'components_changed';
+                || event.type === 'components_cleared';
+
             if (requiresFullRefresh) {
                 this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
                 this.courseController.displaySelectedCourses();
                 this.scheduleController.displayScheduleSelectedCourses();
                 if (this.uiStateManager.currentPage === 'schedule') {
                     this.scheduleController.renderScheduleGrids();
+                }
+                this.updateSelectedCoursesState(selectedCourses);
+                return;
+            }
+
+            if (event.type === 'components_changed' && event.affectedCourseIds) {
+                this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
+                this.courseController.displaySelectedCourses();
+                this.scheduleController.displayScheduleSelectedCourses();
+                if (this.uiStateManager.currentPage === 'schedule') {
+                    this.scheduleController.renderAffectedTerms(event.affectedCourseIds);
                 }
                 this.updateSelectedCoursesState(selectedCourses);
                 return;

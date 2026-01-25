@@ -1166,11 +1166,10 @@ export class ScheduleController {
 
 
         grids.forEach(term => {
+            const termStart = performance.now();
             const gridContainer = document.getElementById(`schedule-grid-${term}`);
             if (!gridContainer) return;
 
-            // Filter courses for this term - use direct Section object access
-            // Graduate courses with F/S terms are mapped to A+B/C+D
             const termCourses = selectedCourses.filter(sc => {
                 const computedTerm = getComputedTerm(sc);
 
@@ -1181,21 +1180,70 @@ export class ScheduleController {
                     return false;
                 }
 
-                // Map F→[A,B], S→[C,D], otherwise [term]
                 const displayTerms = getDisplayTerms(computedTerm);
                 return displayTerms.includes(term);
             });
-            
+
             const hasLocalEvents = this.getLocalEventSlotsForTerm(term).length > 0;
 
             if (termCourses.length === 0 && !hasLocalEvents) {
                 this.renderEmptyGrid(gridContainer);
+                const termEnd = performance.now();
+                console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms (empty)`);
                 return;
             }
 
             this.renderPopulatedGrid(gridContainer, termCourses, term);
+            const termEnd = performance.now();
+            console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms`);
         });
-        
+
+    }
+
+    public renderAffectedTerms(affectedCourseIds: string[]): void {
+        if (affectedCourseIds.length === 0) {
+            return;
+        }
+
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        const affectedCourses = selectedCourses.filter(sc =>
+            affectedCourseIds.includes(sc.course.id)
+        );
+
+        const termsToRender = new Set<string>();
+        for (const selectedCourse of affectedCourses) {
+            const computedTerm = getComputedTerm(selectedCourse);
+            const displayTerms = getDisplayTerms(computedTerm);
+            displayTerms.forEach(term => termsToRender.add(term));
+        }
+
+        const grids = ['A', 'B', 'C', 'D'];
+        grids.forEach(term => {
+            if (termsToRender.has(term)) {
+                const termStart = performance.now();
+                const gridContainer = document.getElementById(`schedule-grid-${term}`);
+                if (!gridContainer) return;
+
+                const termCourses = selectedCourses.filter(sc => {
+                    const computedTerm = getComputedTerm(sc);
+                    const displayTerms = getDisplayTerms(computedTerm);
+                    return displayTerms.includes(term);
+                });
+
+                const hasLocalEvents = this.getLocalEventSlotsForTerm(term).length > 0;
+
+                if (termCourses.length === 0 && !hasLocalEvents) {
+                    this.renderEmptyGrid(gridContainer);
+                    const termEnd = performance.now();
+                    console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms (empty)`);
+                    return;
+                }
+
+                this.renderPopulatedGrid(gridContainer, termCourses, term);
+                const termEnd = performance.now();
+                console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms`);
+            }
+        });
     }
 
     private renderEmptyGrid(container: HTMLElement): void {
@@ -2120,9 +2168,6 @@ export class ScheduleController {
             if (selections.length > 0) {
                 await this.courseSelectionService.batchSetSelectedComponents(selections);
             }
-
-            this.displayScheduleSelectedCourses();
-            this.renderScheduleGrids();
         } finally {
             this.isApplyingAutoSchedule = false;
         }

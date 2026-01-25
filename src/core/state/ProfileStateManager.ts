@@ -584,10 +584,10 @@ export class ProfileStateManager {
 
             this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
 
-            // Await all schedule saves (async for IndexedDB)
-            for (const schedule of this.state.schedules) {
-                await this.storageManager.saveSchedule(schedule);
-            }
+            const savePromises = this.state.schedules.map(schedule =>
+                this.storageManager.saveSchedule(schedule)
+            );
+            await Promise.all(savePromises);
 
             this.storageManager.savePreferences(this.state.preferences);
 
@@ -930,15 +930,11 @@ export class ProfileStateManager {
         }
 
         try {
-            const result = await fn();
-            return result;
+            return await fn();
         } finally {
             if (!wasBatch) {
                 this.isBatchUpdate = false;
-                // Single save after all operations
                 this.save();
-                // Wait for save to complete
-                await Promise.all(this.pendingSavePromises);
             }
         }
     }

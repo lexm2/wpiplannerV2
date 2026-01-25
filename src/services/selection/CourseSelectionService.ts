@@ -23,6 +23,7 @@ export interface SelectionChangeEvent {
     section?: string | null;
     selectedCourses: SelectedCourse[];
     timestamp: number;
+    affectedCourseIds?: string[];
 }
 
 export type SelectionChangeListener = (event: SelectionChangeEvent) => void;
@@ -408,6 +409,25 @@ export class CourseSelectionService {
                 }
             }
 
+            const previousSelections = new Map<string, {
+                lecture: Section | null;
+                discussion: Section | null;
+                lab: Section | null;
+            }>();
+
+            for (const selection of selections) {
+                const current = this.profileStateManager.getSelectedCourses().find(
+                    sc => sc.course.id === selection.course.id
+                );
+                if (current) {
+                    previousSelections.set(selection.course.id, {
+                        lecture: current.lecture,
+                        discussion: current.discussion,
+                        lab: current.lab
+                    });
+                }
+            }
+
             await this.profileStateManager.withBatch(async () => {
                 // Apply all component updates
                 for (const selection of selections) {
@@ -421,11 +441,21 @@ export class CourseSelectionService {
                 }
             });
 
+            const actuallyChangedCourseIds = selections.filter(selection => {
+                const previous = previousSelections.get(selection.course.id);
+                if (!previous) return true;
+
+                return previous.lecture?.crn !== selection.lecture?.crn ||
+                       previous.discussion?.crn !== selection.discussion?.crn ||
+                       previous.lab?.crn !== selection.lab?.crn;
+            }).map(s => s.course.id);
+
             // Emit a single event for all changes
             this.notifySelectionListeners({
                 type: 'components_changed',
                 selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                affectedCourseIds: actuallyChangedCourseIds
             });
 
             return {
