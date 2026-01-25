@@ -5,6 +5,9 @@
 ### Improved
 - Schedules with preferred wake-up times are now shown first properly
 
+### Fixed
+- Fixed failing TermBoundsService test
+
 ## [2026-01-24]
 
 ### Added

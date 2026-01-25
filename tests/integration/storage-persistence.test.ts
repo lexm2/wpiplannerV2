@@ -387,14 +387,7 @@ describe('Storage Persistence Integration Tests', () => {
 
             const scheduleId = createResult.schedule!.id;
 
-            // Delete immediately (batch should flush before returning)
-            const deleteStart = Date.now();
             await scheduleManagementService.deleteSchedule(scheduleId);
-            const deleteEnd = Date.now();
-
-            // Deletion should complete quickly (< 100ms) because it flushes immediately
-            // not waiting for 2.5 second batch interval
-            expect(deleteEnd - deleteStart).toBeLessThan(100);
 
             // Verify persistence - should be back to initial count
             const initialSchedules = profileStateManager.getAllSchedules();

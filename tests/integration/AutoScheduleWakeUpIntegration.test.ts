@@ -6,8 +6,6 @@ import { DayOfWeek } from '../../src/types/types'
 
 describe('Auto-Schedule Wake Up Time Integration', () => {
   it('should apply wake up time preference during generation', async () => {
-    console.log('\n=== INTEGRATION TEST: Wake Up Time ===\n')
-
     const course1 = createMockCourse({
       id: 'CS-1101',
       lectures: [
@@ -74,7 +72,6 @@ describe('Auto-Schedule Wake Up Time Integration', () => {
     }
 
     const schedules = autoScheduler.generateSchedules(selectedCourses, config, 100)
-    console.log(`Generated ${schedules.length} schedules`)
 
     expect(schedules.length).toBe(2)
 
@@ -83,9 +80,6 @@ describe('Auto-Schedule Wake Up Time Integration', () => {
 
     const firstCSSection = firstSchedule.find((r: any) => r.course.id === 'CS-1101')
     const secondCSSection = secondSchedule.find((r: any) => r.course.id === 'CS-1101')
-
-    console.log('First schedule CS section:', firstCSSection?.combination.lecture.crn)
-    console.log('Second schedule CS section:', secondCSSection?.combination.lecture.crn)
 
     expect(firstCSSection?.combination.lecture.crn).toBe(10002)
     expect(secondCSSection?.combination.lecture.crn).toBe(10001)

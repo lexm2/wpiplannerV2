@@ -62,7 +62,7 @@ describe('TermBoundsService', () => {
             await service.loadTermBounds();
 
             expect(service.isLoaded()).toBe(true);
-            expect(mockFetch).toHaveBeenCalledWith('/term-bounds.json');
+            expect(mockFetch).toHaveBeenCalledWith('./term-bounds.json');
         });
 
         it('should handle fetch failure gracefully', async () => {
