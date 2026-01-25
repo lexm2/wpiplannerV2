@@ -24,6 +24,7 @@ export interface SelectionChangeEvent {
     selectedCourses: SelectedCourse[];
     timestamp: number;
     affectedCourseIds?: string[];
+    skipCourseSidebarUpdate?: boolean;
 }
 
 export type SelectionChangeListener = (event: SelectionChangeEvent) => void;
@@ -394,12 +395,12 @@ export class CourseSelectionService {
             lecture: Section | null;
             discussion: Section | null;
             lab: Section | null;
-        }>
+        }>,
+        skipSnapshot = false
     ): Promise<CourseSelectionResult> {
         await this.ensureInitialized();
 
         try {
-            // Validate all courses are selected before making any changes
             for (const selection of selections) {
                 if (!this.isCourseSelected(selection.course)) {
                     return {
@@ -421,15 +422,14 @@ export class CourseSelectionService {
                 );
                 if (current) {
                     previousSelections.set(selection.course.id, {
-                        lecture: current.lecture,
-                        discussion: current.discussion,
-                        lab: current.lab
+                        lecture: current.selectedLecture,
+                        discussion: current.selectedDiscussion,
+                        lab: current.selectedLab
                     });
                 }
             }
 
             await this.profileStateManager.withBatch(async () => {
-                // Apply all component updates
                 for (const selection of selections) {
                     this.profileStateManager.setSelectedComponents(
                         selection.course,
@@ -439,7 +439,7 @@ export class CourseSelectionService {
                         'service'
                     );
                 }
-            });
+            }, skipSnapshot);
 
             const actuallyChangedCourseIds = selections.filter(selection => {
                 const previous = previousSelections.get(selection.course.id);
@@ -450,12 +450,12 @@ export class CourseSelectionService {
                        previous.lab?.crn !== selection.lab?.crn;
             }).map(s => s.course.id);
 
-            // Emit a single event for all changes
             this.notifySelectionListeners({
                 type: 'components_changed',
                 selectedCourses: this.profileStateManager.getSelectedCourses(),
                 timestamp: Date.now(),
-                affectedCourseIds: actuallyChangedCourseIds
+                affectedCourseIds: actuallyChangedCourseIds,
+                skipCourseSidebarUpdate: skipSnapshot
             });
 
             return {

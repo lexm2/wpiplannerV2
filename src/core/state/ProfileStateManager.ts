@@ -561,8 +561,8 @@ export class ProfileStateManager {
         return this.undoRedoManager.onChange(listener);
     }
 
-    save(): void {
-        const savePromise = this.executeSave();
+    save(skipSnapshot = false): void {
+        const savePromise = this.executeSave(skipSnapshot);
         this.pendingSavePromises.add(savePromise);
 
         savePromise
@@ -570,10 +570,9 @@ export class ProfileStateManager {
             .finally(() => this.pendingSavePromises.delete(savePromise));
     }
 
-    private async executeSave(): Promise<void> {
+    private async executeSave(skipSnapshot = false): Promise<void> {
         try {
-            // Capture snapshot before saving (unless we're restoring from undo/redo)
-            if (!this.isRestoringState) {
+            if (!this.isRestoringState && !skipSnapshot) {
                 const schedulesMap = new Map(this.state.schedules.map(s => [s.id, s]));
                 this.undoRedoManager.captureSnapshot(
                     this.state.activeScheduleId,
@@ -914,6 +913,7 @@ export class ProfileStateManager {
      * Automatically manages batch flag, saves once at completion, and emits sync event.
      *
      * @param fn - Function containing batch updates
+     * @param skipSnapshot - Skip expensive snapshot capture during save (useful for rapid navigation)
      * @returns Result of the batch function
      *
      * @example
@@ -923,7 +923,7 @@ export class ProfileStateManager {
      *     }
      * });
      */
-    async withBatch<T>(fn: () => Promise<T>): Promise<T> {
+    async withBatch<T>(fn: () => Promise<T>, skipSnapshot = false): Promise<T> {
         const wasBatch = this.isBatchUpdate;
         if (!wasBatch) {
             this.isBatchUpdate = true;
@@ -934,7 +934,7 @@ export class ProfileStateManager {
         } finally {
             if (!wasBatch) {
                 this.isBatchUpdate = false;
-                this.save();
+                this.save(skipSnapshot);
             }
         }
     }

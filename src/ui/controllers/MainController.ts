@@ -32,6 +32,7 @@ import { ResizablePanel } from '../components/ResizablePanel'
 import { TermBoundsService } from '../../services/data/TermBoundsService'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
 import { DeviceDetection } from '../../utils/deviceDetection'
+import { WorkerPoolManager } from '../../workers/WorkerPoolManager'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -236,7 +237,9 @@ export class MainController {
         this.uiStateManager.showLoadingState();
 
         try {
-            // Initialize StorageService and load persisted data
+            const workerPool = WorkerPoolManager.getInstance();
+            await workerPool.initialize();
+
             await this.storageService.initialize();
             this._themeSelector.initializeTheme();
             await rateMyProfessorService.loadData();
@@ -260,6 +263,7 @@ export class MainController {
             this.setupCourseSelectionListener();
             this.setupScheduleChangeListener();
             this.initializeSwipeNavigation();
+            this.setupWindowUnloadHandler();
 
             // Load active schedule into ScheduleController (for local events, etc.)
             const activeSchedule = this.scheduleManagementService.getActiveSchedule();
@@ -331,6 +335,21 @@ export class MainController {
             this.scheduleController.closeComponentWizard();
             this.uiStateManager.switchToPage('planner');
         }
+    }
+
+    private setupWindowUnloadHandler(): void {
+        window.addEventListener('beforeunload', async (e) => {
+            const profileStateManager = ProfileStateManager.getInstance();
+
+            if (profileStateManager.hasPendingSaves()) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+
+            const workerPool = WorkerPoolManager.getInstance();
+            workerPool.terminate();
+        });
     }
 
 
@@ -1210,8 +1229,10 @@ export class MainController {
             }
 
             if (event.type === 'components_changed' && event.affectedCourseIds) {
-                this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
-                this.courseController.displaySelectedCourses();
+                if (!event.skipCourseSidebarUpdate) {
+                    this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
+                    this.courseController.displaySelectedCourses();
+                }
                 this.scheduleController.displayScheduleSelectedCourses();
                 if (this.uiStateManager.currentPage === 'schedule') {
                     this.scheduleController.renderAffectedTerms(event.affectedCourseIds);

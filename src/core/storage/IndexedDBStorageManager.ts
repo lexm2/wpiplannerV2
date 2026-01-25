@@ -5,6 +5,9 @@
 import { Schedule } from '../../types/schedule';
 import { safeStringify, safeParse } from '../../utils/jsonSerializer';
 import LZString from 'lz-string';
+import { WorkerPoolManager } from '../../workers/WorkerPoolManager';
+import { WorkerTaskType } from '../../workers/protocol';
+import { perfMonitor } from '../../utils/PerformanceMonitor';
 
 interface StorageResult<T> {
     success: boolean;
@@ -85,6 +88,19 @@ export class IndexedDBStorageManager {
             await this.initialize();
             const db = this.ensureDbInitialized();
 
+            const scheduleWithTimestamp = {
+                ...schedule,
+                timestamp: Date.now()
+            };
+
+            const startTime = perfMonitor.startMeasure('save-compression');
+            const workerPool = WorkerPoolManager.getInstance();
+            const compressed = await workerPool.executeTask<string>(
+                WorkerTaskType.COMPRESS_DATA,
+                { data: scheduleWithTimestamp }
+            );
+            perfMonitor.endMeasure('save-compression', startTime);
+
             return new Promise((resolve) => {
                 const transaction = db.transaction(
                     [IndexedDBStorageManager.STORE_NAMES.SCHEDULES],
@@ -92,13 +108,6 @@ export class IndexedDBStorageManager {
                 );
                 const store = transaction.objectStore(IndexedDBStorageManager.STORE_NAMES.SCHEDULES);
 
-                const scheduleWithTimestamp = {
-                    ...schedule,
-                    timestamp: Date.now()
-                };
-
-                const serialized = safeStringify(scheduleWithTimestamp);
-                const compressed = LZString.compress(serialized);
                 const dataToStore = {
                     id: schedule.id,
                     serializedData: compressed,
@@ -132,7 +141,7 @@ export class IndexedDBStorageManager {
             await this.initialize();
             const db = this.ensureDbInitialized();
 
-            return new Promise((resolve) => {
+            return new Promise(async (resolve) => {
                 const transaction = db.transaction(
                     [IndexedDBStorageManager.STORE_NAMES.SCHEDULES],
                     'readonly'
@@ -140,25 +149,33 @@ export class IndexedDBStorageManager {
                 const store = transaction.objectStore(IndexedDBStorageManager.STORE_NAMES.SCHEDULES);
                 const request = store.get(scheduleId);
 
-                request.onsuccess = () => {
+                request.onsuccess = async () => {
                     if (request.result) {
                         const stored = request.result;
                         if (stored.serializedData) {
-                            // Handle both compressed and legacy uncompressed data
-                            const json = stored.compressed
-                                ? LZString.decompress(stored.serializedData)
-                                : stored.serializedData;
+                            if (stored.compressed) {
+                                const startTime = perfMonitor.startMeasure('load-decompression');
+                                const workerPool = WorkerPoolManager.getInstance();
+                                const decompressed = await workerPool.executeTask<string>(
+                                    WorkerTaskType.DECOMPRESS_DATA,
+                                    { compressed: stored.serializedData }
+                                );
+                                perfMonitor.endMeasure('load-decompression', startTime);
 
-                            if (!json) {
-                                resolve({
-                                    success: false,
-                                    error: 'Failed to decompress schedule data'
-                                });
-                                return;
+                                if (!decompressed) {
+                                    resolve({
+                                        success: false,
+                                        error: 'Failed to decompress schedule data'
+                                    });
+                                    return;
+                                }
+
+                                const deserialized = safeParse(decompressed) as Schedule;
+                                resolve({ success: true, data: deserialized });
+                            } else {
+                                const deserialized = safeParse(stored.serializedData) as Schedule;
+                                resolve({ success: true, data: deserialized });
                             }
-
-                            const deserialized = safeParse(json) as Schedule;
-                            resolve({ success: true, data: deserialized });
                         } else {
                             resolve({ success: true, data: stored });
                         }
