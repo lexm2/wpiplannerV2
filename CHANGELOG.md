@@ -5,6 +5,7 @@
 ### Improved
 - Auto-schedule now applies wake-up time preference during generation for better performance
 - Schedules with preferred wake-up times are now shown first without needing to generate thousands of schedules
+- Cleaned up auto-schedule settings interfaces for better code clarity
 
 ## [2026-01-24]
 

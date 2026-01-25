@@ -62,6 +62,7 @@ export class AutoScheduleSettingsModal extends BaseModal {
                     </div>
                     <div class="modal-body auto-schedule-settings-body">
                         ${this.renderCalendarSection()}
+                        ${this.renderWakeUpTimeSection()}
                         ${this.renderPlaceholderSection()}
                     </div>
                     <div class="modal-footer">
@@ -135,6 +136,27 @@ export class AutoScheduleSettingsModal extends BaseModal {
                         <span class="calendar-events-btn-count">${countMessage}</span>
                     </span>
                 </button>
+            </div>
+        `;
+    }
+
+    /**
+     * Render the wake up time section
+     */
+    private renderWakeUpTimeSection(): string {
+        return `
+            <div class="settings-section wake-up-time-section">
+                <label class="wake-up-time-label" for="wake-up-time-input">
+                    Wake up time (earliest class)
+                </label>
+                <input
+                    type="time"
+                    id="wake-up-time-input"
+                    class="wake-up-time-input"
+                >
+                <p class="wake-up-time-hint">
+                    Schedules with classes before this time will appear later in the list
+                </p>
             </div>
         `;
     }
@@ -215,18 +237,38 @@ export class AutoScheduleSettingsModal extends BaseModal {
     }
 
     /**
+     * Validate time input values
+     */
+    private validateTimeInput(hours: number, minutes: number): boolean {
+        return hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59;
+    }
+
+    /**
      * Handle the Next button click
      */
     private handleNext(): void {
+        let wakeUpTime: { hours: number; minutes: number } | null = null;
+
+        const wakeUpInput = document.getElementById('wake-up-time-input') as HTMLInputElement;
+
+        if (wakeUpInput && wakeUpInput.value && wakeUpInput.value.trim()) {
+            const [hours, minutes] = wakeUpInput.value.split(':').map(Number);
+            if (!isNaN(hours) && !isNaN(minutes)) {
+                if (!this.validateTimeInput(hours, minutes)) {
+                    alert('Invalid wake-up time. Hours must be 0-23, minutes 0-59.');
+                    return;
+                }
+                wakeUpTime = { hours, minutes };
+            }
+        }
+
         const settings: AutoScheduleSettings = {
             blockedTimes: [],
-            avoidCalendarEvents: this.avoidCalendarEvents
+            avoidCalendarEvents: this.avoidCalendarEvents,
+            wakeUpTime
         };
 
-        // Call the callback with settings
         this.options.onNext(settings);
-
-        // Close the modal
         this.hide();
     }
 }

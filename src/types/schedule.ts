@@ -152,35 +152,34 @@ export interface DisplayableTimeSlot extends WeeklyTimeSlot {
 }
 
 /**
- * Configuration for the auto-scheduler.
- * Intentionally minimal - add features incrementally.
+ * Hard constraints for auto-schedule generation.
+ * These MUST be satisfied - schedules violating these won't be generated.
  */
-export interface AutoScheduleConfig {
+export interface AutoScheduleConstraints {
     /** Time periods to avoid when scheduling */
     blockedTimes: WeeklyTimeSlot[];
-    /** Wake-up time preference for section scoring */
-    wakeUpTime?: { hours: number; minutes: number } | null;
 }
 
 /**
- * Filters applied during auto-schedule generation.
- * These control which section combinations are considered valid.
+ * Soft preferences for auto-schedule ranking.
+ * These affect which schedules are shown first, but don't exclude schedules.
  */
-export interface AutoScheduleFilters {
-    blockedTimes?: WeeklyTimeSlot[];
-    avoidCalendarEvents?: boolean;
-    /** Earliest preferred class time (soft constraint - affects ranking) */
+export interface AutoSchedulePreferences {
+    /** Earliest preferred class time - sections before this are ranked lower */
     wakeUpTime?: SimpleTime | null;
-    /** Latest preferred class time (soft constraint - affects ranking) */
-    sleepTime?: SimpleTime | null;
-    preferredDays?: DayOfWeek[];
-    avoidDays?: DayOfWeek[];
-    maxClassesPerDay?: number;
-    /** Minimum break time between classes (in minutes) */
-    minBreakTime?: number;
 }
 
 /**
- * Settings for the auto-scheduler including user preferences.
+ * Combined configuration for auto-schedule generation.
+ * Includes both hard constraints and soft preferences.
  */
-export interface AutoScheduleSettings extends AutoScheduleConfig, AutoScheduleFilters {}
+export interface AutoScheduleConfig extends AutoScheduleConstraints, AutoSchedulePreferences {}
+
+/**
+ * UI-level settings for auto-schedule modal.
+ * Includes extra flags that get converted to config before generation.
+ */
+export interface AutoScheduleSettings extends AutoScheduleConfig {
+    /** Whether to convert local calendar events to blocked times */
+    avoidCalendarEvents?: boolean;
+}
