@@ -237,13 +237,6 @@ export class AutoScheduleSettingsModal extends BaseModal {
     }
 
     /**
-     * Validate time input values
-     */
-    private validateTimeInput(hours: number, minutes: number): boolean {
-        return hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59;
-    }
-
-    /**
      * Handle the Next button click
      */
     private handleNext(): void {
@@ -254,10 +247,6 @@ export class AutoScheduleSettingsModal extends BaseModal {
         if (wakeUpInput && wakeUpInput.value && wakeUpInput.value.trim()) {
             const [hours, minutes] = wakeUpInput.value.split(':').map(Number);
             if (!isNaN(hours) && !isNaN(minutes)) {
-                if (!this.validateTimeInput(hours, minutes)) {
-                    alert('Invalid wake-up time. Hours must be 0-23, minutes 0-59.');
-                    return;
-                }
                 wakeUpTime = { hours, minutes };
             }
         }
