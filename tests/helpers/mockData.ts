@@ -326,3 +326,37 @@ export const createMockScheduleFilterService = (): MockScheduleFilterService => 
     }
   }
 }
+
+export const createMockScheduleResult = (overrides: {
+  course?: Partial<Course>;
+  lecture?: Partial<Section>;
+  discussion?: Partial<Section> | null;
+  lab?: Partial<Section> | null;
+} = {}): any => {
+  const course = createMockCourse(overrides.course)
+
+  return {
+    course,
+    combination: {
+      lecture: overrides.lecture ? createMockSection(overrides.lecture) : createMockSection({
+        periods: [createMockPeriod({ startTime: createMockTime(9, 0) })]
+      }),
+      discussion: overrides.discussion ? createMockSection(overrides.discussion) : null,
+      lab: overrides.lab ? createMockSection(overrides.lab) : null
+    },
+    isLocked: false
+  }
+}
+
+export const createScheduleWithEarlyClass = (hours: number, minutes: number): any[] => {
+  return [
+    createMockScheduleResult({
+      lecture: {
+        periods: [createMockPeriod({
+          startTime: createMockTime(hours, minutes),
+          endTime: createMockTime(hours + 1, minutes + 50)
+        })]
+      }
+    })
+  ]
+}

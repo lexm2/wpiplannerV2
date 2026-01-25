@@ -1868,6 +1868,46 @@ html.is-mobile .filter-actions {
   font-style: italic;
 }
 
+/* Wake Up Time Section */
+.wake-up-time-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+}
+
+.wake-up-time-label {
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.wake-up-time-input {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.95rem;
+  transition: var(--effect-transition);
+}
+
+.wake-up-time-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 0, 123, 255), 0.2);
+}
+
+.wake-up-time-hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
 /* ===== Changelog Modal ===== */
 .changelog-modal-dialog {
   max-width: 600px;
