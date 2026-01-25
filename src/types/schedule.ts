@@ -158,14 +158,29 @@ export interface DisplayableTimeSlot extends WeeklyTimeSlot {
 export interface AutoScheduleConfig {
     /** Time periods to avoid when scheduling */
     blockedTimes: WeeklyTimeSlot[];
+    /** Wake-up time preference for section scoring */
+    wakeUpTime?: { hours: number; minutes: number } | null;
+}
+
+/**
+ * Filters applied during auto-schedule generation.
+ * These control which section combinations are considered valid.
+ */
+export interface AutoScheduleFilters {
+    blockedTimes?: WeeklyTimeSlot[];
+    avoidCalendarEvents?: boolean;
+    /** Earliest preferred class time (soft constraint - affects ranking) */
+    wakeUpTime?: SimpleTime | null;
+    /** Latest preferred class time (soft constraint - affects ranking) */
+    sleepTime?: SimpleTime | null;
+    preferredDays?: DayOfWeek[];
+    avoidDays?: DayOfWeek[];
+    maxClassesPerDay?: number;
+    /** Minimum break time between classes (in minutes) */
+    minBreakTime?: number;
 }
 
 /**
  * Settings for the auto-scheduler including user preferences.
- * Extended from AutoScheduleConfig to include weights and other settings.
  */
-export interface AutoScheduleSettings extends AutoScheduleConfig {
-    /** Whether to avoid calendar events when scheduling */
-    avoidCalendarEvents?: boolean;
-    // Future: weights for scoring (professorRating, earlyMorning, timeGap, etc.)
-}
+export interface AutoScheduleSettings extends AutoScheduleConfig, AutoScheduleFilters {}

@@ -1,4 +1,4 @@
-import { DayOfWeek, Course, Section } from '../../types/types'
+import { DayOfWeek, Course, Section, Period } from '../../types/types'
 import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
@@ -13,7 +13,7 @@ import type { SidebarPanel } from '../sidebar/types'
 import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine'
 import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../../utils/typeGuards'
-import { AutoScheduler } from '../../services/scheduling/AutoScheduler'
+import { AutoScheduler, type ScheduleResult } from '../../services/scheduling/AutoScheduler'
 import type { AutoScheduleConfig, AutoScheduleSettings, WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
 import { AutoScheduleSettingsModal } from '../components/AutoScheduleSettingsModal'
 import { getInlineSVG } from '../../utils/iconPaths'
@@ -42,7 +42,7 @@ export class ScheduleController {
     private hoverPreviewSections: Set<number> = new Set(); // Track CRNs of sections being previewed
     private courseColorMap: Map<string, string> = new Map();
     private usedColors: Set<string> = new Set();
-    private generatedSchedules: any[][] = [];
+    private generatedSchedules: ScheduleResult[][] = [];
     private currentScheduleIndex: number = 0;
     private isApplyingAutoSchedule: boolean = false;
     private currentSchedule: Schedule | null = null;
@@ -2037,8 +2037,6 @@ export class ScheduleController {
         settings: AutoScheduleSettings,
         selectedCourses: SelectedCourse[]
     ): Promise<void> {
-        console.log('[Auto-Schedule] Generating new schedules with settings:', settings);
-
         const autoScheduleBtn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
         if (autoScheduleBtn) {
             autoScheduleBtn.disabled = true;
@@ -2052,15 +2050,14 @@ export class ScheduleController {
             if (settings.avoidCalendarEvents) {
                 const calendarBlockedTimes = this.getAllLocalEventBlockedTimes();
                 blockedTimes = [...blockedTimes, ...calendarBlockedTimes];
-                console.log(`[Auto-Schedule] Added ${calendarBlockedTimes.length} blocked times from local events`);
             }
 
             const config: AutoScheduleConfig = {
-                blockedTimes
+                blockedTimes,
+                wakeUpTime: settings.wakeUpTime
             };
 
             const allSchedules = autoScheduler.generateSchedules(selectedCourses, config, 100);
-            console.log(`[Auto-Schedule] Generated ${allSchedules.length} valid schedules`);
 
             if (allSchedules.length === 0) {
                 console.warn('[Auto-Schedule] No valid schedules found');
@@ -2069,15 +2066,12 @@ export class ScheduleController {
                 return;
             }
 
-            // Store all generated schedules (no scoring for now)
             this.generatedSchedules = allSchedules;
             this.currentScheduleIndex = 0;
 
             // Apply the first schedule
             await this.applyScheduleAtIndex(0);
             this.updateAutoScheduleButtonUI();
-
-            console.log(`[Auto-Schedule] SUCCESS: Generated ${this.generatedSchedules.length} schedules. Showing 1/${this.generatedSchedules.length}`);
 
         } catch (error) {
             console.error('[Auto-Schedule] Error generating schedules:', error);
@@ -2089,43 +2083,15 @@ export class ScheduleController {
     }
 
     private async applyScheduleAtIndex(index: number): Promise<void> {
-        console.log(`[Auto-Schedule] Applying schedule at index ${index} (total: ${this.generatedSchedules.length})`);
         const schedule = this.generatedSchedules[index];
         if (!schedule) {
             console.warn(`[Auto-Schedule] No schedule found at index ${index}`);
             return;
         }
 
-        const blockedTimes = this.getAllLocalEventBlockedTimes();
-        console.log('[AutoSchedule Debug] Blocked times from local events:', blockedTimes.map(bt => ({
-            day: bt.day,
-            start: `${bt.startTime.hours}:${String(bt.startTime.minutes).padStart(2, '0')}`,
-            end: `${bt.endTime.hours}:${String(bt.endTime.minutes).padStart(2, '0')}`,
-            term: bt.term
-        })));
-
-        // Debug: Log section times for this schedule
-        console.log('[AutoSchedule Debug] Section times in this schedule:');
-        for (const result of schedule) {
-            const combo = result.combination;
-            const sections = [combo.lecture, combo.discussion, combo.lab].filter(Boolean);
-            for (const section of sections as any[]) {
-                console.log(`[AutoSchedule Debug] Section ${section.crn} (term ${section.computedTerm}):`, {
-                    periods: section.periods.map((p: any) => ({
-                        days: Array.from(p.days),
-                        start: `${p.startTime.hours}:${String(p.startTime.minutes).padStart(2, '0')}`,
-                        end: `${p.endTime.hours}:${String(p.endTime.minutes).padStart(2, '0')}`
-                    }))
-                });
-            }
-        }
-
         this.isApplyingAutoSchedule = true;
         try {
-            let autoFilledCount = 0;
             let lockedCount = 0;
-
-            const batchStartTime = performance.now();
 
             // Collect all component selections for batch update
             const selections: Array<{
@@ -2136,20 +2102,6 @@ export class ScheduleController {
             }> = [];
 
             for (const result of schedule) {
-                const courseName = `${result.course.department.abbreviation}${result.course.number}`;
-                const lectureInfo = result.combination.lecture
-                    ? `L:${result.combination.lecture.number} (CRN ${result.combination.lecture.crn})`
-                    : 'L:none';
-                const discussionInfo = result.combination.discussion
-                    ? `D:${result.combination.discussion.number} (CRN ${result.combination.discussion.crn})`
-                    : 'D:none';
-                const labInfo = result.combination.lab
-                    ? `Lab:${result.combination.lab.number} (CRN ${result.combination.lab.crn})`
-                    : 'Lab:none';
-                const status = result.isLocked ? '[LOCKED]' : '[AUTO-FILLED]';
-
-                console.log(`[Auto-Schedule] ${courseName} ${status} - ${lectureInfo}, ${discussionInfo}, ${labInfo}`);
-
                 if (result.isLocked) {
                     lockedCount++;
                     continue;
@@ -2162,7 +2114,6 @@ export class ScheduleController {
                     discussion: result.combination.discussion,
                     lab: result.combination.lab
                 });
-                autoFilledCount++;
             }
 
             // Apply all selections in a single batch
@@ -2170,20 +2121,8 @@ export class ScheduleController {
                 await this.courseSelectionService.batchSetSelectedComponents(selections);
             }
 
-            const batchTime = performance.now() - batchStartTime;
-            console.log(`[PERF] Batch update: ${batchTime.toFixed(2)}ms`);
-
-            console.log(`[Auto-Schedule] COMPLETE: ${autoFilledCount} auto-filled, ${lockedCount} locked`);
-
-            const sidebarStartTime = performance.now();
             this.displayScheduleSelectedCourses();
-            const sidebarTime = performance.now() - sidebarStartTime;
-            console.log(`[PERF] displayScheduleSelectedCourses: ${sidebarTime.toFixed(2)}ms`);
-
-            const gridStartTime = performance.now();
             this.renderScheduleGrids();
-            const gridTime = performance.now() - gridStartTime;
-            console.log(`[PERF] renderScheduleGrids: ${gridTime.toFixed(2)}ms`);
         } finally {
             this.isApplyingAutoSchedule = false;
         }

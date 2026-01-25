@@ -462,17 +462,17 @@ Automatic schedule generation using bitmask optimization.
 - [ConflictEngine](../src/core/scheduling/ConflictEngine.ts) - Conflict validation
 - [ScheduleController](../src/ui/controllers/ScheduleController.ts) - UI integration
 
-#### [ScheduleScorer.ts](../src/services/scheduling/ScheduleScorer.ts)
+#### [SectionScorer.ts](../src/services/scheduling/SectionScorer.ts)
 
-Scores schedules based on user preferences.
+Scores individual sections based on user preferences.
 
 **Responsibilities:**
-- Score schedules by criteria (gaps, days, times)
-- Rank generated schedules
-- Support custom scoring weights
+- Score sections by wake-up time preference
+- Used during schedule generation to prefer good sections
+- Returns higher scores for sections that match preferences
 
 **Connects to:**
-- [AutoScheduler](../src/services/scheduling/AutoScheduler.ts) - Scoring integration
+- [AutoScheduler](../src/services/scheduling/AutoScheduler.ts) - Used during generation
 
 ---
 

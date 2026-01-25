@@ -1,2 +1,2 @@
 export { AutoScheduler } from './AutoScheduler';
-export { ScheduleScorer } from './ScheduleScorer';
+export { SectionScorer } from './SectionScorer';
