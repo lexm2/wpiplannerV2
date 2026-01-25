@@ -27,4 +27,22 @@ export class SectionScorer {
 
     return totalScore / section.periods.length;
   }
+
+  scoreCombination(
+    lecture: Section | null,
+    discussion: Section | null,
+    lab: Section | null,
+    wakeUpTime: SimpleTime
+  ): number {
+    const sections: Section[] = [lecture, discussion, lab].filter((s): s is Section => s !== null);
+
+    if (sections.length === 0) return 1000;
+
+    let totalScore = 0;
+    for (const section of sections) {
+      totalScore += this.scoreSection(section, wakeUpTime);
+    }
+
+    return totalScore / sections.length;
+  }
 }

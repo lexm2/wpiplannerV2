@@ -3,9 +3,7 @@
 ## [2026-01-25]
 
 ### Improved
-- Auto-schedule now applies wake-up time preference during generation for better performance
-- Schedules with preferred wake-up times are now shown first without needing to generate thousands of schedules
-- Cleaned up auto-schedule settings interfaces for better code clarity
+- Schedules with preferred wake-up times are now shown first properly
 
 ## [2026-01-24]
 
@@ -13,7 +11,7 @@
 - Wake up time preference in auto-schedule settings to prioritize schedules without early classes
 
 ### Improved
-- Course selection button is now more responsive with optimistic UI updates
+- Course selection button is now more responsive with optimistic UI
 
 ## [2026-01-23]
 

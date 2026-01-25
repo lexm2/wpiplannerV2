@@ -464,15 +464,19 @@ Automatic schedule generation using bitmask optimization.
 
 #### [SectionScorer.ts](../src/services/scheduling/SectionScorer.ts)
 
-Scores individual sections based on user preferences.
+Scores sections and section clusters based on user preferences.
 
 **Responsibilities:**
-- Score sections by wake-up time preference
-- Used during schedule generation to prefer good sections
-- Returns higher scores for sections that match preferences
+- Score individual sections by wake-up time preference
+- Score section combinations (lecture + discussion + lab clusters)
+- Higher scores indicate better matches with user preferences
+
+**Scoring Methods:**
+- `scoreSection(section, wakeUpTime)` - Score individual section
+- `scoreCombination(lecture, discussion, lab, wakeUpTime)` - Score entire cluster by averaging component scores
 
 **Connects to:**
-- [AutoScheduler](../src/services/scheduling/AutoScheduler.ts) - Used during generation
+- [AutoScheduler](../src/services/scheduling/AutoScheduler.ts) - Used during candidate generation
 
 ---
 

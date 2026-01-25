@@ -203,27 +203,31 @@ export class AutoScheduler {
 
     // Handle standalone lab courses
     if (typeInfo.isStandaloneLab) {
-      let labs = course.standaloneLabs || [];
-
-      if (config.wakeUpTime && labs.length > 0) {
-        const scoredLabs = labs.map(lab => ({
-          section: lab,
-          score: this.sectionScorer.scoreSection(lab, config.wakeUpTime!)
-        }));
-        scoredLabs.sort((a, b) => b.score - a.score);
-        labs = scoredLabs.map(s => s.section);
-      }
+      const labs = course.standaloneLabs || [];
+      const labCandidates: Array<{ candidate: MaskedCandidate; score: number }> = [];
 
       for (const lab of labs) {
         if (!this.isValidSection(lab, blockedMasksByTerm, selectedCourse)) continue;
 
         const mask = sectionToMask(lab);
-        candidates.push({
+        const candidate: MaskedCandidate = {
           combination: { lecture: null, discussion: null, lab },
           mask,
           term: lab.computedTerm
-        });
+        };
+
+        const score = config.wakeUpTime
+          ? this.sectionScorer.scoreCombination(null, null, lab, config.wakeUpTime)
+          : 1000;
+
+        labCandidates.push({ candidate, score });
       }
+
+      if (config.wakeUpTime) {
+        labCandidates.sort((a, b) => b.score - a.score);
+      }
+
+      candidates.push(...labCandidates.map(c => c.candidate));
       return candidates;
     }
 
@@ -232,18 +236,9 @@ export class AutoScheduler {
       return candidates;
     }
 
-    let lectures = course.lectures;
+    const allCombinations: Array<{ candidate: MaskedCandidate; score: number }> = [];
 
-    if (config.wakeUpTime && lectures.length > 0) {
-      const scoredLectures = lectures.map(lg => ({
-        lectureGroup: lg,
-        score: this.sectionScorer.scoreSection(lg.section, config.wakeUpTime!)
-      }));
-      scoredLectures.sort((a, b) => b.score - a.score);
-      lectures = scoredLectures.map(s => s.lectureGroup);
-    }
-
-    for (const lectureGroup of lectures) {
+    for (const lectureGroup of course.lectures) {
       const lecture = lectureGroup.section;
       if (!this.isValidSection(lecture, blockedMasksByTerm, selectedCourse)) continue;
 
@@ -252,23 +247,12 @@ export class AutoScheduler {
       // Get valid discussion candidates - must be same term as lecture
       const discussionCandidates: Array<{ section: Section | null; mask: bigint }> = [];
       if (typeInfo.hasDiscussions) {
-        let discussions = lectureGroup.compatibleDiscussions || [];
-
-        if (config.wakeUpTime && discussions.length > 0) {
-          const scoredDiscussions = discussions.map(d => ({
-            section: d,
-            score: this.sectionScorer.scoreSection(d, config.wakeUpTime!)
-          }));
-          scoredDiscussions.sort((a, b) => b.score - a.score);
-          discussions = scoredDiscussions.map(s => s.section);
-        }
+        const discussions = lectureGroup.compatibleDiscussions || [];
 
         for (const d of discussions) {
-          // Skip if different term than lecture
           if (d.computedTerm !== lecture.computedTerm) continue;
           if (!this.isValidSection(d, blockedMasksByTerm, selectedCourse)) continue;
           const mask = sectionToMask(d);
-          // Check lecture/discussion internal conflict
           if (masksConflict(lectureMask, mask)) continue;
           discussionCandidates.push({ section: d, mask });
         }
@@ -279,23 +263,12 @@ export class AutoScheduler {
       // Get valid lab candidates - must be same term as lecture
       const labCandidates: Array<{ section: Section | null; mask: bigint }> = [];
       if (typeInfo.hasLabs) {
-        let labs = lectureGroup.compatibleLabs || [];
-
-        if (config.wakeUpTime && labs.length > 0) {
-          const scoredLabs = labs.map(l => ({
-            section: l,
-            score: this.sectionScorer.scoreSection(l, config.wakeUpTime!)
-          }));
-          scoredLabs.sort((a, b) => b.score - a.score);
-          labs = scoredLabs.map(s => s.section);
-        }
+        const labs = lectureGroup.compatibleLabs || [];
 
         for (const l of labs) {
-          // Skip if different term than lecture
           if (l.computedTerm !== lecture.computedTerm) continue;
           if (!this.isValidSection(l, blockedMasksByTerm, selectedCourse)) continue;
           const mask = sectionToMask(l);
-          // Check lecture/lab internal conflict
           if (masksConflict(lectureMask, mask)) continue;
           labCandidates.push({ section: l, mask });
         }
@@ -308,19 +281,29 @@ export class AutoScheduler {
       // Generate all valid combinations with precomputed masks
       for (const disc of discussionCandidates) {
         for (const lab of labCandidates) {
-          // Check discussion/lab internal conflict
           if (disc.section && lab.section && masksConflict(disc.mask, lab.mask)) continue;
 
           const combinedMask = lectureMask | disc.mask | lab.mask;
-          candidates.push({
+          const candidate: MaskedCandidate = {
             combination: { lecture, discussion: disc.section, lab: lab.section },
             mask: combinedMask,
             term: lecture.computedTerm
-          });
+          };
+
+          const score = config.wakeUpTime
+            ? this.sectionScorer.scoreCombination(lecture, disc.section, lab.section, config.wakeUpTime)
+            : 1000;
+
+          allCombinations.push({ candidate, score });
         }
       }
     }
 
+    if (config.wakeUpTime) {
+      allCombinations.sort((a, b) => b.score - a.score);
+    }
+
+    candidates.push(...allCombinations.map(c => c.candidate));
     return candidates;
   }
 
