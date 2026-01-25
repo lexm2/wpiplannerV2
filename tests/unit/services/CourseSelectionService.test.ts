@@ -309,6 +309,8 @@ describe('CourseSelectionService', () => {
     it('should handle listener errors gracefully', async () => {
       const errorListener = () => { throw new Error('Listener error') }
       const normalListener = mock()
+      const originalConsoleError = console.error
+      console.error = mock()
 
       courseSelectionService.addSelectionListener(errorListener)
       courseSelectionService.addSelectionListener(normalListener)
@@ -318,6 +320,9 @@ describe('CourseSelectionService', () => {
       expect(result.success).toBe(true)
 
       expect(normalListener).toHaveBeenCalled()
+      expect(console.error).toHaveBeenCalledWith('Error in selection change listener:', expect.anything())
+
+      console.error = originalConsoleError
     })
 
     it('should remove listeners correctly', async () => {
