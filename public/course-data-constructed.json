@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 25, 2026, 1:39 AM",
+  "generated": "Jan 25, 2026, 3:31 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -241007,7 +241007,7 @@
                 "number": "C01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "Cat. I This course will cover basic principles of prose style for expository and argumentative writing. Students will learn to evaluate writing for stylistic problems and will learn revision strategies for addressing those problems. The ultimate goal of the course is to help students write sentences and paragraphs that are clear, concise, and graceful. In the first part of the course, students will review parts of speech, basic sentence types, and sentence and paragraph structure in order to understand how sentences are put together and the impact their construction has on readers. Then, through hands-on writing exercises and extensive revision of their own and others’ writing, students will learn strategies for tightening their prose (concision), achieving “flow” (cohesion and coherence) and improving usage (language specificity and precision). Recommended background: Basic knowledge of rhetorical writing (e.g., WR 1010, Elements of Writing, WR 1011, Writing About Science & Technology, or WR 1020, Introduction to Rhetoric.",
@@ -241026,7 +241026,7 @@
                     "room": "Stratton Hall 311",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
                     "days": [
