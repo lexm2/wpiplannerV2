@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 26, 2026, 9:45 PM",
+  "generated": "Jan 26, 2026, 10:18 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -246128,7 +246128,7 @@
                 "crn": 337649,
                 "number": "S05",
                 "seats": 999,
-                "seatsAvailable": 970,
+                "seatsAvailable": 969,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -246147,7 +246147,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 999,
-                    "seatsAvailable": 970,
+                    "seatsAvailable": 969,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S05",
@@ -251629,7 +251629,7 @@
                 "number": "D02",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "WPE 1612 Introductory Yoga Cat. I (1/12 unit) This yoga class focuses on connecting the mind, body, and spirit through an awareness of breath. Participating in yoga can improve core strength, flexibility, balance, mindfulness, and relaxation and decrease stress. Those with any level of yoga experience (including first timers) are welcome.",
@@ -251648,7 +251648,7 @@
                     "room": "Recreation Center Dance",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
