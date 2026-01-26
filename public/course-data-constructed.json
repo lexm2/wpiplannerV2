@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 26, 2026, 7:43 PM",
+  "generated": "Jan 26, 2026, 7:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -237514,7 +237514,7 @@
                 "number": "D01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Advanced Spanish II will continue expanding students’ interaction with sophisticated and complex texts such as literature, films, news, and reports about social, political, and historical events related to the Spanish-speaking world. Students will practice advanced grammar structures, vocabulary, and critical thinking to discuss, write, and present in academic and professional settings in the target language. This course satisfies the Inquiry Seminar to complete the HUA requirement In addition, this course would benefit students interested in WPI’s Project Centers in Spanish-speaking countries. This course is taught at an advanced level of Spanish. This course is closed to native speakers of Spanish and heritage speakers except with written permission from the instructor. Recommended background SP 3521",
@@ -237533,7 +237533,7 @@
                     "room": "Salisbury Labs 407",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -243590,7 +243590,7 @@
                 "number": "D02",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -243609,7 +243609,7 @@
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
                     "days": [
@@ -246128,7 +246128,7 @@
                 "crn": 337649,
                 "number": "S05",
                 "seats": 999,
-                "seatsAvailable": 971,
+                "seatsAvailable": 970,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -246147,7 +246147,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 999,
-                    "seatsAvailable": 971,
+                    "seatsAvailable": 970,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S05",
