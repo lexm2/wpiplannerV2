@@ -1,6 +1,6 @@
 {
   "academicYear": "2025-2026",
-  "generated": "2026-01-27T12:40:14.241Z",
+  "generated": "2026-01-27T13:33:34.152Z",
   "terms": {
     "A": {
       "startDate": "2025-08-21",
@@ -24,7 +24,7 @@
       "startDate": "2026-03-16",
       "endDate": "2026-05-06",
       "offeringPeriod": "2026 Spring D Term",
-      "sampleSize": 696
+      "sampleSize": 698
     }
   }
 }
