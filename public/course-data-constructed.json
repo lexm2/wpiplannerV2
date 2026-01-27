@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 27, 2026, 3:27 PM",
+  "generated": "Jan 27, 2026, 3:51 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -51392,7 +51392,7 @@
                 "crn": 338751,
                 "number": "S01",
                 "seats": 45,
-                "seatsAvailable": 19,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -51411,7 +51411,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 45,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -54477,7 +54477,7 @@
                 "crn": 338751,
                 "number": "S01",
                 "seats": 45,
-                "seatsAvailable": 19,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -54496,7 +54496,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 45,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -107130,7 +107130,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -107164,7 +107164,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -107198,7 +107198,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -107232,7 +107232,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -107266,7 +107266,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -108261,7 +108261,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -108295,7 +108295,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -108329,7 +108329,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -108363,7 +108363,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -108397,7 +108397,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -109426,7 +109426,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -109460,7 +109460,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -109494,7 +109494,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -109528,7 +109528,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -109562,7 +109562,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -110523,7 +110523,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -110557,7 +110557,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -110591,7 +110591,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -110625,7 +110625,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -110659,7 +110659,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -111654,7 +111654,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -111688,7 +111688,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -111722,7 +111722,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -111756,7 +111756,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -111790,7 +111790,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -112851,7 +112851,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -112885,7 +112885,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -112919,7 +112919,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -112953,7 +112953,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -112987,7 +112987,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -113021,7 +113021,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -114052,7 +114052,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -114086,7 +114086,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -114120,7 +114120,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -114154,7 +114154,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -114188,7 +114188,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -115183,7 +115183,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -115217,7 +115217,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -115251,7 +115251,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -115285,7 +115285,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -115319,7 +115319,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -115353,7 +115353,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -116348,7 +116348,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -116382,7 +116382,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -116416,7 +116416,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -116450,7 +116450,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -116484,7 +116484,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -116518,7 +116518,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -117513,7 +117513,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -117547,7 +117547,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -117581,7 +117581,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -117615,7 +117615,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -117649,7 +117649,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -118746,7 +118746,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -118780,7 +118780,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -118814,7 +118814,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -118848,7 +118848,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -118882,7 +118882,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -118916,7 +118916,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -119911,7 +119911,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -119945,7 +119945,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -119979,7 +119979,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -120013,7 +120013,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -120047,7 +120047,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -121042,7 +121042,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -121076,7 +121076,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -121110,7 +121110,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -121144,7 +121144,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -121178,7 +121178,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -122207,7 +122207,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -122241,7 +122241,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -122275,7 +122275,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -122309,7 +122309,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -122343,7 +122343,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -123372,7 +123372,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -123406,7 +123406,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -123440,7 +123440,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -123474,7 +123474,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -123508,7 +123508,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -123542,7 +123542,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -124503,7 +124503,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -124537,7 +124537,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -124571,7 +124571,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -124605,7 +124605,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -124639,7 +124639,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -125670,7 +125670,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -125704,7 +125704,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -125738,7 +125738,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -125772,7 +125772,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -125806,7 +125806,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -126767,7 +126767,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -126801,7 +126801,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -126835,7 +126835,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -126869,7 +126869,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -126903,7 +126903,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -228865,7 +228865,7 @@
                 "crn": 337838,
                 "number": "S01",
                 "seats": 20,
-                "seatsAvailable": 4,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -228884,7 +228884,7 @@
                     "building": "",
                     "room": "Olin Hall 223",
                     "seats": 20,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
