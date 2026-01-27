@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 27, 2026, 6:33 PM",
+  "generated": "Jan 27, 2026, 7:14 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -38642,7 +38642,7 @@
                 "number": "D02",
                 "seats": 18,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "Cat. I Building upon the foundation of the Elementary Chinese course series, this course is designed to expand students' skills in listening comprehension, speaking, reading, and writing. The course continues to enhance students’ vocabulary and introduces more complex grammatical patterns, with more emphasis placed on improving communication skills both orally and in writing. Recommended background: CN 1543. This course is closed to native speakers of Chinese and heritage speakers, except with written permission from the coordinator of the Chinese track.",
@@ -38661,7 +38661,7 @@
                     "room": "Kaven Hall 115",
                     "seats": 18,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 5,
                     "specificSection": "D02",
                     "days": [
@@ -46493,7 +46493,7 @@
                 "crn": 337596,
                 "number": "D02",
                 "seats": 35,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -46512,7 +46512,7 @@
                     "building": "",
                     "room": "Unity Hall 405",
                     "seats": 35,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
@@ -60167,7 +60167,7 @@
                 "crn": 337614,
                 "number": "S01",
                 "seats": 40,
-                "seatsAvailable": 19,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -60186,7 +60186,7 @@
                     "building": "",
                     "room": "Atwater Kent 233",
                     "seats": 40,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -66783,7 +66783,7 @@
                   "crn": 337605,
                   "number": "DD01",
                   "seats": 90,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4435",
@@ -66802,7 +66802,7 @@
                       "building": "",
                       "room": "Washburn 229",
                       "seats": 90,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
@@ -86277,7 +86277,7 @@
                 "crn": 337499,
                 "number": "D01",
                 "seats": 25,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -86296,7 +86296,7 @@
                     "building": "",
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 25,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -93965,7 +93965,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -93999,7 +93999,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -94033,7 +94033,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -94067,7 +94067,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -94926,7 +94926,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -94960,7 +94960,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -94994,7 +94994,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -95028,7 +95028,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -95785,7 +95785,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -95819,7 +95819,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -95853,7 +95853,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -95887,7 +95887,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -96678,7 +96678,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -96712,7 +96712,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -96746,7 +96746,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -96780,7 +96780,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -97605,7 +97605,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -97639,7 +97639,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -97673,7 +97673,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -97707,7 +97707,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -98534,7 +98534,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -98568,7 +98568,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -98602,7 +98602,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -98636,7 +98636,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -99461,7 +99461,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -99495,7 +99495,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -99529,7 +99529,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -99563,7 +99563,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -100422,7 +100422,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -100456,7 +100456,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -100490,7 +100490,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -100524,7 +100524,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -101349,7 +101349,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -101383,7 +101383,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -101417,7 +101417,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -101451,7 +101451,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -102276,7 +102276,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -102310,7 +102310,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -102344,7 +102344,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -102378,7 +102378,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -103201,7 +103201,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -103235,7 +103235,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -103269,7 +103269,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -103303,7 +103303,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -104198,7 +104198,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -104232,7 +104232,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -104266,7 +104266,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -104300,7 +104300,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -105091,7 +105091,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -105125,7 +105125,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -105159,7 +105159,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -105193,7 +105193,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -106020,7 +106020,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -106054,7 +106054,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -106088,7 +106088,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -106122,7 +106122,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -127775,7 +127775,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -127809,7 +127809,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -127843,7 +127843,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -127877,7 +127877,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -127911,7 +127911,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -127945,7 +127945,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -127979,7 +127979,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -129042,7 +129042,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -129076,7 +129076,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -129110,7 +129110,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -129144,7 +129144,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -129178,7 +129178,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -129212,7 +129212,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -129246,7 +129246,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -130309,7 +130309,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -130343,7 +130343,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -130377,7 +130377,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -130411,7 +130411,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -130445,7 +130445,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -130479,7 +130479,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -130513,7 +130513,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -131508,7 +131508,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -131542,7 +131542,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -131576,7 +131576,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -131610,7 +131610,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -131644,7 +131644,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -131678,7 +131678,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -131712,7 +131712,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -132743,7 +132743,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -132777,7 +132777,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -132811,7 +132811,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -132845,7 +132845,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -132879,7 +132879,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -132913,7 +132913,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -132947,7 +132947,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -132981,7 +132981,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -134044,7 +134044,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -134078,7 +134078,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -134112,7 +134112,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -134146,7 +134146,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -134180,7 +134180,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -134214,7 +134214,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -134248,7 +134248,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -135311,7 +135311,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -135345,7 +135345,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -135379,7 +135379,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -135413,7 +135413,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -135447,7 +135447,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -135481,7 +135481,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -135515,7 +135515,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -136578,7 +136578,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -136612,7 +136612,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -136646,7 +136646,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -136680,7 +136680,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -136714,7 +136714,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -136748,7 +136748,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -136782,7 +136782,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -137811,7 +137811,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -137845,7 +137845,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -137879,7 +137879,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -137913,7 +137913,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -137947,7 +137947,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -137981,7 +137981,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -138015,7 +138015,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -139010,7 +139010,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -139044,7 +139044,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -139078,7 +139078,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -139112,7 +139112,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -139146,7 +139146,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -139180,7 +139180,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -139214,7 +139214,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -140309,7 +140309,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -140343,7 +140343,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -140377,7 +140377,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -140411,7 +140411,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -140445,7 +140445,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -140479,7 +140479,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -140513,7 +140513,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -140547,7 +140547,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -141610,7 +141610,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -141644,7 +141644,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -141678,7 +141678,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -141712,7 +141712,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -141746,7 +141746,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -141780,7 +141780,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -141814,7 +141814,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -142879,7 +142879,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -142913,7 +142913,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -142947,7 +142947,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -142981,7 +142981,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -143015,7 +143015,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -143049,7 +143049,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -143083,7 +143083,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -144180,7 +144180,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -144214,7 +144214,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -144248,7 +144248,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -144282,7 +144282,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -144316,7 +144316,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -144350,7 +144350,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -144384,7 +144384,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -145379,7 +145379,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -145413,7 +145413,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -145447,7 +145447,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -145481,7 +145481,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -145515,7 +145515,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -145549,7 +145549,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -145583,7 +145583,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -146612,7 +146612,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -146646,7 +146646,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -146680,7 +146680,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -146714,7 +146714,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -146748,7 +146748,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -146782,7 +146782,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -146816,7 +146816,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -147881,7 +147881,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -147915,7 +147915,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -147949,7 +147949,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -147983,7 +147983,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -148017,7 +148017,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -148051,7 +148051,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -148085,7 +148085,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -149114,7 +149114,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -149148,7 +149148,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -149182,7 +149182,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -149216,7 +149216,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -149250,7 +149250,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -149284,7 +149284,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -149318,7 +149318,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -150347,7 +150347,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -150381,7 +150381,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -150415,7 +150415,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -150449,7 +150449,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -150483,7 +150483,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -150517,7 +150517,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -150551,7 +150551,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -151614,7 +151614,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -151648,7 +151648,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -151682,7 +151682,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -151716,7 +151716,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -151750,7 +151750,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -151784,7 +151784,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -151818,7 +151818,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -152915,7 +152915,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -152949,7 +152949,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -152983,7 +152983,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -153017,7 +153017,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -153051,7 +153051,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -153085,7 +153085,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -153119,7 +153119,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -153153,7 +153153,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -154248,7 +154248,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -154282,7 +154282,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -154316,7 +154316,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -154350,7 +154350,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -154384,7 +154384,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -154418,7 +154418,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -154452,7 +154452,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -154486,7 +154486,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Jane Bouchard",
                       "startTime": "15:00",
                       "endTime": "15:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -156712,7 +156712,7 @@
                 "crn": 337015,
                 "number": "DL01",
                 "seats": 90,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4498",
@@ -156731,7 +156731,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 90,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL01",
@@ -156750,7 +156750,7 @@
                   "crn": 337016,
                   "number": "DD02",
                   "seats": 30,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4498",
@@ -156769,7 +156769,7 @@
                       "building": "",
                       "room": "Stratton Hall 202 (new)",
                       "seats": 30,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -156856,7 +156856,7 @@
                 "crn": 336999,
                 "number": "DL02",
                 "seats": 90,
-                "seatsAvailable": 3,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4496",
@@ -156875,7 +156875,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 90,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL02",
@@ -156962,7 +156962,7 @@
                   "crn": 337511,
                   "number": "DD10",
                   "seats": 30,
-                  "seatsAvailable": 2,
+                  "seatsAvailable": 3,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4496",
@@ -156981,7 +156981,7 @@
                       "building": "",
                       "room": "Stratton Hall 205",
                       "seats": 30,
-                      "seatsAvailable": 2,
+                      "seatsAvailable": 3,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD10",
@@ -169658,7 +169658,7 @@
                   "crn": 336977,
                   "number": "DD01",
                   "seats": 72,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 2,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4493",
@@ -169677,7 +169677,7 @@
                       "building": "",
                       "room": "Unity Hall 520",
                       "seats": 72,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 2,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
@@ -169729,7 +169729,7 @@
                   "crn": 337341,
                   "number": "DX02",
                   "seats": 18,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4493",
@@ -169748,7 +169748,7 @@
                       "building": "",
                       "room": "Washburn 107 Machine Shop",
                       "seats": 18,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX02",
@@ -169764,7 +169764,7 @@
                   "crn": 336980,
                   "number": "DX03",
                   "seats": 18,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4493",
@@ -169783,7 +169783,7 @@
                       "building": "",
                       "room": "Washburn 107 Machine Shop",
                       "seats": 18,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX03",
@@ -231119,7 +231119,7 @@
                 "crn": 337486,
                 "number": "D01",
                 "seats": 35,
-                "seatsAvailable": 10,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -231138,7 +231138,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 35,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -237631,7 +237631,7 @@
                 "crn": 337493,
                 "number": "D02",
                 "seats": 20,
-                "seatsAvailable": 8,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -237650,7 +237650,7 @@
                     "building": "",
                     "room": "Atwater Kent 232",
                     "seats": 20,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
@@ -238481,7 +238481,7 @@
                 "crn": 337596,
                 "number": "D02",
                 "seats": 35,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -238500,7 +238500,7 @@
                     "building": "",
                     "room": "Unity Hall 405",
                     "seats": 35,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
