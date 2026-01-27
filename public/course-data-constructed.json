@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 27, 2026, 2:50 PM",
+  "generated": "Jan 27, 2026, 3:27 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -943,7 +943,7 @@
         {
           "id": "AE-2550",
           "number": "2550",
-          "name": "Atmospheric and Space Environments",
+          "name": "Atmospheric And Space Environments",
           "description": "Cat I This course introduces the ambient atmospheric and space environments encountered by aerospace vehicles. Topics include: the sun and solar activity; the solar wind; planetary magnetospheres; planetary atmospheres; radiation environments; galactic cosmic rays; meteoroids; and space debris. Recommended background: mechanics (PH1110 / 1111 or equivalent), electromagnetism (PH 1120 / 1121 or equivalent), and ordinary differential equations (MA 2051 or equivalent).",
           "minCredits": 3,
           "maxCredits": 3,
@@ -51392,7 +51392,7 @@
                 "crn": 338751,
                 "number": "S01",
                 "seats": 45,
-                "seatsAvailable": 18,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -51411,7 +51411,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 45,
-                    "seatsAvailable": 18,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -53731,7 +53731,7 @@
                 "crn": 346996,
                 "number": "S01",
                 "seats": 50,
-                "seatsAvailable": 29,
+                "seatsAvailable": 28,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -53750,7 +53750,7 @@
                     "building": "",
                     "room": "Salisbury Labs 402",
                     "seats": 50,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 28,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -53942,7 +53942,7 @@
                 "crn": 337611,
                 "number": "S02",
                 "seats": 48,
-                "seatsAvailable": 25,
+                "seatsAvailable": 26,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -53961,7 +53961,7 @@
                     "building": "",
                     "room": "Stratton Hall 201",
                     "seats": 48,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 26,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "S02",
@@ -54477,7 +54477,7 @@
                 "crn": 338751,
                 "number": "S01",
                 "seats": 45,
-                "seatsAvailable": 18,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -54496,7 +54496,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 45,
-                    "seatsAvailable": 18,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -73361,7 +73361,7 @@
                 "number": "C01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. IAn introduction to historical analysis through selected periods or themes in thehistory of America before the Civil War. A variety of readings will reflect thevarious ways that historians have attempted to understand the development ofAmerica.",
@@ -73380,7 +73380,7 @@
                     "room": "Kaven Hall 115",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -92438,7 +92438,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -93127,7 +93127,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -106994,7 +106994,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -107028,7 +107028,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -107062,7 +107062,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -107096,7 +107096,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -108159,7 +108159,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -108193,7 +108193,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -108227,7 +108227,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -109290,7 +109290,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -109324,7 +109324,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -109358,7 +109358,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -109392,7 +109392,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -110421,7 +110421,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -110455,7 +110455,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -110489,7 +110489,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -111552,7 +111552,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -111586,7 +111586,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -111620,7 +111620,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -112715,7 +112715,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -112749,7 +112749,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -112783,7 +112783,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -112817,7 +112817,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -113950,7 +113950,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -113984,7 +113984,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -114018,7 +114018,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -115081,7 +115081,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -115115,7 +115115,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -115149,7 +115149,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -116212,7 +116212,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -116246,7 +116246,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -116280,7 +116280,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -116314,7 +116314,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -117377,7 +117377,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -117411,7 +117411,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -117445,7 +117445,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -117479,7 +117479,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -118610,7 +118610,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -118644,7 +118644,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -118678,7 +118678,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -118712,7 +118712,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -119775,7 +119775,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -119809,7 +119809,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -119843,7 +119843,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -119877,7 +119877,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -120906,7 +120906,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -120940,7 +120940,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -120974,7 +120974,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -121008,7 +121008,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -122105,7 +122105,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -122139,7 +122139,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -122173,7 +122173,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -123236,7 +123236,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -123270,7 +123270,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -123304,7 +123304,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -123338,7 +123338,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -124367,7 +124367,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -124401,7 +124401,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -124435,7 +124435,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -124469,7 +124469,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -125568,7 +125568,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -125602,7 +125602,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -125636,7 +125636,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -126631,7 +126631,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "08:00",
                       "endTime": "08:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -126665,7 +126665,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -126699,7 +126699,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -126733,7 +126733,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Caroline Labenski",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 116 Computer Lab",
@@ -168269,7 +168269,7 @@
                 "crn": 337611,
                 "number": "S02",
                 "seats": 48,
-                "seatsAvailable": 25,
+                "seatsAvailable": 26,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -168288,7 +168288,7 @@
                     "building": "",
                     "room": "Stratton Hall 201",
                     "seats": 48,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 26,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "S02",
@@ -174327,7 +174327,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "(2 credits) The failure and wear-out mechanisms for a variety of materials (metals, ceramics, polymers, composites and microelectronics) and applications will be presented and discussed. Multi-axial failure theories and fracture mechanics will be discussed. The methodology and techniques for reliability analysis will also be presented and discussed. A materials systems approach will be used. (Prerequisites: ES 2502 and ME 3023 or equivalent, and senior or graduate standing in engineering or science.) Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MTE 593C/MTE 594C).",
@@ -174346,7 +174346,7 @@
                     "room": "Higgins Labs 202",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -174926,7 +174926,7 @@
                 "number": "D01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 17,
+                "actualWaitlist": 18,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "(2 Credits) The problems of cost determination and evaluation of processing alternatives in the designmanufacturing interface are discussed. Approaches for introducing manufacturing capability knowledge into the product design process are covered. An emphasis is placed on part and process simplification, and analysis of alternative manufacturing methods based on such parameters as: anticipated volume, product life cycle, lead time, customer requirements, and quality yield. Lean manufacturing and Six-Sigma concepts and their influence on design quality are included as well. Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MFE594M).",
@@ -174945,7 +174945,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 17,
+                    "actualWaitlist": 18,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -174964,7 +174964,7 @@
                 "number": "D02",
                 "seats": 30,
                 "seatsAvailable": -1,
-                "actualWaitlist": 7,
+                "actualWaitlist": 8,
                 "maxWaitlist": 25,
                 "note": null,
                 "description": "(2 Credits) The problems of cost determination and evaluation of processing alternatives in the designmanufacturing interface are discussed. Approaches for introducing manufacturing capability knowledge into the product design process are covered. An emphasis is placed on part and process simplification, and analysis of alternative manufacturing methods based on such parameters as: anticipated volume, product life cycle, lead time, customer requirements, and quality yield. Lean manufacturing and Six-Sigma concepts and their influence on design quality are included as well. Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MFE594M).",
@@ -174983,7 +174983,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": -1,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 25,
                     "specificSection": "D02",
                     "days": [],
@@ -175569,7 +175569,7 @@
                 "crn": 337748,
                 "number": "S01",
                 "seats": 80,
-                "seatsAvailable": 34,
+                "seatsAvailable": 33,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -175588,7 +175588,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 80,
-                    "seatsAvailable": 34,
+                    "seatsAvailable": 33,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -175898,7 +175898,7 @@
                 "number": "D01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 17,
+                "actualWaitlist": 18,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "(2 Credits) The problems of cost determination and evaluation of processing alternatives in the designmanufacturing interface are discussed. Approaches for introducing manufacturing capability knowledge into the product design process are covered. An emphasis is placed on part and process simplification, and analysis of alternative manufacturing methods based on such parameters as: anticipated volume, product life cycle, lead time, customer requirements, and quality yield. Lean manufacturing and Six-Sigma concepts and their influence on design quality are included as well. Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MFE594M).",
@@ -175917,7 +175917,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 17,
+                    "actualWaitlist": 18,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -175936,7 +175936,7 @@
                 "number": "D02",
                 "seats": 30,
                 "seatsAvailable": -1,
-                "actualWaitlist": 7,
+                "actualWaitlist": 8,
                 "maxWaitlist": 25,
                 "note": null,
                 "description": "(2 Credits) The problems of cost determination and evaluation of processing alternatives in the designmanufacturing interface are discussed. Approaches for introducing manufacturing capability knowledge into the product design process are covered. An emphasis is placed on part and process simplification, and analysis of alternative manufacturing methods based on such parameters as: anticipated volume, product life cycle, lead time, customer requirements, and quality yield. Lean manufacturing and Six-Sigma concepts and their influence on design quality are included as well. Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MFE594M).",
@@ -175955,7 +175955,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": -1,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 25,
                     "specificSection": "D02",
                     "days": [],
@@ -177396,7 +177396,7 @@
                 "crn": 340544,
                 "number": "S02",
                 "seats": 50,
-                "seatsAvailable": 10,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -177415,7 +177415,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "S02",
@@ -177834,7 +177834,7 @@
                 "crn": 337731,
                 "number": "S01",
                 "seats": 50,
-                "seatsAvailable": 6,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -177853,7 +177853,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -181209,7 +181209,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "(2 credits) The failure and wear-out mechanisms for a variety of materials (metals, ceramics, polymers, composites and microelectronics) and applications will be presented and discussed. Multi-axial failure theories and fracture mechanics will be discussed. The methodology and techniques for reliability analysis will also be presented and discussed. A materials systems approach will be used. (Prerequisites: ES 2502 and ME 3023 or equivalent, and senior or graduate standing in engineering or science.) Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MTE 593C/MTE 594C).",
@@ -181228,7 +181228,7 @@
                     "room": "Higgins Labs 202",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -181382,7 +181382,7 @@
                 "crn": 337752,
                 "number": "S01",
                 "seats": 80,
-                "seatsAvailable": 34,
+                "seatsAvailable": 33,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -181401,7 +181401,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 80,
-                    "seatsAvailable": 34,
+                    "seatsAvailable": 33,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -182304,7 +182304,7 @@
                 "crn": 336298,
                 "number": "C01",
                 "seats": 25,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
@@ -182323,7 +182323,7 @@
                     "building": "",
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 25,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -183290,7 +183290,7 @@
                 "crn": 337745,
                 "number": "S01",
                 "seats": 999,
-                "seatsAvailable": 925,
+                "seatsAvailable": 922,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -183309,7 +183309,7 @@
                     "building": "",
                     "room": "First Baptist Church Gordon",
                     "seats": 999,
-                    "seatsAvailable": 925,
+                    "seatsAvailable": 922,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S01",
@@ -183329,7 +183329,7 @@
                 "crn": 337890,
                 "number": "S02",
                 "seats": 999,
-                "seatsAvailable": 925,
+                "seatsAvailable": 922,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -183348,7 +183348,7 @@
                     "building": "",
                     "room": "First Baptist Church Gordon",
                     "seats": 999,
-                    "seatsAvailable": 925,
+                    "seatsAvailable": 922,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S02",
@@ -183457,7 +183457,7 @@
                 "crn": 337792,
                 "number": "S01",
                 "seats": 999,
-                "seatsAvailable": 925,
+                "seatsAvailable": 922,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -183476,7 +183476,7 @@
                     "building": "",
                     "room": "First Baptist Church Gordon",
                     "seats": 999,
-                    "seatsAvailable": 925,
+                    "seatsAvailable": 922,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S01",
@@ -183496,7 +183496,7 @@
                 "crn": 337715,
                 "number": "S02",
                 "seats": 999,
-                "seatsAvailable": 925,
+                "seatsAvailable": 922,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -183515,7 +183515,7 @@
                     "building": "",
                     "room": "First Baptist Church Gordon",
                     "seats": 999,
-                    "seatsAvailable": 925,
+                    "seatsAvailable": 922,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S02",
@@ -185575,7 +185575,7 @@
                 "crn": 337701,
                 "number": "S01",
                 "seats": 999,
-                "seatsAvailable": 925,
+                "seatsAvailable": 922,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -185594,7 +185594,7 @@
                     "building": "",
                     "room": "First Baptist Church Gordon",
                     "seats": 999,
-                    "seatsAvailable": 925,
+                    "seatsAvailable": 922,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S01",
@@ -185614,7 +185614,7 @@
                 "crn": 337682,
                 "number": "S02",
                 "seats": 999,
-                "seatsAvailable": 925,
+                "seatsAvailable": 922,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -185633,7 +185633,7 @@
                     "building": "",
                     "room": "First Baptist Church Gordon",
                     "seats": 999,
-                    "seatsAvailable": 925,
+                    "seatsAvailable": 922,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "S02",
@@ -188137,7 +188137,7 @@
                 "crn": 337742,
                 "number": "S01",
                 "seats": 60,
-                "seatsAvailable": 16,
+                "seatsAvailable": 17,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -188156,7 +188156,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 17,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -227688,7 +227688,7 @@
         {
           "id": "PH-2550",
           "number": "2550",
-          "name": "Atmospheric and Space Environments",
+          "name": "Atmospheric And Space Environments",
           "description": "Cat I This course introduces the ambient atmospheric and space environments encountered by aerospace vehicles. Topics include: the sun and solar activity; the solar wind; planetary magnetospheres; planetary atmospheres; radiation environments; galactic cosmic rays; meteoroids; and space debris. Recommended background: mechanics (PH1110 / 1111 or equivalent), electromagnetism (PH 1120 / 1121 or equivalent), and ordinary differential equations (MA 2051 or equivalent).",
           "minCredits": 3,
           "maxCredits": 3,
