@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 27, 2026, 9:59 AM",
+  "generated": "Jan 27, 2026, 10:35 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -230853,8 +230853,8 @@
                 "crn": 339216,
                 "number": "D01",
                 "seats": 35,
-                "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "seatsAvailable": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. II This course examines metaphysical and moral questions that philosophers have raised about social and political life. Among questions treated might be: What are the grounds, if any, of the obligation of a citizen to obey a sovereign? Are there basic principles of justice by which societies, institutions and practices are rightly evaluated? What is democracy, and how can we tell if an institution or practice is democratic? To what degree do economic institutions put limits on the realization of freedom, democracy and self-determination? Readings might include excerpts from the works of Plato, Hobbes, Locke, Rousseau and Marx, as well as numerous contemporary philosophers. Suggested background: familiarity with basic concepts in philosophy (as in PY/RE 1731). This course will be offered in 2019-20, and in alternating years thereafter.",
@@ -230872,8 +230872,8 @@
                     "building": "",
                     "room": "Stratton Hall 207 (new)",
                     "seats": 35,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "seatsAvailable": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
