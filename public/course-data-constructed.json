@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 28, 2026, 9:44 PM",
+  "generated": "Jan 28, 2026, 10:00 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -58203,7 +58203,7 @@
                   "crn": 337535,
                   "number": "DX01",
                   "seats": 40,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4507",
@@ -58222,7 +58222,7 @@
                       "building": "",
                       "room": "Atwater Kent 227 Lab Restricted Access",
                       "seats": 40,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
@@ -58237,7 +58237,7 @@
                   "crn": 337536,
                   "number": "DX02",
                   "seats": 40,
-                  "seatsAvailable": 13,
+                  "seatsAvailable": 14,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4507",
@@ -58256,7 +58256,7 @@
                       "building": "",
                       "room": "Atwater Kent 227 Lab Restricted Access",
                       "seats": 40,
-                      "seatsAvailable": 13,
+                      "seatsAvailable": 14,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX02",
