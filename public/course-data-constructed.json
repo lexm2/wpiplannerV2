@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 28, 2026, 6:39 PM",
+  "generated": "Jan 28, 2026, 7:04 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -6546,7 +6546,7 @@
                 "crn": 337028,
                 "number": "DL01",
                 "seats": 40,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -6565,7 +6565,7 @@
                     "building": "",
                     "room": "Unity Hall 420",
                     "seats": 40,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "DL01",
@@ -245225,7 +245225,7 @@
                 "crn": 337337,
                 "number": "D01 - Healthy Alternative: Zumba",
                 "seats": 30,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -245244,7 +245244,7 @@
                     "building": "",
                     "room": "Recreation Center Dance",
                     "seats": 30,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01 - Healthy Alternative: Zumba",
