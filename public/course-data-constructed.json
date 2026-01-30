@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 30, 2026, 8:53 PM",
+  "generated": "Jan 30, 2026, 9:23 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -60529,7 +60529,7 @@
                 "crn": 337763,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 6,
+                "seatsAvailable": 7,
                 "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
@@ -60548,7 +60548,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -62979,7 +62979,7 @@
                 "number": "D01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course introduces the student to a variety of critical perspectives necessary to an understanding and appreciation of the major forms, or genres, of literary expression (e.g., novel, short story, poetry, drama, and essay). Writing and class discussion will be integral parts of this course.",
@@ -62998,7 +62998,7 @@
                     "room": "Salisbury Labs 407",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
