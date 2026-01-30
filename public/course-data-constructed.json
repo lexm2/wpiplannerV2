@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 30, 2026, 8:24 PM",
+  "generated": "Jan 30, 2026, 8:53 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -38943,7 +38943,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Hsinhan Hung",
+                    "professor": "Wen-Hua Du",
                     "startTime": "09:00",
                     "endTime": "09:50",
                     "location": "Salisbury Labs 011",
@@ -77926,7 +77926,7 @@
                 "crn": 337544,
                 "number": "D11 - INQ SEM: Histories of the Future",
                 "seats": 12,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -77945,7 +77945,7 @@
                     "building": "",
                     "room": "Salisbury Labs 226 HUA Seminar Room",
                     "seats": 12,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D11 - INQ SEM: Histories of the Future",
@@ -79245,7 +79245,7 @@
                 "crn": 337256,
                 "number": "D07 - PRAC IN HUA: Develop Technology for Music",
                 "seats": 12,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -79264,7 +79264,7 @@
                     "building": "",
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 12,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D07 - PRAC IN HUA: Develop Technology for Music",
@@ -86228,7 +86228,7 @@
                 "number": "D01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course examines the major theoretical and methodological approaches that characterize global studies . Since the end of the Cold War, new forms of transnational integration, interdependence and conflict have been considered examples of globalization . Yet this period is not the first to undergo such transformation, and the “global” is often experienced in disparate ways around the world . This course examines the diverse ways of understanding globalization in the past and present . No prior background is required . Especially appropriate for students interested in any of WPI’s global Project Centers .",
@@ -86247,7 +86247,7 @@
                     "room": "Salisbury Labs 407",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
