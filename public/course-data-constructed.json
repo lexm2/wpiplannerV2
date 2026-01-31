@@ -1,5 +1,5 @@
 {
-  "generated": "Jan 31, 2026, 8:46 PM",
+  "generated": "Jan 31, 2026, 9:18 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -229222,7 +229222,7 @@
                 "number": "D01",
                 "seats": 55,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "PSY 1400: Introduction to Psychological Science (Cat I) This course is intended for anyone interested in learning about the different areas of psychological science. Psychological science is the scientific examination of human thought and behavior. In other words, psychologists try to understand why people do what they do. This course offers an introduction to different areas and topics within psychological science. Topics may include: the brain, sensation, perception, learning, memory, language, intelligence, development over the lifespan, social cognition and behavior, motivations, emotions, mental health, methodology & statistics. No prior experience in psychology is needed",
@@ -229241,7 +229241,7 @@
                     "room": "Salisbury Labs 411",
                     "seats": 55,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
