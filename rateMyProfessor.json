@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-11-03T23:00:47.559Z",
+  "lastUpdated": "2026-02-01T06:53:39.096Z",
   "school": {
     "id": "1220",
     "name": "Worcester Polytechnic Institute",
@@ -51,8 +51,8 @@
       "department": "Mathematics",
       "avgRating": 4.7,
       "avgDifficulty": 2.6,
-      "numRatings": 69,
-      "wouldTakeAgainPercent": 88.5714,
+      "numRatings": 71,
+      "wouldTakeAgainPercent": 89.1892,
       "profileUrl": "https://www.ratemyprofessors.com/professor/596301"
     },
     {
@@ -169,9 +169,9 @@
       "firstName": "Joseph",
       "lastName": "Aguilar",
       "department": "English & Writing",
-      "avgRating": 4.9,
+      "avgRating": 5,
       "avgDifficulty": 1.7,
-      "numRatings": 18,
+      "numRatings": 19,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2447586"
     },
@@ -195,7 +195,7 @@
       "department": "Computer Science",
       "avgRating": 4.9,
       "avgDifficulty": 2.2,
-      "numRatings": 24,
+      "numRatings": 30,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2843706"
     },
@@ -385,9 +385,9 @@
       "firstName": "Andrea",
       "lastName": "Arnold",
       "department": "Mathematics",
-      "avgRating": 4.5,
+      "avgRating": 4.6,
       "avgDifficulty": 2.5,
-      "numRatings": 6,
+      "numRatings": 8,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2517699"
     },
@@ -421,9 +421,9 @@
       "firstName": "Sakire",
       "lastName": "Arslan Ay",
       "department": "Computer Science",
-      "avgRating": 5,
-      "avgDifficulty": 2.3,
-      "numRatings": 3,
+      "avgRating": 4.8,
+      "avgDifficulty": 2.8,
+      "numRatings": 4,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2996776"
     },
@@ -565,10 +565,10 @@
       "firstName": "Ryan",
       "lastName": "Baker",
       "department": "Psychology",
-      "avgRating": 3,
-      "avgDifficulty": 4,
-      "numRatings": 1,
-      "wouldTakeAgainPercent": -1,
+      "avgRating": 4,
+      "avgDifficulty": 3.5,
+      "numRatings": 2,
+      "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1621244"
     },
     {
@@ -630,6 +630,18 @@
       "numRatings": 25,
       "wouldTakeAgainPercent": 50,
       "profileUrl": "https://www.ratemyprofessors.com/professor/119497"
+    },
+    {
+      "id": "VGVhY2hlci0zMTU1NTY3",
+      "legacyId": 3155567,
+      "firstName": "Jeffrey",
+      "lastName": "Barden",
+      "department": "Mathematics",
+      "avgRating": 5,
+      "avgDifficulty": 3,
+      "numRatings": 1,
+      "wouldTakeAgainPercent": 100,
+      "profileUrl": "https://www.ratemyprofessors.com/professor/3155567"
     },
     {
       "id": "VGVhY2hlci0yNzU3NTI3",
@@ -793,10 +805,10 @@
       "firstName": "Källan",
       "lastName": "Berglund",
       "department": "Physics",
-      "avgRating": 1.5,
-      "avgDifficulty": 2.5,
-      "numRatings": 10,
-      "wouldTakeAgainPercent": 10,
+      "avgRating": 1.3,
+      "avgDifficulty": 3,
+      "numRatings": 15,
+      "wouldTakeAgainPercent": 6.6667,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3032215"
     },
     {
@@ -949,10 +961,10 @@
       "firstName": "Marcel",
       "lastName": "Blais",
       "department": "Mathematics",
-      "avgRating": 4.7,
+      "avgRating": 4.8,
       "avgDifficulty": 2.8,
-      "numRatings": 66,
-      "wouldTakeAgainPercent": 97.2222,
+      "numRatings": 69,
+      "wouldTakeAgainPercent": 97.4359,
       "profileUrl": "https://www.ratemyprofessors.com/professor/783683"
     },
     {
@@ -963,7 +975,7 @@
       "department": "Engineering",
       "avgRating": 4.6,
       "avgDifficulty": 3,
-      "numRatings": 22,
+      "numRatings": 23,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/119893"
     },
@@ -997,11 +1009,23 @@
       "firstName": "Tony",
       "lastName": "Bologna",
       "department": "Women's Studies",
-      "avgRating": 2,
-      "avgDifficulty": 4,
-      "numRatings": 1,
-      "wouldTakeAgainPercent": 0,
+      "avgRating": 3.5,
+      "avgDifficulty": 2.5,
+      "numRatings": 2,
+      "wouldTakeAgainPercent": 50,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1749641"
+    },
+    {
+      "id": "VGVhY2hlci0zMTQ4NDIz",
+      "legacyId": 3148423,
+      "firstName": "Michelle",
+      "lastName": "Borowski",
+      "department": "Humanities",
+      "avgRating": 0,
+      "avgDifficulty": 0,
+      "numRatings": 0,
+      "wouldTakeAgainPercent": -1,
+      "profileUrl": "https://www.ratemyprofessors.com/professor/3148423"
     },
     {
       "id": "VGVhY2hlci0yNjM1MjE0",
@@ -1071,8 +1095,8 @@
       "department": "English",
       "avgRating": 2.7,
       "avgDifficulty": 3.7,
-      "numRatings": 24,
-      "wouldTakeAgainPercent": 37.5,
+      "numRatings": 27,
+      "wouldTakeAgainPercent": 45.4545,
       "profileUrl": "https://www.ratemyprofessors.com/professor/46708"
     },
     {
@@ -1117,10 +1141,10 @@
       "firstName": "Christopher",
       "lastName": "Brown",
       "department": "Engineering",
-      "avgRating": 2.9,
-      "avgDifficulty": 2.1,
-      "numRatings": 16,
-      "wouldTakeAgainPercent": 50,
+      "avgRating": 3,
+      "avgDifficulty": 2,
+      "numRatings": 17,
+      "wouldTakeAgainPercent": 33.3333,
       "profileUrl": "https://www.ratemyprofessors.com/professor/119899"
     },
     {
@@ -1130,8 +1154,8 @@
       "lastName": "Brown",
       "department": "Economics",
       "avgRating": 5,
-      "avgDifficulty": 3,
-      "numRatings": 1,
+      "avgDifficulty": 3.5,
+      "numRatings": 2,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2949734"
     },
@@ -1191,8 +1215,8 @@
       "department": "History",
       "avgRating": 3.7,
       "avgDifficulty": 3,
-      "numRatings": 33,
-      "wouldTakeAgainPercent": 43.75,
+      "numRatings": 35,
+      "wouldTakeAgainPercent": 44.4444,
       "profileUrl": "https://www.ratemyprofessors.com/professor/46000"
     },
     {
@@ -1251,7 +1275,7 @@
       "department": "Political Science",
       "avgRating": 5,
       "avgDifficulty": 2.6,
-      "numRatings": 11,
+      "numRatings": 14,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2681890"
     },
@@ -1263,8 +1287,8 @@
       "department": "Chemistry",
       "avgRating": 4.6,
       "avgDifficulty": 3.6,
-      "numRatings": 51,
-      "wouldTakeAgainPercent": 92.1569,
+      "numRatings": 55,
+      "wouldTakeAgainPercent": 90.9091,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2547132"
     },
     {
@@ -1309,10 +1333,10 @@
       "firstName": "Jielong",
       "lastName": "Cai",
       "department": "Engineering",
-      "avgRating": 2.7,
-      "avgDifficulty": 3.3,
-      "numRatings": 3,
-      "wouldTakeAgainPercent": 33.3333,
+      "avgRating": 3.1,
+      "avgDifficulty": 3.7,
+      "numRatings": 7,
+      "wouldTakeAgainPercent": 57.1429,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3118054"
     },
     {
@@ -1556,6 +1580,18 @@
       "profileUrl": "https://www.ratemyprofessors.com/professor/2469882"
     },
     {
+      "id": "VGVhY2hlci0zMTM4MDA5",
+      "legacyId": 3138009,
+      "firstName": "ZQ",
+      "lastName": "Cheng",
+      "department": "Business",
+      "avgRating": 0,
+      "avgDifficulty": 0,
+      "numRatings": 0,
+      "wouldTakeAgainPercent": -1,
+      "profileUrl": "https://www.ratemyprofessors.com/professor/3138009"
+    },
+    {
       "id": "VGVhY2hlci0xNjkzMTQ3",
       "legacyId": 1693147,
       "firstName": "Sonia",
@@ -1652,28 +1688,28 @@
       "profileUrl": "https://www.ratemyprofessors.com/professor/2721469"
     },
     {
-      "id": "VGVhY2hlci05ODM0ODk=",
-      "legacyId": 983489,
-      "firstName": "Constance",
-      "lastName": "Clark",
-      "department": "Humanities",
-      "avgRating": 4.9,
-      "avgDifficulty": 1.7,
-      "numRatings": 9,
-      "wouldTakeAgainPercent": 100,
-      "profileUrl": "https://www.ratemyprofessors.com/professor/983489"
-    },
-    {
       "id": "VGVhY2hlci05NzIzNDM=",
       "legacyId": 972343,
       "firstName": "Constance",
       "lastName": "Clark",
       "department": "History",
       "avgRating": 5,
-      "avgDifficulty": 1.7,
-      "numRatings": 17,
+      "avgDifficulty": 1.6,
+      "numRatings": 18,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/972343"
+    },
+    {
+      "id": "VGVhY2hlci05ODM0ODk=",
+      "legacyId": 983489,
+      "firstName": "Constance",
+      "lastName": "Clark",
+      "department": "Humanities",
+      "avgRating": 4.9,
+      "avgDifficulty": 1.6,
+      "numRatings": 8,
+      "wouldTakeAgainPercent": 100,
+      "profileUrl": "https://www.ratemyprofessors.com/professor/983489"
     },
     {
       "id": "VGVhY2hlci0xMTc1MTI2",
@@ -1693,10 +1729,10 @@
       "firstName": "Mark",
       "lastName": "Claypool",
       "department": "Computer Science",
-      "avgRating": 4.2,
+      "avgRating": 4.1,
       "avgDifficulty": 3.7,
-      "numRatings": 23,
-      "wouldTakeAgainPercent": 100,
+      "numRatings": 24,
+      "wouldTakeAgainPercent": 50,
       "profileUrl": "https://www.ratemyprofessors.com/professor/61664"
     },
     {
@@ -1921,10 +1957,10 @@
       "firstName": "Joseph",
       "lastName": "Cullon",
       "department": "History",
-      "avgRating": 4.3,
+      "avgRating": 4.2,
       "avgDifficulty": 2.3,
-      "numRatings": 36,
-      "wouldTakeAgainPercent": 89.6552,
+      "numRatings": 37,
+      "wouldTakeAgainPercent": 86.6667,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1884625"
     },
     {
@@ -1934,9 +1970,9 @@
       "lastName": "Cuneo",
       "department": "Computer Science",
       "avgRating": 2.7,
-      "avgDifficulty": 3.5,
-      "numRatings": 37,
-      "wouldTakeAgainPercent": 35.1351,
+      "avgDifficulty": 3.4,
+      "numRatings": 38,
+      "wouldTakeAgainPercent": 36.8421,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2271698"
     },
     {
@@ -2029,10 +2065,10 @@
       "firstName": "Althea",
       "lastName": "Danielski",
       "department": "Writing",
-      "avgRating": 4.7,
-      "avgDifficulty": 2.7,
-      "numRatings": 3,
-      "wouldTakeAgainPercent": 66.6667,
+      "avgRating": 4.8,
+      "avgDifficulty": 2.3,
+      "numRatings": 4,
+      "wouldTakeAgainPercent": 75,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2233129"
     },
     {
@@ -2101,10 +2137,10 @@
       "firstName": "Lindsay",
       "lastName": "Davis",
       "department": "History",
-      "avgRating": 4.1,
-      "avgDifficulty": 2.8,
-      "numRatings": 8,
-      "wouldTakeAgainPercent": 87.5,
+      "avgRating": 4,
+      "avgDifficulty": 2.7,
+      "numRatings": 10,
+      "wouldTakeAgainPercent": 90,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2471491"
     },
     {
@@ -2149,10 +2185,10 @@
       "firstName": "Corey",
       "lastName": "Dehner",
       "department": "Global & International Studies",
-      "avgRating": 3,
-      "avgDifficulty": 4.5,
-      "numRatings": 2,
-      "wouldTakeAgainPercent": 50,
+      "avgRating": 3.7,
+      "avgDifficulty": 4.3,
+      "numRatings": 3,
+      "wouldTakeAgainPercent": 66.6667,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2047618"
     },
     {
@@ -2535,8 +2571,8 @@
       "department": "Mathematics",
       "avgRating": 4.1,
       "avgDifficulty": 3,
-      "numRatings": 75,
-      "wouldTakeAgainPercent": 76.5957,
+      "numRatings": 78,
+      "wouldTakeAgainPercent": 76,
       "profileUrl": "https://www.ratemyprofessors.com/professor/542745"
     },
     {
@@ -2641,10 +2677,10 @@
       "firstName": "Alireza",
       "lastName": "Ebadi",
       "department": "Engineering",
-      "avgRating": 3.3,
-      "avgDifficulty": 3,
-      "numRatings": 3,
-      "wouldTakeAgainPercent": 66.6667,
+      "avgRating": 4,
+      "avgDifficulty": 2.4,
+      "numRatings": 5,
+      "wouldTakeAgainPercent": 80,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2724991"
     },
     {
@@ -2665,10 +2701,10 @@
       "firstName": "Brian",
       "lastName": "Eberman",
       "department": "Business",
-      "avgRating": 0,
-      "avgDifficulty": 0,
-      "numRatings": 0,
-      "wouldTakeAgainPercent": -1,
+      "avgRating": 1,
+      "avgDifficulty": 5,
+      "numRatings": 1,
+      "wouldTakeAgainPercent": 0,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3122870"
     },
     {
@@ -2679,7 +2715,7 @@
       "department": "Theater",
       "avgRating": 5,
       "avgDifficulty": 3,
-      "numRatings": 1,
+      "numRatings": 2,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2885054"
     },
@@ -2871,8 +2907,8 @@
       "department": "Humanities",
       "avgRating": 4.4,
       "avgDifficulty": 3.1,
-      "numRatings": 25,
-      "wouldTakeAgainPercent": 87.5,
+      "numRatings": 26,
+      "wouldTakeAgainPercent": 88.8889,
       "profileUrl": "https://www.ratemyprofessors.com/professor/119819"
     },
     {
@@ -2881,10 +2917,10 @@
       "firstName": "Alena",
       "lastName": "Ernst",
       "department": "Mathematics",
-      "avgRating": 2.6,
-      "avgDifficulty": 3.3,
-      "numRatings": 9,
-      "wouldTakeAgainPercent": 33.3333,
+      "avgRating": 2.9,
+      "avgDifficulty": 3.2,
+      "numRatings": 13,
+      "wouldTakeAgainPercent": 46.1538,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3118004"
     },
     {
@@ -2946,6 +2982,18 @@
       "numRatings": 13,
       "wouldTakeAgainPercent": -1,
       "profileUrl": "https://www.ratemyprofessors.com/professor/108599"
+    },
+    {
+      "id": "VGVhY2hlci0zMTU3NDcw",
+      "legacyId": 3157470,
+      "firstName": "Lichao",
+      "lastName": "Fang",
+      "department": "Engineering",
+      "avgRating": 1,
+      "avgDifficulty": 4.5,
+      "numRatings": 2,
+      "wouldTakeAgainPercent": 0,
+      "profileUrl": "https://www.ratemyprofessors.com/professor/3157470"
     },
     {
       "id": "VGVhY2hlci0xMDgxNTE2",
@@ -3038,9 +3086,9 @@
       "lastName": "Fehribach",
       "department": "Mathematics",
       "avgRating": 4.4,
-      "avgDifficulty": 2.7,
-      "numRatings": 43,
-      "wouldTakeAgainPercent": 92.8571,
+      "avgDifficulty": 2.8,
+      "numRatings": 44,
+      "wouldTakeAgainPercent": 93.3333,
       "profileUrl": "https://www.ratemyprofessors.com/professor/112515"
     },
     {
@@ -3193,10 +3241,10 @@
       "firstName": "Kathrine ",
       "lastName": "Foo",
       "department": "Humanities",
-      "avgRating": 0,
-      "avgDifficulty": 0,
-      "numRatings": 0,
-      "wouldTakeAgainPercent": -1,
+      "avgRating": 1,
+      "avgDifficulty": 2,
+      "numRatings": 1,
+      "wouldTakeAgainPercent": 0,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2978424"
     },
     {
@@ -3253,10 +3301,10 @@
       "firstName": "Kateryna",
       "lastName": "Friedman",
       "department": "Physics",
-      "avgRating": 2.7,
-      "avgDifficulty": 3,
-      "numRatings": 6,
-      "wouldTakeAgainPercent": 33.3333,
+      "avgRating": 1.8,
+      "avgDifficulty": 3.4,
+      "numRatings": 12,
+      "wouldTakeAgainPercent": 16.6667,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2903213"
     },
     {
@@ -3313,10 +3361,10 @@
       "firstName": "Cosme",
       "lastName": "Furlong-Vazquez",
       "department": "Engineering",
-      "avgRating": 2.5,
+      "avgRating": 2.4,
       "avgDifficulty": 4.3,
-      "numRatings": 27,
-      "wouldTakeAgainPercent": 25,
+      "numRatings": 30,
+      "wouldTakeAgainPercent": 14.2857,
       "profileUrl": "https://www.ratemyprofessors.com/professor/119906"
     },
     {
@@ -3349,9 +3397,9 @@
       "firstName": "John",
       "lastName": "Galante",
       "department": "History",
-      "avgRating": 4.7,
-      "avgDifficulty": 2.5,
-      "numRatings": 15,
+      "avgRating": 4.8,
+      "avgDifficulty": 2.6,
+      "numRatings": 16,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2287231"
     },
@@ -3745,10 +3793,10 @@
       "firstName": "Selcuk",
       "lastName": "Guceri",
       "department": "Engineering",
-      "avgRating": 3.9,
+      "avgRating": 4,
       "avgDifficulty": 2,
-      "numRatings": 22,
-      "wouldTakeAgainPercent": 85,
+      "numRatings": 23,
+      "wouldTakeAgainPercent": 85.7143,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2106159"
     },
     {
@@ -4010,8 +4058,8 @@
       "lastName": "Heineman",
       "department": "Computer Science",
       "avgRating": 4.5,
-      "avgDifficulty": 3.4,
-      "numRatings": 52,
+      "avgDifficulty": 3.5,
+      "numRatings": 53,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/119419"
     },
@@ -4069,9 +4117,9 @@
       "firstName": "Alexander",
       "lastName": "Herbert",
       "department": "Humanities",
-      "avgRating": 4.6,
-      "avgDifficulty": 2.5,
-      "numRatings": 11,
+      "avgRating": 4.5,
+      "avgDifficulty": 2.4,
+      "numRatings": 12,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2901169"
     },
@@ -4237,10 +4285,10 @@
       "firstName": "Mayer",
       "lastName": "Humi",
       "department": "Mathematics",
-      "avgRating": 3.4,
+      "avgRating": 3.3,
       "avgDifficulty": 3.3,
-      "numRatings": 113,
-      "wouldTakeAgainPercent": 48.4848,
+      "numRatings": 118,
+      "wouldTakeAgainPercent": 42.1053,
       "profileUrl": "https://www.ratemyprofessors.com/professor/71238"
     },
     {
@@ -4261,10 +4309,10 @@
       "firstName": "Hsin-Han",
       "lastName": "Hung",
       "department": "Languages",
-      "avgRating": 0,
-      "avgDifficulty": 0,
-      "numRatings": 0,
-      "wouldTakeAgainPercent": -1,
+      "avgRating": 4,
+      "avgDifficulty": 3,
+      "numRatings": 1,
+      "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2877152"
     },
     {
@@ -4431,7 +4479,7 @@
       "department": "Social Science",
       "avgRating": 5,
       "avgDifficulty": 1,
-      "numRatings": 1,
+      "numRatings": 3,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3125029"
     },
@@ -4587,8 +4635,8 @@
       "department": "Mathematics",
       "avgRating": 4.2,
       "avgDifficulty": 2.8,
-      "numRatings": 59,
-      "wouldTakeAgainPercent": 100,
+      "numRatings": 61,
+      "wouldTakeAgainPercent": 95.6522,
       "profileUrl": "https://www.ratemyprofessors.com/professor/253920"
     },
     {
@@ -4657,10 +4705,10 @@
       "firstName": "Snehalata",
       "lastName": "Kadam",
       "department": "Physics",
-      "avgRating": 3.7,
-      "avgDifficulty": 2.7,
-      "numRatings": 47,
-      "wouldTakeAgainPercent": 82.9787,
+      "avgRating": 3.6,
+      "avgDifficulty": 2.6,
+      "numRatings": 51,
+      "wouldTakeAgainPercent": 78.4314,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2238776"
     },
     {
@@ -4670,9 +4718,9 @@
       "lastName": "Kafle",
       "department": "Physics",
       "avgRating": 4.6,
-      "avgDifficulty": 3.2,
-      "numRatings": 55,
-      "wouldTakeAgainPercent": 92.4528,
+      "avgDifficulty": 3.1,
+      "numRatings": 58,
+      "wouldTakeAgainPercent": 92.8571,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2134010"
     },
     {
@@ -4705,10 +4753,10 @@
       "firstName": "George",
       "lastName": "Kaminski",
       "department": "Chemistry",
-      "avgRating": 2.1,
-      "avgDifficulty": 3.5,
-      "numRatings": 24,
-      "wouldTakeAgainPercent": 26.6667,
+      "avgRating": 2,
+      "avgDifficulty": 3.6,
+      "numRatings": 26,
+      "wouldTakeAgainPercent": 23.5294,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1441522"
     },
     {
@@ -4755,8 +4803,8 @@
       "department": "Physics",
       "avgRating": 3.7,
       "avgDifficulty": 2.6,
-      "numRatings": 69,
-      "wouldTakeAgainPercent": 83.3333,
+      "numRatings": 71,
+      "wouldTakeAgainPercent": 84.0909,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1248464"
     },
     {
@@ -4922,8 +4970,8 @@
       "lastName": "Kidwell",
       "department": "Mathematics",
       "avgRating": 4.9,
-      "avgDifficulty": 2.4,
-      "numRatings": 17,
+      "avgDifficulty": 2.5,
+      "numRatings": 23,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3034983"
     },
@@ -5090,9 +5138,9 @@
       "lastName": "Kong",
       "department": "Computer Science",
       "avgRating": 2.9,
-      "avgDifficulty": 1.5,
-      "numRatings": 8,
-      "wouldTakeAgainPercent": 50,
+      "avgDifficulty": 1.4,
+      "numRatings": 9,
+      "wouldTakeAgainPercent": 44.4444,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2465471"
     },
     {
@@ -5426,8 +5474,8 @@
       "lastName": "Lessing",
       "department": "Humanities",
       "avgRating": 5,
-      "avgDifficulty": 2.2,
-      "numRatings": 5,
+      "avgDifficulty": 2,
+      "numRatings": 6,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2584487"
     },
@@ -5463,7 +5511,7 @@
       "department": "Engineering",
       "avgRating": 4.7,
       "avgDifficulty": 3.7,
-      "numRatings": 10,
+      "numRatings": 11,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2523110"
     },
@@ -5617,9 +5665,9 @@
       "firstName": "Sijing",
       "lastName": "Liu",
       "department": "Mathematics",
-      "avgRating": 4.6,
-      "avgDifficulty": 1.5,
-      "numRatings": 8,
+      "avgRating": 4.7,
+      "avgDifficulty": 1.6,
+      "numRatings": 9,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3033511"
     },
@@ -5870,9 +5918,9 @@
       "lastName": "MacDonald",
       "department": "Science",
       "avgRating": 4,
-      "avgDifficulty": 3.2,
-      "numRatings": 41,
-      "wouldTakeAgainPercent": 92.3077,
+      "avgDifficulty": 3.1,
+      "numRatings": 43,
+      "wouldTakeAgainPercent": 93.3333,
       "profileUrl": "https://www.ratemyprofessors.com/professor/160223"
     },
     {
@@ -5931,8 +5979,8 @@
       "department": "Engineering",
       "avgRating": 4.4,
       "avgDifficulty": 2.8,
-      "numRatings": 109,
-      "wouldTakeAgainPercent": 91.6667,
+      "numRatings": 111,
+      "wouldTakeAgainPercent": 92.1053,
       "profileUrl": "https://www.ratemyprofessors.com/professor/119850"
     },
     {
@@ -5943,8 +5991,8 @@
       "department": "Engineering",
       "avgRating": 3.5,
       "avgDifficulty": 3.9,
-      "numRatings": 65,
-      "wouldTakeAgainPercent": 71.0526,
+      "numRatings": 67,
+      "wouldTakeAgainPercent": 70,
       "profileUrl": "https://www.ratemyprofessors.com/professor/73318"
     },
     {
@@ -6229,10 +6277,10 @@
       "firstName": "anita",
       "lastName": "mattson",
       "department": "Chemistry",
-      "avgRating": 5,
+      "avgRating": 2.7,
       "avgDifficulty": 3,
-      "numRatings": 1,
-      "wouldTakeAgainPercent": 100,
+      "numRatings": 3,
+      "wouldTakeAgainPercent": 33.3333,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2768922"
     },
     {
@@ -6411,7 +6459,7 @@
       "department": "Physics",
       "avgRating": 5,
       "avgDifficulty": 2.9,
-      "numRatings": 12,
+      "numRatings": 13,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1752641"
     },
@@ -6553,9 +6601,9 @@
       "firstName": "Brajendra",
       "lastName": "Mishra",
       "department": "Engineering",
-      "avgRating": 4.5,
-      "avgDifficulty": 3.5,
-      "numRatings": 2,
+      "avgRating": 4.7,
+      "avgDifficulty": 3,
+      "numRatings": 3,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2376845"
     },
@@ -6601,10 +6649,10 @@
       "firstName": "Rebecca",
       "lastName": "Moody",
       "department": "Religion",
-      "avgRating": 4.2,
+      "avgRating": 4.3,
       "avgDifficulty": 3,
-      "numRatings": 14,
-      "wouldTakeAgainPercent": 92.8571,
+      "numRatings": 15,
+      "wouldTakeAgainPercent": 93.3333,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2398534"
     },
     {
@@ -6795,7 +6843,7 @@
       "department": "Languages",
       "avgRating": 5,
       "avgDifficulty": 3,
-      "numRatings": 2,
+      "numRatings": 3,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3061616"
     },
@@ -6890,9 +6938,9 @@
       "lastName": "Nachbin",
       "department": "Mathematics",
       "avgRating": 1.8,
-      "avgDifficulty": 3.3,
-      "numRatings": 4,
-      "wouldTakeAgainPercent": 25,
+      "avgDifficulty": 3.2,
+      "numRatings": 5,
+      "wouldTakeAgainPercent": 20,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3007590"
     },
     {
@@ -6949,10 +6997,10 @@
       "firstName": "Rodica",
       "lastName": "Neamtu",
       "department": "Computer Science",
-      "avgRating": 2.2,
-      "avgDifficulty": 3.7,
-      "numRatings": 14,
-      "wouldTakeAgainPercent": 21.4286,
+      "avgRating": 2.1,
+      "avgDifficulty": 3.8,
+      "numRatings": 15,
+      "wouldTakeAgainPercent": 20,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2347336"
     },
     {
@@ -6963,7 +7011,7 @@
       "department": "Biology",
       "avgRating": 5,
       "avgDifficulty": 3,
-      "numRatings": 1,
+      "numRatings": 2,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2779345"
     },
@@ -7131,7 +7179,7 @@
       "department": "Physics",
       "avgRating": 5,
       "avgDifficulty": 2.2,
-      "numRatings": 23,
+      "numRatings": 24,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2674846"
     },
@@ -7202,8 +7250,8 @@
       "lastName": "Obayemi",
       "department": "Engineering",
       "avgRating": 4.9,
-      "avgDifficulty": 3.4,
-      "numRatings": 7,
+      "avgDifficulty": 3.3,
+      "numRatings": 8,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2275981"
     },
@@ -7218,6 +7266,18 @@
       "numRatings": 4,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1831835"
+    },
+    {
+      "id": "VGVhY2hlci0zMTI2NTE3",
+      "legacyId": 3126517,
+      "firstName": "Eugene",
+      "lastName": "Okyere-Yeboah",
+      "department": "Business",
+      "avgRating": 0,
+      "avgDifficulty": 0,
+      "numRatings": 0,
+      "wouldTakeAgainPercent": -1,
+      "profileUrl": "https://www.ratemyprofessors.com/professor/3126517"
     },
     {
       "id": "VGVhY2hlci03MzMxNA==",
@@ -7261,10 +7321,10 @@
       "firstName": "Nii ",
       "lastName": "Ollenu",
       "department": "Accounting",
-      "avgRating": 0,
-      "avgDifficulty": 0,
-      "numRatings": 0,
-      "wouldTakeAgainPercent": -1,
+      "avgRating": 2,
+      "avgDifficulty": 3,
+      "numRatings": 1,
+      "wouldTakeAgainPercent": 0,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2978601"
     },
     {
@@ -7322,8 +7382,8 @@
       "lastName": "Orduna Picon",
       "department": "Chemistry",
       "avgRating": 4.9,
-      "avgDifficulty": 1.8,
-      "numRatings": 8,
+      "avgDifficulty": 1.7,
+      "numRatings": 9,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3036023"
     },
@@ -7753,10 +7813,10 @@
       "firstName": "Barry",
       "lastName": "Posterro",
       "department": "Mathematics",
-      "avgRating": 3.4,
-      "avgDifficulty": 2.5,
-      "numRatings": 20,
-      "wouldTakeAgainPercent": 30.7692,
+      "avgRating": 3.2,
+      "avgDifficulty": 2.4,
+      "numRatings": 21,
+      "wouldTakeAgainPercent": 28.5714,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2048718"
     },
     {
@@ -7899,8 +7959,8 @@
       "department": "Economics",
       "avgRating": 2.9,
       "avgDifficulty": 3,
-      "numRatings": 66,
-      "wouldTakeAgainPercent": 31.8182,
+      "numRatings": 67,
+      "wouldTakeAgainPercent": 30.4348,
       "profileUrl": "https://www.ratemyprofessors.com/professor/46706"
     },
     {
@@ -7995,8 +8055,8 @@
       "department": "Mathematics",
       "avgRating": 4.2,
       "avgDifficulty": 3,
-      "numRatings": 48,
-      "wouldTakeAgainPercent": 79.1667,
+      "numRatings": 51,
+      "wouldTakeAgainPercent": 80.3922,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2409509"
     },
     {
@@ -8115,8 +8175,8 @@
       "department": "Engineering",
       "avgRating": 4.7,
       "avgDifficulty": 3.1,
-      "numRatings": 58,
-      "wouldTakeAgainPercent": 83.3333,
+      "numRatings": 59,
+      "wouldTakeAgainPercent": 84.6154,
       "profileUrl": "https://www.ratemyprofessors.com/professor/119375"
     },
     {
@@ -8125,10 +8185,10 @@
       "firstName": "Sarah",
       "lastName": "Riddick",
       "department": "English & Writing",
-      "avgRating": 2.2,
+      "avgRating": 2.1,
       "avgDifficulty": 3.8,
-      "numRatings": 16,
-      "wouldTakeAgainPercent": 18.75,
+      "numRatings": 17,
+      "wouldTakeAgainPercent": 17.6471,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2674758"
     },
     {
@@ -8293,10 +8353,10 @@
       "firstName": "Joshua",
       "lastName": "Rosenstock",
       "department": "Design",
-      "avgRating": 0,
-      "avgDifficulty": 0,
-      "numRatings": 0,
-      "wouldTakeAgainPercent": -1,
+      "avgRating": 5,
+      "avgDifficulty": 3,
+      "numRatings": 1,
+      "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3117041"
     },
     {
@@ -8414,8 +8474,8 @@
       "lastName": "Ryder",
       "department": "Science",
       "avgRating": 2.7,
-      "avgDifficulty": 3.4,
-      "numRatings": 20,
+      "avgDifficulty": 3.5,
+      "numRatings": 21,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/50491"
     },
@@ -8485,10 +8545,10 @@
       "firstName": "Aaron",
       "lastName": "Sakulich",
       "department": "Engineering",
-      "avgRating": 4.2,
-      "avgDifficulty": 3.3,
-      "numRatings": 6,
-      "wouldTakeAgainPercent": 83.3333,
+      "avgRating": 4.1,
+      "avgDifficulty": 3.4,
+      "numRatings": 7,
+      "wouldTakeAgainPercent": 85.7143,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2124793"
     },
     {
@@ -8509,10 +8569,10 @@
       "firstName": "Adam ",
       "lastName": "Sales",
       "department": "Mathematics",
-      "avgRating": 4.8,
-      "avgDifficulty": 2.8,
-      "numRatings": 4,
-      "wouldTakeAgainPercent": 75,
+      "avgRating": 4.4,
+      "avgDifficulty": 2.4,
+      "numRatings": 5,
+      "wouldTakeAgainPercent": 80,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2874596"
     },
     {
@@ -8559,8 +8619,8 @@
       "department": "Humanities",
       "avgRating": 3.8,
       "avgDifficulty": 3.5,
-      "numRatings": 60,
-      "wouldTakeAgainPercent": 57.8947,
+      "numRatings": 61,
+      "wouldTakeAgainPercent": 55,
       "profileUrl": "https://www.ratemyprofessors.com/professor/119914"
     },
     {
@@ -8583,9 +8643,21 @@
       "department": "Mathematics",
       "avgRating": 4,
       "avgDifficulty": 3,
-      "numRatings": 44,
-      "wouldTakeAgainPercent": 75,
+      "numRatings": 46,
+      "wouldTakeAgainPercent": 76.087,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2461718"
+    },
+    {
+      "id": "VGVhY2hlci0zMTI3MTQy",
+      "legacyId": 3127142,
+      "firstName": "Nithin ",
+      "lastName": "Sanket",
+      "department": "Engineering",
+      "avgRating": 0,
+      "avgDifficulty": 0,
+      "numRatings": 0,
+      "wouldTakeAgainPercent": -1,
+      "profileUrl": "https://www.ratemyprofessors.com/professor/3127142"
     },
     {
       "id": "VGVhY2hlci0xNjcyOTk1",
@@ -8641,10 +8713,10 @@
       "firstName": "Robert",
       "lastName": "Sarnie",
       "department": "Business",
-      "avgRating": 5,
+      "avgRating": 3.5,
       "avgDifficulty": 2,
-      "numRatings": 1,
-      "wouldTakeAgainPercent": 100,
+      "numRatings": 2,
+      "wouldTakeAgainPercent": 50,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2628673"
     },
     {
@@ -8737,10 +8809,10 @@
       "firstName": "Kaitlyn ",
       "lastName": "Schneider",
       "department": "Psychology",
-      "avgRating": 2,
-      "avgDifficulty": 4,
-      "numRatings": 4,
-      "wouldTakeAgainPercent": 25,
+      "avgRating": 2.4,
+      "avgDifficulty": 3.6,
+      "numRatings": 5,
+      "wouldTakeAgainPercent": 40,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2932522"
     },
     {
@@ -8833,10 +8905,10 @@
       "firstName": "Megan",
       "lastName": "Sethi",
       "department": "History",
-      "avgRating": 4,
-      "avgDifficulty": 2,
-      "numRatings": 3,
-      "wouldTakeAgainPercent": 100,
+      "avgRating": 2.8,
+      "avgDifficulty": 3.2,
+      "numRatings": 5,
+      "wouldTakeAgainPercent": 60,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2555726"
     },
     {
@@ -9061,10 +9133,10 @@
       "firstName": "Michael",
       "lastName": "Smith",
       "department": "Mathematics",
-      "avgRating": 3.2,
-      "avgDifficulty": 3,
-      "numRatings": 33,
-      "wouldTakeAgainPercent": 57.5758,
+      "avgRating": 3.1,
+      "avgDifficulty": 3.1,
+      "numRatings": 37,
+      "wouldTakeAgainPercent": 54.0541,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2719544"
     },
     {
@@ -9284,6 +9356,18 @@
       "profileUrl": "https://www.ratemyprofessors.com/professor/119950"
     },
     {
+      "id": "VGVhY2hlci0zMTUwODEw",
+      "legacyId": 3150810,
+      "firstName": "Esther",
+      "lastName": "Stella-Rosario",
+      "department": "Philosophy",
+      "avgRating": 0,
+      "avgDifficulty": 0,
+      "numRatings": 0,
+      "wouldTakeAgainPercent": -1,
+      "profileUrl": "https://www.ratemyprofessors.com/professor/3150810"
+    },
+    {
       "id": "VGVhY2hlci0yNDQ3NDc1",
       "legacyId": 2447475,
       "firstName": "Elizabeth",
@@ -9351,8 +9435,8 @@
       "department": "Physics",
       "avgRating": 3.9,
       "avgDifficulty": 2.6,
-      "numRatings": 45,
-      "wouldTakeAgainPercent": 68.5714,
+      "numRatings": 46,
+      "wouldTakeAgainPercent": 66.6667,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1410774"
     },
     {
@@ -9440,15 +9524,27 @@
       "profileUrl": "https://www.ratemyprofessors.com/professor/1360132"
     },
     {
+      "id": "VGVhY2hlci0zMTQ5NTE5",
+      "legacyId": 3149519,
+      "firstName": "Xiaoyan",
+      "lastName": "Sun",
+      "department": "Computer Science",
+      "avgRating": 2,
+      "avgDifficulty": 2,
+      "numRatings": 1,
+      "wouldTakeAgainPercent": 0,
+      "profileUrl": "https://www.ratemyprofessors.com/professor/3149519"
+    },
+    {
       "id": "VGVhY2hlci0yOTQyNTY5",
       "legacyId": 2942569,
       "firstName": "Yu-Shan ",
       "lastName": "Sun",
       "department": "Computer Science",
       "avgRating": 4,
-      "avgDifficulty": 2.8,
-      "numRatings": 12,
-      "wouldTakeAgainPercent": 91.6667,
+      "avgDifficulty": 2.7,
+      "numRatings": 14,
+      "wouldTakeAgainPercent": 92.8571,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2942569"
     },
     {
@@ -9531,8 +9627,8 @@
       "department": "Mathematics",
       "avgRating": 2.9,
       "avgDifficulty": 2.9,
-      "numRatings": 106,
-      "wouldTakeAgainPercent": 51.3514,
+      "numRatings": 109,
+      "wouldTakeAgainPercent": 50,
       "profileUrl": "https://www.ratemyprofessors.com/professor/47866"
     },
     {
@@ -9627,8 +9723,8 @@
       "department": "Mathematics",
       "avgRating": 2.6,
       "avgDifficulty": 4,
-      "numRatings": 58,
-      "wouldTakeAgainPercent": 24.2424,
+      "numRatings": 60,
+      "wouldTakeAgainPercent": 28.5714,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1361677"
     },
     {
@@ -9649,10 +9745,10 @@
       "firstName": "Lyubov",
       "lastName": "Titova",
       "department": "Physics",
-      "avgRating": 4.4,
-      "avgDifficulty": 2.9,
-      "numRatings": 9,
-      "wouldTakeAgainPercent": 88.8889,
+      "avgRating": 4.3,
+      "avgDifficulty": 2.8,
+      "numRatings": 10,
+      "wouldTakeAgainPercent": 80,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1920841"
     },
     {
@@ -9805,10 +9901,10 @@
       "firstName": "Seth",
       "lastName": "Tuler",
       "department": "Education",
-      "avgRating": 2.4,
-      "avgDifficulty": 3.5,
-      "numRatings": 13,
-      "wouldTakeAgainPercent": 50,
+      "avgRating": 2.2,
+      "avgDifficulty": 3.7,
+      "numRatings": 15,
+      "wouldTakeAgainPercent": 37.5,
       "profileUrl": "https://www.ratemyprofessors.com/professor/119361"
     },
     {
@@ -10045,11 +10141,23 @@
       "firstName": "Ralihe",
       "lastName": "Villagran",
       "department": "Mathematics",
-      "avgRating": 3.3,
-      "avgDifficulty": 3.5,
-      "numRatings": 12,
+      "avgRating": 3.2,
+      "avgDifficulty": 3.4,
+      "numRatings": 14,
       "wouldTakeAgainPercent": 50,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2964935"
+    },
+    {
+      "id": "VGVhY2hlci0zMTU3MzEx",
+      "legacyId": 3157311,
+      "firstName": "Ernesto",
+      "lastName": "Villalpando",
+      "department": "Business",
+      "avgRating": 0,
+      "avgDifficulty": 0,
+      "numRatings": 0,
+      "wouldTakeAgainPercent": -1,
+      "profileUrl": "https://www.ratemyprofessors.com/professor/3157311"
     },
     {
       "id": "VGVhY2hlci0xMDMzNDA1",
@@ -10059,8 +10167,8 @@
       "department": "Mathematics",
       "avgRating": 3.6,
       "avgDifficulty": 3.2,
-      "numRatings": 33,
-      "wouldTakeAgainPercent": 70,
+      "numRatings": 34,
+      "wouldTakeAgainPercent": 72.7273,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1033405"
     },
     {
@@ -10273,10 +10381,10 @@
       "firstName": "QI",
       "lastName": "Wen",
       "department": "Physics",
-      "avgRating": 4,
-      "avgDifficulty": 3,
-      "numRatings": 29,
-      "wouldTakeAgainPercent": 73.913,
+      "avgRating": 3.9,
+      "avgDifficulty": 3.1,
+      "numRatings": 30,
+      "wouldTakeAgainPercent": 70.8333,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1625959"
     },
     {
@@ -10322,9 +10430,9 @@
       "lastName": "Whitehill",
       "department": "Computer Science",
       "avgRating": 4.3,
-      "avgDifficulty": 4,
-      "numRatings": 11,
-      "wouldTakeAgainPercent": 81.8182,
+      "avgDifficulty": 4.1,
+      "numRatings": 12,
+      "wouldTakeAgainPercent": 83.3333,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2461991"
     },
     {
@@ -10406,8 +10514,8 @@
       "lastName": "Wong",
       "department": "Engineering",
       "avgRating": 5,
-      "avgDifficulty": 2.9,
-      "numRatings": 7,
+      "avgDifficulty": 2.8,
+      "numRatings": 8,
       "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/3042175"
     },
@@ -10454,9 +10562,9 @@
       "lastName": "Wu",
       "department": "Physics",
       "avgRating": 2.6,
-      "avgDifficulty": 3.2,
-      "numRatings": 5,
-      "wouldTakeAgainPercent": 20,
+      "avgDifficulty": 3,
+      "numRatings": 7,
+      "wouldTakeAgainPercent": 28.5714,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2420408"
     },
     {
@@ -10465,10 +10573,10 @@
       "firstName": "Min",
       "lastName": "Wu",
       "department": "Mathematics",
-      "avgRating": 2.8,
-      "avgDifficulty": 3.5,
-      "numRatings": 11,
-      "wouldTakeAgainPercent": 45.4545,
+      "avgRating": 2.9,
+      "avgDifficulty": 3.4,
+      "numRatings": 13,
+      "wouldTakeAgainPercent": 38.4615,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2387391"
     },
     {
@@ -10489,10 +10597,10 @@
       "firstName": "Zheyang",
       "lastName": "WU",
       "department": "Mathematics",
-      "avgRating": 2.2,
-      "avgDifficulty": 2.6,
-      "numRatings": 22,
-      "wouldTakeAgainPercent": 27.7778,
+      "avgRating": 2.5,
+      "avgDifficulty": 2.7,
+      "numRatings": 25,
+      "wouldTakeAgainPercent": 38.0952,
       "profileUrl": "https://www.ratemyprofessors.com/professor/1619519"
     },
     {
@@ -10585,10 +10693,10 @@
       "firstName": "ABDULLAH",
       "lastName": "YILDIZBASI",
       "department": "Business",
-      "avgRating": 3,
-      "avgDifficulty": 3.5,
-      "numRatings": 2,
-      "wouldTakeAgainPercent": 50,
+      "avgRating": 5,
+      "avgDifficulty": 2,
+      "numRatings": 1,
+      "wouldTakeAgainPercent": 100,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2991329"
     },
     {
@@ -10633,10 +10741,10 @@
       "firstName": "Seyed",
       "lastName": "Zekavat",
       "department": "Physics",
-      "avgRating": 2.7,
-      "avgDifficulty": 2.4,
-      "numRatings": 9,
-      "wouldTakeAgainPercent": 66.6667,
+      "avgRating": 2.8,
+      "avgDifficulty": 2.5,
+      "numRatings": 12,
+      "wouldTakeAgainPercent": 58.3333,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2546875"
     },
     {
@@ -10705,10 +10813,10 @@
       "firstName": "Zhongqiang",
       "lastName": "Zhang",
       "department": "Mathematics",
-      "avgRating": 3.1,
+      "avgRating": 3.4,
       "avgDifficulty": 2.7,
-      "numRatings": 14,
-      "wouldTakeAgainPercent": 35.7143,
+      "numRatings": 16,
+      "wouldTakeAgainPercent": 43.75,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2286144"
     },
     {
@@ -10742,9 +10850,9 @@
       "lastName": "Zheng",
       "department": "Languages",
       "avgRating": 4.3,
-      "avgDifficulty": 3.1,
-      "numRatings": 14,
-      "wouldTakeAgainPercent": 85.7143,
+      "avgDifficulty": 3,
+      "numRatings": 15,
+      "wouldTakeAgainPercent": 86.6667,
       "profileUrl": "https://www.ratemyprofessors.com/professor/2476894"
     },
     {
@@ -10904,5 +11012,5 @@
       "profileUrl": "https://www.ratemyprofessors.com/professor/2109731"
     }
   ],
-  "totalProfessors": 908
+  "totalProfessors": 917
 }
