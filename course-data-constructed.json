@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 1, 2026, 9:56 PM",
+  "generated": "Feb 1, 2026, 10:24 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -48022,7 +48022,7 @@
                 "number": "D01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. II Building on the theoretical foundations from CS 3133, this course addresses the fundamental question of what it means to be “computable,” including different characterization of computable sets and functions. Topics include the halting program, the Church-Turing thesis, primitive recursive functions, recursive sets, recursively enumerable sets, NP-completeness, and reducibilities.Students will be expected to complete a variety of exercises and proofs.Recommended Background: CS 3133.This course will be offered in 2019-20, and in alternating years thereafter.",
@@ -48041,7 +48041,7 @@
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
