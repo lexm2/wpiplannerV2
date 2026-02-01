@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 1, 2026, 5:21 PM",
+  "generated": "Feb 1, 2026, 6:29 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -64732,7 +64732,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 12,
+                "actualWaitlist": 11,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I This introduction course in engineering graphical communications and design provides a solid background for all engineering disciplines. The ability to visualize, create and apply proper design intent and industry standards for simple parts, assemblies and drawings is a necessity for anyone in a technology environment. Computer Aided Design software is used as a tool to create 2D & 3D sketches, 3D parts, 3D assemblies and 2D drawings per an industry standard. Multiview and pictorial graphics techniques are integrated with ANSI standards for dimensioning and tolerances, sectioning, and generating detailed engineering drawings. Emphasis is placed on relating drawings to the required manufacturing processes. The design process and aids to creativity are combined with graphics procedures to incorporate functional design requirements in the geometric model. No prior engineering graphics or software knowledge is assumed.",
@@ -64751,7 +64751,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 12,
+                    "actualWaitlist": 11,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": [],
