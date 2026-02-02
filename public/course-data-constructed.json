@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 2, 2026, 5:57 PM",
+  "generated": "Feb 2, 2026, 6:47 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8272,7 +8272,7 @@
                 "crn": 336065,
                 "number": "CL01",
                 "seats": 20,
-                "seatsAvailable": 10,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -8291,7 +8291,7 @@
                     "building": "",
                     "room": "37 Institute",
                     "seats": 20,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "CL01",
@@ -8309,7 +8309,7 @@
                     "building": "",
                     "room": "Fuller Labs 246 Beckett Conference Room",
                     "seats": 20,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "CL01",
@@ -8326,7 +8326,7 @@
                   "crn": 336064,
                   "number": "CX01",
                   "seats": 20,
-                  "seatsAvailable": 10,
+                  "seatsAvailable": 9,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -8345,7 +8345,7 @@
                       "building": "",
                       "room": "Salisbury Labs 115 Kinnicutt Hall",
                       "seats": 20,
-                      "seatsAvailable": 10,
+                      "seatsAvailable": 9,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX01",
@@ -227886,42 +227886,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "section": {
-                "crn": 337311,
-                "number": "Interest List-A Term",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": "IntList",
-                "description": "Cat. I This course offers experience in experimentation and observation for students of the sciences and others. In a series of subject units, students learn or review the physical principles underlying the phenomena to be observed and the basis for the measurement techniques employed. Principles and uses of laboratory instruments including the cathode-ray oscilloscope, meters for frequency, time, electrical and other quantities are stressed. In addition to systematic measurement procedures and data recording, strong emphasis is placed on processing of the data, preparation and interpretation of graphical presentations, and analysis of precision and accuracy, including determination and interpretation of best value, measures of error and uncertainty, linear best fit to data, and identification of systematic and random errors. Preparation of high-quality experiment reports is also emphasized. Representative experiment subjects are: mechanical motions and vibrations; free and driven electrical oscillations; electric fields and potential; magnetic materials and fields; electron beam dynamics; optics; diffractiongrating spectroscopy; radioactive decay and nuclear energy measurements. Recommended background: the Introductory Physics course sequence or equivalent. No prior laboratory background beyond that experience is required. Students who have received credit for PH 2600 or PH 3600 may not receive credit for PH 2651.",
-                "term": "202201",
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": true,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "Interest List-A Term",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
             }
           ]
         },
