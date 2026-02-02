@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 2, 2026, 11:23 PM",
+  "generated": "Feb 2, 2026, 11:51 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -74939,7 +74939,7 @@
                 "crn": 340350,
                 "number": "D01 - Topics In Modern European History",
                 "seats": 20,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
@@ -74958,7 +74958,7 @@
                     "building": "",
                     "room": "Salisbury Labs 011",
                     "seats": 20,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D01 - Topics In Modern European History",
@@ -236816,7 +236816,7 @@
                 "crn": 337492,
                 "number": "D02",
                 "seats": 20,
-                "seatsAvailable": 6,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -236835,7 +236835,7 @@
                     "building": "",
                     "room": "Atwater Kent 232",
                     "seats": 20,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
