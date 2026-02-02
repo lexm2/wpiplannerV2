@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 2, 2026, 11:50 AM",
+  "generated": "Feb 2, 2026, 12:51 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -78657,7 +78657,7 @@
                 "crn": 343431,
                 "number": "C02 - PRAC IN HUA: Visual Persuasion",
                 "seats": 12,
-                "seatsAvailable": 0,
+                "seatsAvailable": -1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -78676,7 +78676,7 @@
                     "building": "",
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 12,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": -1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "C02 - PRAC IN HUA: Visual Persuasion",
