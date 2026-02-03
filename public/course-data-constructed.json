@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 3, 2026, 1:50 AM",
+  "generated": "Feb 3, 2026, 4:11 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4837,7 +4837,7 @@
                 "crn": 337359,
                 "number": "D01",
                 "seats": 24,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -4856,7 +4856,7 @@
                     "building": "",
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -83394,7 +83394,7 @@
                 "crn": 337359,
                 "number": "D01",
                 "seats": 24,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -83413,7 +83413,7 @@
                     "building": "",
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
