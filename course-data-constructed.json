@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 3, 2026, 4:11 AM",
+  "generated": "Feb 3, 2026, 5:20 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -237557,7 +237557,7 @@
                 "crn": 337493,
                 "number": "D02",
                 "seats": 20,
-                "seatsAvailable": 8,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -237576,7 +237576,7 @@
                     "building": "",
                     "room": "Atwater Kent 232",
                     "seats": 20,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
@@ -237680,7 +237680,7 @@
                 "crn": 337491,
                 "number": "D05",
                 "seats": 20,
-                "seatsAvailable": 11,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -237699,7 +237699,7 @@
                     "building": "",
                     "room": "Salisbury Labs 407",
                     "seats": 20,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D05",
