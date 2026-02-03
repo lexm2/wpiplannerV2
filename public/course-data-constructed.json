@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 3, 2026, 5:20 AM",
+  "generated": "Feb 3, 2026, 6:09 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4242,7 +4242,7 @@
                 "number": "D02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course provides an introduction to the basic principles of two and three-dimensional visual organization. The course focuses on graphic expression, idea development, and visual literacy. Students will be expected to master basic rendering skills, perspective drawing, concept art, and storyboarding through traditional and/or computer-based tools.",
@@ -4261,7 +4261,7 @@
                     "room": "Riley Commons",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
