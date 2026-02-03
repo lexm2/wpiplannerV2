@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 3, 2026, 7:12 PM",
+  "generated": "Feb 3, 2026, 7:52 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -6196,7 +6196,7 @@
                 "crn": 339012,
                 "number": "S01",
                 "seats": 20,
-                "seatsAvailable": 18,
+                "seatsAvailable": 17,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -6215,7 +6215,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 20,
-                    "seatsAvailable": 18,
+                    "seatsAvailable": 17,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
@@ -37002,7 +37002,7 @@
                 "crn": 338645,
                 "number": "D01",
                 "seats": 50,
-                "seatsAvailable": 29,
+                "seatsAvailable": 28,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -37021,7 +37021,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 50,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 28,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
