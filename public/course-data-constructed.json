@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 3, 2026, 10:04 AM",
+  "generated": "Feb 3, 2026, 10:59 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4604,7 +4604,7 @@
                 "number": "D02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course focuses on the methods, procedures and techniques of creating and manipulating images through electronic and digital means. Students will develop an understanding of image alteration. Topics may include color theory, displays, modeling, shading, and visual perception. Recommended background: AR 1100.",
@@ -4623,7 +4623,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
@@ -5788,7 +5788,7 @@
                 "crn": 337366,
                 "number": "D01 - Topics In Studio Art: Contemporary Miniature Painting",
                 "seats": 24,
-                "seatsAvailable": 8,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -5807,7 +5807,7 @@
                     "building": "",
                     "room": "Salisbury Labs 406",
                     "seats": 24,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01 - Topics In Studio Art: Contemporary Miniature Painting",
