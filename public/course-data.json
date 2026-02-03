@@ -6879,10 +6879,10 @@
       "Meeting_Patterns": "M-T-R-F | 1:00 PM - 1:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Unity Hall 400 | M-T-R-F | 1:00 PM - 1:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Closed",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "19/20",
+      "Waitlist_Waitlist_Capacity": "20/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339594"
     },
     {
@@ -19532,7 +19532,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: CH 1010 - Chemical Properties, Bonding, And Forces (b)",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "37/999",
+      "Waitlist_Waitlist_Capacity": "36/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336253"
     },
     {
@@ -19730,7 +19730,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: CH 1010 - Chemical Properties, Bonding, And Forces (b)",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "36/999",
+      "Waitlist_Waitlist_Capacity": "35/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336240"
     },
     {
@@ -19845,7 +19845,7 @@
       "Starting_Academic_Period_Type": "C Term",
       "Student_Course_Section_Cluster": "2026 Spring C Term: CH 1010 - Chemical Properties, Bonding, And Forces (b)",
       "Subject": "Chemistry",
-      "Waitlist_Waitlist_Capacity": "37/999",
+      "Waitlist_Waitlist_Capacity": "36/999",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336684"
     },
     {
@@ -97480,7 +97480,7 @@
       "Course_Title": "ME 591 - Graduate Seminar",
       "Credits": "0",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "93/140",
+      "Enrolled_Capacity": "94/140",
       "Instructional_Format": "Seminar",
       "Instructors": "Jiawei Yang",
       "Locations": "Olin Hall 107",
