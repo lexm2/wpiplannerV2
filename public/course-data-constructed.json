@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 4, 2026, 11:22 PM",
+  "generated": "Feb 4, 2026, 11:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -243014,7 +243014,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -243033,7 +243033,7 @@
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
@@ -251154,7 +251154,7 @@
                 "number": "D05",
                 "seats": 18,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "WPE 1611 Introduction to Mindfulness (Cat. I, 1/12 unit) Introduction to Mindfulness is an evidence-based mindfulness curriculum designed for college aged adults by the Mindfulness Institute for Emerging Adults (MIEA). During this course, you will learn useful, practical tools to help manage your stress and increase self-compassion. Students will practice a variety of meditation skills, engage with the MIEA Mobile App, read the companion book, and participate in class discussion.",
@@ -251173,7 +251173,7 @@
                     "room": "Daniels Hall 102E",
                     "seats": 18,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 5,
                     "specificSection": "D05",
                     "days": [
