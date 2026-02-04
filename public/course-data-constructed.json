@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 4, 2026, 12:00 PM",
+  "generated": "Feb 4, 2026, 1:34 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -76748,7 +76748,7 @@
                 "crn": 336553,
                 "number": "C01 - INQ SEM: Modern Architecture",
                 "seats": 12,
-                "seatsAvailable": 0,
+                "seatsAvailable": -1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -76767,7 +76767,7 @@
                     "building": "",
                     "room": "Salisbury Labs 124 Conference Room",
                     "seats": 12,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": -1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "C01 - INQ SEM: Modern Architecture",
