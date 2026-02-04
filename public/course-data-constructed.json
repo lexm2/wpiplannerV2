@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 4, 2026, 3:08 PM",
+  "generated": "Feb 4, 2026, 3:59 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -62979,7 +62979,7 @@
                 "number": "D01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course introduces the student to a variety of critical perspectives necessary to an understanding and appreciation of the major forms, or genres, of literary expression (e.g., novel, short story, poetry, drama, and essay). Writing and class discussion will be integral parts of this course.",
@@ -62998,7 +62998,7 @@
                     "room": "Salisbury Labs 407",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -63379,7 +63379,7 @@
                 "crn": 337209,
                 "number": "D01",
                 "seats": 35,
-                "seatsAvailable": 13,
+                "seatsAvailable": 14,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -63398,7 +63398,7 @@
                     "building": "",
                     "room": "Salisbury Labs 407",
                     "seats": 35,
-                    "seatsAvailable": 13,
+                    "seatsAvailable": 14,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -229186,7 +229186,7 @@
                 "number": "D01",
                 "seats": 55,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "PSY 1400: Introduction to Psychological Science (Cat I) This course is intended for anyone interested in learning about the different areas of psychological science. Psychological science is the scientific examination of human thought and behavior. In other words, psychologists try to understand why people do what they do. This course offers an introduction to different areas and topics within psychological science. Topics may include: the brain, sensation, perception, learning, memory, language, intelligence, development over the lifespan, social cognition and behavior, motivations, emotions, mental health, methodology & statistics. No prior experience in psychology is needed",
@@ -229205,7 +229205,7 @@
                     "room": "Salisbury Labs 411",
                     "seats": 55,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
