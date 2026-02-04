@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 4, 2026, 5:52 PM",
+  "generated": "Feb 4, 2026, 6:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -68672,7 +68672,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I In the modern competitive and global world confronting today’s engineers, innovation and entrepreneurship (I&E) are increasingly important perspectives for every engineering career. Individuals proficient in I&E are likely to possess unique competitive advantage over those who do not. This course develops the foundation for developing such proficiency by examining the functional roles of the business/commercial aspects of engineering disciplines as well as establishing a basis for innovative thinking. Specific cases where I&E has led to new products innovation and new enterprise development will supplement course materials.",
@@ -68691,7 +68691,7 @@
                     "room": "Salisbury Labs 411",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
