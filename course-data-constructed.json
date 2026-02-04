@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 4, 2026, 10:59 AM",
+  "generated": "Feb 4, 2026, 11:39 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -48545,7 +48545,7 @@
                 "number": "D01",
                 "seats": 60,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "Cat.I In this course, students will explore both theoretical and practical aspects of machine learning, including algorithms for regression, classification, dimensionality reduction, clustering, and density estimation. Specific topics may include neural networks and deep learning, Bayesian networks and probabilistic graphical models, principal component analysis, k-means clustering, decision trees and random forests, support vector machines, and kernel methods. Recommended background: Multivariate Calculus (MA 1024 or MA 1034), Linear Algebra (such as MA 2071), Probability (MA 2621 or MA 2631), and Algorithms (CS 2223). Students may not earn credit for both CS 453X and CS 4342. Undergraduate credit may not be earned both for this course and for CS 539.",
@@ -48564,7 +48564,7 @@
                     "room": "Fuller Labs 320",
                     "seats": 60,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 5,
                     "specificSection": "D01",
                     "days": [
