@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 5, 2026, 5:32 AM",
+  "generated": "Feb 5, 2026, 6:36 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -242652,7 +242652,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -242671,7 +242671,7 @@
                     "room": "Athletic Field",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
@@ -243181,7 +243181,7 @@
                 "number": "D01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -243200,7 +243200,7 @@
                     "room": "Athletics Rooftop Softball Field",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
