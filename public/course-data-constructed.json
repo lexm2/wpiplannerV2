@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 5, 2026, 10:00 PM",
+  "generated": "Feb 5, 2026, 10:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -19964,7 +19964,7 @@
                 "crn": 336982,
                 "number": "DL01",
                 "seats": 80,
-                "seatsAvailable": 9,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -19983,7 +19983,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 80,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "DL01",
@@ -155160,7 +155160,7 @@
                 "crn": 336998,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": 29,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -155179,7 +155179,7 @@
                     "building": "",
                     "room": "Stratton Hall 201",
                     "seats": 30,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
