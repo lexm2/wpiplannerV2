@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 6, 2026, 5:21 AM",
+  "generated": "Feb 6, 2026, 6:11 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -240549,7 +240549,7 @@
                 "number": "D01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "Cat. I This course is designed for students who wish to work intensively on their writing . The course will emphasize the processes of composing and revising, the rhetorical strategies of written exposition and argumentation, and the reading and citation practices central to academic inquiry . In a workshop setting, students will write a sequence of short papers and complete one longer writing project based on multiple source texts; learn to read critically and respond helpfully to each other’s writing; and make oral presentations from written texts . Where applicable, the topical theme of the class will be provided via the Registrar’s office .",
@@ -240568,7 +240568,7 @@
                     "room": "Olin Hall 109",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 5,
                     "specificSection": "D01",
                     "days": [
