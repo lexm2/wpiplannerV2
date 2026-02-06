@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 6, 2026, 9:26 AM",
+  "generated": "Feb 6, 2026, 10:06 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5154,8 +5154,8 @@
                 "crn": 336950,
                 "number": "D01",
                 "seats": 25,
-                "seatsAvailable": 1,
-                "actualWaitlist": 1,
+                "seatsAvailable": 2,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course offers a detailed overview of the history of architecture between the consolidation of modern architecture in standard architectural practice and the present period of pluralism. Topics covered will include: modernism and its critique in the developing world; Louis I. Kahn’s and Robert Venturi’s critiques of modernist architecture culture; the High-Tech movement; utopian alternatives to the modernist city; the return of pre-modern urbanism; Critical Regionalism; the rise of Postmodernism 1970-80; the developer-led architectural boom of the 1980s; “Deconstructivism” and critical dissolution of rationalist form; the introduction of CAD in architectural design and its impact on the “blob architecture” of Frank Gehry and others; the development of global models of architectural practice; sustainable architecture and urbanism; global developments in other, related design fields and their consumer culture. Recommended background: AR 2114.",
@@ -5173,8 +5173,8 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 25,
-                    "seatsAvailable": 1,
-                    "actualWaitlist": 1,
+                    "seatsAvailable": 2,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
