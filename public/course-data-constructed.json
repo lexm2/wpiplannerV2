@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 6, 2026, 10:49 PM",
+  "generated": "Feb 6, 2026, 11:21 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -66153,7 +66153,7 @@
                   "crn": 337369,
                   "number": "DD02",
                   "seats": 90,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4527",
@@ -66172,7 +66172,7 @@
                       "building": "",
                       "room": "Salisbury Labs 115 Kinnicutt Hall",
                       "seats": 90,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
