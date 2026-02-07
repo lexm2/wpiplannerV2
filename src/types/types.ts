@@ -41,6 +41,13 @@ export interface Section {
     periods: Period[];
 }
 
+export enum SectionType {
+    LECTURE = 'lecture',
+    STANDALONE_LAB = 'standaloneLab',
+    DISCUSSION = 'discussion',
+    LAB = 'lab'
+}
+
 export enum PeriodType {
     LECTURE = 'Lecture',
     LAB = 'Lab',

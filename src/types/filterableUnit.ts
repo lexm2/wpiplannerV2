@@ -1,10 +1,10 @@
-import type { Course, Section, Period, LectureGroup } from './types';
+import type { Course, Section, Period, LectureGroup, SectionType } from './types';
 
 export type FilterableSection = {
     course: Course;
     section: Section;
     lectureGroup?: LectureGroup;
-    sectionType: 'lecture' | 'standaloneLab' | 'discussion' | 'lab';
+    sectionType: SectionType;
 };
 
 export type FilterablePeriod = {

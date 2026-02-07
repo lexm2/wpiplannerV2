@@ -1,4 +1,4 @@
-import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB, PeriodType } from '../../src/types/types'
+import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB, PeriodType, SectionType } from '../../src/types/types'
 import { SelectedCourse, Schedule, AcademicTerm } from '../../src/types/schedule'
 import { BlockedTimesFilter } from '../../src/core/filtering/filters/BlockedTimesFilter'
 import { WakeUpTimeFilter } from '../../src/core/filtering/filters/WakeUpTimeFilter'
@@ -189,7 +189,7 @@ export const createMockSchedule = (overrides: Partial<Schedule> = {}): Schedule 
 export const createMockFilterableSection = (overrides: {
   course?: Partial<Course>;
   section?: Partial<Section>;
-  sectionType?: 'lecture' | 'standaloneLab' | 'discussion' | 'lab';
+  sectionType?: SectionType;
 } = {}): import('../../src/types/filterableUnit').FilterableSection => {
   const course = createMockCourse(overrides.course || {});
   const section = createMockSection(overrides.section || {});
@@ -197,7 +197,7 @@ export const createMockFilterableSection = (overrides: {
   return {
     course,
     section,
-    sectionType: overrides.sectionType || 'lecture'
+    sectionType: overrides.sectionType || SectionType.LECTURE
   };
 }
 

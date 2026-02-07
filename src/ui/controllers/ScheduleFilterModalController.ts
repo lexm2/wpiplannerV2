@@ -1,11 +1,12 @@
 import { ModalService } from '../../services/ui/ModalService';
 import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService';
-import { SelectedCourse } from '../../types/schedule';
+import { SelectedCourse, AcademicTerm } from '../../types/schedule';
 import { BaseModal } from '../components/BaseModal';
 import { getAllSections } from '../../utils/courseUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
 import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTypeFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria, GraduateLevelFilterCriteria } from '../../types/filters';
+import { PeriodType } from '../../types/types';
 
 export class ScheduleFilterModalController extends BaseModal {
     private scheduleFilterService: ScheduleFilterService | null = null;
@@ -295,13 +296,13 @@ export class ScheduleFilterModalController extends BaseModal {
         return criteria?.professors || [];
     }
 
-    private getActivePeriodTypes(): string[] {
+    private getActivePeriodTypes(): PeriodType[] {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodType');
         const criteria = filter?.criteria as PeriodTypeFilterCriteria | undefined;
         return criteria?.types || [];
     }
 
-    private getActiveTerms(): string[] {
+    private getActiveTerms(): AcademicTerm[] {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodTerm');
         const criteria = filter?.criteria as PeriodTermFilterCriteria | undefined;
         return criteria?.terms || [];
@@ -485,7 +486,7 @@ export class ScheduleFilterModalController extends BaseModal {
         const modalElement = document.getElementById(this.modalId);
         if (modalElement) {
             const checkedTypes = Array.from(modalElement.querySelectorAll('input[name="periodType"]:checked'))
-                .map(cb => (cb as HTMLInputElement).value);
+                .map(cb => (cb as HTMLInputElement).value as PeriodType);
 
             if (checkedTypes.length > 0) {
                 this.scheduleFilterService!.addFilter('periodType', { types: checkedTypes });
@@ -501,7 +502,7 @@ export class ScheduleFilterModalController extends BaseModal {
         const modalElement = document.getElementById(this.modalId);
         if (modalElement) {
             const checkedTerms = Array.from(modalElement.querySelectorAll('input[name="periodTerm"]:checked'))
-                .map(cb => (cb as HTMLInputElement).value);
+                .map(cb => (cb as HTMLInputElement).value as AcademicTerm);
 
             if (checkedTerms.length > 0) {
                 this.scheduleFilterService!.addFilter('periodTerm', { terms: checkedTerms });

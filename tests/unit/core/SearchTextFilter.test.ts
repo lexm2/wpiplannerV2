@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import { SearchTextFilter } from '../../../src/core/filtering/filters/SearchTextFilter';
 import { FilterableSection } from '../../../src/types/filterableUnit';
+import { SectionType } from '../../../src/types/types';
 import { createMockCourse, createMockSection, createMockDepartment } from '../../helpers/mockData';
 
 describe('SearchTextFilter', () => {
@@ -65,7 +66,7 @@ describe('SearchTextFilter', () => {
             return {
                 course,
                 section,
-                sectionType: 'lecture'
+                sectionType: SectionType.LECTURE
             };
         };
 

@@ -1,5 +1,5 @@
-import { PeriodType, Section, SimpleTime } from './types';
-import { SelectedCourse } from './schedule';
+import { DayOfWeek, PeriodType, Section, SimpleTime } from './types';
+import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
 
 export interface FilterMetadata {
     readonly id: string;
@@ -84,7 +84,7 @@ export interface TimeSlotFilterCriteria {
     timeSlots: Array<{
         startTime: SimpleTime;
         endTime: SimpleTime;
-        days: string[];
+        days: DayOfWeek[];
     }>;
 }
 
@@ -116,7 +116,7 @@ export interface CourseSelectionFilterCriteria {
 
 
 export interface PeriodDaysFilterCriteria {
-    days: string[];
+    days: DayOfWeek[];
 }
 
 export interface PeriodProfessorFilterCriteria {
@@ -128,7 +128,7 @@ export interface PeriodTypeFilterCriteria {
 }
 
 export interface PeriodTermFilterCriteria {
-    terms: string[];
+    terms: AcademicTerm[];
 }
 
 export interface PeriodAvailabilityFilterCriteria {
@@ -143,7 +143,7 @@ export interface PeriodConflictFilterCriteria {
 
 export interface ConflictFilterCriteria {
     avoidConflicts: boolean;
-    blockedSlots: import('./schedule').WeeklyTimeSlot[];
+    blockedSlots: WeeklyTimeSlot[];
 }
 
 export interface SectionCodeFilterCriteria {
@@ -167,10 +167,10 @@ export interface BookmarkFilterCriteria {
 export interface BlockedTimesFilterCriteria {
     blockedTimes: Array<{
         id: string;
-        day: string;
+        day: DayOfWeek;
         startTime: SimpleTime;
         endTime: SimpleTime;
-        term: string;
+        term: AcademicTerm;
     }>;
 }
 
