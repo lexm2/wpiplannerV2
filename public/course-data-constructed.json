@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 6, 2026, 11:48 PM",
+  "generated": "Feb 7, 2026, 1:43 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -163561,7 +163561,7 @@
                 "crn": 337070,
                 "number": "DL01",
                 "seats": 72,
-                "seatsAvailable": 24,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4518",
@@ -163580,7 +163580,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 72,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL01",
@@ -163600,7 +163600,7 @@
                   "crn": 337060,
                   "number": "DX02",
                   "seats": 24,
-                  "seatsAvailable": 8,
+                  "seatsAvailable": 9,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4518",
@@ -163619,7 +163619,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 24,
-                      "seatsAvailable": 8,
+                      "seatsAvailable": 9,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX02",
