@@ -24,14 +24,12 @@ export interface Schedule {
 export interface ScheduleCombination {
     id: string;
     sections: Section[];
-    conflicts: TimeConflict[];
     isValid: boolean;
 }
 
 export interface TimeConflict {
     section1: Section;
     section2: Section;
-    description: string;
 }
 
 export interface SchedulePreferences {

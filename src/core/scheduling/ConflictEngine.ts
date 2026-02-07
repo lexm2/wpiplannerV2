@@ -242,8 +242,7 @@ export class ConflictEngine implements IConflictEngine {
         if (this.hasTimeOverlap(period1, period2)) {
             return {
                 section1,
-                section2,
-                description: `Time overlap on ${sharedDays.join(', ')}: ${period1.startTime.displayTime}-${period1.endTime.displayTime} conflicts with ${period2.startTime.displayTime}-${period2.endTime.displayTime}`
+                section2
             };
         }
 
