@@ -2,6 +2,7 @@ import { ModalService } from '../../services/ui/ModalService';
 import { CourseFilterService } from '../../services/filtering/CourseFilterService';
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
 import { Course, Department } from '../../types/types';
+import { AcademicTerm } from '../../types/schedule';
 import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
@@ -186,7 +187,7 @@ export class FilterModalController extends BaseModal {
         const currentLevel = criteria?.level || 'all';
 
         // Get term filter state
-        const terms = this.filterService.getFilterOptions('term', this.allCourses) as string[];
+        const terms = this.filterService.getFilterOptions('term', this.allCourses) as AcademicTerm[];
         const termFilter = this.filterService.getActiveFilters().find(f => f.id === 'term');
         const termCriteria = termFilter?.criteria as TermFilterCriteria | undefined;
         const activeTerms = termCriteria?.terms || [];
@@ -914,8 +915,8 @@ export class FilterModalController extends BaseModal {
 
     private updateTermFilter(modalElement: HTMLElement): void {
         const checkboxes = modalElement.querySelectorAll('input[data-filter="term"]:checked') as NodeListOf<HTMLInputElement>;
-        const terms = Array.from(checkboxes).map(cb => cb.value);
-        
+        const terms = Array.from(checkboxes).map(cb => cb.value as AcademicTerm);
+
         if (terms.length > 0) {
             this.filterService?.addFilter('term', { terms });
         } else {

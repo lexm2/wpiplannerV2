@@ -10,11 +10,13 @@ export interface ProfessorFilterOptions {
     activeProfessors: string[];
 }
 
+import { AcademicTerm } from '../../types/schedule';
+
 export interface TermFilterOptions {
     idPrefix: string;
     filterId: string;
-    terms: string[];
-    activeTerms: string[];
+    terms: AcademicTerm[];
+    activeTerms: AcademicTerm[];
 }
 
 export interface AvailabilityFilterOptions {
