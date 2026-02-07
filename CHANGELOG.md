@@ -1,5 +1,17 @@
 # Changelog
 
+## [2026-02-07]
+
+### Improved
+- Replaced auto-schedule settings modal with unified filter interface
+- Auto-schedule now uses the same filter UI as regular filtering for consistency
+- Wake-up time and calendar event blocking now available in filter modal
+- Refactored auto-schedule constraints into unified filter system
+- Simplified auto-schedule API by removing config parameter
+- Wake-up time now works as a hard filter (excludes sections before set time)
+- Unified conflict detection system - calendar events and section conflicts now use the same filtering mechanism
+- Simplified filter architecture by merging BlockedTimesFilter into ConflictFilter
+
 ## [2026-02-06]
 
 ### Improved
