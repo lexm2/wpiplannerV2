@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine'
-import { ConflictType } from '../../../src/types/schedule'
 import { DayOfWeek, PeriodType } from '../../../src/types/types'
 import { createMockSection, createMockPeriod, createMockTime } from '../../helpers/mockData'
 
@@ -56,9 +55,8 @@ describe('ConflictDetector', () => {
       })
 
       const conflicts = conflictDetector.detectConflicts([section1, section2])
-      
+
       expect(conflicts).toHaveLength(1)
-      expect(conflicts[0].conflictType).toBe(ConflictType.TIME_OVERLAP)
       expect(conflicts[0].section1.number).toBe('A01')
       expect(conflicts[0].section2.number).toBe('B01')
     })
@@ -116,9 +114,8 @@ describe('ConflictDetector', () => {
       })
 
       const conflicts = conflictDetector.detectConflicts([section1, section2])
-      
+
       expect(conflicts).toHaveLength(1)
-      expect(conflicts[0].conflictType).toBe(ConflictType.TIME_OVERLAP)
     })
 
     it('should detect multiple overlapping periods between same sections', () => {
@@ -155,9 +152,8 @@ describe('ConflictDetector', () => {
       })
 
       const conflicts = conflictDetector.detectConflicts([section1, section2])
-      
+
       expect(conflicts).toHaveLength(2)
-      expect(conflicts.every(c => c.conflictType === ConflictType.TIME_OVERLAP)).toBe(true)
     })
   })
 

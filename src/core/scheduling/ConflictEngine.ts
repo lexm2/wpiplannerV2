@@ -3,7 +3,7 @@
  * Merges functionality from ConflictDetector (detailed conflicts) and TimeSlotMap (fast overlap queries).
  */
 import { Section, Period, DayOfWeek } from '../../types/types';
-import { TimeConflict, ConflictType } from '../../types/schedule';
+import { TimeConflict } from '../../types/schedule';
 import { DateUtils } from '../../utils/dateUtils';
 
 export interface IConflictEngine {
@@ -243,7 +243,6 @@ export class ConflictEngine implements IConflictEngine {
             return {
                 section1,
                 section2,
-                conflictType: ConflictType.TIME_OVERLAP,
                 description: `Time overlap on ${sharedDays.join(', ')}: ${period1.startTime.displayTime}-${period1.endTime.displayTime} conflicts with ${period2.startTime.displayTime}-${period2.endTime.displayTime}`
             };
         }

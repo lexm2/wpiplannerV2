@@ -31,17 +31,12 @@ export interface ScheduleCombination {
 export interface TimeConflict {
     section1: Section;
     section2: Section;
-    conflictType: ConflictType;
     description: string;
 }
 
 export interface SchedulePreferences {
     theme?: string;
     bookmarkedCourseIds?: string[];
-}
-
-export enum ConflictType {
-    TIME_OVERLAP = 'time_overlap'
 }
 
 export interface UserScheduleState {

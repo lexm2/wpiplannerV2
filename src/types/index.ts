@@ -15,7 +15,7 @@ export type {
   DisplayableTimeSlot,
   AutoScheduleConfig,
 } from './schedule';
-export { ConflictType, AcademicTerm } from './schedule';
+export { AcademicTerm } from './schedule';
 export type { FilterableSection, FilterablePeriod } from './filterableUnit';
 export { ScheduleState } from './ScheduleState';
 export type {

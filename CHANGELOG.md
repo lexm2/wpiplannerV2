@@ -5,6 +5,7 @@
 ### Improved
 - Simplified course selection architecture by removing redundant section tracking
 - Cleaned up unused schedule preference fields
+- Removed unnecessary ConflictType enum (only one type exists)
 
 ## [2026-01-25]
 
