@@ -249,9 +249,9 @@ export class ScheduleState {
     }
 
     /**
-     * Convert to legacy Schedule interface (migration helper)
+     * Convert to plain Schedule interface
      *
-     * @returns Schedule in legacy format
+     * @returns Schedule object
      */
     toSchedule(): Schedule {
         return {

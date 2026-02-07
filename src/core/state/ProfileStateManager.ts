@@ -730,10 +730,10 @@ export class ProfileStateManager {
         try {
             const parsed = JSON.parse(data);
             const appState = ApplicationState.fromMinimalFormat(parsed, this.allDepartments);
-            const legacySchedules = appState.schedules.map(s => s.toSchedule());
+            const schedules = appState.schedules.map(s => s.toSchedule());
 
             const result = await this.storageManager.importData(
-                legacySchedules,
+                schedules,
                 appState.activeScheduleId,
                 appState.preferences
             );
