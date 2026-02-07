@@ -1,5 +1,5 @@
 import { Period, Section } from '../../../types/types';
-import { SelectedCourse } from '../../../types/schedule';
+import { SelectedCourse, AcademicTerm } from '../../../types/schedule';
 import { ConflictDetector } from '../../scheduling/ConflictEngine';
 import { PeriodConflictFilterCriteria } from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
@@ -21,7 +21,7 @@ export class PeriodConflictFilter implements SectionBasedFilter {
         this.conflictDetector = conflictDetector;
     }
 
-    private createTempSection(period: Period, computedTerm: string = 'A'): Section {
+    private createTempSection(period: Period, computedTerm: AcademicTerm = AcademicTerm.A): Section {
         return {
             crn: Math.floor(Math.random() * 99_999),
             number: 'TEMP',
@@ -63,7 +63,7 @@ export class PeriodConflictFilter implements SectionBasedFilter {
             return sections;
         }
 
-        const term = selectedSections[0]?.computedTerm || 'A';
+        const term = selectedSections[0]?.computedTerm || AcademicTerm.A;
 
         return sections.filter(fs => {
             for (const currentPeriod of fs.section.periods) {
@@ -102,7 +102,7 @@ export class PeriodConflictFilter implements SectionBasedFilter {
         }
 
         // Get the term from the first selected section to use for temp sections
-        const term = selectedSections[0]?.computedTerm || 'A';
+        const term = selectedSections[0]?.computedTerm || AcademicTerm.A;
 
         // Filter out periods that would cause conflicts
         return periods.filter(period => {
@@ -204,7 +204,7 @@ export class PeriodConflictFilter implements SectionBasedFilter {
         }
 
         // Get the term from the first selected section to use for temp sections
-        const term = selectedSections[0]?.computedTerm || 'A';
+        const term = selectedSections[0]?.computedTerm || AcademicTerm.A;
 
         // Filter out sections that have ANY period conflicting with selected sections
         return sections.filter(currentSection => {

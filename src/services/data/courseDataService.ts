@@ -1,5 +1,6 @@
 import type { ScheduleDB, Department, Course, Section, Period, Time, LectureGroup } from '../../types'
 import { DayOfWeek, PeriodType } from '../../types'
+import { AcademicTerm } from '../../types/schedule'
 import { getAllSections } from '../../utils'
 import type { CourseDataEventType, CourseDataEvent, CourseDataEventListener } from './types'
 
@@ -171,7 +172,7 @@ export class CourseDataService {
             const sectionNumber = sectionData.number || '';
 
             // Use pre-computed term from Java backend
-            const computedTerm: string = sectionData.computedTerm;
+            const computedTerm = sectionData.computedTerm as AcademicTerm;
 
             const section: Section = {
                 crn: sectionData.crn || 0,

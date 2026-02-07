@@ -9,7 +9,7 @@
  * Optimized for size with abbreviated keys
  */
 export interface MinimalSyncData {
-    v: "4";
+    v: string;
     a: number | null;
     s: [string, (string | null)[]][];
     p?: {

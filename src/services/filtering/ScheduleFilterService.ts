@@ -566,12 +566,9 @@ export class ScheduleFilterService {
         selectedCourses.forEach(sc => {
             const sections = getAllSections(sc.course);
             sections.forEach((section: Section) => {
-                // Filter out invalid computed terms
-                if (section.computedTerm &&
-                    section.computedTerm.trim() &&
-                    section.computedTerm !== 'undefined' &&
-                    typeof section.computedTerm === 'string') {
-                    terms.add(section.computedTerm.trim());
+                // Add computed term (enum value)
+                if (section.computedTerm) {
+                    terms.add(section.computedTerm);
                 }
             });
         });
