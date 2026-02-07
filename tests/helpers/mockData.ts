@@ -1,5 +1,7 @@
 import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB, PeriodType } from '../../src/types/types'
 import { SelectedCourse, Schedule, AcademicTerm } from '../../src/types/schedule'
+import { BlockedTimesFilter } from '../../src/core/filtering/filters/BlockedTimesFilter'
+import { WakeUpTimeFilter } from '../../src/core/filtering/filters/WakeUpTimeFilter'
 
 export const createMockTime = (hours: number, minutes: number): Time => ({
   hours,
@@ -293,32 +295,68 @@ export const createLargeCombinationSpace = (
 }
 
 interface MockScheduleFilterService {
-  filterSections: (selectedCourses: SelectedCourse[]) => Array<{ section: Section }>
+  filterSections: (selectedCourses: SelectedCourse[]) => Array<{ course: SelectedCourse; section: Section }>
+  addFilter: (filterId: string, criteria: any) => boolean
+  removeFilter: (filterId: string) => boolean
+  getSectionFilter: (filterId: string) => any
+  getActiveFilters: () => Array<{ id: string; criteria: any }>
 }
 
 export const createMockScheduleFilterService = (): MockScheduleFilterService => {
+  const activeFilters = new Map<string, any>()
+  const blockedTimesFilter = new BlockedTimesFilter()
+  const wakeUpTimeFilter = new WakeUpTimeFilter()
+
+  const registeredFilters = new Map<string, any>()
+  registeredFilters.set('blockedTimes', blockedTimesFilter)
+  registeredFilters.set('wakeUpTime', wakeUpTimeFilter)
+
   return {
-    filterSections: (selectedCourses: SelectedCourse[]): Array<{ section: Section }> => {
-      const allSections: Array<{ section: Section }> = []
+    filterSections: (selectedCourses: SelectedCourse[]): Array<{ course: SelectedCourse; section: Section }> => {
+      let allSections: Array<{ course: SelectedCourse; section: Section }> = []
       for (const sc of selectedCourses) {
         if (sc.course.lectures) {
           for (const lg of sc.course.lectures) {
-            allSections.push({ section: lg.section })
+            allSections.push({ course: sc, section: lg.section })
             for (const disc of lg.compatibleDiscussions) {
-              allSections.push({ section: disc })
+              allSections.push({ course: sc, section: disc })
             }
             for (const lab of lg.compatibleLabs) {
-              allSections.push({ section: lab })
+              allSections.push({ course: sc, section: lab })
             }
           }
         }
         if (sc.course.standaloneLabs) {
           for (const lab of sc.course.standaloneLabs) {
-            allSections.push({ section: lab })
+            allSections.push({ course: sc, section: lab })
           }
         }
       }
+
+      for (const [filterId, criteria] of activeFilters.entries()) {
+        const filter = registeredFilters.get(filterId)
+        if (filter && filter.applyToSectionsWithContext) {
+          allSections = filter.applyToSectionsWithContext(allSections, criteria)
+        }
+      }
+
       return allSections
+    },
+    addFilter: (filterId: string, criteria: any): boolean => {
+      activeFilters.set(filterId, criteria)
+      return true
+    },
+    removeFilter: (filterId: string): boolean => {
+      return activeFilters.delete(filterId)
+    },
+    getSectionFilter: (filterId: string): any => {
+      return registeredFilters.get(filterId)
+    },
+    getActiveFilters: (): Array<{ id: string; criteria: any }> => {
+      return Array.from(activeFilters.entries()).map(([id, criteria]) => ({
+        id,
+        criteria
+      }))
     }
   }
 }

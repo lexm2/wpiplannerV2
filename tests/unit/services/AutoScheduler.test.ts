@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { AutoScheduler } from '../../../src/services/scheduling/AutoScheduler'
-import type { AutoScheduleConfig, WeeklyTimeSlot } from '../../../src/types/schedule'
+import type { WeeklyTimeSlot } from '../../../src/types/schedule'
 import { AcademicTerm } from '../../../src/types/schedule'
 import { DayOfWeek } from '../../../src/types/types'
 import {
@@ -23,8 +23,7 @@ describe('AutoScheduler', () => {
 
   describe('Basic Schedule Generation', () => {
     it('should return empty array for no courses', () => {
-      const config: AutoScheduleConfig = { blockedTimes: [] }
-      const result = autoScheduler.generateSchedules([], config)
+      const result = autoScheduler.generateSchedules([])
       expect(result).toEqual([])
     })
 
@@ -48,9 +47,8 @@ describe('AutoScheduler', () => {
       })
 
       const selectedCourse = createMockSelectedCourse({ course })
-      const config: AutoScheduleConfig = { blockedTimes: [] }
 
-      const result = autoScheduler.generateSchedules([selectedCourse], config)
+      const result = autoScheduler.generateSchedules([selectedCourse])
 
       expect(result.length).toBeGreaterThan(0)
       expect(result[0]).toHaveLength(1)
@@ -74,9 +72,8 @@ describe('AutoScheduler', () => {
       })
 
       const selectedCourse = createMockSelectedCourse({ course })
-      const config: AutoScheduleConfig = { blockedTimes: [] }
 
-      const result = autoScheduler.generateSchedule([selectedCourse], config)
+      const result = autoScheduler.generateSchedule([selectedCourse])
 
       expect(result).not.toBeNull()
       expect(result![0].combination.lecture?.crn).toBe(10001)
@@ -125,9 +122,9 @@ describe('AutoScheduler', () => {
         term: AcademicTerm.ALL
       }
 
-      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
+      mockFilterService.addFilter('blockedTimes', { blockedTimes: [blockedTime] })
 
-      const result = autoScheduler.generateSchedules([selectedCourse], config)
+      const result = autoScheduler.generateSchedules([selectedCourse])
 
       // Should only return the afternoon lecture (morning is blocked)
       expect(result.length).toBe(1)
@@ -166,9 +163,9 @@ describe('AutoScheduler', () => {
         term: AcademicTerm.B
       }
 
-      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
+      mockFilterService.addFilter('blockedTimes', { blockedTimes: [blockedTime] })
 
-      const result = autoScheduler.generateSchedules([selectedCourse], config)
+      const result = autoScheduler.generateSchedules([selectedCourse])
 
       // Section should NOT be blocked (wrong term)
       expect(result.length).toBe(1)
@@ -206,9 +203,9 @@ describe('AutoScheduler', () => {
         term: AcademicTerm.ALL
       }
 
-      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
+      mockFilterService.addFilter('blockedTimes', { blockedTimes: [blockedTime] })
 
-      const result = autoScheduler.generateSchedules([selectedCourse], config)
+      const result = autoScheduler.generateSchedules([selectedCourse])
 
       expect(result).toHaveLength(0)
     })
@@ -250,9 +247,8 @@ describe('AutoScheduler', () => {
 
       const selected1 = createMockSelectedCourse({ course: course1 })
       const selected2 = createMockSelectedCourse({ course: course2 })
-      const config: AutoScheduleConfig = { blockedTimes: [] }
 
-      const result = autoScheduler.generateSchedules([selected1, selected2], config)
+      const result = autoScheduler.generateSchedules([selected1, selected2])
 
       // No valid schedules because sections conflict
       expect(result).toHaveLength(0)
@@ -290,9 +286,8 @@ describe('AutoScheduler', () => {
 
       const selected1 = createMockSelectedCourse({ course: course1 })
       const selected2 = createMockSelectedCourse({ course: course2 })
-      const config: AutoScheduleConfig = { blockedTimes: [] }
 
-      const result = autoScheduler.generateSchedules([selected1, selected2], config)
+      const result = autoScheduler.generateSchedules([selected1, selected2])
 
       expect(result.length).toBeGreaterThan(0)
       expect(result[0]).toHaveLength(2)
@@ -325,9 +320,7 @@ describe('AutoScheduler', () => {
         lockedSections: new Set<string>(['10001'])
       }
 
-      const config: AutoScheduleConfig = { blockedTimes: [] }
-
-      const result = autoScheduler.generateSchedules([selectedCourse], config)
+      const result = autoScheduler.generateSchedules([selectedCourse])
 
       expect(result).toHaveLength(1)
       expect(result[0][0].isLocked).toBe(true)
@@ -370,8 +363,8 @@ describe('AutoScheduler', () => {
         term: AcademicTerm.A
       }
 
-      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
-      const result = autoScheduler.generateSchedules([selectedCourse], config)
+      mockFilterService.addFilter('blockedTimes', { blockedTimes: [blockedTime] })
+      const result = autoScheduler.generateSchedules([selectedCourse])
 
       expect(result).toHaveLength(0)
     })
@@ -410,8 +403,8 @@ describe('AutoScheduler', () => {
         term: AcademicTerm.C
       }
 
-      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
-      const result = autoScheduler.generateSchedules([selectedCourse], config)
+      mockFilterService.addFilter('blockedTimes', { blockedTimes: [blockedTime] })
+      const result = autoScheduler.generateSchedules([selectedCourse])
 
       expect(result).toHaveLength(0)
     })
@@ -450,8 +443,8 @@ describe('AutoScheduler', () => {
         term: AcademicTerm.F
       }
 
-      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
-      const result = autoScheduler.generateSchedules([selectedCourse], config)
+      mockFilterService.addFilter('blockedTimes', { blockedTimes: [blockedTime] })
+      const result = autoScheduler.generateSchedules([selectedCourse])
 
       expect(result).toHaveLength(0)
     })

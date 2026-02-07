@@ -2,12 +2,11 @@ import { describe, it, expect } from 'bun:test'
 import { AutoScheduler } from '../../src/services/scheduling/AutoScheduler'
 import { ScheduleFilterService } from '../../src/services/filtering/ScheduleFilterService'
 import { createMockCourse, createMockSection, createMockPeriod, createMockTime, createMockSelectedCourse, createMockScheduleFilterService } from '../helpers/mockData'
-import type { AutoScheduleConfig } from '../../src/types/schedule'
 import { AcademicTerm } from '../../src/types/schedule'
 import { DayOfWeek } from '../../src/types/types'
 
 describe('Auto-Schedule Wake Up Time Integration', () => {
-  it('should apply wake up time preference during generation', async () => {
+  it('should exclude sections before wake-up time', async () => {
     const course1 = createMockCourse({
       id: 'CS-1101',
       lectures: [
@@ -68,25 +67,17 @@ describe('Auto-Schedule Wake Up Time Integration', () => {
     const filterService = createMockScheduleFilterService()
     const autoScheduler = new AutoScheduler(filterService as unknown as ScheduleFilterService)
 
-    const config: AutoScheduleConfig = {
-      blockedTimes: [],
-      wakeUpTime: { hours: 9, minutes: 0 }
-    }
+    filterService.addFilter('wakeUpTime', { wakeUpTime: { hours: 9, minutes: 0 } })
 
-    const schedules = autoScheduler.generateSchedules(selectedCourses, config, 100)
+    const schedules = autoScheduler.generateSchedules(selectedCourses, 100)
 
-    expect(schedules.length).toBe(2)
+    expect(schedules.length).toBe(1)
 
-    const firstSchedule = schedules[0]
-    const secondSchedule = schedules[1]
+    const schedule = schedules[0]
+    const csSection = schedule.find((r: any) => r.course.id === 'CS-1101')
 
-    const firstCSSection = firstSchedule.find((r: any) => r.course.id === 'CS-1101')
-    const secondCSSection = secondSchedule.find((r: any) => r.course.id === 'CS-1101')
+    if (!csSection?.combination.lecture) throw new Error('Missing lecture in schedule')
 
-    if (!firstCSSection?.combination.lecture) throw new Error('Missing lecture in first schedule')
-    if (!secondCSSection?.combination.lecture) throw new Error('Missing lecture in second schedule')
-
-    expect(firstCSSection.combination.lecture.crn).toBe(10002)
-    expect(secondCSSection.combination.lecture.crn).toBe(10001)
+    expect(csSection.combination.lecture.crn).toBe(10002)
   })
 })
