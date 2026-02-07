@@ -1,5 +1,11 @@
 # Changelog
 
+## [2026-02-06]
+
+### Improved
+- Simplified course selection architecture by removing redundant section tracking
+- Cleaned up unused schedule preference fields
+
 ## [2026-01-25]
 
 ### Improved
