@@ -3,13 +3,14 @@ import type { SchedulePreferences } from './schedule';
 import type { MinimalSyncData } from './export';
 import { ScheduleState, findCourseById, findSectionByCRN } from './ScheduleState';
 import type { SelectedCourse } from './schedule';
+import { getPrimaryCRN } from '../utils/courseUtils';
+
+const APPLICATION_STATE_VERSION: string = '4.1'
 
 /**
  * Application-level state containing multiple schedules and preferences
  *
- * This class:
- * - Wraps multiple ScheduleState instances
- * - Provides conversion to/from compact export format
+ * - Provides conversion to/from export format
  * - Represents the complete exportable/importable state
  */
 export class ApplicationState {
@@ -23,7 +24,7 @@ export class ApplicationState {
         activeScheduleId: string | null,
         schedules: ScheduleState[],
         preferences?: SchedulePreferences,
-        version: string = '3.0',
+        version: string = APPLICATION_STATE_VERSION,
         timestamp: number = Date.now()
     ) {
         this.version = version;
@@ -33,7 +34,6 @@ export class ApplicationState {
         this.preferences = preferences;
     }
 
-
     /**
      * Convert to minimal format for export
      *
@@ -41,21 +41,14 @@ export class ApplicationState {
      */
     toMinimalFormat(): MinimalSyncData {
         return {
-            v: "4",
+            v: this.version,
             a: this.getActiveScheduleIndex(),
             s: this.schedules.map(schedule => [
                 schedule.name,
-                schedule.selectedCourses.flatMap(course => {
-                    // Extract CRN from component fields (lecture, discussion, or lab)
-                    const crn = course.selectedLecture?.crn ??
-                               course.selectedDiscussion?.crn ??
-                               course.selectedLab?.crn ??
-                               null;
-                    return [
-                        course.course.id,
-                        crn?.toString() ?? null
-                    ];
-                })
+                schedule.selectedCourses.flatMap(course => [
+                    course.course.id,
+                    getPrimaryCRN(course)
+                ])
             ]),
             p: this.preferences?.theme ? {
                 t: [0, 0] as [number, number],
