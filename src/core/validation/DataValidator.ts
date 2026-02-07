@@ -2,9 +2,7 @@
  * Validates course data integrity and format consistency
  */
 import { Schedule, SelectedCourse } from '../../types/schedule'
-import { SimpleTime } from '../../types/types'
 import { getAllSections } from '../../utils/courseUtils'
-import { DateUtils } from '../../utils/dateUtils'
 
 export interface ValidationResult {
     valid: boolean;
@@ -149,28 +147,6 @@ export class DataValidator {
             }
         }
 
-        // Validate section selection consistency
-        const hasSelectedSection = selectedCourseObj.selectedSection !== null;
-        const hasSelectedSectionNumber = selectedCourseObj.selectedSectionNumber !== null;
-
-        if (hasSelectedSection !== hasSelectedSectionNumber) {
-            result.warnings.push({
-                field: 'selectedSection',
-                message: 'selectedSection and selectedSectionNumber should be consistent',
-                suggestion: 'Consider reconstructing section objects after data load'
-            });
-        }
-
-        // Validate section number format if present
-        if (selectedCourseObj.selectedSectionNumber && typeof selectedCourseObj.selectedSectionNumber !== 'string') {
-            result.errors.push({
-                field: 'selectedSectionNumber',
-                message: 'selectedSectionNumber must be a string or null',
-                severity: 'error',
-                code: 'INVALID_TYPE'
-            });
-            result.valid = false;
-        }
 
         return result;
     }
@@ -287,101 +263,8 @@ export class DataValidator {
             return result;
         }
 
-        const preferencesObj = preferences as Record<string, unknown>;
-
-        // Validate preferredTimeRange
-        if (preferencesObj.preferredTimeRange) {
-            const timeRange = preferencesObj.preferredTimeRange as any;
-            
-            if (!timeRange.startTime || !timeRange.endTime) {
-                result.errors.push({
-                    field: 'preferredTimeRange',
-                    message: 'Time range must have startTime and endTime',
-                    severity: 'error',
-                    code: 'MISSING_TIME_RANGE'
-                });
-                result.valid = false;
-            } else {
-                // Validate time format
-                if (!this.isValidTimeObject(timeRange.startTime) || !this.isValidTimeObject(timeRange.endTime)) {
-                    result.errors.push({
-                        field: 'preferredTimeRange',
-                        message: 'Time objects must have valid hours and minutes',
-                        severity: 'error',
-                        code: 'INVALID_TIME_FORMAT'
-                    });
-                    result.valid = false;
-                }
-                
-                // Check logical time ordering
-                if (DateUtils.timeToMinutes(timeRange.startTime) >= DateUtils.timeToMinutes(timeRange.endTime)) {
-                    result.errors.push({
-                        field: 'preferredTimeRange',
-                        message: 'Start time must be before end time',
-                        severity: 'error',
-                        code: 'INVALID_TIME_ORDER'
-                    });
-                    result.valid = false;
-                }
-            }
-        }
-
-        // Validate preferredDays
-        if (preferencesObj.preferredDays) {
-            if (!(preferencesObj.preferredDays instanceof Set)) {
-                // Try to convert if it's an array
-                if (Array.isArray(preferencesObj.preferredDays)) {
-                    if (options.repairInPlace) {
-                        preferencesObj.preferredDays = new Set(preferencesObj.preferredDays);
-                        result.warnings.push({
-                            field: 'preferredDays',
-                            message: 'Converted preferredDays array to Set'
-                        });
-                    } else {
-                        result.errors.push({
-                            field: 'preferredDays',
-                            message: 'preferredDays must be a Set',
-                            severity: 'error',
-                            code: 'INVALID_SET'
-                        });
-                        result.valid = false;
-                    }
-                }
-            }
-
-            if (preferencesObj.preferredDays instanceof Set) {
-                const validDays = new Set(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
-                for (const day of preferencesObj.preferredDays) {
-                    if (!validDays.has(day)) {
-                        result.warnings.push({
-                            field: 'preferredDays',
-                            message: `Unknown day: ${day}`,
-                            suggestion: 'Valid days are: mon, tue, wed, thu, fri, sat, sun'
-                        });
-                    }
-                }
-            }
-        }
-
-        // Validate boolean fields
-        if (preferencesObj.avoidBackToBackClasses !== undefined && typeof preferencesObj.avoidBackToBackClasses !== 'boolean') {
-            if (options.repairInPlace) {
-                preferencesObj.avoidBackToBackClasses = Boolean(preferencesObj.avoidBackToBackClasses);
-                result.warnings.push({
-                    field: 'avoidBackToBackClasses',
-                    message: 'Converted avoidBackToBackClasses to boolean'
-                });
-            } else {
-                result.errors.push({
-                    field: 'avoidBackToBackClasses',
-                    message: 'avoidBackToBackClasses must be a boolean',
-                    severity: 'error',
-                    code: 'INVALID_TYPE'
-                });
-                result.valid = false;
-            }
-        }
-
+        // Preferences are minimal now - just theme and bookmarks
+        // No complex validation needed
         return result;
     }
 
@@ -527,18 +410,6 @@ export class DataValidator {
         if (typeof selectedCourse.isRequired !== 'boolean') {
             selectedCourse.isRequired = false;
         }
-
-        // Ensure section consistency
-        if (selectedCourse.selectedSectionNumber && !selectedCourse.selectedSection) {
-            // Try to find the section object from hierarchical structure
-            const allSections = getAllSections(selectedCourse.course);
-            const section = allSections.find(s => s.number === selectedCourse.selectedSectionNumber);
-            selectedCourse.selectedSection = section || null;
-        }
-
-        if (selectedCourse.selectedSection && !selectedCourse.selectedSectionNumber) {
-            selectedCourse.selectedSectionNumber = selectedCourse.selectedSection.number;
-        }
     }
 
     // Schema migration utilities
@@ -550,11 +421,11 @@ export class DataValidator {
 
         // Try to detect version based on data structure
         if (dataObj.selectedCourses && Array.isArray(dataObj.selectedCourses)) {
-            // Check if selectedCourses has both selectedSection and selectedSectionNumber
+            // Check if selectedCourses has component-based structure
             const hasModernStructure = dataObj.selectedCourses.some((sc: unknown) => {
                 if (!sc || typeof sc !== 'object') return false;
                 const scObj = sc as Record<string, unknown>;
-                return scObj.hasOwnProperty('selectedSection') && scObj.hasOwnProperty('selectedSectionNumber');
+                return scObj.hasOwnProperty('selectedLecture') && scObj.hasOwnProperty('selectedLab');
             });
             if (hasModernStructure) return '2.0';
         }
@@ -581,15 +452,6 @@ export class DataValidator {
             });
             result.valid = false;
         }
-    }
-
-    private isValidTimeObject(time: unknown): boolean {
-        if (!time || typeof time !== 'object') return false;
-        const timeObj = time as Record<string, unknown>;
-        return typeof timeObj.hours === 'number' &&
-               typeof timeObj.minutes === 'number' &&
-               timeObj.hours >= 0 && timeObj.hours < 24 &&
-               timeObj.minutes >= 0 && timeObj.minutes < 60;
     }
 
     private validateArray(

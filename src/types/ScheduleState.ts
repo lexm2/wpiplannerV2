@@ -136,7 +136,6 @@ export class ScheduleState {
             if (sc.selectedLecture) sections.push(sc.selectedLecture);
             if (sc.selectedDiscussion) sections.push(sc.selectedDiscussion);
             if (sc.selectedLab) sections.push(sc.selectedLab);
-            if (sc.selectedSection) sections.push(sc.selectedSection);
         }
         return sections;
     }

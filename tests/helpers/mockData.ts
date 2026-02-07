@@ -153,8 +153,6 @@ export const createMockSelectedCourse = (overrides: Partial<SelectedCourse> = {}
     selectedLecture: null,
     selectedDiscussion: null,
     selectedLab: null,
-    selectedSection: null,
-    selectedSectionNumber: null,
     isRequired: false,
     lockedSections: new Set<string>(),
     ...overrides
@@ -170,8 +168,6 @@ export const createMockSelectedCourseWithLocks = (
     selectedLecture: null,
     selectedDiscussion: null,
     selectedLab: null,
-    selectedSection: null,
-    selectedSectionNumber: null,
     isRequired: false,
     lockedSections: new Set(lockedCrns)
   }

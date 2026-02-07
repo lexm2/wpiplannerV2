@@ -80,9 +80,6 @@ export class StorageService implements ThemeStorage {
         this.profileStateManager.clearAllSelections('storage-service');
         selectedCourses.forEach(sc => {
             this.profileStateManager.selectCourse(sc.course, sc.isRequired, 'storage-service');
-            if (sc.selectedSectionNumber) {
-                this.profileStateManager.setSelectedSection(sc.course, sc.selectedSectionNumber, 'storage-service');
-            }
         });
     }
 

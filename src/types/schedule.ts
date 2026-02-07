@@ -5,8 +5,6 @@ export interface SelectedCourse {
     selectedLecture: Section | null;
     selectedDiscussion: Section | null;
     selectedLab: Section | null;
-    selectedSection: Section | null;
-    selectedSectionNumber: string | null;
     isRequired: boolean;
     lockedSections: Set<string>;
     customColor?: string;
@@ -19,7 +17,7 @@ export interface Schedule {
     selectedCourses: SelectedCourse[];
     generatedSchedules: ScheduleCombination[];
     timestamp?: number;
-    /** Locally-stored calendar events (not synced to cloud) */
+    /** Locally-stored calendar events */
     localEvents?: LocalCalendarEvent[];
 }
 
@@ -38,12 +36,6 @@ export interface TimeConflict {
 }
 
 export interface SchedulePreferences {
-    preferredTimeRange: {
-        startTime: SimpleTime;
-        endTime: SimpleTime;
-    };
-    preferredDays: Set<string>;
-    avoidBackToBackClasses: boolean;
     theme?: string;
     bookmarkedCourseIds?: string[];
 }

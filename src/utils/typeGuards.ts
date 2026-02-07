@@ -37,23 +37,19 @@ export function isValidSelectedCourse(sc: any): sc is SelectedCourse {
     // Check basic SelectedCourse properties
     if (typeof sc.isRequired !== 'boolean') return false;
     
-    // Check selectedSectionNumber is either null or string
-    if (sc.selectedSectionNumber !== null && typeof sc.selectedSectionNumber !== 'string') {
+    // Check component sections (lecture, discussion, lab) are either null or valid
+    if (sc.selectedLecture !== null && !isValidSection(sc.selectedLecture)) {
         return false;
     }
-    
-    // Check selectedSection consistency
-    if (sc.selectedSection !== null) {
-        // If selectedSection exists, it must be a valid Section
-        if (!isValidSection(sc.selectedSection)) return false;
-        
-        // If selectedSection exists, selectedSectionNumber should match
-        if (sc.selectedSectionNumber !== sc.selectedSection.number) return false;
-    } else {
-        // If selectedSection is null, selectedSectionNumber should also be null
-        if (sc.selectedSectionNumber !== null) return false;
+
+    if (sc.selectedDiscussion !== null && !isValidSection(sc.selectedDiscussion)) {
+        return false;
     }
-    
+
+    if (sc.selectedLab !== null && !isValidSection(sc.selectedLab)) {
+        return false;
+    }
+
     return true;
 }
 
@@ -123,8 +119,6 @@ export function repairSelectedCourse(sc: any): SelectedCourse | null {
     // Create a repaired version with defaults
     const repaired: SelectedCourse = {
         course: sc.course,
-        selectedSection: null,
-        selectedSectionNumber: null,
         selectedLecture: null,
         selectedDiscussion: null,
         selectedLab: null,
@@ -132,19 +126,13 @@ export function repairSelectedCourse(sc: any): SelectedCourse | null {
         lockedSections: sc.lockedSections instanceof Set ? sc.lockedSections : new Set()
     };
 
-    // Try to repair section selection
-    if (sc.selectedSectionNumber && typeof sc.selectedSectionNumber === 'string') {
-        // Use getAllSections to properly extract sections from hierarchical structure
+    // Migrate old selectedSection data to component fields
+    if (sc.selectedSection && !sc.selectedLecture && !sc.selectedLab) {
         const allSections = getAllSections(sc.course);
-        const section = allSections.find((s: any) => s.number === sc.selectedSectionNumber);
+        const hasLectures = allSections.some((s: any) => s.type === 'Lecture' || s.type === 'LEC');
 
-        if (section && isValidSection(section)) {
-            repaired.selectedSection = section;
-            repaired.selectedSectionNumber = sc.selectedSectionNumber;
-            console.log(`repairSelectedCourse: Repaired section ${sc.selectedSectionNumber} for course ${sc.course.department?.abbreviation}${sc.course.number}`);
-        } else {
-            console.warn(`repairSelectedCourse: Section ${sc.selectedSectionNumber} not found or invalid for course ${sc.course.department?.abbreviation}${sc.course.number}`);
-        }
+        repaired.selectedLab = hasLectures ? null : sc.selectedSection;
+        repaired.selectedLecture = hasLectures ? sc.selectedSection : null;
     }
 
     // Try to repair hierarchical selections (selectedLecture, selectedDiscussion, selectedLab)
@@ -173,32 +161,12 @@ export function repairSelectedCourse(sc: any): SelectedCourse | null {
 }
 
 /**
- * Safe getter for selected course section with validation
- */
-export function getValidSelectedSection(sc: SelectedCourse): Section | null {
-    if (!sc.selectedSection) return null;
-    
-    if (!isValidSection(sc.selectedSection)) {
-        console.warn('getValidSelectedSection: Invalid section detected:', sc.selectedSection);
-        return null;
-    }
-    
-    return sc.selectedSection;
-}
-
-/**
  * Safe getter for computed term from selected course
- * Supports both flat structure (selectedSection) and hierarchical structure (selectedLecture/Discussion/Lab)
+ * Checks component fields: lecture, discussion, lab
  */
 export function getComputedTerm(sc: SelectedCourse): string | null {
-    // First try selectedSection (flat structure)
-    const section = getValidSelectedSection(sc);
-    if (section?.computedTerm) {
-        return section.computedTerm;
-    }
-
-    // Fallback to hierarchical structure: check lecture/discussion/lab
-    // Use lecture as primary source since it's always required
+    // Check component fields: lecture, discussion, lab
+    // Use lecture as primary source since it's typically the main component
     if (sc.selectedLecture?.computedTerm) {
         return sc.selectedLecture.computedTerm;
     }

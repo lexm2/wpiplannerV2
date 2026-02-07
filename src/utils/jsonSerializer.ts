@@ -4,7 +4,6 @@
  * Creates a JSON replacer function that handles:
  * - Circular references (Course ↔ Department)
  * - Set serialization
- * - selectedSection optimization (removes redundant data)
  *
  * @returns A replacer function compatible with JSON.stringify
  */
@@ -26,12 +25,6 @@ export function createJSONReplacer(): (key: string, value: unknown) => unknown {
             };
         }
 
-        // FIXED: DO NOT delete selectedSection - it contains critical selection state
-        // The "optimization" comment was incorrect - this data is needed for rendering
-        // Commenting out to prevent data loss during save operations
-        // if (key === 'selectedSection' && value && typeof value === 'object' && value.number) {
-        //     return undefined;
-        // }
 
         return value;
     };

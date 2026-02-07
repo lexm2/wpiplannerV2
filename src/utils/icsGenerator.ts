@@ -150,10 +150,6 @@ export class ICSGenerator {
                 componentsToExport.push(selectedCourse.selectedLab);
             }
 
-            if (componentsToExport.length === 0 && selectedCourse.selectedSection) {
-                componentsToExport.push(selectedCourse.selectedSection);
-            }
-
             if (componentsToExport.length === 0) {
                 skippedCourses++;
                 continue;

@@ -1075,29 +1075,6 @@ export class ScheduleController {
         });
     }
 
-    private syncSectionObjects(selectedCourses: any[]): void {
-        selectedCourses.forEach(sc => {
-            // If we have a selectedSectionNumber but no selectedSection object (or invalid object)
-            if (sc.selectedSectionNumber && (!sc.selectedSection || !sc.selectedSection.computedTerm)) {
-                // Get all sections from the course using courseUtils (handles hierarchical structure)
-                const allSections = getAllSections(sc.course);
-                const sectionObject = allSections.find((s: Section) => s.number === sc.selectedSectionNumber);
-
-                if (sectionObject && sectionObject.computedTerm) {
-                    sc.selectedSection = sectionObject;
-                    console.log(`[SyncSection] Restored section ${sectionObject.number} for ${sc.course.department.abbreviation}${sc.course.number}, term: ${sectionObject.computedTerm}`);
-                } else {
-                    console.warn(`[SyncSection] Could not find section ${sc.selectedSectionNumber} for ${sc.course.department.abbreviation}${sc.course.number}`);
-                }
-            }
-
-            // If we have a selectedSection but no selectedSectionNumber, sync the other way
-            if (sc.selectedSection && sc.selectedSection.number && !sc.selectedSectionNumber) {
-                sc.selectedSectionNumber = sc.selectedSection.number;
-            }
-        });
-    }
-
     /**
      * Apply wizard preview overlay to selected courses
      */
@@ -1125,8 +1102,6 @@ export class ScheduleController {
                 selectedLecture: this.wizardPreviewSelections.lecture,
                 selectedDiscussion: this.wizardPreviewSelections.discussion,
                 selectedLab: this.wizardPreviewSelections.lab,
-                selectedSection: this.wizardPreviewSelections.lecture,
-                selectedSectionNumber: this.wizardPreviewSelections.lecture?.number || null,
                 isRequired: false,
                 lockedSections: new Set()
             });
@@ -1233,9 +1208,6 @@ export class ScheduleController {
             rawSelectedCourses = this.applyPreviewOverlay(rawSelectedCourses);
         }
 
-        // Sync section objects with section numbers before validation
-        this.syncSectionObjects(rawSelectedCourses);
-
         const selectedCourses = validateSelectedCourses(rawSelectedCourses);
 
         this.precomputeConflicts(selectedCourses);
@@ -1259,9 +1231,7 @@ export class ScheduleController {
                 const computedTerm = getComputedTerm(sc);
 
                 if (!computedTerm) {
-                    if (sc.selectedSection) {
-                        console.warn(`Course ${sc.course.department.abbreviation}${sc.course.number} has invalid section data:`, sc.selectedSection);
-                    }
+                    console.warn(`Course ${sc.course.department.abbreviation}${sc.course.number} has no valid section data`);
                     return false;
                 }
 
@@ -1452,11 +1422,6 @@ export class ScheduleController {
             }
             if (selectedCourse.selectedLab) {
                 sections.push(selectedCourse.selectedLab);
-            }
-
-            // Fallback to legacy selectedSection if no components are set
-            if (sections.length === 0 && selectedCourse.selectedSection) {
-                sections.push(selectedCourse.selectedSection);
             }
 
             // Process each section
@@ -1829,15 +1794,13 @@ export class ScheduleController {
 
             course = selectedCourse.course;
 
-            // Find the section from component selections or legacy selectedSection
+            // Find the section from component selections
             if (selectedCourse.selectedLecture?.number === sectionNumber) {
                 section = selectedCourse.selectedLecture;
             } else if (selectedCourse.selectedDiscussion?.number === sectionNumber) {
                 section = selectedCourse.selectedDiscussion;
             } else if (selectedCourse.selectedLab?.number === sectionNumber) {
                 section = selectedCourse.selectedLab;
-            } else if (selectedCourse.selectedSection?.number === sectionNumber) {
-                section = selectedCourse.selectedSection;
             }
         }
 
@@ -2217,9 +2180,8 @@ export class ScheduleController {
                 const lectureId = sc.selectedLecture?.crn || 'none';
                 const discussionId = sc.selectedDiscussion?.crn || 'none';
                 const labId = sc.selectedLab?.crn || 'none';
-                const sectionId = sc.selectedSectionNumber || 'none';
                 const color = this.getCourseColor(sc.course.id) || 'default';
-                return `${sc.course.id}-${lectureId}-${discussionId}-${labId}-${sectionId}-${color}`;
+                return `${sc.course.id}-${lectureId}-${discussionId}-${labId}-${color}`;
             })
             .sort()
             .join('|');

@@ -152,8 +152,6 @@ export class ProfileStateManager {
                     selectedLecture: null,
                     selectedDiscussion: null,
                     selectedLab: null,
-                    selectedSection: null,
-                    selectedSectionNumber: null,
                     isRequired,
                     lockedSections: new Set()
                 };
@@ -842,12 +840,6 @@ export class ProfileStateManager {
             schedules: [],
             selectedCourses: [],
             preferences: {
-                preferredTimeRange: {
-                    startTime: { hours: 8, minutes: 0 },
-                    endTime: { hours: 18, minutes: 0 }
-                },
-                preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
-                avoidBackToBackClasses: false,
                 theme: 'wpi-dark',
                 bookmarkedCourseIds: []
             },

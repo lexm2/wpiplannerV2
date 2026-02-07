@@ -519,14 +519,8 @@ export class CourseSelectionService {
 
         const selectedCourses = this.profileStateManager.getSelectedCourses();
         return selectedCourses.filter(sc => {
-            // Check if it's a hierarchical course without complete selections
-            const hasLecture = sc.selectedLecture !== null;
-            const hasSection = sc.selectedSection !== null;
-
-            // If it has neither lecture nor section, it's incomplete
-            if (!hasLecture && !hasSection) return true;
-
-            return false;
+            const hasAnyComponent = sc.selectedLecture || sc.selectedDiscussion || sc.selectedLab;
+            return !hasAnyComponent;
         });
     }
 
@@ -636,9 +630,7 @@ export class CourseSelectionService {
     getSelectedCourses(): SelectedCourse[] {
         if (!this.isInitialized) return [];
 
-        const selectedCourses = this.profileStateManager.getSelectedCourses();
-        this.syncSectionObjects(selectedCourses);
-        return selectedCourses;
+        return this.profileStateManager.getSelectedCourses();
     }
 
     private getSectionIndex(course: Course): Map<string, Section> {
@@ -658,29 +650,20 @@ export class CourseSelectionService {
         return index;
     }
 
-    private syncSectionObjects(selectedCourses: SelectedCourse[]): void {
-        selectedCourses.forEach(sc => {
-            // If we have a selectedSectionNumber but no selectedSection object (or invalid object)
-            if (sc.selectedSectionNumber && (!sc.selectedSection || !sc.selectedSection.computedTerm)) {
-                // Use cached section index for O(1) lookup instead of O(n) find
-                const sectionIndex = this.getSectionIndex(sc.course);
-                const sectionObject = sectionIndex.get(sc.selectedSectionNumber);
-
-                if (sectionObject && sectionObject.computedTerm) {
-                    sc.selectedSection = sectionObject;
-                }
-            }
-        });
-    }
-
     getSelectedSection(course: Course): string | null {
         const selectedCourse = this.getSelectedCourse(course);
-        return selectedCourse?.selectedSectionNumber || null;
+        return selectedCourse?.selectedLecture?.number ||
+               selectedCourse?.selectedDiscussion?.number ||
+               selectedCourse?.selectedLab?.number ||
+               null;
     }
 
     getSelectedSectionObject(course: Course): Section | null {
         const selectedCourse = this.getSelectedCourse(course);
-        return selectedCourse?.selectedSection || null;
+        return selectedCourse?.selectedLecture ||
+               selectedCourse?.selectedDiscussion ||
+               selectedCourse?.selectedLab ||
+               null;
     }
 
     getSelectedCoursesCount(): number {
@@ -877,25 +860,10 @@ export class CourseSelectionService {
 
     reconstructSectionObjects(): void {
         try {
-            let reconstructedCount = 0;
+            // No longer needed - component-based selection doesn't require reconstruction
             const selectedCourses = this.getSelectedCourses();
 
-            selectedCourses.forEach(selectedCourse => {
-                if (selectedCourse.selectedSectionNumber && !selectedCourse.selectedSection) {
-                    // Use cached section index for O(1) lookup instead of O(n) find
-                    const sectionIndex = this.getSectionIndex(selectedCourse.course);
-                    const sectionObject = sectionIndex.get(selectedCourse.selectedSectionNumber) || null;
-
-                    if (sectionObject) {
-                        selectedCourse.selectedSection = sectionObject;
-                        reconstructedCount++;
-                    }
-                }
-            });
-
-            if (reconstructedCount > 0) {
-                console.log(`Reconstructed ${reconstructedCount} section objects`);
-                // Save changes and notify listeners
+            if (selectedCourses.length > 0) {
                 this.profileStateManager.save();
             }
         } catch (error) {

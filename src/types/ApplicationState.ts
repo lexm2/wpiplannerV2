@@ -1,7 +1,6 @@
 import type { Department } from './types';
 import type { SchedulePreferences } from './schedule';
 import type { MinimalSyncData } from './export';
-import { dayToNumber, numberToDay, minutesToTime } from './export';
 import { ScheduleState, findCourseById, findSectionByCRN } from './ScheduleState';
 import type { SelectedCourse } from './schedule';
 
@@ -46,19 +45,19 @@ export class ApplicationState {
             a: this.getActiveScheduleIndex(),
             s: this.schedules.map(schedule => [
                 schedule.name,
-                schedule.selectedCourses.flatMap(course => [
-                    course.course.id,
-                    course.selectedSection?.crn.toString() ?? null
-                ])
+                schedule.selectedCourses.flatMap(course => {
+                    // Extract CRN from component fields (lecture, discussion, or lab)
+                    const crn = course.selectedLecture?.crn ??
+                               course.selectedDiscussion?.crn ??
+                               course.selectedLab?.crn ??
+                               null;
+                    return [
+                        course.course.id,
+                        crn?.toString() ?? null
+                    ];
+                })
             ]),
-            p: this.preferences && this.preferences.preferredTimeRange ? {
-                t: [
-                    this.preferences.preferredTimeRange.startTime.hours * 60 +
-                        this.preferences.preferredTimeRange.startTime.minutes,
-                    this.preferences.preferredTimeRange.endTime.hours * 60 +
-                        this.preferences.preferredTimeRange.endTime.minutes
-                ],
-                d: Array.from(this.preferences.preferredDays).map(dayToNumber),
+            p: this.preferences?.theme ? {
                 th: this.preferences.theme
             } : undefined
         };
@@ -94,11 +93,9 @@ export class ApplicationState {
 
                 selectedCourses.push({
                     course,
-                    selectedLecture: null,
+                    selectedLecture: section,
                     selectedDiscussion: null,
                     selectedLab: null,
-                    selectedSection: section,
-                    selectedSectionNumber: section?.number || null,
                     isRequired: false,
                     lockedSections: new Set()
                 });
@@ -114,13 +111,7 @@ export class ApplicationState {
 
         const activeScheduleId = schedules[data.a]?.id ?? null;
 
-        const preferences: SchedulePreferences | undefined = data.p ? {
-            preferredTimeRange: {
-                startTime: minutesToTime(data.p.t?.[0] ?? 480),
-                endTime: minutesToTime(data.p.t?.[1] ?? 1200)
-            },
-            preferredDays: new Set(data.p.d?.map(numberToDay) ?? ['mon', 'tue', 'wed', 'thu', 'fri']),
-            avoidBackToBackClasses: false,
+        const preferences: SchedulePreferences | undefined = data.p?.th ? {
             theme: data.p.th,
             bookmarkedCourseIds: []
         } : undefined;

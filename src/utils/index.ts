@@ -4,7 +4,6 @@ export {
   isValidSelectedCourse,
   validateSelectedCourses,
   repairSelectedCourse,
-  getValidSelectedSection,
   getComputedTerm,
   isValidComputedTerm,
   getDisplayTerms,
