@@ -10,9 +10,12 @@ import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTypeFil
 export class ScheduleFilterModalController extends BaseModal {
     private scheduleFilterService: ScheduleFilterService | null = null;
     private selectedCourses: SelectedCourse[] = [];
+    private mode: 'filter' | 'auto-schedule' = 'filter';
+    private scheduleController?: any;
 
-    constructor(modalService: ModalService) {
+    constructor(modalService: ModalService, scheduleController?: any) {
         super(modalService);
+        this.scheduleController = scheduleController;
     }
 
     setScheduleFilterService(scheduleFilterService: ScheduleFilterService): void {
@@ -20,6 +23,14 @@ export class ScheduleFilterModalController extends BaseModal {
     }
 
     setSelectedCourses(selectedCourses: SelectedCourse[]): void {
+        this.selectedCourses = selectedCourses;
+    }
+
+    setMode(mode: 'filter' | 'auto-schedule'): void {
+        this.mode = mode;
+    }
+
+    updateSelectedCourses(selectedCourses: SelectedCourse[]): void {
         this.selectedCourses = selectedCourses;
     }
 
@@ -67,7 +78,7 @@ export class ScheduleFilterModalController extends BaseModal {
                         </div>
                         <div class="filter-actions">
                             <button class="modal-btn btn-secondary" id="clear-all-filters">Clear All</button>
-                            <button class="modal-btn btn-primary" id="apply-filters">Apply</button>
+                            <button class="modal-btn btn-primary" id="apply-filters">${this.mode === 'auto-schedule' ? 'Generate Schedule' : 'Apply'}</button>
                         </div>
                     </div>
                 </div>
@@ -97,6 +108,8 @@ export class ScheduleFilterModalController extends BaseModal {
                 ${this.createGraduateLevelFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createConflictFilter()}
+                ${this.createWakeUpTimeFilter()}
+                ${this.createCalendarEventsFilter()}
             </div>
         `;
     }
@@ -297,6 +310,98 @@ export class ScheduleFilterModalController extends BaseModal {
         return criteria || { avoidConflicts: false };
     }
 
+    private getActiveWakeUpTime(): { hours: number; minutes: number } | null {
+        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'wakeUpTime');
+        const criteria = filter?.criteria as any;
+        return criteria?.wakeUpTime || null;
+    }
+
+    private hasCalendarEventsBlocked(): boolean {
+        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
+        if (!filter) return false;
+
+        const criteria = filter.criteria as any;
+        const blockedSlots = criteria.blockedSlots || [];
+        return blockedSlots.some((slot: any) => slot.id.includes('calendar-') || slot.id.match(/^[0-9a-f-]{36}/));
+    }
+
+    private createWakeUpTimeFilter(): string {
+        const activeWakeUpTime = this.getActiveWakeUpTime();
+        const timeValue = activeWakeUpTime
+            ? `${String(activeWakeUpTime.hours).padStart(2, '0')}:${String(activeWakeUpTime.minutes).padStart(2, '0')}`
+            : '';
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Wake-Up Time</h4>
+                </div>
+                <div class="filter-section-content">
+                    <label class="wake-up-time-label">
+                        Earliest class start time
+                    </label>
+                    <input
+                        type="time"
+                        id="wake-up-time-input"
+                        class="wake-up-time-input"
+                        value="${timeValue}"
+                    >
+                    <p class="wake-up-time-hint">
+                        Excludes sections that start before this time
+                    </p>
+                    <button class="filter-clear-btn" id="clear-wake-up-time" style="display: ${timeValue ? 'block' : 'none'}">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    private createCalendarEventsFilter(): string {
+        if (!this.scheduleController) {
+            return '';
+        }
+
+        const calendarEventCount = this.scheduleController.getCalendarEventCount();
+        const localEventCount = this.scheduleController.getLocalEventCount();
+        const totalCount = calendarEventCount + localEventCount;
+
+        if (totalCount === 0) {
+            return '';
+        }
+
+        const avoidCalendarEvents = this.hasCalendarEventsBlocked();
+
+        let countMessage: string;
+        if (calendarEventCount > 0 && localEventCount > 0) {
+            countMessage = `${calendarEventCount} cloud + ${localEventCount} local events`;
+        } else if (localEventCount > 0) {
+            countMessage = `${localEventCount} local events`;
+        } else {
+            countMessage = `${calendarEventCount} events`;
+        }
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Calendar Events</h4>
+                </div>
+                <div class="filter-section-content">
+                    <label class="filter-toggle-label">
+                        <input type="checkbox" class="filter-toggle" id="avoid-calendar-toggle"
+                               ${avoidCalendarEvents ? 'checked' : ''}>
+                        <span class="filter-toggle-slider"></span>
+                        <span class="filter-toggle-text">Block calendar event times (${countMessage})</span>
+                    </label>
+                    <button class="calendar-events-btn" id="modal-calendar-btn"
+                            style="display: ${avoidCalendarEvents ? 'flex' : 'none'}">
+                        View/Edit Events
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
     private setupFilterModalEventListeners(modalElement: HTMLElement): void {
 
         // Search text filter
@@ -362,6 +467,36 @@ export class ScheduleFilterModalController extends BaseModal {
             }
         });
 
+        // Wake-up time filter
+        const wakeUpInput = modalElement.querySelector('#wake-up-time-input');
+        if (wakeUpInput) {
+            wakeUpInput.addEventListener('change', () => {
+                this.handleWakeUpTimeChange(modalElement);
+            });
+        }
+
+        const clearWakeUpBtn = modalElement.querySelector('#clear-wake-up-time');
+        if (clearWakeUpBtn) {
+            clearWakeUpBtn.addEventListener('click', () => {
+                this.handleClearWakeUpTime(modalElement);
+            });
+        }
+
+        // Calendar events toggle
+        const calendarToggle = modalElement.querySelector('#avoid-calendar-toggle');
+        if (calendarToggle) {
+            calendarToggle.addEventListener('change', (e) => {
+                this.handleCalendarEventsToggle((e.target as HTMLInputElement).checked, modalElement);
+            });
+        }
+
+        const calendarBtn = modalElement.querySelector('#modal-calendar-btn');
+        if (calendarBtn) {
+            calendarBtn.addEventListener('click', () => {
+                this.handleOpenCalendarPanel();
+            });
+        }
+
         // Clear all filters
         modalElement.querySelector('#clear-all-filters')?.addEventListener('click', () => {
             this.scheduleFilterService!.clearFilters();
@@ -375,8 +510,12 @@ export class ScheduleFilterModalController extends BaseModal {
         });
 
         // Apply filters button
-        modalElement.querySelector('#apply-filters')?.addEventListener('click', () => {
-            this.hide();
+        modalElement.querySelector('#apply-filters')?.addEventListener('click', async () => {
+            if (this.mode === 'auto-schedule') {
+                await this.handleAutoScheduleGenerate();
+            } else {
+                this.hide();
+            }
         });
     }
 
@@ -443,7 +582,13 @@ export class ScheduleFilterModalController extends BaseModal {
             const avoidConflicts = (modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement)?.checked || false;
 
             if (avoidConflicts) {
-                this.scheduleFilterService!.addFilter('periodConflict', { avoidConflicts: true });
+                const existingFilter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
+                const existingBlockedSlots = (existingFilter?.criteria as any)?.blockedSlots || [];
+
+                this.scheduleFilterService!.addFilter('periodConflict', {
+                    avoidConflicts: true,
+                    blockedSlots: existingBlockedSlots
+                });
             } else {
                 this.scheduleFilterService!.removeFilter('periodConflict');
             }
@@ -660,5 +805,85 @@ export class ScheduleFilterModalController extends BaseModal {
                 }
             }
         }
+    }
+
+    private handleWakeUpTimeChange(modalElement: HTMLElement): void {
+        const input = modalElement.querySelector('#wake-up-time-input') as HTMLInputElement;
+        const clearBtn = modalElement.querySelector('#clear-wake-up-time') as HTMLElement;
+
+        if (input.value && input.value.trim()) {
+            const [hours, minutes] = input.value.split(':').map(Number);
+            if (!isNaN(hours) && !isNaN(minutes)) {
+                this.scheduleFilterService!.addFilter('wakeUpTime', {
+                    wakeUpTime: { hours, minutes }
+                });
+                clearBtn.style.display = 'block';
+            }
+        } else {
+            this.scheduleFilterService!.removeFilter('wakeUpTime');
+            clearBtn.style.display = 'none';
+        }
+
+        this.updatePreview(modalElement);
+    }
+
+    private handleClearWakeUpTime(modalElement: HTMLElement): void {
+        const input = modalElement.querySelector('#wake-up-time-input') as HTMLInputElement;
+        const clearBtn = modalElement.querySelector('#clear-wake-up-time') as HTMLElement;
+
+        input.value = '';
+        this.scheduleFilterService!.removeFilter('wakeUpTime');
+        clearBtn.style.display = 'none';
+
+        this.updatePreview(modalElement);
+    }
+
+    private handleCalendarEventsToggle(checked: boolean, modalElement: HTMLElement): void {
+        const calendarBtn = modalElement.querySelector('#modal-calendar-btn') as HTMLElement;
+
+        if (checked) {
+            const calendarSlots = this.scheduleController.getAllCalendarBlockedTimes();
+
+            const existingFilter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
+            const existingSlots = (existingFilter?.criteria as any)?.blockedSlots || [];
+
+            const nonCalendarSlots = existingSlots.filter((slot: any) => !slot.id.includes('calendar-') && !slot.id.match(/^[0-9a-f-]{36}/));
+
+            this.scheduleFilterService!.addFilter('periodConflict', {
+                avoidConflicts: true,
+                blockedSlots: [...nonCalendarSlots, ...calendarSlots]
+            });
+
+            calendarBtn.style.display = 'flex';
+        } else {
+            const existingFilter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
+            if (existingFilter) {
+                const existingSlots = (existingFilter.criteria as any)?.blockedSlots || [];
+                const filteredSlots = existingSlots.filter((slot: any) => !slot.id.includes('calendar-') && !slot.id.match(/^[0-9a-f-]{36}/));
+
+                if (filteredSlots.length > 0 || (existingFilter.criteria as any)?.avoidConflicts) {
+                    this.scheduleFilterService!.addFilter('periodConflict', {
+                        avoidConflicts: (existingFilter.criteria as any)?.avoidConflicts || false,
+                        blockedSlots: filteredSlots
+                    });
+                } else {
+                    this.scheduleFilterService!.removeFilter('periodConflict');
+                }
+            }
+
+            calendarBtn.style.display = 'none';
+        }
+
+        this.updatePreview(modalElement);
+    }
+
+    private handleOpenCalendarPanel(): void {
+        this.hide();
+        this.scheduleController.openCalendarEventsPanel();
+    }
+
+    private async handleAutoScheduleGenerate(): Promise<void> {
+        this.hide();
+        await this.scheduleController.generateSchedulesWithActiveFilters(this.selectedCourses);
     }
 }

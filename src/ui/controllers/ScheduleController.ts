@@ -14,8 +14,7 @@ import { TimeUtils } from '../utils/timeUtils'
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine'
 import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../../utils/typeGuards'
 import { AutoScheduler, type ScheduleResult } from '../../services/scheduling/AutoScheduler'
-import type { AutoScheduleConfig, AutoScheduleSettings, WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
-import { AutoScheduleSettingsModal } from '../components/AutoScheduleSettingsModal'
+import type { AutoScheduleSettings, WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { getAllSections } from '../../utils/courseUtils'
@@ -268,6 +267,23 @@ export class ScheduleController {
         }
 
         return blockedTimes;
+    }
+
+    getCalendarEventCount(): number {
+        return 0;
+    }
+
+    getLocalEventCount(): number {
+        const localEvents = this.currentSchedule?.localEvents || [];
+        return localEvents.filter(e => e.visible).length;
+    }
+
+    getAllCalendarBlockedTimes(): WeeklyTimeSlot[] {
+        return this.getAllLocalEventBlockedTimes();
+    }
+
+    openCalendarEventsPanel(): void {
+        this.openAddLocalEventModal();
     }
 
     /**
@@ -2043,28 +2059,17 @@ export class ScheduleController {
             }
         }
 
-        // Generate new schedules - show settings modal first
         if (!this.modalService) {
             console.error('[Auto-Schedule] Modal service not available');
-            // Fall back to generating with default settings
             await this.generateSchedulesWithSettings({ blockedTimes: [] }, selectedCourses);
             return;
         }
 
-        const localEvents = this.currentSchedule?.localEvents || [];
-        const localEventCount = localEvents.filter(e => e.visible).length;
-
-        const settingsModal = new AutoScheduleSettingsModal(this.modalService, {
-            onNext: async (settings: AutoScheduleSettings) => {
-                await this.generateSchedulesWithSettings(settings, selectedCourses);
-            },
-            onOpenCalendarPanel: () => {
-                this.openAddLocalEventModal();
-            },
-            hasConnectedCalendar: false,
-            localEventCount: localEventCount
-        });
-        settingsModal.show();
+        const scheduleFilterModal = new ScheduleFilterModalController(this.modalService, this);
+        scheduleFilterModal.setScheduleFilterService(this.scheduleFilterService);
+        scheduleFilterModal.setSelectedCourses(selectedCourses);
+        scheduleFilterModal.setMode('auto-schedule');
+        scheduleFilterModal.show();
     }
 
     /**
@@ -2090,12 +2095,22 @@ export class ScheduleController {
                 blockedTimes = [...blockedTimes, ...calendarBlockedTimes];
             }
 
-            const config: AutoScheduleConfig = {
-                blockedTimes,
-                wakeUpTime: settings.wakeUpTime
-            };
+            if (blockedTimes.length > 0) {
+                this.scheduleFilterService!.addFilter('blockedTimes', {
+                    blockedTimes
+                });
+            }
 
-            const allSchedules = autoScheduler.generateSchedules(selectedCourses, config, 100);
+            if (settings.wakeUpTime) {
+                this.scheduleFilterService!.addFilter('wakeUpTime', {
+                    wakeUpTime: settings.wakeUpTime
+                });
+            }
+
+            const allSchedules = autoScheduler.generateSchedules(selectedCourses, 100);
+
+            this.scheduleFilterService!.removeFilter('blockedTimes');
+            this.scheduleFilterService!.removeFilter('wakeUpTime');
 
             if (allSchedules.length === 0) {
                 console.warn('[Auto-Schedule] No valid schedules found');
@@ -2108,6 +2123,43 @@ export class ScheduleController {
             this.currentScheduleIndex = 0;
 
             // Apply the first schedule
+            await this.applyScheduleAtIndex(0);
+            this.updateAutoScheduleButtonUI();
+
+        } catch (error) {
+            console.error('[Auto-Schedule] Error generating schedules:', error);
+            alert('An error occurred while generating the schedule. Please try again.');
+            this.generatedSchedules = [];
+            this.currentScheduleIndex = 0;
+            this.updateAutoScheduleButtonUI();
+
+            this.scheduleFilterService!.removeFilter('blockedTimes');
+            this.scheduleFilterService!.removeFilter('wakeUpTime');
+        }
+    }
+
+    async generateSchedulesWithActiveFilters(selectedCourses: SelectedCourse[]): Promise<void> {
+        const autoScheduleBtn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
+        if (autoScheduleBtn) {
+            autoScheduleBtn.disabled = true;
+            autoScheduleBtn.textContent = 'Generating...';
+        }
+
+        try {
+            const autoScheduler = new AutoScheduler(this.scheduleFilterService!);
+
+            const allSchedules = autoScheduler.generateSchedules(selectedCourses, 100);
+
+            if (allSchedules.length === 0) {
+                console.warn('[Auto-Schedule] No valid schedules found');
+                alert('Could not generate a valid schedule.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts');
+                this.updateAutoScheduleButtonUI();
+                return;
+            }
+
+            this.generatedSchedules = allSchedules;
+            this.currentScheduleIndex = 0;
+
             await this.applyScheduleAtIndex(0);
             this.updateAutoScheduleButtonUI();
 
@@ -2154,7 +2206,6 @@ export class ScheduleController {
 
             if (selections.length > 0) {
                 await this.courseSelectionService.batchSetSelectedComponents(selections, true);
-                // Render all grids to clear stale course data from previous schedule
                 this.renderScheduleGrids();
             }
         } finally {
