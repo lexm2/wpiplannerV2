@@ -11,10 +11,12 @@
 - Added F (Fall) and S (Spring) to term system for proper graduate course handling
 - Completed migration to component-based course selection system
 - Renamed confusing "legacy" schedule methods (no actual legacy format exists)
+- Added helper functions to get CRNs from selected courses
 
 ### Fixed
 - Fixed blocked times not applying to Fall (F) and Spring (S) graduate courses
 - Fixed auto-scheduler ignoring time blocks for multi-term courses
+- Fixed all AcademicTerm type errors by using proper enum values instead of strings
 
 ## [2026-01-25]
 
