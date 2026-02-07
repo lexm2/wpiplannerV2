@@ -31,13 +31,10 @@ export function isValidSection(section: any): section is Section {
 export function isValidSelectedCourse(sc: any): sc is SelectedCourse {
     if (!sc || typeof sc !== 'object') return false;
     
-    // Check course object exists
     if (!sc.course || typeof sc.course !== 'object') return false;
     
-    // Check basic SelectedCourse properties
     if (typeof sc.isRequired !== 'boolean') return false;
     
-    // Check component sections (lecture, discussion, lab) are either null or valid
     if (sc.selectedLecture !== null && !isValidSection(sc.selectedLecture)) {
         return false;
     }
