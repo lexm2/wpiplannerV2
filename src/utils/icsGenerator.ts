@@ -249,13 +249,13 @@ export class ICSGenerator {
                 } else {
                     const terms = localEvent.terms || [];
                     for (const term of terms) {
-                        const termDates = this.getTermDates(term, academicYear);
+                        const termDates = this.getTermDates(term as string, academicYear);
                         if (!termDates) continue;
 
-                        const days = localEvent.days || (localEvent.day ? [localEvent.day] : []);
+                        const days = localEvent.days || [];
                         if (days.length === 0) continue;
 
-                        const firstDay = days.reduce((earliest, day) => {
+                        const firstDay: DayOfWeek = days.reduce((earliest: DayOfWeek, day: DayOfWeek) => {
                             const dayNum = this.DAY_TO_NUMBER[day];
                             const earliestNum = this.DAY_TO_NUMBER[earliest];
                             return dayNum < earliestNum ? day : earliest;
@@ -277,7 +277,7 @@ export class ICSGenerator {
 
                         const uid = `local-${localEvent.id}-${term}@wpiplannerv2`;
 
-                        const byDay = days.map(day => this.DAY_TO_ICAL[day]);
+                        const byDay = days.map((day: DayOfWeek) => this.DAY_TO_ICAL[day]);
 
                         calendar.createEvent({
                             id: uid,

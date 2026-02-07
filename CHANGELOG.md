@@ -9,6 +9,7 @@
 - Removed unused conflict descriptions and fields
 - Refactored conflict detection to return conflict map directly (simpler and faster)
 - Added F (Fall) and S (Spring) to term system for proper graduate course handling
+- Completed migration to component-based course selection system
 
 ### Fixed
 - Fixed blocked times not applying to Fall (F) and Spring (S) graduate courses
