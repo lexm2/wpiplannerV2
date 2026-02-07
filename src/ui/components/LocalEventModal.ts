@@ -5,7 +5,7 @@
 import { ModalService } from '../../services/ui/ModalService';
 import { BaseModal } from './BaseModal';
 import type { LocalCalendarEvent } from '../../types/schedule';
-import { AcademicTerm } from '../../types/schedule';
+import { AcademicTerm, EventType } from '../../types/schedule';
 import { DayOfWeek } from '../../types/types';
 import { getInlineSVG } from '../../utils/iconPaths';
 import styles from '../../styles/components/local-event-modal.module.css';
@@ -16,8 +16,6 @@ export interface LocalEventModalOptions {
     /** Optional: existing event to edit (if not provided, creates new) */
     existingEvent?: LocalCalendarEvent;
 }
-
-type EventType = 'one-time' | 'recurring';
 
 interface DayOption {
     value: DayOfWeek;
@@ -40,7 +38,7 @@ const WEEKDAYS: DayOption[] = [
 export class LocalEventModal extends BaseModal {
     private options: LocalEventModalOptions;
     private isEditMode: boolean;
-    private currentEventType: EventType = 'recurring';
+    private currentEventType: EventType = EventType.RECURRING;
     private selectedDays: Set<DayOfWeek> = new Set();
 
     constructor(modalService: ModalService, options: LocalEventModalOptions) {
@@ -50,7 +48,7 @@ export class LocalEventModal extends BaseModal {
 
         // Initialize from existing event
         if (options.existingEvent) {
-            this.currentEventType = options.existingEvent.eventType || 'recurring';
+            this.currentEventType = options.existingEvent.eventType || EventType.RECURRING;
             if (options.existingEvent.days?.length) {
                 this.selectedDays = new Set(options.existingEvent.days);
             }
@@ -119,12 +117,12 @@ export class LocalEventModal extends BaseModal {
                         <div class="form-group">
                             <label>Event Type</label>
                             <div class="${styles['event-type-selector']}">
-                                <button type="button" class="${styles['event-type-option']} ${eventType === 'one-time' ? styles.selected : ''}"
+                                <button type="button" class="${styles['event-type-option']} ${eventType === EventType.ONE_TIME ? styles.selected : ''}"
                                         data-type="one-time">
                                     ${getInlineSVG('CALENDAR_DOWN', 'type-icon')}
                                     One-time
                                 </button>
-                                <button type="button" class="${styles['event-type-option']} ${eventType === 'recurring' ? styles.selected : ''}"
+                                <button type="button" class="${styles['event-type-option']} ${eventType === EventType.RECURRING ? styles.selected : ''}"
                                         data-type="recurring">
                                     ${getInlineSVG('CALENDAR_REPEAT', 'type-icon')}
                                     Recurring
@@ -361,7 +359,7 @@ export class LocalEventModal extends BaseModal {
         titleInput?.classList.remove('form-error');
 
         // Type-specific validation
-        if (this.currentEventType === 'recurring') {
+        if (this.currentEventType === EventType.RECURRING) {
             // Check at least one day is selected
             if (this.selectedDays.size === 0) {
                 const daySelector = this.modalElement.querySelector(`.${styles['day-selector']}`);
@@ -429,7 +427,7 @@ export class LocalEventModal extends BaseModal {
             visible: true, // Always visible
         };
 
-        if (this.currentEventType === 'one-time') {
+        if (this.currentEventType === EventType.ONE_TIME) {
             const dateInput = this.modalElement.querySelector('#event-date') as HTMLInputElement;
             eventData.date = dateInput.value;
         } else {

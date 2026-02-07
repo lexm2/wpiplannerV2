@@ -2,7 +2,7 @@ import { describe, it, expect } from 'bun:test';
 import { ICSGenerator } from '../../src/utils/icsGenerator';
 import { createMockSchedule, createMockSelectedCourse, createMockCourse, createMockSection, createMockPeriod, createMockTime } from '../helpers/mockData';
 import { DayOfWeek } from '../../src/types/types';
-import { AcademicTerm } from '../../src/types/schedule';
+import { AcademicTerm, EventType } from '../../src/types/schedule';
 
 describe('ICSGenerator', () => {
     describe('Basic Functionality', () => {
@@ -178,7 +178,7 @@ describe('ICSGenerator', () => {
                         id: 'local-1',
                         title: 'Career Fair',
                         description: 'Annual career fair',
-                        eventType: 'one-time',
+                        eventType: EventType.ONE_TIME,
                         date: '2026-09-15',
                         startTime: createMockTime(10, 0),
                         endTime: createMockTime(15, 0),
@@ -209,7 +209,7 @@ describe('ICSGenerator', () => {
                         id: 'local-2',
                         title: 'Office Hours',
                         description: 'Weekly office hours',
-                        eventType: 'recurring',
+                        eventType: EventType.RECURRING,
                         days: [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY],
                         startTime: createMockTime(16, 0),
                         endTime: createMockTime(17, 0),

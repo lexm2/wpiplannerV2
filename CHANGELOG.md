@@ -12,6 +12,7 @@
 - Completed migration to component-based course selection system
 - Renamed confusing "legacy" schedule methods (no actual legacy format exists)
 - Added helper functions to get CRNs from selected courses
+- Converted event type from string literals to proper enum for better type safety
 
 ### Fixed
 - Fixed blocked times not applying to Fall (F) and Spring (S) graduate courses

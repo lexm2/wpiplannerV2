@@ -53,6 +53,14 @@ export enum AcademicTerm {
 }
 
 /**
+ * Calendar event type.
+ */
+export enum EventType {
+    ONE_TIME = 'one-time',
+    RECURRING = 'recurring'
+}
+
+/**
  * ICS-compatible structure for export.
  *
  * Supports two event types:
@@ -64,7 +72,7 @@ export interface LocalCalendarEvent {
     id: string;
     title: string;
     description?: string;
-    eventType: 'one-time' | 'recurring';
+    eventType: EventType;
     /** For one-time events: specific date (ISO format YYYY-MM-DD) */
     date?: string;
     /** For recurring events: days of week (multiple allowed) */

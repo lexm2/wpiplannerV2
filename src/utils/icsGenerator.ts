@@ -1,5 +1,5 @@
 import ical, { ICalEventRepeatingFreq, ICalWeekday, ICalCalendarMethod } from 'ical-generator';
-import { Schedule, SelectedCourse, LocalCalendarEvent } from '../types/schedule';
+import { Schedule, SelectedCourse, LocalCalendarEvent, EventType } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';
 import { TermBoundsService } from '../services/data/TermBoundsService';
 
@@ -226,7 +226,7 @@ export class ICSGenerator {
             for (const localEvent of schedule.localEvents) {
                 if (!localEvent.visible) continue;
 
-                if (localEvent.eventType === 'one-time') {
+                if (localEvent.eventType === EventType.ONE_TIME) {
                     if (!localEvent.date) continue;
 
                     const eventDate = new Date(localEvent.date);

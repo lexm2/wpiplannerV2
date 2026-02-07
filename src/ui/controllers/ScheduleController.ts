@@ -1,5 +1,5 @@
 import { DayOfWeek, Course, Section, Period } from '../../types/types'
-import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm } from '../../types/schedule'
+import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm, EventType } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
 import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService'
@@ -173,7 +173,7 @@ export class ScheduleController {
         if (!this.currentSchedule?.localEvents) return [];
 
         return this.currentSchedule.localEvents.filter(event => {
-            if (event.eventType === 'one-time') {
+            if (event.eventType === EventType.ONE_TIME) {
                 return false;
             }
 
@@ -194,7 +194,7 @@ export class ScheduleController {
     private localEventToSlots(event: LocalCalendarEvent): DisplayableTimeSlot[] {
         const slots: DisplayableTimeSlot[] = [];
 
-        if (event.eventType === 'one-time') {
+        if (event.eventType === EventType.ONE_TIME) {
             return slots;
         }
 
@@ -248,7 +248,7 @@ export class ScheduleController {
         const visibleEvents = this.currentSchedule.localEvents.filter(e => e.visible);
 
         for (const event of visibleEvents) {
-            if (event.eventType === 'one-time') continue;
+            if (event.eventType === EventType.ONE_TIME) continue;
 
             const days = event.days || [];
             const terms = event.terms || [AcademicTerm.ALL];
