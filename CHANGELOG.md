@@ -5,6 +5,9 @@
 ### Added
 - "Clear All Data" button in schedules modal to reset all schedules and data
 
+### Fixed
+- Course selection buttons now work correctly (validator updated to match current data structure)
+
 ### Improved
 - Replaced auto-schedule settings modal with unified filter interface
 - Auto-schedule now uses the same filter UI as regular filtering for consistency

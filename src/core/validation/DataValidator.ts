@@ -172,38 +172,34 @@ export class DataValidator {
         this.validateRequiredField(courseObj, 'number', 'string', result);
         this.validateRequiredField(courseObj, 'name', 'string', result);
 
-        // Validate credits (should be number)
-        if (courseObj.credits !== undefined && (typeof courseObj.credits !== 'number' || courseObj.credits < 0)) {
-            result.errors.push({
-                field: 'credits',
-                message: 'Credits must be a non-negative number',
-                severity: 'error',
-                code: 'INVALID_CREDITS'
-            });
-            result.valid = false;
-        }
+        // Validate credits
+        this.validateRequiredField(courseObj, 'minCredits', 'number', result);
+        this.validateRequiredField(courseObj, 'maxCredits', 'number', result);
 
-        // Validate department
-        if (!courseObj.department || typeof courseObj.department !== 'object') {
-            result.errors.push({
-                field: 'department',
-                message: 'Department must be an object',
-                severity: 'error',
-                code: 'MISSING_DEPARTMENT'
-            });
-            result.valid = false;
-        } else {
-            const deptValidation = this.validateDepartment(courseObj.department, options);
-            if (!deptValidation.valid) {
-                deptValidation.errors.forEach(error => {
-                    result.errors.push({
-                        ...error,
-                        field: `department.${error.field}`
-                    });
+        if (typeof courseObj.minCredits === 'number' && typeof courseObj.maxCredits === 'number') {
+            if (courseObj.minCredits < 0 || courseObj.maxCredits < 0) {
+                result.errors.push({
+                    field: 'credits',
+                    message: 'Credits must be non-negative',
+                    severity: 'error',
+                    code: 'INVALID_CREDITS'
+                });
+                result.valid = false;
+            }
+            if (courseObj.minCredits > courseObj.maxCredits) {
+                result.errors.push({
+                    field: 'credits',
+                    message: 'minCredits cannot be greater than maxCredits',
+                    severity: 'error',
+                    code: 'INVALID_CREDITS'
                 });
                 result.valid = false;
             }
         }
+
+        // Validate department fields
+        this.validateRequiredField(courseObj, 'departmentAbbr', 'string', result);
+        this.validateRequiredField(courseObj, 'departmentName', 'string', result);
 
         // Validate sections (hierarchical structure)
         const allSections = getAllSections(courseObj as any);

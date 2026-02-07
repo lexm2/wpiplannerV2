@@ -437,15 +437,19 @@ export class CourseController {
 
     toggleCourseSelection(element: HTMLElement): void {
         const course = this.elementToCourseMap.get(element);
-        if (!course) return;
+
+        if (!course) {
+            console.error('Course not found in element map');
+            return;
+        }
 
         const wasSelected = this.courseSelectionService.isCourseSelected(course);
-
         this.updateCourseUIById(course.id, !wasSelected);
 
         this.courseSelectionService.toggleCourseSelection(course)
             .then(result => {
                 if (!result.success) {
+                    console.error('Failed to toggle course selection:', result.error);
                     this.updateCourseUIById(course.id, wasSelected);
                 }
             })
@@ -460,9 +464,11 @@ export class CourseController {
         const selectBtn = element.querySelector('.course-select-btn');
 
         if (selectBtn) {
-            selectBtn.innerHTML = isSelected
+            const newIcon = isSelected
                 ? getInlineSVG('CHECK', 'check-icon')
                 : getInlineSVG('PLUS', 'plus-icon');
+
+            selectBtn.innerHTML = newIcon;
 
             if (isSelected) {
                 element.classList.add('selected');
@@ -544,10 +550,8 @@ export class CourseController {
      * @param isSelected Whether the course is selected
      */
     updateCourseUIById(courseId: string, isSelected: boolean): void {
-        // Find all elements with this course ID using direct attribute selector
         const courseElements = document.querySelectorAll(`[data-course-id="${courseId}"]`);
-        
-        courseElements.forEach(element => {
+        courseElements.forEach((element) => {
             this.updateCourseSelectionUI(element as HTMLElement, isSelected);
         });
     }
