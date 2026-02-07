@@ -5,10 +5,10 @@ import { PeriodProfessorFilter } from '../../core/filtering/filters/PeriodProfes
 import { PeriodTypeFilter } from '../../core/filtering/filters/PeriodTypeFilter';
 import { PeriodTermFilter } from '../../core/filtering/filters/PeriodTermFilter';
 import { PeriodAvailabilityFilter } from '../../core/filtering/filters/PeriodAvailabilityFilter';
-import { PeriodConflictFilter } from '../../core/filtering/filters/PeriodConflictFilter';
+import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import { SectionCodeFilter } from '../../core/filtering/filters/SectionCodeFilter';
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine';
-import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter, PeriodConflictFilterCriteria } from '../../types/filters';
+import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter, PeriodConflictFilterCriteria, ConflictFilterCriteria } from '../../types/filters';
 import { SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
 import { FilterState } from '../../core/filtering/FilterState';
 import { RequiredStatusFilter } from '../../core/filtering/filters/RequiredStatusFilter';
@@ -18,6 +18,7 @@ import { PeriodRMPRatingFilter } from '../../core/filtering/filters/PeriodRMPRat
 import { RateMyProfessorService } from '../external/RateMyProfessorService';
 import { getAllSections } from '../../utils/courseUtils';
 import { ScheduleSearchTextFilter } from '../../core/filtering/filters/ScheduleSearchTextFilter';
+import { WakeUpTimeFilter } from '../../core/filtering/filters/WakeUpTimeFilter';
 
 // Schedule-level filtering engine for course sections with time conflict detection and period-level constraints.
 
@@ -26,7 +27,7 @@ export class ScheduleFilterService {
     private registeredSectionFilters!: Map<string, SectionFilter>;
     private registeredSectionBasedFilters!: Map<string, SectionBasedFilter>;
     private registeredSelectedCourseFilters!: Map<string, SelectedCourseFilter>;
-    private periodConflictFilter: PeriodConflictFilter | null = null;
+    private conflictFilter: ConflictFilter | null = null;
     private rmpService: RateMyProfessorService | null = null;
 
     constructor(rmpService?: RateMyProfessorService) {
@@ -37,8 +38,8 @@ export class ScheduleFilterService {
     }
     
     setConflictDetector(conflictDetector: ConflictDetector): void {
-        this.periodConflictFilter = new PeriodConflictFilter(conflictDetector);
-        this.registerSectionBasedFilter(this.periodConflictFilter);
+        this.conflictFilter = new ConflictFilter();
+        this.registerSectionBasedFilter(this.conflictFilter);
     }
     
     private initializeFilters(): void {
@@ -55,6 +56,7 @@ export class ScheduleFilterService {
         this.registerSectionFilter(new PeriodTermFilter());
         this.registerSectionFilter(new PeriodAvailabilityFilter());
         this.registerSectionFilter(new SectionCodeFilter());
+        this.registerSectionFilter(new WakeUpTimeFilter());
 
         // Register RMP filter if service is available
         if (this.rmpService) {
@@ -253,11 +255,11 @@ export class ScheduleFilterService {
                     const filteredSections = (searchFilter as any).applyToSectionsWithContext(sections, activeFilter.criteria);
                     allPeriods = this.sectionsToPeriodsWithContext(filteredSections);
                 }
-            } else if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
+            } else if (activeFilter.id === 'periodConflict' && this.conflictFilter) {
                 // Special handling for conflict filter which needs section context
                 const sections = this.periodsToSections(allPeriods);
                 const conflictCriteria = activeFilter.criteria as PeriodConflictFilterCriteria;
-                const validSections = this.periodConflictFilter.applyToSectionsWithContext(sections, {
+                const validSections = this.conflictFilter.applyToSectionsWithContext(sections, {
                     ...conflictCriteria,
                     selectedCourses: selectedCourses
                 });
@@ -377,7 +379,7 @@ export class ScheduleFilterService {
 
         // Apply section-based filters in priority order
         for (const activeFilter of sortedSectionFilters) {
-            if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
+            if (activeFilter.id === 'periodConflict' && this.conflictFilter) {
                 // Special handling for conflict filter which needs additional context
                 console.log('[ScheduleFilterService] Applying conflict filter');
                 console.log('[ScheduleFilterService] Input sections:', allSections.length);
@@ -385,7 +387,7 @@ export class ScheduleFilterService {
                 console.log('[ScheduleFilterService] Criteria:', activeFilter.criteria);
 
                 const conflictCriteria = activeFilter.criteria as PeriodConflictFilterCriteria;
-                allSections = this.periodConflictFilter.applyToSectionsWithContext(allSections, {
+                allSections = this.conflictFilter.applyToSectionsWithContext(allSections, {
                     ...conflictCriteria,
                     selectedCourses: selectedCourses
                 });

@@ -5,6 +5,8 @@ export { ProfessorFilter } from './ProfessorFilter';
 export { TermFilter } from './TermFilter';
 export { SearchTextFilter } from './SearchTextFilter';
 export { RMPRatingFilter } from './RMPRatingFilter';
+export { ConflictFilter } from './ConflictFilter';
+export { WakeUpTimeFilter } from './WakeUpTimeFilter';
 
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { DepartmentFilter } from './DepartmentFilter';

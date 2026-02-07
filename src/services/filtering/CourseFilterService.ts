@@ -4,7 +4,7 @@ import { FilterState } from '../../core/filtering/FilterState';
 import { SearchService } from './searchService';
 import { getAllSections } from '../../utils/courseUtils';
 import { SectionFilterPipeline, SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
-import { PeriodConflictFilter } from '../../core/filtering/filters/PeriodConflictFilter';
+import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine';
 export class CourseFilterService {
     private filterState: FilterState;
@@ -22,7 +22,7 @@ export class CourseFilterService {
     }
 
     setConflictDetector(conflictDetector: ConflictDetector): void {
-        const periodConflictFilter = new PeriodConflictFilter(conflictDetector);
+        const periodConflictFilter = new ConflictFilter();
         this.registerFilter(periodConflictFilter);
     }
 

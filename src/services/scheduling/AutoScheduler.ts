@@ -1,8 +1,8 @@
 import type { Course, Section, DayOfWeek } from '../../types/types';
-import type { SelectedCourse, WeeklyTimeSlot, AutoScheduleConfig } from '../../types/schedule';
-import { sectionToMask, weeklySlotToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
+import type { SelectedCourse } from '../../types/schedule';
+import { sectionToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { ScheduleFilterService } from '../filtering/ScheduleFilterService';
-import { SectionScorer } from './SectionScorer';
+import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 
 export interface SectionCombination {
   lecture: Section | null;
@@ -34,23 +34,17 @@ interface MaskedCandidate {
  * Conflict check: (mask1 & mask2) !== 0n - O(1)
  */
 export class AutoScheduler {
-  private sectionScorer: SectionScorer;
-
-  constructor(private scheduleFilterService: ScheduleFilterService) {
-    this.sectionScorer = new SectionScorer();
-  }
+  constructor(private scheduleFilterService: ScheduleFilterService) {}
 
   generateSchedules(
     selectedCourses: SelectedCourse[],
-    config: AutoScheduleConfig,
     maxResults: number = 100
   ): ScheduleResult[][] {
     if (selectedCourses.length === 0) {
       return [];
     }
 
-    // Precompute blocked time masks per term
-    const blockedMasksByTerm = this.precomputeBlockedMasks(config.blockedTimes);
+    const blockedMasksByTerm = this.getBlockedMasksByTerm();
 
     const lockedResults: ScheduleResult[] = [];
     const incompleteCourses: SelectedCourse[] = [];
@@ -87,7 +81,7 @@ export class AutoScheduler {
     const candidatesPerCourse: MaskedCandidate[][] = [];
 
     for (const selectedCourse of incompleteCourses) {
-      const candidates = this.getMaskedCandidates(selectedCourse, blockedMasksByTerm, config);
+      const candidates = this.getMaskedCandidates(selectedCourse, blockedMasksByTerm);
 
       if (candidates.length === 0) {
         console.warn(`[AutoScheduler] No valid candidates for ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number}`);
@@ -114,31 +108,16 @@ export class AutoScheduler {
     return validSchedules;
   }
 
-  private precomputeBlockedMasks(blockedTimes: WeeklyTimeSlot[]): Map<string, bigint> {
-    const masksByTerm = new Map<string, bigint>();
-
-    for (const slot of blockedTimes) {
-      const mask = weeklySlotToMask(slot);
-      if (mask === 0n) continue;
-
-      let terms: string[];
-      if (slot.term === 'ALL') {
-        terms = ['A', 'B', 'C', 'D'];
-      } else if (slot.term === 'F') {
-        terms = ['A', 'B'];
-      } else if (slot.term === 'S') {
-        terms = ['C', 'D'];
-      } else {
-        terms = [slot.term];
-      }
-
-      for (const term of terms) {
-        const existing = masksByTerm.get(term) || 0n;
-        masksByTerm.set(term, existing | mask);
+  private getBlockedMasksByTerm(): Map<string, bigint> {
+    const filter = this.scheduleFilterService.getSectionBasedFilter('periodConflict');
+    if (filter instanceof ConflictFilter) {
+      const activeFilters = this.scheduleFilterService.getActiveFilters();
+      const criteria = activeFilters.find(f => f.id === 'periodConflict')?.criteria;
+      if (criteria && filter.isValidCriteria(criteria)) {
+        return filter.getBlockedMasksByTerm(criteria as any);
       }
     }
-
-    return masksByTerm;
+    return new Map();
   }
 
   private generateWithBacktracking(
@@ -190,10 +169,9 @@ export class AutoScheduler {
   }
 
   generateSchedule(
-    selectedCourses: SelectedCourse[],
-    config: AutoScheduleConfig
+    selectedCourses: SelectedCourse[]
   ): ScheduleResult[] | null {
-    const schedules = this.generateSchedules(selectedCourses, config, 1);
+    const schedules = this.generateSchedules(selectedCourses, 1);
     return schedules.length > 0 ? schedules[0] : null;
   }
 
@@ -203,8 +181,7 @@ export class AutoScheduler {
    */
   private getMaskedCandidates(
     selectedCourse: SelectedCourse,
-    blockedMasksByTerm: Map<string, bigint>,
-    config: AutoScheduleConfig
+    blockedMasksByTerm: Map<string, bigint>
   ): MaskedCandidate[] {
     const course = selectedCourse.course;
     const candidates: MaskedCandidate[] = [];
@@ -213,7 +190,6 @@ export class AutoScheduler {
     // Handle standalone lab courses
     if (typeInfo.isStandaloneLab) {
       const labs = course.standaloneLabs || [];
-      const labCandidates: Array<{ candidate: MaskedCandidate; score: number }> = [];
 
       for (const lab of labs) {
         if (!this.isValidSection(lab, blockedMasksByTerm, selectedCourse)) continue;
@@ -225,18 +201,9 @@ export class AutoScheduler {
           term: lab.computedTerm
         };
 
-        const score = config.wakeUpTime
-          ? this.sectionScorer.scoreCombination(null, null, lab, config.wakeUpTime)
-          : 1000;
-
-        labCandidates.push({ candidate, score });
+        candidates.push(candidate);
       }
 
-      if (config.wakeUpTime) {
-        labCandidates.sort((a, b) => b.score - a.score);
-      }
-
-      candidates.push(...labCandidates.map(c => c.candidate));
       return candidates;
     }
 
@@ -244,8 +211,6 @@ export class AutoScheduler {
     if (!course.lectures || course.lectures.length === 0) {
       return candidates;
     }
-
-    const allCombinations: Array<{ candidate: MaskedCandidate; score: number }> = [];
 
     for (const lectureGroup of course.lectures) {
       const lecture = lectureGroup.section;
@@ -299,20 +264,11 @@ export class AutoScheduler {
             term: lecture.computedTerm
           };
 
-          const score = config.wakeUpTime
-            ? this.sectionScorer.scoreCombination(lecture, disc.section, lab.section, config.wakeUpTime)
-            : 1000;
-
-          allCombinations.push({ candidate, score });
+          candidates.push(candidate);
         }
       }
     }
 
-    if (config.wakeUpTime) {
-      allCombinations.sort((a, b) => b.score - a.score);
-    }
-
-    candidates.push(...allCombinations.map(c => c.candidate));
     return candidates;
   }
 
