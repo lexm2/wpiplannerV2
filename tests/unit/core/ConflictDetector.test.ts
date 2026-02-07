@@ -13,6 +13,7 @@ describe('ConflictDetector', () => {
   describe('detectConflicts', () => {
     it('should detect no conflicts for non-overlapping sections', () => {
       const section1 = createMockSection({
+        crn: 11111,
         number: 'A01',
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
@@ -22,7 +23,8 @@ describe('ConflictDetector', () => {
       })
 
       const section2 = createMockSection({
-        number: 'B01', 
+        crn: 22222,
+        number: 'B01',
         periods: [createMockPeriod({
           startTime: createMockTime(11, 0),
           endTime: createMockTime(12, 50),
@@ -63,6 +65,7 @@ describe('ConflictDetector', () => {
 
     it('should not detect conflicts on different days', () => {
       const section1 = createMockSection({
+        crn: 11111,
         number: 'A01',
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
@@ -72,6 +75,7 @@ describe('ConflictDetector', () => {
       })
 
       const section2 = createMockSection({
+        crn: 22222,
         number: 'B01',
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
@@ -85,6 +89,7 @@ describe('ConflictDetector', () => {
 
     it('should handle sections with multiple periods', () => {
       const section1 = createMockSection({
+        crn: 11111,
         number: 'A01',
         periods: [
           createMockPeriod({
@@ -103,6 +108,7 @@ describe('ConflictDetector', () => {
       })
 
       const section2 = createMockSection({
+        crn: 22222,
         number: 'B01',
         periods: [createMockPeriod({
           startTime: createMockTime(9, 30),
@@ -116,6 +122,7 @@ describe('ConflictDetector', () => {
 
     it('should detect multiple overlapping periods between same sections', () => {
       const section1 = createMockSection({
+        crn: 11111,
         number: 'A01',
         periods: [
           createMockPeriod({
@@ -132,6 +139,7 @@ describe('ConflictDetector', () => {
       })
 
       const section2 = createMockSection({
+        crn: 22222,
         number: 'B01',
         periods: [
           createMockPeriod({
@@ -154,6 +162,7 @@ describe('ConflictDetector', () => {
   describe('isValidSchedule', () => {
     it('should return true for schedule with no conflicts', () => {
       const section1 = createMockSection({
+        crn: 11111,
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
           endTime: createMockTime(10, 50),
@@ -162,6 +171,7 @@ describe('ConflictDetector', () => {
       })
 
       const section2 = createMockSection({
+        crn: 22222,
         periods: [createMockPeriod({
           startTime: createMockTime(11, 0),
           endTime: createMockTime(12, 50),
@@ -170,12 +180,13 @@ describe('ConflictDetector', () => {
       })
 
       const isValid = conflictDetector.isValidSchedule([section1, section2])
-      
+
       expect(isValid).toBe(true)
     })
 
     it('should return false for schedule with time overlaps', () => {
       const section1 = createMockSection({
+        crn: 11111,
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
           endTime: createMockTime(10, 50),
@@ -184,6 +195,7 @@ describe('ConflictDetector', () => {
       })
 
       const section2 = createMockSection({
+        crn: 22222,
         periods: [createMockPeriod({
           startTime: createMockTime(10, 0),
           endTime: createMockTime(11, 50),
@@ -192,7 +204,7 @@ describe('ConflictDetector', () => {
       })
 
       const isValid = conflictDetector.isValidSchedule([section1, section2])
-      
+
       expect(isValid).toBe(false)
     })
 
@@ -204,6 +216,7 @@ describe('ConflictDetector', () => {
 
     it('should return true for single section', () => {
       const section = createMockSection({
+        crn: 11111,
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
           endTime: createMockTime(10, 50),
@@ -212,7 +225,7 @@ describe('ConflictDetector', () => {
       })
 
       const isValid = conflictDetector.isValidSchedule([section])
-      
+
       expect(isValid).toBe(true)
     })
   })

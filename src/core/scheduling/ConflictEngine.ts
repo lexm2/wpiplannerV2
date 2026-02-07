@@ -137,11 +137,16 @@ export class ConflictEngine implements IConflictEngine {
      * Detect all time conflicts and return a map of CRN -> Set of conflicting CRNs
      */
     detectConflicts(sections: Section[]): Map<string, Set<string>> {
+        this.clear();
+        for (const section of sections) {
+            this.addSection(section);
+        }
+
         const conflictMap = new Map<string, Set<string>>();
 
         for (let i = 0; i < sections.length; i++) {
             for (let j = i + 1; j < sections.length; j++) {
-                if (this.hasDirectOverlap(sections[i], sections[j])) {
+                if (this.hasOverlap(sections[i], sections[j])) {
                     const crn1 = sections[i].crn.toString();
                     const crn2 = sections[j].crn.toString();
 
@@ -161,9 +166,14 @@ export class ConflictEngine implements IConflictEngine {
      * Check if any conflicts exist between sections
      */
     hasConflicts(sections: Section[]): boolean {
+        this.clear();
+        for (const section of sections) {
+            this.addSection(section);
+        }
+
         for (let i = 0; i < sections.length; i++) {
             for (let j = i + 1; j < sections.length; j++) {
-                if (this.hasDirectOverlap(sections[i], sections[j])) {
+                if (this.hasOverlap(sections[i], sections[j])) {
                     return true;
                 }
             }
@@ -240,7 +250,6 @@ export class ConflictEngine implements IConflictEngine {
         console.log('=== CONFLICT ENGINE DEBUG ===');
         console.log(`Total unique slots: ${this.sectionsBySlot.size}`);
         console.log(`Total sections mapped: ${this.slotsBySection.size}`);
-        console.log(`Conflict cache size: ${this.conflictCache.size}`);
 
         const slotCounts: Array<[string, number]> = [];
         for (const [slot, sections] of this.sectionsBySlot.entries()) {
