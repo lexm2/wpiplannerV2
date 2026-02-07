@@ -3,6 +3,7 @@ import { ProfileStateManager } from '../../../src/core/state/ProfileStateManager
 import { TransactionalStorageManager } from '../../../src/core/storage/TransactionalStorageManager'
 import { mockLocalStorage } from '../../helpers/testUtils'
 import { createMockCourse, createMockSection } from '../../helpers/mockData'
+import { AcademicTerm } from '../../../src/types/schedule'
 
 /**
  * Standalone tests for the new withBatch() and withBatchSync() API
@@ -17,7 +18,7 @@ describe('Batch Operations API (Standalone)', () => {
     number: 'A01',
     description: 'Fall 2024 section',
     term: 'Fall 2024',
-    computedTerm: 'A',
+    computedTerm: AcademicTerm.A,
     periods: []
   })
 

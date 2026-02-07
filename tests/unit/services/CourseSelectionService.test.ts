@@ -5,6 +5,7 @@ import { DataValidator } from '../../../src/core/validation/DataValidator'
 import { Course } from '../../../src/types/types'
 import { mockLocalStorage } from '../../helpers/testUtils'
 import { createMockCourse, createMockSection, createMockDepartment } from '../../helpers/mockData'
+import { AcademicTerm } from '../../../src/types/schedule'
 
 describe('CourseSelectionService', () => {
   let courseSelectionService: CourseSelectionService
@@ -25,7 +26,7 @@ describe('CourseSelectionService', () => {
           number: 'A01',
           description: 'Fall 2024 section',
           term: 'Fall 2024',
-          computedTerm: 'A',
+          computedTerm: AcademicTerm.A,
           periods: []
         }),
         compatibleDiscussions: [],
@@ -37,7 +38,7 @@ describe('CourseSelectionService', () => {
           number: 'A02',
           description: 'Fall 2024 section',
           term: 'Fall 2024',
-          computedTerm: 'A',
+          computedTerm: AcademicTerm.A,
           periods: []
         }),
         compatibleDiscussions: [],
@@ -61,7 +62,7 @@ describe('CourseSelectionService', () => {
           number: 'B01',
           description: 'Fall 2024 section',
           term: 'Fall 2024',
-          computedTerm: 'B',
+          computedTerm: AcademicTerm.B,
           periods: []
         }),
         compatibleDiscussions: [],

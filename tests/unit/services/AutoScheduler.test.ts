@@ -138,7 +138,7 @@ describe('AutoScheduler', () => {
       const lecture = createMockSection({
         crn: 10001,
         number: 'A01',
-        computedTerm: 'A',
+        computedTerm: AcademicTerm.A,
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
           endTime: createMockTime(10, 50),
@@ -340,7 +340,7 @@ describe('AutoScheduler', () => {
       const fallSection = createMockSection({
         crn: 30001,
         number: 'F01',
-        computedTerm: 'F',
+        computedTerm: AcademicTerm.F,
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
           endTime: createMockTime(10, 50),
@@ -380,7 +380,7 @@ describe('AutoScheduler', () => {
       const springSection = createMockSection({
         crn: 40001,
         number: 'S01',
-        computedTerm: 'S',
+        computedTerm: AcademicTerm.S,
         periods: [createMockPeriod({
           startTime: createMockTime(14, 0),
           endTime: createMockTime(15, 50),
@@ -420,7 +420,7 @@ describe('AutoScheduler', () => {
       const fallSection = createMockSection({
         crn: 50001,
         number: 'F01',
-        computedTerm: 'F',
+        computedTerm: AcademicTerm.F,
         periods: [createMockPeriod({
           startTime: createMockTime(11, 0),
           endTime: createMockTime(12, 50),

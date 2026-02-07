@@ -3,6 +3,7 @@ import { ComponentSelectionWizard } from '../../src/ui/components/ComponentSelec
 import { CourseDataService } from '../../src/services/data/courseDataService';
 import { CourseSelectionService } from '../../src/services/selection/CourseSelectionService';
 import { Course, Section, Period, Department, PeriodType, DayOfWeek } from '../../src/types/types';
+import { AcademicTerm } from '../../src/types/schedule';
 
 describe('ComponentSelectionWizard Integration', () => {
     let courseDataService: CourseDataService;
@@ -37,8 +38,8 @@ describe('ComponentSelectionWizard Integration', () => {
         actualWaitlist: 0,
         maxWaitlist: 10,
         description: type,
-        term: 'A',
-        computedTerm: 'A',
+        term: AcademicTerm.A,
+        computedTerm: AcademicTerm.A,
         periods: [createPeriod(type)]
     });
 

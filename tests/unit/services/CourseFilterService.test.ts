@@ -7,6 +7,7 @@ import { SearchTextFilter } from '../../../src/core/filtering/filters/SearchText
 import { ProfessorFilter } from '../../../src/core/filtering/filters/ProfessorFilter';
 import { Course, Department, Section, Period, DayOfWeek } from '../../../src/types/types';
 import { createMockSection } from '../../helpers/mockData';
+import { AcademicTerm } from '../../../src/types/schedule';
 
 describe('CourseFilterService', () => {
     let courseFilterService: CourseFilterService;
@@ -51,8 +52,8 @@ describe('CourseFilterService', () => {
             actualWaitlist: 0,
             maxWaitlist: 10,
             description: '',
-            term: 'A',
-            computedTerm: 'A',
+            term: AcademicTerm.A,
+            computedTerm: AcademicTerm.A,
             periods: [period]
         };
 

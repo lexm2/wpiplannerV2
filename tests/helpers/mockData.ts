@@ -1,5 +1,5 @@
 import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB, PeriodType } from '../../src/types/types'
-import { SelectedCourse, Schedule } from '../../src/types/schedule'
+import { SelectedCourse, Schedule, AcademicTerm } from '../../src/types/schedule'
 
 export const createMockTime = (hours: number, minutes: number): Time => ({
   hours,
@@ -35,7 +35,7 @@ export const createMockSection = (overrides: Partial<Section> = {}): Section => 
   note: undefined,
   description: 'Test section description',
   term: 'Fall 2024',
-  computedTerm: 'A',
+  computedTerm: AcademicTerm.A,
   periods: [createMockPeriod()],
   ...overrides
 })

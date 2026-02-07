@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, mock, spyOn } from 'bun:test';
 import { ComponentSelectionWizard } from '../../../src/ui/components/ComponentSelectionWizard';
 import { CourseDataService } from '../../../src/services/data/courseDataService';
 import { Course, Section, Period, Department, PeriodType, DayOfWeek } from '../../../src/types/types';
-import { SelectedCourse } from '../../../src/types/schedule';
+import { SelectedCourse, AcademicTerm } from '../../../src/types/schedule';
 
 // Create vi mock for timer functions
 // Note: Bun test doesn't have built-in fake timers like Jest/Vitest
@@ -55,8 +55,8 @@ describe('ComponentSelectionWizard', () => {
         actualWaitlist: 0,
         maxWaitlist: 10,
         description: `${type} section`,
-        term: 'A',
-        computedTerm: 'A',
+        term: AcademicTerm.A,
+        computedTerm: AcademicTerm.A,
         periods: [createPeriod(type, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY])]
     });
 

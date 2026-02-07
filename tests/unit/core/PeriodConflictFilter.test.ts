@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach } from 'bun:test';
 import { PeriodConflictFilter, PeriodConflictCriteria } from '../../../src/core/filtering/filters/PeriodConflictFilter';
 import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
 import { Period, Section, DayOfWeek, Time, Department, Course, PeriodType } from '../../../src/types/types';
-import { SelectedCourse } from '../../../src/types/schedule';
+import { SelectedCourse, AcademicTerm } from '../../../src/types/schedule';
 
 // Helper function to create a time object
 function createTime(hours: number, minutes: number = 0): Time {
@@ -49,7 +49,7 @@ function createSection(crn: number, sectionNumber: string, periods: Period[]): S
         maxWaitlist: 10,
         description: `Test Section ${sectionNumber}`,
         term: 'A 2024',
-        computedTerm: 'A',
+        computedTerm: AcademicTerm.A,
         periods
     };
 }

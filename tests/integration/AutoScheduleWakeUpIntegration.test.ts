@@ -3,6 +3,7 @@ import { AutoScheduler } from '../../src/services/scheduling/AutoScheduler'
 import { ScheduleFilterService } from '../../src/services/filtering/ScheduleFilterService'
 import { createMockCourse, createMockSection, createMockPeriod, createMockTime, createMockSelectedCourse, createMockScheduleFilterService } from '../helpers/mockData'
 import type { AutoScheduleConfig } from '../../src/types/schedule'
+import { AcademicTerm } from '../../src/types/schedule'
 import { DayOfWeek } from '../../src/types/types'
 
 describe('Auto-Schedule Wake Up Time Integration', () => {
@@ -14,7 +15,7 @@ describe('Auto-Schedule Wake Up Time Integration', () => {
           section: createMockSection({
             crn: 10001,
             number: 'A01',
-            computedTerm: 'A',
+            computedTerm: AcademicTerm.A,
             periods: [createMockPeriod({
               startTime: createMockTime(8, 0),
               endTime: createMockTime(9, 50)
@@ -27,7 +28,7 @@ describe('Auto-Schedule Wake Up Time Integration', () => {
           section: createMockSection({
             crn: 10002,
             number: 'A02',
-            computedTerm: 'A',
+            computedTerm: AcademicTerm.A,
             periods: [createMockPeriod({
               startTime: createMockTime(10, 0),
               endTime: createMockTime(11, 50)
@@ -46,7 +47,7 @@ describe('Auto-Schedule Wake Up Time Integration', () => {
           section: createMockSection({
             crn: 20001,
             number: 'B01',
-            computedTerm: 'A',
+            computedTerm: AcademicTerm.A,
             periods: [createMockPeriod({
               startTime: createMockTime(12, 0),
               endTime: createMockTime(13, 50),

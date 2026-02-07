@@ -5,7 +5,7 @@ import { ScheduleFilterService } from '../../../src/services/filtering/ScheduleF
 import { SearchService } from '../../../src/services/filtering/searchService';
 import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
 import { Course, Section, Period, Department, DayOfWeek, PeriodType } from '../../../src/types/types';
-import { SelectedCourse } from '../../../src/types/schedule';
+import { SelectedCourse, AcademicTerm } from '../../../src/types/schedule';
 import {
     createMockCourse,
     createMockSection,
@@ -51,8 +51,8 @@ describe('ScheduleController Expansion State', () => {
         actualWaitlist: 0,
         maxWaitlist: 10,
         description: 'Regular section',
-        term: 'A',
-        computedTerm: 'A',
+        term: AcademicTerm.A,
+        computedTerm: AcademicTerm.A,
         periods: [testPeriod]
     };
 

@@ -16,7 +16,7 @@ describe('ICSGenerator', () => {
             const section = createMockSection({
                 crn: 12345,
                 number: 'A01',
-                computedTerm: 'A',
+                computedTerm: AcademicTerm.A,
                 periods: [period],
             });
 
@@ -61,7 +61,7 @@ describe('ICSGenerator', () => {
             const section = createMockSection({
                 crn: 54321,
                 number: 'B02',
-                computedTerm: 'B',
+                computedTerm: AcademicTerm.B,
                 periods: [period],
             });
 
@@ -110,7 +110,7 @@ describe('ICSGenerator', () => {
             const sectionA = createMockSection({
                 crn: 11111,
                 number: 'A01',
-                computedTerm: 'A',
+                computedTerm: AcademicTerm.A,
                 periods: [periodA],
             });
 
@@ -123,7 +123,7 @@ describe('ICSGenerator', () => {
             const sectionB = createMockSection({
                 crn: 22222,
                 number: 'B01',
-                computedTerm: 'B',
+                computedTerm: AcademicTerm.B,
                 periods: [periodB],
             });
 
@@ -282,7 +282,7 @@ describe('ICSGenerator', () => {
             const section = createMockSection({
                 crn: 12345,
                 number: 'A01',
-                computedTerm: 'A',
+                computedTerm: AcademicTerm.A,
                 periods: [period],
             });
 

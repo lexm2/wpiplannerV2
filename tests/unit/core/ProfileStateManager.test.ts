@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, mock, spyOn } from 'bun:test'
 import { ProfileStateManager, StateChangeEvent } from '../../../src/core/state/ProfileStateManager'
 import { TransactionalStorageManager } from '../../../src/core/storage/TransactionalStorageManager'
-import { Schedule, SelectedCourse } from '../../../src/types/schedule'
+import { Schedule, SelectedCourse, AcademicTerm } from '../../../src/types/schedule'
 import { Course } from '../../../src/types/types'
 import { mockLocalStorage } from '../../helpers/testUtils'
 import { createMockCourse, createMockSection } from '../../helpers/mockData'
@@ -21,7 +21,7 @@ describe('ProfileStateManager', () => {
     number: 'A01',
     description: 'Fall 2024 section',
     term: 'Fall 2024',
-    computedTerm: 'A',
+    computedTerm: AcademicTerm.A,
     periods: []
   })
 
