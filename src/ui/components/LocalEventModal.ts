@@ -5,6 +5,7 @@
 import { ModalService } from '../../services/ui/ModalService';
 import { BaseModal } from './BaseModal';
 import type { LocalCalendarEvent } from '../../types/schedule';
+import { AcademicTerm } from '../../types/schedule';
 import { DayOfWeek } from '../../types/types';
 import { getInlineSVG } from '../../utils/iconPaths';
 import styles from '../../styles/components/local-event-modal.module.css';
@@ -50,11 +51,8 @@ export class LocalEventModal extends BaseModal {
         // Initialize from existing event
         if (options.existingEvent) {
             this.currentEventType = options.existingEvent.eventType || 'recurring';
-            // Handle both old `day` field and new `days` array
             if (options.existingEvent.days?.length) {
                 this.selectedDays = new Set(options.existingEvent.days);
-            } else if (options.existingEvent.day) {
-                this.selectedDays = new Set([options.existingEvent.day]);
             }
         } else {
             // Default: Monday selected for new recurring events
@@ -93,7 +91,7 @@ export class LocalEventModal extends BaseModal {
         const startMin = event?.startTime?.minutes ?? 0;
         const endHour = event?.endTime?.hours ?? 10;
         const endMin = event?.endTime?.minutes ?? 0;
-        const terms = event?.terms || ['A', 'B', 'C', 'D'];
+        const terms = event?.terms || [AcademicTerm.A, AcademicTerm.B, AcademicTerm.C, AcademicTerm.D];
 
         backdrop.innerHTML = `
             <div class="modal-dialog ${styles['local-event-modal']}">
@@ -443,7 +441,7 @@ export class LocalEventModal extends BaseModal {
             termCheckboxes.forEach(cb => {
                 terms.push((cb as HTMLInputElement).value);
             });
-            eventData.terms = terms;
+            eventData.terms = terms as AcademicTerm[];
         }
 
         // Call the callback with event data

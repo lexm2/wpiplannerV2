@@ -419,13 +419,8 @@ export class TransactionalStorageManager {
 
     private getDefaultPreferences(): SchedulePreferences {
         return {
-            preferredTimeRange: {
-                startTime: { hours: 8, minutes: 0 },
-                endTime: { hours: 18, minutes: 0 }
-            },
-            preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
-            avoidBackToBackClasses: false,
-            theme: 'wpi-dark'
+            theme: 'wpi-dark',
+            bookmarkedCourseIds: []
         };
     }
 

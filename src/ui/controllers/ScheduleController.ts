@@ -177,7 +177,7 @@ export class ScheduleController {
                 return false;
             }
 
-            return event.terms?.includes(term) || event.terms?.includes('ALL');
+            return event.terms?.includes(term as AcademicTerm) || event.terms?.includes(AcademicTerm.ALL);
         });
     }
 
@@ -198,8 +198,8 @@ export class ScheduleController {
             return slots;
         }
 
-        const days = event.days || (event.day ? [event.day] : []);
-        const terms = event.terms || ['ALL'];
+        const days = event.days || [];
+        const terms = event.terms || [AcademicTerm.ALL];
 
         for (const term of terms) {
             const academicTerm = term as AcademicTerm;
@@ -250,8 +250,8 @@ export class ScheduleController {
         for (const event of visibleEvents) {
             if (event.eventType === 'one-time') continue;
 
-            const days = event.days || (event.day ? [event.day] : []);
-            const terms = event.terms || ['ALL'];
+            const days = event.days || [];
+            const terms = event.terms || [AcademicTerm.ALL];
 
             for (const term of terms) {
                 const academicTerm = term as AcademicTerm;

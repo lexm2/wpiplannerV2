@@ -58,6 +58,8 @@ export class ApplicationState {
                 })
             ]),
             p: this.preferences?.theme ? {
+                t: [0, 0] as [number, number],
+                d: [],
                 th: this.preferences.theme
             } : undefined
         };
@@ -109,7 +111,7 @@ export class ApplicationState {
             );
         });
 
-        const activeScheduleId = schedules[data.a]?.id ?? null;
+        const activeScheduleId = data.a !== null ? (schedules[data.a]?.id ?? null) : null;
 
         const preferences: SchedulePreferences | undefined = data.p?.th ? {
             theme: data.p.th,

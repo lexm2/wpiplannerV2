@@ -1,11 +1,5 @@
 export type {
   SelectedCourse,
-  CourseConflict,
-  CourseConflictResolution,
-  CourseDifference,
-  ScheduleDiff,
-  ScheduleConflict,
-  ScheduleConflictResolution,
   Schedule,
   ScheduleCombination,
   SchedulePreferences,

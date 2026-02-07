@@ -272,8 +272,6 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
                 selectedLecture: step === 'lecture' ? section : (this.selections.lecture || null),
                 selectedDiscussion: step === 'discussion' ? section : (this.selections.discussion || null),
                 selectedLab: step === 'lab' ? section : (this.selections.lab || null),
-                selectedSection: step === 'lecture' ? section : (this.selections.lecture || null),
-                selectedSectionNumber: step === 'lecture' ? section.number : (this.selections.lecture?.number || null),
                 isRequired: false,
                 lockedSections: new Set()
             };

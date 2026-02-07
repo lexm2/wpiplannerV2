@@ -53,7 +53,6 @@ export enum AcademicTerm {
 }
 
 /**
- * A locally-stored calendar event (not synced to cloud).
  * ICS-compatible structure for export.
  *
  * Supports two event types:
@@ -61,38 +60,21 @@ export enum AcademicTerm {
  * - 'recurring': Weekly recurrence on selected days during selected terms
  */
 export interface LocalCalendarEvent {
-    /** Unique identifier (UUID) */
+    /** UUID */
     id: string;
-    /** Event title */
     title: string;
-    /** Optional description */
     description?: string;
-
-    /** Event type: one-time or recurring */
     eventType: 'one-time' | 'recurring';
-
     /** For one-time events: specific date (ISO format YYYY-MM-DD) */
     date?: string;
-
     /** For recurring events: days of week (multiple allowed) */
     days?: DayOfWeek[];
-
-    /** @deprecated Use `days` instead. Kept for backwards compatibility. */
-    day?: DayOfWeek;
-
-    /** Start time */
     startTime: SimpleTime;
-    /** End time */
     endTime: SimpleTime;
-
     /** For recurring events: which term(s) this applies to */
-    terms?: string[];  // ['A', 'B', 'C', 'D'] or subset
-
-    /** Whether this event is visible on the grid */
+    terms?: AcademicTerm[];
     visible: boolean;
-    /** Creation timestamp */
     createdAt: number;
-    /** Last modified timestamp */
     updatedAt: number;
 }
 

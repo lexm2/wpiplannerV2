@@ -518,7 +518,7 @@ export class CourseController {
      * @param selectedCourses Array of currently selected courses
      * @param previousSelections Map of previously selected course IDs
      */
-    refreshCourseSelectionUI(selectedCourses: any[], previousSelections: Map<string, string | null>): void {
+    refreshCourseSelectionUI(selectedCourses: any[], previousSelections: Map<string, any>): void {
         const currentIds = new Set(selectedCourses.map(sc => sc.course.id));
         const previousIds = new Set(previousSelections.keys());
         

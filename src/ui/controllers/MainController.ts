@@ -157,7 +157,11 @@ export class MainController {
         this.previousSelectedCoursesCount = initialSelectedCourses.length;
         this.previousSelectedCoursesMap = new Map();
         initialSelectedCourses.forEach(sc => {
-            this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
+            this.previousSelectedCoursesMap.set(sc.course.id, {
+                lecture: sc.selectedLecture?.number || null,
+                discussion: sc.selectedDiscussion?.number || null,
+                lab: sc.selectedLab?.number || null
+            });
         });
         
         // IMPORTANT: Initialize filters LAST (triggers events that use operationManager)
@@ -572,7 +576,6 @@ export class MainController {
                                 if (existingSelections) {
                                     console.log('Selected Course Data:', {
                                         isRequired: existingSelections.isRequired,
-                                        selectedSectionNumber: existingSelections.selectedSectionNumber,
                                         selectedLecture: existingSelections.selectedLecture?.number || null,
                                         selectedDiscussion: existingSelections.selectedDiscussion?.number || null,
                                         selectedLab: existingSelections.selectedLab?.number || null,
@@ -671,14 +674,19 @@ export class MainController {
                 console.log(`Found ${selectedCourses.length} selected courses with sections:`);
 
                 selectedCourses.forEach(sc => {
-                    const hasSection = sc.selectedSection !== null;
-                    console.log(`${sc.course.department.abbreviation}${sc.course.number}: section ${sc.selectedSectionNumber} ${hasSection ? 'OK' : 'MISSING'}`);
-                    if (hasSection && sc.selectedSection) {
-                        console.log(`  Term: ${sc.selectedSection.term}, Periods: ${sc.selectedSection.periods.length}`);
-                        console.log(`  Full section object:`, sc.selectedSection);
+                    const hasLecture = sc.selectedLecture !== null;
+                    const components = [
+                        sc.selectedLecture ? `L:${sc.selectedLecture.number}` : null,
+                        sc.selectedDiscussion ? `D:${sc.selectedDiscussion.number}` : null,
+                        sc.selectedLab ? `Lab:${sc.selectedLab.number}` : null
+                    ].filter(Boolean).join(', ');
+                    console.log(`${sc.course.department.abbreviation}${sc.course.number}: ${components || 'NO COMPONENTS'} ${hasLecture ? 'OK' : 'MISSING'}`);
+                    if (hasLecture && sc.selectedLecture) {
+                        console.log(`  Term: ${sc.selectedLecture.term}, Periods: ${sc.selectedLecture.periods.length}`);
+                        console.log(`  Full lecture section:`, sc.selectedLecture);
 
                         // Log each period in detail
-                        sc.selectedSection.periods.forEach((period, idx) => {
+                        sc.selectedLecture.periods.forEach((period, idx) => {
                             console.log(`    Period ${idx + 1}:`, {
                                 type: period.type,
                                 professor: period.professor,
@@ -1183,7 +1191,7 @@ export class MainController {
 
 
     private previousSelectedCoursesCount = 0;
-    private previousSelectedCoursesMap = new Map<string, string | null>();
+    private previousSelectedCoursesMap = new Map<string, { lecture: string | null; discussion: string | null; lab: string | null }>();
 
     private setupScheduleChangeListener(): void {
         this.scheduleManagementService.onActiveScheduleChange((_activeSchedule, event) => {
@@ -1242,23 +1250,27 @@ export class MainController {
             }
             
             // Create current state map for comparison
-            const currentCoursesMap = new Map<string, string | null>();
+            const currentCoursesMap = new Map<string, { lecture: string | null; discussion: string | null; lab: string | null }>();
             selectedCourses.forEach(sc => {
-                currentCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
+                currentCoursesMap.set(sc.course.id, {
+                    lecture: sc.selectedLecture?.number || null,
+                    discussion: sc.selectedDiscussion?.number || null,
+                    lab: sc.selectedLab?.number || null
+                });
             });
-            
+
             // Use targeted updates instead of global refresh for better performance
             if (isCoursesAddedOrRemoved) {
                 this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
             }
-            
+
             // Always update the selected courses sidebar
             this.courseController.displaySelectedCourses();
-            
+
             if (isCoursesAddedOrRemoved) {
                 // Full refresh needed when courses are added/removed
                 this.scheduleController.displayScheduleSelectedCourses();
-                
+
                 // Also refresh schedule grids if we're on the schedule page
                 if (this.uiStateManager.currentPage === 'schedule') {
                     this.scheduleController.renderScheduleGrids();
@@ -1266,15 +1278,20 @@ export class MainController {
             } else {
                 // Check if only section selections changed
                 let sectionSelectionsChanged = false;
-                for (const [courseId, selectedSection] of currentCoursesMap) {
-                    const previousSection = this.previousSelectedCoursesMap.get(courseId);
-                    if (previousSection !== selectedSection) {
+                for (const [courseId, currentComponents] of currentCoursesMap) {
+                    const previousComponents = this.previousSelectedCoursesMap.get(courseId);
+                    const hasChanged = !previousComponents ||
+                        previousComponents.lecture !== currentComponents.lecture ||
+                        previousComponents.discussion !== currentComponents.discussion ||
+                        previousComponents.lab !== currentComponents.lab;
+
+                    if (hasChanged) {
                         sectionSelectionsChanged = true;
-                        
+
                         // Update visual state for this course
                         const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
-                        if (selectedCourse) {
-                            this.scheduleController.updateSectionButtonStates(selectedCourse.course, selectedSection);
+                        if (selectedCourse && selectedCourse.selectedLecture) {
+                            this.scheduleController.updateSectionButtonStates(selectedCourse.course, selectedCourse.selectedLecture.number);
                         }
                     }
                 }
@@ -1292,9 +1309,13 @@ export class MainController {
 
     private updateSelectedCoursesState(selectedCourses: SelectedCourse[]): void {
         this.previousSelectedCoursesCount = selectedCourses.length;
-        this.previousSelectedCoursesMap = new Map<string, string | null>();
+        this.previousSelectedCoursesMap = new Map();
         selectedCourses.forEach(sc => {
-            this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
+            this.previousSelectedCoursesMap.set(sc.course.id, {
+                lecture: sc.selectedLecture?.number || null,
+                discussion: sc.selectedDiscussion?.number || null,
+                lab: sc.selectedLab?.number || null
+            });
         });
     }
 

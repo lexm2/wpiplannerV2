@@ -663,7 +663,11 @@ export class ProfileStateManager {
                     selectedCourses: s.selectedCourses.map(sc => ({
                         courseId: sc.course.id,
                         courseName: `${sc.course.department.abbreviation}${sc.course.number}`,
-                        selectedSection: sc.selectedSectionNumber,
+                        selectedComponents: {
+                            lecture: sc.selectedLecture?.number || null,
+                            discussion: sc.selectedDiscussion?.number || null,
+                            lab: sc.selectedLab?.number || null
+                        },
                         isRequired: sc.isRequired
                     }))
                 })),
@@ -671,7 +675,11 @@ export class ProfileStateManager {
                 selectedCourses: loadedCourses.map(sc => ({
                     courseId: sc.course.id,
                     courseName: `${sc.course.department.abbreviation}${sc.course.number}`,
-                    selectedSection: sc.selectedSectionNumber
+                    selectedComponents: {
+                        lecture: sc.selectedLecture?.number || null,
+                        discussion: sc.selectedDiscussion?.number || null,
+                        lab: sc.selectedLab?.number || null
+                    }
                 }))
             };
             logger.log(JSON.stringify(loadedData, null, 2));
@@ -823,8 +831,6 @@ export class ProfileStateManager {
                 selectedLecture: resolveSection(selectedCourse.selectedLecture),
                 selectedDiscussion: resolveSection(selectedCourse.selectedDiscussion),
                 selectedLab: resolveSection(selectedCourse.selectedLab),
-                selectedSection: resolveSection(selectedCourse.selectedSection),
-                selectedSectionNumber: selectedCourse.selectedSectionNumber,
                 isRequired: selectedCourse.isRequired,
                 lockedSections
             };

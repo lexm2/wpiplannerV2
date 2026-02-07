@@ -66,8 +66,6 @@ export class UIStateBuffer {
             // Add new selection
             const selectedCourse: SelectedCourse = {
                 course,
-                selectedSection: null,
-                selectedSectionNumber: null,
                 selectedLecture: null,
                 selectedDiscussion: null,
                 selectedLab: null,
@@ -123,9 +121,6 @@ export class UIStateBuffer {
                 }
             }
 
-            selectedCourse.selectedSection = sectionObject;
-            selectedCourse.selectedSectionNumber = sectionObject ? sectionNumber : null;
-
             // Queue backend operation
             this.queueOperation({
                 id: this.generateOperationId(),
@@ -155,10 +150,6 @@ export class UIStateBuffer {
             selectedCourse.selectedLecture = lecture;
             selectedCourse.selectedDiscussion = discussion;
             selectedCourse.selectedLab = lab;
-
-            // For backward compatibility, set selectedSection to lecture (primary component)
-            selectedCourse.selectedSection = lecture;
-            selectedCourse.selectedSectionNumber = lecture?.number || null;
 
             // Queue backend operation
             this.queueOperation({
@@ -367,8 +358,6 @@ export class UIStateBuffer {
                     // Add new selection
                     const selectedCourse: SelectedCourse = {
                         course,
-                        selectedSection: null,
-                        selectedSectionNumber: null,
                         selectedLecture: null,
                         selectedDiscussion: null,
                         selectedLab: null,
@@ -407,8 +396,6 @@ export class UIStateBuffer {
                         }
                     }
 
-                    selectedCourse.selectedSection = sectionObject;
-                    selectedCourse.selectedSectionNumber = sectionObject ? sectionNumber : null;
                 }
                 break;
                 
@@ -429,20 +416,28 @@ export class UIStateBuffer {
 
     private detectConflicts(backendState: SelectedCourse[]): ConflictResolution[] {
         const conflicts: ConflictResolution[] = [];
-        
+
         // Check for courses that exist in both states but have different section selections
         for (const backendCourse of backendState) {
             const uiCourse = this.uiState.selectedCourses.find(sc => sc.course.id === backendCourse.course.id);
-            if (uiCourse && uiCourse.selectedSectionNumber !== backendCourse.selectedSectionNumber) {
-                conflicts.push({
-                    action: 'use_ui', // Default to UI state (optimistic)
-                    courseId: backendCourse.course.id,
-                    uiState: uiCourse,
-                    backendState: backendCourse
-                });
+            if (uiCourse) {
+                // Check if any component selection differs
+                const hasConflict =
+                    uiCourse.selectedLecture?.number !== backendCourse.selectedLecture?.number ||
+                    uiCourse.selectedDiscussion?.number !== backendCourse.selectedDiscussion?.number ||
+                    uiCourse.selectedLab?.number !== backendCourse.selectedLab?.number;
+
+                if (hasConflict) {
+                    conflicts.push({
+                        action: 'use_ui', // Default to UI state (optimistic)
+                        courseId: backendCourse.course.id,
+                        uiState: uiCourse,
+                        backendState: backendCourse
+                    });
+                }
             }
         }
-        
+
         return conflicts;
     }
 
