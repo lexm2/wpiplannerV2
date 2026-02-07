@@ -17,6 +17,7 @@
 - Fixed blocked times not applying to Fall (F) and Spring (S) graduate courses
 - Fixed auto-scheduler ignoring time blocks for multi-term courses
 - Fixed all AcademicTerm type errors by using proper enum values instead of strings
+- Fixed data loss bug where only one section per course was saved during export (now saves all lecture/discussion/lab selections)
 
 ## [2026-01-25]
 

@@ -1,11 +1,11 @@
 import type { Department } from './types';
 import type { SchedulePreferences } from './schedule';
 import type { MinimalSyncData } from './export';
-import { ScheduleState, findCourseById, findSectionByCRN } from './ScheduleState';
+import { ScheduleState, findCourseById } from './ScheduleState';
 import type { SelectedCourse } from './schedule';
-import { getPrimaryCRN } from '../utils/courseUtils';
+import { encodeCourseSelection, decodeCourseSelection } from '../utils/courseUtils';
 
-const APPLICATION_STATE_VERSION: string = '4.1'
+const APPLICATION_STATE_VERSION: string = '4.2'
 
 /**
  * Application-level state containing multiple schedules and preferences
@@ -45,10 +45,7 @@ export class ApplicationState {
             a: this.getActiveScheduleIndex(),
             s: this.schedules.map(schedule => [
                 schedule.name,
-                schedule.selectedCourses.flatMap(course => [
-                    course.course.id,
-                    getPrimaryCRN(course)
-                ])
+                schedule.selectedCourses.flatMap(course => encodeCourseSelection(course))
             ]),
             p: this.preferences?.theme ? {
                 t: [0, 0] as [number, number],
@@ -73,10 +70,8 @@ export class ApplicationState {
         const schedules = data.s.map(([name, coursesArray]) => {
             const selectedCourses: SelectedCourse[] = [];
 
-            for (let i = 0; i < coursesArray.length; i += 2) {
+            for (let i = 0; i < coursesArray.length; i += 4) {
                 const courseId = coursesArray[i];
-                const crn = coursesArray[i + 1];
-
                 if (!courseId) continue;
 
                 const course = findCourseById(courseId, courseCatalog);
@@ -84,13 +79,16 @@ export class ApplicationState {
                     throw new Error(`Course ${courseId} not found in catalog`);
                 }
 
-                const section = crn ? findSectionByCRN(course, crn) : null;
+                const sections = decodeCourseSelection(
+                    coursesArray[i + 1],
+                    coursesArray[i + 2],
+                    coursesArray[i + 3],
+                    course
+                );
 
                 selectedCourses.push({
                     course,
-                    selectedLecture: section,
-                    selectedDiscussion: null,
-                    selectedLab: null,
+                    ...sections,
                     isRequired: false,
                     lockedSections: new Set()
                 });
