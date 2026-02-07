@@ -1,3 +1,5 @@
+import { AcademicTerm } from "./schedule";
+
 // Hierarchical course structure with lecture groups and compatible discussions/labs.
 export interface LectureGroup {
     section: Section;                 // The lecture section itself
@@ -34,7 +36,7 @@ export interface Section {
     note?: string;
     description: string;
     term: string;
-    computedTerm: string; // Computed academic term letter (A, B, C, D)
+    computedTerm: AcademicTerm; // Computed academic term letter (A, B, C, D, E, F)
     isInterestList?: boolean; // True for interest list placeholder sections
     periods: Period[];
 }

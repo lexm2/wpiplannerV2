@@ -718,7 +718,7 @@ export class ProfileStateManager {
     }
 
     private createApplicationState(): ApplicationState {
-        const schedules = this.state.schedules.map(s => ScheduleState.fromLegacySchedule(s));
+        const schedules = this.state.schedules.map(s => ScheduleState.fromSchedule(s));
         return new ApplicationState(
             this.state.activeScheduleId,
             schedules,
@@ -730,7 +730,7 @@ export class ProfileStateManager {
         try {
             const parsed = JSON.parse(data);
             const appState = ApplicationState.fromMinimalFormat(parsed, this.allDepartments);
-            const legacySchedules = appState.schedules.map(s => s.toLegacySchedule());
+            const legacySchedules = appState.schedules.map(s => s.toSchedule());
 
             const result = await this.storageManager.importData(
                 legacySchedules,

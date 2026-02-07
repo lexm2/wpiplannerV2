@@ -261,8 +261,8 @@ export class TransactionalStorageManager {
             const activeScheduleIdResult = this.loadActiveScheduleId();
             const activeScheduleId = activeScheduleIdResult.data;
 
-            // Convert legacy Schedule objects to ScheduleState
-            const scheduleStates = fullSchedules.map(s => ScheduleState.fromLegacySchedule(s));
+            // Convert Schedule objects to ScheduleState
+            const scheduleStates = fullSchedules.map(s => ScheduleState.fromSchedule(s));
 
             // Create ApplicationState (with full objects)
             const appState = new ApplicationState(

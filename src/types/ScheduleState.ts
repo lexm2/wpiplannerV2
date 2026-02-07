@@ -1,5 +1,5 @@
 import type { Course, Section, Department } from './types';
-import type { SelectedCourse, ScheduleCombination, Schedule, LocalCalendarEvent } from './schedule';
+import type { SelectedCourse, ScheduleCombination, Schedule, LocalCalendarEvent, AcademicTerm } from './schedule';
 import { getAllSections } from '../utils/courseUtils';
 
 /**
@@ -15,7 +15,6 @@ export class ScheduleState {
     readonly selectedCourses: SelectedCourse[];
     readonly generatedSchedules: ScheduleCombination[];
     readonly timestamp: number;
-    /** Locally-stored calendar events (not synced to cloud) */
     readonly localEvents: LocalCalendarEvent[];
 
     constructor(
@@ -80,7 +79,7 @@ export class ScheduleState {
     }
 
     /**
-     * Check if schedule contains a specific course
+     * Check if this schedule contains a specific course
      *
      * @param courseId - Course ID to check
      * @returns True if course is in schedule
@@ -146,7 +145,7 @@ export class ScheduleState {
      * @param term - Term code (A, B, C, D, or E)
      * @returns Sections for that term
      */
-    getSectionsForTerm(term: string): Section[] {
+    getSectionsForTerm(term: AcademicTerm): Section[] {
         return this.getSelectedSections().filter(s => s.computedTerm === term);
     }
 
@@ -184,21 +183,6 @@ export class ScheduleState {
     // =========================================================================
     // Statistics & Metadata
     // =========================================================================
-
-    /**
-     * Calculate total credit hours for the schedule
-     *
-     * @returns Object with min and max credit hours
-     */
-    getTotalCredits(): { min: number; max: number } {
-        let min = 0;
-        let max = 0;
-        for (const sc of this.selectedCourses) {
-            min += sc.course.minCredits || 0;
-            max += sc.course.maxCredits || 0;
-        }
-        return { min, max };
-    }
 
     /**
      * Group courses by term
@@ -248,12 +232,12 @@ export class ScheduleState {
     }
 
     /**
-     * Create from legacy Schedule interface (migration helper)
+     * Create from plain Schedule interface
      *
-     * @param schedule - Legacy Schedule object
+     * @param schedule - Schedule object
      * @returns ScheduleState instance
      */
-    static fromLegacySchedule(schedule: Schedule): ScheduleState {
+    static fromSchedule(schedule: Schedule): ScheduleState {
         return new ScheduleState(
             schedule.id,
             schedule.name,
@@ -269,7 +253,7 @@ export class ScheduleState {
      *
      * @returns Schedule in legacy format
      */
-    toLegacySchedule(): Schedule {
+    toSchedule(): Schedule {
         return {
             id: this.id,
             name: this.name,

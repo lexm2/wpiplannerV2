@@ -86,15 +86,10 @@ export interface LocalCalendarEvent {
  * a day+time on the weekly schedule grid.
  */
 export interface WeeklyTimeSlot {
-    /** Unique identifier for this slot */
     id: string;
-    /** Day of the week */
     day: DayOfWeek;
-    /** Start time */
     startTime: SimpleTime;
-    /** End time */
     endTime: SimpleTime;
-    /** Which academic term this slot belongs to */
     term: AcademicTerm;
 }
 
@@ -103,39 +98,29 @@ export interface WeeklyTimeSlot {
  * Used for calendar events, grid display, visual components.
  */
 export interface DisplayableTimeSlot extends WeeklyTimeSlot {
-    /** Title to display (event name, course code, etc.) */
     title: string;
-    /** Subtitle (location, description, etc.) */
     subtitle?: string;
-    /** Color for visual styling */
     color?: string;
-    /** Where this slot came from */
     sourceType: 'calendar' | 'blocked' | 'course';
-    /** Original ID from source (event ID, period ID, etc.) */
     sourceId?: string;
 }
 
 /**
- * Hard constraints for auto-schedule generation.
- * These MUST be satisfied - schedules violating these won't be generated.
+ * May add more in the future
  */
 export interface AutoScheduleConstraints {
-    /** Time periods to avoid when scheduling */
     blockedTimes: WeeklyTimeSlot[];
 }
 
 /**
- * Soft preferences for auto-schedule ranking.
- * These affect which schedules are shown first, but don't exclude schedules.
+ * May add more/remove if to much code before release
  */
 export interface AutoSchedulePreferences {
-    /** Earliest preferred class time - sections before this are ranked lower */
     wakeUpTime?: SimpleTime | null;
 }
 
 /**
  * Combined configuration for auto-schedule generation.
- * Includes both hard constraints and soft preferences.
  */
 export interface AutoScheduleConfig extends AutoScheduleConstraints, AutoSchedulePreferences {}
 
@@ -144,6 +129,5 @@ export interface AutoScheduleConfig extends AutoScheduleConstraints, AutoSchedul
  * Includes extra flags that get converted to config before generation.
  */
 export interface AutoScheduleSettings extends AutoScheduleConfig {
-    /** Whether to convert local calendar events to blocked times */
     avoidCalendarEvents?: boolean;
 }
