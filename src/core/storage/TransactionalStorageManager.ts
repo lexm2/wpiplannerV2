@@ -253,6 +253,20 @@ export class TransactionalStorageManager {
         });
     }
 
+    async clearAllDataComplete(): Promise<TransactionResult> {
+        try {
+            await this.indexedDBStorage.clearAllSchedules();
+            const result = this.clearAllData();
+            return result;
+        } catch (error) {
+            return {
+                success: false,
+                transactionId: `clear-${Date.now()}`,
+                error: error as Error
+            };
+        }
+    }
+
     async exportData(options: { compressed?: boolean } = {}): Promise<{ data: string | null; valid: boolean; error?: string }> {
         try {
             const schedulesResult = await this.loadAllSchedules();

@@ -76,6 +76,7 @@ export class SchedulePickerModal extends BaseModal {
                             <button class="btn btn-primary" id="new-schedule-btn-modal">${getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')}<span class="btn-text"> New Schedule</span></button>
                             <button class="btn btn-secondary" id="import-schedule-btn-modal">${getInlineSVG('CALENDAR_DOWN', 'modal-footer-icon')}<span class="btn-text"> Import</span></button>
                             <button class="btn btn-secondary" id="export-schedule-btn-modal">${getInlineSVG('CALENDAR_UP', 'modal-footer-icon')}<span class="btn-text"> Export All</span></button>
+                            <button class="btn btn-danger" id="clear-all-data-btn-modal">${getInlineSVG('TRASH', 'modal-footer-icon')}<span class="btn-text"> Clear All Data</span></button>
                         </div>
                     </div>
                 </div>
@@ -179,12 +180,14 @@ export class SchedulePickerModal extends BaseModal {
         const newScheduleBtnHeader = modal.querySelector('#new-schedule-btn-header-modal');
         const importBtn = modal.querySelector('#import-schedule-btn-modal');
         const exportBtn = modal.querySelector('#export-schedule-btn-modal');
+        const clearAllBtn = modal.querySelector('#clear-all-data-btn-modal');
         const closeBtn = modal.querySelector(`[data-modal-close="${this.modalId}"]`);
 
         newScheduleBtn?.addEventListener('click', () => this.createNewSchedule());
         newScheduleBtnHeader?.addEventListener('click', () => this.createNewSchedule());
         importBtn?.addEventListener('click', () => this.importSchedule());
         exportBtn?.addEventListener('click', () => this.exportActiveSchedule());
+        clearAllBtn?.addEventListener('click', () => this.clearAllData());
         closeBtn?.addEventListener('click', () => this.hide());
 
         document.addEventListener('click', (e) => {
@@ -523,5 +526,22 @@ export class SchedulePickerModal extends BaseModal {
                 this.updateScheduleList();
             }
         });
+    }
+
+    private async clearAllData(): Promise<void> {
+        const confirmed = confirm(
+            'Are you sure you want to clear ALL schedules and data?\n\n' +
+            'This will:\n' +
+            '• Delete all schedules\n' +
+            '• Clear all selected courses\n' +
+            '• Reset all preferences\n\n' +
+            'This action CANNOT be undone!'
+        );
+
+        if (!confirmed) return;
+
+        await this.scheduleManagementService.clearAllSchedules();
+        this.updateScheduleList();
+        this.updateStorageUsage();
     }
 }

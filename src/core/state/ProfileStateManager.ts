@@ -1053,4 +1053,29 @@ export class ProfileStateManager {
     async getStorageStats() {
         return this.storageManager.getStorageStats();
     }
+
+    async clearAllData(): Promise<{ success: boolean; error?: string }> {
+        try {
+            const result = await this.storageManager.clearAllDataComplete();
+            if (!result.success) {
+                return {
+                    success: false,
+                    error: result.error?.message || 'Failed to clear storage'
+                };
+            }
+
+            this.state = this.createInitialState();
+            this.undoRedoManager.clear();
+
+            const defaultSchedule = this.createSchedule('My Schedule', 'system');
+            this.setActiveSchedule(defaultSchedule.id, 'system');
+
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                error: `Failed to clear data: ${error}`
+            };
+        }
+    }
 }
