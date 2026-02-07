@@ -1,7 +1,6 @@
 import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../types/schedule';
 import { AcademicTerm, EventType } from '../types/schedule';
-import type { SimpleTime, DayOfWeek } from '../types/types';
-import type { TimeSlot } from '../types/ui';
+import type { SimpleTime, DayOfWeek, TimeSlot } from '../types/types';
 
 /**
  * Generate a unique ID for a time slot.

@@ -1,8 +1,8 @@
 /**
  * High-performance full-text search engine with indexing, ranking, and schedule-aware filtering for course discovery
  */
-import { Course, Department, Period, DayOfWeek } from '../../types/types'
-import { SearchFilter, TimeSlot } from '../../types/ui'
+import { Course, Department, Period, DayOfWeek, TimeSlot } from '../../types/types'
+import { SearchFilter } from '../../types/ui'
 import { getAllSections } from '../../utils/courseUtils'
 
 export class SearchService {
@@ -139,9 +139,9 @@ export class SearchService {
 
         // Check for time overlap
         const timeOverlaps = periodStart < slotEnd && slotStart < periodEnd;
-        
+
         // Check for day overlap
-        const dayOverlaps = timeSlot.days.some((day: string) => period.days.has(day as DayOfWeek));
+        const dayOverlaps = timeSlot.days.some((day: DayOfWeek) => period.days.has(day));
 
         return timeOverlaps && dayOverlaps;
     }

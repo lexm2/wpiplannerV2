@@ -1,4 +1,4 @@
-import { DayOfWeek, PeriodType, Section, SimpleTime } from './types';
+import { DayOfWeek, PeriodType, Section, SimpleTime, TimeSlot } from './types';
 import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
 
 export interface FilterMetadata {
@@ -81,11 +81,7 @@ export interface ProfessorFilterCriteria {
 }
 
 export interface TimeSlotFilterCriteria {
-    timeSlots: Array<{
-        startTime: SimpleTime;
-        endTime: SimpleTime;
-        days: DayOfWeek[];
-    }>;
+    timeSlots: TimeSlot[];
 }
 
 export interface TermFilterCriteria {

@@ -47,14 +47,14 @@ export type {
   Period,
   Time,
   SimpleTime,
+  TimeSlot,
   ScheduleDB,
   PlannerState,
 } from './types';
-export { PeriodType, DayOfWeek, Semester } from './types';
+export { PeriodType, DayOfWeek, Semester, SectionType } from './types';
 export { ApplicationState } from './ApplicationState';
 export type {
   SearchFilter,
-  TimeSlot,
   CourseDisplayProps,
   GridTimeSlot,
   ScheduleGridCell,

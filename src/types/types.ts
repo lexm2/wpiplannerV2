@@ -87,6 +87,12 @@ export interface Time {
 
 export type SimpleTime = Omit<Time, 'displayTime'>;
 
+export interface TimeSlot {
+    startTime: SimpleTime;
+    endTime: SimpleTime;
+    days: DayOfWeek[];
+}
+
 export enum DayOfWeek {
     MONDAY = 'M',
     TUESDAY = 'T',
