@@ -6,10 +6,3 @@ export type FilterableSection = {
     lectureGroup?: LectureGroup;
     sectionType: SectionType;
 };
-
-export type FilterablePeriod = {
-    course: Course;
-    section: Section;
-    period: Period;
-    lectureGroup?: LectureGroup;
-};

@@ -85,7 +85,7 @@ export interface TimeSlotFilterCriteria {
 }
 
 export interface TermFilterCriteria {
-    terms: string[];
+    terms: AcademicTerm[];
 }
 
 

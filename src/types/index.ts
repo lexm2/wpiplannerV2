@@ -8,7 +8,7 @@ export type {
   DisplayableTimeSlot,
 } from './schedule';
 export { AcademicTerm } from './schedule';
-export type { FilterableSection, FilterablePeriod } from './filterableUnit';
+export type { FilterableSection } from './filterableUnit';
 export { ScheduleState } from './ScheduleState';
 export type {
   FilterMetadata,
