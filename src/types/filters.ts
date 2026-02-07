@@ -141,6 +141,11 @@ export interface PeriodConflictFilterCriteria {
     selectedCourses?: SelectedCourse[]; // Array of SelectedCourse objects for context-aware conflict detection
 }
 
+export interface ConflictFilterCriteria {
+    avoidConflicts: boolean;
+    blockedSlots: import('./schedule').WeeklyTimeSlot[];
+}
+
 export interface SectionCodeFilterCriteria {
     codes: string[];
 }
@@ -157,4 +162,18 @@ export interface RMPRatingFilterCriteria {
 
 export interface BookmarkFilterCriteria {
     showBookmarkedOnly: boolean;
+}
+
+export interface BlockedTimesFilterCriteria {
+    blockedTimes: Array<{
+        id: string;
+        day: string;
+        startTime: SimpleTime;
+        endTime: SimpleTime;
+        term: string;
+    }>;
+}
+
+export interface WakeUpTimeFilterCriteria {
+    wakeUpTime: SimpleTime;
 }

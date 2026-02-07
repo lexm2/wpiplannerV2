@@ -1,9 +1,5 @@
-/**
- * Utility functions for working with WeeklyTimeSlot and DisplayableTimeSlot.
- */
-
 import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../types/schedule';
-import { AcademicTerm } from '../types/schedule';
+import { AcademicTerm, EventType } from '../types/schedule';
 import type { SimpleTime, DayOfWeek } from '../types/types';
 import type { TimeSlot } from '../types/ui';
 
@@ -139,4 +135,65 @@ export function minutesToSimpleTime(minutes: number): SimpleTime {
  */
 export function simpleTimeToMinutes(time: SimpleTime): number {
     return time.hours * 60 + time.minutes;
+}
+
+export function periodToWeeklySlots(
+    period: import('../types/types').Period,
+    term: AcademicTerm,
+    sourceId?: string
+): WeeklyTimeSlot[] {
+    const slots: WeeklyTimeSlot[] = [];
+
+    for (const day of period.days) {
+        slots.push({
+            id: `${sourceId || 'period'}-${term}-${day}`,
+            day,
+            startTime: {
+                hours: period.startTime.hours,
+                minutes: period.startTime.minutes
+            },
+            endTime: {
+                hours: period.endTime.hours,
+                minutes: period.endTime.minutes
+            },
+            term
+        });
+    }
+
+    return slots;
+}
+
+export function sectionToWeeklySlots(section: import('../types/types').Section): WeeklyTimeSlot[] {
+    const slots: WeeklyTimeSlot[] = [];
+    const term = section.computedTerm || AcademicTerm.ALL;
+
+    for (const period of section.periods) {
+        slots.push(...periodToWeeklySlots(period, term, String(section.crn)));
+    }
+
+    return slots;
+}
+
+export function calendarEventToWeeklySlots(event: import('../types/schedule').LocalCalendarEvent): WeeklyTimeSlot[] {
+    if (event.eventType === EventType.ONE_TIME) {
+        return [];
+    }
+
+    const slots: WeeklyTimeSlot[] = [];
+    const days = event.days || [];
+    const terms = event.terms || [AcademicTerm.ALL];
+
+    for (const term of terms) {
+        for (const day of days) {
+            slots.push({
+                id: `${event.id}-${term}-${day}`,
+                day,
+                startTime: event.startTime,
+                endTime: event.endTime,
+                term
+            });
+        }
+    }
+
+    return slots;
 }
