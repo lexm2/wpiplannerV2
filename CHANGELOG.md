@@ -7,6 +7,7 @@
 - Cleaned up unused schedule preference fields
 - Removed unnecessary ConflictType enum (only one type exists)
 - Removed unused conflict descriptions and fields
+- Refactored conflict detection to return conflict map directly (simpler and faster)
 
 ## [2026-01-25]
 

@@ -27,11 +27,6 @@ export interface ScheduleCombination {
     isValid: boolean;
 }
 
-export interface TimeConflict {
-    section1: Section;
-    section2: Section;
-}
-
 export interface SchedulePreferences {
     theme?: string;
     bookmarkedCourseIds?: string[];

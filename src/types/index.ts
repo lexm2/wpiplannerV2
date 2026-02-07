@@ -8,7 +8,6 @@ export type {
   ScheduleConflictResolution,
   Schedule,
   ScheduleCombination,
-  TimeConflict,
   SchedulePreferences,
   UserScheduleState,
   WeeklyTimeSlot,

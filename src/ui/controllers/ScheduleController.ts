@@ -1131,18 +1131,7 @@ export class ScheduleController {
             return;
         }
 
-        const conflicts = this.conflictDetector.detectConflicts(allSections);
-
-        for (const conflict of conflicts) {
-            const crn1 = conflict.section1.crn.toString();
-            const crn2 = conflict.section2.crn.toString();
-
-            if (!this.conflictMap.has(crn1)) this.conflictMap.set(crn1, new Set());
-            if (!this.conflictMap.has(crn2)) this.conflictMap.set(crn2, new Set());
-
-            this.conflictMap.get(crn1)!.add(crn2);
-            this.conflictMap.get(crn2)!.add(crn1);
-        }
+        this.conflictMap = this.conflictDetector.detectConflicts(allSections);
 
         perfMonitor.endMeasure('conflict-precompute', startTime);
     }

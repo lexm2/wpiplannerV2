@@ -30,13 +30,12 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      const conflicts = conflictDetector.detectConflicts([section1, section2])
-      
-      expect(conflicts).toHaveLength(0)
+      expect(conflictDetector.hasConflicts([section1, section2])).toBe(false)
     })
 
     it('should detect time overlap conflict', () => {
       const section1 = createMockSection({
+        crn: 12345,
         number: 'A01',
         periods: [createMockPeriod({
           startTime: createMockTime(9, 0),
@@ -46,6 +45,7 @@ describe('ConflictDetector', () => {
       })
 
       const section2 = createMockSection({
+        crn: 67890,
         number: 'B01',
         periods: [createMockPeriod({
           startTime: createMockTime(10, 0),
@@ -54,11 +54,11 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      const conflicts = conflictDetector.detectConflicts([section1, section2])
+      const conflictMap = conflictDetector.detectConflicts([section1, section2])
 
-      expect(conflicts).toHaveLength(1)
-      expect(conflicts[0].section1.number).toBe('A01')
-      expect(conflicts[0].section2.number).toBe('B01')
+      expect(conflictMap.size).toBe(2)
+      expect(conflictMap.get(section1.crn.toString())?.has(section2.crn.toString())).toBe(true)
+      expect(conflictMap.get(section2.crn.toString())?.has(section1.crn.toString())).toBe(true)
     })
 
     it('should not detect conflicts on different days', () => {
@@ -80,9 +80,7 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      const conflicts = conflictDetector.detectConflicts([section1, section2])
-      
-      expect(conflicts).toHaveLength(0)
+      expect(conflictDetector.hasConflicts([section1, section2])).toBe(false)
     })
 
     it('should handle sections with multiple periods', () => {
@@ -113,9 +111,7 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      const conflicts = conflictDetector.detectConflicts([section1, section2])
-
-      expect(conflicts).toHaveLength(1)
+      expect(conflictDetector.hasConflicts([section1, section2])).toBe(true)
     })
 
     it('should detect multiple overlapping periods between same sections', () => {
@@ -151,9 +147,7 @@ describe('ConflictDetector', () => {
         ]
       })
 
-      const conflicts = conflictDetector.detectConflicts([section1, section2])
-
-      expect(conflicts).toHaveLength(2)
+      expect(conflictDetector.hasConflicts([section1, section2])).toBe(true)
     })
   })
 

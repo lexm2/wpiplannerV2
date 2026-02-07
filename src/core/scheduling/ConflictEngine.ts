@@ -3,12 +3,12 @@
  * Merges functionality from ConflictDetector (detailed conflicts) and TimeSlotMap (fast overlap queries).
  */
 import { Section, Period, DayOfWeek } from '../../types/types';
-import { TimeConflict } from '../../types/schedule';
 import { DateUtils } from '../../utils/dateUtils';
 
 export interface IConflictEngine {
     // From ConflictDetector - detailed conflict detection
-    detectConflicts(sections: Section[]): TimeConflict[];
+    detectConflicts(sections: Section[]): Map<string, Set<string>>;
+    hasConflicts(sections: Section[]): boolean;
     isValidSchedule(sections: Section[]): boolean;
 
     // From TimeSlotMap - fast overlap queries
@@ -29,10 +29,6 @@ export class ConflictEngine implements IConflictEngine {
     private sectionsBySlot: Map<string, Set<Section>> = new Map();
     private slotsBySection: Map<string, Set<string>> = new Map();
 
-    // ConflictDetector internals for detailed conflict caching
-    private static readonly MAX_CACHE_SIZE = 1000;
-    private conflictCache = new Map<string, TimeConflict[]>();
-    private cacheAccessOrder: string[] = [];
 
     // ==================== TimeSlotMap API ====================
 
@@ -138,55 +134,65 @@ export class ConflictEngine implements IConflictEngine {
     // ==================== ConflictDetector API ====================
 
     /**
-     * Detect all time conflicts between sections with detailed descriptions
+     * Detect all time conflicts and return a map of CRN -> Set of conflicting CRNs
      */
-    detectConflicts(sections: Section[]): TimeConflict[] {
-        const conflicts: TimeConflict[] = [];
+    detectConflicts(sections: Section[]): Map<string, Set<string>> {
+        const conflictMap = new Map<string, Set<string>>();
 
         for (let i = 0; i < sections.length; i++) {
             for (let j = i + 1; j < sections.length; j++) {
-                const cacheKey = this.getCacheKey(sections[i], sections[j]);
-                let sectionConflicts = this.conflictCache.get(cacheKey);
+                if (this.hasDirectOverlap(sections[i], sections[j])) {
+                    const crn1 = sections[i].crn.toString();
+                    const crn2 = sections[j].crn.toString();
 
-                if (!sectionConflicts) {
-                    sectionConflicts = this.checkSectionConflicts(sections[i], sections[j]);
-                    this.addToCache(cacheKey, sectionConflicts);
-                } else {
-                    this.updateCacheAccess(cacheKey);
+                    if (!conflictMap.has(crn1)) conflictMap.set(crn1, new Set());
+                    if (!conflictMap.has(crn2)) conflictMap.set(crn2, new Set());
+
+                    conflictMap.get(crn1)!.add(crn2);
+                    conflictMap.get(crn2)!.add(crn1);
                 }
-
-                conflicts.push(...sectionConflicts);
             }
         }
 
-        return conflicts;
+        return conflictMap;
+    }
+
+    /**
+     * Check if any conflicts exist between sections
+     */
+    hasConflicts(sections: Section[]): boolean {
+        for (let i = 0; i < sections.length; i++) {
+            for (let j = i + 1; j < sections.length; j++) {
+                if (this.hasDirectOverlap(sections[i], sections[j])) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
      * Check if a schedule (set of sections) has no conflicts
      */
     isValidSchedule(sections: Section[]): boolean {
-        const conflicts = this.detectConflicts(sections);
-        return conflicts.length === 0;
+        return !this.hasConflicts(sections);
     }
 
     // ==================== Common Operations ====================
 
     /**
-     * Clear all slot mappings and caches
+     * Clear all slot mappings
      */
     clear(): void {
         this.sectionsBySlot.clear();
         this.slotsBySection.clear();
-        this.clearCache();
     }
 
     /**
-     * Clear only the conflict detail cache
+     * No-op for compatibility
      */
     clearCache(): void {
-        this.conflictCache.clear();
-        this.cacheAccessOrder = [];
+        // No cache to clear
     }
 
     // ==================== Private Helpers ====================
@@ -215,40 +221,6 @@ export class ConflictEngine implements IConflictEngine {
         return false;
     }
 
-    private checkSectionConflicts(section1: Section, section2: Section): TimeConflict[] {
-        // Sections in different terms cannot conflict
-        if (section1.computedTerm !== section2.computedTerm) {
-            return [];
-        }
-
-        const conflicts: TimeConflict[] = [];
-
-        for (const period1 of section1.periods) {
-            for (const period2 of section2.periods) {
-                const conflict = this.checkPeriodConflict(period1, period2, section1, section2);
-                if (conflict) {
-                    conflicts.push(conflict);
-                }
-            }
-        }
-
-        return conflicts;
-    }
-
-    private checkPeriodConflict(period1: Period, period2: Period, section1: Section, section2: Section): TimeConflict | null {
-        const sharedDays = this.getSharedDays(period1.days, period2.days);
-        if (sharedDays.length === 0) return null;
-
-        if (this.hasTimeOverlap(period1, period2)) {
-            return {
-                section1,
-                section2
-            };
-        }
-
-        return null;
-    }
-
     private getSharedDays(days1: Set<DayOfWeek>, days2: Set<DayOfWeek>): string[] {
         return Array.from(new Set([...days1].filter(day => days2.has(day))));
     }
@@ -260,31 +232,6 @@ export class ConflictEngine implements IConflictEngine {
         const end2 = DateUtils.timeToMinutes(period2.endTime);
 
         return start1 < end2 && start2 < end1;
-    }
-
-    private getCacheKey(section1: Section, section2: Section): string {
-        const key1 = `${section1.crn}-${section2.crn}`;
-        const key2 = `${section2.crn}-${section1.crn}`;
-        return key1 < key2 ? key1 : key2;
-    }
-
-    private addToCache(key: string, value: TimeConflict[]): void {
-        if (this.conflictCache.size >= ConflictEngine.MAX_CACHE_SIZE) {
-            const lruKey = this.cacheAccessOrder.shift();
-            if (lruKey) {
-                this.conflictCache.delete(lruKey);
-            }
-        }
-        this.conflictCache.set(key, value);
-        this.cacheAccessOrder.push(key);
-    }
-
-    private updateCacheAccess(key: string): void {
-        const index = this.cacheAccessOrder.indexOf(key);
-        if (index > -1) {
-            this.cacheAccessOrder.splice(index, 1);
-            this.cacheAccessOrder.push(key);
-        }
     }
 
     // ==================== Debug Methods ====================

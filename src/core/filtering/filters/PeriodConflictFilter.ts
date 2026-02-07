@@ -69,9 +69,7 @@ export class PeriodConflictFilter implements SectionBasedFilter {
             for (const currentPeriod of fs.section.periods) {
                 const tempSection = this.createTempSection(currentPeriod, term);
                 const testSections = [...selectedSections, tempSection];
-                const conflicts = this.conflictDetector.detectConflicts(testSections);
-
-                if (conflicts.length > 0) {
+                if (this.conflictDetector.hasConflicts(testSections)) {
                     return false;
                 }
             }
@@ -110,9 +108,7 @@ export class PeriodConflictFilter implements SectionBasedFilter {
         return periods.filter(period => {
             const tempSection = this.createTempSection(period, term);
             const testSections = [...selectedSections, tempSection];
-            const conflicts = this.conflictDetector.detectConflicts(testSections);
-
-            return conflicts.length === 0;
+            return !this.conflictDetector.hasConflicts(testSections);
         });
     }
 
@@ -174,9 +170,7 @@ export class PeriodConflictFilter implements SectionBasedFilter {
 
             const tempSection = this.createTempSection(currentPeriod, term);
             const testSections = [...otherCoursesSelectedSections, tempSection];
-            const conflicts = this.conflictDetector.detectConflicts(testSections);
-
-            return conflicts.length === 0;
+            return !this.conflictDetector.hasConflicts(testSections);
         });
     }
 
@@ -218,9 +212,7 @@ export class PeriodConflictFilter implements SectionBasedFilter {
             for (const currentPeriod of currentSection.periods) {
                 const tempSection = this.createTempSection(currentPeriod, term);
                 const testSections = [...selectedSections, tempSection];
-                const conflicts = this.conflictDetector.detectConflicts(testSections);
-
-                if (conflicts.length > 0) {
+                if (this.conflictDetector.hasConflicts(testSections)) {
                     return false;
                 }
             }
@@ -312,9 +304,7 @@ export class PeriodConflictFilter implements SectionBasedFilter {
             for (const currentPeriod of currentSection.periods) {
                 const tempSection = this.createTempSection(currentPeriod, term);
                 const testSections = [...sectionsToCheckAgainst, tempSection];
-                const conflicts = this.conflictDetector.detectConflicts(testSections);
-
-                if (conflicts.length > 0) {
+                if (this.conflictDetector.hasConflicts(testSections)) {
                     return false;
                 }
             }
