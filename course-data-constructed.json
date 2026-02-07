@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 7, 2026, 5:57 PM",
+  "generated": "Feb 7, 2026, 6:38 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -9793,7 +9793,7 @@
               "crn": 337592,
               "number": "DX01",
               "seats": 20,
-              "seatsAvailable": 0,
+              "seatsAvailable": 1,
               "actualWaitlist": 0,
               "maxWaitlist": 3,
               "note": null,
@@ -9812,7 +9812,7 @@
                   "building": "",
                   "room": "Goddard Hall 206 BB Lab",
                   "seats": 20,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 3,
                   "specificSection": "DX01",
@@ -229474,7 +229474,7 @@
                 "crn": 337141,
                 "number": "D01",
                 "seats": 55,
-                "seatsAvailable": 5,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -229493,7 +229493,7 @@
                     "building": "",
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 55,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
