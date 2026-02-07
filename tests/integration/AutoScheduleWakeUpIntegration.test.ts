@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'bun:test'
 import { AutoScheduler } from '../../src/services/scheduling/AutoScheduler'
+import { ScheduleFilterService } from '../../src/services/filtering/ScheduleFilterService'
 import { createMockCourse, createMockSection, createMockPeriod, createMockTime, createMockSelectedCourse, createMockScheduleFilterService } from '../helpers/mockData'
 import type { AutoScheduleConfig } from '../../src/types/schedule'
 import { DayOfWeek } from '../../src/types/types'
@@ -64,7 +65,7 @@ describe('Auto-Schedule Wake Up Time Integration', () => {
     ]
 
     const filterService = createMockScheduleFilterService()
-    const autoScheduler = new AutoScheduler(filterService)
+    const autoScheduler = new AutoScheduler(filterService as unknown as ScheduleFilterService)
 
     const config: AutoScheduleConfig = {
       blockedTimes: [],
@@ -81,7 +82,10 @@ describe('Auto-Schedule Wake Up Time Integration', () => {
     const firstCSSection = firstSchedule.find((r: any) => r.course.id === 'CS-1101')
     const secondCSSection = secondSchedule.find((r: any) => r.course.id === 'CS-1101')
 
-    expect(firstCSSection?.combination.lecture.crn).toBe(10002)
-    expect(secondCSSection?.combination.lecture.crn).toBe(10001)
+    if (!firstCSSection?.combination.lecture) throw new Error('Missing lecture in first schedule')
+    if (!secondCSSection?.combination.lecture) throw new Error('Missing lecture in second schedule')
+
+    expect(firstCSSection.combination.lecture.crn).toBe(10002)
+    expect(secondCSSection.combination.lecture.crn).toBe(10001)
   })
 })

@@ -321,10 +321,8 @@ describe('AutoScheduler', () => {
         selectedLecture: lecture,
         selectedDiscussion: null,
         selectedLab: null,
-        selectedSection: null,
-        selectedSectionNumber: null,
         isRequired: false,
-        lockedSections: new Set(['10001'])
+        lockedSections: new Set<string>(['10001'])
       }
 
       const config: AutoScheduleConfig = { blockedTimes: [] }
@@ -361,7 +359,7 @@ describe('AutoScheduler', () => {
         selectedDiscussion: null,
         selectedLab: null,
         isRequired: false,
-        lockedSections: new Set()
+        lockedSections: new Set<string>()
       }
 
       const blockedTime: WeeklyTimeSlot = {
@@ -401,7 +399,7 @@ describe('AutoScheduler', () => {
         selectedDiscussion: null,
         selectedLab: null,
         isRequired: false,
-        lockedSections: new Set()
+        lockedSections: new Set<string>()
       }
 
       const blockedTime: WeeklyTimeSlot = {
@@ -441,7 +439,7 @@ describe('AutoScheduler', () => {
         selectedDiscussion: null,
         selectedLab: null,
         isRequired: false,
-        lockedSections: new Set()
+        lockedSections: new Set<string>()
       }
 
       const blockedTime: WeeklyTimeSlot = {

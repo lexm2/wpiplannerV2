@@ -2,6 +2,7 @@ import { describe, it, expect } from 'bun:test';
 import { ICSGenerator } from '../../src/utils/icsGenerator';
 import { createMockSchedule, createMockSelectedCourse, createMockCourse, createMockSection, createMockPeriod, createMockTime } from '../helpers/mockData';
 import { DayOfWeek } from '../../src/types/types';
+import { AcademicTerm } from '../../src/types/schedule';
 
 describe('ICSGenerator', () => {
     describe('Basic Functionality', () => {
@@ -212,7 +213,7 @@ describe('ICSGenerator', () => {
                         days: [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY],
                         startTime: createMockTime(16, 0),
                         endTime: createMockTime(17, 0),
-                        terms: ['A', 'B'],
+                        terms: [AcademicTerm.A, AcademicTerm.B],
                         visible: true,
                         createdAt: Date.now(),
                         updatedAt: Date.now(),

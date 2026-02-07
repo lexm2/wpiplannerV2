@@ -180,7 +180,7 @@ describe('IndexedDBStorageManager', () => {
                 selectedCourses: [
                     createMockSelectedCourse({
                         course,
-                        selectedSection: section,
+                        selectedLecture: section,
                         isRequired: true
                     })
                 ]

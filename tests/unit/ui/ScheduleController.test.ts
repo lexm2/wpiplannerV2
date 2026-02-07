@@ -72,8 +72,6 @@ describe('ScheduleController Expansion State', () => {
         selectedLecture: null,
         selectedDiscussion: null,
         selectedLab: null,
-        selectedSection: null,
-        selectedSectionNumber: null,
         isRequired: false,
         lockedSections: new Set()
     };

@@ -90,8 +90,6 @@ function createSelectedCourse(course: Course, selectedSection: Section | null = 
         selectedLecture: selectedSection,
         selectedDiscussion: null,
         selectedLab: null,
-        selectedSection,
-        selectedSectionNumber: selectedSection ? selectedSection.number : null,
         isRequired: false,
         lockedSections: new Set()
     };
@@ -481,8 +479,6 @@ describe('PeriodConflictFilter', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: null,
                 selectedLab: null,
-                selectedSection: lecture,
-                selectedSectionNumber: lecture.number,
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -493,8 +489,6 @@ describe('PeriodConflictFilter', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: discussion1,  // Testing this discussion
                 selectedLab: null,
-                selectedSection: discussion1,
-                selectedSectionNumber: discussion1.number,
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -520,8 +514,6 @@ describe('PeriodConflictFilter', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: discussion2,  // Testing this discussion
                 selectedLab: null,
-                selectedSection: discussion2,
-                selectedSectionNumber: discussion2.number,
                 isRequired: false,
                 lockedSections: new Set()
             };

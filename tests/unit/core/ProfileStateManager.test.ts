@@ -262,12 +262,10 @@ describe('ProfileStateManager', () => {
       profileStateManager.addListener((event) => listeners.push(event))
 
       profileStateManager.updatePreferences({
-        avoidBackToBackClasses: true,
         theme: 'dark-mode'
       }, 'test')
 
       const state = profileStateManager.getState()
-      expect(state.preferences.avoidBackToBackClasses).toBe(true)
       expect(state.preferences.theme).toBe('dark-mode')
 
       await waitForEvents();

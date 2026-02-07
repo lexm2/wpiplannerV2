@@ -113,8 +113,6 @@ describe('ScheduleFilterService', () => {
         selectedLecture: null,
         selectedDiscussion: null,
         selectedLab: null,
-        selectedSection: null,
-        selectedSectionNumber: null,
         isRequired: false,
         lockedSections: new Set()
     };
@@ -379,8 +377,6 @@ describe('ScheduleFilterService', () => {
             selectedLecture: null,
             selectedDiscussion: null,
             selectedLab: null,
-            selectedSection: null,
-            selectedSectionNumber: null,
             isRequired: false,
             lockedSections: new Set()
         };
@@ -500,8 +496,6 @@ describe('ScheduleFilterService', () => {
             selectedLecture: null,
             selectedDiscussion: null,
             selectedLab: null,
-            selectedSection: null,
-            selectedSectionNumber: null,
             isRequired: false,
             lockedSections: new Set()
         };

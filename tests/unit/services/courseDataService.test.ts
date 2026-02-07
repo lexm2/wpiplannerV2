@@ -306,8 +306,6 @@ describe('CourseDataService - Data Integrity', () => {
                 selectedLecture: allSections.length > 0 ? allSections[0] : null,
                 selectedDiscussion: null,
                 selectedLab: null,
-                selectedSection: null,
-                selectedSectionNumber: null,
                 isRequired: false,
                 lockedSections: new Set<string>()
             }

@@ -137,8 +137,6 @@ describe('ComponentSelectionWizard', () => {
                 selectedLecture: createSection(12345, 'A01'),
                 selectedDiscussion: createSection(12347, 'A11'),
                 selectedLab: null,
-                selectedSection: null,
-                selectedSectionNumber: null,
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -466,8 +464,6 @@ describe('ComponentSelectionWizard', () => {
                 selectedLecture: createSection(12345, 'A01'),
                 selectedDiscussion: createSection(12347, 'A11', PeriodType.DISCUSSION),
                 selectedLab: createSection(12349, 'A21', PeriodType.LAB),
-                selectedSection: null,
-                selectedSectionNumber: null,
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -498,8 +494,6 @@ describe('ComponentSelectionWizard', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: discussion,
                 selectedLab: null,
-                selectedSection: null,
-                selectedSectionNumber: null,
                 isRequired: false,
                 lockedSections: new Set()
             };
