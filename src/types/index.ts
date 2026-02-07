@@ -6,7 +6,6 @@ export type {
   UserScheduleState,
   WeeklyTimeSlot,
   DisplayableTimeSlot,
-  AutoScheduleConfig,
 } from './schedule';
 export { AcademicTerm } from './schedule';
 export type { FilterableSection, FilterablePeriod } from './filterableUnit';

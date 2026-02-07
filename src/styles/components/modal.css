@@ -1974,3 +1974,67 @@ html.is-mobile .changelog-modal-body {
   padding: 1rem;
   gap: 1rem;
 }
+
+/* Wake-Up Time Filter Styles */
+.wake-up-time-label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-secondary);
+}
+
+.wake-up-time-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  font-size: 1rem;
+  background: var(--color-surface-secondary);
+  color: var(--color-text);
+}
+
+.wake-up-time-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.wake-up-time-hint {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-text-tertiary);
+}
+
+.filter-clear-btn {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: var(--color-surface-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  transition: var(--effect-transition);
+}
+
+.filter-clear-btn:hover {
+  background: var(--color-surface-hover);
+}
+
+.calendar-events-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: var(--effect-transition);
+}
+
+.calendar-events-btn:hover {
+  background: var(--color-surface-hover);
+}

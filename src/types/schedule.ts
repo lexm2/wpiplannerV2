@@ -114,28 +114,10 @@ export interface DisplayableTimeSlot extends WeeklyTimeSlot {
 }
 
 /**
- * May add more in the future
- */
-export interface AutoScheduleConstraints {
-    blockedTimes: WeeklyTimeSlot[];
-}
-
-/**
- * May add more/remove if to much code before release
- */
-export interface AutoSchedulePreferences {
-    wakeUpTime?: SimpleTime | null;
-}
-
-/**
- * Combined configuration for auto-schedule generation.
- */
-export interface AutoScheduleConfig extends AutoScheduleConstraints, AutoSchedulePreferences {}
-
-/**
  * UI-level settings for auto-schedule modal.
- * Includes extra flags that get converted to config before generation.
  */
-export interface AutoScheduleSettings extends AutoScheduleConfig {
+export interface AutoScheduleSettings {
+    blockedTimes: WeeklyTimeSlot[];
+    wakeUpTime?: SimpleTime | null;
     avoidCalendarEvents?: boolean;
 }

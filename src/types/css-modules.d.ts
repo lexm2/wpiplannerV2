@@ -6,7 +6,9 @@
  *
  * Usage:
  * import styles from './Component.module.css';
- * element.className = styles.myClass; // TypeScript autocomplete works!
+ * Autocompete for statments like:
+ * element.className = styles.myClass;
+ * 
  */
 
 declare module '*.module.css' {
