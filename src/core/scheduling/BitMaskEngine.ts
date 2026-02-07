@@ -151,8 +151,16 @@ export class BitMaskEngine {
       const mask = weeklySlotToMask(slot);
       if (mask === 0n) continue;
 
-      // Apply to specific term or all terms
-      const terms = slot.term === 'ALL' ? ['A', 'B', 'C', 'D'] : [slot.term];
+      let terms: string[];
+      if (slot.term === 'ALL') {
+        terms = ['A', 'B', 'C', 'D'];
+      } else if (slot.term === 'F') {
+        terms = ['A', 'B'];
+      } else if (slot.term === 'S') {
+        terms = ['C', 'D'];
+      } else {
+        terms = [slot.term];
+      }
 
       for (const term of terms) {
         const existing = this.blockedMasksByTerm.get(term) || 0n;
@@ -162,6 +170,14 @@ export class BitMaskEngine {
   }
 
   getBlockedMask(term: string): bigint {
+    if (term === 'F') {
+      return (this.blockedMasksByTerm.get('A') || 0n) |
+             (this.blockedMasksByTerm.get('B') || 0n);
+    }
+    if (term === 'S') {
+      return (this.blockedMasksByTerm.get('C') || 0n) |
+             (this.blockedMasksByTerm.get('D') || 0n);
+    }
     return this.blockedMasksByTerm.get(term) || 0n;
   }
 

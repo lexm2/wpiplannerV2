@@ -121,7 +121,16 @@ export class AutoScheduler {
       const mask = weeklySlotToMask(slot);
       if (mask === 0n) continue;
 
-      const terms = slot.term === 'ALL' ? ['A', 'B', 'C', 'D'] : [slot.term];
+      let terms: string[];
+      if (slot.term === 'ALL') {
+        terms = ['A', 'B', 'C', 'D'];
+      } else if (slot.term === 'F') {
+        terms = ['A', 'B'];
+      } else if (slot.term === 'S') {
+        terms = ['C', 'D'];
+      } else {
+        terms = [slot.term];
+      }
 
       for (const term of terms) {
         const existing = masksByTerm.get(term) || 0n;
@@ -319,7 +328,14 @@ export class AutoScheduler {
 
     // Check blocked time conflict using bitmask - O(1)
     const sectionMask = sectionToMask(section);
-    const blockedMask = blockedMasksByTerm.get(section.computedTerm) || 0n;
+    let blockedMask: bigint;
+    if (section.computedTerm === 'F') {
+      blockedMask = (blockedMasksByTerm.get('A') || 0n) | (blockedMasksByTerm.get('B') || 0n);
+    } else if (section.computedTerm === 'S') {
+      blockedMask = (blockedMasksByTerm.get('C') || 0n) | (blockedMasksByTerm.get('D') || 0n);
+    } else {
+      blockedMask = blockedMasksByTerm.get(section.computedTerm) || 0n;
+    }
     if (masksConflict(sectionMask, blockedMask)) return false;
 
     // Check schedule filters

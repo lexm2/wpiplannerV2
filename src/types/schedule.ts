@@ -47,6 +47,8 @@ export enum AcademicTerm {
     B = 'B',
     C = 'C',
     D = 'D',
+    F = 'F',     // Fall (spans A and B)
+    S = 'S',     // Spring (spans C and D)
     ALL = 'ALL'  // Applies to all terms
 }
 

@@ -336,4 +336,126 @@ describe('AutoScheduler', () => {
       expect(result[0][0].combination.lecture?.crn).toBe(10001)
     })
   })
+
+  describe('Fall and Spring Term Blocked Times', () => {
+    it('should block Fall (F) sections when term A is blocked', () => {
+      const fallSection = createMockSection({
+        crn: 30001,
+        number: 'F01',
+        computedTerm: 'F',
+        periods: [createMockPeriod({
+          startTime: createMockTime(9, 0),
+          endTime: createMockTime(10, 50),
+          days: new Set([DayOfWeek.MONDAY])
+        })]
+      })
+
+      const course = createMockCourse({
+        id: 'CS-5001',
+        lectures: [{ section: fallSection, compatibleDiscussions: [], compatibleLabs: [] }]
+      })
+
+      const selectedCourse = {
+        course,
+        selectedLecture: null,
+        selectedDiscussion: null,
+        selectedLab: null,
+        isRequired: false,
+        lockedSections: new Set()
+      }
+
+      const blockedTime: WeeklyTimeSlot = {
+        id: 'block-1',
+        day: DayOfWeek.MONDAY,
+        startTime: { hours: 9, minutes: 0 },
+        endTime: { hours: 10, minutes: 50 },
+        term: AcademicTerm.A
+      }
+
+      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
+      const result = autoScheduler.generateSchedules([selectedCourse], config)
+
+      expect(result).toHaveLength(0)
+    })
+
+    it('should block Spring (S) sections when term C is blocked', () => {
+      const springSection = createMockSection({
+        crn: 40001,
+        number: 'S01',
+        computedTerm: 'S',
+        periods: [createMockPeriod({
+          startTime: createMockTime(14, 0),
+          endTime: createMockTime(15, 50),
+          days: new Set([DayOfWeek.TUESDAY])
+        })]
+      })
+
+      const course = createMockCourse({
+        id: 'CS-5002',
+        lectures: [{ section: springSection, compatibleDiscussions: [], compatibleLabs: [] }]
+      })
+
+      const selectedCourse = {
+        course,
+        selectedLecture: null,
+        selectedDiscussion: null,
+        selectedLab: null,
+        isRequired: false,
+        lockedSections: new Set()
+      }
+
+      const blockedTime: WeeklyTimeSlot = {
+        id: 'block-2',
+        day: DayOfWeek.TUESDAY,
+        startTime: { hours: 14, minutes: 0 },
+        endTime: { hours: 15, minutes: 50 },
+        term: AcademicTerm.C
+      }
+
+      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
+      const result = autoScheduler.generateSchedules([selectedCourse], config)
+
+      expect(result).toHaveLength(0)
+    })
+
+    it('should allow Fall sections when blocking with F term expands to A and B', () => {
+      const fallSection = createMockSection({
+        crn: 50001,
+        number: 'F01',
+        computedTerm: 'F',
+        periods: [createMockPeriod({
+          startTime: createMockTime(11, 0),
+          endTime: createMockTime(12, 50),
+          days: new Set([DayOfWeek.WEDNESDAY])
+        })]
+      })
+
+      const course = createMockCourse({
+        id: 'CS-5003',
+        lectures: [{ section: fallSection, compatibleDiscussions: [], compatibleLabs: [] }]
+      })
+
+      const selectedCourse = {
+        course,
+        selectedLecture: null,
+        selectedDiscussion: null,
+        selectedLab: null,
+        isRequired: false,
+        lockedSections: new Set()
+      }
+
+      const blockedTime: WeeklyTimeSlot = {
+        id: 'block-3',
+        day: DayOfWeek.WEDNESDAY,
+        startTime: { hours: 11, minutes: 0 },
+        endTime: { hours: 12, minutes: 50 },
+        term: AcademicTerm.F
+      }
+
+      const config: AutoScheduleConfig = { blockedTimes: [blockedTime] }
+      const result = autoScheduler.generateSchedules([selectedCourse], config)
+
+      expect(result).toHaveLength(0)
+    })
+  })
 })
