@@ -112,7 +112,7 @@ export class MainController {
         this.sectionInfoModalController = new SectionInfoModalController(this.modalService);
         this.infoModalController = new InfoModalController(this.modalService);
         this.filterModalController = new FilterModalController(this.modalService);
-        this.scheduleFilterModalController = new ScheduleFilterModalController(this.modalService);
+        this.scheduleFilterModalController = new ScheduleFilterModalController(this.modalService, this.scheduleController);
         
         // Connect filter service to course controller
         this.courseController.setFilterService(this.filterService);

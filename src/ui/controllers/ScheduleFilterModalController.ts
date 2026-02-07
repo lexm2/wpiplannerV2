@@ -109,7 +109,6 @@ export class ScheduleFilterModalController extends BaseModal {
                 ${this.createAvailabilityFilter()}
                 ${this.createConflictFilter()}
                 ${this.createWakeUpTimeFilter()}
-                ${this.createCalendarEventsFilter()}
             </div>
         `;
     }
@@ -270,11 +269,22 @@ export class ScheduleFilterModalController extends BaseModal {
         if (!this.scheduleFilterService) return '';
 
         const activeConflictDetection = this.getActiveConflictDetection();
+        const hasCalendarEvents = this.hasCalendarEventsBlocked();
+        const calendarEventCount = this.scheduleController
+            ? this.scheduleController.getCalendarEventCount()
+            : 0;
+        const localEventCount = this.scheduleController
+            ? this.scheduleController.getLocalEventCount()
+            : 0;
+        const totalEventCount = calendarEventCount + localEventCount;
 
         return SharedFilterComponents.createConflictFilter({
             idPrefix: '',
             filterId: 'periodConflict',
-            avoidConflicts: activeConflictDetection.avoidConflicts
+            avoidConflicts: activeConflictDetection.avoidConflicts,
+            includeCalendarToggle: true,
+            hasCalendarEvents: hasCalendarEvents,
+            calendarEventCount: totalEventCount
         });
     }
 
@@ -357,50 +367,6 @@ export class ScheduleFilterModalController extends BaseModal {
         `;
     }
 
-    private createCalendarEventsFilter(): string {
-        if (!this.scheduleController) {
-            return '';
-        }
-
-        const calendarEventCount = this.scheduleController.getCalendarEventCount();
-        const localEventCount = this.scheduleController.getLocalEventCount();
-        const totalCount = calendarEventCount + localEventCount;
-
-        if (totalCount === 0) {
-            return '';
-        }
-
-        const avoidCalendarEvents = this.hasCalendarEventsBlocked();
-
-        let countMessage: string;
-        if (calendarEventCount > 0 && localEventCount > 0) {
-            countMessage = `${calendarEventCount} cloud + ${localEventCount} local events`;
-        } else if (localEventCount > 0) {
-            countMessage = `${localEventCount} local events`;
-        } else {
-            countMessage = `${calendarEventCount} events`;
-        }
-
-        return `
-            <div class="filter-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Calendar Events</h4>
-                </div>
-                <div class="filter-section-content">
-                    <label class="filter-toggle-label">
-                        <input type="checkbox" class="filter-toggle" id="avoid-calendar-toggle"
-                               ${avoidCalendarEvents ? 'checked' : ''}>
-                        <span class="filter-toggle-slider"></span>
-                        <span class="filter-toggle-text">Block calendar event times (${countMessage})</span>
-                    </label>
-                    <button class="calendar-events-btn" id="modal-calendar-btn"
-                            style="display: ${avoidCalendarEvents ? 'flex' : 'none'}">
-                        View/Edit Events
-                    </button>
-                </div>
-            </div>
-        `;
-    }
 
     private setupFilterModalEventListeners(modalElement: HTMLElement): void {
 
@@ -467,6 +433,13 @@ export class ScheduleFilterModalController extends BaseModal {
             }
         });
 
+        const calendarConflictToggle = modalElement.querySelector('#avoid-calendar-filter');
+        if (calendarConflictToggle) {
+            calendarConflictToggle.addEventListener('change', (e) => {
+                this.handleCalendarEventsToggle((e.target as HTMLInputElement).checked, modalElement);
+            });
+        }
+
         // Wake-up time filter
         const wakeUpInput = modalElement.querySelector('#wake-up-time-input');
         if (wakeUpInput) {
@@ -479,21 +452,6 @@ export class ScheduleFilterModalController extends BaseModal {
         if (clearWakeUpBtn) {
             clearWakeUpBtn.addEventListener('click', () => {
                 this.handleClearWakeUpTime(modalElement);
-            });
-        }
-
-        // Calendar events toggle
-        const calendarToggle = modalElement.querySelector('#avoid-calendar-toggle');
-        if (calendarToggle) {
-            calendarToggle.addEventListener('change', (e) => {
-                this.handleCalendarEventsToggle((e.target as HTMLInputElement).checked, modalElement);
-            });
-        }
-
-        const calendarBtn = modalElement.querySelector('#modal-calendar-btn');
-        if (calendarBtn) {
-            calendarBtn.addEventListener('click', () => {
-                this.handleOpenCalendarPanel();
             });
         }
 
@@ -839,8 +797,6 @@ export class ScheduleFilterModalController extends BaseModal {
     }
 
     private handleCalendarEventsToggle(checked: boolean, modalElement: HTMLElement): void {
-        const calendarBtn = modalElement.querySelector('#modal-calendar-btn') as HTMLElement;
-
         if (checked) {
             const calendarSlots = this.scheduleController.getAllCalendarBlockedTimes();
 
@@ -853,8 +809,6 @@ export class ScheduleFilterModalController extends BaseModal {
                 avoidConflicts: true,
                 blockedSlots: [...nonCalendarSlots, ...calendarSlots]
             });
-
-            calendarBtn.style.display = 'flex';
         } else {
             const existingFilter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
             if (existingFilter) {
@@ -870,8 +824,6 @@ export class ScheduleFilterModalController extends BaseModal {
                     this.scheduleFilterService!.removeFilter('periodConflict');
                 }
             }
-
-            calendarBtn.style.display = 'none';
         }
 
         this.updatePreview(modalElement);

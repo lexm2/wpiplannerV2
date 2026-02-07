@@ -11,6 +11,7 @@
 - Wake-up time now works as a hard filter (excludes sections before set time)
 - Unified conflict detection system - calendar events and section conflicts now use the same filtering mechanism
 - Simplified filter architecture by merging BlockedTimesFilter into ConflictFilter
+- Calendar event conflict toggle now appears within Schedule Conflicts section for better discoverability
 
 ## [2026-02-06]
 

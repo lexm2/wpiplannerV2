@@ -1,4 +1,4 @@
-import { Section, SimpleTime } from './types';
+import { PeriodType, Section, SimpleTime } from './types';
 import { SelectedCourse } from './schedule';
 
 export interface FilterMetadata {
@@ -124,7 +124,7 @@ export interface PeriodProfessorFilterCriteria {
 }
 
 export interface PeriodTypeFilterCriteria {
-    types: string[]; // Can be string literals or PeriodType enum values (which are strings)
+    types: PeriodType[];
 }
 
 export interface PeriodTermFilterCriteria {

@@ -29,6 +29,9 @@ export interface ConflictFilterOptions {
     idPrefix: string;
     filterId: string;
     avoidConflicts: boolean;
+    includeCalendarToggle?: boolean;
+    hasCalendarEvents?: boolean;
+    calendarEventCount?: number;
 }
 
 export class SharedFilterComponents {
@@ -198,9 +201,27 @@ export class SharedFilterComponents {
     }
 
     static createConflictFilter(options: ConflictFilterOptions): string {
-        const { idPrefix, avoidConflicts } = options;
+        const { idPrefix, avoidConflicts, includeCalendarToggle, hasCalendarEvents, calendarEventCount } = options;
 
         const prefix = idPrefix ? `${idPrefix}-` : '';
+        const avoidId = `${prefix}avoid-conflicts-filter`;
+        const calendarId = `${prefix}avoid-calendar-filter`;
+
+        let calendarToggleHTML = '';
+        if (includeCalendarToggle && calendarEventCount && calendarEventCount > 0) {
+            const countText = calendarEventCount === 1
+                ? '1 event'
+                : `${calendarEventCount} events`;
+
+            calendarToggleHTML = `
+                <label class="filter-toggle-label">
+                    <input type="checkbox" class="filter-toggle" id="${calendarId}"
+                           ${hasCalendarEvents ? 'checked' : ''}>
+                    <span class="filter-toggle-slider"></span>
+                    <span class="filter-toggle-text">Hide periods that conflict with calendar events (${countText})</span>
+                </label>
+            `;
+        }
 
         return `
             <div class="filter-section">
@@ -209,11 +230,12 @@ export class SharedFilterComponents {
                 </div>
                 <div class="filter-section-content">
                     <label class="filter-toggle-label">
-                        <input type="checkbox" class="filter-toggle" id="${prefix}avoid-conflicts-filter"
+                        <input type="checkbox" class="filter-toggle" id="${avoidId}"
                                ${avoidConflicts ? 'checked' : ''}>
                         <span class="filter-toggle-slider"></span>
                         <span class="filter-toggle-text">Hide periods that conflict with selected sections</span>
                     </label>
+                    ${calendarToggleHTML}
                 </div>
             </div>
         `;
