@@ -8,6 +8,11 @@
 - Removed unnecessary ConflictType enum (only one type exists)
 - Removed unused conflict descriptions and fields
 - Refactored conflict detection to return conflict map directly (simpler and faster)
+- Added F (Fall) and S (Spring) to term system for proper graduate course handling
+
+### Fixed
+- Fixed blocked times not applying to Fall (F) and Spring (S) graduate courses
+- Fixed auto-scheduler ignoring time blocks for multi-term courses
 
 ## [2026-01-25]
 
