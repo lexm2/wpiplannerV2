@@ -653,7 +653,7 @@ export class ScheduleController {
             }
         } else {
             const sortedCourses = selectedCourses.sort((a, b) => {
-                const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
+                const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
                 if (deptCompare !== 0) return deptCompare;
                 return a.course.number.localeCompare(b.course.number);
             });
@@ -679,7 +679,7 @@ export class ScheduleController {
 
         if (!hasActiveFilters) {
             const sortedCourses = selectedCourses.sort((a, b) => {
-                const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
+                const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
                 if (deptCompare !== 0) return deptCompare;
                 return a.course.number.localeCompare(b.course.number);
             });
@@ -782,7 +782,7 @@ export class ScheduleController {
             <div class="sidebar-content-item schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}">
                 <div class="schedule-course-header">
                     <div class="schedule-course-info">
-                        <div class="schedule-course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
+                        <div class="schedule-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
                         <div class="schedule-course-name">${Validators.escapeHtml(course.name)}</div>
                         ${selectedComponentsHTML}
                         <div class="schedule-course-credits">${credits}</div>
@@ -983,7 +983,7 @@ export class ScheduleController {
         
         // Sort by department and number (same as display order)
         uniqueCourses.sort((a, b) => {
-            const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
+            const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
             if (deptCompare !== 0) return deptCompare;
             return a.course.number.localeCompare(b.course.number);
         });
@@ -1236,7 +1236,7 @@ export class ScheduleController {
                 const computedTerm = getComputedTerm(sc);
 
                 if (!computedTerm) {
-                    console.warn(`Course ${sc.course.department.abbreviation}${sc.course.number} has no valid section data`);
+                    console.warn(`Course ${sc.course.departmentAbbr}${sc.course.number} has no valid section data`);
                     return false;
                 }
 
@@ -1579,7 +1579,7 @@ export class ScheduleController {
                     ${isPreview ? `color: var(--color-text-primary);` : `color: white; text-shadow: 1px 1px 1px rgba(0,0,0,0.3);`}
                     cursor: pointer;
                 ">
-                    ${occupyingSection.course.course.department.abbreviation}${occupyingSection.course.course.number}
+                    ${occupyingSection.course.course.departmentAbbr}${occupyingSection.course.course.number}
                 </div>
             `);
         }
@@ -1816,7 +1816,7 @@ export class ScheduleController {
 
         // Create section data for modal controller
         const sectionData = {
-            courseCode: `${course.department.abbreviation}${course.number}`,
+            courseCode: `${course.departmentAbbr}${course.number}`,
             courseName: course.name,
             section: section,
             course: course,

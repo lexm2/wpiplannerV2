@@ -71,7 +71,7 @@ export class CourseEntry implements SidebarEntry {
             <div class="schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}" data-entry-id="${this.entryId}" data-course-id="${course.id}">
                 <div class="schedule-course-header">
                     <div class="schedule-course-info">
-                        <div class="schedule-course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
+                        <div class="schedule-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
                         <div class="schedule-course-name">${Validators.escapeHtml(course.name)}</div>
                         ${selectedComponentsHTML}
                         <div class="schedule-course-credits">${credits}</div>

@@ -64,7 +64,8 @@ describe('AvailabilityFilter Integration', () => {
       const csCourse: Course = {
         ...createMockCourse({
           id: 'CS-101',
-          department: csDept
+          departmentAbbr: 'CS',
+          departmentName: 'Computer Science'
         }),
         lectures: [{
           section: csSection,
@@ -90,7 +91,8 @@ describe('AvailabilityFilter Integration', () => {
       const maCourse: Course = {
         ...createMockCourse({
           id: 'MA-101',
-          department: maDept
+          departmentAbbr: 'MA',
+          departmentName: 'Mathematical Sciences'
         }),
         lectures: [{
           section: maSection,

@@ -19,7 +19,8 @@ describe('SearchService Ranking', () => {
                 name: 'Calculus I',
                 number: '1020',
                 description: 'Introduction to differential calculus',
-                department: mathDept,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
                 minCredits: 3,
                 maxCredits: 3
             },
@@ -28,7 +29,8 @@ describe('SearchService Ranking', () => {
                 name: 'Calculus II',
                 number: '1021',
                 description: 'Introduction to integral calculus',
-                department: mathDept,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
                 minCredits: 3,
                 maxCredits: 3
             },
@@ -37,7 +39,8 @@ describe('SearchService Ranking', () => {
                 name: 'Calculus III',
                 number: '1022',
                 description: 'Multivariable calculus',
-                department: mathDept,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
                 minCredits: 3,
                 maxCredits: 3
             },
@@ -46,7 +49,8 @@ describe('SearchService Ranking', () => {
                 name: 'Matrix Algebra',
                 number: '2051',
                 description: 'Linear algebra with MA1022 prerequisite',
-                department: mathDept,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
                 minCredits: 3,
                 maxCredits: 3
             }
@@ -86,13 +90,15 @@ describe('SearchService Ranking', () => {
                 name: 'Calculus IV',
                 number: '1024',
                 description: 'Advanced multivariable calculus',
-                department: testCourses[0].department,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
                 minCredits: 3,
                 maxCredits: 3
             };
 
             searchService.setCourseData([{
-                ...testCourses[0].department,
+                abbreviation: 'MA',
+                name: 'Mathematical Sciences',
                 courses: [...testCourses, ma1024]
             }]);
 
@@ -126,7 +132,7 @@ describe('SearchService Ranking', () => {
 
             expect(results.length).toBe(4);
             results.forEach(course => {
-                expect(course.department.abbreviation).toBe('MA');
+                expect(course.departmentAbbr).toBe('MA');
             });
         });
     });
@@ -215,7 +221,8 @@ describe('SearchService Ranking', () => {
                 name: 'Advanced Mathematics',
                 number: '2222',
                 description: 'Advanced topics in mathematics',
-                department: testCourses[0].department,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
                 minCredits: 3,
                 maxCredits: 3
             };
@@ -225,7 +232,8 @@ describe('SearchService Ranking', () => {
                 name: 'Unrelated Course',
                 number: '9999',
                 description: 'Prerequisites include MA2222',
-                department: testCourses[0].department,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
                 minCredits: 3,
                 maxCredits: 3
             };
@@ -245,7 +253,8 @@ describe('SearchService Ranking', () => {
                 name: 'Linear Algebra',
                 number: '3000',
                 description: 'Study of linear algebra',
-                department: testCourses[0].department,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
                 minCredits: 3,
                 maxCredits: 3
             };
@@ -255,7 +264,8 @@ describe('SearchService Ranking', () => {
                 name: 'Differential Equations',
                 number: '3001',
                 description: 'Requires Linear Algebra knowledge',
-                department: testCourses[0].department,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
                 minCredits: 3,
                 maxCredits: 3
             };
@@ -275,7 +285,8 @@ describe('SearchService Ranking', () => {
                 name: 'Programming',
                 number: '1234',
                 description: 'Intro to programming',
-                department: testCourses[0].department,
+                departmentAbbr: 'CS',
+                departmentName: 'Computer Science',
                 minCredits: 3,
                 maxCredits: 3
             };
@@ -285,7 +296,8 @@ describe('SearchService Ranking', () => {
                 name: 'Computer Science Basics',
                 number: '123',
                 description: 'CS fundamentals',
-                department: testCourses[0].department,
+                departmentAbbr: 'CS',
+                departmentName: 'Computer Science',
                 minCredits: 3,
                 maxCredits: 3
             };

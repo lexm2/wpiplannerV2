@@ -140,7 +140,8 @@ export class CourseDataService {
                     number: courseData.number,
                     name: courseData.name,
                     description: this.stripHtml(courseData.description || ''),
-                    department: department,
+                    departmentAbbr: department.abbreviation,
+                    departmentName: department.name,
                     lectures: lectures.length > 0 ? lectures : undefined,
                     standaloneLabs: standaloneLabs,
                     minCredits: courseData.minCredits || 0,
@@ -340,11 +341,11 @@ export class CourseDataService {
         }
 
         const queryLower = query.toLowerCase();
-        return allCourses.filter(course => 
+        return allCourses.filter(course =>
             course.name.toLowerCase().includes(queryLower) ||
             course.number.toLowerCase().includes(queryLower) ||
             course.id.toLowerCase().includes(queryLower) ||
-            course.department.abbreviation.toLowerCase().includes(queryLower)
+            course.departmentAbbr.toLowerCase().includes(queryLower)
         );
     }
 

@@ -12,6 +12,9 @@
 - Unified conflict detection system - calendar events and section conflicts now use the same filtering mechanism
 - Simplified filter architecture by merging BlockedTimesFilter into ConflictFilter
 - Calendar event conflict toggle now appears within Schedule Conflicts section for better discoverability
+- Eliminated circular references between Course and Department by flattening department data
+- Simplified JSON serialization by removing custom circular reference handling
+- Standard JSON.stringify/parse now works directly with course data
 
 ## [2026-02-06]
 

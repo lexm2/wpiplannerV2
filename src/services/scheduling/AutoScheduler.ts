@@ -84,7 +84,7 @@ export class AutoScheduler {
       const candidates = this.getMaskedCandidates(selectedCourse, blockedMasksByTerm);
 
       if (candidates.length === 0) {
-        console.warn(`[AutoScheduler] No valid candidates for ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number}`);
+        console.warn(`[AutoScheduler] No valid candidates for ${selectedCourse.course.departmentAbbr}${selectedCourse.course.number}`);
         return [];
       }
 

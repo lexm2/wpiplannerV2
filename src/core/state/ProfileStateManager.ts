@@ -3,7 +3,7 @@ import { ApplicationState } from '../../types'
 import { ScheduleState } from '../../types/ScheduleState'
 import type { TransactionResult } from '../storage'
 import { TransactionalStorageManager } from '../storage'
-import { getAllSections, createJSONReplacer, createJSONReviver, logger } from '../../utils'
+import { getAllSections, setReplacer, setReviver, logger } from '../../utils'
 import { UndoRedoManager } from './UndoRedoManager'
 import { ModalService } from '../../services/ui'
 
@@ -228,7 +228,7 @@ export class ProfileStateManager {
                 }
             }
 
-            logger.warn(`Section ${sectionNumber} not found in course ${course.department.abbreviation}${course.number}`);
+            logger.warn(`Section ${sectionNumber} not found in course ${course.departmentAbbr}${course.number}`);
         });
     }
 
@@ -544,7 +544,7 @@ export class ProfileStateManager {
     }
 
     private deepClone<T>(obj: T): T {
-        return JSON.parse(JSON.stringify(obj, createJSONReplacer()), createJSONReviver());
+        return JSON.parse(JSON.stringify(obj, setReplacer), setReviver);
     }
 
     canUndo(): boolean {
@@ -662,7 +662,7 @@ export class ProfileStateManager {
                     coursesCount: s.selectedCourses.length,
                     selectedCourses: s.selectedCourses.map(sc => ({
                         courseId: sc.course.id,
-                        courseName: `${sc.course.department.abbreviation}${sc.course.number}`,
+                        courseName: `${sc.course.departmentAbbr}${sc.course.number}`,
                         selectedComponents: {
                             lecture: sc.selectedLecture?.number || null,
                             discussion: sc.selectedDiscussion?.number || null,
@@ -674,7 +674,7 @@ export class ProfileStateManager {
                 selectedCoursesCount: loadedCourses.length,
                 selectedCourses: loadedCourses.map(sc => ({
                     courseId: sc.course.id,
-                    courseName: `${sc.course.department.abbreviation}${sc.course.number}`,
+                    courseName: `${sc.course.departmentAbbr}${sc.course.number}`,
                     selectedComponents: {
                         lecture: sc.selectedLecture?.number || null,
                         discussion: sc.selectedDiscussion?.number || null,

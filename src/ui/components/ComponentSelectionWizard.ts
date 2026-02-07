@@ -600,7 +600,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         return `
             <div class="wizard-header">
                 <button class="wizard-close-btn" id="wizard-close-btn">&times;</button>
-                <h2>${Validators.escapeHtml(this.course.department.abbreviation)} ${Validators.escapeHtml(this.course.number)}</h2>
+                <h2>${Validators.escapeHtml(this.course.departmentAbbr)} ${Validators.escapeHtml(this.course.number)}</h2>
                 <div class="wizard-course-name">${Validators.escapeHtml(this.course.name)}</div>
             </div>
 

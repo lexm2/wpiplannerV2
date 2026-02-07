@@ -18,7 +18,7 @@ export class DepartmentFilter implements SectionBasedFilter {
         );
 
         return sections.filter(fs =>
-            departmentSet.has(fs.course.department.abbreviation.toLowerCase())
+            departmentSet.has(fs.course.departmentAbbr.toLowerCase())
         );
     }
     

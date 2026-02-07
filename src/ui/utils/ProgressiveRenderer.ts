@@ -195,7 +195,7 @@ export class ProgressiveRenderer {
                                 <button class="course-bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" title="${isBookmarked ? 'Remove bookmark' : 'Add bookmark'}">
                                     ${isBookmarked ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon') : getInlineSVG('BOOKMARK', 'bookmark-icon')}
                                 </button>
-                                <div class="course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
+                                <div class="course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
                                 <div class="course-name">
                                     <span class="course-name-text">${Validators.escapeHtml(course.name)}</span>
                                 </div>
@@ -387,7 +387,7 @@ export class ProgressiveRenderer {
                             <div class="course-card-info">
                                 <div class="course-title-main">${Validators.escapeHtml(course.name)}</div>
                                 <div class="course-code-row">
-                                    <div class="course-code-badge">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
+                                    <div class="course-code-badge">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
                                     ${hasWarning ? `<span class="capacity-badge">At capacity</span>` : ''}
                                 </div>
                             </div>

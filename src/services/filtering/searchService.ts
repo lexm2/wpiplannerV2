@@ -47,12 +47,12 @@ export class SearchService {
 
         // PHASE 1: Search ID/Name/Number only (no descriptions)
         const phase1Results = courses.filter(course => {
-            const courseCode = `${course.department.abbreviation}${course.number}`;
+            const courseCode = `${course.departmentAbbr}${course.number}`;
             const courseTextNoDesc = [
                 course.id,
                 course.name,
-                course.department.abbreviation,
-                course.department.name,
+                course.departmentAbbr,
+                course.departmentName,
                 course.number,
                 courseCode
             ].join(' ').toLowerCase();
@@ -75,8 +75,8 @@ export class SearchService {
     private applyFilters(courses: Course[], filters: SearchFilter): Course[] {
         return courses.filter(course => {
             // Department filter
-            if (filters.departments.length > 0 && 
-                !filters.departments.includes(course.department.abbreviation.toLowerCase())) {
+            if (filters.departments.length > 0 &&
+                !filters.departments.includes(course.departmentAbbr.toLowerCase())) {
                 return false;
             }
 
@@ -167,7 +167,7 @@ export class SearchService {
 
         const queryLower = query.toLowerCase();
         const normalizedQuery = query.replace(/[-\s]/g, '').toLowerCase();
-        const courseCode = `${course.department.abbreviation}${course.number}`.toLowerCase().replace(/[-\s]/g, '');
+        const courseCode = `${course.departmentAbbr}${course.number}`.toLowerCase().replace(/[-\s]/g, '');
         const normalizedId = course.id.toLowerCase().replace(/[-\s]/g, '');
         const courseName = course.name.toLowerCase();
         const courseDescription = course.description.toLowerCase();
@@ -197,8 +197,8 @@ export class SearchService {
         if (courseName.includes(queryLower)) score += 400;
 
         // TIER 7: Department matches (300+ points)
-        if (course.department.abbreviation.toLowerCase() === normalizedQuery) score += 350;
-        if (course.department.abbreviation.toLowerCase().startsWith(normalizedQuery)) score += 300;
+        if (course.departmentAbbr.toLowerCase() === normalizedQuery) score += 350;
+        if (course.departmentAbbr.toLowerCase().startsWith(normalizedQuery)) score += 300;
 
         // TIER 8: Description matches (1 point only)
         if (courseDescription.includes(queryLower)) score += 1;
@@ -264,13 +264,13 @@ export class SearchService {
     }
 
     private extractKeywords(course: Course): string[] {
-        const courseCode = `${course.department.abbreviation}${course.number}`.toLowerCase();
+        const courseCode = `${course.departmentAbbr}${course.number}`.toLowerCase();
         const keywords = [
             course.id.toLowerCase(),
             course.name.toLowerCase(),
             course.number.toLowerCase(),
-            course.department.abbreviation.toLowerCase(),
-            course.department.name.toLowerCase(),
+            course.departmentAbbr.toLowerCase(),
+            course.departmentName.toLowerCase(),
             courseCode,
             ...course.description.toLowerCase().split(/\s+/)
         ];

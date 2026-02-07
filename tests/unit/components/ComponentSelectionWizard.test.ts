@@ -25,12 +25,6 @@ describe('ComponentSelectionWizard', () => {
     let mockOnComplete: ReturnType<typeof mock>;
     let mockOnCancel: ReturnType<typeof mock>;
 
-    // Test data
-    const department: Department = {
-        abbreviation: 'CS',
-        name: 'Computer Science',
-        courses: []
-    };
 
     const createPeriod = (type: PeriodType, days: DayOfWeek[]): Period => ({
         type,
@@ -67,7 +61,8 @@ describe('ComponentSelectionWizard', () => {
         description: 'Basic programming course',
         minCredits: 3.0,
         maxCredits: 3.0,
-        department: department,
+        departmentAbbr: 'CS',
+        departmentName: 'Computer Science',
         lectures: [
             {
                 section: createSection(12345, 'A01', PeriodType.LECTURE),
@@ -101,7 +96,8 @@ describe('ComponentSelectionWizard', () => {
         description: 'Lab only course',
         minCredits: 1.0,
         maxCredits: 1.0,
-        department: department,
+        departmentAbbr: 'CS',
+        departmentName: 'Computer Science',
         standaloneLabs: [
             createSection(12351, 'L01', PeriodType.LAB),
             createSection(12352, 'L02', PeriodType.LAB)
@@ -651,7 +647,7 @@ describe('ComponentSelectionWizard', () => {
             );
 
             const content = wizard['renderContent']();
-            expect(content).toContain(course.department.abbreviation);
+            expect(content).toContain(course.departmentAbbr);
             expect(content).toContain(course.number);
             expect(content).toContain(course.name);
         });

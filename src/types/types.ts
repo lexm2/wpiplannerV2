@@ -12,7 +12,8 @@ export interface Course {
     number: string;
     name: string;
     description: string;
-    department: Department;
+    departmentAbbr: string;
+    departmentName: string;
     lectures?: LectureGroup[];
     standaloneLabs?: Section[];
     minCredits: number;

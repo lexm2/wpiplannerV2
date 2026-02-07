@@ -54,7 +54,7 @@ export class ScheduleSearchTextFilter implements SectionFilter<SearchTextFilterC
             // Search in course info
             if (course.name.toLowerCase().includes(query) ||
                 course.number.toLowerCase().includes(query) ||
-                course.department.abbreviation.toLowerCase().includes(query)) {
+                course.departmentAbbr.toLowerCase().includes(query)) {
                 return true;
             }
 

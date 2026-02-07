@@ -1,4 +1,4 @@
-import { createJSONReplacer, createJSONReviver } from '../../utils/jsonSerializer';
+import { setReplacer, setReviver } from '../../utils/jsonSerializer';
 
 interface StateSnapshot {
   timestamp: number;
@@ -84,7 +84,7 @@ export class UndoRedoManager {
   }
 
   private deepClone<T>(obj: T): T {
-    return JSON.parse(JSON.stringify(obj, createJSONReplacer()), createJSONReviver());
+    return JSON.parse(JSON.stringify(obj, setReplacer), setReviver);
   }
 
   private deepCloneSchedulesMap(schedules: Map<string, any>): Map<string, any> {

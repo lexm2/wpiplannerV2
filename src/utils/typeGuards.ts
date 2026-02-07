@@ -75,7 +75,7 @@ export function validateSelectedCourses(selectedCourses: any[], attemptRepair: b
             if (attemptRepair) {
                 const repaired = repairSelectedCourse(sc);
                 if (repaired && isValidSelectedCourse(repaired)) {
-                    console.log(`validateSelectedCourses: Successfully repaired course at index ${index} (${sc.course?.department?.abbreviation}${sc.course?.number})`);
+                    console.log(`validateSelectedCourses: Successfully repaired course at index ${index} (${sc.course?.departmentAbbr}${sc.course?.number})`);
                     validCourses.push(repaired);
                     repairedCourses.push(repaired);
                 } else {
@@ -137,21 +137,21 @@ export function repairSelectedCourse(sc: any): SelectedCourse | null {
 
     // Try to repair hierarchical selections (selectedLecture, selectedDiscussion, selectedLab)
     if (sc.selectedLecture && !isValidSection(sc.selectedLecture)) {
-        console.warn(`repairSelectedCourse: Invalid selectedLecture, clearing it for course ${sc.course.department?.abbreviation}${sc.course.number}`);
+        console.warn(`repairSelectedCourse: Invalid selectedLecture, clearing it for course ${sc.course.departmentAbbr}${sc.course.number}`);
         repaired.selectedLecture = null;
     } else if (sc.selectedLecture) {
         repaired.selectedLecture = sc.selectedLecture;
     }
 
     if (sc.selectedDiscussion && !isValidSection(sc.selectedDiscussion)) {
-        console.warn(`repairSelectedCourse: Invalid selectedDiscussion, clearing it for course ${sc.course.department?.abbreviation}${sc.course.number}`);
+        console.warn(`repairSelectedCourse: Invalid selectedDiscussion, clearing it for course ${sc.course.departmentAbbr}${sc.course.number}`);
         repaired.selectedDiscussion = null;
     } else if (sc.selectedDiscussion) {
         repaired.selectedDiscussion = sc.selectedDiscussion;
     }
 
     if (sc.selectedLab && !isValidSection(sc.selectedLab)) {
-        console.warn(`repairSelectedCourse: Invalid selectedLab, clearing it for course ${sc.course.department?.abbreviation}${sc.course.number}`);
+        console.warn(`repairSelectedCourse: Invalid selectedLab, clearing it for course ${sc.course.departmentAbbr}${sc.course.number}`);
         repaired.selectedLab = null;
     } else if (sc.selectedLab) {
         repaired.selectedLab = sc.selectedLab;

@@ -3,7 +3,7 @@
  */
 
 import { Schedule } from '../../types/schedule';
-import { safeStringify, safeParse } from '../../utils/jsonSerializer';
+import { setReplacer, setReviver } from '../../utils/jsonSerializer';
 import LZString from 'lz-string';
 import { WorkerPoolManager } from '../../workers/WorkerPoolManager';
 import { WorkerTaskType } from '../../workers/protocol';
@@ -170,10 +170,10 @@ export class IndexedDBStorageManager {
                                     return;
                                 }
 
-                                const deserialized = safeParse(decompressed) as Schedule;
+                                const deserialized = JSON.parse(decompressed, setReviver) as Schedule;
                                 resolve({ success: true, data: deserialized });
                             } else {
-                                const deserialized = safeParse(stored.serializedData) as Schedule;
+                                const deserialized = JSON.parse(stored.serializedData, setReviver) as Schedule;
                                 resolve({ success: true, data: deserialized });
                             }
                         } else {
@@ -221,7 +221,7 @@ export class IndexedDBStorageManager {
                                 ? LZString.decompress(stored.serializedData)
                                 : stored.serializedData;
 
-                            return safeParse(json || stored.serializedData);
+                            return JSON.parse(json || stored.serializedData, setReviver);
                         }
                         return stored;
                     });
@@ -292,7 +292,7 @@ export class IndexedDBStorageManager {
             let totalSize = 0;
 
             schedules.forEach(schedule => {
-                const serialized = safeStringify(schedule);
+                const serialized = JSON.stringify(schedule, setReplacer);
                 const size = new Blob([serialized]).size;
                 schedulesSizes.set(schedule.id, size);
                 totalSize += size;

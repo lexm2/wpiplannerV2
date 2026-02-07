@@ -221,7 +221,7 @@ export class ScheduleState {
         const byDept = new Map<string, SelectedCourse[]>();
 
         for (const sc of this.selectedCourses) {
-            const dept = sc.course.department?.abbreviation || 'Unknown';
+            const dept = sc.course.departmentAbbr || 'Unknown';
             if (!byDept.has(dept)) {
                 byDept.set(dept, []);
             }

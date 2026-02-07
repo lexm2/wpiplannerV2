@@ -1,6 +1,6 @@
 import LZString from 'lz-string';
 import { WorkerRequest, WorkerResponse, WorkerTaskType } from './protocol';
-import { safeStringify } from '../utils/jsonSerializer';
+import { setReplacer } from '../utils/jsonSerializer';
 
 self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
   const { id, type, payload } = event.data;
@@ -11,7 +11,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
 
     switch (type) {
       case WorkerTaskType.COMPRESS_DATA: {
-        const serialized = safeStringify(payload.data);
+        const serialized = JSON.stringify(payload.data, setReplacer);
         result = LZString.compress(serialized);
         break;
       }

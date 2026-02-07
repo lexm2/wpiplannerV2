@@ -102,7 +102,7 @@ export class ICSGenerator {
     }
 
     private static generateUID(course: SelectedCourse, section: Section, period: Period, startDate: Date): string {
-        const courseId = `${course.course.department.abbreviation}${course.course.number}`;
+        const courseId = `${course.course.departmentAbbr}${course.course.number}`;
         const year = startDate.getFullYear();
         const month = String(startDate.getMonth() + 1).padStart(2, '0');
         const day = String(startDate.getDate()).padStart(2, '0');
@@ -174,7 +174,7 @@ export class ICSGenerator {
 
                     const uid = this.generateUID(selectedCourse, section, period, startDateTime);
 
-                    const courseId = `${selectedCourse.course.department.abbreviation}-${selectedCourse.course.number}`;
+                    const courseId = `${selectedCourse.course.departmentAbbr}-${selectedCourse.course.number}`;
                     const periodTypePrefix = period.type.charAt(0).toUpperCase() + period.type.slice(1);
                     const summary = `${periodTypePrefix}: ${courseId} ${selectedCourse.course.name}`;
 

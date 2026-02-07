@@ -251,7 +251,7 @@ export class CourseFilterService {
     
     private getDepartmentOptions(courses: Course[]): string[] {
         const departments = new Set<string>();
-        courses.forEach(course => departments.add(course.department.abbreviation));
+        courses.forEach(course => departments.add(course.departmentAbbr));
         return Array.from(departments).sort();
     }
     

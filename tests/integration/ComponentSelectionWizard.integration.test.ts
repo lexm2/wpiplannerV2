@@ -2,18 +2,12 @@ import { describe, test, expect, beforeEach, mock, spyOn } from 'bun:test';
 import { ComponentSelectionWizard } from '../../src/ui/components/ComponentSelectionWizard';
 import { CourseDataService } from '../../src/services/data/courseDataService';
 import { CourseSelectionService } from '../../src/services/selection/CourseSelectionService';
-import { Course, Section, Period, Department, PeriodType, DayOfWeek } from '../../src/types/types';
+import { Course, Section, Period, PeriodType, DayOfWeek } from '../../src/types/types';
 import { AcademicTerm } from '../../src/types/schedule';
 
 describe('ComponentSelectionWizard Integration', () => {
     let courseDataService: CourseDataService;
     let courseSelectionService: CourseSelectionService;
-
-    const department: Department = {
-        abbreviation: 'CS',
-        name: 'Computer Science',
-        courses: []
-    };
 
     const createPeriod = (type: PeriodType): Period => ({
         type,
@@ -50,7 +44,8 @@ describe('ComponentSelectionWizard Integration', () => {
         description: 'Basic programming course',
         minCredits: 3,
         maxCredits: 3,
-        department: department,
+        departmentAbbr: 'CS',
+        departmentName: 'Computer Science',
         lectures: [
             {
                 section: createSection(12345, 'A01', PeriodType.LECTURE),

@@ -577,7 +577,7 @@ export class CourseController {
         let html = `
             <div class="course-info">
                 <div class="course-title">${Validators.escapeHtml(course.name)}</div>
-                <div class="course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)} (${credits})</div>
+                <div class="course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)} (${credits})</div>
             </div>
             <div class="course-description-text">${Validators.escapeHtml(course.description)}</div>
         `;
@@ -865,7 +865,7 @@ export class CourseController {
 
         // Sort selected courses by department and number
         const sortedCourses = selectedCourses.sort((a, b) => {
-            const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
+            const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
             if (deptCompare !== 0) return deptCompare;
             return a.course.number.localeCompare(b.course.number);
         });
@@ -880,7 +880,7 @@ export class CourseController {
             html += `
                 <div class="selected-course-item" data-course-id="${Validators.escapeHtml(course.id)}">
                     <div class="selected-course-info">
-                        <div class="selected-course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
+                        <div class="selected-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
                         <div class="selected-course-name">${Validators.escapeHtml(course.name)}</div>
                         <div class="selected-course-credits">${credits}</div>
                     </div>

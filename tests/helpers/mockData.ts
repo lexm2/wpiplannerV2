@@ -1,7 +1,5 @@
 import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB, PeriodType, SectionType } from '../../src/types/types'
 import { SelectedCourse, Schedule, AcademicTerm } from '../../src/types/schedule'
-import { BlockedTimesFilter } from '../../src/core/filtering/filters/BlockedTimesFilter'
-import { WakeUpTimeFilter } from '../../src/core/filtering/filters/WakeUpTimeFilter'
 
 export const createMockTime = (hours: number, minutes: number): Time => ({
   hours,
@@ -50,14 +48,13 @@ export const createMockDepartment = (overrides: Partial<Department> = {}): Depar
 })
 
 export const createMockCourse = (overrides: Partial<Course> = {}): Course => {
-  const department = createMockDepartment()
-
   const defaultCourse: Course = {
     id: 'CS-1101',
     number: '1101',
     name: 'Introduction to Programming Design',
     description: 'An introduction to the design and analysis of algorithms and data structures.',
-    department,
+    departmentAbbr: 'CS',
+    departmentName: 'Computer Science',
     minCredits: 3,
     maxCredits: 3,
   }
@@ -73,14 +70,16 @@ export const createMockScheduleDB = (overrides: Partial<ScheduleDB> = {}): Sched
     id: 'CS-1101', 
     number: '1101',
     name: 'Introduction to Programming Design',
-    department: csDept
+    departmentAbbr: 'CS',
+    departmentName: 'Computer Science'
   })
   
   const maCourse = createMockCourse({ 
     id: 'MA-1021', 
     number: '1021',
     name: 'Calculus I',
-    department: maDept
+    departmentAbbr: 'MA',
+    departmentName: 'Mathematical Sciences'
   })
   
   csDept.courses = [csCourse]
@@ -235,6 +234,8 @@ export const createCoursesWithConflicts = (): {
     id: 'CS-1101',
     number: '1101',
     name: 'Intro to Programming',
+    departmentAbbr: 'CS',
+    departmentName: 'Computer Science',
     lectures: [{
       section: conflictingSection1,
       compatibleDiscussions: [],
@@ -246,6 +247,8 @@ export const createCoursesWithConflicts = (): {
     id: 'MA-1021',
     number: '1021',
     name: 'Calculus I',
+    departmentAbbr: 'MA',
+    departmentName: 'Mathematical Sciences',
     lectures: [{
       section: conflictingSection2,
       compatibleDiscussions: [],
@@ -287,6 +290,8 @@ export const createLargeCombinationSpace = (
       id: `TEST-${i + 1}000`,
       number: `${i + 1}000`,
       name: `Test Course ${i + 1}`,
+      departmentAbbr: 'TEST',
+      departmentName: 'Test Department',
       lectures
     }))
   }
@@ -304,12 +309,7 @@ interface MockScheduleFilterService {
 
 export const createMockScheduleFilterService = (): MockScheduleFilterService => {
   const activeFilters = new Map<string, any>()
-  const blockedTimesFilter = new BlockedTimesFilter()
-  const wakeUpTimeFilter = new WakeUpTimeFilter()
-
   const registeredFilters = new Map<string, any>()
-  registeredFilters.set('blockedTimes', blockedTimesFilter)
-  registeredFilters.set('wakeUpTime', wakeUpTimeFilter)
 
   return {
     filterSections: (selectedCourses: SelectedCourse[]): Array<{ course: SelectedCourse; section: Section }> => {

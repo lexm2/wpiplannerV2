@@ -583,7 +583,7 @@ export class MainController {
                                             id: course.id,
                                             number: course.number,
                                             name: course.name,
-                                            department: course.department?.abbreviation,
+                                            department: course.departmentAbbr,
                                             hasLectures: !!course.lectures && course.lectures.length > 0,
                                             lecturesCount: course.lectures?.length || 0,
                                             hasStandaloneLabs: !!course.standaloneLabs && course.standaloneLabs.length > 0,
@@ -680,7 +680,7 @@ export class MainController {
                         sc.selectedDiscussion ? `D:${sc.selectedDiscussion.number}` : null,
                         sc.selectedLab ? `Lab:${sc.selectedLab.number}` : null
                     ].filter(Boolean).join(', ');
-                    console.log(`${sc.course.department.abbreviation}${sc.course.number}: ${components || 'NO COMPONENTS'} ${hasLecture ? 'OK' : 'MISSING'}`);
+                    console.log(`${sc.course.departmentAbbr}${sc.course.number}: ${components || 'NO COMPONENTS'} ${hasLecture ? 'OK' : 'MISSING'}`);
                     if (hasLecture && sc.selectedLecture) {
                         console.log(`  Term: ${sc.selectedLecture.term}, Periods: ${sc.selectedLecture.periods.length}`);
                         console.log(`  Full lecture section:`, sc.selectedLecture);

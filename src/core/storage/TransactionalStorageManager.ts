@@ -3,7 +3,7 @@
  */
 import { Schedule, UserScheduleState, SchedulePreferences } from '../../types/schedule'
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
-import { createJSONReplacer, createJSONReviver } from '../../utils/jsonSerializer'
+import { setReplacer, setReviver } from '../../utils/jsonSerializer'
 import { ScheduleState } from '../../types/ScheduleState'
 import { ApplicationState } from '../../types/ApplicationState'
 
@@ -121,7 +121,7 @@ export class TransactionalStorageManager {
 
     saveUserState(state: UserScheduleState): TransactionResult {
         return this.executeSyncTransaction(() => {
-            const serializedState = this.safeStringify(state);
+            const serializedState = JSON.stringify(state, this.replacer);
             localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.USER_STATE, serializedState);
         });
     }
@@ -176,7 +176,7 @@ export class TransactionalStorageManager {
 
     savePreferences(preferences: SchedulePreferences): TransactionResult {
         return this.executeSyncTransaction(() => {
-            const serializedPreferences = this.safeStringify(preferences);
+            const serializedPreferences = JSON.stringify(preferences, this.replacer);
             localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.PREFERENCES, serializedPreferences);
         });
     }
@@ -316,7 +316,7 @@ export class TransactionalStorageManager {
             if (preferences) {
                 localStorage.setItem(
                     TransactionalStorageManager.STORAGE_KEYS.PREFERENCES,
-                    this.safeStringify(preferences)
+                    JSON.stringify(preferences, this.replacer)
                 );
             }
 
@@ -410,12 +410,8 @@ export class TransactionalStorageManager {
         }
     }
 
-    private safeStringify(data: any): string {
-        return JSON.stringify(data, createJSONReplacer());
-    }
-
-    private readonly replacer = createJSONReplacer();
-    private readonly reviver = createJSONReviver();
+    private readonly replacer = setReplacer;
+    private readonly reviver = setReviver;
 
     private getDefaultPreferences(): SchedulePreferences {
         return {
