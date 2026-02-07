@@ -183,7 +183,7 @@ export class CourseSelectionService {
 
     async toggleCourseSelection(course: Course, options: CourseSelectionOptions = {}): Promise<CourseSelectionResult> {
         const isSelected = this.isCourseSelected(course);
-        
+
         if (isSelected) {
             return this.unselectCourse(course);
         } else {
