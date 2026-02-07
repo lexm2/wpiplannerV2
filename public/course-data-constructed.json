@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 7, 2026, 2:03 PM",
+  "generated": "Feb 7, 2026, 2:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -86190,7 +86190,7 @@
                 "number": "D01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course examines the major theoretical and methodological approaches that characterize global studies . Since the end of the Cold War, new forms of transnational integration, interdependence and conflict have been considered examples of globalization . Yet this period is not the first to undergo such transformation, and the “global” is often experienced in disparate ways around the world . This course examines the diverse ways of understanding globalization in the past and present . No prior background is required . Especially appropriate for students interested in any of WPI’s global Project Centers .",
@@ -86209,7 +86209,7 @@
                     "room": "Salisbury Labs 407",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
