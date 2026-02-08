@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 8, 2026, 9:22 PM",
+  "generated": "Feb 8, 2026, 9:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -44885,7 +44885,7 @@
                 "number": "D02",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. IBuilding on a fundamental knowledge of data structures, data abstraction techniques, and mathematical tools, a number of examples of algorithm design and analysis — worst case and average case — will be developed. Topics include greedy algorithms, divide-and-conquer, dynamic programming, heuristics, and probabilistic algorithms. Problems will be drawn from areas such as sorting, graph theory, and string processing. The influence of the computational model on algorithm design will be discussed. Students will be expected to perform analysis on a variety of algorithms.Recommended background: CS 2102 or CS 2103, and CS 2022.",
@@ -44904,7 +44904,7 @@
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
                     "days": [
@@ -46742,7 +46742,7 @@
                 "crn": 337593,
                 "number": "D01",
                 "seats": 100,
-                "seatsAvailable": 28,
+                "seatsAvailable": 29,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -46761,7 +46761,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 100,
-                    "seatsAvailable": 28,
+                    "seatsAvailable": 29,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
