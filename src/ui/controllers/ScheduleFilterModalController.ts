@@ -5,8 +5,7 @@ import { BaseModal } from '../components/BaseModal';
 import { getAllSections } from '../../utils/courseUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
-import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTypeFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria, GraduateLevelFilterCriteria } from '../../types/filters';
-import { PeriodType } from '../../types/types';
+import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria, GraduateLevelFilterCriteria } from '../../types/filters';
 
 export class ScheduleFilterModalController extends BaseModal {
     private scheduleFilterService: ScheduleFilterService | null = null;
@@ -104,7 +103,6 @@ export class ScheduleFilterModalController extends BaseModal {
                 ${this.createSearchTextFilter()}
                 ${this.createProfessorFilter()}
                 ${this.createRMPRatingFilter()}
-                ${this.createPeriodTypeFilter()}
                 ${this.createTermFilter()}
                 ${this.createGraduateLevelFilter()}
                 ${this.createAvailabilityFilter()}
@@ -187,39 +185,6 @@ export class ScheduleFilterModalController extends BaseModal {
         });
     }
 
-    private createPeriodTypeFilter(): string {
-        if (!this.scheduleFilterService) return '';
-
-        const typeOptions = this.scheduleFilterService.getFilterOptions('periodType', this.selectedCourses) || [];
-        const activeTypes = this.getActivePeriodTypes();
-
-        if (typeOptions.length === 0) {
-            return '';
-        }
-
-        const typeCheckboxes = typeOptions.map((option: any) => `
-            <label class="filter-toggle-label">
-                <input type="checkbox" class="filter-toggle" name="periodType" value="${option.value}"
-                       ${activeTypes.includes(option.value) ? 'checked' : ''}>
-                <span class="filter-toggle-slider"></span>
-                <span class="filter-toggle-text">${option.label}</span>
-            </label>
-        `).join('');
-
-        return `
-            <div class="filter-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Exclude Period Types</h4>
-                </div>
-                <div class="filter-section-content">
-                    <div class="filter-checkbox-row">
-                        ${typeCheckboxes}
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
     private createTermFilter(): string {
         if (!this.scheduleFilterService) return '';
 
@@ -294,12 +259,6 @@ export class ScheduleFilterModalController extends BaseModal {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodProfessor');
         const criteria = filter?.criteria as PeriodProfessorFilterCriteria | undefined;
         return criteria?.professors || [];
-    }
-
-    private getActivePeriodTypes(): PeriodType[] {
-        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodType');
-        const criteria = filter?.criteria as PeriodTypeFilterCriteria | undefined;
-        return criteria?.types || [];
     }
 
     private getActiveTerms(): AcademicTerm[] {
@@ -379,14 +338,6 @@ export class ScheduleFilterModalController extends BaseModal {
 
         // RMP Rating filter
         this.setupRMPRatingFilter(modalElement);
-
-        // Period type checkboxes
-        modalElement.querySelectorAll('input[name="periodType"]').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                this.updatePeriodTypeFilter();
-                this.updatePreview(modalElement);
-            });
-        });
 
         // Term checkboxes
         modalElement.querySelectorAll('input[name="periodTerm"]').forEach(checkbox => {
@@ -479,22 +430,6 @@ export class ScheduleFilterModalController extends BaseModal {
     }
 
 
-
-    private updatePeriodTypeFilter(): void {
-        if (!this.modalId) return;
-
-        const modalElement = document.getElementById(this.modalId);
-        if (modalElement) {
-            const checkedTypes = Array.from(modalElement.querySelectorAll('input[name="periodType"]:checked'))
-                .map(cb => (cb as HTMLInputElement).value as PeriodType);
-
-            if (checkedTypes.length > 0) {
-                this.scheduleFilterService!.addFilter('periodType', { types: checkedTypes });
-            } else {
-                this.scheduleFilterService!.removeFilter('periodType');
-            }
-        }
-    }
 
     private updateTermFilter(): void {
         if (!this.modalId) return;

@@ -5,6 +5,9 @@
 ### Added
 - "Clear All Data" button in schedules modal to reset all schedules and data
 
+### Removed
+- "Exclude Period Types" filter (unused feature)
+
 ### Fixed
 - Course selection buttons now work correctly (validator updated to match current data structure)
 

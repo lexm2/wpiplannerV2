@@ -2,7 +2,6 @@ import { Period, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
 import { PeriodDaysFilter } from '../../core/filtering/filters/PeriodDaysFilter';
 import { PeriodProfessorFilter } from '../../core/filtering/filters/PeriodProfessorFilter';
-import { PeriodTypeFilter } from '../../core/filtering/filters/PeriodTypeFilter';
 import { PeriodTermFilter } from '../../core/filtering/filters/PeriodTermFilter';
 import { PeriodAvailabilityFilter } from '../../core/filtering/filters/PeriodAvailabilityFilter';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
@@ -52,7 +51,6 @@ export class ScheduleFilterService {
         this.registerSectionFilter(new ScheduleSearchTextFilter());
         this.registerSectionFilter(new PeriodDaysFilter());
         this.registerSectionFilter(new PeriodProfessorFilter());
-        this.registerSectionFilter(new PeriodTypeFilter());
         this.registerSectionFilter(new PeriodTermFilter());
         this.registerSectionFilter(new PeriodAvailabilityFilter());
         this.registerSectionFilter(new SectionCodeFilter());
@@ -462,8 +460,6 @@ export class ScheduleFilterService {
                 ];
             case 'periodProfessor':
                 return this.getAvailableProfessors(selectedCourses);
-            case 'periodType':
-                return this.getAvailablePeriodTypes(selectedCourses);
             case 'periodTerm':
                 return this.getAvailableTerms(selectedCourses);
             case 'sectionCode':
@@ -505,42 +501,6 @@ export class ScheduleFilterService {
             value: prof,
             label: prof
         }));
-    }
-    
-    private getAvailablePeriodTypes(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
-        const types = new Set<string>();
-
-        selectedCourses.forEach(sc => {
-            const sections = getAllSections(sc.course);
-            sections.forEach((section: Section) => {
-                section.periods.forEach((period: Period) => {
-                    if (period.type && period.type.trim()) {
-                        types.add(period.type.trim());
-                    }
-                });
-            });
-        });
-        
-        const typeArray = Array.from(types).sort();
-        return typeArray.map(type => ({
-            value: type,
-            label: this.formatPeriodType(type)
-        }));
-    }
-    
-    
-    private formatPeriodType(type: string): string {
-        const lower = type.toLowerCase();
-        
-        if (lower.includes('lec') || lower.includes('lecture')) return 'Lecture';
-        if (lower.includes('lab')) return 'Lab';
-        if (lower.includes('dis') || lower.includes('discussion')) return 'Discussion';
-        if (lower.includes('rec') || lower.includes('recitation')) return 'Recitation';
-        if (lower.includes('sem') || lower.includes('seminar')) return 'Seminar';
-        if (lower.includes('studio')) return 'Studio';
-        if (lower.includes('conference') || lower.includes('conf')) return 'Conference';
-        
-        return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
     }
     
     private getAvailableSectionCodes(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {

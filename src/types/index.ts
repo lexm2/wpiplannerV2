@@ -32,7 +32,6 @@ export type {
   CourseSelectionFilterCriteria,
   PeriodDaysFilterCriteria,
   PeriodProfessorFilterCriteria,
-  PeriodTypeFilterCriteria,
   PeriodTermFilterCriteria,
   PeriodAvailabilityFilterCriteria,
   PeriodConflictFilterCriteria,

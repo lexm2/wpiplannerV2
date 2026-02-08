@@ -119,10 +119,6 @@ export interface PeriodProfessorFilterCriteria {
     professors: string[];
 }
 
-export interface PeriodTypeFilterCriteria {
-    types: PeriodType[];
-}
-
 export interface PeriodTermFilterCriteria {
     terms: AcademicTerm[];
 }
