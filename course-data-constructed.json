@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 8, 2026, 11:26 PM",
+  "generated": "Feb 9, 2026, 1:53 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -33330,7 +33330,7 @@
                 "crn": 336891,
                 "number": "DL01",
                 "seats": 80,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4491",
@@ -33349,7 +33349,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 80,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL01",
@@ -33370,7 +33370,7 @@
                   "crn": 337167,
                   "number": "DX01",
                   "seats": 20,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4491",
@@ -33389,7 +33389,7 @@
                       "building": "",
                       "room": "Goddard Hall 110 Chem Lab",
                       "seats": 20,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
