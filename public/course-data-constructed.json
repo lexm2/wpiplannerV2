@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 9, 2026, 2:18 PM",
+  "generated": "Feb 9, 2026, 3:29 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -72900,7 +72900,7 @@
                 "crn": 337222,
                 "number": "D01 - Topics In International Politics: Law, International NGOs, and Human Rights",
                 "seats": 50,
-                "seatsAvailable": 6,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -72919,7 +72919,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01 - Topics In International Politics: Law, International NGOs, and Human Rights",
@@ -178038,7 +178038,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Ramin Bagherzadeh",
                     "startTime": "12:00",
                     "endTime": "12:00",
                     "location": "Unknown",
@@ -182010,7 +182010,7 @@
                 "number": "D01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "MU 1000: Music and Its Makers (1/3 unit; Cat. I) This course will introduce students to interdisciplinary music studies by focusing on the people who create musical meaning: performers, composers, listeners, patrons, writers, and more. As we analyze significant musical works, we will also learn about the broader cultural, historical, and social contexts in which they appeared, and the people involved in their creation – including women and people of color, who are often minimized in discussions of music history. Historical examples will be juxtaposed with contemporary musical works from an array of genres, allowing students to compare today’s musical cultures to past ones. Students will also analyze the role of music in their own lives. Recommended background: No prerequisites. A basic reading knowledge of music is helpful, but not required.",
@@ -182029,7 +182029,7 @@
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
