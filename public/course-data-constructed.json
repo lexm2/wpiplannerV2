@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 9, 2026, 4:23 AM",
+  "generated": "Feb 9, 2026, 5:51 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -67943,7 +67943,7 @@
                 "number": "D01",
                 "seats": 85,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 20,
                 "note": null,
                 "description": "Cat. I A study of the fundamental laws of statics, kinematics, and dynamics applied to fluid mechanics. The course will include fluid properties, conservation of mass, momentum, and energy as applied to real and ideal fluids. Laminar and turbulent flows, fluid resistance, and basic boundary layer theory will also be considered. Recommended background: basic physics, basic differential equations, and vectors.",
@@ -67962,7 +67962,7 @@
                     "room": "Washburn 229",
                     "seats": 85,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -74028,7 +74028,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": -1,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. IThis course surveys the transformation of the United States into an urban and industrial nation. Topics will include changes in the organization of business and labor, immigration and the development of cities, the peripheral role of theSouth and West in the industrial economy, politics and government in the age of \"laissez-faire,\" and the diverse sources and nature of late 19th- and early 20th century reform movements.",
@@ -74047,7 +74047,7 @@
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 35,
                     "seatsAvailable": -1,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
                     "days": [
@@ -175627,7 +175627,7 @@
                 "crn": 341324,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -175646,7 +175646,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
