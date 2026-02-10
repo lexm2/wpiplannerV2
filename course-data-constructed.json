@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 10, 2026, 12:36 PM",
+  "generated": "Feb 10, 2026, 2:07 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -62676,6 +62676,42 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 356484,
+                "number": "D01 - ST: The Storyline Model of Teaching & Learning Science",
+                "seats": 5,
+                "seatsAvailable": 5,
+                "actualWaitlist": 0,
+                "maxWaitlist": 2,
+                "note": null,
+                "description": "EDU 580: Special Topics in STEM Education (3 credits) This course guides educators through the shift toward student-centered science teaching & learning, where students ‘figure-out' and explain a real-world phenomenon, as well as the implementation of high-quality instructional materials (HQIM). Throughout the course, participants will experience the different routines & pedagogies associated with the storyline model of teaching science, as well as work with colleagues to review a grade-specific storyline-based unit and plan for adaptation or implementation in their classrooms.",
+                "term": "202201",
+                "computedTerm": "D",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mia Dubosarsky",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 5,
+                    "seatsAvailable": 5,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 2,
+                    "specificSection": "D01 - ST: The Storyline Model of Teaching & Learning Science",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         }
@@ -69311,6 +69347,56 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "FIN-331X",
+          "number": "331X",
+          "name": "Investment Management",
+          "description": "The course will cover the theoretical and practical applications of investments . Within this context, students will review various approaches used in the valuation of stocks, bonds, and derivative securities . Students are expected to master both the theoretical constructs of investments and their application to current industry practice . Topics covered include portfolio and diversification theory, short-term investments, long-term investments, investment banking, security trading, international investing, mutual funds versus ETFs, basic derivatives such as stock options and futures contracts, and government and corporate bonds . By the end of the course, students will be proficient in recommending appropriate asset mixes to achieve clients’ investment goals and monitoring the performance of these assets relative to expectations, benchmarks, and overall market behavior. Recommended background : Knowledge of Finance fundamentals (equivalent to that in FIN 2070)",
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "lectures": [
+            {
+              "section": {
+                "crn": 346372,
+                "number": "D01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "description": "The course will cover the theoretical and practical applications of investments . Within this context, students will review various approaches used in the valuation of stocks, bonds, and derivative securities . Students are expected to master both the theoretical constructs of investments and their application to current industry practice . Topics covered include portfolio and diversification theory, short-term investments, long-term investments, investment banking, security trading, international investing, mutual funds versus ETFs, basic derivatives such as stock options and futures contracts, and government and corporate bonds . By the end of the course, students will be proficient in recommending appropriate asset mixes to achieve clients’ investment goals and monitoring the performance of these assets relative to expectations, benchmarks, and overall market behavior. Recommended background : Knowledge of Finance fundamentals (equivalent to that in FIN 2070)",
+                "term": "202201",
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Eugene Okyere-Yeboah",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Fuller Labs 311",
+                    "building": "",
+                    "room": "Fuller Labs 311",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "D01",
                     "days": [
                       "M",
                       "R"
@@ -169999,7 +170085,7 @@
                 "number": "DL01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4443",
                 "description": "Cat. I This project based course introduces students to the engineering design process including; identifying the need, benchmarking, writing design specifications, evaluating alternative designs and selecting a final design. Student groups will construct and evaluate a working prototype of their design. Additional topics include; creativity, product liability, reverse engineering, patents, and codes of ethics for engineers. Extensive written reports and oral presentations are required. Recommended background: computer-aided design (ES 1310), mechanics (ES 2501, ES 2502), and manufacturing (ME 1800).",
@@ -170018,7 +170104,7 @@
                     "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
                     "days": [
@@ -170036,7 +170122,7 @@
                   "crn": 337399,
                   "number": "DX01",
                   "seats": 40,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4443",
@@ -170055,7 +170141,7 @@
                       "building": "",
                       "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                       "seats": 40,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
@@ -238991,7 +239077,7 @@
                 "crn": 337873,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 15,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -239010,7 +239096,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 15,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
