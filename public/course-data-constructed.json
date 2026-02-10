@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 10, 2026, 11:35 AM",
+  "generated": "Feb 10, 2026, 12:36 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -13603,7 +13603,7 @@
                 "crn": 336942,
                 "number": "D01",
                 "seats": 50,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 50,
                 "note": null,
@@ -13622,7 +13622,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 50,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 50,
                     "specificSection": "D01",
@@ -82001,7 +82001,7 @@
                 "crn": 337975,
                 "number": "D10 - SOC SCI RES-IQP- Panama City, Panama (WI)",
                 "seats": 30,
-                "seatsAvailable": 14,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -82020,7 +82020,7 @@
                     "building": "",
                     "room": "Salisbury Labs 407",
                     "seats": 30,
-                    "seatsAvailable": 14,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D10 - SOC SCI RES-IQP- Panama City, Panama (WI)",
