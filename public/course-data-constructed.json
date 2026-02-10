@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 10, 2026, 9:35 AM",
+  "generated": "Feb 10, 2026, 10:36 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -64105,8 +64105,8 @@
                 "crn": 340336,
                 "number": "D01",
                 "seats": 72,
-                "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "seatsAvailable": 1,
+                "actualWaitlist": 1,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I The study of environmental problems and their solutions requires an interdisciplinary approach. This course will examine current environmental issues from the intersection of several key disciplines including: environmental philosophy and history, environmental policy, and science. The course will develop these different approaches for analyzing environmental problems, explore the tensions between them, and present a framework for integrating them. Topics such as environmental justice, developing nations, globalization, and climate change policy will be explored.",
@@ -64124,8 +64124,8 @@
                     "building": "",
                     "room": "Salisbury Labs 104",
                     "seats": 72,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "seatsAvailable": 1,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
@@ -66116,7 +66116,7 @@
                 "number": "DL02",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4527",
                 "description": "Cat. I This is an introductory course in the engineering mechanics sequence that serves as a foundation for other courses in mechanical engineering. The course covers general two- and three-dimensional force and couple systems, distributed loads, resultant forces, moments of forces, free body diagrams, equilibrium of particles and finite sized bodies. Specific topics include friction, trusses, shear forces, bodies subjected to distributed loads, bending moments in beams, and first and second moments of plane areas. Recommended background: Differential (MA 1021) and integral (MA 1022) calculus, vector algebra (MA 1023), and double and triple integration (MA 1024).",
@@ -66135,7 +66135,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "DL02",
                     "days": [
@@ -169999,7 +169999,7 @@
                 "number": "DL01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4443",
                 "description": "Cat. I This project based course introduces students to the engineering design process including; identifying the need, benchmarking, writing design specifications, evaluating alternative designs and selecting a final design. Student groups will construct and evaluate a working prototype of their design. Additional topics include; creativity, product liability, reverse engineering, patents, and codes of ethics for engineers. Extensive written reports and oral presentations are required. Recommended background: computer-aided design (ES 1310), mechanics (ES 2501, ES 2502), and manufacturing (ME 1800).",
@@ -170018,7 +170018,7 @@
                     "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
                     "days": [
