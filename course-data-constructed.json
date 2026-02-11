@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 11, 2026, 6:08 PM",
+  "generated": "Feb 11, 2026, 7:19 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -156763,7 +156763,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I, This course develops techniques for solving ordinary differential equations. Topics covered include: introduction to modeling using first-order differential equations, solution methods for linear higher-order equations, qualitative behavior of nonlinear first-order equations, oscillatory phenomena including spring-mass system and RLC-circuits and Laplace transform. Additional topics may be chosen from power series method, methods for solving systems of equations and numerical methods for solving ordinary differential equations. Recommended background: MA 1024.",
@@ -156782,7 +156782,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": [],
@@ -238169,7 +238169,7 @@
                 "crn": 340377,
                 "number": "D01",
                 "seats": 50,
-                "seatsAvailable": 15,
+                "seatsAvailable": 14,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -238188,7 +238188,7 @@
                     "building": "",
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 50,
-                    "seatsAvailable": 15,
+                    "seatsAvailable": 14,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
