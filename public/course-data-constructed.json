@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 11, 2026, 11:53 PM",
+  "generated": "Feb 12, 2026, 1:53 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -19465,7 +19465,7 @@
                 "crn": 337029,
                 "number": "D01",
                 "seats": 90,
-                "seatsAvailable": 6,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -19484,7 +19484,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 90,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -169476,7 +169476,7 @@
                 "number": "CL01",
                 "seats": 72,
                 "seatsAvailable": 2,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4414",
                 "description": "Cat. IThis course introduces students to manufacturing science and engineering andprototype part production. It emphasizes CNC (computer-controlled)machining. Students will learn how to go from a solid (CAD, computer-aideddesign) model to a machined part, using CAM software (computer-aidedmanufacturing) and CNC machining. They will also be exposed to associatedissues in manufacturing process analysis, engineering design, material science,and in dimensional and surface metrology. Using machining as an example, thescience of manufacturing processes is developed in a combination of class workand laboratory experience. The laboratory experience includes an experimentalcomponent that relates process variables in machining with performance andmachined part quality. Students whose project work will necessitate fabricationof parts and those who want a background in manufacturing process science andengineering should take this course.",
@@ -169495,7 +169495,7 @@
                     "room": "Olin Hall 107",
                     "seats": 72,
                     "seatsAvailable": 2,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 15,
                     "specificSection": "CL01",
                     "days": [
@@ -243600,7 +243600,7 @@
                 "number": "C01",
                 "seats": 28,
                 "seatsAvailable": 1,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I (1/12 unit) Introduction to basic rules and individual/team skill development with practical application through game competition.",
@@ -243619,7 +243619,7 @@
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 28,
                     "seatsAvailable": 1,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
