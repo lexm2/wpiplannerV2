@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 13, 2026, 3:14 AM",
+  "generated": "Feb 13, 2026, 5:02 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -162908,7 +162908,7 @@
                 "crn": 337046,
                 "number": "DL01",
                 "seats": 52,
-                "seatsAvailable": 13,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4538",
@@ -162927,7 +162927,7 @@
                     "building": "",
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 52,
-                    "seatsAvailable": 13,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL01",
@@ -162981,7 +162981,7 @@
                   "crn": 337052,
                   "number": "DX02",
                   "seats": 26,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4538",
@@ -163000,7 +163000,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 26,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX02",
