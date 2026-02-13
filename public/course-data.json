@@ -24221,7 +24221,7 @@
       "Course_Title": "CH 3510 - Chemical Thermodynamics",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "0/60",
+      "Enrolled_Capacity": "1/60",
       "Instructional_Format": "Lecture",
       "Instructors": "George Kaminski",
       "Locations": "Online-asynchronous",
@@ -52529,7 +52529,7 @@
       "Course_Title": "ES 3004 - Fluid Mechanics",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "4/35",
+      "Enrolled_Capacity": "5/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Ahmet Sabuncu",
       "Locations": "Online-asynchronous",
@@ -136904,7 +136904,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "2/5",
+      "Waitlist_Waitlist_Capacity": "1/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-347346"
     },
     {
