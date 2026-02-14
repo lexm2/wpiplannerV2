@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 14, 2026, 4:06 AM",
+  "generated": "Feb 14, 2026, 5:15 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -230799,7 +230799,7 @@
                 "number": "D01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course provides an overview of key concepts, methods and authors in both fields. These introduce the student to the types of reasoning required for the pursuit of in-depth analysis in each discipline. Emphasis on topics and authors varies with the particular instructor.",
@@ -230818,7 +230818,7 @@
                     "room": "Stratton Hall 201",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -236176,7 +236176,7 @@
                 "number": "D01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I This course provides an overview of key concepts, methods and authors in both fields. These introduce the student to the types of reasoning required for the pursuit of in-depth analysis in each discipline. Emphasis on topics and authors varies with the particular instructor.",
@@ -236195,7 +236195,7 @@
                     "room": "Stratton Hall 201",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
