@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 14, 2026, 10:18 PM",
+  "generated": "Feb 14, 2026, 10:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -171831,7 +171831,7 @@
                 "crn": 337346,
                 "number": "DL01",
                 "seats": 40,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4524",
@@ -171850,7 +171850,7 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 40,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
@@ -171870,7 +171870,7 @@
                   "crn": 337349,
                   "number": "DX01",
                   "seats": 40,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4524",
@@ -171889,7 +171889,7 @@
                       "building": "",
                       "room": "Higgins Labs 218 Discovery Classroom",
                       "seats": 40,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
