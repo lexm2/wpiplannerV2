@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 14, 2026, 2:03 PM",
+  "generated": "Feb 14, 2026, 3:00 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -18152,7 +18152,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course is designed to broaden student perspectives on business through experiential learning in entrepreneurship, finance, strategy and marketing, organizational behavior, and operations. By exposing students to various business disciplines and a wide range of firms and business models, we intend to accelerate student impact through an engaging, immersive experience. During onand off-site situation workshops, students will engage with practitioners to discuss business challenges and decisions in a small-group format. Students will also be matched with alumni to de-brief topics related to cases and prepare a learning portfolio as a culminating assignment. By the end of the course students will have a broader understanding of business domains, increased business fluency, and a better understanding of decision-making within a relevant business context. Recommended background: None Anticipated",
@@ -18171,7 +18171,7 @@
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
