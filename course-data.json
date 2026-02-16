@@ -4848,10 +4848,10 @@
       "Meeting_Patterns": "T-F | 10:00 AM - 11:50 AM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Salisbury Labs 123 Computer Lab | T-F | 10:00 AM - 11:50 AM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "10/10",
+      "Waitlist_Waitlist_Capacity": "9/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337546"
     },
     {
@@ -9310,7 +9310,7 @@
       "Course_Title": "BB 3825 - Plant Physiology Laboratory",
       "Credits": "1.5",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "16/16",
+      "Enrolled_Capacity": "15/16",
       "Instructional_Format": "Laboratory",
       "Instructors": "Chris Collins",
       "Locations": "Goddard Hall 205 BB Lab",
@@ -9318,10 +9318,10 @@
       "Meeting_Patterns": "W | 1:00 PM - 3:50 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Goddard Hall 205 BB Lab | W | 1:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "1/5",
+      "Waitlist_Waitlist_Capacity": "0/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337169"
     },
     {
@@ -32119,7 +32119,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Computer Science",
-      "Waitlist_Waitlist_Capacity": "3/15",
+      "Waitlist_Waitlist_Capacity": "2/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336930"
     },
     {
@@ -50936,7 +50936,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ES 2501 - Introduction To Static Systems ()",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "6/20",
+      "Waitlist_Waitlist_Capacity": "5/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337370"
     },
     {
@@ -53724,10 +53724,10 @@
       "Meeting_Patterns": "T-W-F | 2:00 PM - 3:30 PM",
       "Offering_Period": "2026 Spring D Term",
       "Section_Details": "Higgins Labs 234 Cad/Design Lab (ARC Approval Needed) | T-W-F | 2:00 PM - 3:30 PM",
-      "Section_Status": "Closed",
+      "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "5/5",
+      "Waitlist_Waitlist_Capacity": "4/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337462"
     },
     {
@@ -70340,7 +70340,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "International and Global Studies",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-336888"
     },
     {
