@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 16, 2026, 8:54 PM",
+  "generated": "Feb 16, 2026, 9:24 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5422,7 +5422,7 @@
                 "number": "D01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "This course introduces design principles and their application to create effective forms of graphic communication. The students will learn the fundamentals of visual communication and will work on projects to analyze, organize, and solve design problems. Topics may include: the design process; figure/ground; shape; dynamic balance; Gestalt principles; typography; layout and composition; color; production and presentation in digital formats.",
@@ -5441,7 +5441,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
