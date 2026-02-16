@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 16, 2026, 4:42 PM",
+  "generated": "Feb 16, 2026, 5:25 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -57153,7 +57153,7 @@
                   "crn": 337213,
                   "number": "DX02",
                   "seats": 30,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4442",
@@ -57172,7 +57172,7 @@
                       "building": "",
                       "room": "Atwater Kent 113 Semi-Conductor Lab",
                       "seats": 30,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX02",
@@ -73778,7 +73778,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Brittany Frederick",
                     "startTime": "15:00",
                     "endTime": "15:50",
                     "location": "Washburn 323",
