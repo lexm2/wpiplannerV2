@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 16, 2026, 3:56 PM",
+  "generated": "Feb 16, 2026, 4:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -56516,7 +56516,7 @@
                 "crn": 337526,
                 "number": "DL01",
                 "seats": 120,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4441",
@@ -56535,7 +56535,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 120,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
@@ -56657,7 +56657,7 @@
                   "crn": 337530,
                   "number": "DX04",
                   "seats": 30,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4441",
@@ -56676,7 +56676,7 @@
                       "building": "",
                       "room": "Atwater Kent 317 ECE Lab",
                       "seats": 30,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX04",
