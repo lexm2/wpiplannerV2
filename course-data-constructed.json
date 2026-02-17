@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 17, 2026, 10:57 PM",
+  "generated": "Feb 17, 2026, 11:31 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -187330,7 +187330,7 @@
                 "number": "D01",
                 "seats": 45,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I To aid all engineering students in understanding economics and business constraints on engineering decision making. Topics include evaluation of alternative; the six time-value-of-money factors; present worth, annual cash flow and rate-of-return analysis; incremental analysis; depreciation and income taxes; replacement analysis; inflation; handling probabilistic events; public economy; break-even and minimum cost points; and foreign exchange.",
@@ -187349,7 +187349,7 @@
                     "room": "Olin Hall 223",
                     "seats": 45,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
