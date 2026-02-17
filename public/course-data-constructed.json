@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 17, 2026, 11:31 PM",
+  "generated": "Feb 17, 2026, 11:59 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -245172,7 +245172,7 @@
                 "crn": 353505,
                 "number": "D02 - Healthy Alternative: Zumba",
                 "seats": 30,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -245191,7 +245191,7 @@
                     "building": "",
                     "room": "Recreation Center Dance",
                     "seats": 30,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D02 - Healthy Alternative: Zumba",
