@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 18, 2026, 9:20 PM",
+  "generated": "Feb 18, 2026, 9:55 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -156621,7 +156621,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 8,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I, This course develops techniques for solving ordinary differential equations. Topics covered include: introduction to modeling using first-order differential equations, solution methods for linear higher-order equations, qualitative behavior of nonlinear first-order equations, oscillatory phenomena including spring-mass system and RLC-circuits and Laplace transform. Additional topics may be chosen from power series method, methods for solving systems of equations and numerical methods for solving ordinary differential equations. Recommended background: MA 1024.",
@@ -156640,7 +156640,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": [],
@@ -251653,7 +251653,7 @@
                 "number": "D03",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "WPE 1612 Introductory Yoga Cat. I (1/12 unit) This yoga class focuses on connecting the mind, body, and spirit through an awareness of breath. Participating in yoga can improve core strength, flexibility, balance, mindfulness, and relaxation and decrease stress. Those with any level of yoga experience (including first timers) are welcome.",
@@ -251672,7 +251672,7 @@
                     "room": "Recreation Center Dance",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "D03",
                     "days": [
