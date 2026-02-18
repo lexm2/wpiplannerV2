@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 18, 2026, 12:55 PM",
+  "generated": "Feb 18, 2026, 2:05 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -66640,7 +66640,7 @@
                 "number": "DL01",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4435",
                 "description": "Cat. I Engineers should be able to formulate and solve problems that involve forces that act on bodies which are moving. This course deals with the kinematics and dynamics of particles and rigid bodies which move in a plane. Topics covered will include: kinematics of particles and rigid bodies, equations of motion, work-energy methods, and impulse and momentum. In this course a basic introduction to mechanical vibration is also discussed. Basic equations will be developed with respect to translating and rotating coordinate systems. Recommended background: Statics (ES 2501 or CE 2000).",
@@ -66659,7 +66659,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
                     "days": [
@@ -171690,7 +171690,7 @@
                 "number": "DL01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4524",
                 "description": "Cat. IThis course integrates students’ background in ME in a one-term designproject that is usually taken from a local company. Students must organizethemselves and the project to successfully realize a product that meets customerneeds. Activities include problem definition, design analysis, mathematicalmodelling, CAD modelling, manufacturing, testing, liaison to vendors,customer relations, marketing, technical management, purchasing, reportwriting, and oral presentations.Recommended background: mechanisms (ME 3310, ME 3311), stressanalysis (ES 3502), design (ME 3320), thermo-fluids (ES 3001, ES 3003,ES 3004), materials (ES 2001), manufacturing (ME 1800).",
@@ -171709,7 +171709,7 @@
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
                     "days": [
