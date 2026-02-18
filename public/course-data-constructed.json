@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 18, 2026, 4:49 AM",
+  "generated": "Feb 18, 2026, 5:57 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -215879,7 +215879,7 @@
                   "crn": 337595,
                   "number": "DD02",
                   "seats": 30,
-                  "seatsAvailable": 10,
+                  "seatsAvailable": 11,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4516",
@@ -215898,7 +215898,7 @@
                       "building": "",
                       "room": "Olin Hall 126",
                       "seats": 30,
-                      "seatsAvailable": 10,
+                      "seatsAvailable": 11,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -215984,7 +215984,7 @@
                   "crn": 336911,
                   "number": "DD05",
                   "seats": 30,
-                  "seatsAvailable": 18,
+                  "seatsAvailable": 17,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4516",
@@ -216003,7 +216003,7 @@
                       "building": "",
                       "room": "Olin Hall 126",
                       "seats": 30,
-                      "seatsAvailable": 18,
+                      "seatsAvailable": 17,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD05",
