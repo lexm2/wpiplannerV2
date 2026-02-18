@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 18, 2026, 7:56 PM",
+  "generated": "Feb 18, 2026, 8:38 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -13462,7 +13462,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 50,
                 "note": null,
                 "description": "Cat. I To learn the fundamentals of basic signal processing methods as well as linear time series analyses framework for modeling and mining biological data. Tools of data analysis include statistics for determining significance of a result, Laplace and Z transforms, convolution, correlation, sampling theorem, Fourier transform, transfer function, coherence function and various filtering techniques. The goal of this course is to offer the students an opportunity to learn and model and simulate static and dynamic physiological systems using linear systems theory. First principles of chemistry and physics are used to quantitatively model physiological systems. Most of the models are based on linear systems theory. Simulations and estimation are performed using Matlab and already-developed software. Recommended background: BME 2210, CS 1004 or equivalent.",
@@ -13481,7 +13481,7 @@
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 50,
                     "specificSection": "D01",
                     "days": [
@@ -173079,7 +173079,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I This course introduces students to current developments in nanoscale science and technology. The current advance of materials and devices constituting of building blocks of metals, semiconductors, ceramics or polymers that are nanometer size (1-100 nm) are reviewed. The profound implications for technology and science of this research field are discussed. The differences of the properties of matter on the nanometer scale from those on the macroscopic scale due to the size confinement, predominance of interfacial phenomena and quantum mechanics are studied. The main issues and techniques relevant to science and technologies on the nanometer scale are considered. New developments in this field and future perspectives are presented. Topics covered include: fabrication of nanoscale structures, characterization at nanoscale, molecular electronics, nanoscale mechanics, new architecture, nano-optics and societal impacts. Recommended background: ES 2001 Introduction to Materials or equivalent Some sections of this course may be offered as Writing Intensive (WI).",
@@ -173098,7 +173098,7 @@
                     "room": "Stratton Hall 205",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
