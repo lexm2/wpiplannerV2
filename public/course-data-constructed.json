@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 18, 2026, 2:05 PM",
+  "generated": "Feb 18, 2026, 3:03 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -39148,7 +39148,7 @@
                 "number": "DL01",
                 "seats": 100,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4482",
                 "description": "Cat. I This course introduces students to the fundamental principles of programming in imperative and scripting languages. Topics include control structures, iterators, functional decomposition, basic data structures (such as records). Students will be expected to implement, test and debug programs. Through the use of compelling applications and lab exercises, students will learn how to interface with external data systems and control devices. Recommended background: none. All Computer Science students and other students wishing to prepare for 3000-level courses in Computer Science should take CS 1101/1102 instead of CS 1004. This course provides sufficient background for CS 2301 Systems Programming for Non-Majors. Undergraduate credit may not be earned both for this course and for CS 1005.",
@@ -39167,7 +39167,7 @@
                     "room": "Unity Hall 400",
                     "seats": 100,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
                     "days": [
@@ -62540,7 +62540,7 @@
                 "crn": 356484,
                 "number": "D01 - ST: The Storyline Model of Teaching & Learning Science",
                 "seats": 5,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 2,
                 "note": null,
@@ -62559,7 +62559,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 5,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 2,
                     "specificSection": "D01 - ST: The Storyline Model of Teaching & Learning Science",
@@ -66010,7 +66010,7 @@
                 "number": "DL02",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 6,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4527",
                 "description": "Cat. I This is an introductory course in the engineering mechanics sequence that serves as a foundation for other courses in mechanical engineering. The course covers general two- and three-dimensional force and couple systems, distributed loads, resultant forces, moments of forces, free body diagrams, equilibrium of particles and finite sized bodies. Specific topics include friction, trusses, shear forces, bodies subjected to distributed loads, bending moments in beams, and first and second moments of plane areas. Recommended background: Differential (MA 1021) and integral (MA 1022) calculus, vector algebra (MA 1023), and double and triple integration (MA 1024).",
@@ -66029,7 +66029,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 20,
                     "specificSection": "DL02",
                     "days": [
