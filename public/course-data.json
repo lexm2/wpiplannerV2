@@ -51725,7 +51725,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ES 2503 - Introduction To Dynamic Systems (b)",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337453"
     },
     {
@@ -96045,7 +96045,7 @@
       "Starting_Academic_Period_Type": "D Term",
       "Student_Course_Section_Cluster": "2026 Spring D Term: ME 4320 - Advanced Engineering Design ()",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-337346"
     },
     {
@@ -108524,7 +108524,7 @@
       "Course_Title": "OBC 505 - Teaming And Organizing For Innovation",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "2/40",
+      "Enrolled_Capacity": "3/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Anne Ogilvie",
       "Locations": "Online-synchronous",
@@ -108683,7 +108683,7 @@
       "Course_Title": "OBC 533 - Negotiations",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "5/35",
+      "Enrolled_Capacity": "6/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Lauren Turner",
       "Locations": "Online-asynchronous",
@@ -109787,7 +109787,7 @@
       "Course_Title": "OIE 558 - Designing And Managing Lean Six Sigma Processes",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "7/35",
+      "Enrolled_Capacity": "8/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Marco Bonilla",
       "Locations": "Online-asynchronous",
@@ -129901,7 +129901,7 @@
       "Course_Title": "SYS 501 - Concepts Of Systems Engineering",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "5/30",
+      "Enrolled_Capacity": "6/30",
       "Instructional_Format": "Lecture",
       "Instructors": "David Wojcicki",
       "Locations": "Online-asynchronous",
