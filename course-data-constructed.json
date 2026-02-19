@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 19, 2026, 5:03 AM",
+  "generated": "Feb 19, 2026, 6:13 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -68387,7 +68387,7 @@
                 "number": "D02",
                 "seats": 15,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "Cat. I This course is intended to strengthen solid modeling and analysis skills with an emphasis on robust modeling strategies that capture design intent. The use of solid models for applications in mechanical design and engineering analysis is emphasized. Topics include: advanced feature-based modeling, variational design, physical properties, assembly modeling, mechanisms, and other analytical methods in engineering design. Recommended background: familiarity with drafting standards (ES 1310), mechanical systems (ES 2501 or CE 2000, ES 2503), strength of materials (ES 2502 or CE 2001) and kinematics (ME 3310) is assumed. Additional background in machine design (ME 2300, ME 3320) is helpful",
@@ -68406,7 +68406,7 @@
                     "room": "Higgins Labs 234 Cad/Design Lab (ARC Approval Needed)",
                     "seats": 15,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 5,
                     "specificSection": "D02",
                     "days": [
