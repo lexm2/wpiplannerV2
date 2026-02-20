@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 20, 2026, 9:56 AM",
+  "generated": "Feb 20, 2026, 10:37 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -66010,7 +66010,7 @@
                 "number": "DL02",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4527",
                 "description": "Cat. I This is an introductory course in the engineering mechanics sequence that serves as a foundation for other courses in mechanical engineering. The course covers general two- and three-dimensional force and couple systems, distributed loads, resultant forces, moments of forces, free body diagrams, equilibrium of particles and finite sized bodies. Specific topics include friction, trusses, shear forces, bodies subjected to distributed loads, bending moments in beams, and first and second moments of plane areas. Recommended background: Differential (MA 1021) and integral (MA 1022) calculus, vector algebra (MA 1023), and double and triple integration (MA 1024).",
@@ -66029,7 +66029,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 20,
                     "specificSection": "DL02",
                     "days": [
@@ -68387,7 +68387,7 @@
                 "number": "D02",
                 "seats": 15,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 5,
                 "note": null,
                 "description": "Cat. I This course is intended to strengthen solid modeling and analysis skills with an emphasis on robust modeling strategies that capture design intent. The use of solid models for applications in mechanical design and engineering analysis is emphasized. Topics include: advanced feature-based modeling, variational design, physical properties, assembly modeling, mechanisms, and other analytical methods in engineering design. Recommended background: familiarity with drafting standards (ES 1310), mechanical systems (ES 2501 or CE 2000, ES 2503), strength of materials (ES 2502 or CE 2001) and kinematics (ME 3310) is assumed. Additional background in machine design (ME 2300, ME 3320) is helpful",
@@ -68406,7 +68406,7 @@
                     "room": "Higgins Labs 234 Cad/Design Lab (ARC Approval Needed)",
                     "seats": 15,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 5,
                     "specificSection": "D02",
                     "days": [
@@ -174271,7 +174271,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 8,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "(2 credits) The failure and wear-out mechanisms for a variety of materials (metals, ceramics, polymers, composites and microelectronics) and applications will be presented and discussed. Multi-axial failure theories and fracture mechanics will be discussed. The methodology and techniques for reliability analysis will also be presented and discussed. A materials systems approach will be used. (Prerequisites: ES 2502 and ME 3023 or equivalent, and senior or graduate standing in engineering or science.) Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MTE 593C/MTE 594C).",
@@ -174290,7 +174290,7 @@
                     "room": "Higgins Labs 202",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -181153,7 +181153,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 8,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "(2 credits) The failure and wear-out mechanisms for a variety of materials (metals, ceramics, polymers, composites and microelectronics) and applications will be presented and discussed. Multi-axial failure theories and fracture mechanics will be discussed. The methodology and techniques for reliability analysis will also be presented and discussed. A materials systems approach will be used. (Prerequisites: ES 2502 and ME 3023 or equivalent, and senior or graduate standing in engineering or science.) Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MTE 593C/MTE 594C).",
@@ -181172,7 +181172,7 @@
                     "room": "Higgins Labs 202",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
