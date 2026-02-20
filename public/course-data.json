@@ -9765,7 +9765,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "C Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "4/10",
+      "Waitlist_Waitlist_Capacity": "3/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-339618"
     },
     {
@@ -103253,7 +103253,7 @@
       "Course_Title": "MME 531 - Discrete Mathematics",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "6/25",
+      "Enrolled_Capacity": "7/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Samuel Tripp",
       "Locations": "Online-synchronous",
