@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 20, 2026, 11:50 PM",
+  "generated": "Feb 21, 2026, 1:43 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -82969,7 +82969,7 @@
                 "crn": 337049,
                 "number": "D03",
                 "seats": 24,
-                "seatsAvailable": 4,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -82988,7 +82988,7 @@
                     "building": "",
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 24,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D03",
@@ -171013,7 +171013,7 @@
                 "number": "C01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I A course designed to develop analytical and experimental skills in modern engineering measurement methods, based on electronic instrumentation and computer-based data acquisition systems. The lectures are concerned with the engineering analysis and design as well as the principles of instrumentation, whereas the laboratory periods afford the student an opportunity to use modern devices in actual experiments. Lecture topics include: review of engineering fundamentals and, among others, discussions of standards, measurement and sensing devices, experiment planning, data acquisition, analysis of experimental data, and report writing. Laboratory experiments address both mechanical and thermal systems and instrumentation in either traditional mechanical engineering (heat transfer, flow measurement/visualization, force/torque/strain measurement, motion/vibration measurement) or materials engineering (temperature and pressure measurements in materials processing, measurement of strain and position in mechanical testing of materials). Each year students will be notified which type of experiments will be used in each term offering. Students may also consult with their academic advisor or the Mechanical Engineering department office. Recommended background: mathematics (MA 2051), thermo-fluids (ES 3001, ES 3003, ES 3004), mechanics (ES 2501, ES 2502, ES 2503), materials (ES 2001).",
@@ -171032,7 +171032,7 @@
                     "room": "Higgins Labs 031 ME Computer Lab",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -245134,7 +245134,7 @@
                 "number": "D01 - Healthy Alternative: Zumba",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 15,
                 "note": null,
                 "description": "Cat. I (1/12 unit) In each term, specific PE courses are offered to provide a variety of wellness, dance and healthy alternatives to traditional PE sport-based classes . The specific courses are subject to change on a yearly basis in order to provide flexibility in the PE offerings based upon the latest trends in wellness and dance . The focus of these classes is more on individual fitness, wellness and education, with instruction provided to all students in the classes.",
@@ -245153,7 +245153,7 @@
                     "room": "Recreation Center Dance",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 15,
                     "specificSection": "D01 - Healthy Alternative: Zumba",
                     "days": [
