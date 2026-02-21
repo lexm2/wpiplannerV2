@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 21, 2026, 5:03 AM",
+  "generated": "Feb 21, 2026, 5:54 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -186879,7 +186879,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "description": "Cat. I Leadership is a critical role in any global, technological organization. This course explores how the concepts of creativity, entrepreneurial and critical thinking, emotional and self-awareness, passion, diversity, communication, and ethics inform and affect leadership practice. The course considers a variety of contemporary leadership challenges including how leaders work effectively across cultural, technological, and disciplinary boundaries, how leaders foster new ideas and bring them to fruition, how they communicate effectively and persuasively to diverse stakeholders, and how they make decisions that are both ethical and effective. The course is designed to 1) increase students’ awareness of their own leadership styles, 2) examine the responsibilities of leadership, and 3) determine best practices in leadership. Students cannot receive credit for both BUS 1010 and OBC 1010.",
@@ -186898,7 +186898,7 @@
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -229456,7 +229456,7 @@
                 "crn": 337141,
                 "number": "D01",
                 "seats": 55,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -229475,7 +229475,7 @@
                     "building": "",
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 55,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
