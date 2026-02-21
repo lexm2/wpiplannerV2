@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 21, 2026, 11:19 PM",
+  "generated": "Feb 21, 2026, 11:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -244181,7 +244181,7 @@
                 "crn": 337283,
                 "number": "D02",
                 "seats": 25,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -244200,7 +244200,7 @@
                     "building": "",
                     "room": "Recreation Center All Courts 3-4",
                     "seats": 25,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
