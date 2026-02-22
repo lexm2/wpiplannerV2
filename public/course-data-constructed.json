@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 22, 2026, 2:59 PM",
+  "generated": "Feb 22, 2026, 3:33 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -84199,7 +84199,7 @@
                 "crn": 337508,
                 "number": "DL01",
                 "seats": 24,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4499",
@@ -84218,7 +84218,7 @@
                     "building": "",
                     "room": "Kaven Hall 202 Stats Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
@@ -84236,7 +84236,7 @@
                   "crn": 337005,
                   "number": "DX01",
                   "seats": 24,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4499",
@@ -84255,7 +84255,7 @@
                       "building": "",
                       "room": "Kaven Hall 202 Stats Computer Lab",
                       "seats": 24,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
