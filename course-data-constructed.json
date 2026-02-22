@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 22, 2026, 2:03 PM",
+  "generated": "Feb 22, 2026, 2:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -66024,9 +66024,9 @@
                     "professor": "Yihao Zheng",
                     "startTime": "11:00",
                     "endTime": "11:50",
-                    "location": "Salisbury Labs 115 Kinnicutt Hall",
+                    "location": "Higgins Labs 116",
                     "building": "",
-                    "room": "Salisbury Labs 115 Kinnicutt Hall",
+                    "room": "Higgins Labs 116",
                     "seats": 90,
                     "seatsAvailable": 0,
                     "actualWaitlist": 4,
