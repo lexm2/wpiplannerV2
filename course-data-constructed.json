@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 23, 2026, 6:59 AM",
+  "generated": "Feb 23, 2026, 7:57 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -25314,7 +25314,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 34,
+                "actualWaitlist": 33,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "description": "Cat. I The CH1010 course is an introduction to chemistry using the fundamental structures of atoms as a starting point. Emphasis is placed on discussing how all properties of matter as well as bonding mechanisms arise from atomic structure. Lewis structures and molecular orbitals are used to understand bonding, and the intermolecular forces present in chemicals systems are used as a prelude to reactivity patterns covered in future courses.",
@@ -25333,7 +25333,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 34,
+                    "actualWaitlist": 33,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": [],
