@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 23, 2026, 2:32 PM",
+  "generated": "Feb 23, 2026, 3:30 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -17712,7 +17712,7 @@
                 "crn": 356277,
                 "number": "D01 - ST: Biomaterials for Women's Health",
                 "seats": 12,
-                "seatsAvailable": 9,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -17731,7 +17731,7 @@
                     "building": "",
                     "room": "Stratton Hall 202 (new)",
                     "seats": 12,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "D01 - ST: Biomaterials for Women's Health",
@@ -38041,7 +38041,7 @@
                 "crn": 337389,
                 "number": "D01 - ST: Biomaterials for Women's Health",
                 "seats": 15,
-                "seatsAvailable": 2,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -38060,7 +38060,7 @@
                     "building": "",
                     "room": "Stratton Hall 202 (new)",
                     "seats": 15,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01 - ST: Biomaterials for Women's Health",
