@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 23, 2026, 5:47 AM",
+  "generated": "Feb 23, 2026, 6:59 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -35882,7 +35882,7 @@
                 "crn": 339704,
                 "number": "D02 - AT: Introduction to Sensor Science and Technology",
                 "seats": 30,
-                "seatsAvailable": 27,
+                "seatsAvailable": 26,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -35901,7 +35901,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 27,
+                    "seatsAvailable": 26,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D02 - AT: Introduction to Sensor Science and Technology",
@@ -244181,7 +244181,7 @@
                 "crn": 337283,
                 "number": "D02",
                 "seats": 25,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -244200,7 +244200,7 @@
                     "building": "",
                     "room": "Recreation Center All Courts 3-4",
                     "seats": 25,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
