@@ -6,7 +6,6 @@
 export interface ConverterConfig {
     fallYear: number;
     springYear: number;
-    showOldLink: boolean;
     specialCourses: string[];
     specialSections: string[];
     sectionNumberAppendices: string[];
@@ -20,9 +19,6 @@ export const DEFAULT_CONFIG: ConverterConfig = {
     // Academic Period
     fallYear: 2025,    // Fall term year (A, B terms)
     springYear: 2026,  // Spring term year (C, D terms)
-
-    // UI Configuration
-    showOldLink: false,
 
     // Special Courses (full section name displayed)
     specialCourses: [

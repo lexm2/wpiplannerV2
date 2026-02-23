@@ -13,9 +13,6 @@ export const converterConfig: ConverterConfig = {
     // Spring term includes C and D terms
     springYear: 2026,
 
-    // UI Configuration
-    showOldLink: false,
-
     // Special Courses
     // These courses will display full section names and use Course_Description
     specialCourses: [
