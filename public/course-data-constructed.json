@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 23, 2026, 1:41 PM",
+  "generated": "Feb 23, 2026, 2:32 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -46986,7 +46986,7 @@
                 "crn": 337265,
                 "number": "D01",
                 "seats": 65,
-                "seatsAvailable": 2,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -47005,7 +47005,7 @@
                     "building": "",
                     "room": "Atwater Kent 233",
                     "seats": 65,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -48454,7 +48454,7 @@
                 "crn": 337602,
                 "number": "D01",
                 "seats": 50,
-                "seatsAvailable": 2,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -48473,7 +48473,7 @@
                     "building": "",
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 50,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
