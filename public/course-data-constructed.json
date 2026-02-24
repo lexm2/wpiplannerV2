@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 24, 2026, 10:31 AM",
+  "generated": "Feb 24, 2026, 11:27 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -67135,7 +67135,7 @@
                 "crn": 337578,
                 "number": "DL01",
                 "seats": 60,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4513",
@@ -67154,7 +67154,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 60,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "DL01",
@@ -67173,7 +67173,7 @@
                   "crn": 337580,
                   "number": "DD01",
                   "seats": 60,
-                  "seatsAvailable": 16,
+                  "seatsAvailable": 15,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4513",
@@ -67192,7 +67192,7 @@
                       "building": "",
                       "room": "Fuller Labs 320",
                       "seats": 60,
-                      "seatsAvailable": 16,
+                      "seatsAvailable": 15,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
