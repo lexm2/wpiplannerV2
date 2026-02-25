@@ -5,7 +5,7 @@ import { BaseModal } from '../components/BaseModal';
 import { getAllSections } from '../../utils/courseUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
-import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria, GraduateLevelFilterCriteria } from '../../types/filters';
+import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria } from '../../types/filters';
 
 export class ScheduleFilterModalController extends BaseModal {
     private scheduleFilterService: ScheduleFilterService | null = null;
@@ -105,6 +105,7 @@ export class ScheduleFilterModalController extends BaseModal {
                 ${this.createRMPRatingFilter()}
                 ${this.createTermFilter()}
                 ${this.createGraduateLevelFilter()}
+                ${this.createAcademicYearFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createConflictFilter()}
                 ${this.createWakeUpTimeFilter()}
@@ -129,6 +130,34 @@ export class ScheduleFilterModalController extends BaseModal {
                         <button class="segmented-btn ${currentLevel === 'all' ? 'active' : ''}" data-level="all">All</button>
                         <button class="segmented-btn ${currentLevel === 'undergraduate' ? 'active' : ''}" data-level="undergraduate">Undergrad</button>
                         <button class="segmented-btn ${currentLevel === 'graduate' ? 'active' : ''}" data-level="graduate">Graduate</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    private createAcademicYearFilter(): string {
+        if (!this.scheduleFilterService) return '';
+
+        const years = [...new Set(this.selectedCourses.map(sc => sc.course.academicYear).filter(Boolean) as number[])].sort();
+        if (years.length <= 1) return '';
+
+        const activeFilter = this.scheduleFilterService.getActiveFilters().find(f => f.id === 'academicYear');
+        const currentYear = (activeFilter?.criteria as AcademicYearFilterCriteria | undefined)?.year ?? 'all';
+
+        const yearBtns = years.map(y =>
+            `<button class="segmented-btn ${currentYear === y ? 'active' : ''}" data-year="${y}">${y}–${y + 1}</button>`
+        ).join('');
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Academic Year</h4>
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-segmented-control" id="academic-year-filter">
+                        <button class="segmented-btn ${currentYear === 'all' ? 'active' : ''}" data-year="all">All</button>
+                        ${yearBtns}
                     </div>
                 </div>
             </div>
@@ -360,6 +389,26 @@ export class ScheduleFilterModalController extends BaseModal {
                     target.classList.add('active');
 
                     this.updateGraduateLevelFilter(level);
+                    this.updatePreview(modalElement);
+                });
+            });
+        }
+
+        // Academic year filter
+        const academicYearControl = modalElement.querySelector('#academic-year-filter');
+        if (academicYearControl) {
+            academicYearControl.querySelectorAll('.segmented-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const target = e.target as HTMLElement;
+                    const raw = target.dataset.year;
+                    const year = raw === 'all' ? 'all' : parseInt(raw!);
+                    academicYearControl.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active'));
+                    target.classList.add('active');
+                    if (year === 'all') {
+                        this.scheduleFilterService?.removeFilter('academicYear');
+                    } else {
+                        this.scheduleFilterService?.addFilter('academicYear', { year });
+                    }
                     this.updatePreview(modalElement);
                 });
             });

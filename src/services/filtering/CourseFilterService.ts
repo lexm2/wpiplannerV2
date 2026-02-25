@@ -63,6 +63,12 @@ export class CourseFilterService {
             return true;
         }
 
+        if (filterId === 'academicYear') {
+            const displayValue = criteria.year === 'all' ? 'All Years' : `${criteria.year}–${Number(criteria.year) + 1}`;
+            this.filterState.addFilter(filterId, 'Academic Year', criteria, displayValue);
+            return true;
+        }
+
         if (filterId === 'bookmark') {
             const displayValue = criteria.showBookmarkedOnly ? 'Bookmarked Only' : 'All Courses';
             this.filterState.addFilter(filterId, 'Bookmarks', criteria, displayValue);
@@ -166,6 +172,14 @@ export class CourseFilterService {
 
         if (this.debugLogging) {
             console.log(`Filtered result: ${filteredCourses.length} courses`);
+        }
+
+        // Apply academic year filter at course level
+        const academicYearCriteria = criteriaMap.get('academicYear');
+        if (academicYearCriteria && academicYearCriteria.year !== 'all') {
+            filteredCourses = filteredCourses.filter(course =>
+                course.academicYear === academicYearCriteria.year
+            );
         }
 
         // Apply graduate level filter at course level

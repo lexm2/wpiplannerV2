@@ -7,7 +7,7 @@ import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
-import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria } from '../../types/filters';
+import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria } from '../../types/filters';
 
 export class FilterModalController extends BaseModal {
     private filterService: CourseFilterService | null = null;
@@ -169,6 +169,7 @@ export class FilterModalController extends BaseModal {
         return `
             <div class="filter-sections">
                 ${this.createGraduateLevelFilter()}
+                ${this.createAcademicYearFilter()}
                 ${this.createSearchTextFilter()}
                 ${this.createBookmarkFilter()}
                 ${this.createAvailabilityFilter()}
@@ -215,6 +216,34 @@ export class FilterModalController extends BaseModal {
                     </div>
                     <div class="filter-term-row">
                         ${termCheckboxes}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    private createAcademicYearFilter(): string {
+        if (!this.filterService) return '';
+
+        const years = [...new Set(this.allCourses.map(c => c.academicYear).filter(Boolean) as number[])].sort();
+        if (years.length <= 1) return '';
+
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'academicYear');
+        const currentYear = (activeFilter?.criteria as AcademicYearFilterCriteria | undefined)?.year ?? 'all';
+
+        const yearBtns = years.map(y =>
+            `<button class="segmented-btn ${currentYear === y ? 'active' : ''}" data-year="${y}">${y}–${y + 1}</button>`
+        ).join('');
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Academic Year</h4>
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-segmented-control" id="academic-year-filter">
+                        <button class="segmented-btn ${currentYear === 'all' ? 'active' : ''}" data-year="all">All</button>
+                        ${yearBtns}
                     </div>
                 </div>
             </div>
@@ -426,6 +455,7 @@ export class FilterModalController extends BaseModal {
         this.setupCreditRangeFilter(modalElement);
         this.setupTermFilter(modalElement);
         this.setupGraduateLevelFilter(modalElement);
+        this.setupAcademicYearFilter(modalElement);
         this.setupClearAllButton(modalElement);
         this.setupFilterSearch(modalElement);
     }
@@ -446,6 +476,26 @@ export class FilterModalController extends BaseModal {
                 });
             });
         }
+    }
+
+    private setupAcademicYearFilter(modalElement: HTMLElement): void {
+        const control = modalElement.querySelector('#academic-year-filter');
+        if (!control) return;
+        control.querySelectorAll('.segmented-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                const raw = target.dataset.year;
+                const year = raw === 'all' ? 'all' : parseInt(raw!);
+                control.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active'));
+                target.classList.add('active');
+                if (year === 'all') {
+                    this.filterService?.removeFilter('academicYear');
+                } else {
+                    this.filterService?.addFilter('academicYear', { year });
+                }
+                this.updatePreview(modalElement);
+            });
+        });
     }
 
     private updateGraduateLevelFilter(level: 'all' | 'undergraduate' | 'graduate', modalElement: HTMLElement): void {

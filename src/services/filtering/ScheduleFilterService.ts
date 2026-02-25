@@ -13,6 +13,7 @@ import { FilterState } from '../../core/filtering/FilterState';
 import { RequiredStatusFilter } from '../../core/filtering/filters/RequiredStatusFilter';
 import { SectionStatusFilter } from '../../core/filtering/filters/SectionStatusFilter';
 import { GraduateLevelFilter } from '../../core/filtering/filters/GraduateLevelFilter';
+import { AcademicYearFilter } from '../../core/filtering/filters/AcademicYearFilter';
 import { PeriodRMPRatingFilter } from '../../core/filtering/filters/PeriodRMPRatingFilter';
 import { RateMyProfessorService } from '../external/RateMyProfessorService';
 import { getAllSections } from '../../utils/courseUtils';
@@ -65,6 +66,7 @@ export class ScheduleFilterService {
         this.registerSelectedCourseFilter(new RequiredStatusFilter());
         this.registerSelectedCourseFilter(new SectionStatusFilter());
         this.registerSelectedCourseFilter(new GraduateLevelFilter());
+        this.registerSelectedCourseFilter(new AcademicYearFilter());
     }
 
     // Section Filter Registration

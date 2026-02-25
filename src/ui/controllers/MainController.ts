@@ -33,6 +33,7 @@ import { TermBoundsService } from '../../services/data/TermBoundsService'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
 import { DeviceDetection } from '../../utils/deviceDetection'
 import { WorkerPoolManager } from '../../workers/WorkerPoolManager'
+import { DateUtils } from '../../utils/dateUtils'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -190,6 +191,17 @@ export class MainController {
             this.courseSelectionService.reconstructSectionObjects();
             this.scheduleManagementService.initializeDefaultScheduleIfNeeded();
             this.timestampManager.updateClientTimestamp();
+
+            // Apply default academic year filter if data has multiple years and no filter is set
+            if (!this.filterService.hasFilter('academicYear')) {
+                const allCourses = event.departments.flatMap(d => d.courses);
+                const years = [...new Set(allCourses.map(c => c.academicYear).filter(Boolean) as number[])].sort();
+                if (years.length > 1) {
+                    const currentYear = DateUtils.getCurrentAcademicYear();
+                    const defaultYear = years.includes(currentYear) ? currentYear : years[0];
+                    this.filterService.addFilter('academicYear', { year: defaultYear });
+                }
+            }
 
             // Store reference for later use
             this.allDepartments = event.departments;
@@ -682,7 +694,7 @@ export class MainController {
                     ].filter(Boolean).join(', ');
                     console.log(`${sc.course.departmentAbbr}${sc.course.number}: ${components || 'NO COMPONENTS'} ${hasLecture ? 'OK' : 'MISSING'}`);
                     if (hasLecture && sc.selectedLecture) {
-                        console.log(`  Term: ${sc.selectedLecture.term}, Periods: ${sc.selectedLecture.periods.length}`);
+                        console.log(`  Term: ${sc.selectedLecture.computedTerm}, Periods: ${sc.selectedLecture.periods.length}`);
                         console.log(`  Full lecture section:`, sc.selectedLecture);
 
                         // Log each period in detail

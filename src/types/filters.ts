@@ -105,6 +105,10 @@ export interface GraduateLevelFilterCriteria {
     level: 'all' | 'undergraduate' | 'graduate';
 }
 
+export interface AcademicYearFilterCriteria {
+    year: number | 'all';
+}
+
 // Period-based filter criteria
 export interface CourseSelectionFilterCriteria {
     selectedCourseIds: string[];
