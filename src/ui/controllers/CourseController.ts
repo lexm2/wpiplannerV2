@@ -582,7 +582,7 @@ export class CourseController {
 
         let html = `
             <div class="course-info">
-                <div class="course-title">${Validators.escapeHtml(course.name)}</div>
+                <div class="course-desc-title">${Validators.escapeHtml(course.name)}</div>
                 <div class="course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)} (${credits})</div>
                 ${yearLabel ? `<div class="course-year">${yearLabel}</div>` : ''}
             </div>
