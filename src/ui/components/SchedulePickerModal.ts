@@ -45,6 +45,8 @@ export class SchedulePickerModal extends BaseModal {
         setTimeout(() => {
             this.updateScheduleList();
             this.setupCourseSelectionListener();
+            const container = this.modalElement?.querySelector('.modal-pages-container') as HTMLElement;
+            if (container) container.scrollLeft = 0;
         }, 0);
     }
 
@@ -67,7 +69,14 @@ export class SchedulePickerModal extends BaseModal {
                             <div class="modal-page settings-page">
                                 <button class="btn btn-primary" id="new-schedule-btn-settings">${getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')}<span class="btn-text"> New Schedule</span></button>
                                 <button class="btn btn-secondary" id="import-schedule-btn-settings">${getInlineSVG('CALENDAR_DOWN', 'modal-footer-icon')}<span class="btn-text"> Import</span></button>
+                                <button class="btn btn-secondary" id="export-ics-btn-settings">${getInlineSVG('CALENDAR_SHARE', 'modal-footer-icon')}<span class="btn-text"> Export Current Schedule to Calendar</span></button>
                                 <button class="btn btn-secondary" id="export-schedule-btn-settings">${getInlineSVG('CALENDAR_UP', 'modal-footer-icon')}<span class="btn-text"> Export All</span></button>
+                                <button class="btn btn-secondary" id="toggle-theme-btn-settings">${getInlineSVG('BRIGHTNESS', 'modal-footer-icon')}<span class="btn-text"> Toggle Theme</span></button>
+                                <div class="settings-btn-row">
+                                    <button class="btn btn-secondary" id="undo-btn-settings">${getInlineSVG('ARROW_BACK_UP', 'modal-footer-icon')}<span class="btn-text"> Undo</span></button>
+                                    <button class="btn btn-secondary" id="redo-btn-settings">${getInlineSVG('ARROW_FORWARD_UP', 'modal-footer-icon')}<span class="btn-text"> Redo</span></button>
+                                </div>
+                                <!-- keep clear all data at the bottom -->
                                 <button class="btn btn-danger" id="clear-all-data-btn-settings">${getInlineSVG('TRASH', 'modal-footer-icon')}<span class="btn-text"> Clear All Data</span></button>
                             </div>
                         </div>
@@ -142,14 +151,25 @@ export class SchedulePickerModal extends BaseModal {
 
         const newScheduleBtnSettings = modal.querySelector('#new-schedule-btn-settings');
         const importBtn = modal.querySelector('#import-schedule-btn-settings');
+        const exportIcsBtn = modal.querySelector('#export-ics-btn-settings');
         const exportBtn = modal.querySelector('#export-schedule-btn-settings');
         const clearAllBtn = modal.querySelector('#clear-all-data-btn-settings');
+        const toggleThemeBtn = modal.querySelector('#toggle-theme-btn-settings');
+        const undoBtn = modal.querySelector('#undo-btn-settings');
+        const redoBtn = modal.querySelector('#redo-btn-settings');
 
         newScheduleBtnHeader?.addEventListener('click', () => this.createNewSchedule());
         newScheduleBtnSettings?.addEventListener('click', () => this.createNewSchedule());
         importBtn?.addEventListener('click', () => this.importSchedule());
+        exportIcsBtn?.addEventListener('click', () => {
+            const activeId = this.scheduleManagementService.getActiveScheduleId();
+            if (activeId) this.exportScheduleICS(activeId);
+        });
         exportBtn?.addEventListener('click', () => this.exportAllSchedules());
         clearAllBtn?.addEventListener('click', () => this.clearAllData());
+        toggleThemeBtn?.addEventListener('click', () => document.getElementById('settings-theme-btn')?.click());
+        undoBtn?.addEventListener('click', () => document.getElementById('undo-btn')?.click());
+        redoBtn?.addEventListener('click', () => document.getElementById('redo-btn')?.click());
         closeBtn?.addEventListener('click', () => this.hide());
 
         modal.querySelectorAll('.schedule-picker-footer .nav-tab').forEach(tab => {

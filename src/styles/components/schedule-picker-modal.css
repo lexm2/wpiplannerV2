@@ -312,6 +312,15 @@
   gap: 0.5rem;
 }
 
+.schedule-picker-modal-dialog .settings-btn-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.schedule-picker-modal-dialog .settings-btn-row .btn {
+  flex: 1;
+}
+
 /* Focus States for Accessibility */
 .schedule-picker-modal-dialog .switch-btn:focus-visible,
 .schedule-picker-modal-dialog .menu-btn:focus-visible,
