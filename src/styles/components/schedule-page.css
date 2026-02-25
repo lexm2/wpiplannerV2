@@ -999,9 +999,9 @@
 
 /* Calendar Events Button in Sidebar */
 .calendar-events-section {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .calendar-events-btn {

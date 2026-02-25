@@ -6,6 +6,7 @@
 - Academic year now always defaults to the newest available year
 
 ### Improved
+- Moved separator bar in sidebar calendar events section to appear below the button instead of above
 - Schedules modal footer redesigned with a pill-style tab nav; body now slides between Schedules and Settings pages
 - Academic Year filter in course and schedule filter modals — filter courses by 2025–2026 or 2026–2027
 - Reduced course data file size by removing redundant fields from sections (legacy term code and duplicate description)
