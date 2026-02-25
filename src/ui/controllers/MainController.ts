@@ -33,7 +33,6 @@ import { TermBoundsService } from '../../services/data/TermBoundsService'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
 import { DeviceDetection } from '../../utils/deviceDetection'
 import { WorkerPoolManager } from '../../workers/WorkerPoolManager'
-import { DateUtils } from '../../utils/dateUtils'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -196,9 +195,7 @@ export class MainController {
                 const allCourses = event.departments.flatMap(d => d.courses);
                 const years = [...new Set(allCourses.map(c => c.academicYear).filter(Boolean) as number[])].sort();
                 if (years.length > 1) {
-                    const currentYear = DateUtils.getCurrentAcademicYear();
-                    const defaultYear = years.includes(currentYear) ? currentYear : years[years.length - 1];
-                    this.filterService.addFilter('academicYear', { year: defaultYear });
+                    this.filterService.addFilter('academicYear', { year: years[years.length - 1] });
                 }
             }
 
@@ -1587,6 +1584,7 @@ export class MainController {
             {
                 icon: 'BRIGHTNESS',
                 label: 'Toggle Theme',
+                id: 'settings-theme-btn',
                 action: () => {
                     this.toggleTheme();
                     this.closeSettingsMenu();
