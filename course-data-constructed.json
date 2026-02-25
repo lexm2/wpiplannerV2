@@ -1,5 +1,5 @@
 {
-  "generated": "Feb 25, 2026, 11:58 AM",
+  "generated": "Feb 25, 2026, 1:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -65387,7 +65387,7 @@
                 "number": "DL01",
                 "seats": 100,
                 "seatsAvailable": 0,
-                "actualWaitlist": 19,
+                "actualWaitlist": 20,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4511",
                 "description": "Cat. I This beginning course provides important background for all science and engineering disciplines regarding the capabilities and limitations of materials in our everyday lives. Students are introduced to the fundamental theme of materials science-- structure-property-processing relationships—in metals, ceramics, and plastics. Aspects of material structure range from the atomic to microstructural and macroscopic scales. In turn, these structural features determine the properties of materials. In particular, this course investigates connections between structure and mechanical properties, and how working and thermal treatments may transform structure and thus alter material properties. This knowledge is then applied to material selection decisions. Recommended background: prior knowledge of college-level chemistry.",
@@ -65406,7 +65406,7 @@
                     "room": "Unity Hall 500",
                     "seats": 100,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 19,
+                    "actualWaitlist": 20,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
                     "days": [
