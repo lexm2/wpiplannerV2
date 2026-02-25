@@ -2,22 +2,24 @@ import { Period, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
 import { PeriodDaysFilter } from '../../core/filtering/filters/PeriodDaysFilter';
 import { PeriodProfessorFilter } from '../../core/filtering/filters/PeriodProfessorFilter';
-import { PeriodTypeFilter } from '../../core/filtering/filters/PeriodTypeFilter';
 import { PeriodTermFilter } from '../../core/filtering/filters/PeriodTermFilter';
 import { PeriodAvailabilityFilter } from '../../core/filtering/filters/PeriodAvailabilityFilter';
-import { PeriodConflictFilter } from '../../core/filtering/filters/PeriodConflictFilter';
+import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import { SectionCodeFilter } from '../../core/filtering/filters/SectionCodeFilter';
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine';
-import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter, PeriodConflictFilterCriteria } from '../../types/filters';
+import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter, PeriodConflictFilterCriteria, ConflictFilterCriteria } from '../../types/filters';
 import { SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
 import { FilterState } from '../../core/filtering/FilterState';
 import { RequiredStatusFilter } from '../../core/filtering/filters/RequiredStatusFilter';
 import { SectionStatusFilter } from '../../core/filtering/filters/SectionStatusFilter';
 import { GraduateLevelFilter } from '../../core/filtering/filters/GraduateLevelFilter';
+import { AcademicYearFilter } from '../../core/filtering/filters/AcademicYearFilter';
 import { PeriodRMPRatingFilter } from '../../core/filtering/filters/PeriodRMPRatingFilter';
 import { RateMyProfessorService } from '../external/RateMyProfessorService';
 import { getAllSections } from '../../utils/courseUtils';
 import { ScheduleSearchTextFilter } from '../../core/filtering/filters/ScheduleSearchTextFilter';
+import { WakeUpTimeFilter } from '../../core/filtering/filters/WakeUpTimeFilter';
+import { PeriodTypeFilter } from '../../core/filtering/filters/PeriodTypeFilter';
 
 // Schedule-level filtering engine for course sections with time conflict detection and period-level constraints.
 
@@ -26,7 +28,7 @@ export class ScheduleFilterService {
     private registeredSectionFilters!: Map<string, SectionFilter>;
     private registeredSectionBasedFilters!: Map<string, SectionBasedFilter>;
     private registeredSelectedCourseFilters!: Map<string, SelectedCourseFilter>;
-    private periodConflictFilter: PeriodConflictFilter | null = null;
+    private conflictFilter: ConflictFilter | null = null;
     private rmpService: RateMyProfessorService | null = null;
 
     constructor(rmpService?: RateMyProfessorService) {
@@ -37,8 +39,8 @@ export class ScheduleFilterService {
     }
     
     setConflictDetector(conflictDetector: ConflictDetector): void {
-        this.periodConflictFilter = new PeriodConflictFilter(conflictDetector);
-        this.registerSectionBasedFilter(this.periodConflictFilter);
+        this.conflictFilter = new ConflictFilter();
+        this.registerSectionBasedFilter(this.conflictFilter);
     }
     
     private initializeFilters(): void {
@@ -51,10 +53,11 @@ export class ScheduleFilterService {
         this.registerSectionFilter(new ScheduleSearchTextFilter());
         this.registerSectionFilter(new PeriodDaysFilter());
         this.registerSectionFilter(new PeriodProfessorFilter());
-        this.registerSectionFilter(new PeriodTypeFilter());
         this.registerSectionFilter(new PeriodTermFilter());
         this.registerSectionFilter(new PeriodAvailabilityFilter());
         this.registerSectionFilter(new SectionCodeFilter());
+        this.registerSectionFilter(new WakeUpTimeFilter());
+        this.registerSectionFilter(new PeriodTypeFilter());
 
         // Register RMP filter if service is available
         if (this.rmpService) {
@@ -65,6 +68,7 @@ export class ScheduleFilterService {
         this.registerSelectedCourseFilter(new RequiredStatusFilter());
         this.registerSelectedCourseFilter(new SectionStatusFilter());
         this.registerSelectedCourseFilter(new GraduateLevelFilter());
+        this.registerSelectedCourseFilter(new AcademicYearFilter());
     }
 
     // Section Filter Registration
@@ -253,11 +257,11 @@ export class ScheduleFilterService {
                     const filteredSections = (searchFilter as any).applyToSectionsWithContext(sections, activeFilter.criteria);
                     allPeriods = this.sectionsToPeriodsWithContext(filteredSections);
                 }
-            } else if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
+            } else if (activeFilter.id === 'periodConflict' && this.conflictFilter) {
                 // Special handling for conflict filter which needs section context
                 const sections = this.periodsToSections(allPeriods);
                 const conflictCriteria = activeFilter.criteria as PeriodConflictFilterCriteria;
-                const validSections = this.periodConflictFilter.applyToSectionsWithContext(sections, {
+                const validSections = this.conflictFilter.applyToSectionsWithContext(sections, {
                     ...conflictCriteria,
                     selectedCourses: selectedCourses
                 });
@@ -377,7 +381,7 @@ export class ScheduleFilterService {
 
         // Apply section-based filters in priority order
         for (const activeFilter of sortedSectionFilters) {
-            if (activeFilter.id === 'periodConflict' && this.periodConflictFilter) {
+            if (activeFilter.id === 'periodConflict' && this.conflictFilter) {
                 // Special handling for conflict filter which needs additional context
                 console.log('[ScheduleFilterService] Applying conflict filter');
                 console.log('[ScheduleFilterService] Input sections:', allSections.length);
@@ -385,7 +389,7 @@ export class ScheduleFilterService {
                 console.log('[ScheduleFilterService] Criteria:', activeFilter.criteria);
 
                 const conflictCriteria = activeFilter.criteria as PeriodConflictFilterCriteria;
-                allSections = this.periodConflictFilter.applyToSectionsWithContext(allSections, {
+                allSections = this.conflictFilter.applyToSectionsWithContext(allSections, {
                     ...conflictCriteria,
                     selectedCourses: selectedCourses
                 });
@@ -460,8 +464,6 @@ export class ScheduleFilterService {
                 ];
             case 'periodProfessor':
                 return this.getAvailableProfessors(selectedCourses);
-            case 'periodType':
-                return this.getAvailablePeriodTypes(selectedCourses);
             case 'periodTerm':
                 return this.getAvailableTerms(selectedCourses);
             case 'sectionCode':
@@ -505,42 +507,6 @@ export class ScheduleFilterService {
         }));
     }
     
-    private getAvailablePeriodTypes(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
-        const types = new Set<string>();
-
-        selectedCourses.forEach(sc => {
-            const sections = getAllSections(sc.course);
-            sections.forEach((section: Section) => {
-                section.periods.forEach((period: Period) => {
-                    if (period.type && period.type.trim()) {
-                        types.add(period.type.trim());
-                    }
-                });
-            });
-        });
-        
-        const typeArray = Array.from(types).sort();
-        return typeArray.map(type => ({
-            value: type,
-            label: this.formatPeriodType(type)
-        }));
-    }
-    
-    
-    private formatPeriodType(type: string): string {
-        const lower = type.toLowerCase();
-        
-        if (lower.includes('lec') || lower.includes('lecture')) return 'Lecture';
-        if (lower.includes('lab')) return 'Lab';
-        if (lower.includes('dis') || lower.includes('discussion')) return 'Discussion';
-        if (lower.includes('rec') || lower.includes('recitation')) return 'Recitation';
-        if (lower.includes('sem') || lower.includes('seminar')) return 'Seminar';
-        if (lower.includes('studio')) return 'Studio';
-        if (lower.includes('conference') || lower.includes('conf')) return 'Conference';
-        
-        return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
-    }
-    
     private getAvailableSectionCodes(selectedCourses: SelectedCourse[]): { value: string; label: string }[] {
         const sectionCodes = new Set<string>();
 
@@ -566,12 +532,9 @@ export class ScheduleFilterService {
         selectedCourses.forEach(sc => {
             const sections = getAllSections(sc.course);
             sections.forEach((section: Section) => {
-                // Filter out invalid computed terms
-                if (section.computedTerm &&
-                    section.computedTerm.trim() &&
-                    section.computedTerm !== 'undefined' &&
-                    typeof section.computedTerm === 'string') {
-                    terms.add(section.computedTerm.trim());
+                // Add computed term (enum value)
+                if (section.computedTerm) {
+                    terms.add(section.computedTerm);
                 }
             });
         });

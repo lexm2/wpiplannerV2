@@ -1,18 +1,21 @@
 import { ModalService } from '../../services/ui/ModalService';
 import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService';
-import { SelectedCourse } from '../../types/schedule';
+import { SelectedCourse, AcademicTerm } from '../../types/schedule';
 import { BaseModal } from '../components/BaseModal';
 import { getAllSections } from '../../utils/courseUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
-import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTypeFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria, GraduateLevelFilterCriteria } from '../../types/filters';
+import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria } from '../../types/filters';
 
 export class ScheduleFilterModalController extends BaseModal {
     private scheduleFilterService: ScheduleFilterService | null = null;
     private selectedCourses: SelectedCourse[] = [];
+    private mode: 'filter' | 'auto-schedule' = 'filter';
+    private scheduleController?: any;
 
-    constructor(modalService: ModalService) {
+    constructor(modalService: ModalService, scheduleController?: any) {
         super(modalService);
+        this.scheduleController = scheduleController;
     }
 
     setScheduleFilterService(scheduleFilterService: ScheduleFilterService): void {
@@ -20,6 +23,14 @@ export class ScheduleFilterModalController extends BaseModal {
     }
 
     setSelectedCourses(selectedCourses: SelectedCourse[]): void {
+        this.selectedCourses = selectedCourses;
+    }
+
+    setMode(mode: 'filter' | 'auto-schedule'): void {
+        this.mode = mode;
+    }
+
+    updateSelectedCourses(selectedCourses: SelectedCourse[]): void {
         this.selectedCourses = selectedCourses;
     }
 
@@ -67,7 +78,7 @@ export class ScheduleFilterModalController extends BaseModal {
                         </div>
                         <div class="filter-actions">
                             <button class="modal-btn btn-secondary" id="clear-all-filters">Clear All</button>
-                            <button class="modal-btn btn-primary" id="apply-filters">Apply</button>
+                            <button class="modal-btn btn-primary" id="apply-filters">${this.mode === 'auto-schedule' ? 'Generate Schedule' : 'Apply'}</button>
                         </div>
                     </div>
                 </div>
@@ -92,11 +103,12 @@ export class ScheduleFilterModalController extends BaseModal {
                 ${this.createSearchTextFilter()}
                 ${this.createProfessorFilter()}
                 ${this.createRMPRatingFilter()}
-                ${this.createPeriodTypeFilter()}
                 ${this.createTermFilter()}
                 ${this.createGraduateLevelFilter()}
+                ${this.createAcademicYearFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createConflictFilter()}
+                ${this.createWakeUpTimeFilter()}
             </div>
         `;
     }
@@ -118,6 +130,34 @@ export class ScheduleFilterModalController extends BaseModal {
                         <button class="segmented-btn ${currentLevel === 'all' ? 'active' : ''}" data-level="all">All</button>
                         <button class="segmented-btn ${currentLevel === 'undergraduate' ? 'active' : ''}" data-level="undergraduate">Undergrad</button>
                         <button class="segmented-btn ${currentLevel === 'graduate' ? 'active' : ''}" data-level="graduate">Graduate</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    private createAcademicYearFilter(): string {
+        if (!this.scheduleFilterService) return '';
+
+        const years = [...new Set(this.selectedCourses.map(sc => sc.course.academicYear).filter(Boolean) as number[])].sort();
+        if (years.length <= 1) return '';
+
+        const activeFilter = this.scheduleFilterService.getActiveFilters().find(f => f.id === 'academicYear');
+        const currentYear = (activeFilter?.criteria as AcademicYearFilterCriteria | undefined)?.year ?? 'all';
+
+        const yearBtns = years.map(y =>
+            `<button class="segmented-btn ${currentYear === y ? 'active' : ''}" data-year="${y}">${y}–${y + 1}</button>`
+        ).join('');
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Academic Year</h4>
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-segmented-control" id="academic-year-filter">
+                        <button class="segmented-btn ${currentYear === 'all' ? 'active' : ''}" data-year="all">All</button>
+                        ${yearBtns}
                     </div>
                 </div>
             </div>
@@ -174,39 +214,6 @@ export class ScheduleFilterModalController extends BaseModal {
         });
     }
 
-    private createPeriodTypeFilter(): string {
-        if (!this.scheduleFilterService) return '';
-
-        const typeOptions = this.scheduleFilterService.getFilterOptions('periodType', this.selectedCourses) || [];
-        const activeTypes = this.getActivePeriodTypes();
-
-        if (typeOptions.length === 0) {
-            return '';
-        }
-
-        const typeCheckboxes = typeOptions.map((option: any) => `
-            <label class="filter-toggle-label">
-                <input type="checkbox" class="filter-toggle" name="periodType" value="${option.value}"
-                       ${activeTypes.includes(option.value) ? 'checked' : ''}>
-                <span class="filter-toggle-slider"></span>
-                <span class="filter-toggle-text">${option.label}</span>
-            </label>
-        `).join('');
-
-        return `
-            <div class="filter-section">
-                <div class="filter-section-header">
-                    <h4 class="filter-section-title">Exclude Period Types</h4>
-                </div>
-                <div class="filter-section-content">
-                    <div class="filter-checkbox-row">
-                        ${typeCheckboxes}
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
     private createTermFilter(): string {
         if (!this.scheduleFilterService) return '';
 
@@ -257,11 +264,22 @@ export class ScheduleFilterModalController extends BaseModal {
         if (!this.scheduleFilterService) return '';
 
         const activeConflictDetection = this.getActiveConflictDetection();
+        const hasCalendarEvents = this.hasCalendarEventsBlocked();
+        const calendarEventCount = this.scheduleController
+            ? this.scheduleController.getCalendarEventCount()
+            : 0;
+        const localEventCount = this.scheduleController
+            ? this.scheduleController.getLocalEventCount()
+            : 0;
+        const totalEventCount = calendarEventCount + localEventCount;
 
         return SharedFilterComponents.createConflictFilter({
             idPrefix: '',
             filterId: 'periodConflict',
-            avoidConflicts: activeConflictDetection.avoidConflicts
+            avoidConflicts: activeConflictDetection.avoidConflicts,
+            includeCalendarToggle: true,
+            hasCalendarEvents: hasCalendarEvents,
+            calendarEventCount: totalEventCount
         });
     }
 
@@ -272,13 +290,7 @@ export class ScheduleFilterModalController extends BaseModal {
         return criteria?.professors || [];
     }
 
-    private getActivePeriodTypes(): string[] {
-        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodType');
-        const criteria = filter?.criteria as PeriodTypeFilterCriteria | undefined;
-        return criteria?.types || [];
-    }
-
-    private getActiveTerms(): string[] {
+    private getActiveTerms(): AcademicTerm[] {
         const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodTerm');
         const criteria = filter?.criteria as PeriodTermFilterCriteria | undefined;
         return criteria?.terms || [];
@@ -297,6 +309,54 @@ export class ScheduleFilterModalController extends BaseModal {
         return criteria || { avoidConflicts: false };
     }
 
+    private getActiveWakeUpTime(): { hours: number; minutes: number } | null {
+        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'wakeUpTime');
+        const criteria = filter?.criteria as any;
+        return criteria?.wakeUpTime || null;
+    }
+
+    private hasCalendarEventsBlocked(): boolean {
+        const filter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
+        if (!filter) return false;
+
+        const criteria = filter.criteria as any;
+        const blockedSlots = criteria.blockedSlots || [];
+        return blockedSlots.some((slot: any) => slot.id.includes('calendar-') || slot.id.match(/^[0-9a-f-]{36}/));
+    }
+
+    private createWakeUpTimeFilter(): string {
+        const activeWakeUpTime = this.getActiveWakeUpTime();
+        const timeValue = activeWakeUpTime
+            ? `${String(activeWakeUpTime.hours).padStart(2, '0')}:${String(activeWakeUpTime.minutes).padStart(2, '0')}`
+            : '';
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Wake-Up Time</h4>
+                </div>
+                <div class="filter-section-content">
+                    <label class="wake-up-time-label">
+                        Earliest class start time
+                    </label>
+                    <input
+                        type="time"
+                        id="wake-up-time-input"
+                        class="wake-up-time-input"
+                        value="${timeValue}"
+                    >
+                    <p class="wake-up-time-hint">
+                        Excludes sections that start before this time
+                    </p>
+                    <button class="filter-clear-btn" id="clear-wake-up-time" style="display: ${timeValue ? 'block' : 'none'}">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+
     private setupFilterModalEventListeners(modalElement: HTMLElement): void {
 
         // Search text filter
@@ -307,14 +367,6 @@ export class ScheduleFilterModalController extends BaseModal {
 
         // RMP Rating filter
         this.setupRMPRatingFilter(modalElement);
-
-        // Period type checkboxes
-        modalElement.querySelectorAll('input[name="periodType"]').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                this.updatePeriodTypeFilter();
-                this.updatePreview(modalElement);
-            });
-        });
 
         // Term checkboxes
         modalElement.querySelectorAll('input[name="periodTerm"]').forEach(checkbox => {
@@ -342,6 +394,26 @@ export class ScheduleFilterModalController extends BaseModal {
             });
         }
 
+        // Academic year filter
+        const academicYearControl = modalElement.querySelector('#academic-year-filter');
+        if (academicYearControl) {
+            academicYearControl.querySelectorAll('.segmented-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const target = e.target as HTMLElement;
+                    const raw = target.dataset.year;
+                    const year = raw === 'all' ? 'all' : parseInt(raw!);
+                    academicYearControl.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active'));
+                    target.classList.add('active');
+                    if (year === 'all') {
+                        this.scheduleFilterService?.removeFilter('academicYear');
+                    } else {
+                        this.scheduleFilterService?.addFilter('academicYear', { year });
+                    }
+                    this.updatePreview(modalElement);
+                });
+            });
+        }
+
         // Availability filter
         SharedFilterSetup.setupAvailabilityFilter({
             modalElement,
@@ -362,6 +434,28 @@ export class ScheduleFilterModalController extends BaseModal {
             }
         });
 
+        const calendarConflictToggle = modalElement.querySelector('#avoid-calendar-filter');
+        if (calendarConflictToggle) {
+            calendarConflictToggle.addEventListener('change', (e) => {
+                this.handleCalendarEventsToggle((e.target as HTMLInputElement).checked, modalElement);
+            });
+        }
+
+        // Wake-up time filter
+        const wakeUpInput = modalElement.querySelector('#wake-up-time-input');
+        if (wakeUpInput) {
+            wakeUpInput.addEventListener('change', () => {
+                this.handleWakeUpTimeChange(modalElement);
+            });
+        }
+
+        const clearWakeUpBtn = modalElement.querySelector('#clear-wake-up-time');
+        if (clearWakeUpBtn) {
+            clearWakeUpBtn.addEventListener('click', () => {
+                this.handleClearWakeUpTime(modalElement);
+            });
+        }
+
         // Clear all filters
         modalElement.querySelector('#clear-all-filters')?.addEventListener('click', () => {
             this.scheduleFilterService!.clearFilters();
@@ -375,28 +469,16 @@ export class ScheduleFilterModalController extends BaseModal {
         });
 
         // Apply filters button
-        modalElement.querySelector('#apply-filters')?.addEventListener('click', () => {
-            this.hide();
+        modalElement.querySelector('#apply-filters')?.addEventListener('click', async () => {
+            if (this.mode === 'auto-schedule') {
+                await this.handleAutoScheduleGenerate();
+            } else {
+                this.hide();
+            }
         });
     }
 
 
-
-    private updatePeriodTypeFilter(): void {
-        if (!this.modalId) return;
-
-        const modalElement = document.getElementById(this.modalId);
-        if (modalElement) {
-            const checkedTypes = Array.from(modalElement.querySelectorAll('input[name="periodType"]:checked'))
-                .map(cb => (cb as HTMLInputElement).value);
-
-            if (checkedTypes.length > 0) {
-                this.scheduleFilterService!.addFilter('periodType', { types: checkedTypes });
-            } else {
-                this.scheduleFilterService!.removeFilter('periodType');
-            }
-        }
-    }
 
     private updateTermFilter(): void {
         if (!this.modalId) return;
@@ -404,7 +486,7 @@ export class ScheduleFilterModalController extends BaseModal {
         const modalElement = document.getElementById(this.modalId);
         if (modalElement) {
             const checkedTerms = Array.from(modalElement.querySelectorAll('input[name="periodTerm"]:checked'))
-                .map(cb => (cb as HTMLInputElement).value);
+                .map(cb => (cb as HTMLInputElement).value as AcademicTerm);
 
             if (checkedTerms.length > 0) {
                 this.scheduleFilterService!.addFilter('periodTerm', { terms: checkedTerms });
@@ -443,7 +525,13 @@ export class ScheduleFilterModalController extends BaseModal {
             const avoidConflicts = (modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement)?.checked || false;
 
             if (avoidConflicts) {
-                this.scheduleFilterService!.addFilter('periodConflict', { avoidConflicts: true });
+                const existingFilter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
+                const existingBlockedSlots = (existingFilter?.criteria as any)?.blockedSlots || [];
+
+                this.scheduleFilterService!.addFilter('periodConflict', {
+                    avoidConflicts: true,
+                    blockedSlots: existingBlockedSlots
+                });
             } else {
                 this.scheduleFilterService!.removeFilter('periodConflict');
             }
@@ -660,5 +748,79 @@ export class ScheduleFilterModalController extends BaseModal {
                 }
             }
         }
+    }
+
+    private handleWakeUpTimeChange(modalElement: HTMLElement): void {
+        const input = modalElement.querySelector('#wake-up-time-input') as HTMLInputElement;
+        const clearBtn = modalElement.querySelector('#clear-wake-up-time') as HTMLElement;
+
+        if (input.value && input.value.trim()) {
+            const [hours, minutes] = input.value.split(':').map(Number);
+            if (!isNaN(hours) && !isNaN(minutes)) {
+                this.scheduleFilterService!.addFilter('wakeUpTime', {
+                    wakeUpTime: { hours, minutes }
+                });
+                clearBtn.style.display = 'block';
+            }
+        } else {
+            this.scheduleFilterService!.removeFilter('wakeUpTime');
+            clearBtn.style.display = 'none';
+        }
+
+        this.updatePreview(modalElement);
+    }
+
+    private handleClearWakeUpTime(modalElement: HTMLElement): void {
+        const input = modalElement.querySelector('#wake-up-time-input') as HTMLInputElement;
+        const clearBtn = modalElement.querySelector('#clear-wake-up-time') as HTMLElement;
+
+        input.value = '';
+        this.scheduleFilterService!.removeFilter('wakeUpTime');
+        clearBtn.style.display = 'none';
+
+        this.updatePreview(modalElement);
+    }
+
+    private handleCalendarEventsToggle(checked: boolean, modalElement: HTMLElement): void {
+        if (checked) {
+            const calendarSlots = this.scheduleController.getAllCalendarBlockedTimes();
+
+            const existingFilter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
+            const existingSlots = (existingFilter?.criteria as any)?.blockedSlots || [];
+
+            const nonCalendarSlots = existingSlots.filter((slot: any) => !slot.id.includes('calendar-') && !slot.id.match(/^[0-9a-f-]{36}/));
+
+            this.scheduleFilterService!.addFilter('periodConflict', {
+                avoidConflicts: true,
+                blockedSlots: [...nonCalendarSlots, ...calendarSlots]
+            });
+        } else {
+            const existingFilter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
+            if (existingFilter) {
+                const existingSlots = (existingFilter.criteria as any)?.blockedSlots || [];
+                const filteredSlots = existingSlots.filter((slot: any) => !slot.id.includes('calendar-') && !slot.id.match(/^[0-9a-f-]{36}/));
+
+                if (filteredSlots.length > 0 || (existingFilter.criteria as any)?.avoidConflicts) {
+                    this.scheduleFilterService!.addFilter('periodConflict', {
+                        avoidConflicts: (existingFilter.criteria as any)?.avoidConflicts || false,
+                        blockedSlots: filteredSlots
+                    });
+                } else {
+                    this.scheduleFilterService!.removeFilter('periodConflict');
+                }
+            }
+        }
+
+        this.updatePreview(modalElement);
+    }
+
+    private handleOpenCalendarPanel(): void {
+        this.hide();
+        this.scheduleController.openCalendarEventsPanel();
+    }
+
+    private async handleAutoScheduleGenerate(): Promise<void> {
+        this.hide();
+        await this.scheduleController.generateSchedulesWithActiveFilters(this.selectedCourses);
     }
 }

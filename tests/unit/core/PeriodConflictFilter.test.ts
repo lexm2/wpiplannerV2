@@ -1,8 +1,8 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { PeriodConflictFilter, PeriodConflictCriteria } from '../../../src/core/filtering/filters/PeriodConflictFilter';
+import { ConflictFilter, ConflictCriteria } from '../../../src/core/filtering/filters/ConflictFilter';
 import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
 import { Period, Section, DayOfWeek, Time, Department, Course, PeriodType } from '../../../src/types/types';
-import { SelectedCourse } from '../../../src/types/schedule';
+import { SelectedCourse, AcademicTerm } from '../../../src/types/schedule';
 
 // Helper function to create a time object
 function createTime(hours: number, minutes: number = 0): Time {
@@ -49,25 +49,20 @@ function createSection(crn: number, sectionNumber: string, periods: Period[]): S
         maxWaitlist: 10,
         description: `Test Section ${sectionNumber}`,
         term: 'A 2024',
-        computedTerm: 'A',
+        computedTerm: AcademicTerm.A,
         periods
     };
 }
 
 // Helper function to create a course with hierarchical structure
 function createCourse(id: string, number: string, sections: Section[]): Course {
-    const department: Department = {
-        abbreviation: 'TEST',
-        name: 'Test Department',
-        courses: []
-    };
-
     const course: Course = {
         id,
         number,
         name: `Test Course ${number}`,
         description: 'Test course description',
-        department,
+        departmentAbbr: 'TEST',
+        departmentName: 'Test Department',
         minCredits: 3,
         maxCredits: 3
     };
@@ -90,20 +85,18 @@ function createSelectedCourse(course: Course, selectedSection: Section | null = 
         selectedLecture: selectedSection,
         selectedDiscussion: null,
         selectedLab: null,
-        selectedSection,
-        selectedSectionNumber: selectedSection ? selectedSection.number : null,
         isRequired: false,
         lockedSections: new Set()
     };
 }
 
-describe('PeriodConflictFilter', () => {
+describe('ConflictFilter', () => {
     let conflictDetector: ConflictDetector;
-    let periodConflictFilter: PeriodConflictFilter;
+    let periodConflictFilter: ConflictFilter;
 
     beforeEach(() => {
         conflictDetector = new ConflictDetector();
-        periodConflictFilter = new PeriodConflictFilter(conflictDetector);
+        periodConflictFilter = new ConflictFilter(conflictDetector);
     });
 
     describe('Basic Functionality', () => {
@@ -113,7 +106,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod(PeriodType.LAB, 'Prof B', 14, 16, [DayOfWeek.TUESDAY])
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: false
             };
 
@@ -128,7 +121,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod(PeriodType.LAB, 'Prof B', 14, 16, [DayOfWeek.TUESDAY])
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: []
             };
@@ -150,7 +143,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod(PeriodType.LAB, 'Prof C', 14, 16, [DayOfWeek.TUESDAY])
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourse1]
             };
@@ -178,7 +171,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod(PeriodType.LAB, 'Prof D', 8, 10, [DayOfWeek.MONDAY]) // Should NOT conflict (no overlap)
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourseObj]
             };
@@ -206,7 +199,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod(PeriodType.LAB, 'Prof D', 10, 12, [DayOfWeek.FRIDAY]) // Different day
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourseObj]
             };
@@ -240,7 +233,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod(PeriodType.LAB, 'Prof E', 8, 10, [DayOfWeek.FRIDAY]) // No conflicts
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourseObj1, selectedCourseObj2]
             };
@@ -271,12 +264,12 @@ describe('PeriodConflictFilter', () => {
                 { course: selectedCourseObj, period: section2.periods[0] }  // B01 period (conflicts but same course)
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourseObj]
             };
 
-            const filter = new PeriodConflictFilter(conflictDetector);
+            const filter = new ConflictFilter(conflictDetector);
             const result = filter.applyToPeriodsWithContext(periodsWithContext, criteria);
             
             // Both periods should remain - same course conflicts are allowed
@@ -304,12 +297,12 @@ describe('PeriodConflictFilter', () => {
                 { course: selectedCourse2, period: course2Section.periods[0] } // Course 2 period that conflicts
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourse1, selectedCourse2] // Course 1 has selection
             };
 
-            const filter = new PeriodConflictFilter(conflictDetector);
+            const filter = new ConflictFilter(conflictDetector);
             const result = filter.applyToPeriodsWithContext(periodsWithContext, criteria);
             
             // Period should be filtered out due to conflict with different course
@@ -335,12 +328,12 @@ describe('PeriodConflictFilter', () => {
                 { course: selectedCourse2, period: course2Section.periods[0] }
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourse1, selectedCourse2]
             };
 
-            const filter = new PeriodConflictFilter(conflictDetector);
+            const filter = new ConflictFilter(conflictDetector);
             const result = filter.applyToPeriodsWithContext(periodsWithContext, criteria);
             
             // Period should remain - no conflict with different course
@@ -382,12 +375,12 @@ describe('PeriodConflictFilter', () => {
                 { course: selectedCourse3, period: course3Section3.periods[0] }  // No conflicts
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourse1, selectedCourse2, selectedCourse3]
             };
 
-            const filter = new PeriodConflictFilter(conflictDetector);
+            const filter = new ConflictFilter(conflictDetector);
             const result = filter.applyToPeriodsWithContext(periodsWithContext, criteria);
             
             // Only the non-conflicting period should remain
@@ -417,12 +410,12 @@ describe('PeriodConflictFilter', () => {
                 { course: selectedCourse2, section: course2Section }
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourse1, selectedCourse2]
             };
 
-            const filter = new PeriodConflictFilter(conflictDetector);
+            const filter = new ConflictFilter(conflictDetector);
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
             
             // Entire section should be filtered out because ONE period conflicts
@@ -449,12 +442,12 @@ describe('PeriodConflictFilter', () => {
                 { course: selectedCourse2, section: course2Section }
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourse1, selectedCourse2]
             };
 
-            const filter = new PeriodConflictFilter(conflictDetector);
+            const filter = new ConflictFilter(conflictDetector);
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
             
             // Section should remain because no periods conflict
@@ -481,8 +474,6 @@ describe('PeriodConflictFilter', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: null,
                 selectedLab: null,
-                selectedSection: lecture,
-                selectedSectionNumber: lecture.number,
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -493,8 +484,6 @@ describe('PeriodConflictFilter', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: discussion1,  // Testing this discussion
                 selectedLab: null,
-                selectedSection: discussion1,
-                selectedSectionNumber: discussion1.number,
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -503,12 +492,12 @@ describe('PeriodConflictFilter', () => {
                 { course: tempCourseD01, section: discussion1 }
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourseWithLecture]
             };
 
-            const filter = new PeriodConflictFilter(conflictDetector);
+            const filter = new ConflictFilter(conflictDetector);
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
 
             // Discussion D01 should be filtered out because it conflicts with the lecture
@@ -520,8 +509,6 @@ describe('PeriodConflictFilter', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: discussion2,  // Testing this discussion
                 selectedLab: null,
-                selectedSection: discussion2,
-                selectedSectionNumber: discussion2.number,
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -562,12 +549,12 @@ describe('PeriodConflictFilter', () => {
                 { course: selectedCourse2, section: course2Section2 }  // No conflict
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourse1, selectedCourse2]
             };
 
-            const filter = new PeriodConflictFilter(conflictDetector);
+            const filter = new ConflictFilter(conflictDetector);
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
             
             // Only the non-conflicting section should remain
@@ -596,12 +583,12 @@ describe('PeriodConflictFilter', () => {
                 { course: selectedCourse2, section: course2Section }
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourse1, selectedCourse2]
             };
 
-            const filter = new PeriodConflictFilter(conflictDetector);
+            const filter = new ConflictFilter(conflictDetector);
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
             
             // Section should be filtered out because workshop conflicts with selected course's lab
@@ -621,7 +608,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod(PeriodType.INDEPENDENT_STUDY, 'Prof B', 10, 12, []) // No days
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourseObj]
             };
@@ -647,7 +634,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod(PeriodType.LAB, 'Prof D', 8, 10, [DayOfWeek.TUESDAY]) // No conflicts
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourseObj]
             };
@@ -672,7 +659,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod(PeriodType.LAB, 'Prof C', 12, 14, [DayOfWeek.MONDAY]) // 12-14 (no overlap)
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourseObj]
             };
@@ -696,7 +683,7 @@ describe('PeriodConflictFilter', () => {
                 createPeriod(PeriodType.LAB, 'Prof C', 11, 13, [DayOfWeek.MONDAY]) // 11-13 (1 hour overlap)
             ];
 
-            const criteria: PeriodConflictCriteria = {
+            const criteria: ConflictCriteria = {
                 avoidConflicts: true,
                 selectedCourses: [selectedCourseObj]
             };

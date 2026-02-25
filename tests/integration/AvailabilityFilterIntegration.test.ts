@@ -8,6 +8,7 @@ import { DepartmentFilter } from '../../src/core/filtering/filters/DepartmentFil
 import { ProfessorFilter } from '../../src/core/filtering/filters/ProfessorFilter'
 import { TermFilter } from '../../src/core/filtering/filters/TermFilter'
 import { DayOfWeek, Course } from '../../src/types/types'
+import { AcademicTerm } from '../../src/types/schedule'
 import {
   createMockCourse,
   createMockSection,
@@ -55,7 +56,7 @@ describe('AvailabilityFilter Integration', () => {
       })
 
       const csSection = createMockSection({
-        computedTerm: 'A',
+        computedTerm: AcademicTerm.A,
         periods: [csPeriod],
         seatsAvailable: 5
       })
@@ -63,7 +64,8 @@ describe('AvailabilityFilter Integration', () => {
       const csCourse: Course = {
         ...createMockCourse({
           id: 'CS-101',
-          department: csDept
+          departmentAbbr: 'CS',
+          departmentName: 'Computer Science'
         }),
         lectures: [{
           section: csSection,
@@ -81,7 +83,7 @@ describe('AvailabilityFilter Integration', () => {
       })
 
       const maSection = createMockSection({
-        computedTerm: 'B',
+        computedTerm: AcademicTerm.B,
         periods: [maPeriod],
         seatsAvailable: 3
       })
@@ -89,7 +91,8 @@ describe('AvailabilityFilter Integration', () => {
       const maCourse: Course = {
         ...createMockCourse({
           id: 'MA-101',
-          department: maDept
+          departmentAbbr: 'MA',
+          departmentName: 'Mathematical Sciences'
         }),
         lectures: [{
           section: maSection,
@@ -143,7 +146,7 @@ describe('AvailabilityFilter Integration', () => {
     })
 
     test('should handle concurrent filter modifications', async () => {
-      const section = createMockSection({ seatsAvailable: 5, computedTerm: 'A' })
+      const section = createMockSection({ seatsAvailable: 5, computedTerm: AcademicTerm.A })
       const course: Course = {
         ...createMockCourse({}),
         lectures: [{

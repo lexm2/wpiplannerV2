@@ -826,4 +826,8 @@ export class ScheduleManagementService {
     async getStorageStats() {
         return this.profileStateManager.getStorageStats();
     }
+
+    async clearAllSchedules(): Promise<void> {
+        await this.profileStateManager.clearAllData();
+    }
 }

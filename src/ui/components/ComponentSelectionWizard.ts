@@ -272,8 +272,6 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
                 selectedLecture: step === 'lecture' ? section : (this.selections.lecture || null),
                 selectedDiscussion: step === 'discussion' ? section : (this.selections.discussion || null),
                 selectedLab: step === 'lab' ? section : (this.selections.lab || null),
-                selectedSection: step === 'lecture' ? section : (this.selections.lecture || null),
-                selectedSectionNumber: step === 'lecture' ? section.number : (this.selections.lecture?.number || null),
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -602,7 +600,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         return `
             <div class="wizard-header">
                 <button class="wizard-close-btn" id="wizard-close-btn">&times;</button>
-                <h2>${Validators.escapeHtml(this.course.department.abbreviation)} ${Validators.escapeHtml(this.course.number)}</h2>
+                <h2>${Validators.escapeHtml(this.course.departmentAbbr)} ${Validators.escapeHtml(this.course.number)}</h2>
                 <div class="wizard-course-name">${Validators.escapeHtml(this.course.name)}</div>
             </div>
 

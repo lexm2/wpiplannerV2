@@ -30,7 +30,7 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "WPI Course Planner",
-      "description": "Interactive course planning tool for Worcester Polytechnic Institute students",
+      "description": "Referbished class planner for WPI students",
       "url": "https://lexm2.github.io/wpiplannerV2/",
       "applicationCategory": "EducationalApplication",
       "operatingSystem": "Web Browser",
@@ -41,7 +41,7 @@
       },
       "creator": {
         "@type": "Person",
-        "name": "WPI Student"
+        "name": "Lex"
       }
     }
     </script>
@@ -69,8 +69,8 @@
                     </div>
                 </nav>
                 <div class="header-controls">
+                    <button id="schedule-mobile-menu-btn" class="btn btn-icon hamburger-btn" title="Show selected courses" aria-label="Show selected courses" style="display: none;"></button>
                     <button id="settings-menu-btn" class="btn btn-icon settings-menu-btn" title="Settings" aria-label="Settings menu"></button>
-                    <div id="cloud-status-button-container"></div>
                     <div class="undo-redo-controls">
                         <button id="undo-btn" class="btn btn-icon" title="Undo (Ctrl+Z)" disabled></button>
                         <button id="redo-btn" class="btn btn-icon" title="Redo (Ctrl+Y)" disabled></button>
@@ -155,7 +155,6 @@
         
         <div class="app-body schedule-page" id="schedule-page" style="display: none;">
             <div class="schedule-page-layout">
-                <button id="schedule-mobile-menu-btn" class="schedule-floating-btn" title="Show selected courses" aria-label="Show selected courses"></button>
                 <aside class="schedule-sidebar">
                     <div class="schedule-sidebar-header">
                         <div class="schedule-filter-controls">

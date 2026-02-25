@@ -23,6 +23,8 @@ export interface SelectionChangeEvent {
     section?: string | null;
     selectedCourses: SelectedCourse[];
     timestamp: number;
+    affectedCourseIds?: string[];
+    skipCourseSidebarUpdate?: boolean;
 }
 
 export type SelectionChangeListener = (event: SelectionChangeEvent) => void;
@@ -181,7 +183,7 @@ export class CourseSelectionService {
 
     async toggleCourseSelection(course: Course, options: CourseSelectionOptions = {}): Promise<CourseSelectionResult> {
         const isSelected = this.isCourseSelected(course);
-        
+
         if (isSelected) {
             return this.unselectCourse(course);
         } else {
@@ -393,12 +395,12 @@ export class CourseSelectionService {
             lecture: Section | null;
             discussion: Section | null;
             lab: Section | null;
-        }>
+        }>,
+        skipSnapshot = false
     ): Promise<CourseSelectionResult> {
         await this.ensureInitialized();
 
         try {
-            // Validate all courses are selected before making any changes
             for (const selection of selections) {
                 if (!this.isCourseSelected(selection.course)) {
                     return {
@@ -408,8 +410,26 @@ export class CourseSelectionService {
                 }
             }
 
+            const previousSelections = new Map<string, {
+                lecture: Section | null;
+                discussion: Section | null;
+                lab: Section | null;
+            }>();
+
+            for (const selection of selections) {
+                const current = this.profileStateManager.getSelectedCourses().find(
+                    sc => sc.course.id === selection.course.id
+                );
+                if (current) {
+                    previousSelections.set(selection.course.id, {
+                        lecture: current.selectedLecture,
+                        discussion: current.selectedDiscussion,
+                        lab: current.selectedLab
+                    });
+                }
+            }
+
             await this.profileStateManager.withBatch(async () => {
-                // Apply all component updates
                 for (const selection of selections) {
                     this.profileStateManager.setSelectedComponents(
                         selection.course,
@@ -419,13 +439,23 @@ export class CourseSelectionService {
                         'service'
                     );
                 }
-            });
+            }, skipSnapshot);
 
-            // Emit a single event for all changes
+            const actuallyChangedCourseIds = selections.filter(selection => {
+                const previous = previousSelections.get(selection.course.id);
+                if (!previous) return true;
+
+                return previous.lecture?.crn !== selection.lecture?.crn ||
+                       previous.discussion?.crn !== selection.discussion?.crn ||
+                       previous.lab?.crn !== selection.lab?.crn;
+            }).map(s => s.course.id);
+
             this.notifySelectionListeners({
                 type: 'components_changed',
                 selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                affectedCourseIds: actuallyChangedCourseIds,
+                skipCourseSidebarUpdate: skipSnapshot
             });
 
             return {
@@ -489,14 +519,8 @@ export class CourseSelectionService {
 
         const selectedCourses = this.profileStateManager.getSelectedCourses();
         return selectedCourses.filter(sc => {
-            // Check if it's a hierarchical course without complete selections
-            const hasLecture = sc.selectedLecture !== null;
-            const hasSection = sc.selectedSection !== null;
-
-            // If it has neither lecture nor section, it's incomplete
-            if (!hasLecture && !hasSection) return true;
-
-            return false;
+            const hasAnyComponent = sc.selectedLecture || sc.selectedDiscussion || sc.selectedLab;
+            return !hasAnyComponent;
         });
     }
 
@@ -606,9 +630,7 @@ export class CourseSelectionService {
     getSelectedCourses(): SelectedCourse[] {
         if (!this.isInitialized) return [];
 
-        const selectedCourses = this.profileStateManager.getSelectedCourses();
-        this.syncSectionObjects(selectedCourses);
-        return selectedCourses;
+        return this.profileStateManager.getSelectedCourses();
     }
 
     private getSectionIndex(course: Course): Map<string, Section> {
@@ -628,29 +650,20 @@ export class CourseSelectionService {
         return index;
     }
 
-    private syncSectionObjects(selectedCourses: SelectedCourse[]): void {
-        selectedCourses.forEach(sc => {
-            // If we have a selectedSectionNumber but no selectedSection object (or invalid object)
-            if (sc.selectedSectionNumber && (!sc.selectedSection || !sc.selectedSection.computedTerm)) {
-                // Use cached section index for O(1) lookup instead of O(n) find
-                const sectionIndex = this.getSectionIndex(sc.course);
-                const sectionObject = sectionIndex.get(sc.selectedSectionNumber);
-
-                if (sectionObject && sectionObject.computedTerm) {
-                    sc.selectedSection = sectionObject;
-                }
-            }
-        });
-    }
-
     getSelectedSection(course: Course): string | null {
         const selectedCourse = this.getSelectedCourse(course);
-        return selectedCourse?.selectedSectionNumber || null;
+        return selectedCourse?.selectedLecture?.number ||
+               selectedCourse?.selectedDiscussion?.number ||
+               selectedCourse?.selectedLab?.number ||
+               null;
     }
 
     getSelectedSectionObject(course: Course): Section | null {
         const selectedCourse = this.getSelectedCourse(course);
-        return selectedCourse?.selectedSection || null;
+        return selectedCourse?.selectedLecture ||
+               selectedCourse?.selectedDiscussion ||
+               selectedCourse?.selectedLab ||
+               null;
     }
 
     getSelectedCoursesCount(): number {
@@ -847,25 +860,10 @@ export class CourseSelectionService {
 
     reconstructSectionObjects(): void {
         try {
-            let reconstructedCount = 0;
+            // No longer needed - component-based selection doesn't require reconstruction
             const selectedCourses = this.getSelectedCourses();
 
-            selectedCourses.forEach(selectedCourse => {
-                if (selectedCourse.selectedSectionNumber && !selectedCourse.selectedSection) {
-                    // Use cached section index for O(1) lookup instead of O(n) find
-                    const sectionIndex = this.getSectionIndex(selectedCourse.course);
-                    const sectionObject = sectionIndex.get(selectedCourse.selectedSectionNumber) || null;
-
-                    if (sectionObject) {
-                        selectedCourse.selectedSection = sectionObject;
-                        reconstructedCount++;
-                    }
-                }
-            });
-
-            if (reconstructedCount > 0) {
-                console.log(`Reconstructed ${reconstructedCount} section objects`);
-                // Save changes and notify listeners
+            if (selectedCourses.length > 0) {
                 this.profileStateManager.save();
             }
         } catch (error) {

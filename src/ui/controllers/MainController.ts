@@ -27,15 +27,11 @@ import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { StorageService } from '../../services/selection/StorageService'
 import { ThemeManager } from '../../themes/ThemeManager'
 import { getInlineSVG } from '../../utils/iconPaths'
-import { CloudStatusButton } from '../components/CloudStatusButton'
-import { syncManager } from '../../services/sync/SyncManager'
-import { providerRegistry } from '../../services/sync/ProviderRegistry'
-import { syncEventBus } from '../../services/sync/SyncEventBus'
-import type { ConflictInfo, SyncData } from '../../services/sync/types'
-import { ConflictResolutionModal } from '../components/ConflictResolutionModal'
-import { ChangelogModal } from '../components/ChangelogModal'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { TermBoundsService } from '../../services/data/TermBoundsService'
+import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
+import { DeviceDetection } from '../../utils/deviceDetection'
+import { WorkerPoolManager } from '../../workers/WorkerPoolManager'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -65,10 +61,6 @@ export class MainController {
     private operationManager: OperationManager;
     private debouncedSearch: DebouncedOperation;
     private scheduleManagementService: ScheduleManagementService;
-    private cloudStatusButton: CloudStatusButton;
-    private conflictResolutionModal: ConflictResolutionModal;
-    private changelogModal: ChangelogModal;
-    private cloudSyncMenuItem: HTMLButtonElement | null = null;
     private resizablePanel: ResizablePanel | null = null;
     private allDepartments: Department[] = [];
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
@@ -110,18 +102,13 @@ export class MainController {
         this.operationManager = new OperationManager();
         this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
 
-        // Sync UI components (no provider currently configured)
-        this.cloudStatusButton = new CloudStatusButton('cloud-status-button-container');
-        this.conflictResolutionModal = new ConflictResolutionModal(this.modalService);
-        this.changelogModal = new ChangelogModal(this.modalService);
-
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
         this.scheduleController = new ScheduleController(this.courseSelectionService);
         this.sectionInfoModalController = new SectionInfoModalController(this.modalService);
         this.infoModalController = new InfoModalController(this.modalService);
         this.filterModalController = new FilterModalController(this.modalService);
-        this.scheduleFilterModalController = new ScheduleFilterModalController(this.modalService);
+        this.scheduleFilterModalController = new ScheduleFilterModalController(this.modalService, this.scheduleController);
         
         // Connect filter service to course controller
         this.courseController.setFilterService(this.filterService);
@@ -166,12 +153,16 @@ export class MainController {
         this.previousSelectedCoursesCount = initialSelectedCourses.length;
         this.previousSelectedCoursesMap = new Map();
         initialSelectedCourses.forEach(sc => {
-            this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
+            this.previousSelectedCoursesMap.set(sc.course.id, {
+                lecture: sc.selectedLecture?.number || null,
+                discussion: sc.selectedDiscussion?.number || null,
+                lab: sc.selectedLab?.number || null
+            });
         });
         
         // IMPORTANT: Initialize filters LAST (triggers events that use operationManager)
         this.initializeFilters();
-        
+
         this.init();
     }
 
@@ -195,6 +186,14 @@ export class MainController {
             this.courseSelectionService.reconstructSectionObjects();
             this.scheduleManagementService.initializeDefaultScheduleIfNeeded();
             this.timestampManager.updateClientTimestamp();
+
+            if (!this.filterService.hasFilter('academicYear')) {
+                const allCourses = event.departments.flatMap(d => d.courses);
+                const years = [...new Set(allCourses.map(c => c.academicYear).filter(Boolean) as number[])].sort();
+                if (years.length > 1) {
+                    this.filterService.addFilter('academicYear', { year: years[years.length - 1] });
+                }
+            }
 
             // Store reference for later use
             this.allDepartments = event.departments;
@@ -246,7 +245,9 @@ export class MainController {
         this.uiStateManager.showLoadingState();
 
         try {
-            // Initialize StorageService and load persisted data
+            const workerPool = WorkerPoolManager.getInstance();
+            await workerPool.initialize();
+
             await this.storageService.initialize();
             this._themeSelector.initializeTheme();
             await rateMyProfessorService.loadData();
@@ -262,14 +263,11 @@ export class MainController {
             // Set "All Departments" as the default selection on startup
             this.initializeDefaultDepartmentView();
 
-            setTimeout(() => {
-                this.changelogModal.show();
-            }, 500);
-
             this.setupEventListeners();
-            this.setupCloudStatusButtonListener();
             this.setupCourseSelectionListener();
             this.setupScheduleChangeListener();
+            this.initializeSwipeNavigation();
+            this.setupWindowUnloadHandler();
 
             // Load active schedule into ScheduleController (for local events, etc.)
             const activeSchedule = this.scheduleManagementService.getActiveSchedule();
@@ -286,7 +284,10 @@ export class MainController {
             this.syncInitialCourseSelectionUI();
         } catch (error) {
             console.error('Failed to initialize application:', error);
-            this.uiStateManager.showErrorMessage('Failed to initialize application. Some features may not work properly.');
+            this.uiStateManager.showErrorMessage(
+                'Failed to initialize application. Some features may not work properly.',
+                () => this.scheduleManagementService.clearAllSchedules()
+            );
         }
     }
 
@@ -303,6 +304,59 @@ export class MainController {
             console.error('Failed to load course data:', error);
             this.uiStateManager.showErrorMessage('Failed to load course data. Please try refreshing the page.');
         }
+    }
+
+    private initializeSwipeNavigation(): void {
+        if (!DeviceDetection.isMobilePhone()) return;
+
+        const plannerPage = document.getElementById('planner-page');
+        const schedulePage = document.getElementById('schedule-page');
+
+        if (plannerPage) {
+            new SwipeGestureHandler(
+                plannerPage,
+                () => this.handleSwipeLeft(),
+                () => this.handleSwipeRight()
+            );
+        }
+
+        if (schedulePage) {
+            new SwipeGestureHandler(
+                schedulePage,
+                () => this.handleSwipeLeft(),
+                () => this.handleSwipeRight()
+            );
+        }
+    }
+
+    private handleSwipeLeft(): void {
+        if (this.uiStateManager.getCurrentPage() === 'planner') {
+            this.uiStateManager.switchToPage('schedule');
+            this.scheduleController.displayScheduleSelectedCourses();
+            this.scheduleController.renderScheduleGrids();
+        }
+    }
+
+    private handleSwipeRight(): void {
+        if (this.uiStateManager.getCurrentPage() === 'schedule') {
+            this.scheduleController.closeComponentWizard();
+            this.uiStateManager.switchToPage('planner');
+        }
+    }
+
+    private setupWindowUnloadHandler(): void {
+        window.addEventListener('beforeunload', async (e) => {
+            const profileStateManager = ProfileStateManager.getInstance();
+
+            if (profileStateManager.hasPendingSaves()) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+
+            const workerPool = WorkerPoolManager.getInstance();
+            workerPool.terminate();
+        });
     }
 
 
@@ -432,11 +486,12 @@ export class MainController {
             if (target.classList.contains('course-select-btn')) {
                 const courseElement = target.closest('.course-item, .course-card') as HTMLElement;
                 if (courseElement) {
-                    // Make async call and handle potential errors
-                    this.courseController.toggleCourseSelection(courseElement).catch(error => {
+                    try {
+                        this.courseController.toggleCourseSelection(courseElement);
+                    } catch (error) {
                         console.error('Failed to toggle course selection:', error);
                         this.uiStateManager.showErrorMessage('Failed to update course selection. Please try again.');
-                    });
+                    }
                 }
             }
 
@@ -524,7 +579,6 @@ export class MainController {
                                 if (existingSelections) {
                                     console.log('Selected Course Data:', {
                                         isRequired: existingSelections.isRequired,
-                                        selectedSectionNumber: existingSelections.selectedSectionNumber,
                                         selectedLecture: existingSelections.selectedLecture?.number || null,
                                         selectedDiscussion: existingSelections.selectedDiscussion?.number || null,
                                         selectedLab: existingSelections.selectedLab?.number || null,
@@ -532,7 +586,7 @@ export class MainController {
                                             id: course.id,
                                             number: course.number,
                                             name: course.name,
-                                            department: course.department?.abbreviation,
+                                            department: course.departmentAbbr,
                                             hasLectures: !!course.lectures && course.lectures.length > 0,
                                             lecturesCount: course.lectures?.length || 0,
                                             hasStandaloneLabs: !!course.standaloneLabs && course.standaloneLabs.length > 0,
@@ -623,14 +677,19 @@ export class MainController {
                 console.log(`Found ${selectedCourses.length} selected courses with sections:`);
 
                 selectedCourses.forEach(sc => {
-                    const hasSection = sc.selectedSection !== null;
-                    console.log(`${sc.course.department.abbreviation}${sc.course.number}: section ${sc.selectedSectionNumber} ${hasSection ? 'OK' : 'MISSING'}`);
-                    if (hasSection && sc.selectedSection) {
-                        console.log(`  Term: ${sc.selectedSection.term}, Periods: ${sc.selectedSection.periods.length}`);
-                        console.log(`  Full section object:`, sc.selectedSection);
+                    const hasLecture = sc.selectedLecture !== null;
+                    const components = [
+                        sc.selectedLecture ? `L:${sc.selectedLecture.number}` : null,
+                        sc.selectedDiscussion ? `D:${sc.selectedDiscussion.number}` : null,
+                        sc.selectedLab ? `Lab:${sc.selectedLab.number}` : null
+                    ].filter(Boolean).join(', ');
+                    console.log(`${sc.course.departmentAbbr}${sc.course.number}: ${components || 'NO COMPONENTS'} ${hasLecture ? 'OK' : 'MISSING'}`);
+                    if (hasLecture && sc.selectedLecture) {
+                        console.log(`  Term: ${sc.selectedLecture.computedTerm}, Periods: ${sc.selectedLecture.periods.length}`);
+                        console.log(`  Full lecture section:`, sc.selectedLecture);
 
                         // Log each period in detail
-                        sc.selectedSection.periods.forEach((period, idx) => {
+                        sc.selectedLecture.periods.forEach((period, idx) => {
                             console.log(`    Period ${idx + 1}:`, {
                                 type: period.type,
                                 professor: period.professor,
@@ -1135,32 +1194,7 @@ export class MainController {
 
 
     private previousSelectedCoursesCount = 0;
-    private previousSelectedCoursesMap = new Map<string, string | null>();
-
-    private setupCloudStatusButtonListener(): void {
-        this.profileStateManager.addListener((event, state) => {
-            this.cloudStatusButton.onStateChange(event, state);
-            this.updateCloudSyncMenuItem();
-        });
-    }
-
-    private updateCloudSyncMenuItem(): void {
-        if (!this.cloudSyncMenuItem) return;
-
-        const icon = this.cloudStatusButton.getCurrentIcon() || 'CALENDAR_UP';
-        const text = this.cloudStatusButton.getCurrentText();
-
-        const iconElement = this.cloudSyncMenuItem.querySelector('.menu-item-icon');
-        const textElement = this.cloudSyncMenuItem.querySelector('span');
-
-        if (iconElement) {
-            iconElement.outerHTML = getInlineSVG(icon, 'menu-item-icon');
-        }
-
-        if (textElement) {
-            textElement.textContent = text;
-        }
-    }
+    private previousSelectedCoursesMap = new Map<string, { lecture: string | null; discussion: string | null; lab: string | null }>();
 
     private setupScheduleChangeListener(): void {
         this.scheduleManagementService.onActiveScheduleChange((_activeSchedule, event) => {
@@ -1192,8 +1226,8 @@ export class MainController {
             // Handle schedule changes and data loads with full refresh
             const requiresFullRefresh = event.type === 'data_loaded'
                 || event.type === 'selection_cleared'
-                || event.type === 'components_cleared'
-                || event.type === 'components_changed';
+                || event.type === 'components_cleared';
+
             if (requiresFullRefresh) {
                 this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
                 this.courseController.displaySelectedCourses();
@@ -1204,25 +1238,42 @@ export class MainController {
                 this.updateSelectedCoursesState(selectedCourses);
                 return;
             }
+
+            if (event.type === 'components_changed' && event.affectedCourseIds) {
+                if (!event.skipCourseSidebarUpdate) {
+                    this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
+                    this.courseController.displaySelectedCourses();
+                }
+                this.scheduleController.displayScheduleSelectedCourses();
+                if (this.uiStateManager.currentPage === 'schedule') {
+                    this.scheduleController.renderAffectedTerms(event.affectedCourseIds);
+                }
+                this.updateSelectedCoursesState(selectedCourses);
+                return;
+            }
             
             // Create current state map for comparison
-            const currentCoursesMap = new Map<string, string | null>();
+            const currentCoursesMap = new Map<string, { lecture: string | null; discussion: string | null; lab: string | null }>();
             selectedCourses.forEach(sc => {
-                currentCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
+                currentCoursesMap.set(sc.course.id, {
+                    lecture: sc.selectedLecture?.number || null,
+                    discussion: sc.selectedDiscussion?.number || null,
+                    lab: sc.selectedLab?.number || null
+                });
             });
-            
+
             // Use targeted updates instead of global refresh for better performance
             if (isCoursesAddedOrRemoved) {
                 this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
             }
-            
+
             // Always update the selected courses sidebar
             this.courseController.displaySelectedCourses();
-            
+
             if (isCoursesAddedOrRemoved) {
                 // Full refresh needed when courses are added/removed
                 this.scheduleController.displayScheduleSelectedCourses();
-                
+
                 // Also refresh schedule grids if we're on the schedule page
                 if (this.uiStateManager.currentPage === 'schedule') {
                     this.scheduleController.renderScheduleGrids();
@@ -1230,15 +1281,20 @@ export class MainController {
             } else {
                 // Check if only section selections changed
                 let sectionSelectionsChanged = false;
-                for (const [courseId, selectedSection] of currentCoursesMap) {
-                    const previousSection = this.previousSelectedCoursesMap.get(courseId);
-                    if (previousSection !== selectedSection) {
+                for (const [courseId, currentComponents] of currentCoursesMap) {
+                    const previousComponents = this.previousSelectedCoursesMap.get(courseId);
+                    const hasChanged = !previousComponents ||
+                        previousComponents.lecture !== currentComponents.lecture ||
+                        previousComponents.discussion !== currentComponents.discussion ||
+                        previousComponents.lab !== currentComponents.lab;
+
+                    if (hasChanged) {
                         sectionSelectionsChanged = true;
-                        
+
                         // Update visual state for this course
                         const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
-                        if (selectedCourse) {
-                            this.scheduleController.updateSectionButtonStates(selectedCourse.course, selectedSection);
+                        if (selectedCourse && selectedCourse.selectedLecture) {
+                            this.scheduleController.updateSectionButtonStates(selectedCourse.course, selectedCourse.selectedLecture.number);
                         }
                     }
                 }
@@ -1256,9 +1312,13 @@ export class MainController {
 
     private updateSelectedCoursesState(selectedCourses: SelectedCourse[]): void {
         this.previousSelectedCoursesCount = selectedCourses.length;
-        this.previousSelectedCoursesMap = new Map<string, string | null>();
+        this.previousSelectedCoursesMap = new Map();
         selectedCourses.forEach(sc => {
-            this.previousSelectedCoursesMap.set(sc.course.id, sc.selectedSectionNumber);
+            this.previousSelectedCoursesMap.set(sc.course.id, {
+                lecture: sc.selectedLecture?.number || null,
+                discussion: sc.selectedDiscussion?.number || null,
+                lab: sc.selectedLab?.number || null
+            });
         });
     }
 
@@ -1357,6 +1417,8 @@ export class MainController {
         this.mobileMenuBackdrop.addEventListener('click', () => {
             this.closeMobileMenu();
         });
+
+        this.setupMobilePanelSwipeGestures();
     }
 
     private toggleMobileMenu(panel: 'sidebar' | 'right-panel'): void {
@@ -1399,6 +1461,29 @@ export class MainController {
         }
 
         this.mobileMenuOpen = null;
+    }
+
+    private setupMobilePanelSwipeGestures(): void {
+        const sidebar = document.querySelector('.sidebar') as HTMLElement;
+        const rightPanel = document.querySelector('.right-panel') as HTMLElement;
+
+        if (sidebar) {
+            new SwipeGestureHandler(
+                sidebar,
+                () => this.closeMobileMenu(),
+                () => {},
+                false
+            );
+        }
+
+        if (rightPanel) {
+            new SwipeGestureHandler(
+                rightPanel,
+                () => {},
+                () => this.closeMobileMenu(),
+                false
+            );
+        }
     }
 
     private setupScheduleMobileMenu(): void {
@@ -1448,6 +1533,25 @@ export class MainController {
                 }
             });
         }
+
+        this.setupScheduleSidebarSwipeGesture();
+    }
+
+    private setupScheduleSidebarSwipeGesture(): void {
+        const scheduleSidebar = document.querySelector('.schedule-sidebar') as HTMLElement;
+        if (!scheduleSidebar) return;
+
+        new SwipeGestureHandler(
+            scheduleSidebar,
+            () => {
+                scheduleSidebar.classList.remove('mobile-open');
+                if (this.mobileMenuBackdrop) {
+                    this.mobileMenuBackdrop.classList.remove('active');
+                }
+            },
+            () => {},
+            false
+        );
     }
 
     private setupSettingsMenu(): void {
@@ -1475,6 +1579,7 @@ export class MainController {
             {
                 icon: 'BRIGHTNESS',
                 label: 'Toggle Theme',
+                id: 'settings-theme-btn',
                 action: () => {
                     this.toggleTheme();
                     this.closeSettingsMenu();
@@ -1499,16 +1604,6 @@ export class MainController {
                     this.closeSettingsMenu();
                 },
                 checkDisabled: () => !this.profileStateManager.canRedo()
-            },
-            {
-                icon: this.cloudStatusButton.getCurrentIcon() || 'CALENDAR_UP',
-                label: this.cloudStatusButton.getCurrentText(),
-                id: 'settings-cloud-sync-btn',
-                action: async () => {
-                    await this.cloudStatusButton.triggerClick();
-                    this.closeSettingsMenu();
-                },
-                isCloudSync: true
             }
         ];
 
@@ -1528,11 +1623,6 @@ export class MainController {
             // Check if should be disabled
             if (item.checkDisabled && item.checkDisabled()) {
                 menuItem.disabled = true;
-            }
-
-            // Store reference to cloud sync menu item
-            if ((item as any).isCloudSync) {
-                this.cloudSyncMenuItem = menuItem;
             }
 
             // Add click handler

@@ -157,17 +157,15 @@
 }
 
 /* Mobile responsive */
-@media (max-width: 480px) {
-    .calendar-select-modal {
-        max-width: 100%;
-        margin: 0 0.5rem;
-    }
+html.is-mobile .calendar-select-modal {
+    max-width: 100%;
+    margin: 0 0.5rem;
+}
 
-    .calendar-list {
-        max-height: 300px;
-    }
+html.is-mobile .calendar-list {
+    max-height: 300px;
+}
 
-    .calendar-list-item {
-        padding: 1rem;
-    }
+html.is-mobile .calendar-list-item {
+    padding: 1rem;
 }

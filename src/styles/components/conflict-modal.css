@@ -97,16 +97,14 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-    .schedule-conflict-modal .modal-content {
-        max-width: 95%;
-    }
+html.is-mobile .schedule-conflict-modal .modal-content {
+    max-width: 95%;
+}
 
-    .conflict-actions {
-        flex-direction: column;
-    }
+html.is-mobile .conflict-actions {
+    flex-direction: column;
+}
 
-    .conflict-actions .modal-btn {
-        width: 100%;
-    }
+html.is-mobile .conflict-actions .modal-btn {
+    width: 100%;
 }

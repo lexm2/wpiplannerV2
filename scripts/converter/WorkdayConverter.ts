@@ -1,8 +1,3 @@
-/**
- * Main converter class for transforming Workday JSON to WPI Planner format
- * Implements the NEW hierarchical structure with lecture groups
- */
-
 import { readFile, writeFile, stat } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -217,93 +212,92 @@ export class WorkdayConverter {
         console.log('----------------------------\n');
     }
 
-    /**
-     * Calculates term bounds from Workday sections using mode (most common dates)
-     */
     private calculateTermBounds(sections: WorkdaySection[]): TermBoundsOutput {
-        const academicYear = `${this.config.fallYear}-${this.config.springYear}`;
+        const uniqueYears = [...new Set(sections.map(s => parseInt(s.Academic_Year)))].sort();
+        console.log(`[TermBounds] Detected academic years: ${uniqueYears.join(', ')}`);
 
-        const FALLBACK_DATES = {
-            A: { start: `${this.config.fallYear}-07-25`, end: `${this.config.fallYear}-09-13`, period: `${this.config.fallYear} Fall A Term` },
-            B: { start: `${this.config.fallYear}-09-21`, end: `${this.config.fallYear}-11-13`, period: `${this.config.fallYear} Fall B Term` },
-            C: { start: `${this.config.springYear}-01-06`, end: `${this.config.springYear}-03-07`, period: `${this.config.springYear} Spring C Term` },
-            D: { start: `${this.config.springYear}-03-17`, end: `${this.config.springYear}-05-09`, period: `${this.config.springYear} Spring D Term` },
-        };
-
-        const terms = ['A', 'B', 'C', 'D'] as const;
-        const result: any = {
-            academicYear,
+        const result: TermBoundsOutput = {
             generated: new Date().toISOString(),
-            terms: {}
+            years: {}
         };
 
-        for (const term of terms) {
-            const termSections = sections.filter(s => {
-                const extracted = this.extractTermFromOfferingPeriod(s.Offering_Period);
-                return extracted === term;
-            });
+        for (const fallYear of uniqueYears) {
+            const springYear = fallYear + 1;
+            const yearSections = sections.filter(s => parseInt(s.Academic_Year) === fallYear);
 
-            if (termSections.length === 0) {
-                console.warn(`[TermBounds] No sections found for term ${term}, using fallback`);
-                result.terms[term] = {
-                    startDate: FALLBACK_DATES[term].start,
-                    endDate: FALLBACK_DATES[term].end,
-                    offeringPeriod: FALLBACK_DATES[term].period,
-                    sampleSize: 0
-                };
-                continue;
-            }
+            const FALLBACK_DATES = {
+                A: { start: `${fallYear}-07-25`, end: `${fallYear}-09-13`, period: `${fallYear} Fall A Term` },
+                B: { start: `${fallYear}-09-21`, end: `${fallYear}-11-13`, period: `${fallYear} Fall B Term` },
+                C: { start: `${springYear}-01-06`, end: `${springYear}-03-07`, period: `${springYear} Spring C Term` },
+                D: { start: `${springYear}-03-17`, end: `${springYear}-05-09`, period: `${springYear} Spring D Term` },
+            };
 
-            const datePairs = new Map<string, number>();
-            for (const section of termSections) {
-                const start = section.Course_Section_Start_Date;
-                const end = section.Course_Section_End_Date;
+            const terms = ['A', 'B', 'C', 'D'] as const;
+            const yearBounds: any = {};
 
-                if (!start || !end || !/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) {
+            for (const term of terms) {
+                const termSections = yearSections.filter(s =>
+                    this.extractTermFromOfferingPeriod(s.Offering_Period) === term
+                );
+
+                if (termSections.length === 0) {
+                    console.warn(`[TermBounds] No sections for year ${fallYear} term ${term}, using fallback`);
+                    yearBounds[term] = {
+                        startDate: FALLBACK_DATES[term].start,
+                        endDate: FALLBACK_DATES[term].end,
+                        offeringPeriod: FALLBACK_DATES[term].period,
+                        sampleSize: 0
+                    };
                     continue;
                 }
 
-                const key = `${start}|${end}`;
-                datePairs.set(key, (datePairs.get(key) || 0) + 1);
-            }
-
-            if (datePairs.size === 0) {
-                console.warn(`[TermBounds] No valid dates for term ${term}, using fallback`);
-                result.terms[term] = {
-                    startDate: FALLBACK_DATES[term].start,
-                    endDate: FALLBACK_DATES[term].end,
-                    offeringPeriod: FALLBACK_DATES[term].period,
-                    sampleSize: 0
-                };
-                continue;
-            }
-
-            let maxCount = 0;
-            let modeKey = '';
-            for (const [key, count] of datePairs.entries()) {
-                if (count > maxCount) {
-                    maxCount = count;
-                    modeKey = key;
+                const datePairs = new Map<string, number>();
+                for (const section of termSections) {
+                    const start = section.Course_Section_Start_Date;
+                    const end = section.Course_Section_End_Date;
+                    if (!start || !end || !/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) {
+                        continue;
+                    }
+                    const key = `${start}|${end}`;
+                    datePairs.set(key, (datePairs.get(key) || 0) + 1);
                 }
+
+                if (datePairs.size === 0) {
+                    console.warn(`[TermBounds] No valid dates for year ${fallYear} term ${term}, using fallback`);
+                    yearBounds[term] = {
+                        startDate: FALLBACK_DATES[term].start,
+                        endDate: FALLBACK_DATES[term].end,
+                        offeringPeriod: FALLBACK_DATES[term].period,
+                        sampleSize: 0
+                    };
+                    continue;
+                }
+
+                let maxCount = 0;
+                let modeKey = '';
+                for (const [key, count] of datePairs.entries()) {
+                    if (count > maxCount) { maxCount = count; modeKey = key; }
+                }
+
+                const [startDate, endDate] = modeKey.split('|');
+                const sampleSection = termSections.find(s =>
+                    s.Course_Section_Start_Date === startDate && s.Course_Section_End_Date === endDate
+                );
+
+                yearBounds[term] = {
+                    startDate,
+                    endDate,
+                    offeringPeriod: sampleSection?.Offering_Period || FALLBACK_DATES[term].period,
+                    sampleSize: maxCount
+                };
+
+                console.log(`[TermBounds] Year ${fallYear} Term ${term}: ${startDate} to ${endDate} (${maxCount}/${termSections.length} sections)`);
             }
 
-            const [startDate, endDate] = modeKey.split('|');
-            const sampleSection = termSections.find(s =>
-                s.Course_Section_Start_Date === startDate &&
-                s.Course_Section_End_Date === endDate
-            );
-
-            result.terms[term] = {
-                startDate,
-                endDate,
-                offeringPeriod: sampleSection?.Offering_Period || FALLBACK_DATES[term].period,
-                sampleSize: maxCount
-            };
-
-            console.log(`[TermBounds] Term ${term}: ${startDate} to ${endDate} (${maxCount}/${termSections.length} sections)`);
+            result.years[fallYear] = yearBounds;
         }
 
-        return result as TermBoundsOutput;
+        return result;
     }
 
     /**

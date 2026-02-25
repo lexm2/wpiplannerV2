@@ -1,5 +1,121 @@
 # Changelog
 
+## [2026-02-25]
+
+### Improved
+- Error messages shown when the app fails to load now include a "Clear Data & Reload" button with a note that saved data may be outdated
+- Period type filter now supports partial matching (e.g. filtering "lec" excludes Lecture sections)
+- Schedule generation now correctly respects blocked times from calendar events
+
+### Fixed
+- Academic year now always defaults to the newest available year
+
+### Improved
+- Moved separator bar in sidebar calendar events section to appear below the button instead of above
+- Schedules modal footer redesigned with a pill-style tab nav; body now slides between Schedules and Settings pages
+- Academic Year filter in course and schedule filter modals — filter courses by 2025–2026 or 2026–2027
+- Reduced course data file size by removing redundant fields from sections (legacy term code and duplicate description)
+
+## [2026-02-07]
+
+### Added
+- "Clear All Data" button in schedules modal to reset all schedules and data
+
+### Removed
+- "Exclude Period Types" filter (unused feature)
+
+### Fixed
+- Course selection buttons now work correctly (validator updated to match current data structure)
+
+### Improved
+- Replaced auto-schedule settings modal with unified filter interface
+- Auto-schedule now uses the same filter UI as regular filtering for consistency
+- Wake-up time and calendar event blocking now available in filter modal
+- Refactored auto-schedule constraints into unified filter system
+- Simplified auto-schedule API by removing config parameter
+- Wake-up time now works as a hard filter (excludes sections before set time)
+- Unified conflict detection system - calendar events and section conflicts now use the same filtering mechanism
+- Simplified filter architecture by merging BlockedTimesFilter into ConflictFilter
+- Calendar event conflict toggle now appears within Schedule Conflicts section for better discoverability
+- Eliminated circular references between Course and Department by flattening department data
+- Simplified JSON serialization by removing custom circular reference handling
+- Standard JSON.stringify/parse now works directly with course data
+
+## [2026-02-06]
+
+### Improved
+- Simplified course selection architecture by removing redundant section tracking
+- Cleaned up unused schedule preference fields
+- Removed unnecessary ConflictType enum (only one type exists)
+- Removed unused conflict descriptions and fields
+- Refactored conflict detection to return conflict map directly (simpler and faster)
+- Added F (Fall) and S (Spring) to term system for proper graduate course handling
+- Completed migration to component-based course selection system
+- Renamed confusing "legacy" schedule methods (no actual legacy format exists)
+- Added helper functions to get CRNs from selected courses
+- Converted event type from string literals to proper enum for better type safety
+
+### Fixed
+- Fixed blocked times not applying to Fall (F) and Spring (S) graduate courses
+- Fixed auto-scheduler ignoring time blocks for multi-term courses
+- Fixed all AcademicTerm type errors by using proper enum values instead of strings
+- Fixed data loss bug where only one section per course was saved during export (now saves all lecture/discussion/lab selections)
+
+## [2026-01-25]
+
+### Improved
+- Grid rendering is now dramatically faster with optimized conflict detection (70-75% faster)
+- Schedule grid now renders 80-85% faster with optimized string building and color caching
+- Schedule saves and loads now use background workers for smoother performance
+- Schedules with preferred wake-up times are now shown first properly
+- Auto-schedule navigation is now significantly faster with optimized rendering (90% faster)
+
+### Fixed
+- Fixed grid cells not clearing properly when navigating between auto-generated schedules
+- Fixed auto-schedule generation failing after worker pool optimization
+- Fixed failing TermBoundsService test
+- Fixed type errors in course selection and schedule rendering
+
+## [2026-01-24]
+
+### Added
+- Wake up time preference in auto-schedule settings to prioritize schedules without early classes
+
+### Improved
+- Course selection button is now more responsive with optimistic UI
+
+## [2026-01-23]
+
+### Why I removed cloud sync
+- Im just trying to get a clean product that I would be happy putting on the offical site so cloud save will return eventually, but for now it is gone.
+
+### Improved
+- Right panel now adjusts its width based on screen size for better proportions on smaller displays
+- Panel width preferences are saved and persist across sessions
+- Added tooltip to full term badges
+- Schedules modal now shows inline actions at lower screen widths and displays icon-only buttons on smaller screens
+- Mobile detection now uses device type instead of screen width for more reliable phone vs tablet distinction
+- Added swipe navigation on mobile phones to switch between Classes and Schedule pages
+- Mobile menus can now be closed by swiping in the opposite direction they opened from
+- Schedule mobile menu button moved to header
+- Disabled term focus mode on mobile for better viewing experience
+- Term filter toggles now display as colored buttons at narrow widths
+
+### Fixed
+- Course select button now reliably shows checkmark icon when selected
+- Removed staggered animations from checkmark for instant appearance
+- Fixed header navigation layout issues at specific screen widths by using device detection
+- Fixed mobile menu panels not appearing when hamburger button is clicked
+- Fixed header navigation being left-aligned instead of centered on mobile devices
+- Schedule mobile menu button now visible on screens smaller than 1250px
+- Fixed unintended page switches after using header navigation following swipe gestures
+
+### Removed
+- Removed all cloud sync functionality and infrastructure
+- Removed all calendar integration features
+- Removed Export ICS button from schedules modal footer
+- Removed cloud calendar integration - local events continue to work
+
 ## [2026-01-21]
 
 ### Changed

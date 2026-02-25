@@ -4,7 +4,7 @@ import { FilterState } from '../../core/filtering/FilterState';
 import { SearchService } from './searchService';
 import { getAllSections } from '../../utils/courseUtils';
 import { SectionFilterPipeline, SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
-import { PeriodConflictFilter } from '../../core/filtering/filters/PeriodConflictFilter';
+import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import { ConflictDetector } from '../../core/scheduling/ConflictEngine';
 export class CourseFilterService {
     private filterState: FilterState;
@@ -22,7 +22,7 @@ export class CourseFilterService {
     }
 
     setConflictDetector(conflictDetector: ConflictDetector): void {
-        const periodConflictFilter = new PeriodConflictFilter(conflictDetector);
+        const periodConflictFilter = new ConflictFilter();
         this.registerFilter(periodConflictFilter);
     }
 
@@ -60,6 +60,12 @@ export class CourseFilterService {
             };
             const displayValue = levelNames[criteria.level] || 'Unknown Level';
             this.filterState.addFilter(filterId, 'Course Level', criteria, displayValue);
+            return true;
+        }
+
+        if (filterId === 'academicYear') {
+            const displayValue = criteria.year === 'all' ? 'All Years' : `${criteria.year}–${Number(criteria.year) + 1}`;
+            this.filterState.addFilter(filterId, 'Academic Year', criteria, displayValue);
             return true;
         }
 
@@ -168,6 +174,14 @@ export class CourseFilterService {
             console.log(`Filtered result: ${filteredCourses.length} courses`);
         }
 
+        // Apply academic year filter at course level
+        const academicYearCriteria = criteriaMap.get('academicYear');
+        if (academicYearCriteria && academicYearCriteria.year !== 'all') {
+            filteredCourses = filteredCourses.filter(course =>
+                course.academicYear === academicYearCriteria.year
+            );
+        }
+
         // Apply graduate level filter at course level
         const graduateLevelCriteria = criteriaMap.get('graduateLevel');
         if (graduateLevelCriteria && graduateLevelCriteria.level && graduateLevelCriteria.level !== 'all') {
@@ -251,7 +265,7 @@ export class CourseFilterService {
     
     private getDepartmentOptions(courses: Course[]): string[] {
         const departments = new Set<string>();
-        courses.forEach(course => departments.add(course.department.abbreviation));
+        courses.forEach(course => departments.add(course.departmentAbbr));
         return Array.from(departments).sort();
     }
     

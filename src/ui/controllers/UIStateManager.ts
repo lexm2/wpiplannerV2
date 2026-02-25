@@ -31,6 +31,10 @@ export class UIStateManager {
         this.switchToPage(nextPage);
     }
 
+    getCurrentPage(): 'planner' | 'schedule' {
+        return this.currentPage;
+    }
+
     switchToPage(page: 'planner' | 'schedule'): void {
         if (page === this.currentPage) return;
 
@@ -56,18 +60,25 @@ export class UIStateManager {
     private showPlannerPage(): void {
         const plannerPage = document.getElementById('planner-page');
         const schedulePage = document.getElementById('schedule-page');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const scheduleMobileMenuBtn = document.getElementById('schedule-mobile-menu-btn');
 
         if (plannerPage) plannerPage.style.display = 'grid';
         if (schedulePage) schedulePage.style.display = 'none';
+        if (mobileMenuBtn) mobileMenuBtn.style.display = '';
+        if (scheduleMobileMenuBtn) scheduleMobileMenuBtn.style.display = 'none';
     }
 
     private showSchedulePage(): void {
         const plannerPage = document.getElementById('planner-page');
         const schedulePage = document.getElementById('schedule-page');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const scheduleMobileMenuBtn = document.getElementById('schedule-mobile-menu-btn');
 
         if (plannerPage) plannerPage.style.display = 'none';
         if (schedulePage) schedulePage.style.display = 'flex';
-        
+        if (mobileMenuBtn) mobileMenuBtn.style.display = 'none';
+        if (scheduleMobileMenuBtn) scheduleMobileMenuBtn.style.display = '';
     }
 
 
@@ -78,15 +89,32 @@ export class UIStateManager {
         }
     }
 
-    showErrorMessage(message: string): void {
+    showErrorMessage(message: string, onClearData?: () => Promise<void>): void {
+        const content = onClearData
+            ? `<div class="error-message">
+                <p>${message}</p>
+                <p>Your saved data may be outdated or deprecated. Clearing it will reset the app to a fresh state.</p>
+                <button class="btn btn-danger" id="error-clear-data-btn">Clear Data &amp; Reload</button>
+               </div>`
+            : `<div class="error-message">${message}</div>`;
+
         const departmentList = document.getElementById('department-list');
         if (departmentList) {
-            departmentList.innerHTML = `<div class="error-message">${message}</div>`;
+            departmentList.innerHTML = content;
         }
-        
+
         const courseContainer = document.getElementById('course-container');
         if (courseContainer) {
-            courseContainer.innerHTML = `<div class="error-message">${message}</div>`;
+            courseContainer.innerHTML = content;
+        }
+
+        if (onClearData) {
+            document.querySelectorAll('#error-clear-data-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await onClearData();
+                    location.reload();
+                });
+            });
         }
     }
 }

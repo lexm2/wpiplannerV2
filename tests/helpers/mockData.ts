@@ -1,5 +1,6 @@
-import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB, PeriodType } from '../../src/types/types'
-import { SelectedCourse, Schedule } from '../../src/types/schedule'
+import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB, PeriodType, SectionType } from '../../src/types/types'
+import { SelectedCourse, Schedule, AcademicTerm } from '../../src/types/schedule'
+import { WakeUpTimeFilter } from '../../src/core/filtering/filters/WakeUpTimeFilter'
 
 export const createMockTime = (hours: number, minutes: number): Time => ({
   hours,
@@ -35,7 +36,7 @@ export const createMockSection = (overrides: Partial<Section> = {}): Section => 
   note: undefined,
   description: 'Test section description',
   term: 'Fall 2024',
-  computedTerm: 'A',
+  computedTerm: AcademicTerm.A,
   periods: [createMockPeriod()],
   ...overrides
 })
@@ -48,14 +49,13 @@ export const createMockDepartment = (overrides: Partial<Department> = {}): Depar
 })
 
 export const createMockCourse = (overrides: Partial<Course> = {}): Course => {
-  const department = createMockDepartment()
-
   const defaultCourse: Course = {
     id: 'CS-1101',
     number: '1101',
     name: 'Introduction to Programming Design',
     description: 'An introduction to the design and analysis of algorithms and data structures.',
-    department,
+    departmentAbbr: 'CS',
+    departmentName: 'Computer Science',
     minCredits: 3,
     maxCredits: 3,
   }
@@ -71,14 +71,16 @@ export const createMockScheduleDB = (overrides: Partial<ScheduleDB> = {}): Sched
     id: 'CS-1101', 
     number: '1101',
     name: 'Introduction to Programming Design',
-    department: csDept
+    departmentAbbr: 'CS',
+    departmentName: 'Computer Science'
   })
   
   const maCourse = createMockCourse({ 
     id: 'MA-1021', 
     number: '1021',
     name: 'Calculus I',
-    department: maDept
+    departmentAbbr: 'MA',
+    departmentName: 'Mathematical Sciences'
   })
   
   csDept.courses = [csCourse]
@@ -153,8 +155,6 @@ export const createMockSelectedCourse = (overrides: Partial<SelectedCourse> = {}
     selectedLecture: null,
     selectedDiscussion: null,
     selectedLab: null,
-    selectedSection: null,
-    selectedSectionNumber: null,
     isRequired: false,
     lockedSections: new Set<string>(),
     ...overrides
@@ -170,8 +170,6 @@ export const createMockSelectedCourseWithLocks = (
     selectedLecture: null,
     selectedDiscussion: null,
     selectedLab: null,
-    selectedSection: null,
-    selectedSectionNumber: null,
     isRequired: false,
     lockedSections: new Set(lockedCrns)
   }
@@ -191,7 +189,7 @@ export const createMockSchedule = (overrides: Partial<Schedule> = {}): Schedule 
 export const createMockFilterableSection = (overrides: {
   course?: Partial<Course>;
   section?: Partial<Section>;
-  sectionType?: 'lecture' | 'standaloneLab' | 'discussion' | 'lab';
+  sectionType?: SectionType;
 } = {}): import('../../src/types/filterableUnit').FilterableSection => {
   const course = createMockCourse(overrides.course || {});
   const section = createMockSection(overrides.section || {});
@@ -199,7 +197,7 @@ export const createMockFilterableSection = (overrides: {
   return {
     course,
     section,
-    sectionType: overrides.sectionType || 'lecture'
+    sectionType: overrides.sectionType || SectionType.LECTURE
   };
 }
 
@@ -237,6 +235,8 @@ export const createCoursesWithConflicts = (): {
     id: 'CS-1101',
     number: '1101',
     name: 'Intro to Programming',
+    departmentAbbr: 'CS',
+    departmentName: 'Computer Science',
     lectures: [{
       section: conflictingSection1,
       compatibleDiscussions: [],
@@ -248,6 +248,8 @@ export const createCoursesWithConflicts = (): {
     id: 'MA-1021',
     number: '1021',
     name: 'Calculus I',
+    departmentAbbr: 'MA',
+    departmentName: 'Mathematical Sciences',
     lectures: [{
       section: conflictingSection2,
       compatibleDiscussions: [],
@@ -289,6 +291,8 @@ export const createLargeCombinationSpace = (
       id: `TEST-${i + 1}000`,
       number: `${i + 1}000`,
       name: `Test Course ${i + 1}`,
+      departmentAbbr: 'TEST',
+      departmentName: 'Test Department',
       lectures
     }))
   }
@@ -297,32 +301,103 @@ export const createLargeCombinationSpace = (
 }
 
 interface MockScheduleFilterService {
-  filterSections: (selectedCourses: SelectedCourse[]) => Array<{ section: Section }>
+  filterSections: (selectedCourses: SelectedCourse[]) => Array<{ course: SelectedCourse; section: Section }>
+  addFilter: (filterId: string, criteria: any) => boolean
+  removeFilter: (filterId: string) => boolean
+  getSectionFilter: (filterId: string) => any
+  getSectionBasedFilter: (filterId: string) => any
+  getActiveFilters: () => Array<{ id: string; criteria: any }>
 }
 
 export const createMockScheduleFilterService = (): MockScheduleFilterService => {
+  const activeFilters = new Map<string, any>()
+  const registeredFilters = new Map<string, any>([
+    ['wakeUpTime', new WakeUpTimeFilter()]
+  ])
+
   return {
-    filterSections: (selectedCourses: SelectedCourse[]): Array<{ section: Section }> => {
-      const allSections: Array<{ section: Section }> = []
+    filterSections: (selectedCourses: SelectedCourse[]): Array<{ course: SelectedCourse; section: Section }> => {
+      let allSections: Array<{ course: SelectedCourse; section: Section }> = []
       for (const sc of selectedCourses) {
         if (sc.course.lectures) {
           for (const lg of sc.course.lectures) {
-            allSections.push({ section: lg.section })
+            allSections.push({ course: sc, section: lg.section })
             for (const disc of lg.compatibleDiscussions) {
-              allSections.push({ section: disc })
+              allSections.push({ course: sc, section: disc })
             }
             for (const lab of lg.compatibleLabs) {
-              allSections.push({ section: lab })
+              allSections.push({ course: sc, section: lab })
             }
           }
         }
         if (sc.course.standaloneLabs) {
           for (const lab of sc.course.standaloneLabs) {
-            allSections.push({ section: lab })
+            allSections.push({ course: sc, section: lab })
           }
         }
       }
+
+      for (const [filterId, criteria] of activeFilters.entries()) {
+        const filter = registeredFilters.get(filterId)
+        if (filter && filter.applyToSectionsWithContext) {
+          allSections = filter.applyToSectionsWithContext(allSections, criteria)
+        }
+      }
+
       return allSections
+    },
+    addFilter: (filterId: string, criteria: any): boolean => {
+      activeFilters.set(filterId, criteria)
+      return true
+    },
+    removeFilter: (filterId: string): boolean => {
+      return activeFilters.delete(filterId)
+    },
+    getSectionFilter: (filterId: string): any => {
+      return registeredFilters.get(filterId)
+    },
+    getSectionBasedFilter: (_filterId: string): any => {
+      return undefined
+    },
+    getActiveFilters: (): Array<{ id: string; criteria: any }> => {
+      return Array.from(activeFilters.entries()).map(([id, criteria]) => ({
+        id,
+        criteria
+      }))
     }
   }
+}
+
+export const createMockScheduleResult = (overrides: {
+  course?: Partial<Course>;
+  lecture?: Partial<Section>;
+  discussion?: Partial<Section> | null;
+  lab?: Partial<Section> | null;
+} = {}): any => {
+  const course = createMockCourse(overrides.course)
+
+  return {
+    course,
+    combination: {
+      lecture: overrides.lecture ? createMockSection(overrides.lecture) : createMockSection({
+        periods: [createMockPeriod({ startTime: createMockTime(9, 0) })]
+      }),
+      discussion: overrides.discussion ? createMockSection(overrides.discussion) : null,
+      lab: overrides.lab ? createMockSection(overrides.lab) : null
+    },
+    isLocked: false
+  }
+}
+
+export const createScheduleWithEarlyClass = (hours: number, minutes: number): any[] => {
+  return [
+    createMockScheduleResult({
+      lecture: {
+        periods: [createMockPeriod({
+          startTime: createMockTime(hours, minutes),
+          endTime: createMockTime(hours + 1, minutes + 50)
+        })]
+      }
+    })
+  ]
 }

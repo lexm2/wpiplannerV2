@@ -19,16 +19,18 @@ export class SectionStatusFilter implements SelectedCourseFilter {
         if (criteria.status === 'all') {
             return selectedCourses;
         }
-        
+
         return selectedCourses.filter(sc => {
-            const hasSelectedSection = sc.selectedSection !== null;
-            
+            const hasSelectedSection = sc.selectedLecture !== null ||
+                                       sc.selectedDiscussion !== null ||
+                                       sc.selectedLab !== null;
+
             if (criteria.status === 'selected') {
                 return hasSelectedSection;
             } else if (criteria.status === 'unselected') {
                 return !hasSelectedSection;
             }
-            
+
             return true;
         });
     }

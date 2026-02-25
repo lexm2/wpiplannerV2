@@ -2,7 +2,6 @@
  * Core modal interface that all modals must implement
  */
 export interface IModal {
-    // Core lifecycle methods
     show(...args: any[]): void | Promise<void> | string;
     hide(): void;
     isOpen(): boolean;

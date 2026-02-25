@@ -3,7 +3,7 @@ import { ScheduleFilterService } from '../../../src/services/filtering/ScheduleF
 import { SearchService } from '../../../src/services/filtering/searchService';
 import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
 import { Course, Section, Period, Department, DayOfWeek, PeriodType } from '../../../src/types/types';
-import { SelectedCourse } from '../../../src/types/schedule';
+import { SelectedCourse, AcademicTerm } from '../../../src/types/schedule';
 
 describe('ScheduleFilterService', () => {
     let scheduleFilterService: ScheduleFilterService;
@@ -55,8 +55,8 @@ describe('ScheduleFilterService', () => {
         actualWaitlist: 0,
         maxWaitlist: 10,
         description: 'Regular section',
-        term: 'A',
-        computedTerm: 'A',
+        term: AcademicTerm.A,
+        computedTerm: AcademicTerm.A,
         periods: [testPeriod1]
     };
 
@@ -68,8 +68,8 @@ describe('ScheduleFilterService', () => {
         actualWaitlist: 0,
         maxWaitlist: 10,
         description: 'Lab section',
-        term: 'A',
-        computedTerm: 'A',
+        term: AcademicTerm.A,
+        computedTerm: AcademicTerm.A,
         periods: [testPeriod2]
     };
 
@@ -81,8 +81,8 @@ describe('ScheduleFilterService', () => {
         actualWaitlist: 0,
         maxWaitlist: 5,
         description: 'Alternative section',
-        term: 'A',
-        computedTerm: 'A',
+        term: AcademicTerm.A,
+        computedTerm: AcademicTerm.A,
         periods: [testPeriod1]
     };
 
@@ -93,7 +93,8 @@ describe('ScheduleFilterService', () => {
         description: 'Basic programming course',
         minCredits: 3.0,
         maxCredits: 3.0,
-        department: department,
+        departmentAbbr: 'CS',
+        departmentName: 'Computer Science',
         lectures: [
             {
                 section: testSection1,
@@ -113,8 +114,6 @@ describe('ScheduleFilterService', () => {
         selectedLecture: null,
         selectedDiscussion: null,
         selectedLab: null,
-        selectedSection: null,
-        selectedSectionNumber: null,
         isRequired: false,
         lockedSections: new Set()
     };
@@ -329,8 +328,8 @@ describe('ScheduleFilterService', () => {
             actualWaitlist: 0,
             maxWaitlist: 10,
             description: 'B Term section',
-            term: 'B',
-            computedTerm: 'B',
+            term: AcademicTerm.B,
+            computedTerm: AcademicTerm.B,
             periods: [testPeriod1]
         };
 
@@ -342,8 +341,8 @@ describe('ScheduleFilterService', () => {
             actualWaitlist: 0,
             maxWaitlist: 10,
             description: 'C Term section',
-            term: 'C',
-            computedTerm: 'C',
+            term: AcademicTerm.C,
+            computedTerm: AcademicTerm.C,
             periods: [testPeriod1]
         };
 
@@ -354,7 +353,8 @@ describe('ScheduleFilterService', () => {
             description: 'Data structures course',
             minCredits: 3.0,
             maxCredits: 3.0,
-            department: department,
+            departmentAbbr: 'CS',
+            departmentName: 'Computer Science',
             lectures: [
                 {
                     section: testSection1,
@@ -379,8 +379,6 @@ describe('ScheduleFilterService', () => {
             selectedLecture: null,
             selectedDiscussion: null,
             selectedLab: null,
-            selectedSection: null,
-            selectedSectionNumber: null,
             isRequired: false,
             lockedSections: new Set()
         };
@@ -398,7 +396,7 @@ describe('ScheduleFilterService', () => {
             const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
             
             expect(result).toHaveLength(1);
-            expect(result[0].section.computedTerm).toBe('A');
+            expect(result[0].section.computedTerm).toBe(AcademicTerm.A);
         });
 
         test('should filter sections to show only B term', () => {
@@ -407,7 +405,7 @@ describe('ScheduleFilterService', () => {
             const result = scheduleFilterService.filterSections([selectedCourseWithTerms]);
             
             expect(result).toHaveLength(1);
-            expect(result[0].section.computedTerm).toBe('B');
+            expect(result[0].section.computedTerm).toBe(AcademicTerm.B);
         });
 
         test('should filter sections to show multiple terms', () => {
@@ -463,8 +461,8 @@ describe('ScheduleFilterService', () => {
             actualWaitlist: 0,
             maxWaitlist: 10,
             description: 'D Term section',
-            term: 'D',
-            computedTerm: 'D',
+            term: AcademicTerm.D,
+            computedTerm: AcademicTerm.D,
             periods: [testPeriod1]
         };
 
@@ -475,7 +473,8 @@ describe('ScheduleFilterService', () => {
             description: 'Algorithms course',
             minCredits: 3.0,
             maxCredits: 3.0,
-            department: department,
+            departmentAbbr: 'CS',
+            departmentName: 'Computer Science',
             lectures: [
                 {
                     section: testSection1,
@@ -500,8 +499,6 @@ describe('ScheduleFilterService', () => {
             selectedLecture: null,
             selectedDiscussion: null,
             selectedLab: null,
-            selectedSection: null,
-            selectedSectionNumber: null,
             isRequired: false,
             lockedSections: new Set()
         };

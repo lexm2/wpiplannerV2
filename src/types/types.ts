@@ -1,3 +1,5 @@
+import { AcademicTerm } from "./schedule";
+
 // Hierarchical course structure with lecture groups and compatible discussions/labs.
 export interface LectureGroup {
     section: Section;                 // The lecture section itself
@@ -10,12 +12,14 @@ export interface Course {
     number: string;
     name: string;
     description: string;
-    department: Department;
+    departmentAbbr: string;
+    departmentName: string;
     lectures?: LectureGroup[];
     standaloneLabs?: Section[];
     minCredits: number;
     maxCredits: number;
     isGraduate?: boolean;
+    academicYear?: number;
 }
 
 export interface Department {
@@ -32,11 +36,16 @@ export interface Section {
     actualWaitlist: number;
     maxWaitlist: number;
     note?: string;
-    description: string;
-    term: string;
-    computedTerm: string; // Computed academic term letter (A, B, C, D)
+    computedTerm: AcademicTerm; // Computed academic term letter (A, B, C, D, E, F)
     isInterestList?: boolean; // True for interest list placeholder sections
     periods: Period[];
+}
+
+export enum SectionType {
+    LECTURE = 'lecture',
+    STANDALONE_LAB = 'standaloneLab',
+    DISCUSSION = 'discussion',
+    LAB = 'lab'
 }
 
 export enum PeriodType {
@@ -77,6 +86,12 @@ export interface Time {
 }
 
 export type SimpleTime = Omit<Time, 'displayTime'>;
+
+export interface TimeSlot {
+    startTime: SimpleTime;
+    endTime: SimpleTime;
+    days: DayOfWeek[];
+}
 
 export enum DayOfWeek {
     MONDAY = 'M',

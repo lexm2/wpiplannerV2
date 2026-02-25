@@ -154,10 +154,6 @@ export class SectionInfoModalController extends BaseModal {
                                 <span class="section-info-value">${data.section.crn}</span>
                             </div>
                             <div class="section-info-item">
-                                <span class="section-info-label">Term</span>
-                                <span class="section-info-value">${this.escapeHtml(data.section.term)}</span>
-                            </div>
-                            <div class="section-info-item">
                                 <span class="section-info-label">Credits</span>
                                 <span class="section-info-value">${creditsDisplay}</span>
                             </div>

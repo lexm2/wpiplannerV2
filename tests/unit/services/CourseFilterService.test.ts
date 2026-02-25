@@ -7,6 +7,7 @@ import { SearchTextFilter } from '../../../src/core/filtering/filters/SearchText
 import { ProfessorFilter } from '../../../src/core/filtering/filters/ProfessorFilter';
 import { Course, Department, Section, Period, DayOfWeek } from '../../../src/types/types';
 import { createMockSection } from '../../helpers/mockData';
+import { AcademicTerm } from '../../../src/types/schedule';
 
 describe('CourseFilterService', () => {
     let courseFilterService: CourseFilterService;
@@ -22,12 +23,6 @@ describe('CourseFilterService', () => {
         professor: string = 'Prof Smith',
         seatsAvailable: number = 5
     ): Course {
-        const department: Department = {
-            abbreviation: dept,
-            name: `${dept} Department`,
-            courses: []
-        };
-
         const period: Period = {
             type: 'Lecture' as any,
             professor,
@@ -51,8 +46,8 @@ describe('CourseFilterService', () => {
             actualWaitlist: 0,
             maxWaitlist: 10,
             description: '',
-            term: 'A',
-            computedTerm: 'A',
+            term: AcademicTerm.A,
+            computedTerm: AcademicTerm.A,
             periods: [period]
         };
 
@@ -61,7 +56,8 @@ describe('CourseFilterService', () => {
             number,
             name,
             description: `Description for ${name}`,
-            department,
+            departmentAbbr: dept,
+            departmentName: `${dept} Department`,
             lectures: [{
                 section,
                 compatibleDiscussions: [],
@@ -104,11 +100,11 @@ describe('CourseFilterService', () => {
 
         // Initialize search service with courses
         const departments = testCourses.reduce((depts, course) => {
-            const existingDept = depts.find(d => d.abbreviation === course.department.abbreviation);
+            const existingDept = depts.find(d => d.abbreviation === course.departmentAbbr);
             if (existingDept) {
                 existingDept.courses.push(course);
             } else {
-                const newDept = { ...course.department, courses: [course] };
+                const newDept = { abbreviation: course.departmentAbbr, name: course.departmentName, courses: [course] };
                 depts.push(newDept);
             }
             return depts;
@@ -128,7 +124,7 @@ describe('CourseFilterService', () => {
             const filtered = courseFilterService.filterCourses(testCourses);
 
             expect(filtered).toHaveLength(5);
-            expect(filtered.every(c => c.department.abbreviation === 'CS')).toBe(true);
+            expect(filtered.every(c => c.departmentAbbr === 'CS')).toBe(true);
         });
 
         test('should filter courses by availability', () => {
@@ -154,7 +150,7 @@ describe('CourseFilterService', () => {
 
             expect(filtered).toHaveLength(4); // CS courses with available seats
             expect(filtered.every(c => {
-                const isDept = c.department.abbreviation === 'CS';
+                const isDept = c.departmentAbbr === 'CS';
                 let hasSeats = false;
                 if (c.lectures && c.lectures.length > 0) {
                     hasSeats = c.lectures.some(lg => lg.section.seatsAvailable > 0);
@@ -198,7 +194,7 @@ describe('CourseFilterService', () => {
             // Department filter (priority 25) should run before availability filter (priority 50)
             // Result should be CS courses with available seats
             expect(result.length).toBe(4);
-            expect(result.every(c => c.department.abbreviation === 'CS')).toBe(true);
+            expect(result.every(c => c.departmentAbbr === 'CS')).toBe(true);
 
             consoleSpy.mockRestore();
         });
@@ -241,7 +237,7 @@ describe('CourseFilterService', () => {
 
             // Should return only CS courses
             expect(result.length).toBe(5); // 5 CS courses in test data
-            expect(result.every(c => c.department.abbreviation === 'CS')).toBe(true);
+            expect(result.every(c => c.departmentAbbr === 'CS')).toBe(true);
         });
 
         test('should handle availability filter correctly', () => {

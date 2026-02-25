@@ -1,5 +1,42 @@
-import { TermBoundsData } from '../calendar/types';
-import { TermBoundsDataSchema } from '../calendar/schemas';
+import { z } from 'zod';
+
+export interface TermBoundInfo {
+    startDate: string;
+    endDate: string;
+    offeringPeriod: string;
+    sampleSize: number;
+}
+
+export interface YearTermBounds {
+    A: TermBoundInfo;
+    B: TermBoundInfo;
+    C: TermBoundInfo;
+    D: TermBoundInfo;
+}
+
+export interface TermBoundsData {
+    generated: string;
+    years: Record<string, YearTermBounds>;
+}
+
+const TermBoundInfoSchema = z.object({
+    startDate: z.string().date(),
+    endDate: z.string().date(),
+    offeringPeriod: z.string(),
+    sampleSize: z.number().int().nonnegative(),
+}) satisfies z.ZodType<TermBoundInfo>;
+
+const YearTermBoundsSchema = z.object({
+    A: TermBoundInfoSchema,
+    B: TermBoundInfoSchema,
+    C: TermBoundInfoSchema,
+    D: TermBoundInfoSchema,
+}) satisfies z.ZodType<YearTermBounds>;
+
+const TermBoundsDataSchema = z.object({
+    generated: z.string().datetime(),
+    years: z.record(z.string(), YearTermBoundsSchema),
+});
 
 export class TermBoundsService {
     private static instance: TermBoundsService | null = null;
@@ -24,23 +61,26 @@ export class TermBoundsService {
 
             const data = await response.json();
             this.termBoundsCache = TermBoundsDataSchema.parse(data);
-            console.log(`[TermBoundsService] Successfully loaded term bounds for ${this.termBoundsCache.academicYear}`);
+            const years = Object.keys(this.termBoundsCache.years).join(', ');
+            console.log(`[TermBoundsService] Loaded term bounds for academic years: ${years}`);
         } catch (error) {
             console.warn('[TermBoundsService] Error loading term-bounds.json, services will use fallback dates:', error);
             this.termBoundsCache = null;
         }
     }
 
-    public getTermDates(termLetter: 'A' | 'B' | 'C' | 'D'): { start: Date, end: Date } | null {
-        if (!this.termBoundsCache) {
-            return null;
-        }
+    public getTermDates(termLetter: 'A' | 'B' | 'C' | 'D', year?: number): { start: Date, end: Date } | null {
+        if (!this.termBoundsCache) return null;
+        const fallYear = year ?? Math.max(...Object.keys(this.termBoundsCache.years).map(Number));
+        const yearBounds = this.termBoundsCache.years[fallYear];
+        if (!yearBounds) return null;
+        const termInfo = yearBounds[termLetter];
+        return { start: new Date(termInfo.startDate), end: new Date(termInfo.endDate) };
+    }
 
-        const termInfo = this.termBoundsCache.terms[termLetter];
-        return {
-            start: new Date(termInfo.startDate),
-            end: new Date(termInfo.endDate)
-        };
+    public getMostRecentYear(): number | null {
+        if (!this.termBoundsCache) return null;
+        return Math.max(...Object.keys(this.termBoundsCache.years).map(Number));
     }
 
     public getTermBoundsData(): TermBoundsData | null {

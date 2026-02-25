@@ -2,6 +2,7 @@ import { describe, test, expect, beforeEach, mock } from 'bun:test'
 import { RMPRatingFilter } from '../../../src/core/filtering/filters/RMPRatingFilter'
 import { RateMyProfessorService } from '../../../src/services/external/RateMyProfessorService'
 import { FilterableSection } from '../../../src/types/filterableUnit'
+import { SectionType } from '../../../src/types/types'
 import {
   createMockCourse,
   createMockSection,
@@ -85,12 +86,12 @@ describe('RMPRatingFilter - includeWithoutData functionality', () => {
       {
         course: adamMesserCourse,
         section: adamMesserSection,
-        sectionType: 'lecture' as const
+        sectionType: SectionType.LECTURE
       },
       {
         course: normalCourse,
         section: normalSection,
-        sectionType: 'lecture' as const
+        sectionType: SectionType.LECTURE
       }
     ]
 
@@ -157,12 +158,12 @@ describe('RMPRatingFilter - includeWithoutData functionality', () => {
       {
         course: adamMesserCourse,
         section: adamMesserSection,
-        sectionType: 'lecture' as const
+        sectionType: SectionType.LECTURE
       },
       {
         course: normalCourse,
         section: normalSection,
-        sectionType: 'lecture' as const
+        sectionType: SectionType.LECTURE
       }
     ]
 
@@ -206,7 +207,7 @@ describe('RMPRatingFilter - includeWithoutData functionality', () => {
       {
         course: adamMesserCourse,
         section: adamMesserSection,
-        sectionType: 'lecture' as const
+        sectionType: SectionType.LECTURE
       }
     ]
 
@@ -249,7 +250,7 @@ describe('RMPRatingFilter - includeWithoutData functionality', () => {
       {
         course: adamMesserCourse,
         section: adamMesserSection,
-        sectionType: 'lecture' as const
+        sectionType: SectionType.LECTURE
       }
     ]
 

@@ -1,4 +1,4 @@
-import { SimpleTime } from './types';
+import { DayOfWeek, SimpleTime, TimeSlot } from './types';
 
 export interface SearchFilter {
     departments: string[];
@@ -6,12 +6,6 @@ export interface SearchFilter {
     professors: string[];
     availabilityOnly: boolean;
     creditRange: { min: number; max: number };
-}
-
-export interface TimeSlot {
-    startTime: SimpleTime;
-    endTime: SimpleTime;
-    days: string[];
 }
 
 export interface CourseDisplayProps {

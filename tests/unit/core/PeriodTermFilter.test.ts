@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import { PeriodTermFilter } from '../../../src/core/filtering/filters/PeriodTermFilter';
 import { Section } from '../../../src/types/types';
+import { AcademicTerm } from '../../../src/types/schedule';
 
 describe('PeriodTermFilter', () => {
     let periodTermFilter: PeriodTermFilter;
@@ -104,8 +105,8 @@ describe('PeriodTermFilter', () => {
                 actualWaitlist: 0,
                 maxWaitlist: 10,
                 description: 'Test section',
-                term: term,
-                computedTerm: term,
+                term: term as string,
+                computedTerm: term.toUpperCase() as AcademicTerm,
                 periods: []
             } as Section
         });
@@ -167,7 +168,7 @@ describe('PeriodTermFilter', () => {
 
             // Should match regardless of case
             expect(result).toHaveLength(2);
-            expect(result.map(r => r.section.computedTerm)).toEqual(['A', 'b']);
+            expect(result.map(r => r.section.computedTerm)).toEqual([AcademicTerm.A, AcademicTerm.B]);
         });
 
         test('should handle whitespace in term values', () => {

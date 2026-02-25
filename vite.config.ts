@@ -3,6 +3,10 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: '/wpiplannerV2/',
   publicDir: 'public',
+  worker: {
+    format: 'es',
+    plugins: () => []
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,
@@ -20,7 +24,8 @@ export default defineConfig({
             'lz-string',
             'rrule',
             'zod'
-          ]
+          ],
+          'worker-storage': ['src/workers/storage.worker.ts']
         }
       }
     }

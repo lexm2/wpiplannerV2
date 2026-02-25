@@ -4,6 +4,7 @@
  */
 
 import { Course, Section } from '../types/types';
+import type { SelectedCourse } from '../types/schedule';
 
 const EXCLUDED_PROFESSORS = new Set(['TBA', 'Not Assigned', '']);
 
@@ -103,4 +104,82 @@ export function getProfessorsByTerm(course: Course): string {
     });
 
     return parts.length > 0 ? parts.join(' | ') : 'No professors listed';
+}
+
+/**
+ * Get all CRNs from a selected course's components
+ * @param course - Selected course to extract CRNs from
+ * @returns Object with CRN for each component type
+ */
+export function getCombinedCRNs(course: SelectedCourse): {
+    lecture: string | null;
+    discussion: string | null;
+    lab: string | null;
+} {
+    return {
+        lecture: course.selectedLecture?.crn?.toString() ?? null,
+        discussion: course.selectedDiscussion?.crn?.toString() ?? null,
+        lab: course.selectedLab?.crn?.toString() ?? null
+    };
+}
+
+/**
+ * Get the primary CRN from a selected course
+ * Returns the first available CRN (lecture, then discussion, then lab)
+ * @param course - Selected course to extract CRN from
+ * @returns Primary CRN or null if none available
+ */
+export function getPrimaryCRN(course: SelectedCourse): string | null {
+    return course.selectedLecture?.crn?.toString() ??
+           course.selectedDiscussion?.crn?.toString() ??
+           course.selectedLab?.crn?.toString() ??
+           null;
+}
+
+/**
+ * Encode selected course component CRNs for export
+ * @param course - Selected course to encode
+ * @returns Array of [courseId, lectureCRN, discussionCRN, labCRN]
+ */
+export function encodeCourseSelection(course: SelectedCourse): [string, string | null, string | null, string | null] {
+    return [
+        course.course.id,
+        course.selectedLecture?.crn?.toString() ?? null,
+        course.selectedDiscussion?.crn?.toString() ?? null,
+        course.selectedLab?.crn?.toString() ?? null
+    ];
+}
+
+/**
+ * Decode course selection from export format
+ * @param courseId - Course ID
+ * @param lectureCRN - Lecture section CRN
+ * @param discussionCRN - Discussion section CRN
+ * @param labCRN - Lab section CRN
+ * @param course - Course object from catalog
+ * @returns Object with selected sections for each component
+ */
+export function decodeCourseSelection(
+    lectureCRN: string | null,
+    discussionCRN: string | null,
+    labCRN: string | null,
+    course: Course
+): {
+    selectedLecture: Section | null;
+    selectedDiscussion: Section | null;
+    selectedLab: Section | null;
+} {
+    return {
+        selectedLecture: lectureCRN ? findSectionByCRN(course, lectureCRN) : null,
+        selectedDiscussion: discussionCRN ? findSectionByCRN(course, discussionCRN) : null,
+        selectedLab: labCRN ? findSectionByCRN(course, labCRN) : null
+    };
+}
+
+/**
+ * Helper to find section by CRN in a course
+ */
+function findSectionByCRN(course: Course, crn: string): Section | null {
+    const allSections = getAllSections(course);
+    return allSections.find(s => s.crn.toString() === crn) || null;
 }

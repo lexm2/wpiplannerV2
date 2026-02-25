@@ -3,7 +3,7 @@
  */
 import { Schedule, UserScheduleState, SchedulePreferences } from '../../types/schedule'
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
-import { createJSONReplacer, createJSONReviver } from '../../utils/jsonSerializer'
+import { setReplacer, setReviver } from '../../utils/jsonSerializer'
 import { ScheduleState } from '../../types/ScheduleState'
 import { ApplicationState } from '../../types/ApplicationState'
 
@@ -121,7 +121,7 @@ export class TransactionalStorageManager {
 
     saveUserState(state: UserScheduleState): TransactionResult {
         return this.executeSyncTransaction(() => {
-            const serializedState = this.safeStringify(state);
+            const serializedState = JSON.stringify(state, this.replacer);
             localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.USER_STATE, serializedState);
         });
     }
@@ -176,7 +176,7 @@ export class TransactionalStorageManager {
 
     savePreferences(preferences: SchedulePreferences): TransactionResult {
         return this.executeSyncTransaction(() => {
-            const serializedPreferences = this.safeStringify(preferences);
+            const serializedPreferences = JSON.stringify(preferences, this.replacer);
             localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.PREFERENCES, serializedPreferences);
         });
     }
@@ -253,6 +253,20 @@ export class TransactionalStorageManager {
         });
     }
 
+    async clearAllDataComplete(): Promise<TransactionResult> {
+        try {
+            await this.indexedDBStorage.clearAllSchedules();
+            const result = this.clearAllData();
+            return result;
+        } catch (error) {
+            return {
+                success: false,
+                transactionId: `clear-${Date.now()}`,
+                error: error as Error
+            };
+        }
+    }
+
     async exportData(options: { compressed?: boolean } = {}): Promise<{ data: string | null; valid: boolean; error?: string }> {
         try {
             const schedulesResult = await this.loadAllSchedules();
@@ -261,8 +275,8 @@ export class TransactionalStorageManager {
             const activeScheduleIdResult = this.loadActiveScheduleId();
             const activeScheduleId = activeScheduleIdResult.data;
 
-            // Convert legacy Schedule objects to ScheduleState
-            const scheduleStates = fullSchedules.map(s => ScheduleState.fromLegacySchedule(s));
+            // Convert Schedule objects to ScheduleState
+            const scheduleStates = fullSchedules.map(s => ScheduleState.fromSchedule(s));
 
             // Create ApplicationState (with full objects)
             const appState = new ApplicationState(
@@ -271,40 +285,20 @@ export class TransactionalStorageManager {
                 preferences
             );
 
-            if (options.compressed) {
-                // Export as compressed string
-                const compressed = await appState.toCompressedJSONWithChecksum();
+            // Export as minimal JSON format
+            const minimalData = appState.toMinimalFormat();
 
-                const stats = appState.getCompressionStats();
-                console.log('[TransactionalStorageManager] Exported compressed data:', {
-                    originalBytes: stats.originalBytes,
-                    compressedBytes: stats.compressedBytes,
-                    compressionRatio: `${(stats.ratio * 100).toFixed(1)}%`,
-                    savings: `${((1 - stats.ratio) * 100).toFixed(1)}%`
-                });
+            console.log('[TransactionalStorageManager] Exported minimal data:', {
+                version: minimalData.v,
+                activeScheduleIndex: minimalData.a,
+                scheduleCount: minimalData.s.length,
+                totalCourses: minimalData.s.reduce((sum, [_, courses]) => sum + courses.length / 2, 0)
+            });
 
-                return {
-                    data: compressed,
-                    valid: true
-                };
-            } else {
-                // Export as JSON (default, for backward compatibility)
-                const syncData = await appState.toCloudFormatWithChecksum();
-
-                console.log('[TransactionalStorageManager] Exported SyncData:', {
-                    version: syncData.version,
-                    timestamp: syncData.timestamp,
-                    checksum: syncData.checksum.substring(0, 16) + '...',
-                    activeScheduleId: syncData.activeScheduleId,
-                    scheduleCount: syncData.schedules.length,
-                    totalCourses: syncData.schedules.reduce((sum, s) => sum + s.selectedCourses.length, 0)
-                });
-
-                return {
-                    data: JSON.stringify(syncData, this.replacer, 2),
-                    valid: true
-                };
-            }
+            return {
+                data: JSON.stringify(minimalData, this.replacer, 2),
+                valid: true
+            };
         } catch (error) {
             console.error('[TransactionalStorageManager] Export failed:', error);
             return {
@@ -336,7 +330,7 @@ export class TransactionalStorageManager {
             if (preferences) {
                 localStorage.setItem(
                     TransactionalStorageManager.STORAGE_KEYS.PREFERENCES,
-                    this.safeStringify(preferences)
+                    JSON.stringify(preferences, this.replacer)
                 );
             }
 
@@ -430,22 +424,13 @@ export class TransactionalStorageManager {
         }
     }
 
-    private safeStringify(data: any): string {
-        return JSON.stringify(data, createJSONReplacer());
-    }
-
-    private readonly replacer = createJSONReplacer();
-    private readonly reviver = createJSONReviver();
+    private readonly replacer = setReplacer;
+    private readonly reviver = setReviver;
 
     private getDefaultPreferences(): SchedulePreferences {
         return {
-            preferredTimeRange: {
-                startTime: { hours: 8, minutes: 0 },
-                endTime: { hours: 18, minutes: 0 }
-            },
-            preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
-            avoidBackToBackClasses: false,
-            theme: 'wpi-dark'
+            theme: 'wpi-dark',
+            bookmarkedCourseIds: []
         };
     }
 

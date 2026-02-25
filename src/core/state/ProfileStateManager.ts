@@ -3,9 +3,8 @@ import { ApplicationState } from '../../types'
 import { ScheduleState } from '../../types/ScheduleState'
 import type { TransactionResult } from '../storage'
 import { TransactionalStorageManager } from '../storage'
-import { getAllSections, createJSONReplacer, createJSONReviver, logger } from '../../utils'
+import { getAllSections, setReplacer, setReviver, logger } from '../../utils'
 import { UndoRedoManager } from './UndoRedoManager'
-import { syncEventBus } from '../../services/sync/SyncEventBus'
 import { ModalService } from '../../services/ui'
 
 export interface StateChangeEvent {
@@ -153,8 +152,6 @@ export class ProfileStateManager {
                     selectedLecture: null,
                     selectedDiscussion: null,
                     selectedLab: null,
-                    selectedSection: null,
-                    selectedSectionNumber: null,
                     isRequired,
                     lockedSections: new Set()
                 };
@@ -231,7 +228,7 @@ export class ProfileStateManager {
                 }
             }
 
-            logger.warn(`Section ${sectionNumber} not found in course ${course.department.abbreviation}${course.number}`);
+            logger.warn(`Section ${sectionNumber} not found in course ${course.departmentAbbr}${course.number}`);
         });
     }
 
@@ -547,7 +544,7 @@ export class ProfileStateManager {
     }
 
     private deepClone<T>(obj: T): T {
-        return JSON.parse(JSON.stringify(obj, createJSONReplacer()), createJSONReviver());
+        return JSON.parse(JSON.stringify(obj, setReplacer), setReviver);
     }
 
     canUndo(): boolean {
@@ -562,8 +559,8 @@ export class ProfileStateManager {
         return this.undoRedoManager.onChange(listener);
     }
 
-    save(): void {
-        const savePromise = this.executeSave();
+    save(skipSnapshot = false): void {
+        const savePromise = this.executeSave(skipSnapshot);
         this.pendingSavePromises.add(savePromise);
 
         savePromise
@@ -571,10 +568,9 @@ export class ProfileStateManager {
             .finally(() => this.pendingSavePromises.delete(savePromise));
     }
 
-    private async executeSave(): Promise<void> {
+    private async executeSave(skipSnapshot = false): Promise<void> {
         try {
-            // Capture snapshot before saving (unless we're restoring from undo/redo)
-            if (!this.isRestoringState) {
+            if (!this.isRestoringState && !skipSnapshot) {
                 const schedulesMap = new Map(this.state.schedules.map(s => [s.id, s]));
                 this.undoRedoManager.captureSnapshot(
                     this.state.activeScheduleId,
@@ -585,10 +581,10 @@ export class ProfileStateManager {
 
             this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
 
-            // Await all schedule saves (async for IndexedDB)
-            for (const schedule of this.state.schedules) {
-                await this.storageManager.saveSchedule(schedule);
-            }
+            const savePromises = this.state.schedules.map(schedule =>
+                this.storageManager.saveSchedule(schedule)
+            );
+            await Promise.all(savePromises);
 
             this.storageManager.savePreferences(this.state.preferences);
 
@@ -598,14 +594,6 @@ export class ProfileStateManager {
 
             if (previousUnsavedState) {
                 this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
-            }
-
-            // Only emit sync event if NOT in batch mode
-            // During batch updates, sync will be triggered once after batch completes
-            if (!this.isBatchUpdate) {
-                syncEventBus.emitEvent('local-save-completed', {
-                    timestamp: Date.now()
-                });
             }
         } catch (error) {
             logger.error('Save failed:', error);
@@ -674,16 +662,24 @@ export class ProfileStateManager {
                     coursesCount: s.selectedCourses.length,
                     selectedCourses: s.selectedCourses.map(sc => ({
                         courseId: sc.course.id,
-                        courseName: `${sc.course.department.abbreviation}${sc.course.number}`,
-                        selectedSection: sc.selectedSectionNumber,
+                        courseName: `${sc.course.departmentAbbr}${sc.course.number}`,
+                        selectedComponents: {
+                            lecture: sc.selectedLecture?.number || null,
+                            discussion: sc.selectedDiscussion?.number || null,
+                            lab: sc.selectedLab?.number || null
+                        },
                         isRequired: sc.isRequired
                     }))
                 })),
                 selectedCoursesCount: loadedCourses.length,
                 selectedCourses: loadedCourses.map(sc => ({
                     courseId: sc.course.id,
-                    courseName: `${sc.course.department.abbreviation}${sc.course.number}`,
-                    selectedSection: sc.selectedSectionNumber
+                    courseName: `${sc.course.departmentAbbr}${sc.course.number}`,
+                    selectedComponents: {
+                        lecture: sc.selectedLecture?.number || null,
+                        discussion: sc.selectedDiscussion?.number || null,
+                        lab: sc.selectedLab?.number || null
+                    }
                 }))
             };
             logger.log(JSON.stringify(loadedData, null, 2));
@@ -722,7 +718,7 @@ export class ProfileStateManager {
     }
 
     private createApplicationState(): ApplicationState {
-        const schedules = this.state.schedules.map(s => ScheduleState.fromLegacySchedule(s));
+        const schedules = this.state.schedules.map(s => ScheduleState.fromSchedule(s));
         return new ApplicationState(
             this.state.activeScheduleId,
             schedules,
@@ -734,10 +730,10 @@ export class ProfileStateManager {
         try {
             const parsed = JSON.parse(data);
             const appState = ApplicationState.fromMinimalFormat(parsed, this.allDepartments);
-            const legacySchedules = appState.schedules.map(s => s.toLegacySchedule());
+            const schedules = appState.schedules.map(s => s.toSchedule());
 
             const result = await this.storageManager.importData(
-                legacySchedules,
+                schedules,
                 appState.activeScheduleId,
                 appState.preferences
             );
@@ -835,8 +831,6 @@ export class ProfileStateManager {
                 selectedLecture: resolveSection(selectedCourse.selectedLecture),
                 selectedDiscussion: resolveSection(selectedCourse.selectedDiscussion),
                 selectedLab: resolveSection(selectedCourse.selectedLab),
-                selectedSection: resolveSection(selectedCourse.selectedSection),
-                selectedSectionNumber: selectedCourse.selectedSectionNumber,
                 isRequired: selectedCourse.isRequired,
                 lockedSections
             };
@@ -852,12 +846,6 @@ export class ProfileStateManager {
             schedules: [],
             selectedCourses: [],
             preferences: {
-                preferredTimeRange: {
-                    startTime: { hours: 8, minutes: 0 },
-                    endTime: { hours: 18, minutes: 0 }
-                },
-                preferredDays: new Set(['mon', 'tue', 'wed', 'thu', 'fri']),
-                avoidBackToBackClasses: false,
                 theme: 'wpi-dark',
                 bookmarkedCourseIds: []
             },
@@ -923,6 +911,7 @@ export class ProfileStateManager {
      * Automatically manages batch flag, saves once at completion, and emits sync event.
      *
      * @param fn - Function containing batch updates
+     * @param skipSnapshot - Skip expensive snapshot capture during save (useful for rapid navigation)
      * @returns Result of the batch function
      *
      * @example
@@ -932,22 +921,18 @@ export class ProfileStateManager {
      *     }
      * });
      */
-    async withBatch<T>(fn: () => Promise<T>): Promise<T> {
+    async withBatch<T>(fn: () => Promise<T>, skipSnapshot = false): Promise<T> {
         const wasBatch = this.isBatchUpdate;
         if (!wasBatch) {
             this.isBatchUpdate = true;
         }
 
         try {
-            const result = await fn();
-            return result;
+            return await fn();
         } finally {
             if (!wasBatch) {
                 this.isBatchUpdate = false;
-                // Single save after all operations
-                this.save();
-                // Wait for save to complete
-                await Promise.all(this.pendingSavePromises);
+                this.save(skipSnapshot);
             }
         }
     }
@@ -1067,5 +1052,30 @@ export class ProfileStateManager {
 
     async getStorageStats() {
         return this.storageManager.getStorageStats();
+    }
+
+    async clearAllData(): Promise<{ success: boolean; error?: string }> {
+        try {
+            const result = await this.storageManager.clearAllDataComplete();
+            if (!result.success) {
+                return {
+                    success: false,
+                    error: result.error?.message || 'Failed to clear storage'
+                };
+            }
+
+            this.state = this.createInitialState();
+            this.undoRedoManager.clear();
+
+            const defaultSchedule = this.createSchedule('My Schedule', 'system');
+            this.setActiveSchedule(defaultSchedule.id, 'system');
+
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                error: `Failed to clear data: ${error}`
+            };
+        }
     }
 }

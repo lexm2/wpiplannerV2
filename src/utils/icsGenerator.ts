@@ -1,5 +1,5 @@
 import ical, { ICalEventRepeatingFreq, ICalWeekday, ICalCalendarMethod } from 'ical-generator';
-import { Schedule, SelectedCourse, LocalCalendarEvent } from '../types/schedule';
+import { Schedule, SelectedCourse, LocalCalendarEvent, EventType } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';
 import { TermBoundsService } from '../services/data/TermBoundsService';
 
@@ -49,7 +49,7 @@ export class ICSGenerator {
         const termLetter = term.charAt(0).toUpperCase() as 'A' | 'B' | 'C' | 'D';
 
         const termBoundsService = TermBoundsService.getInstance();
-        const boundsFromService = termBoundsService.getTermDates(termLetter);
+        const boundsFromService = termBoundsService.getTermDates(termLetter, year);
 
         if (boundsFromService) {
             return boundsFromService;
@@ -102,7 +102,7 @@ export class ICSGenerator {
     }
 
     private static generateUID(course: SelectedCourse, section: Section, period: Period, startDate: Date): string {
-        const courseId = `${course.course.department.abbreviation}${course.course.number}`;
+        const courseId = `${course.course.departmentAbbr}${course.course.number}`;
         const year = startDate.getFullYear();
         const month = String(startDate.getMonth() + 1).padStart(2, '0');
         const day = String(startDate.getDate()).padStart(2, '0');
@@ -116,9 +116,9 @@ export class ICSGenerator {
         let academicYear = options.academicYear;
         if (!academicYear) {
             const service = TermBoundsService.getInstance();
-            const data = service.getTermBoundsData();
-            if (data) {
-                academicYear = parseInt(data.academicYear.split('-')[0]);
+            const mostRecentYear = service.getMostRecentYear();
+            if (mostRecentYear !== null) {
+                academicYear = mostRecentYear;
             } else {
                 const now = new Date();
                 const year = now.getFullYear();
@@ -150,10 +150,6 @@ export class ICSGenerator {
                 componentsToExport.push(selectedCourse.selectedLab);
             }
 
-            if (componentsToExport.length === 0 && selectedCourse.selectedSection) {
-                componentsToExport.push(selectedCourse.selectedSection);
-            }
-
             if (componentsToExport.length === 0) {
                 skippedCourses++;
                 continue;
@@ -178,7 +174,7 @@ export class ICSGenerator {
 
                     const uid = this.generateUID(selectedCourse, section, period, startDateTime);
 
-                    const courseId = `${selectedCourse.course.department.abbreviation}-${selectedCourse.course.number}`;
+                    const courseId = `${selectedCourse.course.departmentAbbr}-${selectedCourse.course.number}`;
                     const periodTypePrefix = period.type.charAt(0).toUpperCase() + period.type.slice(1);
                     const summary = `${periodTypePrefix}: ${courseId} ${selectedCourse.course.name}`;
 
@@ -230,7 +226,7 @@ export class ICSGenerator {
             for (const localEvent of schedule.localEvents) {
                 if (!localEvent.visible) continue;
 
-                if (localEvent.eventType === 'one-time') {
+                if (localEvent.eventType === EventType.ONE_TIME) {
                     if (!localEvent.date) continue;
 
                     const eventDate = new Date(localEvent.date);
@@ -253,13 +249,13 @@ export class ICSGenerator {
                 } else {
                     const terms = localEvent.terms || [];
                     for (const term of terms) {
-                        const termDates = this.getTermDates(term, academicYear);
+                        const termDates = this.getTermDates(term as string, academicYear);
                         if (!termDates) continue;
 
-                        const days = localEvent.days || (localEvent.day ? [localEvent.day] : []);
+                        const days = localEvent.days || [];
                         if (days.length === 0) continue;
 
-                        const firstDay = days.reduce((earliest, day) => {
+                        const firstDay: DayOfWeek = days.reduce((earliest: DayOfWeek, day: DayOfWeek) => {
                             const dayNum = this.DAY_TO_NUMBER[day];
                             const earliestNum = this.DAY_TO_NUMBER[earliest];
                             return dayNum < earliestNum ? day : earliest;
@@ -281,7 +277,7 @@ export class ICSGenerator {
 
                         const uid = `local-${localEvent.id}-${term}@wpiplannerv2`;
 
-                        const byDay = days.map(day => this.DAY_TO_ICAL[day]);
+                        const byDay = days.map((day: DayOfWeek) => this.DAY_TO_ICAL[day]);
 
                         calendar.createEvent({
                             id: uid,

@@ -268,7 +268,7 @@
   cursor: help;
 }
 
-.header-controls {
+.course-item-controls {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -999,9 +999,9 @@
 
 /* Calendar Events Button in Sidebar */
 .calendar-events-section {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .calendar-events-btn {
@@ -1084,12 +1084,10 @@
   }
 }
 
-@media (max-width: 768px) {
-  .schedule-page-layout {
-    grid-template-columns: 1fr;
-  }
+html.is-mobile .schedule-page-layout {
+  grid-template-columns: 1fr;
+}
 
-  .schedule-sidebar {
-    display: none;
-  }
+html.is-mobile .schedule-sidebar {
+  display: none;
 }

@@ -3,6 +3,7 @@ import { ProfileStateManager } from '../../../src/core/state/ProfileStateManager
 import { TransactionalStorageManager } from '../../../src/core/storage/TransactionalStorageManager'
 import { mockLocalStorage } from '../../helpers/testUtils'
 import { createMockCourse, createMockSection } from '../../helpers/mockData'
+import { AcademicTerm } from '../../../src/types/schedule'
 
 /**
  * Standalone tests for the new withBatch() and withBatchSync() API
@@ -17,7 +18,7 @@ describe('Batch Operations API (Standalone)', () => {
     number: 'A01',
     description: 'Fall 2024 section',
     term: 'Fall 2024',
-    computedTerm: 'A',
+    computedTerm: AcademicTerm.A,
     periods: []
   })
 
@@ -116,31 +117,6 @@ describe('Batch Operations API (Standalone)', () => {
 
     expect(profileStateManager.getState().selectedCourses.length).toBe(1)
     expect(saveSpy).toHaveBeenCalled()
-  })
-
-  it('✅ batch suppresses sync events during operation', async () => {
-    const syncEventBusSpy = spyOn(require('../../../src/services/sync/SyncEventBus').syncEventBus, 'emitEvent')
-
-    await profileStateManager.withBatch(async () => {
-      profileStateManager.selectCourse(mockCourse, false, 'test')
-      profileStateManager.selectCourse({
-        ...mockCourse,
-        id: 'CS-102',
-        number: '102'
-      }, false, 'test')
-      profileStateManager.selectCourse({
-        ...mockCourse,
-        id: 'CS-103',
-        number: '103'
-      }, false, 'test')
-    })
-
-    const saveCompletedEvents = syncEventBusSpy.mock.calls.filter(
-      call => call[0] === 'local-save-completed'
-    )
-
-    // Should only emit once at the end
-    expect(saveCompletedEvents.length).toBe(1)
   })
 
   it('✅ complex batch operations maintain integrity', async () => {

@@ -45,8 +45,6 @@ export class Validators {
             typeof sectionObj.seatsAvailable === 'number' &&
             typeof sectionObj.actualWaitlist === 'number' &&
             typeof sectionObj.maxWaitlist === 'number' &&
-            typeof sectionObj.description === 'string' &&
-            typeof sectionObj.term === 'string' &&
             Array.isArray(sectionObj.periods) &&
             sectionObj.periods.every((p: unknown) => this.isValidPeriod(p));
     }

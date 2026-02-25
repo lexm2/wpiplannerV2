@@ -9,6 +9,7 @@ import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
+import { DeviceDetection } from '../../utils/deviceDetection'
 
 // Course listing and interaction management with optimistic UI integration
 // Provides progressive rendering for large datasets with instant visual feedback
@@ -107,9 +108,8 @@ export class CourseController {
             return document.querySelector('.mobile-backdrop');
         };
 
-        // Check if mobile mode
         const isMobile = (): boolean => {
-            return window.innerWidth <= 1200;
+            return DeviceDetection.isMobilePhone();
         };
 
         // Mobile overlay toggle
@@ -435,29 +435,28 @@ export class CourseController {
     }
 
 
-    async toggleCourseSelection(element: HTMLElement): Promise<boolean> {
+    toggleCourseSelection(element: HTMLElement): void {
         const course = this.elementToCourseMap.get(element);
-        if (!course) return false;
+
+        if (!course) {
+            console.error('Course not found in element map');
+            return;
+        }
 
         const wasSelected = this.courseSelectionService.isCourseSelected(course);
+        this.updateCourseUIById(course.id, !wasSelected);
 
-        try {
-            // Show immediate optimistic feedback
-            this.updateCourseUIById(course.id, !wasSelected);
-            
-            const result = await this.courseSelectionService.toggleCourseSelection(course);
-            const newSelection = result.success && result.course !== undefined;
-            
-            // Update to final state (removes optimistic feedback)
-            this.updateCourseUIById(course.id, newSelection);
-            
-            return newSelection;
-        } catch (error) {
-            console.error('Error toggling course selection:', error);
-            // Rollback optimistic change on error
-            this.updateCourseUIById(course.id, wasSelected);
-            return false;
-        }
+        this.courseSelectionService.toggleCourseSelection(course)
+            .then(result => {
+                if (!result.success) {
+                    console.error('Failed to toggle course selection:', result.error);
+                    this.updateCourseUIById(course.id, wasSelected);
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling course selection:', error);
+                this.updateCourseUIById(course.id, wasSelected);
+            });
     }
 
 
@@ -465,13 +464,17 @@ export class CourseController {
         const selectBtn = element.querySelector('.course-select-btn');
 
         if (selectBtn) {
+            const newIcon = isSelected
+                ? getInlineSVG('CHECK', 'check-icon')
+                : getInlineSVG('PLUS', 'plus-icon');
+
+            selectBtn.innerHTML = newIcon;
+
             if (isSelected) {
                 element.classList.add('selected');
-                selectBtn.innerHTML = getInlineSVG('CHECK', 'check-icon');
                 selectBtn.classList.add('selected');
             } else {
                 element.classList.remove('selected');
-                selectBtn.innerHTML = getInlineSVG('PLUS', 'plus-icon');
                 selectBtn.classList.remove('selected');
             }
         }
@@ -521,7 +524,7 @@ export class CourseController {
      * @param selectedCourses Array of currently selected courses
      * @param previousSelections Map of previously selected course IDs
      */
-    refreshCourseSelectionUI(selectedCourses: any[], previousSelections: Map<string, string | null>): void {
+    refreshCourseSelectionUI(selectedCourses: any[], previousSelections: Map<string, any>): void {
         const currentIds = new Set(selectedCourses.map(sc => sc.course.id));
         const previousIds = new Set(previousSelections.keys());
         
@@ -547,10 +550,8 @@ export class CourseController {
      * @param isSelected Whether the course is selected
      */
     updateCourseUIById(courseId: string, isSelected: boolean): void {
-        // Find all elements with this course ID using direct attribute selector
         const courseElements = document.querySelectorAll(`[data-course-id="${courseId}"]`);
-        
-        courseElements.forEach(element => {
+        courseElements.forEach((element) => {
             this.updateCourseSelectionUI(element as HTMLElement, isSelected);
         });
     }
@@ -577,10 +578,13 @@ export class CourseController {
             ? `${course.minCredits} credits`
             : `${course.minCredits}-${course.maxCredits} credits`;
 
+        const yearLabel = course.academicYear ? `${course.academicYear}–${course.academicYear + 1}` : '';
+
         let html = `
             <div class="course-info">
-                <div class="course-title">${Validators.escapeHtml(course.name)}</div>
-                <div class="course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)} (${credits})</div>
+                <div class="course-desc-title">${Validators.escapeHtml(course.name)}</div>
+                <div class="course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)} (${credits})</div>
+                ${yearLabel ? `<div class="course-year">${yearLabel}</div>` : ''}
             </div>
             <div class="course-description-text">${Validators.escapeHtml(course.description)}</div>
         `;
@@ -680,27 +684,18 @@ export class CourseController {
     }
 
     private renderDiscussionsTab(course: Course): string {
-        const lectures = this.courseDataService.getLecturesForCourse(course);
+        const discussions = this.courseDataService.getLecturesForCourse(course)
+            .flatMap(lg => lg.compatibleDiscussions);
 
         let html = '<div class="tab-panel" data-panel="discussions">';
-        html += '<h3>Available Discussions by Lecture</h3>';
+        html += `<h3>Available Discussions (${discussions.length})</h3>`;
+        html += '<div class="sections-list">';
 
-        for (const lectureGroup of lectures) {
-            const discussions = lectureGroup.compatibleDiscussions;
-            if (discussions.length === 0) continue;
-
-            html += `<div class="lecture-group">`;
-            html += `<h4>Lecture ${Validators.escapeHtml(lectureGroup.section.number)} - ${discussions.length} Discussion(s)</h4>`;
-            html += '<div class="sections-list">';
-
-            for (const discussion of discussions) {
-                html += this.renderSectionCard(discussion, 'Discussion');
-            }
-
-            html += '</div></div>';
+        for (const discussion of discussions) {
+            html += this.renderSectionCard(discussion, 'Discussion');
         }
 
-        html += '</div>';
+        html += '</div></div>';
         return html;
     }
 
@@ -716,23 +711,16 @@ export class CourseController {
                 html += this.renderSectionCard(lab, 'Lab');
             }
         } else {
-            const lectures = this.courseDataService.getLecturesForCourse(course);
-            html += '<h3>Available Labs by Lecture</h3>';
+            const labs = this.courseDataService.getLecturesForCourse(course)
+                .flatMap(lg => lg.compatibleLabs);
+            html += `<h3>Available Labs (${labs.length})</h3>`;
+            html += '<div class="sections-list">';
 
-            for (const lectureGroup of lectures) {
-                const labs = lectureGroup.compatibleLabs;
-                if (labs.length === 0) continue;
-
-                html += `<div class="lecture-group">`;
-                html += `<h4>Lecture ${Validators.escapeHtml(lectureGroup.section.number)} - ${labs.length} Lab(s)</h4>`;
-                html += '<div class="sections-list">';
-
-                for (const lab of labs) {
-                    html += this.renderSectionCard(lab, 'Lab');
-                }
-
-                html += '</div></div>';
+            for (const lab of labs) {
+                html += this.renderSectionCard(lab, 'Lab');
             }
+
+            html += '</div>';
         }
 
         html += '</div></div>';
@@ -868,7 +856,7 @@ export class CourseController {
 
         // Sort selected courses by department and number
         const sortedCourses = selectedCourses.sort((a, b) => {
-            const deptCompare = a.course.department.abbreviation.localeCompare(b.course.department.abbreviation);
+            const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
             if (deptCompare !== 0) return deptCompare;
             return a.course.number.localeCompare(b.course.number);
         });
@@ -883,7 +871,7 @@ export class CourseController {
             html += `
                 <div class="selected-course-item" data-course-id="${Validators.escapeHtml(course.id)}">
                     <div class="selected-course-info">
-                        <div class="selected-course-code">${Validators.escapeHtml(course.department.abbreviation)}${Validators.escapeHtml(course.number)}</div>
+                        <div class="selected-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
                         <div class="selected-course-name">${Validators.escapeHtml(course.name)}</div>
                         <div class="selected-course-credits">${credits}</div>
                     </div>

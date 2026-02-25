@@ -112,25 +112,23 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-  .dual-range-slider {
-    padding: 0 15px;
-  }
+html.is-mobile .dual-range-slider {
+  padding: 0 15px;
+}
 
-  .dual-range-track {
-    left: 15px;
-    right: 15px;
-  }
+html.is-mobile .dual-range-track {
+  left: 15px;
+  right: 15px;
+}
 
-  .dual-range-thumb {
-    width: 24px;
-    height: 24px;
-  }
+html.is-mobile .dual-range-thumb {
+  width: 24px;
+  height: 24px;
+}
 
-  .dual-range-tooltip {
-    font-size: 11px;
-    padding: 3px 6px;
-  }
+html.is-mobile .dual-range-tooltip {
+  font-size: 11px;
+  padding: 3px 6px;
 }
 
 /* Dark theme adjustments */

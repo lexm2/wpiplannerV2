@@ -1,22 +1,14 @@
 export type {
   SelectedCourse,
-  CourseConflict,
-  CourseConflictResolution,
-  CourseDifference,
-  ScheduleDiff,
-  ScheduleConflict,
-  ScheduleConflictResolution,
   Schedule,
   ScheduleCombination,
-  TimeConflict,
   SchedulePreferences,
   UserScheduleState,
   WeeklyTimeSlot,
   DisplayableTimeSlot,
-  AutoScheduleConfig,
 } from './schedule';
-export { ConflictType, AcademicTerm } from './schedule';
-export type { FilterableSection, FilterablePeriod } from './filterableUnit';
+export { AcademicTerm } from './schedule';
+export type { FilterableSection } from './filterableUnit';
 export { ScheduleState } from './ScheduleState';
 export type {
   FilterMetadata,
@@ -40,7 +32,6 @@ export type {
   CourseSelectionFilterCriteria,
   PeriodDaysFilterCriteria,
   PeriodProfessorFilterCriteria,
-  PeriodTypeFilterCriteria,
   PeriodTermFilterCriteria,
   PeriodAvailabilityFilterCriteria,
   PeriodConflictFilterCriteria,
@@ -55,14 +46,14 @@ export type {
   Period,
   Time,
   SimpleTime,
+  TimeSlot,
   ScheduleDB,
   PlannerState,
 } from './types';
-export { PeriodType, DayOfWeek, Semester } from './types';
+export { PeriodType, DayOfWeek, Semester, SectionType } from './types';
 export { ApplicationState } from './ApplicationState';
 export type {
   SearchFilter,
-  TimeSlot,
   CourseDisplayProps,
   GridTimeSlot,
   ScheduleGridCell,

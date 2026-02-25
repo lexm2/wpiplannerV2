@@ -1,5 +1,6 @@
 import type { ScheduleDB, Department, Course, Section, Period, Time, LectureGroup } from '../../types'
 import { DayOfWeek, PeriodType } from '../../types'
+import { AcademicTerm } from '../../types/schedule'
 import { getAllSections } from '../../utils'
 import type { CourseDataEventType, CourseDataEvent, CourseDataEventListener } from './types'
 
@@ -139,12 +140,14 @@ export class CourseDataService {
                     number: courseData.number,
                     name: courseData.name,
                     description: this.stripHtml(courseData.description || ''),
-                    department: department,
+                    departmentAbbr: department.abbreviation,
+                    departmentName: department.name,
                     lectures: lectures.length > 0 ? lectures : undefined,
                     standaloneLabs: standaloneLabs,
                     minCredits: courseData.minCredits || 0,
                     maxCredits: courseData.maxCredits || 0,
-                    isGraduate: courseData.isGraduate || false
+                    isGraduate: courseData.isGraduate || false,
+                    academicYear: courseData.academicYear
                 };
                 return course;
             });
@@ -167,23 +170,15 @@ export class CourseDataService {
 
     private parseConstructedSections(sections: any[]): Section[] {
         return sections.map(sectionData => {
-            const rawTerm = sectionData.term || '';
-            const sectionNumber = sectionData.number || '';
-
-            // Use pre-computed term from Java backend
-            const computedTerm: string = sectionData.computedTerm;
-
             const section: Section = {
                 crn: sectionData.crn || 0,
-                number: sectionNumber,
+                number: sectionData.number || '',
                 seats: sectionData.seats || 0,
                 seatsAvailable: sectionData.seatsAvailable || 0,
                 actualWaitlist: sectionData.actualWaitlist || 0,
                 maxWaitlist: sectionData.maxWaitlist || 0,
                 note: sectionData.note,
-                description: this.stripHtml(sectionData.description || ''),
-                term: rawTerm,
-                computedTerm: computedTerm,
+                computedTerm: sectionData.computedTerm as AcademicTerm,
                 isInterestList: sectionData.isInterestList,
                 periods: this.parseConstructedPeriods(sectionData.periods || [])
             };
@@ -339,11 +334,11 @@ export class CourseDataService {
         }
 
         const queryLower = query.toLowerCase();
-        return allCourses.filter(course => 
+        return allCourses.filter(course =>
             course.name.toLowerCase().includes(queryLower) ||
             course.number.toLowerCase().includes(queryLower) ||
             course.id.toLowerCase().includes(queryLower) ||
-            course.department.abbreviation.toLowerCase().includes(queryLower)
+            course.departmentAbbr.toLowerCase().includes(queryLower)
         );
     }
 

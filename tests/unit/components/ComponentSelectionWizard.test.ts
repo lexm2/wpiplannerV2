@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, mock, spyOn } from 'bun:test';
 import { ComponentSelectionWizard } from '../../../src/ui/components/ComponentSelectionWizard';
 import { CourseDataService } from '../../../src/services/data/courseDataService';
 import { Course, Section, Period, Department, PeriodType, DayOfWeek } from '../../../src/types/types';
-import { SelectedCourse } from '../../../src/types/schedule';
+import { SelectedCourse, AcademicTerm } from '../../../src/types/schedule';
 
 // Create vi mock for timer functions
 // Note: Bun test doesn't have built-in fake timers like Jest/Vitest
@@ -25,12 +25,6 @@ describe('ComponentSelectionWizard', () => {
     let mockOnComplete: ReturnType<typeof mock>;
     let mockOnCancel: ReturnType<typeof mock>;
 
-    // Test data
-    const department: Department = {
-        abbreviation: 'CS',
-        name: 'Computer Science',
-        courses: []
-    };
 
     const createPeriod = (type: PeriodType, days: DayOfWeek[]): Period => ({
         type,
@@ -55,8 +49,8 @@ describe('ComponentSelectionWizard', () => {
         actualWaitlist: 0,
         maxWaitlist: 10,
         description: `${type} section`,
-        term: 'A',
-        computedTerm: 'A',
+        term: AcademicTerm.A,
+        computedTerm: AcademicTerm.A,
         periods: [createPeriod(type, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY])]
     });
 
@@ -67,7 +61,8 @@ describe('ComponentSelectionWizard', () => {
         description: 'Basic programming course',
         minCredits: 3.0,
         maxCredits: 3.0,
-        department: department,
+        departmentAbbr: 'CS',
+        departmentName: 'Computer Science',
         lectures: [
             {
                 section: createSection(12345, 'A01', PeriodType.LECTURE),
@@ -101,7 +96,8 @@ describe('ComponentSelectionWizard', () => {
         description: 'Lab only course',
         minCredits: 1.0,
         maxCredits: 1.0,
-        department: department,
+        departmentAbbr: 'CS',
+        departmentName: 'Computer Science',
         standaloneLabs: [
             createSection(12351, 'L01', PeriodType.LAB),
             createSection(12352, 'L02', PeriodType.LAB)
@@ -137,8 +133,6 @@ describe('ComponentSelectionWizard', () => {
                 selectedLecture: createSection(12345, 'A01'),
                 selectedDiscussion: createSection(12347, 'A11'),
                 selectedLab: null,
-                selectedSection: null,
-                selectedSectionNumber: null,
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -466,8 +460,6 @@ describe('ComponentSelectionWizard', () => {
                 selectedLecture: createSection(12345, 'A01'),
                 selectedDiscussion: createSection(12347, 'A11', PeriodType.DISCUSSION),
                 selectedLab: createSection(12349, 'A21', PeriodType.LAB),
-                selectedSection: null,
-                selectedSectionNumber: null,
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -498,8 +490,6 @@ describe('ComponentSelectionWizard', () => {
                 selectedLecture: lecture,
                 selectedDiscussion: discussion,
                 selectedLab: null,
-                selectedSection: null,
-                selectedSectionNumber: null,
                 isRequired: false,
                 lockedSections: new Set()
             };
@@ -657,7 +647,7 @@ describe('ComponentSelectionWizard', () => {
             );
 
             const content = wizard['renderContent']();
-            expect(content).toContain(course.department.abbreviation);
+            expect(content).toContain(course.departmentAbbr);
             expect(content).toContain(course.number);
             expect(content).toContain(course.name);
         });

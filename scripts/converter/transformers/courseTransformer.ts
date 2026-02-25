@@ -5,7 +5,7 @@
 import { WorkdaySection } from '../types/workdayTypes.js';
 import { PlannerCourse } from '../types/outputTypes.js';
 import { transformSection, categorizeSections } from './sectionTransformer.js';
-import { buildLectureGroups, buildOtherLectureGroups } from './lectureGroupBuilder.js';
+import { buildLectureGroups } from './lectureGroupBuilder.js';
 import { sanitizeHTML } from '../utils/htmlSanitizer.js';
 import { ConverterConfig } from '../ConverterConfig.js';
 
@@ -36,7 +36,7 @@ export function transformCourse(
         ? courseTitle.substring(titleDashIndex + 2).trim()
         : courseSection.substring(courseSection.lastIndexOf('-') + 1).trim();
 
-    // Get description (use Course_Description for special courses)
+    // Get description
     const isSpecialCourse = config.specialCourses.some(
         sc => subjectAndNumber.includes(sc)
     ) || config.specialSections.some(
@@ -55,18 +55,18 @@ export function transformCourse(
     // Determine if graduate course
     const isGraduate = firstSection.Academic_Level === 'Graduate';
 
+    // Parse fall year from "2025 - 2026 Academic Year"
+    const academicYear = parseInt(firstSection.Academic_Year);
+
     // Transform all sections (flatMap because graduate F/S terms expand to multiple sections)
     const plannerSections = workdaySections.flatMap(ws => transformSection(ws, config));
 
     // Categorize sections by type
     const categorized = categorizeSections(plannerSections);
 
-    // Build lecture groups (NEW HIERARCHICAL STRUCTURE)
     const lectures = buildLectureGroups(categorized);
 
-    // Add "other" sections (seminars, etc.) as lecture groups
-    const otherLectures = buildOtherLectureGroups(categorized.other);
-    lectures.push(...otherLectures);
+    lectures.push(...categorized.other.map(section => ({ section, compatibleDiscussions: [], compatibleLabs: [] })));
 
     // Handle lab-only courses
     const standaloneLabs = lectures.length === 0 && categorized.labs.length > 0
@@ -81,6 +81,7 @@ export function transformCourse(
         minCredits: credits,
         maxCredits: credits,
         isGraduate,
+        academicYear,
         lectures,
         standaloneLabs
     };

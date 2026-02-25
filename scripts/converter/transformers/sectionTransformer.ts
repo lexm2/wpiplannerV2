@@ -5,7 +5,6 @@
 import { WorkdaySection } from '../types/workdayTypes.js';
 import { PlannerSection, PlannerPeriod } from '../types/outputTypes.js';
 import { parseSectionDetails } from '../utils/timeParser.js';
-import { sanitizeHTML } from '../utils/htmlSanitizer.js';
 import { ConverterConfig } from '../ConverterConfig.js';
 
 export interface CategorizedSections {
@@ -53,9 +52,6 @@ export function transformSection(
     // Get cluster ID (if any)
     const clusterId = workdaySection.CF_LRV_Cluster_Ref_ID || null;
     const note = isInterestList ? 'IntList' : (clusterId || null);
-
-    // Get description (section-specific)
-    const description = sanitizeHTML(workdaySection.Course_Section_Description);
 
     // Determine if graduate course
     const isGraduate = workdaySection.Academic_Level === 'Graduate';
@@ -106,8 +102,6 @@ export function transformSection(
         actualWaitlist: waitlistActual,
         maxWaitlist: waitlistMax,
         note,
-        description,
-        term: '202201', // Fixed term code (legacy)
         computedTerm,
         isGps: isGPS,
         isInterestList: isInterestList,

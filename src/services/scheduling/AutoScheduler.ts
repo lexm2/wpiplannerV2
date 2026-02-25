@@ -1,15 +1,16 @@
 import type { Course, Section, DayOfWeek } from '../../types/types';
-import type { SelectedCourse, WeeklyTimeSlot, AutoScheduleConfig } from '../../types/schedule';
-import { sectionToMask, weeklySlotToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
+import type { SelectedCourse } from '../../types/schedule';
+import { sectionToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { ScheduleFilterService } from '../filtering/ScheduleFilterService';
+import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 
-interface SectionCombination {
+export interface SectionCombination {
   lecture: Section | null;
   discussion: Section | null;
   lab: Section | null;
 }
 
-interface ScheduleResult {
+export interface ScheduleResult {
   course: Course;
   combination: SectionCombination;
   isLocked?: boolean;
@@ -37,15 +38,13 @@ export class AutoScheduler {
 
   generateSchedules(
     selectedCourses: SelectedCourse[],
-    config: AutoScheduleConfig,
     maxResults: number = 100
   ): ScheduleResult[][] {
     if (selectedCourses.length === 0) {
       return [];
     }
 
-    // Precompute blocked time masks per term
-    const blockedMasksByTerm = this.precomputeBlockedMasks(config.blockedTimes);
+    const blockedMasksByTerm = this.getBlockedMasksByTerm();
 
     const lockedResults: ScheduleResult[] = [];
     const incompleteCourses: SelectedCourse[] = [];
@@ -85,7 +84,7 @@ export class AutoScheduler {
       const candidates = this.getMaskedCandidates(selectedCourse, blockedMasksByTerm);
 
       if (candidates.length === 0) {
-        console.warn(`[AutoScheduler] No valid candidates for ${selectedCourse.course.department.abbreviation}${selectedCourse.course.number}`);
+        console.warn(`[AutoScheduler] No valid candidates for ${selectedCourse.course.departmentAbbr}${selectedCourse.course.number}`);
         return [];
       }
 
@@ -109,35 +108,27 @@ export class AutoScheduler {
     return validSchedules;
   }
 
-  private precomputeBlockedMasks(blockedTimes: WeeklyTimeSlot[]): Map<string, bigint> {
-    const masksByTerm = new Map<string, bigint>();
+  private getBlockedMasksByTerm(): Map<string, bigint> {
+    const activeFilters = this.scheduleFilterService.getActiveFilters();
 
-    console.log(`[AutoScheduler] precomputeBlockedMasks called with ${blockedTimes.length} blocked times`);
-
-    for (const slot of blockedTimes) {
-      const mask = weeklySlotToMask(slot);
-
-      // Debug: Log each blocked time and whether it produces a valid mask
-      const start = `${slot.startTime.hours}:${String(slot.startTime.minutes).padStart(2, '0')}`;
-      const end = `${slot.endTime.hours}:${String(slot.endTime.minutes).padStart(2, '0')}`;
-      console.log(`[AutoScheduler] Blocked: day=${slot.day} time=${start}-${end} term=${slot.term} → mask=${mask !== 0n ? 'SET' : 'EMPTY!'}`);
-
-      if (mask === 0n) continue;
-
-      const terms = slot.term === 'ALL' ? ['A', 'B', 'C', 'D'] : [slot.term];
-
-      for (const term of terms) {
-        const existing = masksByTerm.get(term) || 0n;
-        masksByTerm.set(term, existing | mask);
+    const sectionBasedFilter = this.scheduleFilterService.getSectionBasedFilter('periodConflict');
+    if (sectionBasedFilter instanceof ConflictFilter) {
+      const criteria = activeFilters.find(f => f.id === 'periodConflict')?.criteria;
+      if (criteria && sectionBasedFilter.isValidCriteria(criteria)) {
+        return sectionBasedFilter.getBlockedMasksByTerm(criteria as any);
       }
     }
 
-    // Debug: Log final masks per term
-    for (const [term, mask] of masksByTerm) {
-      console.log(`[AutoScheduler] Final blocked mask for term ${term}: ${mask !== 0n ? 'has blocks' : 'empty'}`);
+    const blockedTimesCriteria = activeFilters.find(f => f.id === 'blockedTimes')?.criteria as any;
+    if (blockedTimesCriteria?.blockedTimes?.length > 0) {
+      const tempFilter = new ConflictFilter();
+      return tempFilter.getBlockedMasksByTerm({
+        avoidConflicts: true,
+        blockedSlots: blockedTimesCriteria.blockedTimes
+      });
     }
 
-    return masksByTerm;
+    return new Map();
   }
 
   private generateWithBacktracking(
@@ -189,10 +180,9 @@ export class AutoScheduler {
   }
 
   generateSchedule(
-    selectedCourses: SelectedCourse[],
-    config: AutoScheduleConfig
+    selectedCourses: SelectedCourse[]
   ): ScheduleResult[] | null {
-    const schedules = this.generateSchedules(selectedCourses, config, 1);
+    const schedules = this.generateSchedules(selectedCourses, 1);
     return schedules.length > 0 ? schedules[0] : null;
   }
 
@@ -210,16 +200,21 @@ export class AutoScheduler {
 
     // Handle standalone lab courses
     if (typeInfo.isStandaloneLab) {
-      for (const lab of course.standaloneLabs || []) {
+      const labs = course.standaloneLabs || [];
+
+      for (const lab of labs) {
         if (!this.isValidSection(lab, blockedMasksByTerm, selectedCourse)) continue;
 
         const mask = sectionToMask(lab);
-        candidates.push({
+        const candidate: MaskedCandidate = {
           combination: { lecture: null, discussion: null, lab },
           mask,
           term: lab.computedTerm
-        });
+        };
+
+        candidates.push(candidate);
       }
+
       return candidates;
     }
 
@@ -237,12 +232,12 @@ export class AutoScheduler {
       // Get valid discussion candidates - must be same term as lecture
       const discussionCandidates: Array<{ section: Section | null; mask: bigint }> = [];
       if (typeInfo.hasDiscussions) {
-        for (const d of lectureGroup.compatibleDiscussions || []) {
-          // Skip if different term than lecture
+        const discussions = lectureGroup.compatibleDiscussions || [];
+
+        for (const d of discussions) {
           if (d.computedTerm !== lecture.computedTerm) continue;
           if (!this.isValidSection(d, blockedMasksByTerm, selectedCourse)) continue;
           const mask = sectionToMask(d);
-          // Check lecture/discussion internal conflict
           if (masksConflict(lectureMask, mask)) continue;
           discussionCandidates.push({ section: d, mask });
         }
@@ -253,12 +248,12 @@ export class AutoScheduler {
       // Get valid lab candidates - must be same term as lecture
       const labCandidates: Array<{ section: Section | null; mask: bigint }> = [];
       if (typeInfo.hasLabs) {
-        for (const l of lectureGroup.compatibleLabs || []) {
-          // Skip if different term than lecture
+        const labs = lectureGroup.compatibleLabs || [];
+
+        for (const l of labs) {
           if (l.computedTerm !== lecture.computedTerm) continue;
           if (!this.isValidSection(l, blockedMasksByTerm, selectedCourse)) continue;
           const mask = sectionToMask(l);
-          // Check lecture/lab internal conflict
           if (masksConflict(lectureMask, mask)) continue;
           labCandidates.push({ section: l, mask });
         }
@@ -271,15 +266,16 @@ export class AutoScheduler {
       // Generate all valid combinations with precomputed masks
       for (const disc of discussionCandidates) {
         for (const lab of labCandidates) {
-          // Check discussion/lab internal conflict
           if (disc.section && lab.section && masksConflict(disc.mask, lab.mask)) continue;
 
           const combinedMask = lectureMask | disc.mask | lab.mask;
-          candidates.push({
+          const candidate: MaskedCandidate = {
             combination: { lecture, discussion: disc.section, lab: lab.section },
             mask: combinedMask,
             term: lecture.computedTerm
-          });
+          };
+
+          candidates.push(candidate);
         }
       }
     }
@@ -299,7 +295,14 @@ export class AutoScheduler {
 
     // Check blocked time conflict using bitmask - O(1)
     const sectionMask = sectionToMask(section);
-    const blockedMask = blockedMasksByTerm.get(section.computedTerm) || 0n;
+    let blockedMask: bigint;
+    if (section.computedTerm === 'F') {
+      blockedMask = (blockedMasksByTerm.get('A') || 0n) | (blockedMasksByTerm.get('B') || 0n);
+    } else if (section.computedTerm === 'S') {
+      blockedMask = (blockedMasksByTerm.get('C') || 0n) | (blockedMasksByTerm.get('D') || 0n);
+    } else {
+      blockedMask = blockedMasksByTerm.get(section.computedTerm) || 0n;
+    }
     if (masksConflict(sectionMask, blockedMask)) return false;
 
     // Check schedule filters

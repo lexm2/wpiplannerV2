@@ -10,7 +10,7 @@ export interface WorkdayFeed {
 export interface WorkdaySection {
     Academic_Level: string;
     Academic_Units: string;
-    Academic_Year: string;
+    Academic_Year: string; // e.g. "2025 - 2026 Academic Year" — fall year is parseInt(Academic_Year)
     Course_Description: string;
     Course_Section: string;
     Course_Section_Description: string;

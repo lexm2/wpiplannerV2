@@ -4,7 +4,6 @@ export {
   isValidSelectedCourse,
   validateSelectedCourses,
   repairSelectedCourse,
-  getValidSelectedSection,
   getComputedTerm,
   isValidComputedTerm,
   getDisplayTerms,
@@ -17,12 +16,7 @@ export type {
   FilterPerformanceMetrics,
 } from './PerformanceMetrics';
 export { PerformanceMetrics } from './PerformanceMetrics';
-export {
-  createJSONReplacer,
-  createJSONReviver,
-  safeStringify,
-  safeParse,
-} from './jsonSerializer';
+export { setReplacer, setReviver } from './jsonSerializer';
 export {
   getAllSections,
   getLectureSections,

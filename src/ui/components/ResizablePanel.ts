@@ -20,11 +20,13 @@ export class ResizablePanel {
   private activeConfig: ResizablePanelConfig | null = null;
   private startX: number = 0;
   private startWidth: number = 0;
+  private resizeDebounceTimeout: number | null = null;
 
   private boundDocumentMouseMove: (e: MouseEvent) => void;
   private boundDocumentMouseUp: () => void;
   private boundDocumentTouchMove: (e: TouchEvent) => void;
   private boundDocumentTouchEnd: () => void;
+  private boundWindowResize: () => void;
 
   constructor(options: ResizablePanelOptions) {
     this.options = options;
@@ -33,14 +35,19 @@ export class ResizablePanel {
     this.boundDocumentMouseUp = this.onDocumentMouseUp.bind(this);
     this.boundDocumentTouchMove = this.onDocumentTouchMove.bind(this);
     this.boundDocumentTouchEnd = this.onDocumentTouchEnd.bind(this);
+    this.boundWindowResize = this.onWindowResize.bind(this);
 
     this.initialize();
   }
 
   private initialize(): void {
     this.options.panels.forEach((config) => {
-      // Set initial width from config
-      this.setWidth(config, config.defaultWidth);
+      const userPreference = this.loadUserPreference(config);
+      const initialWidth = userPreference !== null
+        ? userPreference
+        : this.calculateResponsiveDefault(config);
+
+      this.setWidth(config, initialWidth);
 
       const handle = document.querySelector(
         config.handleSelector
@@ -61,6 +68,7 @@ export class ResizablePanel {
       passive: false,
     });
     document.addEventListener('touchend', this.boundDocumentTouchEnd);
+    window.addEventListener('resize', this.boundWindowResize);
   }
 
   private onMouseDown(e: MouseEvent, config: ResizablePanelConfig): void {
@@ -133,6 +141,11 @@ export class ResizablePanel {
     }
     document.body.classList.remove(styles.resizing);
 
+    if (this.activeConfig) {
+      const currentWidth = this.getCurrentWidth(this.activeConfig);
+      this.saveUserPreference(this.activeConfig, currentWidth);
+    }
+
     this.activeHandle = null;
     this.activeConfig = null;
   }
@@ -152,16 +165,66 @@ export class ResizablePanel {
     );
   }
 
+  private calculateResponsiveDefault(config: ResizablePanelConfig): number {
+    const viewportWidth = window.innerWidth;
+
+    if (viewportWidth <= 1200) {
+      return config.defaultWidth;
+    }
+
+    const calculatedWidth = viewportWidth * 0.25;
+    return Math.max(config.minWidth, Math.min(config.maxWidth, calculatedWidth));
+  }
+
+  private loadUserPreference(config: ResizablePanelConfig): number | null {
+    const stored = localStorage.getItem(`panel-width-${config.targetProperty}`);
+    if (stored) {
+      const width = parseInt(stored, 10);
+      if (!isNaN(width)) {
+        return Math.max(config.minWidth, Math.min(config.maxWidth, width));
+      }
+    }
+    return null;
+  }
+
+  private saveUserPreference(config: ResizablePanelConfig, width: number): void {
+    localStorage.setItem(`panel-width-${config.targetProperty}`, width.toString());
+  }
+
+  private onWindowResize(): void {
+    if (this.resizeDebounceTimeout !== null) {
+      clearTimeout(this.resizeDebounceTimeout);
+    }
+
+    this.resizeDebounceTimeout = window.setTimeout(() => {
+      this.options.panels.forEach((config) => {
+        const userPreference = this.loadUserPreference(config);
+        if (userPreference === null) {
+          const responsiveWidth = this.calculateResponsiveDefault(config);
+          this.setWidth(config, responsiveWidth);
+        }
+      });
+      this.resizeDebounceTimeout = null;
+    }, 300);
+  }
+
   public resetWidths(): void {
     this.options.panels.forEach((config) => {
-      this.setWidth(config, config.defaultWidth);
+      localStorage.removeItem(`panel-width-${config.targetProperty}`);
+      const responsiveWidth = this.calculateResponsiveDefault(config);
+      this.setWidth(config, responsiveWidth);
     });
   }
 
   public destroy(): void {
+    if (this.resizeDebounceTimeout !== null) {
+      clearTimeout(this.resizeDebounceTimeout);
+    }
+
     document.removeEventListener('mousemove', this.boundDocumentMouseMove);
     document.removeEventListener('mouseup', this.boundDocumentMouseUp);
     document.removeEventListener('touchmove', this.boundDocumentTouchMove);
     document.removeEventListener('touchend', this.boundDocumentTouchEnd);
+    window.removeEventListener('resize', this.boundWindowResize);
   }
 }

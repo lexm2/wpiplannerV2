@@ -17,12 +17,12 @@ export class SearchTextFilter implements SectionBasedFilter {
 
         return sections.filter(fs => {
             const course = fs.course;
-            const courseCode = `${course.department.abbreviation}${course.number}`;
+            const courseCode = `${course.departmentAbbr}${course.number}`;
             const courseText = [
                 course.id,
                 course.name,
                 course.description,
-                course.department.name,
+                course.departmentName,
                 courseCode
             ].join(' ').toLowerCase();
 

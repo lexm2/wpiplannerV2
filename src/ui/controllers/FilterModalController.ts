@@ -2,11 +2,12 @@ import { ModalService } from '../../services/ui/ModalService';
 import { CourseFilterService } from '../../services/filtering/CourseFilterService';
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
 import { Course, Department } from '../../types/types';
+import { AcademicTerm } from '../../types/schedule';
 import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
-import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria } from '../../types/filters';
+import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria } from '../../types/filters';
 
 export class FilterModalController extends BaseModal {
     private filterService: CourseFilterService | null = null;
@@ -168,6 +169,7 @@ export class FilterModalController extends BaseModal {
         return `
             <div class="filter-sections">
                 ${this.createGraduateLevelFilter()}
+                ${this.createAcademicYearFilter()}
                 ${this.createSearchTextFilter()}
                 ${this.createBookmarkFilter()}
                 ${this.createAvailabilityFilter()}
@@ -186,7 +188,7 @@ export class FilterModalController extends BaseModal {
         const currentLevel = criteria?.level || 'all';
 
         // Get term filter state
-        const terms = this.filterService.getFilterOptions('term', this.allCourses) as string[];
+        const terms = this.filterService.getFilterOptions('term', this.allCourses) as AcademicTerm[];
         const termFilter = this.filterService.getActiveFilters().find(f => f.id === 'term');
         const termCriteria = termFilter?.criteria as TermFilterCriteria | undefined;
         const activeTerms = termCriteria?.terms || [];
@@ -214,6 +216,34 @@ export class FilterModalController extends BaseModal {
                     </div>
                     <div class="filter-term-row">
                         ${termCheckboxes}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    private createAcademicYearFilter(): string {
+        if (!this.filterService) return '';
+
+        const years = [...new Set(this.allCourses.map(c => c.academicYear).filter(Boolean) as number[])].sort();
+        if (years.length <= 1) return '';
+
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'academicYear');
+        const currentYear = (activeFilter?.criteria as AcademicYearFilterCriteria | undefined)?.year ?? 'all';
+
+        const yearBtns = years.map(y =>
+            `<button class="segmented-btn ${currentYear === y ? 'active' : ''}" data-year="${y}">${y}–${y + 1}</button>`
+        ).join('');
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Academic Year</h4>
+                </div>
+                <div class="filter-section-content">
+                    <div class="filter-segmented-control" id="academic-year-filter">
+                        <button class="segmented-btn ${currentYear === 'all' ? 'active' : ''}" data-year="all">All</button>
+                        ${yearBtns}
                     </div>
                 </div>
             </div>
@@ -425,6 +455,7 @@ export class FilterModalController extends BaseModal {
         this.setupCreditRangeFilter(modalElement);
         this.setupTermFilter(modalElement);
         this.setupGraduateLevelFilter(modalElement);
+        this.setupAcademicYearFilter(modalElement);
         this.setupClearAllButton(modalElement);
         this.setupFilterSearch(modalElement);
     }
@@ -445,6 +476,26 @@ export class FilterModalController extends BaseModal {
                 });
             });
         }
+    }
+
+    private setupAcademicYearFilter(modalElement: HTMLElement): void {
+        const control = modalElement.querySelector('#academic-year-filter');
+        if (!control) return;
+        control.querySelectorAll('.segmented-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                const raw = target.dataset.year;
+                const year = raw === 'all' ? 'all' : parseInt(raw!);
+                control.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active'));
+                target.classList.add('active');
+                if (year === 'all') {
+                    this.filterService?.removeFilter('academicYear');
+                } else {
+                    this.filterService?.addFilter('academicYear', { year });
+                }
+                this.updatePreview(modalElement);
+            });
+        });
     }
 
     private updateGraduateLevelFilter(level: 'all' | 'undergraduate' | 'graduate', modalElement: HTMLElement): void {
@@ -914,8 +965,8 @@ export class FilterModalController extends BaseModal {
 
     private updateTermFilter(modalElement: HTMLElement): void {
         const checkboxes = modalElement.querySelectorAll('input[data-filter="term"]:checked') as NodeListOf<HTMLInputElement>;
-        const terms = Array.from(checkboxes).map(cb => cb.value);
-        
+        const terms = Array.from(checkboxes).map(cb => cb.value as AcademicTerm);
+
         if (terms.length > 0) {
             this.filterService?.addFilter('term', { terms });
         } else {

@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeEach } from 'bun:test'
 import { AvailabilityFilter } from '../../../src/core/filtering/filters/AvailabilityFilter'
+import { AcademicTerm } from '../../../src/types/schedule'
 import {
   createMockFilterableSection
 } from '../../helpers/mockData'
@@ -47,10 +48,10 @@ describe('AvailabilityFilter', () => {
     test('should return all sections when filter is disabled', () => {
       const sections = [
         createMockFilterableSection({
-          section: { seatsAvailable: 0, computedTerm: 'A' }
+          section: { seatsAvailable: 0, computedTerm: AcademicTerm.A }
         }),
         createMockFilterableSection({
-          section: { seatsAvailable: 5, computedTerm: 'A' }
+          section: { seatsAvailable: 5, computedTerm: AcademicTerm.A }
         })
       ]
 
@@ -63,11 +64,11 @@ describe('AvailabilityFilter', () => {
       const sections = [
         createMockFilterableSection({
           course: { id: 'CS-101' },
-          section: { seatsAvailable: 0, computedTerm: 'A' }
+          section: { seatsAvailable: 0, computedTerm: AcademicTerm.A }
         }),
         createMockFilterableSection({
           course: { id: 'CS-102' },
-          section: { seatsAvailable: 5, computedTerm: 'A' }
+          section: { seatsAvailable: 5, computedTerm: AcademicTerm.A }
         })
       ]
 
@@ -80,11 +81,11 @@ describe('AvailabilityFilter', () => {
       const sections = [
         createMockFilterableSection({
           course: { id: 'CS-101' },
-          section: { number: 'A01', seatsAvailable: 0, computedTerm: 'A' }
+          section: { number: 'A01', seatsAvailable: 0, computedTerm: AcademicTerm.A }
         }),
         createMockFilterableSection({
           course: { id: 'CS-101' },
-          section: { number: 'A02', seatsAvailable: 3, computedTerm: 'A' }
+          section: { number: 'A02', seatsAvailable: 3, computedTerm: AcademicTerm.A }
         })
       ]
 
@@ -101,7 +102,7 @@ describe('AvailabilityFilter', () => {
     test('should handle sections with zero available seats', () => {
       const section = createMockFilterableSection({
         course: { id: 'CS-101' },
-        section: { seatsAvailable: 0, computedTerm: 'A' }
+        section: { seatsAvailable: 0, computedTerm: AcademicTerm.A }
       })
 
       const result = availabilityFilter.apply([section], { availableOnly: true })
@@ -114,11 +115,11 @@ describe('AvailabilityFilter', () => {
       const sections = [
         createMockFilterableSection({
           course: { id: 'CS-101' },
-          section: { seatsAvailable: 5, computedTerm: 'A' }
+          section: { seatsAvailable: 5, computedTerm: AcademicTerm.A }
         }),
         createMockFilterableSection({
           course: { id: 'CS-102' },
-          section: { seatsAvailable: 3, computedTerm: 'A' }
+          section: { seatsAvailable: 3, computedTerm: AcademicTerm.A }
         })
       ]
 
@@ -131,7 +132,7 @@ describe('AvailabilityFilter', () => {
         course: { id: 'CS-101' },
         section: {
           number: 'A01',
-          computedTerm: 'A',
+          computedTerm: AcademicTerm.A,
           seatsAvailable: 5
         }
       })
@@ -140,7 +141,7 @@ describe('AvailabilityFilter', () => {
         course: { id: 'CS-101' },
         section: {
           number: 'B01',
-          computedTerm: 'B',
+          computedTerm: AcademicTerm.B,
           seatsAvailable: 3
         }
       })
@@ -151,7 +152,7 @@ describe('AvailabilityFilter', () => {
       const result = availabilityFilter.apply([sectionA, sectionB], { availableOnly: true }, activeFilters)
 
       expect(result).toHaveLength(1)
-      expect(result[0].section.computedTerm).toBe('A')
+      expect(result[0].section.computedTerm).toBe(AcademicTerm.A)
     })
 
     test('should filter out sections with no available seats in active terms', () => {
@@ -159,7 +160,7 @@ describe('AvailabilityFilter', () => {
         course: { id: 'CS-101' },
         section: {
           number: 'A01',
-          computedTerm: 'A',
+          computedTerm: AcademicTerm.A,
           seatsAvailable: 0
         }
       })
@@ -168,7 +169,7 @@ describe('AvailabilityFilter', () => {
         course: { id: 'CS-101' },
         section: {
           number: 'B01',
-          computedTerm: 'B',
+          computedTerm: AcademicTerm.B,
           seatsAvailable: 5
         }
       })
@@ -186,7 +187,7 @@ describe('AvailabilityFilter', () => {
         course: { id: 'CS-101' },
         section: {
           number: 'A01',
-          computedTerm: 'A',
+          computedTerm: AcademicTerm.A,
           seatsAvailable: 5
         }
       })
@@ -195,7 +196,7 @@ describe('AvailabilityFilter', () => {
         course: { id: 'CS-101' },
         section: {
           number: 'B01',
-          computedTerm: 'B',
+          computedTerm: AcademicTerm.B,
           seatsAvailable: 0
         }
       })
@@ -204,7 +205,7 @@ describe('AvailabilityFilter', () => {
         course: { id: 'CS-102' },
         section: {
           number: 'C01',
-          computedTerm: 'C',
+          computedTerm: AcademicTerm.C,
           seatsAvailable: 3
         }
       })
@@ -215,13 +216,13 @@ describe('AvailabilityFilter', () => {
       const result = availabilityFilter.apply([sectionA, sectionB, sectionC], { availableOnly: true }, activeFilters)
 
       expect(result).toHaveLength(2)
-      expect(result[0].section.computedTerm).toBe('A')
-      expect(result[1].section.computedTerm).toBe('C')
+      expect(result[0].section.computedTerm).toBe(AcademicTerm.A)
+      expect(result[1].section.computedTerm).toBe(AcademicTerm.C)
     })
 
     test('should handle undefined activeFilters', () => {
       const section = createMockFilterableSection({
-        section: { seatsAvailable: 5, computedTerm: 'A' }
+        section: { seatsAvailable: 5, computedTerm: AcademicTerm.A }
       })
 
       const result = availabilityFilter.apply([section], { availableOnly: true }, undefined)
@@ -230,7 +231,7 @@ describe('AvailabilityFilter', () => {
 
     test('should handle Map without term filter', () => {
       const section = createMockFilterableSection({
-        section: { seatsAvailable: 5, computedTerm: 'A' }
+        section: { seatsAvailable: 5, computedTerm: AcademicTerm.A }
       })
 
       const activeFilters = new Map()

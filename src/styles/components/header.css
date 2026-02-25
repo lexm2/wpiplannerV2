@@ -161,10 +161,9 @@
   white-space: nowrap;
 }
 
-/* Override icon colors for schedule page buttons in header-controls */
-.header-controls .course-clear-sections-btn:hover .eraser-icon,
-.header-controls .course-remove-btn:hover .x-icon,
-.header-controls .course-remove-btn:hover .trash-icon {
+.course-item-controls .course-clear-sections-btn:hover .eraser-icon,
+.course-item-controls .course-remove-btn:hover .x-icon,
+.course-item-controls .course-remove-btn:hover .trash-icon {
   color: var(--color-text) !important;
   opacity: 1;
 }
@@ -351,7 +350,7 @@
     margin-left: auto;
   }
 
-  .app-header .header-controls > :not(.settings-menu-btn) {
+  .app-header .header-controls > :not(.settings-menu-btn):not(.hamburger-btn) {
     display: none;
   }
 
@@ -374,11 +373,7 @@
   }
 }
 
-@media (max-width: 768px) {
-  .header-navigation {
-    position: static;
-    transform: none;
-    max-width: none;
-  }
+html.is-mobile .header-navigation {
+  max-width: none;
 }
 

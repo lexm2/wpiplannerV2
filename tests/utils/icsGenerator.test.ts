@@ -2,6 +2,7 @@ import { describe, it, expect } from 'bun:test';
 import { ICSGenerator } from '../../src/utils/icsGenerator';
 import { createMockSchedule, createMockSelectedCourse, createMockCourse, createMockSection, createMockPeriod, createMockTime } from '../helpers/mockData';
 import { DayOfWeek } from '../../src/types/types';
+import { AcademicTerm, EventType } from '../../src/types/schedule';
 
 describe('ICSGenerator', () => {
     describe('Basic Functionality', () => {
@@ -15,7 +16,7 @@ describe('ICSGenerator', () => {
             const section = createMockSection({
                 crn: 12345,
                 number: 'A01',
-                computedTerm: 'A',
+                computedTerm: AcademicTerm.A,
                 periods: [period],
             });
 
@@ -60,21 +61,16 @@ describe('ICSGenerator', () => {
             const section = createMockSection({
                 crn: 54321,
                 number: 'B02',
-                computedTerm: 'B',
+                computedTerm: AcademicTerm.B,
                 periods: [period],
             });
-
-            const maDept = {
-                abbreviation: 'MA',
-                name: 'Mathematical Sciences',
-                courses: []
-            };
 
             const course = createMockCourse({
                 id: 'MA-1021',
                 number: '1021',
                 name: 'Calculus I',
-                department: maDept,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
             });
 
             const selectedCourse = createMockSelectedCourse({
@@ -109,7 +105,7 @@ describe('ICSGenerator', () => {
             const sectionA = createMockSection({
                 crn: 11111,
                 number: 'A01',
-                computedTerm: 'A',
+                computedTerm: AcademicTerm.A,
                 periods: [periodA],
             });
 
@@ -122,7 +118,7 @@ describe('ICSGenerator', () => {
             const sectionB = createMockSection({
                 crn: 22222,
                 number: 'B01',
-                computedTerm: 'B',
+                computedTerm: AcademicTerm.B,
                 periods: [periodB],
             });
 
@@ -177,7 +173,7 @@ describe('ICSGenerator', () => {
                         id: 'local-1',
                         title: 'Career Fair',
                         description: 'Annual career fair',
-                        eventType: 'one-time',
+                        eventType: EventType.ONE_TIME,
                         date: '2026-09-15',
                         startTime: createMockTime(10, 0),
                         endTime: createMockTime(15, 0),
@@ -208,11 +204,11 @@ describe('ICSGenerator', () => {
                         id: 'local-2',
                         title: 'Office Hours',
                         description: 'Weekly office hours',
-                        eventType: 'recurring',
+                        eventType: EventType.RECURRING,
                         days: [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY],
                         startTime: createMockTime(16, 0),
                         endTime: createMockTime(17, 0),
-                        terms: ['A', 'B'],
+                        terms: [AcademicTerm.A, AcademicTerm.B],
                         visible: true,
                         createdAt: Date.now(),
                         updatedAt: Date.now(),
@@ -281,7 +277,7 @@ describe('ICSGenerator', () => {
             const section = createMockSection({
                 crn: 12345,
                 number: 'A01',
-                computedTerm: 'A',
+                computedTerm: AcademicTerm.A,
                 periods: [period],
             });
 

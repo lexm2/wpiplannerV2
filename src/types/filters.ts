@@ -1,5 +1,5 @@
-import { Section, SimpleTime } from './types';
-import { SelectedCourse } from './schedule';
+import { DayOfWeek, PeriodType, Section, SimpleTime, TimeSlot } from './types';
+import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
 
 export interface FilterMetadata {
     readonly id: string;
@@ -81,15 +81,11 @@ export interface ProfessorFilterCriteria {
 }
 
 export interface TimeSlotFilterCriteria {
-    timeSlots: Array<{
-        startTime: SimpleTime;
-        endTime: SimpleTime;
-        days: string[];
-    }>;
+    timeSlots: TimeSlot[];
 }
 
 export interface TermFilterCriteria {
-    terms: string[];
+    terms: AcademicTerm[];
 }
 
 
@@ -109,6 +105,10 @@ export interface GraduateLevelFilterCriteria {
     level: 'all' | 'undergraduate' | 'graduate';
 }
 
+export interface AcademicYearFilterCriteria {
+    year: number | 'all';
+}
+
 // Period-based filter criteria
 export interface CourseSelectionFilterCriteria {
     selectedCourseIds: string[];
@@ -116,19 +116,15 @@ export interface CourseSelectionFilterCriteria {
 
 
 export interface PeriodDaysFilterCriteria {
-    days: string[];
+    days: DayOfWeek[];
 }
 
 export interface PeriodProfessorFilterCriteria {
     professors: string[];
 }
 
-export interface PeriodTypeFilterCriteria {
-    types: string[]; // Can be string literals or PeriodType enum values (which are strings)
-}
-
 export interface PeriodTermFilterCriteria {
-    terms: string[];
+    terms: AcademicTerm[];
 }
 
 export interface PeriodAvailabilityFilterCriteria {
@@ -139,6 +135,11 @@ export interface PeriodAvailabilityFilterCriteria {
 export interface PeriodConflictFilterCriteria {
     avoidConflicts: boolean;
     selectedCourses?: SelectedCourse[]; // Array of SelectedCourse objects for context-aware conflict detection
+}
+
+export interface ConflictFilterCriteria {
+    avoidConflicts: boolean;
+    blockedSlots: WeeklyTimeSlot[];
 }
 
 export interface SectionCodeFilterCriteria {
@@ -157,4 +158,18 @@ export interface RMPRatingFilterCriteria {
 
 export interface BookmarkFilterCriteria {
     showBookmarkedOnly: boolean;
+}
+
+export interface BlockedTimesFilterCriteria {
+    blockedTimes: Array<{
+        id: string;
+        day: DayOfWeek;
+        startTime: SimpleTime;
+        endTime: SimpleTime;
+        term: AcademicTerm;
+    }>;
+}
+
+export interface WakeUpTimeFilterCriteria {
+    wakeUpTime: SimpleTime;
 }

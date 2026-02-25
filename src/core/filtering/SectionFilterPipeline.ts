@@ -1,4 +1,5 @@
 import type { Course, Section, LectureGroup } from '../../types/types';
+import { SectionType } from '../../types/types';
 import type { FilterableSection } from '../../types/filterableUnit';
 import { FilterPriorityQueue } from './FilterPriorityQueue';
 
@@ -40,7 +41,7 @@ export class SectionFilterPipeline {
                         course,
                         section: lectureGroup.section,
                         lectureGroup,
-                        sectionType: 'lecture'
+                        sectionType: SectionType.LECTURE
                     });
 
                     for (const discussion of lectureGroup.compatibleDiscussions) {
@@ -48,7 +49,7 @@ export class SectionFilterPipeline {
                             course,
                             section: discussion,
                             lectureGroup,
-                            sectionType: 'discussion'
+                            sectionType: SectionType.DISCUSSION
                         });
                     }
 
@@ -57,7 +58,7 @@ export class SectionFilterPipeline {
                             course,
                             section: lab,
                             lectureGroup,
-                            sectionType: 'lab'
+                            sectionType: SectionType.LAB
                         });
                     }
                 }
@@ -68,7 +69,7 @@ export class SectionFilterPipeline {
                     sections.push({
                         course,
                         section: lab,
-                        sectionType: 'standaloneLab'
+                        sectionType: SectionType.STANDALONE_LAB
                     });
                 }
             }
@@ -102,7 +103,7 @@ export class SectionFilterPipeline {
             const courseData = courseMap.get(courseId);
             if (!courseData) continue;
 
-            if (fs.sectionType === 'lecture') {
+            if (fs.sectionType === SectionType.LECTURE) {
                 const lectureCrn = String(fs.section.crn);
                 if (!courseData.lectureGroups.has(lectureCrn)) {
                     courseData.lectureGroups.set(lectureCrn, {
@@ -111,7 +112,7 @@ export class SectionFilterPipeline {
                         labs: []
                     });
                 }
-            } else if (fs.sectionType === 'discussion' && fs.lectureGroup) {
+            } else if (fs.sectionType === SectionType.DISCUSSION && fs.lectureGroup) {
                 const lectureCrn = String(fs.lectureGroup.section.crn);
                 if (!courseData.lectureGroups.has(lectureCrn)) {
                     courseData.lectureGroups.set(lectureCrn, {
@@ -124,7 +125,7 @@ export class SectionFilterPipeline {
                 if (lectureData && !lectureData.discussions.find(d => d.crn === fs.section.crn)) {
                     lectureData.discussions.push(fs.section);
                 }
-            } else if (fs.sectionType === 'lab' && fs.lectureGroup) {
+            } else if (fs.sectionType === SectionType.LAB && fs.lectureGroup) {
                 const lectureCrn = String(fs.lectureGroup.section.crn);
                 if (!courseData.lectureGroups.has(lectureCrn)) {
                     courseData.lectureGroups.set(lectureCrn, {
@@ -137,7 +138,7 @@ export class SectionFilterPipeline {
                 if (lectureData && !lectureData.labs.find(l => l.crn === fs.section.crn)) {
                     lectureData.labs.push(fs.section);
                 }
-            } else if (fs.sectionType === 'standaloneLab') {
+            } else if (fs.sectionType === SectionType.STANDALONE_LAB) {
                 if (!courseData.standaloneLabs.find(l => l.crn === fs.section.crn)) {
                     courseData.standaloneLabs.push(fs.section);
                 }
