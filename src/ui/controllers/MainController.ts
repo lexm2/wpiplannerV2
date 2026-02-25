@@ -197,7 +197,7 @@ export class MainController {
                 const years = [...new Set(allCourses.map(c => c.academicYear).filter(Boolean) as number[])].sort();
                 if (years.length > 1) {
                     const currentYear = DateUtils.getCurrentAcademicYear();
-                    const defaultYear = years.includes(currentYear) ? currentYear : years[0];
+                    const defaultYear = years.includes(currentYear) ? currentYear : years[years.length - 1];
                     this.filterService.addFilter('academicYear', { year: defaultYear });
                 }
             }

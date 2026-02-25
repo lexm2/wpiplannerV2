@@ -76,7 +76,7 @@ export class CourseEntry implements SidebarEntry {
                         ${selectedComponentsHTML}
                         <div class="schedule-course-credits">${credits}</div>
                     </div>
-                    <div class="header-controls">
+                    <div class="course-item-controls">
                         <button class="course-clear-sections-btn" title="Clear selected sections">
                             ${getInlineSVG('ERASER', 'eraser-icon')}
                         </button>

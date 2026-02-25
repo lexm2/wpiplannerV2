@@ -268,7 +268,7 @@
   cursor: help;
 }
 
-.header-controls {
+.course-item-controls {
   display: flex;
   align-items: center;
   gap: 0.5rem;
