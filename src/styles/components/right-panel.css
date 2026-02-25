@@ -41,7 +41,7 @@
 }
 
 .course-title {
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   color: var(--color-text-secondary);
   margin-bottom: 0;
   flex-shrink: 0;
