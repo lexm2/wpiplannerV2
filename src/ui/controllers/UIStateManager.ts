@@ -89,15 +89,32 @@ export class UIStateManager {
         }
     }
 
-    showErrorMessage(message: string): void {
+    showErrorMessage(message: string, onClearData?: () => Promise<void>): void {
+        const content = onClearData
+            ? `<div class="error-message">
+                <p>${message}</p>
+                <p>Your saved data may be outdated or deprecated. Clearing it will reset the app to a fresh state.</p>
+                <button class="btn btn-danger" id="error-clear-data-btn">Clear Data &amp; Reload</button>
+               </div>`
+            : `<div class="error-message">${message}</div>`;
+
         const departmentList = document.getElementById('department-list');
         if (departmentList) {
-            departmentList.innerHTML = `<div class="error-message">${message}</div>`;
+            departmentList.innerHTML = content;
         }
-        
+
         const courseContainer = document.getElementById('course-container');
         if (courseContainer) {
-            courseContainer.innerHTML = `<div class="error-message">${message}</div>`;
+            courseContainer.innerHTML = content;
+        }
+
+        if (onClearData) {
+            document.querySelectorAll('#error-clear-data-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await onClearData();
+                    location.reload();
+                });
+            });
         }
     }
 }

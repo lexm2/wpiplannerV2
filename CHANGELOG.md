@@ -2,6 +2,9 @@
 
 ## [2026-02-25]
 
+### Improved
+- Error messages shown when the app fails to load now include a "Clear Data & Reload" button with a note that saved data may be outdated
+
 ### Fixed
 - Academic year now always defaults to the newest available year
 

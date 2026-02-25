@@ -284,7 +284,10 @@ export class MainController {
             this.syncInitialCourseSelectionUI();
         } catch (error) {
             console.error('Failed to initialize application:', error);
-            this.uiStateManager.showErrorMessage('Failed to initialize application. Some features may not work properly.');
+            this.uiStateManager.showErrorMessage(
+                'Failed to initialize application. Some features may not work properly.',
+                () => this.scheduleManagementService.clearAllSchedules()
+            );
         }
     }
 
