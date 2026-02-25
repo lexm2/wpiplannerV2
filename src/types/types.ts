@@ -19,6 +19,7 @@ export interface Course {
     minCredits: number;
     maxCredits: number;
     isGraduate?: boolean;
+    academicYear?: number;
 }
 
 export interface Department {
@@ -35,8 +36,6 @@ export interface Section {
     actualWaitlist: number;
     maxWaitlist: number;
     note?: string;
-    description: string;
-    term: string;
     computedTerm: AcademicTerm; // Computed academic term letter (A, B, C, D, E, F)
     isInterestList?: boolean; // True for interest list placeholder sections
     periods: Period[];

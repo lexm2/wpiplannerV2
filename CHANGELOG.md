@@ -1,5 +1,13 @@
 # Changelog
 
+## [2026-02-25]
+
+### Added
+- Academic Year filter in course and schedule filter modals — filter courses by 2025–2026 or 2026–2027
+
+### Improved
+- Reduced course data file size by removing redundant fields from sections (legacy term code and duplicate description)
+
 ## [2026-02-07]
 
 ### Added

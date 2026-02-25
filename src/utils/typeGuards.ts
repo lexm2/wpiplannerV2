@@ -18,8 +18,6 @@ export function isValidSection(section: any): section is Section {
         typeof section.seatsAvailable === 'number' &&
         typeof section.actualWaitlist === 'number' &&
         typeof section.maxWaitlist === 'number' &&
-        typeof section.description === 'string' &&
-        typeof section.term === 'string' &&
         typeof section.computedTerm === 'string' &&
         ['A', 'B', 'C', 'D', 'F', 'S'].includes(section.computedTerm)
     );

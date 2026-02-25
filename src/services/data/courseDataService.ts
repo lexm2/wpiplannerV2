@@ -146,7 +146,8 @@ export class CourseDataService {
                     standaloneLabs: standaloneLabs,
                     minCredits: courseData.minCredits || 0,
                     maxCredits: courseData.maxCredits || 0,
-                    isGraduate: courseData.isGraduate || false
+                    isGraduate: courseData.isGraduate || false,
+                    academicYear: courseData.academicYear
                 };
                 return course;
             });
@@ -169,23 +170,15 @@ export class CourseDataService {
 
     private parseConstructedSections(sections: any[]): Section[] {
         return sections.map(sectionData => {
-            const rawTerm = sectionData.term || '';
-            const sectionNumber = sectionData.number || '';
-
-            // Use pre-computed term from Java backend
-            const computedTerm = sectionData.computedTerm as AcademicTerm;
-
             const section: Section = {
                 crn: sectionData.crn || 0,
-                number: sectionNumber,
+                number: sectionData.number || '',
                 seats: sectionData.seats || 0,
                 seatsAvailable: sectionData.seatsAvailable || 0,
                 actualWaitlist: sectionData.actualWaitlist || 0,
                 maxWaitlist: sectionData.maxWaitlist || 0,
                 note: sectionData.note,
-                description: this.stripHtml(sectionData.description || ''),
-                term: rawTerm,
-                computedTerm: computedTerm,
+                computedTerm: sectionData.computedTerm as AcademicTerm,
                 isInterestList: sectionData.isInterestList,
                 periods: this.parseConstructedPeriods(sectionData.periods || [])
             };

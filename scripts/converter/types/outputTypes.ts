@@ -40,8 +40,6 @@ export interface PlannerSection {
     actualWaitlist: number;
     maxWaitlist: number;
     note: string | null;
-    description: string;
-    term: string;
     computedTerm: string;
     isGps: boolean;
     isInterestList: boolean;
