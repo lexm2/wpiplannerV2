@@ -192,7 +192,6 @@ export class MainController {
             this.scheduleManagementService.initializeDefaultScheduleIfNeeded();
             this.timestampManager.updateClientTimestamp();
 
-            // Apply default academic year filter if data has multiple years and no filter is set
             if (!this.filterService.hasFilter('academicYear')) {
                 const allCourses = event.departments.flatMap(d => d.courses);
                 const years = [...new Set(allCourses.map(c => c.academicYear).filter(Boolean) as number[])].sort();

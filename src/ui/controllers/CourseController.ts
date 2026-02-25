@@ -578,10 +578,13 @@ export class CourseController {
             ? `${course.minCredits} credits`
             : `${course.minCredits}-${course.maxCredits} credits`;
 
+        const yearLabel = course.academicYear ? `${course.academicYear}–${course.academicYear + 1}` : '';
+
         let html = `
             <div class="course-info">
                 <div class="course-title">${Validators.escapeHtml(course.name)}</div>
                 <div class="course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)} (${credits})</div>
+                ${yearLabel ? `<div class="course-year">${yearLabel}</div>` : ''}
             </div>
             <div class="course-description-text">${Validators.escapeHtml(course.description)}</div>
         `;

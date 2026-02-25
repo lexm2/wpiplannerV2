@@ -41,16 +41,22 @@
 }
 
 .course-title {
-  font-size: 1.1rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
   margin-bottom: 0;
+  flex-shrink: 0;
 }
 
 .course-code {
   font-size: 0.9rem;
   color: var(--color-text-secondary);
   margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.course-year {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
   flex-shrink: 0;
 }
 
