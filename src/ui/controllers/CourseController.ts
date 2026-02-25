@@ -684,27 +684,18 @@ export class CourseController {
     }
 
     private renderDiscussionsTab(course: Course): string {
-        const lectures = this.courseDataService.getLecturesForCourse(course);
+        const discussions = this.courseDataService.getLecturesForCourse(course)
+            .flatMap(lg => lg.compatibleDiscussions);
 
         let html = '<div class="tab-panel" data-panel="discussions">';
-        html += '<h3>Available Discussions by Lecture</h3>';
+        html += `<h3>Available Discussions (${discussions.length})</h3>`;
+        html += '<div class="sections-list">';
 
-        for (const lectureGroup of lectures) {
-            const discussions = lectureGroup.compatibleDiscussions;
-            if (discussions.length === 0) continue;
-
-            html += `<div class="lecture-group">`;
-            html += `<h4>Lecture ${Validators.escapeHtml(lectureGroup.section.number)} - ${discussions.length} Discussion(s)</h4>`;
-            html += '<div class="sections-list">';
-
-            for (const discussion of discussions) {
-                html += this.renderSectionCard(discussion, 'Discussion');
-            }
-
-            html += '</div></div>';
+        for (const discussion of discussions) {
+            html += this.renderSectionCard(discussion, 'Discussion');
         }
 
-        html += '</div>';
+        html += '</div></div>';
         return html;
     }
 
@@ -720,23 +711,16 @@ export class CourseController {
                 html += this.renderSectionCard(lab, 'Lab');
             }
         } else {
-            const lectures = this.courseDataService.getLecturesForCourse(course);
-            html += '<h3>Available Labs by Lecture</h3>';
+            const labs = this.courseDataService.getLecturesForCourse(course)
+                .flatMap(lg => lg.compatibleLabs);
+            html += `<h3>Available Labs (${labs.length})</h3>`;
+            html += '<div class="sections-list">';
 
-            for (const lectureGroup of lectures) {
-                const labs = lectureGroup.compatibleLabs;
-                if (labs.length === 0) continue;
-
-                html += `<div class="lecture-group">`;
-                html += `<h4>Lecture ${Validators.escapeHtml(lectureGroup.section.number)} - ${labs.length} Lab(s)</h4>`;
-                html += '<div class="sections-list">';
-
-                for (const lab of labs) {
-                    html += this.renderSectionCard(lab, 'Lab');
-                }
-
-                html += '</div></div>';
+            for (const lab of labs) {
+                html += this.renderSectionCard(lab, 'Lab');
             }
+
+            html += '</div>';
         }
 
         html += '</div></div>';
