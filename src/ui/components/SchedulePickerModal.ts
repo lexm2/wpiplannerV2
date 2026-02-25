@@ -2,6 +2,7 @@ import { ScheduleManagementService } from '../../services/selection/ScheduleMana
 import { ModalService } from '../../services/ui/ModalService';
 import { Schedule } from '../../types/schedule';
 import { BaseModal } from './BaseModal';
+import { ChangelogModal } from './ChangelogModal';
 import { getInlineSVG } from '../../utils/iconPaths';
 import styles from '../../styles/components/schedule-picker-modal.module.css';
 
@@ -11,6 +12,7 @@ export class SchedulePickerModal extends BaseModal {
     private static readonly MENU_OFFSET = 4;
     private static readonly VIEWPORT_PADDING = 8;
     private scheduleManagementService: ScheduleManagementService;
+    private changelogModal: ChangelogModal;
     private scheduleListClickHandler: ((e: Event) => void) | null = null;
     private scheduleListDblClickHandler: ((e: Event) => void) | null = null;
 
@@ -20,6 +22,7 @@ export class SchedulePickerModal extends BaseModal {
     ) {
         super(modalService);
         this.scheduleManagementService = scheduleManagementService;
+        this.changelogModal = new ChangelogModal(modalService);
 
         this.scheduleManagementService.onActiveScheduleChange(() => {
             if (this.modalElement) {
@@ -77,6 +80,7 @@ export class SchedulePickerModal extends BaseModal {
                                     <button class="btn btn-secondary" id="redo-btn-settings">${getInlineSVG('ARROW_FORWARD_UP', 'modal-footer-icon')}<span class="btn-text"> Redo</span></button>
                                 </div>
                                 <!-- keep clear all data at the bottom -->
+                                <button class="btn btn-secondary" id="changelog-btn-settings">${getInlineSVG('CLOCK', 'modal-footer-icon')}<span class="btn-text"> What's New</span></button>
                                 <button class="btn btn-danger" id="clear-all-data-btn-settings">${getInlineSVG('TRASH', 'modal-footer-icon')}<span class="btn-text"> Clear All Data</span></button>
                             </div>
                         </div>
@@ -153,6 +157,7 @@ export class SchedulePickerModal extends BaseModal {
         const importBtn = modal.querySelector('#import-schedule-btn-settings');
         const exportIcsBtn = modal.querySelector('#export-ics-btn-settings');
         const exportBtn = modal.querySelector('#export-schedule-btn-settings');
+        const changelogBtn = modal.querySelector('#changelog-btn-settings');
         const clearAllBtn = modal.querySelector('#clear-all-data-btn-settings');
         const toggleThemeBtn = modal.querySelector('#toggle-theme-btn-settings');
         const undoBtn = modal.querySelector('#undo-btn-settings');
@@ -166,6 +171,7 @@ export class SchedulePickerModal extends BaseModal {
             if (activeId) this.exportScheduleICS(activeId);
         });
         exportBtn?.addEventListener('click', () => this.exportAllSchedules());
+        changelogBtn?.addEventListener('click', () => this.changelogModal.show());
         clearAllBtn?.addEventListener('click', () => this.clearAllData());
         toggleThemeBtn?.addEventListener('click', () => document.getElementById('settings-theme-btn')?.click());
         undoBtn?.addEventListener('click', () => document.getElementById('undo-btn')?.click());

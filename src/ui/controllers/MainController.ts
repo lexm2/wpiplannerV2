@@ -27,7 +27,6 @@ import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { StorageService } from '../../services/selection/StorageService'
 import { ThemeManager } from '../../themes/ThemeManager'
 import { getInlineSVG } from '../../utils/iconPaths'
-import { ChangelogModal } from '../components/ChangelogModal'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { TermBoundsService } from '../../services/data/TermBoundsService'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
@@ -62,7 +61,6 @@ export class MainController {
     private operationManager: OperationManager;
     private debouncedSearch: DebouncedOperation;
     private scheduleManagementService: ScheduleManagementService;
-    private changelogModal: ChangelogModal;
     private resizablePanel: ResizablePanel | null = null;
     private allDepartments: Department[] = [];
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
@@ -103,8 +101,6 @@ export class MainController {
         this.timestampManager = new TimestampManager();
         this.operationManager = new OperationManager();
         this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
-
-        this.changelogModal = new ChangelogModal(this.modalService);
 
         // Initialize controllers
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
@@ -266,10 +262,6 @@ export class MainController {
 
             // Set "All Departments" as the default selection on startup
             this.initializeDefaultDepartmentView();
-
-            setTimeout(() => {
-                this.changelogModal.show();
-            }, 500);
 
             this.setupEventListeners();
             this.setupCourseSelectionListener();
