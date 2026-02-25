@@ -49,7 +49,7 @@ export class ICSGenerator {
         const termLetter = term.charAt(0).toUpperCase() as 'A' | 'B' | 'C' | 'D';
 
         const termBoundsService = TermBoundsService.getInstance();
-        const boundsFromService = termBoundsService.getTermDates(termLetter);
+        const boundsFromService = termBoundsService.getTermDates(termLetter, year);
 
         if (boundsFromService) {
             return boundsFromService;
@@ -116,9 +116,9 @@ export class ICSGenerator {
         let academicYear = options.academicYear;
         if (!academicYear) {
             const service = TermBoundsService.getInstance();
-            const data = service.getTermBoundsData();
-            if (data) {
-                academicYear = parseInt(data.academicYear.split('-')[0]);
+            const mostRecentYear = service.getMostRecentYear();
+            if (mostRecentYear !== null) {
+                academicYear = mostRecentYear;
             } else {
                 const now = new Date();
                 const year = now.getFullYear();

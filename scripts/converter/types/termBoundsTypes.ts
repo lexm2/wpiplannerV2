@@ -1,12 +1,13 @@
 export interface TermBoundsOutput {
-    academicYear: string;
     generated: string;
-    terms: {
-        A: TermBoundInfo;
-        B: TermBoundInfo;
-        C: TermBoundInfo;
-        D: TermBoundInfo;
-    };
+    years: Record<number, YearTermBounds>;
+}
+
+export interface YearTermBounds {
+    A: TermBoundInfo;
+    B: TermBoundInfo;
+    C: TermBoundInfo;
+    D: TermBoundInfo;
 }
 
 export interface TermBoundInfo {

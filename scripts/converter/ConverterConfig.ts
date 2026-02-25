@@ -4,23 +4,12 @@
  */
 
 export interface ConverterConfig {
-    fallYear: number;
-    springYear: number;
     specialCourses: string[];
     specialSections: string[];
     sectionNumberAppendices: string[];
 }
 
-/**
- * Default converter configuration
- * Update these values for each academic year
- */
 export const DEFAULT_CONFIG: ConverterConfig = {
-    // Academic Period
-    fallYear: 2025,    // Fall term year (A, B terms)
-    springYear: 2026,  // Spring term year (C, D terms)
-
-    // Special Courses (full section name displayed)
     specialCourses: [
         'HU 3900',
         'HU 3910',
@@ -28,8 +17,6 @@ export const DEFAULT_CONFIG: ConverterConfig = {
         'WPE 1099',
         'WPE 1699'
     ],
-
-    // Special Sections (identified by substrings)
     specialSections: [
         'GPS:',
         '- ST:',
@@ -40,8 +27,6 @@ export const DEFAULT_CONFIG: ConverterConfig = {
         'History:',
         'In Psychological Science:'
     ],
-
-    // Section Number Appendices (for parsing)
     sectionNumberAppendices: [
         '-Quiz',
         '-Multipurpose',
@@ -51,29 +36,20 @@ export const DEFAULT_CONFIG: ConverterConfig = {
 };
 
 /**
- * Validates academic period against configured years
+ * Validates that an offering period is a recognized academic term format.
+ * Accepts any year — e.g. "2025 Fall A Term", "2026 Spring C Term", "2026 Fall Semester".
  */
 export function isValidAcademicPeriod(
     offeringPeriod: string,
     courseSection: string,
     instructionalFormat: string,
-    config: ConverterConfig
+    _config: ConverterConfig
 ): boolean {
-    // Valid periods
-    const validPeriods = [
-        `${config.fallYear} Fall A Term`,
-        `${config.fallYear} Fall B Term`,
-        `${config.springYear} Spring C Term`,
-        `${config.springYear} Spring D Term`,
-        `${config.fallYear} Fall Semester`,
-        `${config.springYear} Spring Semester`
-    ];
-
-    if (!validPeriods.includes(offeringPeriod)) {
+    const validPattern = /^\d{4} (Fall [AB] Term|Spring [CD] Term|Fall Semester|Spring Semester)$/;
+    if (!validPattern.test(offeringPeriod)) {
         return false;
     }
 
-    // Exception: Interest List sections with non-Lecture types are excluded
     if (courseSection.includes('Interest List') && instructionalFormat !== 'Lecture') {
         return false;
     }

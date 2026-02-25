@@ -1,6 +1,18 @@
 import { describe, it, expect, beforeEach, mock } from 'bun:test';
 import { TermBoundsService, type TermBoundsData } from '../../../src/services/data/TermBoundsService';
 
+const mockYear2025 = {
+    A: { startDate: '2025-08-21', endDate: '2025-10-10', offeringPeriod: '2025 Fall A Term', sampleSize: 814 },
+    B: { startDate: '2025-10-20', endDate: '2025-12-12', offeringPeriod: '2025 Fall B Term', sampleSize: 835 },
+    C: { startDate: '2026-01-14', endDate: '2026-03-06', offeringPeriod: '2026 Spring C Term', sampleSize: 768 },
+    D: { startDate: '2026-03-16', endDate: '2026-05-06', offeringPeriod: '2026 Spring D Term', sampleSize: 698 }
+};
+
+const mockTermBoundsData: TermBoundsData = {
+    generated: '2025-01-01T00:00:00.000Z',
+    years: { '2025': mockYear2025 }
+};
+
 describe('TermBoundsService', () => {
     let service: TermBoundsService;
 
@@ -18,37 +30,6 @@ describe('TermBoundsService', () => {
     });
 
     describe('loadTermBounds', () => {
-        const mockTermBoundsData: TermBoundsData = {
-            academicYear: '2025-2026',
-            generated: '2025-01-01T00:00:00.000Z',
-            terms: {
-                A: {
-                    startDate: '2025-08-21',
-                    endDate: '2025-10-10',
-                    offeringPeriod: '202501',
-                    sampleSize: 814
-                },
-                B: {
-                    startDate: '2025-10-20',
-                    endDate: '2025-12-12',
-                    offeringPeriod: '202502',
-                    sampleSize: 835
-                },
-                C: {
-                    startDate: '2026-01-14',
-                    endDate: '2026-03-06',
-                    offeringPeriod: '202503',
-                    sampleSize: 768
-                },
-                D: {
-                    startDate: '2026-03-16',
-                    endDate: '2026-05-06',
-                    offeringPeriod: '202504',
-                    sampleSize: 698
-                }
-            }
-        };
-
         it('should successfully load term bounds from JSON', async () => {
             const mockFetch = mock(() =>
                 Promise.resolve({
@@ -109,37 +90,6 @@ describe('TermBoundsService', () => {
     });
 
     describe('getTermDates', () => {
-        const mockTermBoundsData: TermBoundsData = {
-            academicYear: '2025-2026',
-            generated: '2025-01-01T00:00:00.000Z',
-            terms: {
-                A: {
-                    startDate: '2025-08-21',
-                    endDate: '2025-10-10',
-                    offeringPeriod: '202501',
-                    sampleSize: 814
-                },
-                B: {
-                    startDate: '2025-10-20',
-                    endDate: '2025-12-12',
-                    offeringPeriod: '202502',
-                    sampleSize: 835
-                },
-                C: {
-                    startDate: '2026-01-14',
-                    endDate: '2026-03-06',
-                    offeringPeriod: '202503',
-                    sampleSize: 768
-                },
-                D: {
-                    startDate: '2026-03-16',
-                    endDate: '2026-05-06',
-                    offeringPeriod: '202504',
-                    sampleSize: 698
-                }
-            }
-        };
-
         beforeEach(async () => {
             const mockFetch = mock(() =>
                 Promise.resolve({
@@ -180,6 +130,16 @@ describe('TermBoundsService', () => {
             expect(dates!.end).toEqual(new Date('2026-05-06'));
         });
 
+        it('should return correct dates for a specific year', () => {
+            const dates = service.getTermDates('A', 2025);
+            expect(dates).not.toBeNull();
+            expect(dates!.start).toEqual(new Date('2025-08-21'));
+        });
+
+        it('should return null for an unknown year', () => {
+            expect(service.getTermDates('A', 2099)).toBeNull();
+        });
+
         it('should handle year transitions correctly', () => {
             const termA = service.getTermDates('A');
             const termC = service.getTermDates('C');
@@ -210,38 +170,34 @@ describe('TermBoundsService', () => {
         });
     });
 
-    describe('getTermBoundsData', () => {
-        const mockTermBoundsData: TermBoundsData = {
-            academicYear: '2025-2026',
-            generated: '2025-01-01T00:00:00.000Z',
-            terms: {
-                A: {
-                    startDate: '2025-08-21',
-                    endDate: '2025-10-10',
-                    offeringPeriod: '202501',
-                    sampleSize: 814
-                },
-                B: {
-                    startDate: '2025-10-20',
-                    endDate: '2025-12-12',
-                    offeringPeriod: '202502',
-                    sampleSize: 835
-                },
-                C: {
-                    startDate: '2026-01-14',
-                    endDate: '2026-03-06',
-                    offeringPeriod: '202503',
-                    sampleSize: 768
-                },
-                D: {
-                    startDate: '2026-03-16',
-                    endDate: '2026-05-06',
-                    offeringPeriod: '202504',
-                    sampleSize: 698
-                }
-            }
-        };
+    describe('getMostRecentYear', () => {
+        it('should return null when not loaded', () => {
+            expect(service.getMostRecentYear()).toBeNull();
+        });
 
+        it('should return the most recent year when loaded', async () => {
+            const multiYearData: TermBoundsData = {
+                generated: '2025-01-01T00:00:00.000Z',
+                years: {
+                    '2025': mockYear2025,
+                    '2026': mockYear2025
+                }
+            };
+            const mockFetch = mock(() =>
+                Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(multiYearData)
+                } as Response)
+            );
+
+            global.fetch = mockFetch as any;
+            await service.loadTermBounds();
+
+            expect(service.getMostRecentYear()).toBe(2026);
+        });
+    });
+
+    describe('getTermBoundsData', () => {
         it('should return full term bounds data when loaded', async () => {
             const mockFetch = mock(() =>
                 Promise.resolve({
@@ -255,8 +211,7 @@ describe('TermBoundsService', () => {
 
             const data = service.getTermBoundsData();
             expect(data).not.toBeNull();
-            expect(data!.academicYear).toBe('2025-2026');
-            expect(data!.terms.A.sampleSize).toBe(814);
+            expect(data!.years['2025'].A.sampleSize).toBe(814);
         });
 
         it('should return null when not loaded', async () => {
@@ -270,8 +225,7 @@ describe('TermBoundsService', () => {
             global.fetch = mockFetch as any;
             await service.loadTermBounds();
 
-            const data = service.getTermBoundsData();
-            expect(data).toBeNull();
+            expect(service.getTermBoundsData()).toBeNull();
         });
     });
 
@@ -280,16 +234,7 @@ describe('TermBoundsService', () => {
             const mockFetch = mock(() =>
                 Promise.resolve({
                     ok: true,
-                    json: () => Promise.resolve({
-                        academicYear: '2025-2026',
-                        generated: '2025-01-01T00:00:00.000Z',
-                        terms: {
-                            A: { startDate: '2025-08-21', endDate: '2025-10-10', offeringPeriod: '202501', sampleSize: 814 },
-                            B: { startDate: '2025-10-20', endDate: '2025-12-12', offeringPeriod: '202502', sampleSize: 835 },
-                            C: { startDate: '2026-01-14', endDate: '2026-03-06', offeringPeriod: '202503', sampleSize: 768 },
-                            D: { startDate: '2026-03-16', endDate: '2026-05-06', offeringPeriod: '202504', sampleSize: 698 }
-                        }
-                    })
+                    json: () => Promise.resolve(mockTermBoundsData)
                 } as Response)
             );
 
