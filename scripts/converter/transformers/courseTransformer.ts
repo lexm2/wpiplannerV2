@@ -36,7 +36,7 @@ export function transformCourse(
         ? courseTitle.substring(titleDashIndex + 2).trim()
         : courseSection.substring(courseSection.lastIndexOf('-') + 1).trim();
 
-    // Get description (use Course_Description for special courses)
+    // Get description
     const isSpecialCourse = config.specialCourses.some(
         sc => subjectAndNumber.includes(sc)
     ) || config.specialSections.some(
@@ -55,7 +55,7 @@ export function transformCourse(
     // Determine if graduate course
     const isGraduate = firstSection.Academic_Level === 'Graduate';
 
-    // Parse fall year from "2025 - 2026 Academic Year" → 2025
+    // Parse fall year from "2025 - 2026 Academic Year"
     const academicYear = parseInt(firstSection.Academic_Year);
 
     // Transform all sections (flatMap because graduate F/S terms expand to multiple sections)
