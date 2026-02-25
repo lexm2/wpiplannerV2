@@ -2,10 +2,9 @@
 
 ## [2026-02-25]
 
-### Added
-- Academic Year filter in course and schedule filter modals — filter courses by 2025–2026 or 2026–2027
-
 ### Improved
+- Schedules modal footer redesigned with a pill-style tab nav; body now slides between Schedules and Settings pages
+- Academic Year filter in course and schedule filter modals — filter courses by 2025–2026 or 2026–2027
 - Reduced course data file size by removing redundant fields from sections (legacy term code and duplicate description)
 
 ## [2026-02-07]
