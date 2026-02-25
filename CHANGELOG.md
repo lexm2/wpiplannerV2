@@ -4,6 +4,8 @@
 
 ### Improved
 - Error messages shown when the app fails to load now include a "Clear Data & Reload" button with a note that saved data may be outdated
+- Period type filter now supports partial matching (e.g. filtering "lec" excludes Lecture sections)
+- Schedule generation now correctly respects blocked times from calendar events
 
 ### Fixed
 - Academic year now always defaults to the newest available year

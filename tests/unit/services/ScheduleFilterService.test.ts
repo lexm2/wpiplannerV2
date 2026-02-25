@@ -93,7 +93,8 @@ describe('ScheduleFilterService', () => {
         description: 'Basic programming course',
         minCredits: 3.0,
         maxCredits: 3.0,
-        department: department,
+        departmentAbbr: 'CS',
+        departmentName: 'Computer Science',
         lectures: [
             {
                 section: testSection1,
@@ -352,7 +353,8 @@ describe('ScheduleFilterService', () => {
             description: 'Data structures course',
             minCredits: 3.0,
             maxCredits: 3.0,
-            department: department,
+            departmentAbbr: 'CS',
+            departmentName: 'Computer Science',
             lectures: [
                 {
                     section: testSection1,
@@ -471,7 +473,8 @@ describe('ScheduleFilterService', () => {
             description: 'Algorithms course',
             minCredits: 3.0,
             maxCredits: 3.0,
-            department: department,
+            departmentAbbr: 'CS',
+            departmentName: 'Computer Science',
             lectures: [
                 {
                     section: testSection1,

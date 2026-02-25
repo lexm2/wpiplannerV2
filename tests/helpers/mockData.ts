@@ -1,5 +1,6 @@
 import { Course, Department, Section, Period, Time, DayOfWeek, ScheduleDB, PeriodType, SectionType } from '../../src/types/types'
 import { SelectedCourse, Schedule, AcademicTerm } from '../../src/types/schedule'
+import { WakeUpTimeFilter } from '../../src/core/filtering/filters/WakeUpTimeFilter'
 
 export const createMockTime = (hours: number, minutes: number): Time => ({
   hours,
@@ -304,12 +305,15 @@ interface MockScheduleFilterService {
   addFilter: (filterId: string, criteria: any) => boolean
   removeFilter: (filterId: string) => boolean
   getSectionFilter: (filterId: string) => any
+  getSectionBasedFilter: (filterId: string) => any
   getActiveFilters: () => Array<{ id: string; criteria: any }>
 }
 
 export const createMockScheduleFilterService = (): MockScheduleFilterService => {
   const activeFilters = new Map<string, any>()
-  const registeredFilters = new Map<string, any>()
+  const registeredFilters = new Map<string, any>([
+    ['wakeUpTime', new WakeUpTimeFilter()]
+  ])
 
   return {
     filterSections: (selectedCourses: SelectedCourse[]): Array<{ course: SelectedCourse; section: Section }> => {
@@ -351,6 +355,9 @@ export const createMockScheduleFilterService = (): MockScheduleFilterService => 
     },
     getSectionFilter: (filterId: string): any => {
       return registeredFilters.get(filterId)
+    },
+    getSectionBasedFilter: (_filterId: string): any => {
+      return undefined
     },
     getActiveFilters: (): Array<{ id: string; criteria: any }> => {
       return Array.from(activeFilters.entries()).map(([id, criteria]) => ({

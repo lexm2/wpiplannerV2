@@ -19,6 +19,7 @@ import { RateMyProfessorService } from '../external/RateMyProfessorService';
 import { getAllSections } from '../../utils/courseUtils';
 import { ScheduleSearchTextFilter } from '../../core/filtering/filters/ScheduleSearchTextFilter';
 import { WakeUpTimeFilter } from '../../core/filtering/filters/WakeUpTimeFilter';
+import { PeriodTypeFilter } from '../../core/filtering/filters/PeriodTypeFilter';
 
 // Schedule-level filtering engine for course sections with time conflict detection and period-level constraints.
 
@@ -56,6 +57,7 @@ export class ScheduleFilterService {
         this.registerSectionFilter(new PeriodAvailabilityFilter());
         this.registerSectionFilter(new SectionCodeFilter());
         this.registerSectionFilter(new WakeUpTimeFilter());
+        this.registerSectionFilter(new PeriodTypeFilter());
 
         // Register RMP filter if service is available
         if (this.rmpService) {

@@ -1,8 +1,11 @@
 import { describe, it, expect } from 'bun:test'
 import { createMockScheduleDB } from '../../helpers/mockData'
-import { safeStringify, safeParse } from '../../../src/utils/jsonSerializer'
+import { setReplacer, setReviver } from '../../../src/utils/jsonSerializer'
 import { getAllSections } from '../../../src/utils/courseUtils'
 import type { Section, ScheduleDB } from '../../../src/types/types'
+
+const safeStringify = (value: unknown) => JSON.stringify(value, setReplacer)
+const safeParse = (json: string) => JSON.parse(json, setReviver)
 // Direct import - JSON now uses camelCase matching TypeScript types
 // @ts-ignore - JSON import
 import courseData from '../../../public/course-data-constructed.json'
@@ -280,18 +283,11 @@ describe('CourseDataService - Data Integrity', () => {
         })
 
         it('should detect if a section incorrectly references its parent course', () => {
-            // Create a mock section that incorrectly has a reference to its course
-            const mockDB = createMockScheduleDB()
-            const course = mockDB.departments[0].courses[0]
-            const section = getAllSections(course)[0]
+            const obj: any = { crn: 12345, number: 'A01', periods: [] }
+            obj.parentCourse = obj
 
-            // Add an incorrect circular reference (this should NOT exist in real data)
-            const corruptedSection = { ...section, parentCourse: course }
+            const { hasCycle } = detectUnexpectedCycles(obj)
 
-            // This should detect the unexpected cycle
-            const { hasCycle } = detectUnexpectedCycles(corruptedSection)
-
-            // We expect this to find a cycle since we added an unexpected reference
             expect(hasCycle).toBe(true)
         })
 

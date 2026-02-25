@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach } from 'bun:test';
 import { SearchTextFilter } from '../../../src/core/filtering/filters/SearchTextFilter';
 import { FilterableSection } from '../../../src/types/filterableUnit';
 import { SectionType } from '../../../src/types/types';
-import { createMockCourse, createMockSection, createMockDepartment } from '../../helpers/mockData';
+import { createMockCourse, createMockSection } from '../../helpers/mockData';
 
 describe('SearchTextFilter', () => {
     let searchTextFilter: SearchTextFilter;
@@ -52,13 +52,11 @@ describe('SearchTextFilter', () => {
 
     describe('apply', () => {
         const createFilterableSection = (courseOverrides = {}, sectionOverrides = {}): FilterableSection => {
-            const dept = createMockDepartment({ abbreviation: 'CS', name: 'Computer Science' });
             const course = createMockCourse({
                 id: 'CS-1101',
                 number: '1101',
                 name: 'Introduction to Programming Design',
                 description: 'An introduction to the design and analysis of algorithms and data structures.',
-                department: dept,
                 ...courseOverrides
             });
             const section = createMockSection(sectionOverrides);
@@ -112,7 +110,7 @@ describe('SearchTextFilter', () => {
                 id: 'MA-1021',
                 number: '1021',
                 name: 'Calculus I',
-                department: createMockDepartment({ abbreviation: 'MA', name: 'Mathematical Sciences' })
+                departmentAbbr: 'MA', departmentName: 'Mathematical Sciences'
             });
             const sections = [cs1101, ma1021];
 
@@ -133,7 +131,7 @@ describe('SearchTextFilter', () => {
                 id: 'MA-1021',
                 number: '1021',
                 name: 'Calculus I',
-                department: createMockDepartment({ abbreviation: 'MA', name: 'Mathematical Sciences' })
+                departmentAbbr: 'MA', departmentName: 'Mathematical Sciences'
             });
             const sections = [programming, calculus];
 
@@ -151,7 +149,7 @@ describe('SearchTextFilter', () => {
                 number: '1021',
                 name: 'Calculus I',
                 description: 'Limits, derivatives, and integrals.',
-                department: createMockDepartment({ abbreviation: 'MA', name: 'Mathematical Sciences' })
+                departmentAbbr: 'MA', departmentName: 'Mathematical Sciences'
             });
             const sections = [algorithms, calculus];
 
@@ -166,7 +164,7 @@ describe('SearchTextFilter', () => {
                 id: 'MA-1021',
                 number: '1021',
                 name: 'Calculus I',
-                department: createMockDepartment({ abbreviation: 'MA', name: 'Mathematical Sciences' })
+                departmentAbbr: 'MA', departmentName: 'Mathematical Sciences'
             });
             const sections = [csSection, maSection];
 
@@ -241,7 +239,7 @@ describe('SearchTextFilter', () => {
                 number: '1021',
                 name: 'Calculus I',
                 description: 'Limits, derivatives, and integrals.',
-                department: createMockDepartment({ abbreviation: 'MA', name: 'Mathematical Sciences' })
+                departmentAbbr: 'MA', departmentName: 'Mathematical Sciences'
             });
             const sections = [cs1101, ma1021];
 

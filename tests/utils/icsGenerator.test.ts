@@ -65,17 +65,12 @@ describe('ICSGenerator', () => {
                 periods: [period],
             });
 
-            const maDept = {
-                abbreviation: 'MA',
-                name: 'Mathematical Sciences',
-                courses: []
-            };
-
             const course = createMockCourse({
                 id: 'MA-1021',
                 number: '1021',
                 name: 'Calculus I',
-                department: maDept,
+                departmentAbbr: 'MA',
+                departmentName: 'Mathematical Sciences',
             });
 
             const selectedCourse = createMockSelectedCourse({

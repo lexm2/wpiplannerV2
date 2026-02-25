@@ -1,5 +1,8 @@
 import { beforeEach, afterEach, mock } from 'bun:test'
 import { MockIndexedDB } from './mocks/MockIndexedDB'
+import { WorkerPoolManager } from '../src/workers/WorkerPoolManager'
+
+await WorkerPoolManager.getInstance().initialize();
 
 // Create global MockIndexedDB instance
 const mockIndexedDBInstance = new MockIndexedDB();

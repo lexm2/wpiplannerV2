@@ -116,9 +116,14 @@ export class ConflictFilter implements SectionBasedFilter {
         return periodsWithContext.filter(({course, period}) => {
             const periodSlots = periodToWeeklySlots(period, course.course.lectures?.[0]?.section.computedTerm || AcademicTerm.ALL);
 
+            const selectedCrns = new Set<string>();
+            if (course.selectedLecture) selectedCrns.add(String(course.selectedLecture.crn));
+            if (course.selectedDiscussion) selectedCrns.add(String(course.selectedDiscussion.crn));
+            if (course.selectedLab) selectedCrns.add(String(course.selectedLab.crn));
+
             const relevantBlockedSlots = blockedSlots.filter(slot => {
-                const courseIdFromSlot = slot.id.split('-')[0];
-                return courseIdFromSlot !== course.course.id;
+                const crnFromSlot = slot.id.split('-')[0];
+                return !selectedCrns.has(crnFromSlot);
             });
 
             return !this.hasConflictWithBlockedSlots(periodSlots, relevantBlockedSlots);

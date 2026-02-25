@@ -109,14 +109,25 @@ export class AutoScheduler {
   }
 
   private getBlockedMasksByTerm(): Map<string, bigint> {
-    const filter = this.scheduleFilterService.getSectionBasedFilter('periodConflict');
-    if (filter instanceof ConflictFilter) {
-      const activeFilters = this.scheduleFilterService.getActiveFilters();
+    const activeFilters = this.scheduleFilterService.getActiveFilters();
+
+    const sectionBasedFilter = this.scheduleFilterService.getSectionBasedFilter('periodConflict');
+    if (sectionBasedFilter instanceof ConflictFilter) {
       const criteria = activeFilters.find(f => f.id === 'periodConflict')?.criteria;
-      if (criteria && filter.isValidCriteria(criteria)) {
-        return filter.getBlockedMasksByTerm(criteria as any);
+      if (criteria && sectionBasedFilter.isValidCriteria(criteria)) {
+        return sectionBasedFilter.getBlockedMasksByTerm(criteria as any);
       }
     }
+
+    const blockedTimesCriteria = activeFilters.find(f => f.id === 'blockedTimes')?.criteria as any;
+    if (blockedTimesCriteria?.blockedTimes?.length > 0) {
+      const tempFilter = new ConflictFilter();
+      return tempFilter.getBlockedMasksByTerm({
+        avoidConflicts: true,
+        blockedSlots: blockedTimesCriteria.blockedTimes
+      });
+    }
+
     return new Map();
   }
 
