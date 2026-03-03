@@ -2,6 +2,9 @@
 
 ## [2026-03-03]
 
+### Improved
+- The course component wizard now shows only the steps relevant to the selected lecture — lectures with no labs or discussions skip those steps entirely and go straight to Finish
+
 ### Fixed
 - ICS export now uses each course's own academic year for event dates instead of defaulting to the most recent year
 - Importing schedules exported from v4.2 no longer fails with "Unsupported import format"

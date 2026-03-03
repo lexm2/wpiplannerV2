@@ -118,22 +118,16 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
                 steps.push('lab');
             }
         } else if (isHierarchical) {
-            // Hierarchical course
             const lectures = this.courseDataService.getLecturesForCourse(this.course);
-
             if (lectures.length > 0) {
                 steps.push('lecture');
 
-                // Check if any lecture has discussions
-                const hasDiscussions = lectures.some(lg =>
-                    lg.compatibleDiscussions.length > 0
-                );
+                if (this.selections.lecture) {
+                    return this.computeStepsForLecture(this.selections.lecture);
+                }
 
-                // Check if any lecture has labs
-                const hasLabs = lectures.some(lg =>
-                    lg.compatibleLabs.length > 0
-                );
-
+                const hasDiscussions = lectures.some(lg => lg.compatibleDiscussions.length > 0);
+                const hasLabs = lectures.some(lg => lg.compatibleLabs.length > 0);
                 if (hasDiscussions) steps.push('discussion');
                 if (hasLabs) steps.push('lab');
             }
@@ -147,6 +141,20 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      */
     determineStartStep(): WizardStep {
         return this.availableSteps[0] || 'lecture';
+    }
+
+    /**
+     * Compute the wizard steps relevant to a specific lecture section
+     */
+    private computeStepsForLecture(lecture: Section): WizardStep[] {
+        const steps: WizardStep[] = ['lecture'];
+        const discussions = this.courseDataService.getDiscussionsForLecture(this.course, lecture)
+            .filter(s => !s.isInterestList);
+        const labs = this.courseDataService.getLabsForLecture(this.course, lecture)
+            .filter(s => !s.isInterestList);
+        if (discussions.length > 0) steps.push('discussion');
+        if (labs.length > 0) steps.push('lab');
+        return steps;
     }
 
     /**
@@ -399,12 +407,29 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
 
         // Store selection
         if (this.currentStep === 'lecture') {
-            // Clear dependent selections if changing to a different lecture
             if (previousSelection && previousSelection.crn !== section.crn) {
                 this.selections.discussion = null;
                 this.selections.lab = null;
             }
             this.selections.lecture = section;
+
+            const newSteps = this.computeStepsForLecture(section);
+            const stepsChanged = newSteps.join(',') !== this.availableSteps.join(',');
+            this.availableSteps = newSteps;
+
+            if (stepsChanged) {
+                if (newSteps.length > 1) {
+                    // Advance to the next step — transitionToStep will re-render with correct breadcrumbs
+                    if (this.onSelectionChange) this.onSelectionChange(this.selections);
+                    this.nextStep();
+                } else {
+                    // Lecture is the only step; silently update footer to show "Finish"
+                    this.rerender();
+                    this.panel?.querySelector('.wizard-step.active')?.classList.remove('slide-in-right');
+                    if (this.onSelectionChange) this.onSelectionChange(this.selections);
+                }
+                return;
+            }
         } else if (this.currentStep === 'discussion') {
             this.selections.discussion = section;
         } else if (this.currentStep === 'lab') {
