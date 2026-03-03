@@ -57,8 +57,12 @@ git add public/
 
 git commit -m "Merge Development into master"
 
+git checkout Development
+ON_MASTER=false
+trap - EXIT
+
 echo ""
-read -p "Push to origin/master? Type 'yes' to continue: " -r
+read -p "Push to origin/master? Type 'yes' to continue: " -r || true
 echo ""
 if [[ $REPLY == "yes" ]]; then
   git push --no-verify origin master
@@ -66,11 +70,6 @@ else
   echo "[WARNING] Skipped push. Merge is committed locally."
   echo "  To push later: git push --no-verify origin master"
 fi
-
-git checkout Development
-ON_MASTER=false
-
-trap - EXIT
 
 echo ""
 echo "=== Merge completed ==="

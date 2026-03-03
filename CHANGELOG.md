@@ -3,6 +3,7 @@
 ## [2026-03-03]
 
 ### Fixed
+- ICS export now uses each course's own academic year for event dates instead of defaulting to the most recent year
 - Importing schedules exported from v4.2 no longer fails with "Unsupported import format"
 
 
