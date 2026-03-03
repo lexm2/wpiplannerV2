@@ -5,7 +5,7 @@ import { ScheduleState, findCourseById } from './ScheduleState';
 import type { SelectedCourse } from './schedule';
 import { encodeCourseSelection, decodeCourseSelection } from '../utils/courseUtils';
 
-const APPLICATION_STATE_VERSION: string = '4.2'
+const APPLICATION_STATE_VERSION: string = '4.3'
 
 /**
  * Application-level state containing multiple schedules and preferences

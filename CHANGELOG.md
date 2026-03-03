@@ -3,6 +3,11 @@
 ## [2026-03-03]
 
 ### Fixed
+- Importing schedules exported from v4.2 no longer fails with "Unsupported import format"
+
+
+
+### Fixed
 - Hovering a section in the wizard after clicking it no longer shows it as a dashed preview — it stays solid
 
 ## [2026-02-28]
