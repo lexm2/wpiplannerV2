@@ -616,7 +616,7 @@ export class ScheduleManagementService {
 
             const data = JSON.parse(jsonData);
 
-            if (data.v !== "4") {
+            if (!data.v?.startsWith("4")) {
                 return {
                     success: false,
                     error: 'Unsupported import format. Please export your schedules again using the latest version.'
