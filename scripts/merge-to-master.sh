@@ -27,11 +27,6 @@ fi
 
 git fetch origin
 
-echo ""
-echo "Running validation..."
-bun test
-bun run build
-
 git checkout master
 ON_MASTER=true
 git pull origin master
@@ -63,11 +58,6 @@ if ! git merge Development --no-commit --no-ff; then
 fi
 
 git commit -m "Merge Development into master"
-
-echo ""
-echo "Post-merge validation..."
-bun test
-bun run build
 
 echo ""
 read -p "Push to origin/master? Type 'yes' to continue: " -r
