@@ -27,6 +27,31 @@ interface WizardSelections {
     lab: Section | null;
 }
 
+interface SectionOccupant {
+    course: SelectedCourse;
+    section: Section;
+    periodsOnThisDay: Period[];
+    startSlot: number;
+    endSlot: number;
+    isFirstSlot: boolean;
+    startMinutes: number;
+    endMinutes: number;
+}
+
+interface CalendarOccupant {
+    slot: DisplayableTimeSlot;
+    startSlot: number;
+    endSlot: number;
+    isFirstSlot: boolean;
+    startMinutes: number;
+    endMinutes: number;
+}
+
+interface CellData {
+    sections: SectionOccupant[];
+    calendar: CalendarOccupant[];
+}
+
 export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
     private courseDataService: CourseDataService | null = null;
@@ -135,14 +160,10 @@ export class ScheduleController {
      * Should be called when the active schedule changes.
      */
     async loadExternalEvents(schedule: Schedule): Promise<void> {
-        console.log('[ScheduleController] Loading schedule:', {
-            name: schedule.name,
-            id: schedule.id,
-            localEventsCount: schedule.localEvents?.length || 0,
-        });
-
         this.currentSchedule = schedule;
-        this.renderScheduleGrids();
+        if (this.isSchedulePageVisible()) {
+            this.renderScheduleGrids();
+        }
         this.displayScheduleSelectedCourses();
     }
 
@@ -151,7 +172,14 @@ export class ScheduleController {
      */
     clearExternalEvents(): void {
         this.currentSchedule = null;
-        this.renderScheduleGrids();
+        if (this.isSchedulePageVisible()) {
+            this.renderScheduleGrids();
+        }
+    }
+
+    private isSchedulePageVisible(): boolean {
+        const schedulePage = document.getElementById('schedule-page');
+        return schedulePage ? getComputedStyle(schedulePage).display !== 'none' : false;
     }
 
     /**
@@ -500,10 +528,12 @@ export class ScheduleController {
         this.componentWizard = null;
         this.sidebarManager.closePanel();
 
-        // Clear preview and re-render calendar
+        const hadPreview = this.wizardPreviewCourse !== null;
         this.wizardPreviewCourse = null;
         this.wizardPreviewSelections = null;
-        this.renderScheduleGrids();
+        if (hadPreview) {
+            this.renderScheduleGrids();
+        }
     }
 
     /**
@@ -544,6 +574,7 @@ export class ScheduleController {
         this.wizardPreviewCourse = course;
         this.wizardPreviewSelections = selections;
         this.hoverPreviewSections.clear();
+        this.cellContentCache.clear();
         this.renderScheduleGrids();
     }
 
@@ -551,30 +582,23 @@ export class ScheduleController {
      * Handle hover preview changes from the wizard (shows dashed preview)
      */
     onWizardHoverPreview(course: Course, selections: WizardSelections): void {
-        // Store preview data
         this.wizardPreviewCourse = course;
-        this.wizardPreviewSelections = selections;
 
-        // Track which specific sections are hover previews (by CRN)
-        // Only mark sections as preview if they're different from existing selections
+        // wizardPreviewSelections holds the clicked state here because clearSectionPreview()
+        // (mouseleave) always fires before showSectionPreview() (mouseenter), restoring it.
         this.hoverPreviewSections.clear();
-
-        // Get existing selected course to compare
-        const existingCourse = this.courseSelectionService.getSelectedCourses()
-            .find(sc => sc.course.id === course.id);
-
-        // Only mark as preview if this section is NEW (different from existing)
-        if (selections.lecture && selections.lecture.crn !== existingCourse?.selectedLecture?.crn) {
+        if (selections.lecture && selections.lecture.crn !== this.wizardPreviewSelections?.lecture?.crn) {
             this.hoverPreviewSections.add(selections.lecture.crn);
         }
-        if (selections.discussion && selections.discussion.crn !== existingCourse?.selectedDiscussion?.crn) {
+        if (selections.discussion && selections.discussion.crn !== this.wizardPreviewSelections?.discussion?.crn) {
             this.hoverPreviewSections.add(selections.discussion.crn);
         }
-        if (selections.lab && selections.lab.crn !== existingCourse?.selectedLab?.crn) {
+        if (selections.lab && selections.lab.crn !== this.wizardPreviewSelections?.lab?.crn) {
             this.hoverPreviewSections.add(selections.lab.crn);
         }
 
-        // Re-render calendar with hover preview
+        this.wizardPreviewSelections = selections;
+        this.cellContentCache.clear();
         this.renderScheduleGrids();
     }
 
@@ -1344,15 +1368,9 @@ export class ScheduleController {
         });
 
         const localEventSlots = this.getLocalEventSlotsForTerm(term);
-        const calendarSlotsForTerm = localEventSlots;
         console.log(`[ScheduleController] Rendering term ${term} with ${localEventSlots.length} local calendar slots`);
 
-        const calendarSlotsByDay = new Map<DayOfWeek, DisplayableTimeSlot[]>();
-        for (const day of weekdays) {
-            calendarSlotsByDay.set(day,
-                calendarSlotsForTerm.filter(slot => slot.day === day)
-            );
-        }
+        const cellMap = this.buildCellOccupancyMap(courses, localEventSlots, weekdays);
 
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {
@@ -1363,8 +1381,7 @@ export class ScheduleController {
             htmlParts.push(`<div class="time-label">${timeLabel}</div>`);
 
             weekdays.forEach(day => {
-                const dayCalendarSlots = calendarSlotsByDay.get(day) || [];
-                const cell = this.getCellContent(courses, day, slot, dayCalendarSlots, term);
+                const cell = this.getCellFromMap(cellMap.get(day)?.get(slot), slot, day, term);
                 if (cell.classes.includes('has-conflict')) {
                     hasConflicts = true;
                 }
@@ -1402,112 +1419,95 @@ export class ScheduleController {
         }
     }
 
-    private getCellContent(courses: any[], day: DayOfWeek, timeSlot: number, calendarSlots: DisplayableTimeSlot[] = [], term: string): { content: string, classes: string } {
-        const calendarKey = calendarSlots.map(cs => cs.id).join(',');
+    private buildCellOccupancyMap(
+        courses: SelectedCourse[],
+        calendarSlotsForTerm: DisplayableTimeSlot[],
+        weekdays: DayOfWeek[]
+    ): Map<DayOfWeek, Map<number, CellData>> {
+        const map = new Map<DayOfWeek, Map<number, CellData>>();
+        for (const day of weekdays) map.set(day, new Map());
+
+        const getCell = (day: DayOfWeek, slot: number): CellData => {
+            const dayMap = map.get(day)!;
+            if (!dayMap.has(slot)) dayMap.set(slot, { sections: [], calendar: [] });
+            return dayMap.get(slot)!;
+        };
+
+        for (const selectedCourse of courses) {
+            const sections = [
+                selectedCourse.selectedLecture,
+                selectedCourse.selectedDiscussion,
+                selectedCourse.selectedLab,
+            ].filter(Boolean) as Section[];
+
+            for (const section of sections) {
+                for (const day of weekdays) {
+                    const periodsOnThisDay = section.periods.filter(p => p.days.has(day));
+                    if (periodsOnThisDay.length === 0) continue;
+
+                    let earliestStartMinutes = Infinity;
+                    let latestEndMinutes = -1;
+                    const occupiedSlots = new Set<number>();
+                    let sectionStartSlot = Infinity;
+                    let sectionEndSlot = -1;
+
+                    for (const period of periodsOnThisDay) {
+                        const startSlot = TimeUtils.timeToGridRowStart(period.startTime);
+                        const endSlot = TimeUtils.timeToGridRowEnd(period.endTime);
+                        for (let s = startSlot; s < endSlot; s++) occupiedSlots.add(s);
+                        sectionStartSlot = Math.min(sectionStartSlot, startSlot);
+                        sectionEndSlot = Math.max(sectionEndSlot, endSlot);
+                        earliestStartMinutes = Math.min(earliestStartMinutes, period.startTime.hours * 60 + period.startTime.minutes);
+                        latestEndMinutes = Math.max(latestEndMinutes, period.endTime.hours * 60 + period.endTime.minutes);
+                    }
+
+                    for (const slot of occupiedSlots) {
+                        getCell(day, slot).sections.push({
+                            course: selectedCourse,
+                            section,
+                            periodsOnThisDay,
+                            startSlot: sectionStartSlot,
+                            endSlot: sectionEndSlot,
+                            isFirstSlot: slot === sectionStartSlot,
+                            startMinutes: earliestStartMinutes,
+                            endMinutes: latestEndMinutes,
+                        });
+                    }
+                }
+            }
+        }
+
+        for (const calSlot of calendarSlotsForTerm) {
+            if (!map.has(calSlot.day)) continue;
+            const startMinutes = calSlot.startTime.hours * 60 + calSlot.startTime.minutes;
+            const endMinutes = calSlot.endTime.hours * 60 + calSlot.endTime.minutes;
+            const startSlot = Math.floor((startMinutes - TimeUtils.START_HOUR * 60) / 60);
+            const endSlot = Math.ceil((endMinutes - TimeUtils.START_HOUR * 60) / 60);
+            for (let s = startSlot; s < endSlot; s++) {
+                getCell(calSlot.day, s).calendar.push({
+                    slot: calSlot,
+                    startSlot,
+                    endSlot,
+                    isFirstSlot: s === startSlot,
+                    startMinutes,
+                    endMinutes,
+                });
+            }
+        }
+
+        return map;
+    }
+
+    private getCellFromMap(cellData: CellData | undefined, timeSlot: number, day: DayOfWeek, term: string): { content: string, classes: string } {
+        const calendarKey = cellData?.calendar.map(c => c.slot.id).join(',') || '';
         const cacheKey = `${term}-${day}-${timeSlot}-${calendarKey}`;
 
         if (this.cellContentCache.has(cacheKey)) {
             return this.cellContentCache.get(cacheKey);
         }
 
-        // Find all sections that occupy this cell
-        const occupyingSections: any[] = [];
-        // Find calendar slots that occupy this cell
-        const occupyingCalendarSlots: any[] = [];
-
-        for (const selectedCourse of courses) {
-            // Collect all component sections (lecture, discussion, lab)
-            const sections: Section[] = [];
-
-            if (selectedCourse.selectedLecture) {
-                sections.push(selectedCourse.selectedLecture);
-            }
-            if (selectedCourse.selectedDiscussion) {
-                sections.push(selectedCourse.selectedDiscussion);
-            }
-            if (selectedCourse.selectedLab) {
-                sections.push(selectedCourse.selectedLab);
-            }
-
-            // Process each section
-            for (const section of sections) {
-                // Check if this section has any period that occupies this time slot on this day
-                const periodsOnThisDay = section.periods.filter((period: any) => period.days.has(day));
-
-                let sectionOccupiesSlot = false;
-                let sectionStartSlot = Infinity;
-                let sectionEndSlot = -1;
-                let isFirstSlot = false;
-
-                for (const period of periodsOnThisDay) {
-                    const startSlot = TimeUtils.timeToGridRowStart(period.startTime);
-                    const endSlot = TimeUtils.timeToGridRowEnd(period.endTime);
-
-                    if (timeSlot >= startSlot && timeSlot < endSlot) {
-                        sectionOccupiesSlot = true;
-                        sectionStartSlot = Math.min(sectionStartSlot, startSlot);
-                        sectionEndSlot = Math.max(sectionEndSlot, endSlot);
-
-                    }
-                }
-
-                if (sectionOccupiesSlot) {
-                    // Check if this is the first slot for this section on this day
-                    isFirstSlot = timeSlot === sectionStartSlot;
-
-                    // Calculate actual start and end times in minutes for precise height
-                    let earliestStartMinutes = Infinity;
-                    let latestEndMinutes = -1;
-                    for (const period of periodsOnThisDay) {
-                        const startMinutes = period.startTime.hours * 60 + period.startTime.minutes;
-                        const endMinutes = period.endTime.hours * 60 + period.endTime.minutes;
-                        earliestStartMinutes = Math.min(earliestStartMinutes, startMinutes);
-                        latestEndMinutes = Math.max(latestEndMinutes, endMinutes);
-                    }
-
-                    occupyingSections.push({
-                        course: selectedCourse,
-                        section,
-                        periodsOnThisDay,
-                        startSlot: sectionStartSlot,
-                        endSlot: sectionEndSlot,
-                        isFirstSlot,
-                        startMinutes: earliestStartMinutes,
-                        endMinutes: latestEndMinutes
-                    });
-                }
-            }
-        }
-
-        // Process calendar slots (already pre-computed with day and time info)
-        for (const slot of calendarSlots) {
-            // Check if this slot is on the current day
-            if (slot.day !== day) {
-                continue;
-            }
-
-            // Use pre-computed time values from WeeklyTimeSlot
-            const startMinutes = slot.startTime.hours * 60 + slot.startTime.minutes;
-            const endMinutes = slot.endTime.hours * 60 + slot.endTime.minutes;
-
-            // Map to grid slots (TimeUtils.START_HOUR is typically 7am)
-            const startSlot = Math.floor((startMinutes - TimeUtils.START_HOUR * 60) / 60);
-            const endSlot = Math.ceil((endMinutes - TimeUtils.START_HOUR * 60) / 60);
-
-            // Check if this slot overlaps with current time slot
-            if (timeSlot >= startSlot && timeSlot < endSlot) {
-                const isFirstSlot = timeSlot === startSlot;
-
-                occupyingCalendarSlots.push({
-                    slot,
-                    startSlot,
-                    endSlot,
-                    isFirstSlot,
-                    startMinutes,
-                    endMinutes,
-                });
-            }
-        }
+        const occupyingSections: SectionOccupant[] = cellData?.sections ?? [];
+        const occupyingCalendarSlots: CalendarOccupant[] = cellData?.calendar ?? [];
 
         if (occupyingSections.length === 0 && occupyingCalendarSlots.length === 0) {
             return { content: '', classes: '' };

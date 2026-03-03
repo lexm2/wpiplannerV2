@@ -1,5 +1,16 @@
 # Changelog
 
+## [2026-03-03]
+
+### Fixed
+- Hovering a section in the wizard after clicking it no longer shows it as a dashed preview — it stays solid
+
+## [2026-02-28]
+
+### Improved
+- Schedule grid no longer re-renders when navigating away from the schedule page, reducing unnecessary work on startup and schedule switches
+- Schedule grid rendering is now faster — course data is scanned once per render instead of once per grid cell
+
 ## [2026-02-25]
 
 ### Improved
