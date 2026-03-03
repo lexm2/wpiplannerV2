@@ -4,7 +4,6 @@ import { Section, Period, DayOfWeek } from '../types/types';
 import { TermBoundsService } from '../services/data/TermBoundsService';
 
 export interface ICSExportOptions {
-    academicYear?: number;
     includeDescription?: boolean;
     includeProfessor?: boolean;
     timezone?: string;
@@ -113,18 +112,16 @@ export class ICSGenerator {
 
     static generateICS(schedule: Schedule, options: ICSExportOptions = {}): ICSExportResult {
         const timezone = options.timezone || this.DEFAULT_TIMEZONE;
-        let academicYear = options.academicYear;
-        if (!academicYear) {
-            const service = TermBoundsService.getInstance();
-            const mostRecentYear = service.getMostRecentYear();
-            if (mostRecentYear !== null) {
-                academicYear = mostRecentYear;
-            } else {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = now.getMonth();
-                academicYear = month >= 7 ? year : year - 1;
-            }
+        const service = TermBoundsService.getInstance();
+        const mostRecentYear = service.getMostRecentYear();
+        let academicYear: number;
+        if (mostRecentYear !== null) {
+            academicYear = mostRecentYear;
+        } else {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            academicYear = month >= 7 ? year : year - 1;
         }
 
         const calendar = ical({
@@ -156,7 +153,8 @@ export class ICSGenerator {
             }
 
             for (const section of componentsToExport) {
-                const termDates = this.getTermDates(section.computedTerm, academicYear);
+                const courseYear = selectedCourse.course.academicYear ?? academicYear;
+                const termDates = this.getTermDates(section.computedTerm, courseYear);
                 if (!termDates) {
                     continue;
                 }

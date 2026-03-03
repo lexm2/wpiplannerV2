@@ -37,7 +37,6 @@ describe('ICSGenerator', () => {
             });
 
             const result = ICSGenerator.generateICS(schedule, {
-                academicYear: 2026,
                 timezone: 'America/New_York',
             });
 
@@ -84,7 +83,6 @@ describe('ICSGenerator', () => {
             });
 
             const result = ICSGenerator.generateICS(schedule, {
-                academicYear: 2026,
                 timezone: 'America/New_York',
             });
 
@@ -150,7 +148,6 @@ describe('ICSGenerator', () => {
             });
 
             const result = ICSGenerator.generateICS(schedule, {
-                academicYear: 2026,
                 timezone: 'America/New_York',
             });
 
@@ -160,6 +157,45 @@ describe('ICSGenerator', () => {
 
             const eventCount = (result.data!.match(/BEGIN:VEVENT/g) || []).length;
             expect(eventCount).toBe(2);
+        });
+
+        it('should use course academicYear for event dates', () => {
+            const period = createMockPeriod({
+                startTime: createMockTime(9, 0),
+                endTime: createMockTime(10, 50),
+                days: new Set([DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY]),
+            });
+
+            const section = createMockSection({
+                crn: 33333,
+                number: 'A01',
+                computedTerm: AcademicTerm.A,
+                periods: [period],
+            });
+
+            const course = createMockCourse({
+                id: 'CS-3001',
+                number: '3001',
+                name: 'Systems Programming',
+                academicYear: 2025,
+            });
+
+            const selectedCourse = createMockSelectedCourse({
+                course,
+                selectedLecture: section,
+            });
+
+            const schedule = createMockSchedule({
+                name: 'Prior Year Schedule',
+                selectedCourses: [selectedCourse],
+            });
+
+            const result = ICSGenerator.generateICS(schedule, {
+                timezone: 'America/New_York',
+            });
+
+            expect(result.success).toBe(true);
+            expect(result.data).toMatch(/DTSTART[^:]*:2025/);
         });
     });
 
@@ -185,7 +221,6 @@ describe('ICSGenerator', () => {
             });
 
             const result = ICSGenerator.generateICS(schedule, {
-                academicYear: 2026,
                 timezone: 'America/New_York',
             });
 
@@ -217,7 +252,6 @@ describe('ICSGenerator', () => {
             });
 
             const result = ICSGenerator.generateICS(schedule, {
-                academicYear: 2026,
                 timezone: 'America/New_York',
             });
 
@@ -299,7 +333,6 @@ describe('ICSGenerator', () => {
             });
 
             const result = ICSGenerator.generateICS(schedule, {
-                academicYear: 2026,
                 includeDescription: true,
                 includeProfessor: true,
             });
