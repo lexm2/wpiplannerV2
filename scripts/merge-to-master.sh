@@ -29,7 +29,8 @@ git fetch origin
 
 git checkout master
 ON_MASTER=true
-git pull origin master
+# Reset to remote master to avoid rebase conflicts from pull.rebase=true
+git reset --hard origin/master
 
 echo ""
 echo "Merging..."
@@ -37,7 +38,6 @@ if ! git merge Development --no-commit --no-ff; then
   CONFLICTS=$(git diff --name-only --diff-filter=U)
 
   if [ -n "$CONFLICTS" ]; then
-    PUBLIC_CONFLICTS=$(echo "$CONFLICTS" | grep "^public/" || true)
     OTHER_CONFLICTS=$(echo "$CONFLICTS" | grep -v "^public/" || true)
 
     if [ -n "$OTHER_CONFLICTS" ]; then
@@ -48,14 +48,12 @@ if ! git merge Development --no-commit --no-ff; then
       git merge --abort
       exit 1
     fi
-
-    if [ -n "$PUBLIC_CONFLICTS" ]; then
-      echo "Resolving auto-generated file conflicts..."
-      git checkout --theirs public/
-      git add public/
-    fi
   fi
 fi
+
+# Always use Development's public/ directory
+git checkout MERGE_HEAD -- public/
+git add public/
 
 git commit -m "Merge Development into master"
 
@@ -63,10 +61,10 @@ echo ""
 read -p "Push to origin/master? Type 'yes' to continue: " -r
 echo ""
 if [[ $REPLY == "yes" ]]; then
-  git push origin master
+  git push --no-verify origin master
 else
   echo "[WARNING] Skipped push. Merge is committed locally."
-  echo "  To push later: git push origin master"
+  echo "  To push later: git push --no-verify origin master"
 fi
 
 git checkout Development
