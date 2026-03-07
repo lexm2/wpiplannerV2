@@ -9,7 +9,6 @@ import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
-import { DeviceDetection } from '../../utils/deviceDetection'
 
 // Course listing and interaction management with optimistic UI integration
 // Provides progressive rendering for large datasets with instant visual feedback
@@ -103,35 +102,7 @@ export class CourseController {
             content.classList.add('expanded');
         }
 
-        // Get backdrop element
-        const getBackdrop = (): HTMLElement | null => {
-            return document.querySelector('.mobile-backdrop');
-        };
-
-        const isMobile = (): boolean => {
-            return DeviceDetection.isMobilePhone();
-        };
-
-        // Mobile overlay toggle
-        const toggleMobileOverlay = () => {
-            const backdrop = getBackdrop();
-            const isOpen = content.classList.contains('mobile-open');
-
-            if (isOpen) {
-                content.classList.remove('mobile-open');
-                if (backdrop) {
-                    backdrop.classList.remove('active');
-                }
-            } else {
-                content.classList.add('mobile-open');
-                if (backdrop) {
-                    backdrop.classList.add('active');
-                }
-            }
-        };
-
-        // Desktop expander toggle
-        const toggleDesktopExpander = () => {
+        const toggleExpander = () => {
             const currentState = header.getAttribute('aria-expanded') === 'true';
             const newState = !currentState;
 
@@ -142,54 +113,15 @@ export class CourseController {
                 content.classList.remove('expanded');
             }
 
-            // Save state to localStorage
             localStorage.setItem('selectedCoursesExpanded', newState.toString());
         };
 
-        // Unified toggle function
-        const toggleExpander = () => {
-            if (isMobile()) {
-                toggleMobileOverlay();
-            } else {
-                toggleDesktopExpander();
-            }
-        };
-
-        // Add click handler
         header.addEventListener('click', toggleExpander);
 
-        // Add keyboard handler for accessibility
         header.addEventListener('keydown', (e: KeyboardEvent) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 toggleExpander();
-            }
-        });
-
-        // Handle backdrop clicks to close mobile overlay
-        const handleBackdropClick = (e: MouseEvent) => {
-            const backdrop = e.target as HTMLElement;
-            if (backdrop.classList.contains('mobile-backdrop') && content.classList.contains('mobile-open')) {
-                content.classList.remove('mobile-open');
-                backdrop.classList.remove('active');
-            }
-        };
-
-        // Add backdrop listener
-        document.addEventListener('click', handleBackdropClick);
-
-        // Handle window resize to clean up state
-        window.addEventListener('resize', () => {
-            if (!isMobile()) {
-                // Switched to desktop - clean up mobile state
-                content.classList.remove('mobile-open');
-                const backdrop = getBackdrop();
-                if (backdrop) {
-                    backdrop.classList.remove('active');
-                }
-            } else {
-                // Switched to mobile - clean up desktop state
-                content.classList.remove('expanded');
             }
         });
     }

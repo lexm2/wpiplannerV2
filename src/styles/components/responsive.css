@@ -1,35 +1,5 @@
 /* Responsive design */
 
-/* Hamburger menu button - hidden by default */
-.hamburger-btn {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.hamburger-btn:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-.hamburger-btn:hover svg {
-  stroke: var(--color-text-inverse);
-}
-
-.hamburger-btn svg {
-  display: block;
-  width: 20px;
-  height: 20px;
-  stroke: var(--color-primary);
-  transition: stroke 0.2s ease;
-}
-
 @media (max-width: 1440px) {
   .course-sections {
     display: none;
@@ -44,10 +14,6 @@
   .sidebar, .right-panel {
     display: none;
   }
-
-  .hamburger-btn {
-    display: flex;
-  }
 }
 
 html.is-mobile .app-body {
@@ -58,89 +24,6 @@ html.is-mobile .app-body {
 html.is-mobile .sidebar,
 html.is-mobile .right-panel {
   display: none;
-}
-
-html.is-mobile .sidebar.mobile-open {
-  display: block;
-  position: fixed;
-  top: var(--spacing-header-height);
-  left: 0;
-  bottom: 0;
-  width: 280px;
-  z-index: 1000;
-  background: var(--color-background-alt);
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-  animation: slideInLeft 0.3s ease;
-  overflow-y: auto;
-}
-
-html.is-mobile .right-panel.mobile-open {
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  z-index: 1000;
-  background: var(--color-background);
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
-  animation: slideInRight 0.3s ease;
-  overflow-y: auto;
-}
-
-html.is-mobile .right-panel.mobile-open .mobile-menu-close-btn {
-  display: flex;
-}
-
-html.is-mobile .schedule-sidebar.mobile-open {
-  display: flex;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  z-index: 1000;
-  background: var(--color-background-alt);
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-  animation: slideInLeft 0.3s ease;
-}
-
-html.is-mobile .schedule-sidebar.mobile-open .schedule-sidebar-content-footer {
-  padding: 0.5rem 1rem;
-}
-
-html.is-mobile .schedule-sidebar.mobile-open .schedule-sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: space-between;
-}
-
-html.is-mobile .schedule-sidebar.mobile-open .schedule-filter-controls {
-  flex: 1;
-}
-
-html.is-mobile .schedule-sidebar.mobile-open .schedule-mobile-close-btn {
-  display: flex;
-}
-
-@keyframes slideInLeft {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
 }
 
 html.is-mobile .header-controls {
@@ -162,130 +45,7 @@ html.is-mobile .content-header .search-input {
   max-width: none;
 }
 
-/* Mobile menu overlay styles */
-.mobile-backdrop {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 500;
-  backdrop-filter: blur(2px);
-}
-
-.mobile-backdrop.active {
-  display: block;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Mobile menu close button */
-.mobile-menu-close-btn {
-  display: none;
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  padding: 0.5rem;
-  background: var(--color-primary);
-  border: 1px solid var(--color-primary);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 1001;
-  align-items: center;
-  justify-content: center;
-}
-
-.mobile-menu-close-btn svg {
-  display: block;
-  width: 24px;
-  height: 24px;
-  stroke: #000;
-  transition: stroke 0.2s ease;
-}
-
-.mobile-menu-close-btn:hover svg {
-  stroke: var(--color-text-inverse);
-}
-
-/* Mobile open states for sidebar and right-panel */
-@media (max-width: 1200px) {
-  .sidebar.mobile-open {
-    display: block;
-    position: fixed;
-    top: var(--spacing-header-height);
-    left: 0;
-    bottom: 0;
-    width: 280px;
-    z-index: 1000;
-    background: var(--color-background-alt);
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-    animation: slideInLeft 0.3s ease;
-    overflow-y: auto;
-  }
-
-  .right-panel.mobile-open {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    z-index: 1000;
-    background: var(--color-background);
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
-    animation: slideInRight 0.3s ease;
-    overflow-y: auto;
-  }
-
-  .right-panel.mobile-open .mobile-menu-close-btn {
-    display: flex;
-  }
-
-  /* Hide selected courses section on mobile */
-  .right-panel .selected-courses-section {
-    display: none;
-  }
-}
-
 /* Schedule page responsive breakpoints */
-.schedule-mobile-close-btn {
-  display: none;
-  padding: 0.5rem;
-  background: var(--color-primary);
-  border: 1px solid var(--color-primary);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-}
-
-.schedule-mobile-close-btn:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-.schedule-mobile-close-btn:hover svg {
-  stroke: var(--color-text-inverse);
-}
-
-.schedule-mobile-close-btn svg {
-  display: block;
-  width: 24px;
-  height: 24px;
-  stroke: #000;
-  transition: stroke 0.2s ease;
-}
-
 @media (max-width: 1024px) {
   .schedule-sidebar {
     display: none;
@@ -293,37 +53,5 @@ html.is-mobile .content-header .search-input {
 
   .schedule-page-layout {
     grid-template-columns: 1fr;
-  }
-
-  .schedule-sidebar.mobile-open {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    z-index: 1000;
-    background: var(--color-background-alt);
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-    animation: slideInLeft 0.3s ease;
-  }
-
-  .schedule-sidebar.mobile-open .schedule-sidebar-content-footer {
-    padding: 0.5rem 1rem;
-  }
-
-  .schedule-sidebar.mobile-open .schedule-sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: space-between;
-  }
-
-  .schedule-sidebar.mobile-open .schedule-filter-controls {
-    flex: 1;
-  }
-
-  .schedule-sidebar.mobile-open .schedule-mobile-close-btn {
-    display: flex;
   }
 }
