@@ -104,9 +104,6 @@ export function weeklySlotToMask(slot: WeeklyTimeSlot): bigint {
   return mask;
 }
 
-/** @deprecated Use weeklySlotToMask instead */
-export const blockedTimeToMask = weeklySlotToMask;
-
 export function masksConflict(mask1: bigint, mask2: bigint): boolean {
   return (mask1 & mask2) !== 0n;
 }
