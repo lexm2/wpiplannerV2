@@ -322,7 +322,7 @@ export class ProfileStateManager {
             const schedule: Schedule = {
                 id: this.generateScheduleId(),
                 name,
-                selectedCourses: [...this.state.selectedCourses],
+                selectedCourses: [],
                 generatedSchedules: []
             };
 
