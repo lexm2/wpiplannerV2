@@ -36,6 +36,7 @@ interface SectionOccupant {
     isFirstSlot: boolean;
     startMinutes: number;
     endMinutes: number;
+    isPreview: boolean;
 }
 
 interface CalendarOccupant {
@@ -64,10 +65,9 @@ export class ScheduleController {
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
     private wizardPreviewSelections: WizardSelections | null = null;
-    private hoverPreviewSections: Set<number> = new Set(); // Track CRNs of sections being previewed
+    private hoverPreviewSelections: WizardSelections | null = null;
     private courseColorMap: Map<string, string> = new Map();
     private usedColors: Set<string> = new Set();
-    private colorCache: Map<string, string> = new Map();
     private generatedSchedules: ScheduleResult[][] = [];
     private currentScheduleIndex: number = 0;
     private isApplyingAutoSchedule: boolean = false;
@@ -531,6 +531,7 @@ export class ScheduleController {
         const hadPreview = this.wizardPreviewCourse !== null;
         this.wizardPreviewCourse = null;
         this.wizardPreviewSelections = null;
+        this.hoverPreviewSelections = null;
         if (hadPreview) {
             this.renderScheduleGrids();
         }
@@ -543,6 +544,7 @@ export class ScheduleController {
         // Clear preview first
         this.wizardPreviewCourse = null;
         this.wizardPreviewSelections = null;
+        this.hoverPreviewSelections = null;
 
         try {
             const result = await this.courseSelectionService.setSelectedComponents(
@@ -573,31 +575,14 @@ export class ScheduleController {
     private onWizardSelectionChange(course: Course, selections: WizardSelections): void {
         this.wizardPreviewCourse = course;
         this.wizardPreviewSelections = selections;
-        this.hoverPreviewSections.clear();
+        this.hoverPreviewSelections = null;
         this.cellContentCache.clear();
         this.renderScheduleGrids();
     }
 
-    /**
-     * Handle hover preview changes from the wizard (shows dashed preview)
-     */
     onWizardHoverPreview(course: Course, selections: WizardSelections): void {
         this.wizardPreviewCourse = course;
-
-        // wizardPreviewSelections holds the clicked state here because clearSectionPreview()
-        // (mouseleave) always fires before showSectionPreview() (mouseenter), restoring it.
-        this.hoverPreviewSections.clear();
-        if (selections.lecture && selections.lecture.crn !== this.wizardPreviewSelections?.lecture?.crn) {
-            this.hoverPreviewSections.add(selections.lecture.crn);
-        }
-        if (selections.discussion && selections.discussion.crn !== this.wizardPreviewSelections?.discussion?.crn) {
-            this.hoverPreviewSections.add(selections.discussion.crn);
-        }
-        if (selections.lab && selections.lab.crn !== this.wizardPreviewSelections?.lab?.crn) {
-            this.hoverPreviewSections.add(selections.lab.crn);
-        }
-
-        this.wizardPreviewSelections = selections;
+        this.hoverPreviewSelections = selections;
         this.cellContentCache.clear();
         this.renderScheduleGrids();
     }
@@ -1151,7 +1136,9 @@ export class ScheduleController {
     }
 
     private precomputeConflicts(selectedCourses: SelectedCourse[]): void {
-        const cacheKey = selectedCourses.map(sc => sc.course.id).sort().join(',');
+        const cacheKey = selectedCourses.map(sc =>
+            `${sc.course.id}:${sc.selectedLecture?.crn ?? ''}-${sc.selectedDiscussion?.crn ?? ''}-${sc.selectedLab?.crn ?? ''}`
+        ).sort().join(',');
         if (cacheKey === this.lastConflictCacheKey) return;
 
         const startTime = perfMonitor.startMeasure('conflict-precompute');
@@ -1179,39 +1166,20 @@ export class ScheduleController {
     private precomputeCourseColors(selectedCourses: SelectedCourse[]): void {
         const startTime = perfMonitor.startMeasure('color-precompute');
 
-        this.colorCache.clear();
-
         const colors = [
             '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336',
             '#00BCD4', '#795548', '#607D8B', '#3F51B5', '#E91E63'
         ];
 
-        const shuffledColors = [...colors];
-        for (let i = shuffledColors.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffledColors[i], shuffledColors[j]] = [shuffledColors[j], shuffledColors[i]];
-        }
-
-        let colorIndex = 0;
         for (const sc of selectedCourses) {
             const courseId = sc.course.id;
 
             if (sc.customColor) {
-                this.colorCache.set(courseId, sc.customColor);
                 this.courseColorMap.set(courseId, sc.customColor);
                 this.usedColors.add(sc.customColor);
-            } else if (this.courseColorMap.has(courseId)) {
-                this.colorCache.set(courseId, this.courseColorMap.get(courseId)!);
-            } else {
-                while (colorIndex < shuffledColors.length && this.usedColors.has(shuffledColors[colorIndex])) {
-                    colorIndex++;
-                }
-
-                let assignedColor: string;
-                if (colorIndex < shuffledColors.length) {
-                    assignedColor = shuffledColors[colorIndex];
-                    colorIndex++;
-                } else {
+            } else if (!this.courseColorMap.has(courseId)) {
+                let assignedColor = colors.find(c => !this.usedColors.has(c));
+                if (!assignedColor) {
                     let hash = 0;
                     for (let i = 0; i < courseId.length; i++) {
                         hash = courseId.charCodeAt(i) + ((hash << 5) - hash);
@@ -1219,13 +1187,30 @@ export class ScheduleController {
                     assignedColor = colors[Math.abs(hash) % colors.length];
                 }
 
-                this.colorCache.set(courseId, assignedColor);
                 this.courseColorMap.set(courseId, assignedColor);
                 this.usedColors.add(assignedColor);
             }
         }
 
         perfMonitor.endMeasure('color-precompute', startTime);
+    }
+
+    private buildHoverCourse(selectedCourses: SelectedCourse[]): SelectedCourse | null {
+        if (!this.wizardPreviewCourse || !this.hoverPreviewSelections) return null;
+
+        const clicked = this.wizardPreviewSelections;
+        const hover = this.hoverPreviewSelections;
+
+        const lecture = hover.lecture?.crn !== clicked?.lecture?.crn ? hover.lecture : null;
+        const discussion = hover.discussion?.crn !== clicked?.discussion?.crn ? hover.discussion : null;
+        const lab = hover.lab?.crn !== clicked?.lab?.crn ? hover.lab : null;
+
+        if (!lecture && !discussion && !lab) return null;
+
+        const base = selectedCourses.find(sc => sc.course.id === this.wizardPreviewCourse!.id);
+        if (!base) return null;
+
+        return { ...base, selectedLecture: lecture, selectedDiscussion: discussion, selectedLab: lab };
     }
 
     renderScheduleGrids(): void {
@@ -1249,7 +1234,7 @@ export class ScheduleController {
         }
 
         const grids = ['A', 'B', 'C', 'D'];
-
+        const hoverCourse = this.buildHoverCourse(selectedCourses);
 
         grids.forEach(term => {
             const termStart = performance.now();
@@ -1277,7 +1262,9 @@ export class ScheduleController {
                 return;
             }
 
-            this.renderPopulatedGrid(gridContainer, termCourses, term);
+            const termHoverCourse = hoverCourse && termCourses.some(sc => sc.course.id === hoverCourse.course.id)
+                ? hoverCourse : null;
+            this.renderPopulatedGrid(gridContainer, termCourses, term, termHoverCourse);
             const termEnd = performance.now();
             console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms`);
         });
@@ -1326,7 +1313,7 @@ export class ScheduleController {
                     return;
                 }
 
-                this.renderPopulatedGrid(gridContainer, termCourses, term);
+                this.renderPopulatedGrid(gridContainer, termCourses, term, null);
                 const termEnd = performance.now();
                 console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms`);
             }
@@ -1344,7 +1331,7 @@ export class ScheduleController {
         container.classList.add('empty');
     }
 
-    private renderPopulatedGrid(container: HTMLElement, courses: any[], term: string): void {
+    private renderPopulatedGrid(container: HTMLElement, courses: SelectedCourse[], term: string, hoverCourse: SelectedCourse | null): void {
         container.classList.remove('empty');
 
         // Clean up existing event listeners before replacing DOM content
@@ -1370,7 +1357,7 @@ export class ScheduleController {
         const localEventSlots = this.getLocalEventSlotsForTerm(term);
         console.log(`[ScheduleController] Rendering term ${term} with ${localEventSlots.length} local calendar slots`);
 
-        const cellMap = this.buildCellOccupancyMap(courses, localEventSlots, weekdays);
+        const cellMap = this.buildCellOccupancyMap(courses, localEventSlots, weekdays, hoverCourse);
 
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {
@@ -1382,9 +1369,7 @@ export class ScheduleController {
 
             weekdays.forEach(day => {
                 const cell = this.getCellFromMap(cellMap.get(day)?.get(slot), slot, day, term);
-                if (cell.classes.includes('has-conflict')) {
-                    hasConflicts = true;
-                }
+                if (cell.hasConflict) hasConflicts = true;
                 htmlParts.push(`<div class="schedule-cell ${cell.classes}" data-day="${day}" data-slot="${slot}" style="position: relative;">${cell.content}</div>`);
             });
         }
@@ -1422,7 +1407,8 @@ export class ScheduleController {
     private buildCellOccupancyMap(
         courses: SelectedCourse[],
         calendarSlotsForTerm: DisplayableTimeSlot[],
-        weekdays: DayOfWeek[]
+        weekdays: DayOfWeek[],
+        hoverCourse: SelectedCourse | null
     ): Map<DayOfWeek, Map<number, CellData>> {
         const map = new Map<DayOfWeek, Map<number, CellData>>();
         for (const day of weekdays) map.set(day, new Map());
@@ -1433,7 +1419,7 @@ export class ScheduleController {
             return dayMap.get(slot)!;
         };
 
-        for (const selectedCourse of courses) {
+        const addCourse = (selectedCourse: SelectedCourse, isPreview: boolean) => {
             const sections = [
                 selectedCourse.selectedLecture,
                 selectedCourse.selectedDiscussion,
@@ -1471,11 +1457,15 @@ export class ScheduleController {
                             isFirstSlot: slot === sectionStartSlot,
                             startMinutes: earliestStartMinutes,
                             endMinutes: latestEndMinutes,
+                            isPreview,
                         });
                     }
                 }
             }
-        }
+        };
+
+        for (const selectedCourse of courses) addCourse(selectedCourse, false);
+        if (hoverCourse) addCourse(hoverCourse, true);
 
         for (const calSlot of calendarSlotsForTerm) {
             if (!map.has(calSlot.day)) continue;
@@ -1498,7 +1488,7 @@ export class ScheduleController {
         return map;
     }
 
-    private getCellFromMap(cellData: CellData | undefined, timeSlot: number, day: DayOfWeek, term: string): { content: string, classes: string } {
+    private getCellFromMap(cellData: CellData | undefined, timeSlot: number, day: DayOfWeek, term: string): { content: string, classes: string, hasConflict: boolean } {
         const calendarKey = cellData?.calendar.map(c => c.slot.id).join(',') || '';
         const cacheKey = `${term}-${day}-${timeSlot}-${calendarKey}`;
 
@@ -1510,7 +1500,7 @@ export class ScheduleController {
         const occupyingCalendarSlots: CalendarOccupant[] = cellData?.calendar ?? [];
 
         if (occupyingSections.length === 0 && occupyingCalendarSlots.length === 0) {
-            return { content: '', classes: '' };
+            return { content: '', classes: '', hasConflict: false };
         }
 
         let hasConflict = false;
@@ -1544,7 +1534,7 @@ export class ScheduleController {
             }
 
             const courseColor = this.getCourseColor(occupyingSection.course.course.id);
-            const isPreview = this.hoverPreviewSections.has(occupyingSection.section.crn);
+            const isPreview = occupyingSection.isPreview;
             const blockClass = isPreview ? 'section-preview' : 'section-block';
 
             const durationMinutes = occupyingSection.endMinutes - occupyingSection.startMinutes;
@@ -1558,27 +1548,7 @@ export class ScheduleController {
                      data-course-id="${occupyingSection.course.course.id}"
                      data-section-number="${occupyingSection.section.number}"
                      data-section-crn="${occupyingSection.section.crn}"
-                     data-selected-course-index="${occupyingSection.courseIndex || 0}"
-                     style="
-                    ${isPreview ? `border-color: ${courseColor};` : `background-color: ${courseColor};`}
-                    height: ${heightPercent}%;
-                    width: 100%;
-                    position: absolute;
-                    top: ${topOffsetPercent}%;
-                    left: 0;
-                    z-index: ${isPreview ? '15' : '10'};
-                    ${!isPreview ? `border: 1px solid rgba(0,0,0,0.2);` : ''}
-                    border-radius: 3px;
-                    box-sizing: border-box;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    text-align: center;
-                    font-weight: bold;
-                    font-size: 0.8rem;
-                    ${isPreview ? `color: var(--color-text-primary);` : `color: white; text-shadow: 1px 1px 1px rgba(0,0,0,0.3);`}
-                    cursor: pointer;
-                ">
+                     style="${isPreview ? `border-color: ${courseColor};` : `background-color: ${courseColor};`} height: ${heightPercent}%; top: ${topOffsetPercent}%;">
                     ${occupyingSection.course.course.departmentAbbr}${occupyingSection.course.course.number}
                 </div>
             `);
@@ -1599,14 +1569,8 @@ export class ScheduleController {
             // Build conflict information
             const conflictInfo = allConflictingSections.map(s => {
                 const conflictCourse = occupyingSections.find(os => os.section.crn === s.crn)?.course.course;
-                return conflictCourse ? `${conflictCourse.department.abbreviation}${conflictCourse.number} ${s.number}` : '';
+                return conflictCourse ? `${conflictCourse.departmentAbbr}${conflictCourse.number} ${s.number}` : '';
             }).filter(info => info).join(', ');
-
-            // Log conflict details (moved outside overlayStartsInThisSlot to always log)
-            const startHours = Math.floor(overlapStartMinutes / 60);
-            const startMins = overlapStartMinutes % 60;
-            const endHours = Math.floor(overlapEndMinutes / 60);
-            const endMins = overlapEndMinutes % 60;
 
             // Only add overlay if it starts in this slot
             // timeSlot is 0-indexed grid row, need to add START_HOUR to get actual hour
@@ -1648,34 +1612,16 @@ export class ScheduleController {
                 <div class="external-event-block"
                      data-event-id="${eventId}"
                      title="${eventTitle}"
-                     style="
-                    height: ${heightPercent}%;
-                    width: 100%;
-                    position: absolute;
-                    top: ${topOffsetPercent}%;
-                    left: 0;
-                    z-index: 5;
-                    border-radius: 3px;
-                    box-sizing: border-box;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    text-align: center;
-                    font-weight: 500;
-                    font-size: 0.7rem;
-                    overflow: hidden;
-                ">
+                     style="height: ${heightPercent}%; top: ${topOffsetPercent}%;">
                     ${eventTitle}
                 </div>
             `);
         }
 
         const hasAnyFirstSlot = occupyingSections.some(os => os.isFirstSlot) || occupyingCalendarSlots.some(s => s.isFirstSlot);
-        const classes = hasAnyFirstSlot ?
-            `occupied section-start ${hasConflict ? 'has-conflict' : ''}` :
-            '';
+        const classes = hasAnyFirstSlot ? 'occupied section-start' : '';
 
-        const result = { content: contentParts.join(''), classes };
+        const result = { content: contentParts.join(''), classes, hasConflict };
 
         // Performance optimization: Store result in cache
         this.cellContentCache.set(cacheKey, result);
@@ -1684,7 +1630,7 @@ export class ScheduleController {
     }
 
     private getCourseColor(courseId: string): string {
-        return this.colorCache.get(courseId) || '#6B7280';
+        return this.courseColorMap.get(courseId) || '#6B7280';
     }
 
     /**

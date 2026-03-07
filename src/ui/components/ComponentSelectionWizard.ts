@@ -419,11 +419,9 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
 
             if (stepsChanged) {
                 if (newSteps.length > 1) {
-                    // Advance to the next step — transitionToStep will re-render with correct breadcrumbs
                     if (this.onSelectionChange) this.onSelectionChange(this.selections);
                     this.nextStep();
                 } else {
-                    // Lecture is the only step; silently update footer to show "Finish"
                     this.rerender();
                     this.panel?.querySelector('.wizard-step.active')?.classList.remove('slide-in-right');
                     if (this.onSelectionChange) this.onSelectionChange(this.selections);
@@ -1039,15 +1037,12 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     private showSectionPreview(section: Section): void {
         if (!this.onHoverPreview) return;
 
-        // Create temporary selections including existing selections AND the hovered section
-        // This ensures all components are visible, but only the new hover is marked as preview
         const tempSelections: WizardSelections = {
-            lecture: this.currentStep === 'lecture' ? section : this.selections.lecture,
-            discussion: this.currentStep === 'discussion' ? section : this.selections.discussion,
-            lab: this.currentStep === 'lab' ? section : this.selections.lab
+            lecture: this.currentStep === 'lecture' ? section : null,
+            discussion: this.currentStep === 'discussion' ? section : null,
+            lab: this.currentStep === 'lab' ? section : null
         };
 
-        // Trigger hover preview (renders with dashed borders for only the new section)
         this.onHoverPreview(tempSelections);
     }
 

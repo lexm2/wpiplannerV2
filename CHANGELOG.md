@@ -13,6 +13,7 @@
 
 ### Fixed
 - Hovering a section in the wizard after clicking it no longer shows it as a dashed preview — it stays solid
+- Re-opening the wizard in editing mode no longer shows already-confirmed sections (like discussions) as ghost previews when hovering a lecture card
 
 ## [2026-02-28]
 
