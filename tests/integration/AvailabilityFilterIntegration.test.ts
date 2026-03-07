@@ -2,7 +2,6 @@ import { describe, test, expect, beforeEach } from 'bun:test'
 import { CourseFilterService } from '../../src/services/filtering/CourseFilterService'
 import { SearchService } from '../../src/services/filtering/searchService'
 import { CourseSelectionService } from '../../src/services/selection/CourseSelectionService'
-import { ConflictDetector } from '../../src/core/scheduling/ConflictEngine'
 import { AvailabilityFilter } from '../../src/core/filtering/filters/AvailabilityFilter'
 import { DepartmentFilter } from '../../src/core/filtering/filters/DepartmentFilter'
 import { ProfessorFilter } from '../../src/core/filtering/filters/ProfessorFilter'
@@ -22,13 +21,11 @@ describe('AvailabilityFilter Integration', () => {
   let filterService: CourseFilterService
   let searchService: SearchService
   let courseSelectionService: CourseSelectionService
-  let conflictDetector: ConflictDetector
 
   beforeEach(async () => {
     // Create services
     searchService = new SearchService()
     courseSelectionService = new CourseSelectionService()
-    conflictDetector = new ConflictDetector()
     filterService = new CourseFilterService(searchService, () => [])
 
     // Initialize course selection service

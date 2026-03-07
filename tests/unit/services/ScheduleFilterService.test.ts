@@ -1,14 +1,12 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import { ScheduleFilterService } from '../../../src/services/filtering/ScheduleFilterService';
 import { SearchService } from '../../../src/services/filtering/searchService';
-import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
 import { Course, Section, Period, Department, DayOfWeek, PeriodType } from '../../../src/types/types';
 import { SelectedCourse, AcademicTerm } from '../../../src/types/schedule';
 
 describe('ScheduleFilterService', () => {
     let scheduleFilterService: ScheduleFilterService;
     let searchService: SearchService;
-    let conflictDetector: ConflictDetector;
 
     // Test data
     const department: Department = {
@@ -120,8 +118,7 @@ describe('ScheduleFilterService', () => {
 
     beforeEach(() => {
         scheduleFilterService = new ScheduleFilterService();
-        conflictDetector = new ConflictDetector();
-        scheduleFilterService.setConflictDetector(conflictDetector);
+        scheduleFilterService.setConflictDetector();
     });
 
     describe('filterSections', () => {

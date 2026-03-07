@@ -1,6 +1,5 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import { ConflictFilter, ConflictCriteria } from '../../../src/core/filtering/filters/ConflictFilter';
-import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
 import { Period, Section, DayOfWeek, Time, Department, Course, PeriodType } from '../../../src/types/types';
 import { SelectedCourse, AcademicTerm } from '../../../src/types/schedule';
 
@@ -91,12 +90,10 @@ function createSelectedCourse(course: Course, selectedSection: Section | null = 
 }
 
 describe('ConflictFilter', () => {
-    let conflictDetector: ConflictDetector;
     let periodConflictFilter: ConflictFilter;
 
     beforeEach(() => {
-        conflictDetector = new ConflictDetector();
-        periodConflictFilter = new ConflictFilter(conflictDetector);
+        periodConflictFilter = new ConflictFilter();
     });
 
     describe('Basic Functionality', () => {
@@ -269,7 +266,7 @@ describe('ConflictFilter', () => {
                 selectedCourses: [selectedCourseObj]
             };
 
-            const filter = new ConflictFilter(conflictDetector);
+            const filter = new ConflictFilter();
             const result = filter.applyToPeriodsWithContext(periodsWithContext, criteria);
             
             // Both periods should remain - same course conflicts are allowed
@@ -302,7 +299,7 @@ describe('ConflictFilter', () => {
                 selectedCourses: [selectedCourse1, selectedCourse2] // Course 1 has selection
             };
 
-            const filter = new ConflictFilter(conflictDetector);
+            const filter = new ConflictFilter();
             const result = filter.applyToPeriodsWithContext(periodsWithContext, criteria);
             
             // Period should be filtered out due to conflict with different course
@@ -333,7 +330,7 @@ describe('ConflictFilter', () => {
                 selectedCourses: [selectedCourse1, selectedCourse2]
             };
 
-            const filter = new ConflictFilter(conflictDetector);
+            const filter = new ConflictFilter();
             const result = filter.applyToPeriodsWithContext(periodsWithContext, criteria);
             
             // Period should remain - no conflict with different course
@@ -380,7 +377,7 @@ describe('ConflictFilter', () => {
                 selectedCourses: [selectedCourse1, selectedCourse2, selectedCourse3]
             };
 
-            const filter = new ConflictFilter(conflictDetector);
+            const filter = new ConflictFilter();
             const result = filter.applyToPeriodsWithContext(periodsWithContext, criteria);
             
             // Only the non-conflicting period should remain
@@ -415,7 +412,7 @@ describe('ConflictFilter', () => {
                 selectedCourses: [selectedCourse1, selectedCourse2]
             };
 
-            const filter = new ConflictFilter(conflictDetector);
+            const filter = new ConflictFilter();
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
             
             // Entire section should be filtered out because ONE period conflicts
@@ -447,7 +444,7 @@ describe('ConflictFilter', () => {
                 selectedCourses: [selectedCourse1, selectedCourse2]
             };
 
-            const filter = new ConflictFilter(conflictDetector);
+            const filter = new ConflictFilter();
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
             
             // Section should remain because no periods conflict
@@ -497,7 +494,7 @@ describe('ConflictFilter', () => {
                 selectedCourses: [selectedCourseWithLecture]
             };
 
-            const filter = new ConflictFilter(conflictDetector);
+            const filter = new ConflictFilter();
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
 
             // Discussion D01 should be filtered out because it conflicts with the lecture
@@ -554,7 +551,7 @@ describe('ConflictFilter', () => {
                 selectedCourses: [selectedCourse1, selectedCourse2]
             };
 
-            const filter = new ConflictFilter(conflictDetector);
+            const filter = new ConflictFilter();
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
             
             // Only the non-conflicting section should remain
@@ -588,7 +585,7 @@ describe('ConflictFilter', () => {
                 selectedCourses: [selectedCourse1, selectedCourse2]
             };
 
-            const filter = new ConflictFilter(conflictDetector);
+            const filter = new ConflictFilter();
             const result = filter.applyToSectionsWithContext(sectionsWithContext, criteria);
             
             // Section should be filtered out because workshop conflicts with selected course's lab

@@ -4,7 +4,7 @@ import { CourseDataService } from '../../services/data/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { SchedulePickerModal } from '../components/SchedulePickerModal'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
-import { ConflictDetector } from '../../core/scheduling/ConflictEngine'
+import { BitMaskEngine } from '../../core/scheduling/BitMaskEngine'
 import { getAllSections } from '../../utils/courseUtils'
 import { ModalService } from '../../services/ui/ModalService'
 import { DepartmentController } from './DepartmentController'
@@ -44,7 +44,7 @@ export class MainController {
     private profileStateManager: ProfileStateManager;
     private storageService: StorageService;
     private courseSelectionService: CourseSelectionService;
-    private conflictDetector: ConflictDetector;
+    private conflictDetector: BitMaskEngine;
     private modalService: ModalService;
     private departmentController: DepartmentController;
     private courseController: CourseController;
@@ -80,7 +80,7 @@ export class MainController {
         this.courseDataService = new CourseDataService();
         this._themeSelector = new ThemeSelector(this.profileStateManager);
         this.courseSelectionService = new CourseSelectionService(this.profileStateManager);
-        this.conflictDetector = new ConflictDetector();
+        this.conflictDetector = new BitMaskEngine();
         this.modalService = new ModalService();
         this.profileStateManager.setModalService(this.modalService);
         this.departmentController = new DepartmentController();
@@ -221,7 +221,7 @@ export class MainController {
         this.filterService.registerFilter(searchTextFilter);
 
         // Register PeriodConflictFilter
-        this.filterService.setConflictDetector(this.conflictDetector);
+        this.filterService.setConflictDetector();
 
         // Set up filter change listener to refresh UI
         this.filterService.addEventListener((_event) => {

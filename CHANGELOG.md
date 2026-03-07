@@ -9,6 +9,7 @@
 ### Changed
 - Removed mobile hamburger/overlay UI; panels follow standard responsive layout at all screen sizes
 - Mobile devices now see a notice that mobile support is temporarily unavailable
+- Improved internal conflict detection performance by switching to a bitmask-based engine
 
 ## [2026-03-03]
 

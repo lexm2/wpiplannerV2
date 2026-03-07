@@ -6,7 +6,6 @@ import { PeriodTermFilter } from '../../core/filtering/filters/PeriodTermFilter'
 import { PeriodAvailabilityFilter } from '../../core/filtering/filters/PeriodAvailabilityFilter';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import { SectionCodeFilter } from '../../core/filtering/filters/SectionCodeFilter';
-import { ConflictDetector } from '../../core/scheduling/ConflictEngine';
 import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter, PeriodConflictFilterCriteria, ConflictFilterCriteria } from '../../types/filters';
 import { SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
 import { FilterState } from '../../core/filtering/FilterState';
@@ -38,7 +37,7 @@ export class ScheduleFilterService {
         this.initializeFilters();
     }
     
-    setConflictDetector(conflictDetector: ConflictDetector): void {
+    setConflictDetector(): void {
         this.conflictFilter = new ConflictFilter();
         this.registerSectionBasedFilter(this.conflictFilter);
     }

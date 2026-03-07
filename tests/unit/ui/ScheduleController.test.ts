@@ -3,7 +3,6 @@ import { ScheduleController } from '../../../src/ui/controllers/ScheduleControll
 import { CourseSelectionService } from '../../../src/services/selection/CourseSelectionService';
 import { ScheduleFilterService } from '../../../src/services/filtering/ScheduleFilterService';
 import { SearchService } from '../../../src/services/filtering/searchService';
-import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine';
 import { Course, Section, Period, Department, DayOfWeek, PeriodType } from '../../../src/types/types';
 import { SelectedCourse, AcademicTerm } from '../../../src/types/schedule';
 import {
@@ -19,7 +18,6 @@ describe('ScheduleController Expansion State', () => {
     let courseSelectionService: CourseSelectionService;
     let scheduleFilterService: ScheduleFilterService;
     let searchService: SearchService;
-    let conflictDetector: ConflictDetector;
 
     // Test data
     const department: Department = {
@@ -84,8 +82,7 @@ describe('ScheduleController Expansion State', () => {
         `;
 
         scheduleFilterService = new ScheduleFilterService();
-        conflictDetector = new ConflictDetector();
-        scheduleFilterService.setConflictDetector(conflictDetector);
+        scheduleFilterService.setConflictDetector();
         
         courseSelectionService = new CourseSelectionService();
         scheduleController = new ScheduleController(courseSelectionService);
@@ -174,7 +171,6 @@ describe('ScheduleController Auto-Schedule Cycling', () => {
     let scheduleController: ScheduleController;
     let courseSelectionService: CourseSelectionService;
     let scheduleFilterService: ScheduleFilterService;
-    let conflictDetector: ConflictDetector;
 
     beforeEach(() => {
         // Set up DOM elements that the controller expects
@@ -190,8 +186,7 @@ describe('ScheduleController Auto-Schedule Cycling', () => {
         `;
 
         scheduleFilterService = new ScheduleFilterService();
-        conflictDetector = new ConflictDetector();
-        scheduleFilterService.setConflictDetector(conflictDetector);
+        scheduleFilterService.setConflictDetector();
 
         courseSelectionService = new CourseSelectionService();
         scheduleController = new ScheduleController(courseSelectionService);

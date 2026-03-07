@@ -1,16 +1,16 @@
 import { describe, it, expect, beforeEach } from 'bun:test'
-import { ConflictDetector } from '../../../src/core/scheduling/ConflictEngine'
+import { BitMaskEngine, buildConflictMatrix } from '../../../src/core/scheduling/BitMaskEngine'
 import { DayOfWeek, PeriodType } from '../../../src/types/types'
 import { createMockSection, createMockPeriod, createMockTime } from '../../helpers/mockData'
 
-describe('ConflictDetector', () => {
-  let conflictDetector: ConflictDetector
+describe('BitMaskEngine', () => {
+  let engine: BitMaskEngine
 
   beforeEach(() => {
-    conflictDetector = new ConflictDetector()
+    engine = new BitMaskEngine()
   })
 
-  describe('detectConflicts', () => {
+  describe('sectionsConflict / buildConflictMatrix', () => {
     it('should detect no conflicts for non-overlapping sections', () => {
       const section1 = createMockSection({
         crn: 11111,
@@ -32,7 +32,7 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      expect(conflictDetector.hasConflicts([section1, section2])).toBe(false)
+      expect(engine.sectionsConflict(section1, section2)).toBe(false)
     })
 
     it('should detect time overlap conflict', () => {
@@ -56,11 +56,11 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      const conflictMap = conflictDetector.detectConflicts([section1, section2])
+      const conflictMatrix = buildConflictMatrix([section1, section2], engine)
 
-      expect(conflictMap.size).toBe(2)
-      expect(conflictMap.get(section1.crn.toString())?.has(section2.crn.toString())).toBe(true)
-      expect(conflictMap.get(section2.crn.toString())?.has(section1.crn.toString())).toBe(true)
+      expect(conflictMatrix.size).toBe(2)
+      expect(conflictMatrix.get(section1.crn)?.has(section2.crn)).toBe(true)
+      expect(conflictMatrix.get(section2.crn)?.has(section1.crn)).toBe(true)
     })
 
     it('should not detect conflicts on different days', () => {
@@ -84,7 +84,7 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      expect(conflictDetector.hasConflicts([section1, section2])).toBe(false)
+      expect(engine.sectionsConflict(section1, section2)).toBe(false)
     })
 
     it('should handle sections with multiple periods', () => {
@@ -117,7 +117,7 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      expect(conflictDetector.hasConflicts([section1, section2])).toBe(true)
+      expect(engine.sectionsConflict(section1, section2)).toBe(true)
     })
 
     it('should detect multiple overlapping periods between same sections', () => {
@@ -155,7 +155,7 @@ describe('ConflictDetector', () => {
         ]
       })
 
-      expect(conflictDetector.hasConflicts([section1, section2])).toBe(true)
+      expect(engine.sectionsConflict(section1, section2)).toBe(true)
     })
   })
 
@@ -179,9 +179,7 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      const isValid = conflictDetector.isValidSchedule([section1, section2])
-
-      expect(isValid).toBe(true)
+      expect(engine.isValidSchedule([section1, section2])).toBe(true)
     })
 
     it('should return false for schedule with time overlaps', () => {
@@ -203,15 +201,11 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      const isValid = conflictDetector.isValidSchedule([section1, section2])
-
-      expect(isValid).toBe(false)
+      expect(engine.isValidSchedule([section1, section2])).toBe(false)
     })
 
     it('should return true for empty schedule', () => {
-      const isValid = conflictDetector.isValidSchedule([])
-      
-      expect(isValid).toBe(true)
+      expect(engine.isValidSchedule([])).toBe(true)
     })
 
     it('should return true for single section', () => {
@@ -224,9 +218,7 @@ describe('ConflictDetector', () => {
         })]
       })
 
-      const isValid = conflictDetector.isValidSchedule([section])
-
-      expect(isValid).toBe(true)
+      expect(engine.isValidSchedule([section])).toBe(true)
     })
   })
 })

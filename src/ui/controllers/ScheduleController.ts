@@ -11,7 +11,7 @@ import { LocalEventModal } from '../components/LocalEventModal'
 import { SidebarManager } from '../sidebar/SidebarManager'
 import type { SidebarPanel } from '../sidebar/types'
 import { TimeUtils } from '../utils/timeUtils'
-import { ConflictDetector } from '../../core/scheduling/ConflictEngine'
+import { BitMaskEngine, buildConflictMatrix } from '../../core/scheduling/BitMaskEngine'
 import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../../utils/typeGuards'
 import { AutoScheduler, type ScheduleResult } from '../../services/scheduling/AutoScheduler'
 import type { AutoScheduleSettings, WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
@@ -58,7 +58,7 @@ export class ScheduleController {
     private courseDataService: CourseDataService | null = null;
     private scheduleFilterService: ScheduleFilterService | null = null;
     private sectionInfoModalController: SectionInfoModalController | null = null;
-    private conflictDetector: ConflictDetector | null = null;
+    private conflictDetector: BitMaskEngine | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private containerEventListeners = new Map<HTMLElement, EventListener>();
     private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
@@ -79,7 +79,7 @@ export class ScheduleController {
     // Performance optimization: Caching infrastructure for grid rendering
     private cellContentCache: Map<string, any> = new Map();
     private currentCacheKey: string = '';
-    private conflictMap: Map<string, Set<string>> = new Map();
+    private conflictMap: Map<number, Set<number>> = new Map();
     private lastConflictCacheKey: string = '';
     private autoScheduleE2EStartTime: number | null = null;
 
@@ -120,21 +120,19 @@ export class ScheduleController {
         this.sectionInfoModalController = sectionInfoModalController;
     }
 
-    setConflictDetector(conflictDetector: ConflictDetector): void {
-        this.conflictDetector = conflictDetector;
+    setConflictDetector(engine: BitMaskEngine): void {
+        this.conflictDetector = engine;
         
-        // If we already have ScheduleFilterService, update it with ConflictDetector
         if (this.scheduleFilterService) {
-            this.scheduleFilterService.setConflictDetector(conflictDetector);
+            this.scheduleFilterService.setConflictDetector();
         }
     }
 
     setScheduleFilterService(scheduleFilterService: ScheduleFilterService): void {
         this.scheduleFilterService = scheduleFilterService;
         
-        // If we already have ConflictDetector, pass it to the service
         if (this.conflictDetector) {
-            this.scheduleFilterService.setConflictDetector(this.conflictDetector);
+            this.scheduleFilterService.setConflictDetector();
         }
         
         // Set up filter change listener to refresh display
@@ -1158,7 +1156,7 @@ export class ScheduleController {
             return;
         }
 
-        this.conflictMap = this.conflictDetector.detectConflicts(allSections);
+        this.conflictMap = buildConflictMatrix(allSections, this.conflictDetector);
 
         perfMonitor.endMeasure('conflict-precompute', startTime);
     }
@@ -1508,10 +1506,10 @@ export class ScheduleController {
 
         if (occupyingSections.length > 1) {
             for (let i = 0; i < occupyingSections.length; i++) {
-                const crn1 = occupyingSections[i].section.crn.toString();
+                const crn1 = occupyingSections[i].section.crn;
 
                 for (let j = i + 1; j < occupyingSections.length; j++) {
-                    const crn2 = occupyingSections[j].section.crn.toString();
+                    const crn2 = occupyingSections[j].section.crn;
 
                     if (this.conflictMap.get(crn1)?.has(crn2)) {
                         hasConflict = true;

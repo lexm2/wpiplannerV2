@@ -5,7 +5,6 @@ import { SearchService } from './searchService';
 import { getAllSections } from '../../utils/courseUtils';
 import { SectionFilterPipeline, SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
-import { ConflictDetector } from '../../core/scheduling/ConflictEngine';
 export class CourseFilterService {
     private filterState: FilterState;
     private registeredFilters: Map<string, SectionBasedFilter> = new Map();
@@ -21,7 +20,7 @@ export class CourseFilterService {
         this.getBookmarkedCourseIds = getBookmarkedCourseIds;
     }
 
-    setConflictDetector(conflictDetector: ConflictDetector): void {
+    setConflictDetector(): void {
         const periodConflictFilter = new ConflictFilter();
         this.registerFilter(periodConflictFilter);
     }
