@@ -98,7 +98,7 @@ export class ScheduleManagementService {
         const {
             includeCurrentCourses = false,
             copyFromSchedule,
-            autoActivate = false,
+            autoActivate = true,
             autoSave = true
         } = options;
 

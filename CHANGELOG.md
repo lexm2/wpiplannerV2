@@ -4,6 +4,7 @@
 
 ### Fixed
 - Creating a new schedule no longer inherits courses from the previously active schedule — new schedules start empty
+- Creating a new schedule now automatically switches to it
 
 ### Changed
 - Removed mobile hamburger/overlay UI; panels follow standard responsive layout at all screen sizes
