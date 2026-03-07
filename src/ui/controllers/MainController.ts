@@ -483,8 +483,9 @@ export class MainController {
                 }
             }
 
-            if (target.classList.contains('course-select-btn')) {
-                const courseElement = target.closest('.course-item, .course-card') as HTMLElement;
+            const selectBtn = target.closest('.course-select-btn') as HTMLElement | null;
+            if (selectBtn) {
+                const courseElement = selectBtn.closest('.course-item, .course-card') as HTMLElement;
                 if (courseElement) {
                     try {
                         this.courseController.toggleCourseSelection(courseElement);
@@ -495,8 +496,9 @@ export class MainController {
                 }
             }
 
-            if (target.classList.contains('course-bookmark-btn')) {
-                const courseElement = target.closest('.course-item, .course-card') as HTMLElement;
+            const bookmarkBtn = target.closest('.course-bookmark-btn') as HTMLElement | null;
+            if (bookmarkBtn) {
+                const courseElement = bookmarkBtn.closest('.course-item, .course-card') as HTMLElement;
                 if (courseElement) {
                     this.courseController.toggleCourseBookmark(courseElement);
                 }
@@ -606,7 +608,7 @@ export class MainController {
             }
 
 
-            if (target.closest('.course-item, .course-card, .selected-course-item') && !target.classList.contains('course-select-btn') && !target.classList.contains('section-badge') && !target.classList.contains('course-remove-btn')) {
+            if (target.closest('.course-item, .course-card, .selected-course-item') && !target.closest('.course-select-btn') && !target.closest('.course-bookmark-btn') && !target.classList.contains('section-badge') && !target.closest('.course-remove-btn')) {
                 const courseElement = target.closest('.course-item, .course-card, .selected-course-item') as HTMLElement;
                 if (courseElement) {
                     this.courseController.selectCourse(courseElement);

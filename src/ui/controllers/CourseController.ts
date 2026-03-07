@@ -3,7 +3,7 @@ import { CourseSelectionService } from '../../services/selection/CourseSelection
 import { CourseFilterService } from '../../services/filtering/CourseFilterService'
 import { CourseDataService } from '../../services/data/courseDataService'
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService'
-import { ProgressiveRenderer, ProgressiveRenderOptions } from '../utils/ProgressiveRenderer'
+import { ProgressiveRenderer } from '../utils/ProgressiveRenderer'
 import { CancellationToken } from '../../utils/RequestCancellation'
 import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
 import { getInlineSVG } from '../../utils/iconPaths'
@@ -15,6 +15,7 @@ import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 export class CourseController {
     private allDepartments: Department[] = [];
     private selectedCourse: Course | null = null;
+    private activeElement: HTMLElement | null = null;
     private courseSelectionService: CourseSelectionService;
     private courseDataService: CourseDataService;
     private filterService: CourseFilterService | null = null;
@@ -28,51 +29,17 @@ export class CourseController {
     private readonly INITIAL_PAGE_SIZE = 100;
     private hasMore: boolean = false;
 
-    // Callbacks
-    private onBatchCallback?: () => void;
     private onRenderCompleteCallback?: () => void;
 
     constructor(courseSelectionService: CourseSelectionService, courseDataService: CourseDataService) {
         this.courseSelectionService = courseSelectionService;
         this.courseDataService = courseDataService;
-        
-        // Initialize performance metrics
         this.performanceMetrics = new PerformanceMetrics();
-        
-        // Initialize progressive renderer with performance callbacks
-        const renderOptions: ProgressiveRenderOptions = {
-            batchSize: 10,
-            batchDelay: 16, // 60 FPS
-            performanceMetrics: this.performanceMetrics,
-            onBatch: (batchIndex, totalBatches, totalCount) => {
-                // Update any progress indicators if needed
-                console.log(`Rendered batch ${batchIndex}/${totalBatches} (${totalCount} total courses)`);
-
-                // Call external batch callback if registered
-                this.onBatchCallback?.();
-            },
-            onComplete: (totalRendered, totalTime) => {
-                console.log(`Progressive rendering complete: ${totalRendered} courses in ${totalTime.toFixed(2)}ms`);
-
-                // Log performance insights periodically
-                if (Math.random() < 0.1) { // 10% chance to log insights
-                    const insights = this.performanceMetrics.getInsights();
-                    console.log('Performance insights:', insights.join(', '));
-
-                    // Auto-adjust batch size based on performance
-                    const optimalBatchSize = this.performanceMetrics.getOptimalBatchSize(this.progressiveRenderer.getBatchSize());
-                    if (optimalBatchSize !== this.progressiveRenderer.getBatchSize()) {
-                        console.log(`Adjusting batch size from ${this.progressiveRenderer.getBatchSize()} to ${optimalBatchSize}`);
-                        this.progressiveRenderer.setBatchSize(optimalBatchSize);
-                    }
-                }
-
-                // Call external completion callback if registered
+        this.progressiveRenderer = new ProgressiveRenderer({
+            onComplete: (_totalRendered, _totalTime) => {
                 this.onRenderCompleteCallback?.();
             }
-        };
-        
-        this.progressiveRenderer = new ProgressiveRenderer(renderOptions);
+        });
 
         // Initialize selected courses expander
         this.initializeSelectedCoursesExpander();
@@ -89,7 +56,7 @@ export class CourseController {
 
         if (!header || !content || !chevronContainer) return;
 
-        // Inject chevron icon (without adding the chevron-icon class to avoid double rotation)
+        // Inject chevron icon
         chevronContainer.innerHTML = getInlineSVG('CHEVRON_DOWN');
 
         // Load saved state from localStorage (default: collapsed)
@@ -170,9 +137,6 @@ export class CourseController {
     }
     
     async displayCoursesWithCancellation(courses: Course[], currentView: 'list' | 'grid', cancellationToken?: CancellationToken, isLoadMore: boolean = false): Promise<void> {
-        // Cancel any existing render operations
-        this.progressiveRenderer.cancelCurrentRender();
-        
         // Handle pagination setup for initial load
         if (!isLoadMore) {
             this.resetPagination();
@@ -356,13 +320,12 @@ export class CourseController {
 
         this.selectedCourse = course;
         this.displayCourseDescription(course);
-        
-        // Update active state for course items
-        document.querySelectorAll('.course-item, .course-card').forEach(item => {
-            item.classList.remove('active');
-        });
-        
+
+        if (this.activeElement && this.activeElement !== element) {
+            this.activeElement.classList.remove('active');
+        }
         element.classList.add('active');
+        this.activeElement = element;
         return course;
     }
 
@@ -767,6 +730,7 @@ export class CourseController {
 
     clearCourseSelection(): void {
         this.selectedCourse = null;
+        this.activeElement = null;
         this.clearCourseDescription();
     }
 
@@ -891,12 +855,10 @@ export class CourseController {
     }
 
     isRendering(): boolean {
-        return this.progressiveRenderer.isCurrentlyRendering();
+        return false;
     }
 
-    setOnBatchCallback(callback: () => void): void {
-        this.onBatchCallback = callback;
-    }
+    setOnBatchCallback(_callback: () => void): void {}
 
     setOnRenderCompleteCallback(callback: () => void): void {
         this.onRenderCompleteCallback = callback;

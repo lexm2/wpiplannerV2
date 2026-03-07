@@ -5,6 +5,8 @@
 ### Fixed
 - Creating a new schedule no longer inherits courses from the previously active schedule — new schedules start empty
 - Creating a new schedule now automatically switches to it
+- Clicking the bookmark or select button on a course card no longer feels sluggish — buttons now respond instantly without triggering unintended side effects
+- Course list now renders all at once instead of in small batches, eliminating a race condition where button clicks during loading would revert
 
 ### Changed
 - Removed mobile hamburger/overlay UI; panels follow standard responsive layout at all screen sizes
