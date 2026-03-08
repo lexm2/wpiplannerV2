@@ -1,7 +1,7 @@
 import ical, { ICalEventRepeatingFreq, ICalWeekday, ICalCalendarMethod } from 'ical-generator';
 import { Schedule, SelectedCourse, LocalCalendarEvent, EventType } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';
-import { TermBoundsService } from '../services/data/TermBoundsService';
+import { TermBoundsService } from './termBounds';
 
 export interface ICSExportOptions {
     includeDescription?: boolean;

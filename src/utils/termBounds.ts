@@ -19,9 +19,12 @@ export interface TermBoundsData {
     years: Record<string, YearTermBounds>;
 }
 
+// ISO date format regex (YYYY-MM-DD)
+const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
 const TermBoundInfoSchema = z.object({
-    startDate: z.string().date(),
-    endDate: z.string().date(),
+    startDate: z.string().regex(isoDateRegex, 'Must be ISO date format (YYYY-MM-DD)'),
+    endDate: z.string().regex(isoDateRegex, 'Must be ISO date format (YYYY-MM-DD)'),
     offeringPeriod: z.string(),
     sampleSize: z.number().int().nonnegative(),
 }) satisfies z.ZodType<TermBoundInfo>;
