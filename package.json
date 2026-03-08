@@ -9,16 +9,11 @@
     "preview": "vite preview",
     "convert": "bun run scripts/convert-course-data.ts",
     "generate-icons": "bun run scripts/generate-icon-paths.ts",
-    "test": "bun test",
-    "test:run": "bun test",
-    "test:coverage": "bun test --coverage",
     "fetch-data": "bun run scripts/fetch-course-data.ts",
     "fetch-rmp-data": "bun run scripts/rateMyProfessor/fetchRateMyProfessor.ts",
     "merge-to-master": "bash scripts/merge-to-master.sh"
   },
   "devDependencies": {
-    "@happy-dom/global-registrator": "^16.6.0",
-    "@testing-library/dom": "^10.4.1",
     "@types/bun": "^1.2.10",
     "typescript": "^5.0.0",
     "vite": "^7.2.7"
