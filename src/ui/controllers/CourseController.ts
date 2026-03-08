@@ -184,7 +184,7 @@ export class CourseController {
         }
 
         // Only sort by course number when not searching
-        // When searching, preserve relevance ranking from SearchService
+        // When searching, preserve relevance ranking from searchUtils
         const displayCourses = (this.filterService && this.filterService.hasFilter('searchText'))
             ? courses
             : courses.sort((a, b) => a.number.localeCompare(b.number));
@@ -213,7 +213,7 @@ export class CourseController {
         }
 
         // Only sort by course number when not searching
-        // When searching, preserve relevance ranking from SearchService
+        // When searching, preserve relevance ranking from searchUtils
         const displayCourses = (this.filterService && this.filterService.hasFilter('searchText'))
             ? courses
             : courses.sort((a, b) => a.number.localeCompare(b.number));

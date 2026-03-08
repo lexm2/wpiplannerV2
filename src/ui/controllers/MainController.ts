@@ -16,7 +16,6 @@ import { FilterModalController } from './FilterModalController'
 import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { CourseFilterService } from '../../services/filtering/CourseFilterService'
 import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService'
-import { SearchService } from '../../services/filtering/searchService'
 import { createDefaultFilters, SearchTextFilter } from '../../core/filtering/filters'
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService'
 import { UIStateManager } from './UIStateManager'
@@ -53,7 +52,6 @@ export class MainController {
     private infoModalController: InfoModalController;
     private filterModalController: FilterModalController;
     private scheduleFilterModalController: ScheduleFilterModalController;
-    private searchService: SearchService;
     private filterService: CourseFilterService;
     private scheduleFilterService: ScheduleFilterService;
     private uiStateManager: UIStateManager;
@@ -85,10 +83,8 @@ export class MainController {
         this.profileStateManager.setModalService(this.modalService);
         this.departmentController = new DepartmentController();
         
-        // Initialize search and filter services
-        this.searchService = new SearchService();
+        // Initialize filter services
         this.filterService = new CourseFilterService(
-            this.searchService,
             () => this.profileStateManager.getBookmarkedCourseIds()
         );
         this.scheduleFilterService = new ScheduleFilterService(rateMyProfessorService);
@@ -174,7 +170,10 @@ export class MainController {
         this.courseDataService.on('data-loaded', (event) => {
             // Phase 1: Set catalog (needed for section reconstruction)
             this.profileStateManager.setCourseData(event.departments);
-            this.searchService.setCourseData(event.departments);
+
+            // Set course data for filters (needed for professor list, etc.)
+            const allCourses = event.departments.flatMap(d => d.courses);
+            this.filterService.setCourseData(allCourses);
             this.filterModalController.setCourseData(event.departments);
 
             // Phase 2: Set department data
@@ -202,7 +201,10 @@ export class MainController {
         // Subscribe to data-refreshed event (after cloud sync)
         this.courseDataService.on('data-refreshed', (event) => {
             this.profileStateManager.setCourseData(event.departments);
-            this.searchService.setCourseData(event.departments);
+
+            // Set course data for filters (needed for professor list, etc.)
+            const allCourses = event.departments.flatMap(d => d.courses);
+            this.filterService.setCourseData(allCourses);
             this.filterModalController.setCourseData(event.departments);
             this.departmentController.setAllDepartments(event.departments);
             this.courseController.setAllDepartments(event.departments);

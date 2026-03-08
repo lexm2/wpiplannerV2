@@ -1,23 +1,27 @@
 import { Course } from '../../types/types';
 import { FilterEventListener, ActiveFilter } from '../../types/filters';
 import { FilterState } from '../../core/filtering/FilterState';
-import { SearchService } from './searchService';
 import { getAllSections } from '../../utils/courseUtils';
+import { rankCoursesByRelevance, getAvailableProfessors } from '../../utils/searchUtils';
 import { SectionFilterPipeline, SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
+
 export class CourseFilterService {
     private filterState: FilterState;
     private registeredFilters: Map<string, SectionBasedFilter> = new Map();
-    private searchService: SearchService;
     private debugLogging: boolean = false;
     private sectionPipeline: SectionFilterPipeline;
     private getBookmarkedCourseIds: () => string[];
+    private allCourses: Course[] = [];
 
-    constructor(searchService: SearchService, getBookmarkedCourseIds: () => string[]) {
+    constructor(getBookmarkedCourseIds: () => string[]) {
         this.filterState = new FilterState();
-        this.searchService = searchService;
         this.sectionPipeline = new SectionFilterPipeline();
         this.getBookmarkedCourseIds = getBookmarkedCourseIds;
+    }
+
+    setCourseData(courses: Course[]): void {
+        this.allCourses = courses;
     }
 
     setConflictDetector(): void {
@@ -212,7 +216,7 @@ export class CourseFilterService {
 
         const searchCriteria = criteriaMap.get('searchText');
         if (searchCriteria && searchCriteria.query) {
-            filteredCourses = this.searchService.rankCoursesByRelevance(filteredCourses, searchCriteria.query);
+            filteredCourses = rankCoursesByRelevance(filteredCourses, searchCriteria.query);
 
             if (this.debugLogging) {
                 console.log(`Ranked search results for query: "${searchCriteria.query}"`);
@@ -268,8 +272,8 @@ export class CourseFilterService {
         return Array.from(departments).sort();
     }
     
-    private getProfessorOptions(_courses: Course[]): string[] {
-        return this.searchService.getAvailableProfessors();
+    private getProfessorOptions(courses: Course[]): string[] {
+        return getAvailableProfessors(courses);
     }
     
     
