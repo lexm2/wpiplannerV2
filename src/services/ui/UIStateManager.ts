@@ -6,11 +6,11 @@ export class UIStateManager {
 
     setView(view: 'list' | 'grid'): void {
         this.currentView = view;
-        
+
         // Update button states
         const viewListBtn = document.getElementById('view-list');
         const viewGridBtn = document.getElementById('view-grid');
-        
+
         if (viewListBtn && viewGridBtn) {
             if (view === 'list') {
                 viewListBtn.classList.add('btn-primary', 'active');

@@ -1,12 +1,8 @@
 import { Course, Department } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
-import { CourseDataService } from '../../services/data/courseDataService'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { SchedulePickerModal } from '../components/SchedulePickerModal'
-import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
-import { BitMaskEngine } from '../../core/scheduling/BitMaskEngine'
 import { getAllSections } from '../../utils/courseUtils'
-import { ModalService } from '../../services/ui/ModalService'
 import { DepartmentController } from './DepartmentController'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
@@ -14,98 +10,66 @@ import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { ScheduleFilterModalController } from './ScheduleFilterModalController'
-import { CourseFilterService } from '../../services/filtering/CourseFilterService'
-import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService'
-import { createDefaultFilters, SearchTextFilter } from '../../core/filtering/filters'
-import { rateMyProfessorService } from '../../services/external/RateMyProfessorService'
-import { UIStateManager } from './UIStateManager'
-import { TimestampManager } from './TimestampManager'
-import { OperationManager, DebouncedOperation } from '../../utils/RequestCancellation'
-import { ScheduleManagementService } from '../../services/selection/ScheduleManagementService'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
-import { StorageService } from '../../services/selection/StorageService'
-import { ThemeManager } from '../../themes/ThemeManager'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { ResizablePanel } from '../components/ResizablePanel'
-import { TermBoundsService } from '../../utils/termBounds'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
 import { DeviceDetection } from '../../utils/deviceDetection'
-import { StorageWorkerManager } from '../../workers/StorageWorkerManager'
+import { DebouncedOperation } from '../../utils/RequestCancellation'
+import { CourseColorService } from '../../services/scheduling/CourseColorService'
+import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator'
+import { AppBootstrap } from '../../bootstrap/AppBootstrap'
+import type { ServiceContainer } from '../../bootstrap/ServiceContainer'
+import type { ModalService } from '../../services/ui/ModalService'
 
 /**
- * Application orchestrator managing service initialization, dependency injection, and event coordination
+ * UI controller managing DOM event binding, view refreshing, and sub-controller coordination
  */
 export class MainController {
-    private courseDataService: CourseDataService;
+    private services: ServiceContainer;
     private schedulePickerModal: SchedulePickerModal | null = null;
     private themeSelector: ThemeSelector;
-    private themeManager: ThemeManager;
-    private profileStateManager: ProfileStateManager;
-    private storageService: StorageService;
-    private courseSelectionService: CourseSelectionService;
-    private conflictDetector: BitMaskEngine;
-    private modalService: ModalService;
     private departmentController: DepartmentController;
     private courseController: CourseController;
     private scheduleController: ScheduleController;
     private sectionInfoModalController: SectionInfoModalController;
     private filterModalController: FilterModalController;
     private scheduleFilterModalController: ScheduleFilterModalController;
-    private filterService: CourseFilterService;
-    private scheduleFilterService: ScheduleFilterService;
-    private uiStateManager: UIStateManager;
-    private timestampManager: TimestampManager;
-    private operationManager: OperationManager;
     private debouncedSearch: DebouncedOperation;
-    private scheduleManagementService: ScheduleManagementService;
+    private colorService: CourseColorService;
+    private autoScheduleOrchestrator: AutoScheduleOrchestrator;
     private allDepartments: Department[] = [];
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
     private pendingExpansions: Array<{courseId: string, term: string}> = [];
 
 
-    constructor() {
-        // Initialize core storage and state management first
-        this.profileStateManager = ProfileStateManager.getInstance();
-        this.storageService = StorageService.getInstance(this.profileStateManager);
-        
-        // Connect ThemeManager to use our unified storage
-        this.themeManager = ThemeManager.getInstance();
-        this.themeManager.setStorage(this.storageService);
-        
-        // Initialize services with shared ProfileStateManager
-        this.courseDataService = new CourseDataService();
-        this.themeSelector = new ThemeSelector(this.profileStateManager);
-        this.courseSelectionService = new CourseSelectionService(this.profileStateManager);
-        this.conflictDetector = new BitMaskEngine();
-        this.modalService = new ModalService();
-        this.profileStateManager.setModalService(this.modalService);
-        this.departmentController = new DepartmentController();
-        
-        // Initialize filter services
-        this.filterService = new CourseFilterService(
-            () => this.profileStateManager.getBookmarkedCourseIds()
-        );
-        this.scheduleFilterService = new ScheduleFilterService(rateMyProfessorService);
-        
-        // Initialize schedule management service with shared ProfileStateManager and CourseSelectionService
-        this.scheduleManagementService = new ScheduleManagementService(this.profileStateManager, this.courseSelectionService);
-        
-        // Initialize managers (before any event listeners that might use them)
-        this.uiStateManager = new UIStateManager();
-        this.timestampManager = new TimestampManager();
-        this.operationManager = new OperationManager();
-        this.debouncedSearch = new DebouncedOperation(this.operationManager, 'search', 300);
+    constructor(services: ServiceContainer) {
+        this.services = services;
+
+        const {
+            profileStateManager, courseDataService, courseSelectionService,
+            conflictDetector, modalService, filterService, scheduleFilterService,
+            scheduleManagementService, operationManager, uiStateManager
+        } = services;
+
+        this.themeSelector = new ThemeSelector(profileStateManager);
+        this.debouncedSearch = new DebouncedOperation(operationManager, 'search', 300);
+
+        // Initialize extracted services
+        this.colorService = new CourseColorService(courseSelectionService);
+        this.autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, scheduleFilterService);
 
         // Initialize controllers
-        this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
-        this.scheduleController = new ScheduleController(this.courseSelectionService);
-        this.sectionInfoModalController = new SectionInfoModalController(this.modalService);
-        new InfoModalController(this.modalService);
-        this.filterModalController = new FilterModalController(this.modalService);
-        this.scheduleFilterModalController = new ScheduleFilterModalController(this.modalService, this.scheduleController);
-        
+        this.departmentController = new DepartmentController();
+        this.courseController = new CourseController(courseSelectionService, courseDataService);
+        this.scheduleController = new ScheduleController(courseSelectionService, this.colorService, this.autoScheduleOrchestrator);
+        this.sectionInfoModalController = new SectionInfoModalController(modalService);
+        new InfoModalController(modalService);
+        this.filterModalController = new FilterModalController(modalService);
+        this.scheduleFilterModalController = new ScheduleFilterModalController(modalService, this.autoScheduleOrchestrator);
+
         // Connect filter service to course controller
-        this.courseController.setFilterService(this.filterService);
+        this.courseController.setFilterService(filterService);
 
         // Register rendering callbacks for term expansion state management
         this.courseController.setOnBatchCallback(() => {
@@ -116,32 +80,46 @@ export class MainController {
         });
 
         // Connect filter service and course data to filter modal
-        this.filterModalController.setFilterService(this.filterService);
-        this.filterModalController.setCourseSelectionService(this.courseSelectionService);
-        
+        this.filterModalController.setFilterService(filterService);
+        this.filterModalController.setCourseSelectionService(courseSelectionService);
+
         // Connect schedule filter service to controllers
-        this.scheduleFilterModalController.setScheduleFilterService(this.scheduleFilterService);
-        this.scheduleController.setCourseDataService(this.courseDataService);
-        this.scheduleController.setConflictDetector(this.conflictDetector);
-        this.scheduleController.setScheduleFilterService(this.scheduleFilterService);
+        this.scheduleFilterModalController.setScheduleFilterService(scheduleFilterService);
+        this.scheduleController.setCourseDataService(courseDataService);
+        this.scheduleController.setConflictDetector(conflictDetector);
+        this.scheduleController.setScheduleFilterService(scheduleFilterService);
 
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
-        this.scheduleController.setModalService(this.modalService);
+        this.scheduleController.setModalService(modalService);
 
         // Set up schedule update callback for calendar event exclusions
         this.scheduleController.setScheduleUpdateCallback((scheduleId, updates) => {
-            this.profileStateManager.updateSchedule(scheduleId, updates, 'calendar-event-exclusion');
+            profileStateManager.updateSchedule(scheduleId, updates, 'calendar-event-exclusion');
         });
 
         // Connect filter service to department controller
-        this.departmentController.setFilterService(this.filterService);
+        this.departmentController.setFilterService(filterService);
 
-        // Set up course data event subscriptions
-        this.setupCourseDataSubscriptions();
+        // Set up course data event subscriptions via AppBootstrap
+        AppBootstrap.setupCourseDataSubscriptions(services, {
+            setAllDepartments: (departments) => {
+                this.allDepartments = departments;
+            },
+            onDataLoaded: (departments) => {
+                this.filterModalController.setCourseData(departments);
+                this.departmentController.setAllDepartments(departments);
+                this.courseController.setAllDepartments(departments);
+            },
+            onDataRefreshed: (departments) => {
+                this.filterModalController.setCourseData(departments);
+                this.departmentController.setAllDepartments(departments);
+                this.courseController.setAllDepartments(departments);
+            },
+        });
 
         // Initialize tracking for course changes
-        const initialSelectedCourses = this.courseSelectionService.getSelectedCourses();
+        const initialSelectedCourses = courseSelectionService.getSelectedCourses();
         this.previousSelectedCoursesCount = initialSelectedCourses.length;
         this.previousSelectedCoursesMap = new Map();
         initialSelectedCourses.forEach(sc => {
@@ -151,83 +129,15 @@ export class MainController {
                 lab: sc.selectedLab?.number || null
             });
         });
-        
-        // IMPORTANT: Initialize filters LAST (triggers events that use operationManager)
-        this.initializeFilters();
 
-        this.init();
-    }
+        // Initialize filters and wire up filter change listeners
+        AppBootstrap.initializeFilters(services);
 
-    /**
-     * Set up event subscriptions for course data changes
-     */
-    private setupCourseDataSubscriptions(): void {
-        // Subscribe to data-loaded event
-        this.courseDataService.on('data-loaded', (event) => {
-            // Phase 1: Set catalog (needed for section reconstruction)
-            this.profileStateManager.setCourseData(event.departments);
-
-            // Set course data for filters (needed for professor list, etc.)
-            const allCourses = event.departments.flatMap(d => d.courses);
-            this.filterService.setCourseData(allCourses);
-            this.filterModalController.setCourseData(event.departments);
-
-            // Phase 2: Set department data
-            this.departmentController.setAllDepartments(event.departments);
-            this.courseController.setAllDepartments(event.departments);
-            this.courseSelectionService.setAllDepartments(event.departments);
-
-            // Phase 3: Post-load operations
-            this.courseSelectionService.reconstructSectionObjects();
-            this.scheduleManagementService.initializeDefaultScheduleIfNeeded();
-            this.timestampManager.updateClientTimestamp();
-
-            if (!this.filterService.hasFilter('academicYear')) {
-                const allCourses = event.departments.flatMap(d => d.courses);
-                const years = [...new Set(allCourses.map(c => c.academicYear).filter(Boolean) as number[])].sort();
-                if (years.length > 1) {
-                    this.filterService.addFilter('academicYear', { year: years[years.length - 1] });
-                }
-            }
-
-            // Store reference for later use
-            this.allDepartments = event.departments;
-        });
-
-        // Subscribe to data-refreshed event (after cloud sync)
-        this.courseDataService.on('data-refreshed', (event) => {
-            this.profileStateManager.setCourseData(event.departments);
-
-            // Set course data for filters (needed for professor list, etc.)
-            const allCourses = event.departments.flatMap(d => d.courses);
-            this.filterService.setCourseData(allCourses);
-            this.filterModalController.setCourseData(event.departments);
-            this.departmentController.setAllDepartments(event.departments);
-            this.courseController.setAllDepartments(event.departments);
-            this.courseSelectionService.setAllDepartments(event.departments);
-        });
-    }
-
-    private initializeFilters(): void {
-        const filters = createDefaultFilters(rateMyProfessorService);
-        filters.forEach(filter => {
-            this.filterService.registerFilter(filter);
-        });
-
-        // Register SearchTextFilter
-        const searchTextFilter = new SearchTextFilter();
-        this.filterService.registerFilter(searchTextFilter);
-
-        // Register PeriodConflictFilter
-        this.filterService.setConflictDetector();
-
-        // Set up filter change listener to refresh UI
-        this.filterService.addEventListener((_event) => {
+        filterService.addEventListener((_event) => {
             this.refreshCurrentView();
         });
 
-        // Set up schedule filter change listener
-        this.scheduleFilterService.addEventListener((_event) => {
+        scheduleFilterService.addEventListener((_event) => {
             this.scheduleController.applyFiltersAndRefresh();
         });
 
@@ -237,24 +147,16 @@ export class MainController {
             this.updateScheduleFilterButtonState();
             this.updateBookmarkFilterButtonState();
         }, 100);
+
+        this.init();
     }
 
     private async init(): Promise<void> {
-        this.uiStateManager.showLoadingState();
+        this.services.uiStateManager.showLoadingState();
 
         try {
-            const storageWorker = StorageWorkerManager.getInstance();
-            await storageWorker.initialize();
-
-            await this.storageService.initialize();
+            await AppBootstrap.initializeAsyncServices(this.services);
             this.themeSelector.initializeTheme();
-            await rateMyProfessorService.loadData();
-            await this.courseSelectionService.initialize();
-            await this.scheduleManagementService.initialize();
-
-            await TermBoundsService.getInstance().loadTermBounds();
-
-            await this.loadCourseData();
 
             this.departmentController.displayDepartments();
 
@@ -265,40 +167,30 @@ export class MainController {
             this.setupCourseSelectionListener();
             this.setupScheduleChangeListener();
             this.initializeSwipeNavigation();
-            this.setupWindowUnloadHandler();
+            AppBootstrap.setupWindowUnloadHandler();
+
+            // Wire up calendar event provider for auto-scheduler
+            this.autoScheduleOrchestrator.setCalendarEventProvider(this.scheduleController);
 
             // Load active schedule into ScheduleController (for local events, etc.)
-            const activeSchedule = this.scheduleManagementService.getActiveSchedule();
+            const activeSchedule = this.services.scheduleManagementService.getActiveSchedule();
             if (activeSchedule) {
                 this.scheduleController.loadExternalEvents(activeSchedule);
             }
 
             this.scheduleController.setupAutoScheduleButton();
             this.scheduleController.setupClearAllSectionsButton();
-            this.scheduleController.setupCourseSelectionChangeListener();
+            this.autoScheduleOrchestrator.setupCourseSelectionChangeListener();
             this.courseController.displaySelectedCourses();
-            
+
             // Initial UI sync for selected courses (use efficient targeted updates)
             this.syncInitialCourseSelectionUI();
         } catch (error) {
             console.error('Failed to initialize application:', error);
-            this.uiStateManager.showErrorMessage(
+            this.services.uiStateManager.showErrorMessage(
                 'Failed to initialize application. Some features may not work properly.',
-                () => this.scheduleManagementService.clearAllSchedules()
+                () => this.services.scheduleManagementService.clearAllSchedules()
             );
-        }
-    }
-
-    private async loadCourseData(): Promise<void> {
-        try {
-            // Load course data - event listeners handle distribution
-            await this.courseDataService.loadCourseData();
-
-            // Load server timestamp
-            await this.timestampManager.loadServerTimestamp();
-        } catch (error) {
-            console.error('Failed to load course data:', error);
-            this.uiStateManager.showErrorMessage('Failed to load course data. Please try refreshing the page.');
         }
     }
 
@@ -326,32 +218,18 @@ export class MainController {
     }
 
     private handleSwipeLeft(): void {
-        if (this.uiStateManager.getCurrentPage() === 'planner') {
-            this.uiStateManager.switchToPage('schedule');
+        if (this.services.uiStateManager.getCurrentPage() === 'planner') {
+            this.services.uiStateManager.switchToPage('schedule');
             this.scheduleController.displayScheduleSelectedCourses();
             this.scheduleController.renderScheduleGrids();
         }
     }
 
     private handleSwipeRight(): void {
-        if (this.uiStateManager.getCurrentPage() === 'schedule') {
+        if (this.services.uiStateManager.getCurrentPage() === 'schedule') {
             this.scheduleController.closeComponentWizard();
-            this.uiStateManager.switchToPage('planner');
+            this.services.uiStateManager.switchToPage('planner');
         }
-    }
-
-    private setupWindowUnloadHandler(): void {
-        window.addEventListener('beforeunload', async (e) => {
-            const profileStateManager = ProfileStateManager.getInstance();
-
-            if (profileStateManager.hasPendingSaves()) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            }
-
-            StorageWorkerManager.getInstance().terminate();
-        });
     }
 
 
@@ -505,7 +383,7 @@ export class MainController {
                         this.courseController.toggleCourseSelection(courseElement);
                     } catch (error) {
                         console.error('Failed to toggle course selection:', error);
-                        this.uiStateManager.showErrorMessage('Failed to update course selection. Please try again.');
+                        this.services.uiStateManager.showErrorMessage('Failed to update course selection. Please try again.');
                     }
                 }
             }
@@ -522,7 +400,7 @@ export class MainController {
                 // Handle Load More button click
                 this.handleLoadMoreClick().catch(error => {
                     console.error('Failed to load more courses:', error);
-                    this.uiStateManager.showErrorMessage('Failed to load more courses. Please try again.');
+                    this.services.uiStateManager.showErrorMessage('Failed to load more courses. Please try again.');
                 });
                 return;
             }
@@ -530,7 +408,7 @@ export class MainController {
             if (target.classList.contains('course-remove-btn')) {
                 // Determine which page we're on and use the appropriate controller
                 let course;
-                if (this.uiStateManager.currentPage === 'schedule') {
+                if (this.services.uiStateManager.currentPage === 'schedule') {
                     course = this.scheduleController.getCourseFromElement(target as HTMLElement);
                 } else {
                     course = this.courseController.getCourseFromElement(target as HTMLElement);
@@ -538,9 +416,9 @@ export class MainController {
 
                 if (course) {
                     // Directly remove course (remove button means always unselect)
-                    this.courseSelectionService.unselectCourse(course).catch(error => {
+                    this.services.courseSelectionService.unselectCourse(course).catch(error => {
                         console.error('Failed to unselect course:', error);
-                        this.uiStateManager.showErrorMessage('Failed to remove course. Please try again.');
+                        this.services.uiStateManager.showErrorMessage('Failed to remove course. Please try again.');
                     });
                 }
             }
@@ -553,16 +431,16 @@ export class MainController {
                     : target.closest('.course-clear-sections-btn') as HTMLElement;
 
                 let course;
-                if (this.uiStateManager.currentPage === 'schedule') {
+                if (this.services.uiStateManager.currentPage === 'schedule') {
                     course = this.scheduleController.getCourseFromElement(button);
                 } else {
                     course = this.courseController.getCourseFromElement(button);
                 }
 
                 if (course) {
-                    this.courseSelectionService.clearCourseComponents(course).catch(error => {
+                    this.services.courseSelectionService.clearCourseComponents(course).catch(error => {
                         console.error('Failed to clear course components:', error);
-                        this.uiStateManager.showErrorMessage('Failed to clear sections. Please try again.');
+                        this.services.uiStateManager.showErrorMessage('Failed to clear sections. Please try again.');
                     });
                 }
                 return;
@@ -572,7 +450,7 @@ export class MainController {
             if (target.classList.contains('schedule-course-header') || target.closest('.schedule-course-header')) {
                 e.stopPropagation();
 
-                if (this.uiStateManager.currentPage === 'schedule') {
+                if (this.services.uiStateManager.currentPage === 'schedule') {
                     // Don't trigger if clicking remove button
                     if (target.classList.contains('course-remove-btn')) {
                         return;
@@ -588,7 +466,7 @@ export class MainController {
                             const course = this.scheduleController.getCourseFromElement(courseElement);
                             if (course) {
                                 // Get existing selections for this course
-                                const selectedCourses = this.courseSelectionService.getSelectedCourses();
+                                const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
                                 const existingSelections = selectedCourses.find(sc => sc.course.id === course.id);
 
                                 // Log without circular reference
@@ -643,9 +521,9 @@ export class MainController {
                     // Update search text filter in FilterService
                     // Only trim for the check, but pass the original query with spaces
                     if (query.trim().length > 0) {
-                        this.filterService.addFilter('searchText', { query });
+                        this.services.filterService.addFilter('searchText', { query });
                     } else {
-                        this.filterService.removeFilter('searchText');
+                        this.services.filterService.removeFilter('searchText');
                     }
 
                     cancellationToken.throwIfCancelled();
@@ -679,13 +557,13 @@ export class MainController {
             plannerTab.addEventListener('click', () => {
                 // Close wizard when switching to planner/classes page
                 this.scheduleController.closeComponentWizard();
-                this.uiStateManager.switchToPage('planner');
+                this.services.uiStateManager.switchToPage('planner');
             });
         }
 
         if (scheduleTab) {
             scheduleTab.addEventListener('click', async () => {
-                this.uiStateManager.switchToPage('schedule');
+                this.services.uiStateManager.switchToPage('schedule');
 
                 // Wrap display operations in batch mode to prevent multiple saves
                 const stateManager = ProfileStateManager.getInstance();
@@ -702,14 +580,14 @@ export class MainController {
         
         if (viewListBtn) {
             viewListBtn.addEventListener('click', () => {
-                this.uiStateManager.setView('list');
+                this.services.uiStateManager.setView('list');
                 this.refreshCurrentView();
             });
         }
         
         if (viewGridBtn) {
             viewGridBtn.addEventListener('click', () => {
-                this.uiStateManager.setView('grid');
+                this.services.uiStateManager.setView('grid');
                 this.refreshCurrentView();
             });
         }
@@ -728,10 +606,10 @@ export class MainController {
         if (bookmarkFilterButton) {
             // Icon is set by updateBookmarkFilterButtonState during initialization
             bookmarkFilterButton.addEventListener('click', () => {
-                if (this.filterService.hasFilter('bookmark')) {
-                    this.filterService.removeFilter('bookmark');
+                if (this.services.filterService.hasFilter('bookmark')) {
+                    this.services.filterService.removeFilter('bookmark');
                 } else {
-                    this.filterService.addFilter('bookmark', { showBookmarkedOnly: true });
+                    this.services.filterService.addFilter('bookmark', { showBookmarkedOnly: true });
                 }
                 this.updateBookmarkFilterButtonState();
             });
@@ -742,8 +620,8 @@ export class MainController {
         if (clearFiltersButton) {
             clearFiltersButton.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'eraser-icon'));
             clearFiltersButton.addEventListener('click', () => {
-                if (this.filterService) {
-                    this.filterService.clearFilters();
+                if (this.services.filterService) {
+                    this.services.filterService.clearFilters();
                     this.updateFilterButtonState();
                     this.updateClearFiltersButtonState();
                     this.updateBookmarkFilterButtonState();
@@ -756,7 +634,7 @@ export class MainController {
         if (scheduleFilterButton) {
             scheduleFilterButton.insertAdjacentHTML('afterbegin', getInlineSVG('FILTER_FILLED', 'filter-icon'));
             scheduleFilterButton.addEventListener('click', () => {
-                const selectedCourses = this.courseSelectionService.getSelectedCourses();
+                const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
                 this.scheduleFilterModalController.setSelectedCourses(selectedCourses);
                 this.scheduleFilterModalController.show();
             });
@@ -767,8 +645,8 @@ export class MainController {
         if (scheduleClearFiltersButton) {
             scheduleClearFiltersButton.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'eraser-icon'));
             scheduleClearFiltersButton.addEventListener('click', () => {
-                if (this.scheduleFilterService) {
-                    this.scheduleFilterService.clearFilters();
+                if (this.services.scheduleFilterService) {
+                    this.services.scheduleFilterService.clearFilters();
                     this.updateScheduleFilterButtonState();
                     this.updateScheduleClearFiltersButtonState();
                 }
@@ -782,9 +660,9 @@ export class MainController {
                 const query = scheduleSearchInput.value;
 
                 if (query.trim().length > 0) {
-                    this.scheduleFilterService.addFilter('searchText', { query });
+                    this.services.scheduleFilterService.addFilter('searchText', { query });
                 } else {
-                    this.scheduleFilterService.removeFilter('searchText');
+                    this.services.scheduleFilterService.removeFilter('searchText');
                 }
 
                 // Refresh the schedule page display
@@ -828,7 +706,7 @@ export class MainController {
         });
 
         // Listen to undo/redo state changes to update button states
-        this.profileStateManager.onUndoRedoChange(() => {
+        this.services.profileStateManager.onUndoRedoChange(() => {
             this.updateUndoRedoButtons();
         });
 
@@ -1007,16 +885,16 @@ export class MainController {
     private refreshCurrentView(): void {
         this.expandedTerms.clear();
 
-        const hasFilters = !this.filterService.isEmpty();
+        const hasFilters = !this.services.filterService.isEmpty();
 
         // Check if department filter is active
-        const departmentFilter = this.filterService.getActiveFilters()
+        const departmentFilter = this.services.filterService.getActiveFilters()
             .find(f => f.id === 'department');
         const departmentCriteria = departmentFilter?.criteria as { departments?: string[] } | undefined;
         const activeDepartmentIds = departmentCriteria?.departments || [];
 
         // Start a new render operation with cancellation support
-        const cancellationToken = this.operationManager.startOperation('render', 'New render requested');
+        const cancellationToken = this.services.operationManager.startOperation('render', 'New render requested');
 
         let coursesToDisplay: Course[] = [];
 
@@ -1030,10 +908,10 @@ export class MainController {
                 baseCourses = this.getAllCourses();
             }
 
-            coursesToDisplay = this.filterService.filterCourses(baseCourses);
+            coursesToDisplay = this.services.filterService.filterCourses(baseCourses);
 
             // Update header based on filter state
-            if (activeDepartmentIds.length === 1 && this.filterService.getActiveFilters().length === 1) {
+            if (activeDepartmentIds.length === 1 && this.services.filterService.getActiveFilters().length === 1) {
                 // Single department filter only
                 const dept = this.departmentController.getDepartmentById(activeDepartmentIds[0]);
                 if (dept) {
@@ -1064,12 +942,12 @@ export class MainController {
             // Pass cancellation token to the progressive renderer
             await this.courseController.displayCoursesWithCancellation(
                 coursesToDisplay, 
-                this.uiStateManager.currentView,
+                this.services.uiStateManager.currentView,
                 cancellationToken
             );
             
             // Mark operation as complete
-            this.operationManager.completeOperation('render');
+            this.services.operationManager.completeOperation('render');
             
         } catch (error) {
             if ((error as Error).name === 'CancellationError') {
@@ -1077,15 +955,15 @@ export class MainController {
                 return;
             }
             console.error('Error displaying courses:', error);
-            this.operationManager.completeOperation('render');
+            this.services.operationManager.completeOperation('render');
         }
     }
 
     private updateFilterButtonState(): void {
         const filterButton = document.getElementById('filter-btn');
-        if (filterButton && this.filterService) {
-            const hasActiveFilters = !this.filterService.isEmpty();
-            const filterCount = this.filterService.getFilterCount();
+        if (filterButton && this.services.filterService) {
+            const hasActiveFilters = !this.services.filterService.isEmpty();
+            const filterCount = this.services.filterService.getFilterCount();
 
             if (hasActiveFilters) {
                 filterButton.classList.add('active');
@@ -1100,8 +978,8 @@ export class MainController {
 
     private updateClearFiltersButtonState(): void {
         const clearFiltersButton = document.getElementById('clear-filters-btn') as HTMLButtonElement | null;
-        if (clearFiltersButton && this.filterService) {
-            const hasActiveFilters = !this.filterService.isEmpty();
+        if (clearFiltersButton && this.services.filterService) {
+            const hasActiveFilters = !this.services.filterService.isEmpty();
 
             if (hasActiveFilters) {
                 clearFiltersButton.style.display = '';
@@ -1114,8 +992,8 @@ export class MainController {
 
     private updateBookmarkFilterButtonState(): void {
         const button = document.getElementById('bookmark-filter-btn');
-        if (button && this.filterService) {
-            const isActive = this.filterService.hasFilter('bookmark');
+        if (button && this.services.filterService) {
+            const isActive = this.services.filterService.hasFilter('bookmark');
             button.classList.toggle('active', isActive);
 
             // Swap icon between outline and filled
@@ -1134,9 +1012,9 @@ export class MainController {
 
     private updateScheduleFilterButtonState(): void {
         const scheduleFilterButton = document.getElementById('schedule-filter-btn');
-        if (scheduleFilterButton && this.scheduleFilterService) {
-            const hasActiveFilters = !this.scheduleFilterService.isEmpty();
-            const filterCount = this.scheduleFilterService.getFilterCount();
+        if (scheduleFilterButton && this.services.scheduleFilterService) {
+            const hasActiveFilters = !this.services.scheduleFilterService.isEmpty();
+            const filterCount = this.services.scheduleFilterService.getFilterCount();
 
             if (hasActiveFilters) {
                 scheduleFilterButton.classList.add('active');
@@ -1151,8 +1029,8 @@ export class MainController {
 
     private updateScheduleClearFiltersButtonState(): void {
         const scheduleClearFiltersButton = document.getElementById('schedule-clear-filters-btn') as HTMLButtonElement | null;
-        if (scheduleClearFiltersButton && this.scheduleFilterService) {
-            const hasActiveFilters = !this.scheduleFilterService.isEmpty();
+        if (scheduleClearFiltersButton && this.services.scheduleFilterService) {
+            const hasActiveFilters = !this.services.scheduleFilterService.isEmpty();
 
             if (hasActiveFilters) {
                 scheduleClearFiltersButton.style.display = '';
@@ -1165,7 +1043,7 @@ export class MainController {
 
     private openSchedulePicker(): void {
         if (!this.schedulePickerModal) {
-            this.schedulePickerModal = new SchedulePickerModal(this.modalService, this.scheduleManagementService);
+            this.schedulePickerModal = new SchedulePickerModal(this.services.modalService, this.services.scheduleManagementService);
         }
         this.schedulePickerModal.show();
     }
@@ -1174,9 +1052,9 @@ export class MainController {
         const labelElement = document.getElementById('schedule-picker-label');
         if (labelElement) {
             // Wait for initialization if needed
-            await this.scheduleManagementService.initialize();
+            await this.services.scheduleManagementService.initialize();
 
-            const activeSchedule = this.scheduleManagementService.getActiveSchedule();
+            const activeSchedule = this.services.scheduleManagementService.getActiveSchedule();
             if (activeSchedule) {
                 labelElement.textContent = activeSchedule.name;
             }
@@ -1188,7 +1066,7 @@ export class MainController {
     private previousSelectedCoursesMap = new Map<string, { lecture: string | null; discussion: string | null; lab: string | null }>();
 
     private setupScheduleChangeListener(): void {
-        this.scheduleManagementService.onActiveScheduleChange((_activeSchedule, event) => {
+        this.services.scheduleManagementService.onActiveScheduleChange((_activeSchedule, event) => {
             this.updateSchedulePickerButton();
 
             // Skip reloading events if this was just an exclusion change
@@ -1199,7 +1077,7 @@ export class MainController {
             }
 
             // Load schedule data (including local events) for the new active schedule
-            const activeSchedule = this.scheduleManagementService.getActiveSchedule();
+            const activeSchedule = this.services.scheduleManagementService.getActiveSchedule();
             if (activeSchedule) {
                 console.log('[MainController] Loading schedule data after schedule change');
                 this.scheduleController.loadExternalEvents(activeSchedule);
@@ -1209,7 +1087,7 @@ export class MainController {
     }
 
     private setupCourseSelectionListener(): void {
-        this.courseSelectionService.onSelectionChangeWithType((event) => {
+        this.services.courseSelectionService.onSelectionChangeWithType((event) => {
             const selectedCourses = event.selectedCourses;
             const currentCount = selectedCourses.length;
             const isCoursesAddedOrRemoved = currentCount !== this.previousSelectedCoursesCount;
@@ -1223,7 +1101,7 @@ export class MainController {
                 this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
                 this.courseController.displaySelectedCourses();
                 this.scheduleController.displayScheduleSelectedCourses();
-                if (this.uiStateManager.currentPage === 'schedule') {
+                if (this.services.uiStateManager.currentPage === 'schedule') {
                     this.scheduleController.renderScheduleGrids();
                 }
                 this.updateSelectedCoursesState(selectedCourses);
@@ -1236,7 +1114,7 @@ export class MainController {
                     this.courseController.displaySelectedCourses();
                 }
                 this.scheduleController.displayScheduleSelectedCourses();
-                if (this.uiStateManager.currentPage === 'schedule') {
+                if (this.services.uiStateManager.currentPage === 'schedule') {
                     this.scheduleController.renderAffectedTerms(event.affectedCourseIds);
                 }
                 this.updateSelectedCoursesState(selectedCourses);
@@ -1266,7 +1144,7 @@ export class MainController {
                 this.scheduleController.displayScheduleSelectedCourses();
 
                 // Also refresh schedule grids if we're on the schedule page
-                if (this.uiStateManager.currentPage === 'schedule') {
+                if (this.services.uiStateManager.currentPage === 'schedule') {
                     this.scheduleController.renderScheduleGrids();
                 }
             } else {
@@ -1291,7 +1169,7 @@ export class MainController {
                 }
                 
                 // Update schedule grids if any sections changed
-                if (sectionSelectionsChanged && this.uiStateManager.currentPage === 'schedule') {
+                if (sectionSelectionsChanged && this.services.uiStateManager.currentPage === 'schedule') {
                     this.scheduleController.renderScheduleGrids();
                 }
             }
@@ -1314,20 +1192,20 @@ export class MainController {
     }
 
     private handleUndo(): void {
-        this.profileStateManager.undo().then(() => {
+        this.services.profileStateManager.undo().then(() => {
             this.refreshUI();
         }).catch(error => {
             console.error('Undo failed:', error);
-            this.uiStateManager.showErrorMessage('Failed to undo. Please try again.');
+            this.services.uiStateManager.showErrorMessage('Failed to undo. Please try again.');
         });
     }
 
     private handleRedo(): void {
-        this.profileStateManager.redo().then(() => {
+        this.services.profileStateManager.redo().then(() => {
             this.refreshUI();
         }).catch(error => {
             console.error('Redo failed:', error);
-            this.uiStateManager.showErrorMessage('Failed to redo. Please try again.');
+            this.services.uiStateManager.showErrorMessage('Failed to redo. Please try again.');
         });
     }
 
@@ -1335,7 +1213,7 @@ export class MainController {
         this.courseController.displaySelectedCourses();
         this.scheduleController.displayScheduleSelectedCourses();
 
-        if (this.uiStateManager.currentPage === 'schedule') {
+        if (this.services.uiStateManager.currentPage === 'schedule') {
             this.scheduleController.renderScheduleGrids();
         } else {
             this.refreshCurrentView();
@@ -1347,11 +1225,11 @@ export class MainController {
         const redoBtn = document.getElementById('redo-btn') as HTMLButtonElement;
 
         if (undoBtn) {
-            undoBtn.disabled = !this.profileStateManager.canUndo();
+            undoBtn.disabled = !this.services.profileStateManager.canUndo();
         }
 
         if (redoBtn) {
-            redoBtn.disabled = !this.profileStateManager.canRedo();
+            redoBtn.disabled = !this.services.profileStateManager.canRedo();
         }
     }
 
@@ -1359,7 +1237,7 @@ export class MainController {
      * Efficiently sync UI for initially selected courses without global refresh
      */
     private syncInitialCourseSelectionUI(): void {
-        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
         
         // Use targeted updates for each selected course
         selectedCourses.forEach(selectedCourse => {
@@ -1408,7 +1286,7 @@ export class MainController {
                     this.handleUndo();
                     this.closeSettingsMenu();
                 },
-                checkDisabled: () => !this.profileStateManager.canUndo()
+                checkDisabled: () => !this.services.profileStateManager.canUndo()
             },
             {
                 icon: 'ARROW_FORWARD_UP',
@@ -1418,7 +1296,7 @@ export class MainController {
                     this.handleRedo();
                     this.closeSettingsMenu();
                 },
-                checkDisabled: () => !this.profileStateManager.canRedo()
+                checkDisabled: () => !this.services.profileStateManager.canRedo()
             }
         ];
 
@@ -1465,8 +1343,8 @@ export class MainController {
                 // Update undo/redo button states
                 const undoBtn = document.getElementById('settings-undo-btn') as HTMLButtonElement;
                 const redoBtn = document.getElementById('settings-redo-btn') as HTMLButtonElement;
-                if (undoBtn) undoBtn.disabled = !this.profileStateManager.canUndo();
-                if (redoBtn) redoBtn.disabled = !this.profileStateManager.canRedo();
+                if (undoBtn) undoBtn.disabled = !this.services.profileStateManager.canUndo();
+                if (redoBtn) redoBtn.disabled = !this.services.profileStateManager.canRedo();
             }
         });
 
@@ -1518,18 +1396,18 @@ export class MainController {
     }
 
     private toggleTheme(): void {
-        const currentThemeId = this.themeManager.getCurrentThemeId();
+        const currentThemeId = this.services.themeManager.getCurrentThemeId();
 
         // Toggle between light and dark themes
         if (currentThemeId === 'wpi-dark') {
-            this.themeManager.setTheme('wpi-light');
+            this.services.themeManager.setTheme('wpi-light');
         } else {
-            this.themeManager.setTheme('wpi-dark');
+            this.services.themeManager.setTheme('wpi-dark');
         }
     }
 
     public getModalService(): ModalService {
-        return this.modalService;
+        return this.services.modalService;
     }
 
     private getAllCourses(): Course[] {
@@ -1548,7 +1426,7 @@ export class MainController {
     private syncSearchInputFromFilters(): void {
         const searchInput = document.getElementById('search-input') as HTMLInputElement;
         if (searchInput) {
-            const searchTextFilter = this.filterService.getActiveFilters().find(f => f.id === 'searchText');
+            const searchTextFilter = this.services.filterService.getActiveFilters().find(f => f.id === 'searchText');
             const searchCriteria = searchTextFilter?.criteria as { query?: string } | undefined;
             const currentQuery = searchCriteria?.query || '';
             if (searchInput.value !== currentQuery) {
@@ -1560,7 +1438,7 @@ export class MainController {
     private updateFilteredHeader(resultCount: number, _selectedDepartment: Department | null): void {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
-            const filters = this.filterService.getActiveFilters();
+            const filters = this.services.filterService.getActiveFilters();
             const searchTextFilter = filters.find(f => f.id === 'searchText');
 
             if (searchTextFilter && filters.length === 1) {
@@ -1614,7 +1492,7 @@ export class MainController {
 
         try {
             // Load more courses using the current view
-            const currentView = this.uiStateManager.currentView;
+            const currentView = this.services.uiStateManager.currentView;
             await this.courseController.displayMoreCourses(currentView);
         } catch (error) {
             console.error('Error loading more courses:', error);

@@ -261,6 +261,7 @@ export class ScheduleFilterService {
                 const sections = this.periodsToSections(allPeriods);
                 const conflictCriteria = activeFilter.criteria as PeriodConflictFilterCriteria;
                 const validSections = this.conflictFilter.applyToSectionsWithContext(sections, {
+                    blockedSlots: [],
                     ...conflictCriteria,
                     selectedCourses: selectedCourses
                 });
@@ -389,6 +390,7 @@ export class ScheduleFilterService {
 
                 const conflictCriteria = activeFilter.criteria as PeriodConflictFilterCriteria;
                 allSections = this.conflictFilter.applyToSectionsWithContext(allSections, {
+                    blockedSlots: [],
                     ...conflictCriteria,
                     selectedCourses: selectedCourses
                 });

@@ -5,7 +5,7 @@ export { SectionInfoModalController } from './SectionInfoModalController';
 export { MainController } from './MainController';
 export { ScheduleController } from './ScheduleController';
 export { TimestampManager } from './TimestampManager';
-export { UIStateManager } from './UIStateManager';
+export { UIStateManager } from '../../services/ui/UIStateManager';
 export { ScheduleFilterModalController } from './ScheduleFilterModalController';
 export { FilterModalController } from './FilterModalController';
 export { CourseController } from './CourseController';

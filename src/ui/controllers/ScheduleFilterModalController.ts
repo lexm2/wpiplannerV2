@@ -6,16 +6,17 @@ import { getAllSections } from '../../utils/courseUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup } from '../components/SharedFilterSetup';
 import { SectionCodeFilterCriteria, PeriodProfessorFilterCriteria, PeriodTermFilterCriteria, PeriodAvailabilityFilterCriteria, PeriodConflictFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria } from '../../types/filters';
+import type { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
 
 export class ScheduleFilterModalController extends BaseModal {
     private scheduleFilterService: ScheduleFilterService | null = null;
     private selectedCourses: SelectedCourse[] = [];
     private mode: 'filter' | 'auto-schedule' = 'filter';
-    private scheduleController?: any;
+    private autoScheduleOrchestrator?: AutoScheduleOrchestrator;
 
-    constructor(modalService: ModalService, scheduleController?: any) {
+    constructor(modalService: ModalService, autoScheduleOrchestrator?: AutoScheduleOrchestrator) {
         super(modalService);
-        this.scheduleController = scheduleController;
+        this.autoScheduleOrchestrator = autoScheduleOrchestrator;
     }
 
     setScheduleFilterService(scheduleFilterService: ScheduleFilterService): void {
@@ -265,8 +266,8 @@ export class ScheduleFilterModalController extends BaseModal {
 
         const activeConflictDetection = this.getActiveConflictDetection();
         const hasCalendarEvents = this.hasCalendarEventsBlocked();
-        const localEventCount = this.scheduleController
-            ? this.scheduleController.getLocalEventCount()
+        const localEventCount = this.autoScheduleOrchestrator
+            ? this.autoScheduleOrchestrator.getLocalEventCount()
             : 0;
 
         return SharedFilterComponents.createConflictFilter({
@@ -779,7 +780,7 @@ export class ScheduleFilterModalController extends BaseModal {
 
     private handleCalendarEventsToggle(checked: boolean, modalElement: HTMLElement): void {
         if (checked) {
-            const calendarSlots = this.scheduleController.getAllCalendarBlockedTimes();
+            const calendarSlots = this.autoScheduleOrchestrator!.getAllCalendarBlockedTimes();
 
             const existingFilter = this.scheduleFilterService!.getActiveFilters().find(f => f.id === 'periodConflict');
             const existingSlots = (existingFilter?.criteria as any)?.blockedSlots || [];
@@ -812,6 +813,6 @@ export class ScheduleFilterModalController extends BaseModal {
 
     private async handleAutoScheduleGenerate(): Promise<void> {
         this.hide();
-        await this.scheduleController.generateSchedules(this.selectedCourses);
+        await this.autoScheduleOrchestrator!.generateSchedules(this.selectedCourses);
     }
 }
