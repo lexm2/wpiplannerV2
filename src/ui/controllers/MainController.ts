@@ -2,7 +2,6 @@ import { Course, Department } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { SchedulePickerModal } from '../components/SchedulePickerModal'
-import { getAllSections } from '../../utils/courseUtils'
 import { DepartmentController } from './DepartmentController'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
@@ -271,7 +270,6 @@ export class MainController {
                 if (this.courseController.isRendering()) {
                     // Queue the expansion for later
                     this.pendingExpansions.push({ courseId, term: clickedTerm });
-                    console.log(`Queued term expansion: ${courseId} -> ${clickedTerm}`);
                     return;
                 }
 
@@ -468,27 +466,6 @@ export class MainController {
                                 // Get existing selections for this course
                                 const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
                                 const existingSelections = selectedCourses.find(sc => sc.course.id === course.id);
-
-                                // Log without circular reference
-                                if (existingSelections) {
-                                    console.log('Selected Course Data:', {
-                                        isRequired: existingSelections.isRequired,
-                                        selectedLecture: existingSelections.selectedLecture?.number || null,
-                                        selectedDiscussion: existingSelections.selectedDiscussion?.number || null,
-                                        selectedLab: existingSelections.selectedLab?.number || null,
-                                        course: {
-                                            id: course.id,
-                                            number: course.number,
-                                            name: course.name,
-                                            department: course.departmentAbbr,
-                                            hasLectures: !!course.lectures && course.lectures.length > 0,
-                                            lecturesCount: course.lectures?.length || 0,
-                                            hasStandaloneLabs: !!course.standaloneLabs && course.standaloneLabs.length > 0,
-                                            standaloneLabs: course.standaloneLabs?.length || 0,
-                                            sectionsCount: getAllSections(course).length
-                                        }
-                                    });
-                                }
 
                                 // Open wizard with existing selections if any
                                 this.scheduleController.openComponentWizard(course, existingSelections);
@@ -851,8 +828,6 @@ export class MainController {
 
     private processPendingExpansions(): void {
         // Process all queued term expansions with animations
-        console.log(`Processing ${this.pendingExpansions.length} pending expansions`);
-
         this.pendingExpansions.forEach(({ courseId, term }) => {
             const courseSections = document.querySelector(`.course-sections[data-course-id="${courseId}"]`) as HTMLElement;
             if (!courseSections) {
@@ -875,7 +850,6 @@ export class MainController {
             // Use extracted animation function
             this.animateTermExpansion(courseSections, termBadgesContainer, termSectionsContainers, clickedTermContainer);
 
-            console.log(`Expanding ${courseId} -> ${term} with animation`);
         });
 
         // Clear the queue
@@ -1072,14 +1046,11 @@ export class MainController {
             // Skip reloading events if this was just an exclusion change
             // (the UI already updated optimistically, no need to refetch)
             if (event?.source === 'calendar-event-exclusion') {
-                console.log('[MainController] Skipping external events reload for exclusion change');
                 return;
             }
 
-            // Load schedule data (including local events) for the new active schedule
             const activeSchedule = this.services.scheduleManagementService.getActiveSchedule();
             if (activeSchedule) {
-                console.log('[MainController] Loading schedule data after schedule change');
                 this.scheduleController.loadExternalEvents(activeSchedule);
             }
         });
@@ -1244,7 +1215,6 @@ export class MainController {
             this.courseController.updateCourseUIById(selectedCourse.course.id, true);
         });
         
-        console.log(`Initial UI sync complete: Updated ${selectedCourses.length} selected courses`);
     }
 
     private setupSettingsMenu(): void {

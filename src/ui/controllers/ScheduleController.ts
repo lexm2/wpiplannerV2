@@ -444,7 +444,7 @@ export class ScheduleController implements CalendarEventProvider {
         const countElement = document.getElementById('schedule-selected-count');
 
         if (!selectedCoursesContainer) {
-            console.log('ERROR: Missing DOM element - selectedCoursesContainer not found');
+            console.error('Missing DOM element - selectedCoursesContainer not found');
             return;
         }
 
@@ -460,7 +460,6 @@ export class ScheduleController implements CalendarEventProvider {
         
         // Always show calendar button - users can add local events even without courses
         if (selectedCourses.length === 0) {
-            console.log('No courses selected - showing calendar button and empty state');
             if (countElement) {
                 countElement.textContent = '(0)';
             }
@@ -489,7 +488,6 @@ export class ScheduleController implements CalendarEventProvider {
         }
 
         if (hasActiveFilters && filteredSections.length === 0) {
-            console.log('Early return: 0 sections match active filters - displaying empty state');
             if (countElement) {
                 countElement.textContent = '(0 sections match filters)';
             }
@@ -1022,7 +1020,6 @@ export class ScheduleController implements CalendarEventProvider {
                 const computedTerm = getComputedTerm(sc);
 
                 if (!computedTerm) {
-                    console.warn(`Course ${sc.course.departmentAbbr}${sc.course.number} has no valid section data`);
                     return false;
                 }
 
@@ -1042,8 +1039,6 @@ export class ScheduleController implements CalendarEventProvider {
             }
 
             this.renderPopulatedGrid(gridContainer, termCourses, term, termHoverCourse);
-            const termEnd = performance.now();
-            console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms`);
         });
 
         perfMonitor.endMeasure('grid-render-total', renderStartTime);
@@ -1082,16 +1077,10 @@ export class ScheduleController implements CalendarEventProvider {
                 });
 
                 this.renderPopulatedGrid(gridContainer, termCourses, term, null);
-                const termEnd = performance.now();
-                console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms`);
             }
         });
 
-        if (this.autoScheduleE2EStartTime !== null) {
-            const e2eTime = performance.now() - this.autoScheduleE2EStartTime;
-            console.log(`[PERF E2E] Auto-schedule navigation (button click → schedule-cell updated): ${e2eTime.toFixed(2)}ms`);
-            this.autoScheduleE2EStartTime = null;
-        }
+        this.autoScheduleE2EStartTime = null;
     }
 
     private renderPopulatedGrid(container: HTMLElement, courses: SelectedCourse[], term: string, hoverCourse: SelectedCourse | null): void {
@@ -1118,7 +1107,6 @@ export class ScheduleController implements CalendarEventProvider {
         });
 
         const localEventSlots = this.getLocalEventSlotsForTerm(term);
-        console.log(`[ScheduleController] Rendering term ${term} with ${localEventSlots.length} local calendar slots`);
 
         const cellMap = this.buildCellOccupancyMap(courses, localEventSlots, weekdays, hoverCourse);
 
