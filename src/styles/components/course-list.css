@@ -184,7 +184,6 @@
   align-items: flex-start;
   flex-shrink: 0;
   overflow: visible;
-  transition: max-height 0.3s ease;
 }
 
 .course-sections.expanded {
@@ -298,10 +297,9 @@
   gap: 0.5rem;
   align-items: center;
   flex-wrap: wrap;
-  transition: opacity 0.2s ease, max-height 0.3s ease, padding-top 0.3s ease;
   padding-top: 0;
   max-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .term-badge.active {

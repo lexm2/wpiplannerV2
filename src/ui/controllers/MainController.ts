@@ -409,71 +409,81 @@ export class MainController {
                 // Check if this term is already expanded
                 const isExpanded = clickedTermContainer && clickedTermContainer.style.display !== 'none';
 
-                // Get current height before changes
-                const currentHeight = courseSections.scrollHeight;
-
-                // Set starting height
-                courseSections.style.maxHeight = `${currentHeight}px`;
-
                 if (isExpanded) {
                     // Update state: term is being collapsed
                     this.expandedTerms.delete(courseId);
 
-                    // Stagger animate badges out by row in reverse
-                    const sectionBadges = Array.from(clickedTermContainer.querySelectorAll('.section-badge')) as HTMLElement[];
-                    const rows = this.groupBadgesByRow(sectionBadges);
-                    const reversedRows = [...rows].reverse();
+                    const courseItem = courseSections.closest('.course-item') as HTMLElement;
 
-                    reversedRows.forEach((rowBadges, rowIndex) => {
-                        rowBadges.forEach((badge, badgeIndex) => {
-                            setTimeout(() => {
-                                badge.style.opacity = '0';
-                                badge.style.transform = 'translateX(-10px)';
-                            }, rowIndex * 30 + badgeIndex * 15);
-                        });
+                    // 1. Lock course-item at current height, promote to compositor layer
+                    const currentItemHeight = courseItem.getBoundingClientRect().height;
+                    courseItem.style.willChange = 'height';
+                    courseItem.style.height = `${currentItemHeight}px`;
+                    courseItem.style.overflow = 'hidden';
+
+                    // 2. Instantly do the full content swap
+                    termSectionsContainers.forEach(c => c.style.display = 'none');
+                    courseSections.classList.remove('expanded');
+                    courseSections.style.maxHeight = '';
+
+                    // Set initial state for term badges (hidden)
+                    const termBadges = termBadgesContainer.querySelectorAll('.term-badge') as NodeListOf<HTMLElement>;
+                    termBadges.forEach(badge => {
+                        badge.style.opacity = '0';
+                        badge.style.transform = 'translateX(-10px)';
+                        badge.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
                     });
 
-                    const badgeAnimTime = reversedRows.length * 30;
+                    termBadgesContainer.style.display = 'flex';
+                    termBadgesContainer.style.opacity = '1';
 
-                    // Animate height and padding to 0 after badges start fading
-                    setTimeout(() => {
-                        clickedTermContainer.style.maxHeight = '0';
-                        clickedTermContainer.style.paddingTop = '0';
+                    // Reset container styles (badges are hidden via display:none, no need to touch individually)
+                    clickedTermContainer.style.cssText = '';
+                    clickedTermContainer.style.display = 'none';
 
-                        // Rotate icon back
-                        const termIcon = clickedTermContainer.querySelector('.term-badge.active .term-icon') as HTMLElement;
-                        if (termIcon) {
-                            termIcon.style.transform = 'rotate(0deg)';
-                        }
-                    }, badgeAnimTime);
+                    // Rotate icon back
+                    const termIcon = clickedTermContainer.querySelector('.term-badge.active .term-icon') as HTMLElement;
+                    if (termIcon) {
+                        termIcon.style.transform = 'rotate(0deg)';
+                    }
 
-                    // After transition, swap containers
-                    setTimeout(() => {
-                        termSectionsContainers.forEach(c => c.style.display = 'none');
+                    // 3. Measure target height (temporarily unlock to get true content height)
+                    courseItem.style.height = 'auto';
+                    const targetItemHeight = courseItem.getBoundingClientRect().height;
+                    // Re-lock at starting height
+                    courseItem.style.height = `${currentItemHeight}px`;
+                    // Force browser to commit starting height before adding transition
+                    courseItem.offsetHeight;
+                    const collapseDuration = this.getHeightAnimDuration(currentItemHeight, targetItemHeight);
+                    courseItem.style.transition = `height ${collapseDuration}s ease`;
 
-                        // Set initial state for term badges
-                        const termBadges = termBadgesContainer.querySelectorAll('.term-badge') as NodeListOf<HTMLElement>;
-                        termBadges.forEach(badge => {
-                            badge.style.opacity = '0';
-                            badge.style.transform = 'translateX(-10px)';
-                            badge.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
-                        });
-
-                        termBadgesContainer.style.display = 'flex';
-                        termBadgesContainer.style.opacity = '1';
+                    // 4. Animate to target height
+                    requestAnimationFrame(() => {
+                        courseItem.style.height = `${targetItemHeight}px`;
 
                         // Stagger animate term badges in
-                        requestAnimationFrame(() => {
-                            termBadges.forEach((badge, i) => {
-                                setTimeout(() => {
-                                    badge.style.opacity = '1';
-                                    badge.style.transform = 'translateX(0)';
-                                }, i * 30);
-                            });
+                        termBadges.forEach((badge, i) => {
+                            setTimeout(() => {
+                                badge.style.opacity = '1';
+                                badge.style.transform = 'translateX(0)';
+                            }, i * 30);
                         });
 
-                        courseSections.classList.remove('expanded');
-                    }, badgeAnimTime + 300);
+                        // Clean up after transition
+                        const onEnd = (e: TransitionEvent) => {
+                            if (e.propertyName !== 'height') return;
+                            courseItem.style.height = '';
+                            courseItem.style.transition = '';
+                            courseItem.style.overflow = '';
+                            courseItem.style.willChange = '';
+                            // Clean up term badge inline styles
+                            termBadges.forEach(badge => {
+                                badge.style.cssText = '';
+                            });
+                            courseItem.removeEventListener('transitionend', onEnd);
+                        };
+                        courseItem.addEventListener('transitionend', onEnd);
+                    });
                 } else {
                     // Update state: term is being expanded
                     this.expandedTerms.set(courseId, clickedTerm);
@@ -862,17 +872,13 @@ export class MainController {
         this.updateUndoRedoButtons();
     }
 
-    private groupBadgesByRow(badges: HTMLElement[]): HTMLElement[][] {
-        const badgesByRow = new Map<number, HTMLElement[]>();
-        badges.forEach(badge => {
-            const top = badge.offsetTop;
-            if (!badgesByRow.has(top)) {
-                badgesByRow.set(top, []);
-            }
-            badgesByRow.get(top)!.push(badge);
-        });
-        return Array.from(badgesByRow.values());
+    /** Compute animation duration scaled by pixel distance (min 0.2s, max 0.5s) */
+    private getHeightAnimDuration(fromHeight: number, toHeight: number): number {
+        const distance = Math.abs(toHeight - fromHeight);
+        // ~2ms per pixel, clamped to [200, 500]ms
+        return Math.min(500, Math.max(200, distance * 2)) / 1000;
     }
+
 
     private animateTermExpansion(
         courseSections: HTMLElement,
@@ -881,61 +887,92 @@ export class MainController {
         clickedTermContainer: HTMLElement,
         onComplete?: () => void
     ): void {
-        courseSections.classList.add('expanded');
+        const courseItem = courseSections.closest('.course-item') as HTMLElement;
 
-        // Hide term badges immediately
+        // 1. Lock course-item at current height, promote to compositor layer
+        const currentItemHeight = courseItem.getBoundingClientRect().height;
+        courseItem.style.willChange = 'height';
+        courseItem.style.height = `${currentItemHeight}px`;
+        courseItem.style.overflow = 'hidden';
+
+        // 2. Instantly do the full content swap
         termBadgesContainer.style.display = 'none';
         termSectionsContainers.forEach(c => c.style.display = 'none');
 
-        // Show clicked container
+        courseSections.classList.add('expanded');
+
+        // Show clicked container — reset any stale inline styles from prior collapse
+        clickedTermContainer.style.cssText = '';
         clickedTermContainer.style.display = 'flex';
-        clickedTermContainer.style.opacity = '1';
-
-        // Set initial state for section badges
-        const sectionBadges = clickedTermContainer.querySelectorAll('.section-badge') as NodeListOf<HTMLElement>;
-        sectionBadges.forEach(badge => {
-            badge.style.opacity = '0';
-            badge.style.transform = 'translateX(-10px)';
-            badge.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
-        });
-
-        // Measure with padding, then animate from 0
-        clickedTermContainer.style.paddingTop = '0.5rem';
         clickedTermContainer.style.maxHeight = 'none';
-        const targetHeight = clickedTermContainer.scrollHeight;
-        clickedTermContainer.style.maxHeight = '0';
-        clickedTermContainer.style.paddingTop = '0';
+        clickedTermContainer.style.paddingTop = '0.5rem';
 
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                clickedTermContainer.style.paddingTop = '0.5rem';
-                clickedTermContainer.style.maxHeight = `${targetHeight}px`;
-                courseSections.style.maxHeight = `${targetHeight}px`;
+        const sectionBadges = clickedTermContainer.querySelectorAll('.section-badge') as NodeListOf<HTMLElement>;
+        const tooMany = sectionBadges.length > 50;
 
-                // Stagger animate badges in by row
-                const rows = this.groupBadgesByRow(Array.from(sectionBadges));
-                rows.forEach((rowBadges, rowIndex) => {
-                    rowBadges.forEach((badge, badgeIndex) => {
-                        setTimeout(() => {
-                            badge.style.opacity = '1';
-                            badge.style.transform = 'translateX(0)';
-                        }, rowIndex * 30 + badgeIndex * 15);
-                    });
-                });
+        if (tooMany) {
+            // Hide container — one style write instead of N
+            clickedTermContainer.style.opacity = '0';
+        } else {
+            sectionBadges.forEach(badge => {
+                badge.style.opacity = '0';
+                badge.style.transform = 'translateX(-10px)';
+                badge.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
             });
+        }
+
+        // 3. Measure target height (temporarily unlock to get true content height)
+        courseItem.style.height = 'auto';
+        const targetItemHeight = courseItem.getBoundingClientRect().height;
+        // Re-lock at starting height and force reflow before adding transition
+        courseItem.style.height = `${currentItemHeight}px`;
+        courseItem.offsetHeight;
+        const expandDuration = this.getHeightAnimDuration(currentItemHeight, targetItemHeight);
+        courseItem.style.transition = `height ${expandDuration}s ease`;
+
+        // 4. Animate to target height
+        requestAnimationFrame(() => {
+            courseItem.style.height = `${targetItemHeight}px`;
+
+            if (tooMany) {
+                // Fade the whole container in at once
+                clickedTermContainer.style.transition = 'opacity 0.2s ease';
+                clickedTermContainer.style.opacity = '1';
+            } else {
+                // Stagger animate badges in
+                sectionBadges.forEach((badge, i) => {
+                    setTimeout(() => {
+                        badge.style.opacity = '1';
+                        badge.style.transform = 'translateX(0)';
+                    }, i * 15);
+                });
+            }
+
+            // Clean up after transition
+            const onEnd = (e: TransitionEvent) => {
+                if (e.propertyName !== 'height') return;
+                courseItem.style.height = '';
+                courseItem.style.transition = '';
+                courseItem.style.overflow = '';
+                courseItem.style.willChange = '';
+                courseItem.removeEventListener('transitionend', onEnd);
+                // Clean up inline styles so they don't slow down future interactions
+                clickedTermContainer.style.transition = '';
+                if (!tooMany) {
+                    sectionBadges.forEach(badge => {
+                        badge.style.cssText = '';
+                    });
+                }
+                if (onComplete) onComplete();
+            };
+            courseItem.addEventListener('transitionend', onEnd);
         });
 
         // Rotate icon
         const termIcon = clickedTermContainer.querySelector('.term-badge.active .term-icon') as HTMLElement;
         if (termIcon) {
-            termIcon.style.transition = 'transform 0.3s ease';
+            termIcon.style.transition = `transform ${expandDuration}s ease`;
             termIcon.style.transform = 'rotate(45deg)';
-        }
-
-        if (onComplete) {
-            const rows = this.groupBadgesByRow(Array.from(sectionBadges));
-            const totalTime = Math.max(300, rows.length * 30 + 150);
-            setTimeout(onComplete, totalTime);
         }
     }
 
@@ -951,24 +988,16 @@ export class MainController {
 
             if (!expandedTermContainer || !termBadgesContainer) return;
 
-            // Mark as expanded for full-width layout
+            // Set display states without animation
             courseSections.classList.add('expanded');
-
-            // Hide term badges container
             termBadgesContainer.style.display = 'none';
-
-            // Hide all term sections
             termSectionsContainers.forEach(container => {
                 container.style.display = 'none';
             });
-
-            // Show the expanded term container
             expandedTermContainer.style.display = 'flex';
             expandedTermContainer.style.opacity = '1';
-            expandedTermContainer.style.transform = 'translateX(0)';
-
-            // Set course sections max height
-            courseSections.style.maxHeight = `${expandedTermContainer.scrollHeight}px`;
+            expandedTermContainer.style.maxHeight = 'none';
+            expandedTermContainer.style.paddingTop = '0.5rem';
         });
     }
 
@@ -994,10 +1023,6 @@ export class MainController {
                 console.warn(`Term container not found for ${courseId} term ${term}`);
                 return;
             }
-
-            // Get current height and set starting height
-            const currentHeight = courseSections.scrollHeight;
-            courseSections.style.maxHeight = `${currentHeight}px`;
 
             // Use extracted animation function
             this.animateTermExpansion(courseSections, termBadgesContainer, termSectionsContainers, clickedTermContainer);
