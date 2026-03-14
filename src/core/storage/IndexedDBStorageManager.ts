@@ -5,7 +5,7 @@
 import { Schedule } from '../../types/schedule';
 import { setReplacer, setReviver } from '../../utils/jsonSerializer';
 import LZString from 'lz-string';
-import { WorkerPoolManager } from '../../workers/WorkerPoolManager';
+import { StorageWorkerManager } from '../../workers/StorageWorkerManager';
 import { WorkerTaskType } from '../../workers/protocol';
 import { perfMonitor } from '../../utils/PerformanceMonitor';
 
@@ -94,7 +94,7 @@ export class IndexedDBStorageManager {
             };
 
             const startTime = perfMonitor.startMeasure('save-compression');
-            const workerPool = WorkerPoolManager.getInstance();
+            const workerPool = StorageWorkerManager.getInstance();
             const compressed = await workerPool.executeTask<string>(
                 WorkerTaskType.COMPRESS_DATA,
                 { data: scheduleWithTimestamp }
@@ -155,7 +155,7 @@ export class IndexedDBStorageManager {
                         if (stored.serializedData) {
                             if (stored.compressed) {
                                 const startTime = perfMonitor.startMeasure('load-decompression');
-                                const workerPool = WorkerPoolManager.getInstance();
+                                const workerPool = StorageWorkerManager.getInstance();
                                 const decompressed = await workerPool.executeTask<string>(
                                     WorkerTaskType.DECOMPRESS_DATA,
                                     { compressed: stored.serializedData }

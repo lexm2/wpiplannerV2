@@ -30,7 +30,7 @@ import { ResizablePanel } from '../components/ResizablePanel'
 import { TermBoundsService } from '../../utils/termBounds'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
 import { DeviceDetection } from '../../utils/deviceDetection'
-import { WorkerPoolManager } from '../../workers/WorkerPoolManager'
+import { StorageWorkerManager } from '../../workers/StorageWorkerManager'
 
 /**
  * Application orchestrator managing service initialization, dependency injection, and event coordination
@@ -243,8 +243,8 @@ export class MainController {
         this.uiStateManager.showLoadingState();
 
         try {
-            const workerPool = WorkerPoolManager.getInstance();
-            await workerPool.initialize();
+            const storageWorker = StorageWorkerManager.getInstance();
+            await storageWorker.initialize();
 
             await this.storageService.initialize();
             this.themeSelector.initializeTheme();
@@ -350,8 +350,7 @@ export class MainController {
                 return '';
             }
 
-            const workerPool = WorkerPoolManager.getInstance();
-            workerPool.terminate();
+            StorageWorkerManager.getInstance().terminate();
         });
     }
 
