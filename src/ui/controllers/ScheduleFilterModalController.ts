@@ -265,13 +265,9 @@ export class ScheduleFilterModalController extends BaseModal {
 
         const activeConflictDetection = this.getActiveConflictDetection();
         const hasCalendarEvents = this.hasCalendarEventsBlocked();
-        const calendarEventCount = this.scheduleController
-            ? this.scheduleController.getCalendarEventCount()
-            : 0;
         const localEventCount = this.scheduleController
             ? this.scheduleController.getLocalEventCount()
             : 0;
-        const totalEventCount = calendarEventCount + localEventCount;
 
         return SharedFilterComponents.createConflictFilter({
             idPrefix: '',
@@ -279,7 +275,7 @@ export class ScheduleFilterModalController extends BaseModal {
             avoidConflicts: activeConflictDetection.avoidConflicts,
             includeCalendarToggle: true,
             hasCalendarEvents: hasCalendarEvents,
-            calendarEventCount: totalEventCount
+            calendarEventCount: localEventCount
         });
     }
 
@@ -821,6 +817,6 @@ export class ScheduleFilterModalController extends BaseModal {
 
     private async handleAutoScheduleGenerate(): Promise<void> {
         this.hide();
-        await this.scheduleController.generateSchedulesWithActiveFilters(this.selectedCourses);
+        await this.scheduleController.generateSchedules(this.selectedCourses);
     }
 }

@@ -126,8 +126,6 @@ export class MainController {
         this.scheduleController.setCourseDataService(this.courseDataService);
         this.scheduleController.setConflictDetector(this.conflictDetector);
         this.scheduleController.setScheduleFilterService(this.scheduleFilterService);
-        this.scheduleController.setScheduleFilterModalController(this.scheduleFilterModalController);
-        this.scheduleController.setScheduleManagementService(this.scheduleManagementService);
 
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);

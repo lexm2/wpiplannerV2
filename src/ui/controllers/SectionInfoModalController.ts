@@ -1,36 +1,14 @@
 import { ModalService } from '../../services/ui/ModalService';
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
-import { PeriodType } from '../../types/types';
+import { PeriodType, Section, Course } from '../../types/types';
 import { BaseModal } from '../components/BaseModal';
 import { getInlineSVG } from '../../utils/iconPaths';
 
 export interface SectionData {
     courseCode: string;
     courseName: string;
-    section: {
-        number: string;
-        crn: number;
-        term: string;
-        seatsAvailable: number;
-        actualWaitlist: number;
-        maxWaitlist: number;
-        note?: string;
-        periods: Array<{
-            type: string;
-            professor: string;
-            startTime: { displayTime: string };
-            endTime: { displayTime: string };
-            days: Set<string>;
-            building: string;
-            room: string;
-            location: string;
-            isAsync?: boolean;
-        }>;
-    };
-    course: {
-        minCredits: number;
-        maxCredits: number;
-    };
+    section: Section;
+    course: Course;
     courseId: string;
     currentColor: string;
     onColorChange?: (color: string) => void;
