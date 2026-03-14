@@ -80,10 +80,12 @@ export class MainController {
         // Connect filter service and course data to filter modal
         this.filterModalController.setFilterService(catalogFilterService);
         this.filterModalController.setCourseSelectionService(courseSelectionService);
+        this.filterModalController.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
 
         // Connect schedule filter service to controllers
         this.scheduleFilterModalController.setFilterService(scheduleFilterService);
         this.scheduleFilterModalController.setCourseSelectionService(courseSelectionService);
+        this.scheduleFilterModalController.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
         this.scheduleController.setCourseDataService(courseDataService);
         this.scheduleController.setConflictDetector(conflictDetector);
         this.scheduleController.setFilterService(scheduleFilterService);
@@ -1086,7 +1088,17 @@ export class MainController {
                 }
                 this.scheduleController.displayScheduleSelectedCourses();
                 if (this.services.uiStateManager.currentPage === 'schedule') {
-                    this.scheduleController.renderAffectedTerms(event.affectedCourseIds);
+                    // If any affected course has no sections (cleared), we can't determine
+                    // which terms were affected — fall back to full grid re-render
+                    const needsFullRefresh = event.affectedCourseIds.some(id => {
+                        const sc = selectedCourses.find(c => c.course.id === id);
+                        return sc && !sc.selectedLecture && !sc.selectedDiscussion && !sc.selectedLab;
+                    });
+                    if (needsFullRefresh) {
+                        this.scheduleController.renderScheduleGrids();
+                    } else {
+                        this.scheduleController.renderAffectedTerms(event.affectedCourseIds);
+                    }
                 }
                 this.updateSelectedCoursesState(selectedCourses);
                 return;

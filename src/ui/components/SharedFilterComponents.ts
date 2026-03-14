@@ -25,6 +25,9 @@ export interface AvailabilityFilterOptions {
     availableOnly: boolean;
     minAvailable?: number;
     avoidConflicts?: boolean;
+    includeCalendarToggle?: boolean;
+    hasCalendarEvents?: boolean;
+    calendarEventCount?: number;
 }
 
 export interface ConflictFilterOptions {
@@ -168,9 +171,22 @@ export class SharedFilterComponents {
     }
 
     static createAvailabilityFilter(options: AvailabilityFilterOptions): string {
-        const { idPrefix, availableOnly, minAvailable, avoidConflicts } = options;
+        const { idPrefix, availableOnly, minAvailable, avoidConflicts, includeCalendarToggle, hasCalendarEvents, calendarEventCount } = options;
 
         const prefix = idPrefix ? `${idPrefix}-` : '';
+
+        let calendarToggleHTML = '';
+        if (includeCalendarToggle && calendarEventCount && calendarEventCount > 0) {
+            const countText = calendarEventCount === 1 ? '1 event' : `${calendarEventCount} events`;
+            calendarToggleHTML = `
+                    <label class="filter-toggle-label">
+                        <input type="checkbox" class="filter-toggle" id="${prefix}avoid-calendar-filter"
+                               ${hasCalendarEvents ? 'checked' : ''}>
+                        <span class="filter-toggle-slider"></span>
+                        <span class="filter-toggle-text">Hide sections that conflict with calendar events (${countText})</span>
+                    </label>
+            `;
+        }
 
         return `
             <div class="filter-section">
@@ -184,6 +200,7 @@ export class SharedFilterComponents {
                         <span class="filter-toggle-slider"></span>
                         <span class="filter-toggle-text">Hide periods that conflict with selected sections</span>
                     </label>
+                    ${calendarToggleHTML}
                     <label class="filter-toggle-label" style="margin-top: 0.75rem;">
                         <input type="checkbox" class="filter-toggle" id="${prefix}available-only-filter"
                                ${availableOnly ? 'checked' : ''}>

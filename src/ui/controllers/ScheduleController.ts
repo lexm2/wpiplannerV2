@@ -1695,6 +1695,14 @@ export class ScheduleController implements CalendarEventProvider {
         const scheduleFilterModal = new FilterModalController(this.modalService);
         scheduleFilterModal.setFilterService(this.filterService);
         scheduleFilterModal.setCourseSelectionService(this.courseSelectionService);
+        scheduleFilterModal.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
+        scheduleFilterModal.setMode('auto-schedule');
+        scheduleFilterModal.setOnGenerate(() => {
+            this.doGenerateSchedules(selectedCourses);
+        });
+        if (this.courseDataService) {
+            scheduleFilterModal.setCourseData(this.courseDataService.getAllDepartments());
+        }
         scheduleFilterModal.show();
     }
 

@@ -281,6 +281,7 @@ export class CourseSelectionService {
             this.notifySelectionListeners({
                 type: 'components_changed',
                 course,
+                affectedCourseIds: [course.id],
                 selectedCourses: this.profileStateManager.getSelectedCourses(),
                 timestamp: Date.now()
             });

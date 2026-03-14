@@ -1,6 +1,7 @@
 import { ModalService } from '../../services/ui/ModalService';
 import { FilterService } from '../../services/filtering/FilterService';
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
+import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
 import { Course, Department } from '../../types/types';
 import { AcademicTerm } from '../../types/schedule';
 import { BaseModal } from '../components/BaseModal';
@@ -12,9 +13,12 @@ import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterC
 export class FilterModalController extends BaseModal {
     private filterService: FilterService | null = null;
     private courseSelectionService: CourseSelectionService | null = null;
+    private autoScheduleOrchestrator: AutoScheduleOrchestrator | null = null;
     private allCourses: Course[] = [];
     private isCategoryMode: boolean = false;
     private isUpdatingFilter: boolean = false;
+    private mode: 'filter' | 'auto-schedule' = 'filter';
+    private onGenerate: (() => void) | null = null;
 
     constructor(modalService: ModalService) {
         super(modalService);
@@ -26,6 +30,18 @@ export class FilterModalController extends BaseModal {
 
     setCourseSelectionService(courseSelectionService: CourseSelectionService): void {
         this.courseSelectionService = courseSelectionService;
+    }
+
+    setAutoScheduleOrchestrator(orchestrator: AutoScheduleOrchestrator): void {
+        this.autoScheduleOrchestrator = orchestrator;
+    }
+
+    setMode(mode: 'filter' | 'auto-schedule'): void {
+        this.mode = mode;
+    }
+
+    setOnGenerate(callback: () => void): void {
+        this.onGenerate = callback;
     }
 
     setCourseData(departments: Department[]): void {
@@ -122,14 +138,19 @@ export class FilterModalController extends BaseModal {
         backdrop.className = 'modal-backdrop filter-modal';
 
         const activeFiltersCount = this.filterService?.getFilterCount() || 0;
-        const courseCount = this.filterService ? this.filterService.filterCourses(this.allCourses).length : this.allCourses.length;
+        const isAutoSchedule = this.mode === 'auto-schedule';
+        const title = isAutoSchedule ? 'Auto-Schedule Settings' : 'Filter Courses';
+        const primaryBtnText = isAutoSchedule ? 'Generate Schedule' : 'Apply';
+        const previewText = isAutoSchedule
+            ? this.getAutoSchedulePreviewText()
+            : this.getFilterPreviewText();
 
         backdrop.innerHTML = `
             <div class="modal-dialog filter-modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="modal-title">
-                            Filter Courses
+                            ${title}
                             <span id="filter-count" class="filter-count">${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}</span>
                         </h3>
                         <button class="modal-close" data-modal-close>×</button>
@@ -139,11 +160,11 @@ export class FilterModalController extends BaseModal {
                     </div>
                     <div class="modal-footer">
                         <div class="filter-preview">
-                            <span id="course-count-preview">${courseCount} courses match current filters</span>
+                            <span id="course-count-preview">${previewText}</span>
                         </div>
                         <div class="filter-actions">
                             <button class="modal-btn btn-secondary" id="clear-all-filters">Clear All</button>
-                            <button class="modal-btn btn-primary" data-modal-close>Apply</button>
+                            <button class="modal-btn btn-primary" id="modal-primary-btn">${primaryBtnText}</button>
                         </div>
                     </div>
                 </div>
@@ -161,6 +182,19 @@ export class FilterModalController extends BaseModal {
         backdrop.querySelectorAll('[data-modal-close]').forEach(btn => {
             btn.addEventListener('click', () => this.hide());
         });
+
+        // Setup primary button
+        const primaryBtn = backdrop.querySelector('#modal-primary-btn');
+        if (primaryBtn) {
+            primaryBtn.addEventListener('click', () => {
+                if (this.mode === 'auto-schedule' && this.onGenerate) {
+                    this.hide();
+                    this.onGenerate();
+                } else {
+                    this.hide();
+                }
+            });
+        }
 
         return backdrop;
     }
@@ -357,15 +391,25 @@ export class FilterModalController extends BaseModal {
 
         // Get conflict filter state
         const conflictFilter = this.filterService.getActiveFilters().find(f => f.id === 'periodConflict');
-        const conflictCriteria = conflictFilter?.criteria as { avoidConflicts?: boolean } | undefined;
+        const conflictCriteria = conflictFilter?.criteria as { avoidConflicts?: boolean; blockedSlots?: any[] } | undefined;
         const avoidConflicts = conflictCriteria?.avoidConflicts || false;
+
+        // Check if calendar events are currently blocked
+        const blockedSlots = conflictCriteria?.blockedSlots || [];
+        const hasCalendarEvents = blockedSlots.some((slot: any) =>
+            slot.id?.includes('calendar-') || slot.id?.match(/^[0-9a-f-]{36}/)
+        );
+        const localEventCount = this.autoScheduleOrchestrator?.getLocalEventCount() ?? 0;
 
         return SharedFilterComponents.createAvailabilityFilter({
             idPrefix: '',
             filterId: 'availability',
             availableOnly,
             minAvailable,
-            avoidConflicts
+            avoidConflicts,
+            includeCalendarToggle: true,
+            hasCalendarEvents,
+            calendarEventCount: localEventCount
         });
     }
 
@@ -623,6 +667,13 @@ export class FilterModalController extends BaseModal {
             idPrefix: '',
             updateFilter: () => this.updateConflictFilter(modalElement)
         });
+
+        const calendarToggle = modalElement.querySelector('#avoid-calendar-filter') as HTMLInputElement;
+        if (calendarToggle) {
+            calendarToggle.addEventListener('change', () => {
+                this.handleCalendarEventsToggle(calendarToggle.checked, modalElement);
+            });
+        }
     }
 
     private setupBookmarkFilter(modalElement: HTMLElement): void {
@@ -997,13 +1048,62 @@ export class FilterModalController extends BaseModal {
 
         if (avoidConflictsCheckbox?.checked) {
             const selectedCourses = this.courseSelectionService?.getSelectedCourses() || [];
+            // Preserve existing calendar blocked slots
+            const existingFilter = this.filterService?.getActiveFilters().find(f => f.id === 'periodConflict');
+            const existingSlots = (existingFilter?.criteria as any)?.blockedSlots || [];
             this.filterService?.addFilter('periodConflict', {
                 avoidConflicts: true,
-                selectedCourses: selectedCourses
+                selectedCourses: selectedCourses,
+                blockedSlots: existingSlots
             });
         } else {
-            this.filterService?.removeFilter('periodConflict');
+            // Preserve calendar blocked slots even when unchecking section conflicts
+            const existingFilter = this.filterService?.getActiveFilters().find(f => f.id === 'periodConflict');
+            const existingSlots = (existingFilter?.criteria as any)?.blockedSlots || [];
+            if (existingSlots.length > 0) {
+                this.filterService?.addFilter('periodConflict', {
+                    avoidConflicts: false,
+                    blockedSlots: existingSlots
+                });
+            } else {
+                this.filterService?.removeFilter('periodConflict');
+            }
         }
+        this.updatePreview(modalElement);
+    }
+
+    private handleCalendarEventsToggle(checked: boolean, modalElement: HTMLElement): void {
+        if (!this.autoScheduleOrchestrator) return;
+
+        const existingFilter = this.filterService?.getActiveFilters().find(f => f.id === 'periodConflict');
+        const existingCriteria = existingFilter?.criteria as any;
+        const existingSlots: any[] = existingCriteria?.blockedSlots || [];
+        const avoidConflicts = existingCriteria?.avoidConflicts || false;
+        const selectedCourses = existingCriteria?.selectedCourses || this.courseSelectionService?.getSelectedCourses() || [];
+
+        // Separate calendar slots from non-calendar slots
+        const isCalendarSlot = (slot: any) => slot.id?.includes('calendar-') || slot.id?.match(/^[0-9a-f-]{36}/);
+        const nonCalendarSlots = existingSlots.filter((slot: any) => !isCalendarSlot(slot));
+
+        if (checked) {
+            const calendarSlots = this.autoScheduleOrchestrator.getAllCalendarBlockedTimes();
+            this.filterService?.addFilter('periodConflict', {
+                avoidConflicts,
+                selectedCourses,
+                blockedSlots: [...nonCalendarSlots, ...calendarSlots]
+            });
+        } else {
+            if (nonCalendarSlots.length > 0 || avoidConflicts) {
+                this.filterService?.addFilter('periodConflict', {
+                    avoidConflicts,
+                    selectedCourses,
+                    blockedSlots: nonCalendarSlots
+                });
+            } else {
+                this.filterService?.removeFilter('periodConflict');
+            }
+        }
+
         this.updatePreview(modalElement);
     }
 
@@ -1047,20 +1147,38 @@ export class FilterModalController extends BaseModal {
     }
 
 
+    private getFilterPreviewText(): string {
+        const courseCount = this.filterService ? this.filterService.filterCourses(this.allCourses).length : this.allCourses.length;
+        return `${courseCount} courses match current filters`;
+    }
+
+    private getAutoSchedulePreviewText(): string {
+        if (!this.filterService || !this.autoScheduleOrchestrator) {
+            return 'Configure filters then generate';
+        }
+        const selectedCourses = this.courseSelectionService?.getSelectedCourses() || [];
+        if (selectedCourses.length === 0) {
+            return 'No courses selected';
+        }
+        const courses = selectedCourses.map(sc => sc.course);
+        const filteredSections = this.filterService.apply(courses);
+        const uniqueCourses = new Set(filteredSections.map(fs => fs.course.id)).size;
+        return `${filteredSections.length} sections across ${uniqueCourses} courses available`;
+    }
+
     private updatePreview(modalElement: HTMLElement): void {
         if (!this.filterService) return;
-        
-        const filteredCourses = this.filterService.filterCourses(this.allCourses);
-        const courseCount = filteredCourses.length;
+
         const filterCount = this.filterService.getFilterCount();
-        
         const countElement = modalElement.querySelector('#course-count-preview');
         const filterCountElement = modalElement.querySelector('#filter-count');
-        
+
         if (countElement) {
-            countElement.textContent = `${courseCount} courses match current filters`;
+            countElement.textContent = this.mode === 'auto-schedule'
+                ? this.getAutoSchedulePreviewText()
+                : this.getFilterPreviewText();
         }
-        
+
         if (filterCountElement) {
             filterCountElement.textContent = filterCount > 0 ? `(${filterCount})` : '';
         }
