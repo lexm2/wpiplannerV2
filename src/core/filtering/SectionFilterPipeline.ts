@@ -164,12 +164,10 @@ export class SectionFilterPipeline {
         return reconstructedCourses;
     }
 
-    filterCourses(
-        courses: Course[],
+    applyFilters(
+        sections: FilterableSection[],
         activeFilters: Map<string, any>
-    ): Course[] {
-        const sections = this.flattenCoursesToSections(courses);
-
+    ): FilterableSection[] {
         const filtersToApply: ActiveSectionFilter[] = [];
 
         for (const [filterId, criteria] of activeFilters.entries()) {
@@ -185,14 +183,22 @@ export class SectionFilterPipeline {
         }
 
         let filteredSections = sections;
-        const criteriaMap = activeFilters;
 
         while (!priorityQueue.isEmpty()) {
             const activeFilter = priorityQueue.extractMin();
             if (!activeFilter) break;
-            filteredSections = activeFilter.filter.apply(filteredSections, activeFilter.criteria, criteriaMap);
+            filteredSections = activeFilter.filter.apply(filteredSections, activeFilter.criteria, activeFilters);
         }
 
+        return filteredSections;
+    }
+
+    filterCourses(
+        courses: Course[],
+        activeFilters: Map<string, any>
+    ): Course[] {
+        const sections = this.flattenCoursesToSections(courses);
+        const filteredSections = this.applyFilters(sections, activeFilters);
         return this.reconstructCourses(filteredSections);
     }
 }

@@ -1,19 +1,16 @@
-import { SelectedCourse } from '../../../types/schedule';
-import { SelectedCourseFilter, AcademicYearFilterCriteria } from '../../../types/filters';
+import { AcademicYearFilterCriteria } from '../../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../../types/filterableUnit';
 
-export class AcademicYearFilter implements SelectedCourseFilter {
+export class AcademicYearFilter implements SectionBasedFilter {
     readonly id = 'academicYear';
     readonly name = 'Academic Year';
     readonly description = 'Filter courses by academic year';
     readonly priority = 75;
 
-    apply(selectedCourses: any[], criteria: any): any[] {
-        return this.applyToSelectedCourses(selectedCourses, criteria);
-    }
-
-    applyToSelectedCourses(selectedCourses: SelectedCourse[], criteria: AcademicYearFilterCriteria): SelectedCourse[] {
-        if (criteria.year === 'all') return selectedCourses;
-        return selectedCourses.filter(sc => sc.course.academicYear === criteria.year);
+    apply(sections: FilterableSection[], criteria: AcademicYearFilterCriteria): FilterableSection[] {
+        if (criteria.year === 'all') return sections;
+        return sections.filter(fs => fs.course.academicYear === criteria.year);
     }
 
     isValidCriteria(criteria: any): criteria is AcademicYearFilterCriteria {

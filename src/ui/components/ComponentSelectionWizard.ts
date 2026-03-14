@@ -4,7 +4,7 @@
 import { Course, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
 import { CourseDataService } from '../../services/data/courseDataService';
-import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService';
+import { FilterService } from '../../services/filtering/FilterService';
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
@@ -29,7 +29,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     readonly panelClass = 'wizard-active';
     private course: Course;
     private courseDataService: CourseDataService;
-    private scheduleFilterService: ScheduleFilterService | null;
+    private filterService: FilterService | null;
     private currentStep: WizardStep;
     private selections: WizardSelections;
     private onComplete: (selections: WizardSelections) => void;
@@ -47,7 +47,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         onCancel: () => void,
         existingSelections?: SelectedCourse,
         onSelectionChange?: (selections: WizardSelections) => void,
-        scheduleFilterService?: ScheduleFilterService,
+        filterService?: FilterService,
         allSelectedCourses?: SelectedCourse[],
         onHoverPreview?: (selections: WizardSelections) => void
     ) {
@@ -72,7 +72,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         this.onCancel = onCancel;
         this.onSelectionChange = onSelectionChange;
         this.onHoverPreview = onHoverPreview;
-        this.scheduleFilterService = scheduleFilterService || null;
+        this.filterService = filterService || null;
         this.allSelectedCourses = allSelectedCourses || [];
 
         // Initialize selections from existing if editing
@@ -87,9 +87,9 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         this.currentStep = this.determineStartStep();
 
         // Set up filter change listener if filter service is available
-        if (this.scheduleFilterService) {
+        if (this.filterService) {
             this.filterChangeHandler = () => this.onFilterChange();
-            this.scheduleFilterService.addEventListener(this.filterChangeHandler);
+            this.filterService.addEventListener(this.filterChangeHandler);
         }
 
         // RMP data is loaded centrally by MainController during app initialization
@@ -210,7 +210,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         sections = sections.filter(section => !section.isInterestList);
 
         // Apply schedule filters if available
-        if (this.scheduleFilterService && sections.length > 0) {
+        if (this.filterService && sections.length > 0) {
             const filteredSections = this.applyScheduleFilters(sections, step);
             return filteredSections;
         }
@@ -232,40 +232,23 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     /**
      * Apply schedule filters to sections
      */
-    private applyScheduleFilters(sections: Section[], step: WizardStep): Section[] {
-        if (!this.scheduleFilterService) return sections;
+    private applyScheduleFilters(sections: Section[], _step: WizardStep): Section[] {
+        if (!this.filterService) return sections;
 
-        // Filter sections individually through the schedule filter service
-        const filteredSections = sections.filter(section => {
-            // Create a temporary course object with ONLY the section being tested
-            // This ensures filterSections only evaluates this single section
-            const tempCourse: Course = {
-                ...this.course
-            };
+        // Get all courses for filtering context
+        const allCourses = [this.course, ...this.allSelectedCourses.map(sc => sc.course)];
 
-            // Create a temporary SelectedCourse with this section in the appropriate slot
-            const tempSelectedCourse: SelectedCourse = {
-                course: tempCourse,
-                selectedLecture: step === 'lecture' ? section : (this.selections.lecture || null),
-                selectedDiscussion: step === 'discussion' ? section : (this.selections.discussion || null),
-                selectedLab: step === 'lab' ? section : (this.selections.lab || null),
-                isRequired: false,
-                lockedSections: new Set()
-            };
+        // Apply filters to all courses
+        const filtered = this.filterService.apply(allCourses);
 
-            // Combine the temp selected course with all other selected courses for context
-            // This allows conflict detection to check against OTHER courses
-            const allCoursesForFiltering = [tempSelectedCourse, ...this.allSelectedCourses];
+        // Keep only sections from this course that passed filtering
+        const passingSectionCrns = new Set(
+            filtered
+                .filter(fs => fs.course.id === this.course.id)
+                .map(fs => fs.section.crn)
+        );
 
-            // Test if this section passes the filters
-            const filtered = this.scheduleFilterService?.filterSections(allCoursesForFiltering);
-            const passes = filtered ? filtered.some(item =>
-                item.section.crn === section.crn &&
-                item.course.course.id === this.course.id
-            ) : true;
-
-            return passes;
-        });
+        const filteredSections = sections.filter(section => passingSectionCrns.has(section.crn));
 
         return filteredSections;
     }
@@ -342,8 +325,8 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     protected onClose(): void {
         document.removeEventListener('keydown', this.handleWizardEscapeKey);
 
-        if (this.scheduleFilterService && this.filterChangeHandler) {
-            this.scheduleFilterService.removeEventListener(this.filterChangeHandler);
+        if (this.filterService && this.filterChangeHandler) {
+            this.filterService.removeEventListener(this.filterChangeHandler);
             this.filterChangeHandler = null;
         }
     }
@@ -613,11 +596,11 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      * Render filter status indicator
      */
     private renderFilterStatus(): string {
-        if (!this.scheduleFilterService || this.scheduleFilterService.isEmpty()) {
+        if (!this.filterService || this.filterService.isEmpty()) {
             return '';
         }
 
-        const activeFilters = this.scheduleFilterService.getActiveFilters();
+        const activeFilters = this.filterService.getActiveFilters();
         const filterDescriptions: string[] = [];
 
         activeFilters.forEach(filter => {

@@ -1,7 +1,7 @@
 import type { Course, Section } from '../../types/types';
 import type { SelectedCourse } from '../../types/schedule';
 import { sectionToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
-import type { ScheduleFilterService } from '../filtering/ScheduleFilterService';
+import type { FilterService } from '../filtering/FilterService';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 
 export interface SectionCombination {
@@ -34,7 +34,7 @@ interface MaskedCandidate {
  * Conflict check: (mask1 & mask2) !== 0n - O(1)
  */
 export class AutoScheduler {
-  constructor(private scheduleFilterService: ScheduleFilterService) {}
+  constructor(private filterService: FilterService) {}
 
   generateSchedules(
     selectedCourses: SelectedCourse[],
@@ -109,13 +109,13 @@ export class AutoScheduler {
   }
 
   private getBlockedMasksByTerm(): Map<string, bigint> {
-    const activeFilters = this.scheduleFilterService.getActiveFilters();
+    const activeFilters = this.filterService.getActiveFilters();
 
-    const sectionBasedFilter = this.scheduleFilterService.getSectionBasedFilter('periodConflict');
-    if (sectionBasedFilter instanceof ConflictFilter) {
+    const conflictFilter = this.filterService.getRegisteredFilter('periodConflict');
+    if (conflictFilter instanceof ConflictFilter) {
       const criteria = activeFilters.find(f => f.id === 'periodConflict')?.criteria;
-      if (criteria && sectionBasedFilter.isValidCriteria(criteria)) {
-        return sectionBasedFilter.getBlockedMasksByTerm(criteria as any);
+      if (criteria && conflictFilter.isValidCriteria(criteria)) {
+        return conflictFilter.getBlockedMasksByTerm(criteria as any);
       }
     }
 
@@ -411,7 +411,7 @@ export class AutoScheduler {
   private sectionPassesFilters(section: Section, selectedCourse: SelectedCourse): boolean {
     if (!this.hasValidTimeSlot(section)) return false;
 
-    const filteredSections = this.scheduleFilterService.filterSections([selectedCourse]);
+    const filteredSections = this.filterService.apply([selectedCourse.course]);
     return filteredSections.some(fs => fs.section.crn === section.crn);
   }
 }

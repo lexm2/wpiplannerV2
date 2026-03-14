@@ -1,2 +1,1 @@
-export { CourseFilterService } from './CourseFilterService';
-export { ScheduleFilterService } from './ScheduleFilterService';
+export { FilterService } from './FilterService';

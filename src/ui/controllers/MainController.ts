@@ -8,7 +8,6 @@ import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
-import { ScheduleFilterModalController } from './ScheduleFilterModalController'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { ResizablePanel } from '../components/ResizablePanel'
@@ -33,7 +32,7 @@ export class MainController {
     private scheduleController: ScheduleController;
     private sectionInfoModalController: SectionInfoModalController;
     private filterModalController: FilterModalController;
-    private scheduleFilterModalController: ScheduleFilterModalController;
+    private scheduleFilterModalController: FilterModalController;
     private debouncedSearch: DebouncedOperation;
     private colorService: CourseColorService;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator;
@@ -47,7 +46,7 @@ export class MainController {
 
         const {
             profileStateManager, courseDataService, courseSelectionService,
-            conflictDetector, modalService, filterService, scheduleFilterService,
+            conflictDetector, modalService, catalogFilterService, scheduleFilterService,
             scheduleManagementService, operationManager, uiStateManager
         } = services;
 
@@ -65,10 +64,10 @@ export class MainController {
         this.sectionInfoModalController = new SectionInfoModalController(modalService);
         new InfoModalController(modalService);
         this.filterModalController = new FilterModalController(modalService);
-        this.scheduleFilterModalController = new ScheduleFilterModalController(modalService, this.autoScheduleOrchestrator);
+        this.scheduleFilterModalController = new FilterModalController(modalService);
 
         // Connect filter service to course controller
-        this.courseController.setFilterService(filterService);
+        this.courseController.setFilterService(catalogFilterService);
 
         // Register rendering callbacks for term expansion state management
         this.courseController.setOnBatchCallback(() => {
@@ -79,14 +78,15 @@ export class MainController {
         });
 
         // Connect filter service and course data to filter modal
-        this.filterModalController.setFilterService(filterService);
+        this.filterModalController.setFilterService(catalogFilterService);
         this.filterModalController.setCourseSelectionService(courseSelectionService);
 
         // Connect schedule filter service to controllers
-        this.scheduleFilterModalController.setScheduleFilterService(scheduleFilterService);
+        this.scheduleFilterModalController.setFilterService(scheduleFilterService);
+        this.scheduleFilterModalController.setCourseSelectionService(courseSelectionService);
         this.scheduleController.setCourseDataService(courseDataService);
         this.scheduleController.setConflictDetector(conflictDetector);
-        this.scheduleController.setScheduleFilterService(scheduleFilterService);
+        this.scheduleController.setFilterService(scheduleFilterService);
 
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
@@ -98,7 +98,7 @@ export class MainController {
         });
 
         // Connect filter service to department controller
-        this.departmentController.setFilterService(filterService);
+        this.departmentController.setFilterService(catalogFilterService);
 
         // Set up course data event subscriptions via AppBootstrap
         AppBootstrap.setupCourseDataSubscriptions(services, {
@@ -107,11 +107,13 @@ export class MainController {
             },
             onDataLoaded: (departments) => {
                 this.filterModalController.setCourseData(departments);
+                this.scheduleFilterModalController.setCourseData(departments);
                 this.departmentController.setAllDepartments(departments);
                 this.courseController.setAllDepartments(departments);
             },
             onDataRefreshed: (departments) => {
                 this.filterModalController.setCourseData(departments);
+                this.scheduleFilterModalController.setCourseData(departments);
                 this.departmentController.setAllDepartments(departments);
                 this.courseController.setAllDepartments(departments);
             },
@@ -132,7 +134,7 @@ export class MainController {
         // Initialize filters and wire up filter change listeners
         AppBootstrap.initializeFilters(services);
 
-        filterService.addEventListener((_event) => {
+        catalogFilterService.addEventListener((_event) => {
             this.refreshCurrentView();
         });
 
@@ -498,9 +500,9 @@ export class MainController {
                     // Update search text filter in FilterService
                     // Only trim for the check, but pass the original query with spaces
                     if (query.trim().length > 0) {
-                        this.services.filterService.addFilter('searchText', { query });
+                        this.services.catalogFilterService.addFilter('searchText', { query });
                     } else {
-                        this.services.filterService.removeFilter('searchText');
+                        this.services.catalogFilterService.removeFilter('searchText');
                     }
 
                     cancellationToken.throwIfCancelled();
@@ -583,10 +585,10 @@ export class MainController {
         if (bookmarkFilterButton) {
             // Icon is set by updateBookmarkFilterButtonState during initialization
             bookmarkFilterButton.addEventListener('click', () => {
-                if (this.services.filterService.hasFilter('bookmark')) {
-                    this.services.filterService.removeFilter('bookmark');
+                if (this.services.catalogFilterService.hasFilter('bookmark')) {
+                    this.services.catalogFilterService.removeFilter('bookmark');
                 } else {
-                    this.services.filterService.addFilter('bookmark', { showBookmarkedOnly: true });
+                    this.services.catalogFilterService.addFilter('bookmark', { showBookmarkedOnly: true });
                 }
                 this.updateBookmarkFilterButtonState();
             });
@@ -597,8 +599,8 @@ export class MainController {
         if (clearFiltersButton) {
             clearFiltersButton.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'eraser-icon'));
             clearFiltersButton.addEventListener('click', () => {
-                if (this.services.filterService) {
-                    this.services.filterService.clearFilters();
+                if (this.services.catalogFilterService) {
+                    this.services.catalogFilterService.clearFilters();
                     this.updateFilterButtonState();
                     this.updateClearFiltersButtonState();
                     this.updateBookmarkFilterButtonState();
@@ -611,8 +613,6 @@ export class MainController {
         if (scheduleFilterButton) {
             scheduleFilterButton.insertAdjacentHTML('afterbegin', getInlineSVG('FILTER_FILLED', 'filter-icon'));
             scheduleFilterButton.addEventListener('click', () => {
-                const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
-                this.scheduleFilterModalController.setSelectedCourses(selectedCourses);
                 this.scheduleFilterModalController.show();
             });
         }
@@ -859,10 +859,10 @@ export class MainController {
     private refreshCurrentView(): void {
         this.expandedTerms.clear();
 
-        const hasFilters = !this.services.filterService.isEmpty();
+        const hasFilters = !this.services.catalogFilterService.isEmpty();
 
         // Check if department filter is active
-        const departmentFilter = this.services.filterService.getActiveFilters()
+        const departmentFilter = this.services.catalogFilterService.getActiveFilters()
             .find(f => f.id === 'department');
         const departmentCriteria = departmentFilter?.criteria as { departments?: string[] } | undefined;
         const activeDepartmentIds = departmentCriteria?.departments || [];
@@ -882,10 +882,10 @@ export class MainController {
                 baseCourses = this.getAllCourses();
             }
 
-            coursesToDisplay = this.services.filterService.filterCourses(baseCourses);
+            coursesToDisplay = this.services.catalogFilterService.filterCourses(baseCourses);
 
             // Update header based on filter state
-            if (activeDepartmentIds.length === 1 && this.services.filterService.getActiveFilters().length === 1) {
+            if (activeDepartmentIds.length === 1 && this.services.catalogFilterService.getActiveFilters().length === 1) {
                 // Single department filter only
                 const dept = this.departmentController.getDepartmentById(activeDepartmentIds[0]);
                 if (dept) {
@@ -935,9 +935,9 @@ export class MainController {
 
     private updateFilterButtonState(): void {
         const filterButton = document.getElementById('filter-btn');
-        if (filterButton && this.services.filterService) {
-            const hasActiveFilters = !this.services.filterService.isEmpty();
-            const filterCount = this.services.filterService.getFilterCount();
+        if (filterButton && this.services.catalogFilterService) {
+            const hasActiveFilters = !this.services.catalogFilterService.isEmpty();
+            const filterCount = this.services.catalogFilterService.getFilterCount();
 
             if (hasActiveFilters) {
                 filterButton.classList.add('active');
@@ -952,8 +952,8 @@ export class MainController {
 
     private updateClearFiltersButtonState(): void {
         const clearFiltersButton = document.getElementById('clear-filters-btn') as HTMLButtonElement | null;
-        if (clearFiltersButton && this.services.filterService) {
-            const hasActiveFilters = !this.services.filterService.isEmpty();
+        if (clearFiltersButton && this.services.catalogFilterService) {
+            const hasActiveFilters = !this.services.catalogFilterService.isEmpty();
 
             if (hasActiveFilters) {
                 clearFiltersButton.style.display = '';
@@ -966,8 +966,8 @@ export class MainController {
 
     private updateBookmarkFilterButtonState(): void {
         const button = document.getElementById('bookmark-filter-btn');
-        if (button && this.services.filterService) {
-            const isActive = this.services.filterService.hasFilter('bookmark');
+        if (button && this.services.catalogFilterService) {
+            const isActive = this.services.catalogFilterService.hasFilter('bookmark');
             button.classList.toggle('active', isActive);
 
             // Swap icon between outline and filled
@@ -1396,7 +1396,7 @@ export class MainController {
     private syncSearchInputFromFilters(): void {
         const searchInput = document.getElementById('search-input') as HTMLInputElement;
         if (searchInput) {
-            const searchTextFilter = this.services.filterService.getActiveFilters().find(f => f.id === 'searchText');
+            const searchTextFilter = this.services.catalogFilterService.getActiveFilters().find(f => f.id === 'searchText');
             const searchCriteria = searchTextFilter?.criteria as { query?: string } | undefined;
             const currentQuery = searchCriteria?.query || '';
             if (searchInput.value !== currentQuery) {
@@ -1408,7 +1408,7 @@ export class MainController {
     private updateFilteredHeader(resultCount: number, _selectedDepartment: Department | null): void {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
-            const filters = this.services.filterService.getActiveFilters();
+            const filters = this.services.catalogFilterService.getActiveFilters();
             const searchTextFilter = filters.find(f => f.id === 'searchText');
 
             if (searchTextFilter && filters.length === 1) {

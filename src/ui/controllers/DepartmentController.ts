@@ -1,15 +1,15 @@
 import { Department } from '../../types/types'
-import { CourseFilterService } from '../../services/filtering/CourseFilterService'
+import { FilterService } from '../../services/filtering/FilterService'
 import { groupDepartmentsByCategory } from '../../utils/departmentUtils'
 
 export class DepartmentController {
     private allDepartments: Department[] = [];
-    private filterService: CourseFilterService | null = null;
+    private filterService: FilterService | null = null;
     private expandedCategories: Set<string> = new Set();
 
     constructor() {}
 
-    setFilterService(filterService: CourseFilterService): void {
+    setFilterService(filterService: FilterService): void {
         this.filterService = filterService;
 
         // Listen for filter changes to sync sidebar visual state

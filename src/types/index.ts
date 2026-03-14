@@ -12,8 +12,6 @@ export type { FilterableSection } from './filterableUnit';
 export { ScheduleState } from './ScheduleState';
 export type {
   FilterMetadata,
-  SectionFilter,
-  SelectedCourseFilter,
   BaseFilter,
   FilterCriteria,
   ActiveFilter,

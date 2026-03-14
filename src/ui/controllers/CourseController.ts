@@ -1,6 +1,6 @@
 import { Course, Department, Section } from '../../types/types'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
-import { CourseFilterService } from '../../services/filtering/CourseFilterService'
+import { FilterService } from '../../services/filtering/FilterService'
 import { CourseDataService } from '../../services/data/courseDataService'
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService'
 import { ProgressiveRenderer } from '../utils/ProgressiveRenderer'
@@ -17,7 +17,7 @@ export class CourseController {
     private activeElement: HTMLElement | null = null;
     private courseSelectionService: CourseSelectionService;
     private courseDataService: CourseDataService;
-    private filterService: CourseFilterService | null = null;
+    private filterService: FilterService | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private progressiveRenderer: ProgressiveRenderer;
     // Pagination state
@@ -41,7 +41,7 @@ export class CourseController {
         this.initializeSelectedCoursesExpander();
     }
 
-    setFilterService(filterService: CourseFilterService): void {
+    setFilterService(filterService: FilterService): void {
         this.filterService = filterService;
     }
 

@@ -1,4 +1,4 @@
-import { DayOfWeek, Section, SimpleTime, TimeSlot } from './types';
+import { DayOfWeek, SimpleTime, TimeSlot } from './types';
 import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
 
 export interface FilterMetadata {
@@ -6,18 +6,6 @@ export interface FilterMetadata {
     readonly name: string;
     readonly description: string;
     readonly priority?: number;
-}
-
-export interface SectionFilter<TCriteria = unknown> extends FilterMetadata {
-    apply(sections: Section[], criteria: TCriteria, activeFilters?: Map<string, unknown>): Section[];
-    isValidCriteria(criteria: unknown): criteria is TCriteria;
-    getDisplayValue(criteria: TCriteria): string;
-}
-
-export interface SelectedCourseFilter<TCriteria = unknown> extends FilterMetadata {
-    apply(selectedCourses: SelectedCourse[], criteria: TCriteria, activeFilters?: Map<string, unknown>): SelectedCourse[];
-    isValidCriteria(criteria: unknown): criteria is TCriteria;
-    getDisplayValue(criteria: TCriteria): string;
 }
 
 export interface BaseFilter<TCriteria = unknown> extends FilterMetadata {

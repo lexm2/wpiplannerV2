@@ -2,9 +2,9 @@ import { DayOfWeek, Course, Section, Period } from '../../types/types'
 import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm, EventType } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
-import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService'
+import { FilterService } from '../../services/filtering/FilterService'
 import { SectionInfoModalController } from './SectionInfoModalController'
-import { ScheduleFilterModalController } from './ScheduleFilterModalController'
+import { FilterModalController } from './FilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
 import { LocalEventModal } from '../components/LocalEventModal'
 import { SidebarManager } from '../sidebar/SidebarManager'
@@ -53,7 +53,7 @@ interface CellData {
 export class ScheduleController implements CalendarEventProvider {
     private courseSelectionService: CourseSelectionService;
     private courseDataService: CourseDataService | null = null;
-    private scheduleFilterService: ScheduleFilterService | null = null;
+    private filterService: FilterService | null = null;
     private sectionInfoModalController: SectionInfoModalController | null = null;
     private conflictDetector: BitMaskEngine | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
@@ -107,20 +107,20 @@ export class ScheduleController implements CalendarEventProvider {
     setConflictDetector(engine: BitMaskEngine): void {
         this.conflictDetector = engine;
         
-        if (this.scheduleFilterService) {
-            this.scheduleFilterService.setConflictDetector();
+        if (this.filterService) {
+            this.filterService.setConflictDetector();
         }
     }
 
-    setScheduleFilterService(scheduleFilterService: ScheduleFilterService): void {
-        this.scheduleFilterService = scheduleFilterService;
-        
+    setFilterService(filterService: FilterService): void {
+        this.filterService = filterService;
+
         if (this.conflictDetector) {
-            this.scheduleFilterService.setConflictDetector();
+            this.filterService.setConflictDetector();
         }
-        
+
         // Set up filter change listener to refresh display
-        this.scheduleFilterService.addEventListener(() => {
+        this.filterService.addEventListener(() => {
             this.applyFiltersAndRefresh();
         });
     }
@@ -363,7 +363,7 @@ export class ScheduleController implements CalendarEventProvider {
             () => this.closeComponentWizard(),
             existingSelections,
             (selections) => this.onWizardSelectionChange(freshCourse, selections),
-            this.scheduleFilterService || undefined,
+            this.filterService || undefined,
             otherSelectedCourses,
             (selections) => this.onWizardHoverPreview(freshCourse, selections)
         );
@@ -449,11 +449,17 @@ export class ScheduleController implements CalendarEventProvider {
 
         let selectedCourses = this.courseSelectionService.getSelectedCourses();
 
-        let filteredSections: Array<{course: any, section: any}> = [];
+        let filteredSections: Array<{course: SelectedCourse, section: any}> = [];
         let hasActiveFilters = false;
 
-        if (this.scheduleFilterService && !this.scheduleFilterService.isEmpty()) {
-            filteredSections = this.scheduleFilterService.filterSections(selectedCourses);
+        if (this.filterService && !this.filterService.isEmpty()) {
+            const courses = selectedCourses.map(sc => sc.course);
+            const filtered = this.filterService.apply(courses);
+            // Map FilterableSection[] back to {course: SelectedCourse, section} shape
+            const courseMap = new Map(selectedCourses.map(sc => [sc.course.id, sc]));
+            filteredSections = filtered
+                .map(fs => ({ course: courseMap.get(fs.course.id)!, section: fs.section }))
+                .filter(fs => fs.course != null);
             hasActiveFilters = true;
         }
         
@@ -1387,9 +1393,9 @@ export class ScheduleController implements CalendarEventProvider {
 
     private updateScheduleFilterButtonState(): void {
         const scheduleFilterButton = document.getElementById('schedule-filter-btn');
-        if (scheduleFilterButton && this.scheduleFilterService) {
-            const hasActiveFilters = !this.scheduleFilterService.isEmpty();
-            const filterCount = this.scheduleFilterService.getFilterCount();
+        if (scheduleFilterButton && this.filterService) {
+            const hasActiveFilters = !this.filterService.isEmpty();
+            const filterCount = this.filterService.getFilterCount();
             
             if (hasActiveFilters) {
                 scheduleFilterButton.classList.add('active');
@@ -1664,7 +1670,7 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     private async handleAutoSchedule(): Promise<void> {
-        if (!this.scheduleFilterService) {
+        if (!this.filterService) {
             console.error('[Auto-Schedule] Filter service not available');
             alert('Filter service not available. Please try again.');
             return;
@@ -1686,10 +1692,9 @@ export class ScheduleController implements CalendarEventProvider {
             return;
         }
 
-        const scheduleFilterModal = new ScheduleFilterModalController(this.modalService, this.autoScheduleOrchestrator);
-        scheduleFilterModal.setScheduleFilterService(this.scheduleFilterService);
-        scheduleFilterModal.setSelectedCourses(selectedCourses);
-        scheduleFilterModal.setMode('auto-schedule');
+        const scheduleFilterModal = new FilterModalController(this.modalService);
+        scheduleFilterModal.setFilterService(this.filterService);
+        scheduleFilterModal.setCourseSelectionService(this.courseSelectionService);
         scheduleFilterModal.show();
     }
 

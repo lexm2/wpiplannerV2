@@ -1,5 +1,5 @@
 import { ModalService } from '../../services/ui/ModalService';
-import { CourseFilterService } from '../../services/filtering/CourseFilterService';
+import { FilterService } from '../../services/filtering/FilterService';
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
 import { Course, Department } from '../../types/types';
 import { AcademicTerm } from '../../types/schedule';
@@ -10,7 +10,7 @@ import { SharedFilterSetup } from '../components/SharedFilterSetup';
 import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria } from '../../types/filters';
 
 export class FilterModalController extends BaseModal {
-    private filterService: CourseFilterService | null = null;
+    private filterService: FilterService | null = null;
     private courseSelectionService: CourseSelectionService | null = null;
     private allCourses: Course[] = [];
     private isCategoryMode: boolean = false;
@@ -20,7 +20,7 @@ export class FilterModalController extends BaseModal {
         super(modalService);
     }
 
-    setFilterService(filterService: CourseFilterService): void {
+    setFilterService(filterService: FilterService): void {
         this.filterService = filterService;
     }
 
@@ -174,6 +174,7 @@ export class FilterModalController extends BaseModal {
                 ${this.createBookmarkFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createDepartmentFilter()}
+                ${this.createWakeUpTimeFilter()}
                 ${this.createCreditRangeFilter()}
                 ${this.createRMPRatingFilter()}
             </div>
@@ -430,6 +431,42 @@ export class FilterModalController extends BaseModal {
         `;
     }
 
+    private createWakeUpTimeFilter(): string {
+        if (!this.filterService) return '';
+
+        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'wakeUpTime');
+        const criteria = activeFilter?.criteria as any;
+        const activeWakeUpTime = criteria?.wakeUpTime || null;
+        const timeValue = activeWakeUpTime
+            ? `${String(activeWakeUpTime.hours).padStart(2, '0')}:${String(activeWakeUpTime.minutes).padStart(2, '0')}`
+            : '';
+
+        return `
+            <div class="filter-section">
+                <div class="filter-section-header">
+                    <h4 class="filter-section-title">Wake-Up Time</h4>
+                </div>
+                <div class="filter-section-content">
+                    <label class="wake-up-time-label">
+                        Earliest class start time
+                    </label>
+                    <input
+                        type="time"
+                        id="wake-up-time-input"
+                        class="wake-up-time-input"
+                        value="${timeValue}"
+                    >
+                    <p class="wake-up-time-hint">
+                        Excludes sections that start before this time
+                    </p>
+                    <button class="filter-clear-btn" id="clear-wake-up-time" style="display: ${timeValue ? 'block' : 'none'}">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
     private createRMPRatingFilter(): string {
         if (!this.filterService) return '';
 
@@ -456,6 +493,7 @@ export class FilterModalController extends BaseModal {
         this.setupTermFilter(modalElement);
         this.setupGraduateLevelFilter(modalElement);
         this.setupAcademicYearFilter(modalElement);
+        this.setupWakeUpTimeFilter(modalElement);
         this.setupClearAllButton(modalElement);
         this.setupFilterSearch(modalElement);
     }
@@ -668,6 +706,39 @@ export class FilterModalController extends BaseModal {
         });
     }
 
+
+    private setupWakeUpTimeFilter(modalElement: HTMLElement): void {
+        const wakeUpInput = modalElement.querySelector('#wake-up-time-input') as HTMLInputElement;
+        if (wakeUpInput) {
+            wakeUpInput.addEventListener('change', () => {
+                const clearBtn = modalElement.querySelector('#clear-wake-up-time') as HTMLElement;
+                if (wakeUpInput.value && wakeUpInput.value.trim()) {
+                    const [hours, minutes] = wakeUpInput.value.split(':').map(Number);
+                    if (!isNaN(hours) && !isNaN(minutes)) {
+                        this.filterService?.addFilter('wakeUpTime', {
+                            wakeUpTime: { hours, minutes }
+                        });
+                        if (clearBtn) clearBtn.style.display = 'block';
+                    }
+                } else {
+                    this.filterService?.removeFilter('wakeUpTime');
+                    if (clearBtn) clearBtn.style.display = 'none';
+                }
+                this.updatePreview(modalElement);
+            });
+        }
+
+        const clearWakeUpBtn = modalElement.querySelector('#clear-wake-up-time');
+        if (clearWakeUpBtn) {
+            clearWakeUpBtn.addEventListener('click', () => {
+                const input = modalElement.querySelector('#wake-up-time-input') as HTMLInputElement;
+                if (input) input.value = '';
+                this.filterService?.removeFilter('wakeUpTime');
+                (clearWakeUpBtn as HTMLElement).style.display = 'none';
+                this.updatePreview(modalElement);
+            });
+        }
+    }
 
     private setupClearAllButton(modalElement: HTMLElement): void {
         const clearButton = modalElement.querySelector('#clear-all-filters');

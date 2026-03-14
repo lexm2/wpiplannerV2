@@ -1,23 +1,20 @@
-import { SelectedCourse } from '../../../types/schedule';
-import { SelectedCourseFilter, GraduateLevelFilterCriteria } from '../../../types/filters';
+import { GraduateLevelFilterCriteria } from '../../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../../types/filterableUnit';
 
-export class GraduateLevelFilter implements SelectedCourseFilter {
+export class GraduateLevelFilter implements SectionBasedFilter {
     readonly id = 'graduateLevel';
     readonly name = 'Graduate Level';
     readonly description = 'Filter courses by graduate/undergraduate level';
     readonly priority = 80;
 
-    apply(selectedCourses: any[], criteria: any, _activeFilters?: Map<string, any>): any[] {
-        return this.applyToSelectedCourses(selectedCourses, criteria);
-    }
-
-    applyToSelectedCourses(selectedCourses: SelectedCourse[], criteria: GraduateLevelFilterCriteria): SelectedCourse[] {
+    apply(sections: FilterableSection[], criteria: GraduateLevelFilterCriteria): FilterableSection[] {
         if (criteria.level === 'all') {
-            return selectedCourses;
+            return sections;
         }
 
-        return selectedCourses.filter(sc => {
-            const isGraduate = sc.course.isGraduate ?? false;
+        return sections.filter(fs => {
+            const isGraduate = fs.course.isGraduate ?? false;
 
             if (criteria.level === 'graduate') {
                 return isGraduate;

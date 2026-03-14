@@ -1,7 +1,7 @@
 import { SelectedCourse } from '../../types/schedule'
 import type { AutoScheduleSettings, WeeklyTimeSlot } from '../../types/schedule'
 import { CourseSelectionService } from '../selection/CourseSelectionService'
-import { ScheduleFilterService } from '../filtering/ScheduleFilterService'
+import { FilterService } from '../filtering/FilterService'
 import { AutoScheduler, type ScheduleResult } from './AutoScheduler'
 
 export interface CalendarEventProvider {
@@ -14,13 +14,13 @@ export class AutoScheduleOrchestrator {
     private currentScheduleIndex: number = 0;
     private isApplyingAutoSchedule: boolean = false;
     private courseSelectionService: CourseSelectionService;
-    private scheduleFilterService: ScheduleFilterService;
+    private scheduleFilterService: FilterService;
     private calendarEventProvider: CalendarEventProvider | null = null;
     private onStateChangeCallback: (() => void) | null = null;
 
     constructor(
         courseSelectionService: CourseSelectionService,
-        scheduleFilterService: ScheduleFilterService
+        scheduleFilterService: FilterService
     ) {
         this.courseSelectionService = courseSelectionService;
         this.scheduleFilterService = scheduleFilterService;

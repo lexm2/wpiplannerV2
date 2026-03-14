@@ -1,79 +1,37 @@
-import { Section } from '../../../types/types';
-import { SectionFilter, SectionCodeFilterCriteria } from '../../../types/filters';
-import { SelectedCourse } from '../../../types/schedule';
+import { SectionCodeFilterCriteria } from '../../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../../types/filterableUnit';
 
-export class SectionCodeFilter implements SectionFilter<SectionCodeFilterCriteria> {
+export class SectionCodeFilter implements SectionBasedFilter {
     readonly id = 'sectionCode';
     readonly name = 'Section Code';
     readonly description = 'Filter by section codes (AL01, AX01, A01, etc.)';
     readonly priority = 2;
 
-    apply(sections: Section[], criteria: SectionCodeFilterCriteria, _activeFilters?: Map<string, unknown>): Section[] {
-        return this.applyToSections(sections, criteria);
-    }
-
-    applyToSections(sections: Section[], criteria: SectionCodeFilterCriteria): Section[] {
+    apply(sections: FilterableSection[], criteria: SectionCodeFilterCriteria): FilterableSection[] {
         if (!criteria.codes || criteria.codes.length === 0) {
             return sections;
         }
-        
+
         const searchCodes = criteria.codes.map(code => code.toLowerCase().trim()).filter(code => code.length > 0);
         if (searchCodes.length === 0) {
             return sections;
         }
-        
-        return sections.filter(section => {
-            const sectionNumber = section.number.toLowerCase();
-            
-            // Check if any of the search codes match this section
-            return searchCodes.some(searchCode => {
-                // Exact match
-                if (sectionNumber === searchCode) {
-                    return true;
-                }
-                
-                // Partial match - section contains the search code
-                if (sectionNumber.includes(searchCode)) {
-                    return true;
-                }
-                
-                // Pattern match for composite sections like "A01/AL01"
-                const sectionParts = sectionNumber.split('/');
-                return sectionParts.some(part => 
-                    part.trim() === searchCode || part.trim().includes(searchCode)
-                );
-            });
-        });
-    }
 
-    applyToSectionsWithContext(sectionsWithContext: Array<{course: SelectedCourse, section: Section}>, criteria: SectionCodeFilterCriteria): Array<{course: SelectedCourse, section: Section}> {
-        if (!criteria.codes || criteria.codes.length === 0) {
-            return sectionsWithContext;
-        }
-        
-        const searchCodes = criteria.codes.map(code => code.toLowerCase().trim()).filter(code => code.length > 0);
-        if (searchCodes.length === 0) {
-            return sectionsWithContext;
-        }
-        
-        return sectionsWithContext.filter(item => {
-            const sectionNumber = item.section.number.toLowerCase();
-            
-            // Check if any of the search codes match this section
+        return sections.filter(fs => {
+            const sectionNumber = fs.section.number.toLowerCase();
+
             return searchCodes.some(searchCode => {
-                // Exact match
                 if (sectionNumber === searchCode) {
                     return true;
                 }
-                
-                // Partial match - section contains the search code
+
                 if (sectionNumber.includes(searchCode)) {
                     return true;
                 }
-                
-                // Pattern match for composite sections like "A01/AL01"
+
                 const sectionParts = sectionNumber.split('/');
-                return sectionParts.some(part => 
+                return sectionParts.some(part =>
                     part.trim() === searchCode || part.trim().includes(searchCode)
                 );
             });
@@ -93,11 +51,11 @@ export class SectionCodeFilter implements SectionFilter<SectionCodeFilterCriteri
         if (!criteria.codes || criteria.codes.length === 0) {
             return 'No section codes';
         }
-        
+
         if (criteria.codes.length === 1) {
             return `Section: ${criteria.codes[0]}`;
         }
-        
+
         return `Sections: ${criteria.codes.join(', ')}`;
     }
 }
