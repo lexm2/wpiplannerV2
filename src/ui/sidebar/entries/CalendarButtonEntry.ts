@@ -1,24 +1,13 @@
-// =============================================================================
-// Calendar Button Entry - Sidebar entry for external calendar events button
-// =============================================================================
-
 import type { SidebarEntry, CalendarButtonEntryOptions } from '../types';
 import { getInlineSVG } from '../../../utils/iconPaths';
 import { Validators } from '../../../utils/validators';
 
-/**
- * Data returned by the CalendarButtonEntry
- */
 export interface CalendarButtonData {
     calendarName: string;
     totalEvents: number;
     visibleEvents: number;
 }
 
-/**
- * Sidebar entry for the external calendar events button.
- * Clicking opens the CalendarEventsPanel.
- */
 export class CalendarButtonEntry implements SidebarEntry {
     readonly entryId = 'calendar-events-button';
     readonly entryType = 'calendar';
@@ -29,9 +18,6 @@ export class CalendarButtonEntry implements SidebarEntry {
         this.options = options;
     }
 
-    /**
-     * Render the calendar button as HTML
-     */
     render(): string {
         const { calendarName, totalEvents, visibleEvents } = this.options;
 
@@ -48,9 +34,6 @@ export class CalendarButtonEntry implements SidebarEntry {
         `;
     }
 
-    /**
-     * Attach event listeners to the entry elements
-     */
     attachListeners(container: HTMLElement): void {
         const button = container.querySelector('#calendar-events-btn');
         if (button && this.options.onClick) {
@@ -60,9 +43,6 @@ export class CalendarButtonEntry implements SidebarEntry {
         }
     }
 
-    /**
-     * Get the data associated with this entry
-     */
     getData(): CalendarButtonData {
         return {
             calendarName: this.options.calendarName,

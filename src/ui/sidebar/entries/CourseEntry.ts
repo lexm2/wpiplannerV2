@@ -1,7 +1,3 @@
-// =============================================================================
-// Course Entry - Sidebar entry for displaying a selected course
-// =============================================================================
-
 import type { Section } from '../../../types/types';
 import type { SelectedCourse } from '../../../types/schedule';
 import type { SidebarEntry, CourseEntryOptions } from '../types';
@@ -9,9 +5,6 @@ import { CourseDataService } from '../../../services/data/courseDataService';
 import { getInlineSVG } from '../../../utils/iconPaths';
 import { Validators } from '../../../utils/validators';
 
-/**
- * Sidebar entry for displaying a selected course with its components.
- */
 export class CourseEntry implements SidebarEntry {
     readonly entryId: string;
     readonly entryType = 'course';
@@ -31,9 +24,6 @@ export class CourseEntry implements SidebarEntry {
         this.entryId = `course-${selectedCourse.course.id}`;
     }
 
-    /**
-     * Render the course entry as HTML
-     */
     render(): string {
         const course = this.selectedCourse.course;
         const isExpanded = this.options.isExpanded ?? false;
@@ -42,7 +32,6 @@ export class CourseEntry implements SidebarEntry {
             ? `${course.minCredits} credits`
             : `${course.minCredits}-${course.maxCredits} credits`;
 
-        // Build selected components display
         let selectedComponentsHTML = '';
         const components: string[] = [];
 
@@ -56,7 +45,6 @@ export class CourseEntry implements SidebarEntry {
             components.push(`<span class="selected-component lab">Lab ${Validators.escapeHtml(this.selectedCourse.selectedLab.number)}</span>`);
         }
 
-        // Check for incomplete selections
         const incompleteInfo = this.getIncompleteSelectionInfo();
         if (incompleteInfo.isIncomplete) {
             const warningIconHTML = `<span class="incomplete-warning" title="${Validators.escapeHtml(incompleteInfo.message)}"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="warning-icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" /></svg></span>`;
@@ -89,24 +77,18 @@ export class CourseEntry implements SidebarEntry {
         `;
     }
 
-    /**
-     * Attach event listeners to the entry elements
-     */
     attachListeners(container: HTMLElement): void {
         const entryElement = container.querySelector(`[data-entry-id="${this.entryId}"]`);
         if (!entryElement) return;
 
-        // Course header click (opens wizard)
         const header = entryElement.querySelector('.schedule-course-header');
         if (header && this.options.onClick) {
             header.addEventListener('click', (e) => {
-                // Don't trigger if clicking on buttons
                 if ((e.target as HTMLElement).closest('button')) return;
                 this.options.onClick?.();
             });
         }
 
-        // Clear sections button
         const clearBtn = entryElement.querySelector('.course-clear-sections-btn');
         if (clearBtn && this.options.onClearSections) {
             clearBtn.addEventListener('click', (e) => {
@@ -115,7 +97,6 @@ export class CourseEntry implements SidebarEntry {
             });
         }
 
-        // Remove course button
         const removeBtn = entryElement.querySelector('.course-remove-btn');
         if (removeBtn && this.options.onRemove) {
             removeBtn.addEventListener('click', (e) => {
@@ -125,16 +106,10 @@ export class CourseEntry implements SidebarEntry {
         }
     }
 
-    /**
-     * Get the data associated with this entry
-     */
     getData(): SelectedCourse {
         return this.selectedCourse;
     }
 
-    /**
-     * Check if a section has at least one period with a valid time slot
-     */
     private hasValidTimeSlot(section: Section): boolean {
         return section.periods.some(period => {
             if (period.isAsync) return true;
@@ -143,13 +118,9 @@ export class CourseEntry implements SidebarEntry {
         });
     }
 
-    /**
-     * Check if the course has incomplete component selections
-     */
     private getIncompleteSelectionInfo(): { isIncomplete: boolean; message: string } {
         const course = this.selectedCourse.course;
 
-        // Skip check for lab-only courses
         if (this.courseDataService?.isLabOnlyCourse(course)) {
             if (!this.selectedCourse.selectedLab) {
                 const labs = this.courseDataService.getStandaloneLabs(course);
@@ -161,25 +132,21 @@ export class CourseEntry implements SidebarEntry {
             return { isIncomplete: false, message: '' };
         }
 
-        // For hierarchical courses, check if lecture groups exist
         if (!course.lectures || course.lectures.length === 0) {
             return { isIncomplete: false, message: '' };
         }
 
         const missingComponents: string[] = [];
 
-        // Check if lectures with valid time slots exist
         const validLectures = course.lectures.filter(lg => this.hasValidTimeSlot(lg.section));
         if (validLectures.length === 0) {
             return { isIncomplete: false, message: '' };
         }
 
-        // Check lecture selection
         if (!this.selectedCourse.selectedLecture) {
             missingComponents.push('lecture');
         }
 
-        // Check if ANY lecture has discussions/labs with valid time slots
         const hasValidDiscussions = course.lectures.some(lg =>
             lg.compatibleDiscussions?.some(d => this.hasValidTimeSlot(d))
         );
