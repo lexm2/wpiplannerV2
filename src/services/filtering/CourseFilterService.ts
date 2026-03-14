@@ -12,7 +12,6 @@ export class CourseFilterService {
     private debugLogging: boolean = false;
     private sectionPipeline: SectionFilterPipeline;
     private getBookmarkedCourseIds: () => string[];
-    private allCourses: Course[] = [];
 
     constructor(getBookmarkedCourseIds: () => string[]) {
         this.filterState = new FilterState();
@@ -20,8 +19,8 @@ export class CourseFilterService {
         this.getBookmarkedCourseIds = getBookmarkedCourseIds;
     }
 
-    setCourseData(courses: Course[]): void {
-        this.allCourses = courses;
+    setCourseData(_courses: Course[]): void {
+        // Course data is passed to filter methods directly; this method is kept for interface compatibility.
     }
 
     setConflictDetector(): void {

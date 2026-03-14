@@ -5,7 +5,6 @@ import { CourseDataService } from '../../services/data/courseDataService'
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService'
 import { ProgressiveRenderer } from '../utils/ProgressiveRenderer'
 import { CancellationToken } from '../../utils/RequestCancellation'
-import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
@@ -21,8 +20,6 @@ export class CourseController {
     private filterService: CourseFilterService | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private progressiveRenderer: ProgressiveRenderer;
-    private performanceMetrics: PerformanceMetrics;
-
     // Pagination state
     private allCoursesToDisplay: Course[] = [];
     private displayedCourses: Course[] = [];
@@ -34,7 +31,6 @@ export class CourseController {
     constructor(courseSelectionService: CourseSelectionService, courseDataService: CourseDataService) {
         this.courseSelectionService = courseSelectionService;
         this.courseDataService = courseDataService;
-        this.performanceMetrics = new PerformanceMetrics();
         this.progressiveRenderer = new ProgressiveRenderer({
             onComplete: (_totalRendered, _totalTime) => {
                 this.onRenderCompleteCallback?.();

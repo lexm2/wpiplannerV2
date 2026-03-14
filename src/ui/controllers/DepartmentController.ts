@@ -89,7 +89,7 @@ export class DepartmentController {
 
     private setupCategoryToggleListeners(): void {
         document.querySelectorAll('.category-header[data-category]').forEach(header => {
-            header.addEventListener('click', (e) => {
+            header.addEventListener('click', (_e) => {
                 const categoryName = (header as HTMLElement).dataset.category;
                 if (categoryName) {
                     this.toggleCategory(categoryName);

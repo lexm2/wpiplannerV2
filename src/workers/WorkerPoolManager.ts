@@ -78,7 +78,7 @@ export class WorkerPoolManager {
     });
   }
 
-  private handleWorkerMessage(workerId: string, event: MessageEvent<WorkerResponse>): void {
+  private handleWorkerMessage(_workerId: string, event: MessageEvent<WorkerResponse>): void {
     const response = event.data;
     const pending = this.pendingTasks.get(response.id);
 

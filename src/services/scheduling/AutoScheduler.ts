@@ -1,4 +1,4 @@
-import type { Course, Section, DayOfWeek } from '../../types/types';
+import type { Course, Section } from '../../types/types';
 import type { SelectedCourse } from '../../types/schedule';
 import { sectionToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { ScheduleFilterService } from '../filtering/ScheduleFilterService';

@@ -42,7 +42,6 @@ export class ProfileStateManager {
     private isRestoringState = false;
     private pendingSavePromises = new Set<Promise<void>>();
     private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
-    private modalService: ModalService | null = null;
     public isBatchUpdate = false; // Flag to suppress individual event emissions during batch updates
 
     private constructor(storageManager?: TransactionalStorageManager) {
@@ -66,8 +65,8 @@ export class ProfileStateManager {
         }
     }
 
-    setModalService(modalService: ModalService): void {
-        this.modalService = modalService;
+    setModalService(_modalService: ModalService): void {
+        // Reserved for future use
     }
 
     private setupBeforeUnloadHandler(): void {

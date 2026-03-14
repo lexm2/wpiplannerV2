@@ -810,11 +810,6 @@ export class ScheduleFilterModalController extends BaseModal {
         this.updatePreview(modalElement);
     }
 
-    private handleOpenCalendarPanel(): void {
-        this.hide();
-        this.scheduleController.openCalendarEventsPanel();
-    }
-
     private async handleAutoScheduleGenerate(): Promise<void> {
         this.hide();
         await this.scheduleController.generateSchedules(this.selectedCourses);

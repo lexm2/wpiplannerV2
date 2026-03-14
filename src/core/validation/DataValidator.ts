@@ -151,7 +151,7 @@ export class DataValidator {
         return result;
     }
 
-    validateCourse(course: unknown, options: SchemaValidationOptions = {}): ValidationResult {
+    validateCourse(course: unknown, _options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
         if (!course || typeof course !== 'object') {
@@ -245,7 +245,7 @@ export class DataValidator {
         return result;
     }
 
-    validateSchedulePreferences(preferences: unknown, options: SchemaValidationOptions = {}): ValidationResult {
+    validateSchedulePreferences(preferences: unknown, _options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
         if (!preferences || typeof preferences !== 'object') {

@@ -1,5 +1,5 @@
 import ical, { ICalEventRepeatingFreq, ICalWeekday, ICalCalendarMethod } from 'ical-generator';
-import { Schedule, SelectedCourse, LocalCalendarEvent, EventType } from '../types/schedule';
+import { Schedule, SelectedCourse, EventType } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';
 import { TermBoundsService } from './termBounds';
 

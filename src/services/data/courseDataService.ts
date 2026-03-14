@@ -298,11 +298,6 @@ export class CourseDataService {
         return daySet;
     }
 
-    private logMA1024Sections(_scheduleDB: ScheduleDB): void {
-        // Debug logging method - keeping for development purposes but not logging on boot
-    }
-
-
 
     private stripHtml(html: string): string {
         return html.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim();

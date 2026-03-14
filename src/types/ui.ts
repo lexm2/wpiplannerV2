@@ -1,4 +1,4 @@
-import { DayOfWeek, SimpleTime, TimeSlot } from './types';
+import { TimeSlot } from './types';
 
 export interface SearchFilter {
     departments: string[];

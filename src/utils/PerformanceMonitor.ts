@@ -2,7 +2,7 @@ class PerformanceMonitor {
   private metrics: Map<string, number[]> = new Map();
   private enabled = import.meta.env.DEV;
 
-  startMeasure(label: string): number {
+  startMeasure(_label: string): number {
     return performance.now();
   }
 

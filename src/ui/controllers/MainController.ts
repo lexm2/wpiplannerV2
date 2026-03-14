@@ -38,7 +38,7 @@ import { WorkerPoolManager } from '../../workers/WorkerPoolManager'
 export class MainController {
     private courseDataService: CourseDataService;
     private schedulePickerModal: SchedulePickerModal | null = null;
-    private _themeSelector: ThemeSelector;
+    private themeSelector: ThemeSelector;
     private themeManager: ThemeManager;
     private profileStateManager: ProfileStateManager;
     private storageService: StorageService;
@@ -49,7 +49,6 @@ export class MainController {
     private courseController: CourseController;
     private scheduleController: ScheduleController;
     private sectionInfoModalController: SectionInfoModalController;
-    private infoModalController: InfoModalController;
     private filterModalController: FilterModalController;
     private scheduleFilterModalController: ScheduleFilterModalController;
     private filterService: CourseFilterService;
@@ -59,7 +58,6 @@ export class MainController {
     private operationManager: OperationManager;
     private debouncedSearch: DebouncedOperation;
     private scheduleManagementService: ScheduleManagementService;
-    private resizablePanel: ResizablePanel | null = null;
     private allDepartments: Department[] = [];
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
     private pendingExpansions: Array<{courseId: string, term: string}> = [];
@@ -76,7 +74,7 @@ export class MainController {
         
         // Initialize services with shared ProfileStateManager
         this.courseDataService = new CourseDataService();
-        this._themeSelector = new ThemeSelector(this.profileStateManager);
+        this.themeSelector = new ThemeSelector(this.profileStateManager);
         this.courseSelectionService = new CourseSelectionService(this.profileStateManager);
         this.conflictDetector = new BitMaskEngine();
         this.modalService = new ModalService();
@@ -102,7 +100,7 @@ export class MainController {
         this.courseController = new CourseController(this.courseSelectionService, this.courseDataService);
         this.scheduleController = new ScheduleController(this.courseSelectionService);
         this.sectionInfoModalController = new SectionInfoModalController(this.modalService);
-        this.infoModalController = new InfoModalController(this.modalService);
+        new InfoModalController(this.modalService);
         this.filterModalController = new FilterModalController(this.modalService);
         this.scheduleFilterModalController = new ScheduleFilterModalController(this.modalService, this.scheduleController);
         
@@ -249,7 +247,7 @@ export class MainController {
             await workerPool.initialize();
 
             await this.storageService.initialize();
-            this._themeSelector.initializeTheme();
+            this.themeSelector.initializeTheme();
             await rateMyProfessorService.loadData();
             await this.courseSelectionService.initialize();
             await this.scheduleManagementService.initialize();
@@ -294,12 +292,10 @@ export class MainController {
     private async loadCourseData(): Promise<void> {
         try {
             // Load course data - event listeners handle distribution
-            const scheduleDB = await this.courseDataService.loadCourseData();
+            await this.courseDataService.loadCourseData();
 
             // Load server timestamp
             await this.timestampManager.loadServerTimestamp();
-
-            console.log(`[MainController] Course data loaded: ${scheduleDB.departments.length} departments`);
         } catch (error) {
             console.error('Failed to load course data:', error);
             this.uiStateManager.showErrorMessage('Failed to load course data. Please try refreshing the page.');
@@ -691,46 +687,6 @@ export class MainController {
         if (scheduleTab) {
             scheduleTab.addEventListener('click', async () => {
                 this.uiStateManager.switchToPage('schedule');
-
-                // Log selected section data for debugging
-                const selectedCourses = this.courseSelectionService.getSelectedCourses();
-                console.log('=== SCHEDULE PAGE LOADED ===');
-                console.log(`Found ${selectedCourses.length} selected courses with sections:`);
-
-                selectedCourses.forEach(sc => {
-                    const hasLecture = sc.selectedLecture !== null;
-                    const components = [
-                        sc.selectedLecture ? `L:${sc.selectedLecture.number}` : null,
-                        sc.selectedDiscussion ? `D:${sc.selectedDiscussion.number}` : null,
-                        sc.selectedLab ? `Lab:${sc.selectedLab.number}` : null
-                    ].filter(Boolean).join(', ');
-                    console.log(`${sc.course.departmentAbbr}${sc.course.number}: ${components || 'NO COMPONENTS'} ${hasLecture ? 'OK' : 'MISSING'}`);
-                    if (hasLecture && sc.selectedLecture) {
-                        console.log(`  Term: ${sc.selectedLecture.computedTerm}, Periods: ${sc.selectedLecture.periods.length}`);
-                        console.log(`  Full lecture section:`, sc.selectedLecture);
-
-                        // Log each period in detail
-                        sc.selectedLecture.periods.forEach((period, idx) => {
-                            console.log(`    Period ${idx + 1}:`, {
-                                type: period.type,
-                                professor: period.professor,
-                                startTime: period.startTime,
-                                endTime: period.endTime,
-                                days: Array.from(period.days),
-                                location: period.location,
-                                building: period.building,
-                                room: period.room
-                            });
-
-                            // Calculate and log time slots for debugging
-                            const startSlot = Math.floor(((period.startTime.hours * 60 + period.startTime.minutes) - (7 * 60)) / 10);
-                            const endSlot = Math.floor(((period.endTime.hours * 60 + period.endTime.minutes) - (7 * 60)) / 10);
-                            const duration = endSlot - startSlot;
-                            console.log(`      Time slots: ${startSlot} to ${endSlot} (span ${duration} rows)`);
-                        });
-                    }
-                });
-                console.log('=== END SCHEDULE SECTION DATA ===\n');
 
                 // Wrap display operations in batch mode to prevent multiple saves
                 const stateManager = ProfileStateManager.getInstance();
@@ -1532,7 +1488,7 @@ export class MainController {
     }
 
     private setupResizablePanels(): void {
-        this.resizablePanel = new ResizablePanel({
+        new ResizablePanel({
             panels: [
                 {
                     handleSelector: '.resize-handle-left',
@@ -1573,37 +1529,8 @@ export class MainController {
         }
     }
 
-    // Public methods for easy access to selected courses
-    public getSelectedCourses() {
-        return this.courseSelectionService.getSelectedCourses();
-    }
-
-    public getSelectedCoursesCount(): number {
-        return this.courseSelectionService.getSelectedCoursesCount();
-    }
-
-    public getCourseSelectionService(): CourseSelectionService {
-        return this.courseSelectionService;
-    }
-
-    public getFilterService(): CourseFilterService {
-        return this.filterService;
-    }
-
     public getModalService(): ModalService {
         return this.modalService;
-    }
-
-    public getSectionInfoModalController(): SectionInfoModalController {
-        return this.sectionInfoModalController;
-    }
-
-    public getInfoModalController(): InfoModalController {
-        return this.infoModalController;
-    }
-
-    public getScheduleManagementService(): ScheduleManagementService {
-        return this.scheduleManagementService;
     }
 
     private getAllCourses(): Course[] {

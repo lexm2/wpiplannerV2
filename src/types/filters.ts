@@ -1,4 +1,4 @@
-import { DayOfWeek, PeriodType, Section, SimpleTime, TimeSlot } from './types';
+import { DayOfWeek, Section, SimpleTime, TimeSlot } from './types';
 import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
 
 export interface FilterMetadata {

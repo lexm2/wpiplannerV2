@@ -1,6 +1,6 @@
 import { Period, Section } from '../../../types/types';
 import { SelectedCourse, AcademicTerm, WeeklyTimeSlot } from '../../../types/schedule';
-import { ConflictFilterCriteria, PeriodConflictFilterCriteria } from '../../../types/filters';
+import { ConflictFilterCriteria } from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { FilterableSection } from '../../../types/filterableUnit';
 import { logger } from '../../../utils/logger';

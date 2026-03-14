@@ -38,7 +38,6 @@ export class CourseSelectionService {
     private selectionListeners = new Set<SelectionChangeListener>();
     private isInitialized = false;
     private initializationPromise: Promise<boolean> | null = null;
-    private sectionIndexCache = new WeakMap<Course, Map<string, Section>>();
 
     constructor(
         profileStateManager?: ProfileStateManager,
@@ -633,22 +632,6 @@ export class CourseSelectionService {
         return this.profileStateManager.getSelectedCourses();
     }
 
-    private getSectionIndex(course: Course): Map<string, Section> {
-        let index = this.sectionIndexCache.get(course);
-
-        if (!index) {
-            index = new Map<string, Section>();
-            const allSections = this.getAllSectionsForCourse(course);
-
-            allSections.forEach(section => {
-                index!.set(section.number, section);
-            });
-
-            this.sectionIndexCache.set(course, index);
-        }
-
-        return index;
-    }
 
     getSelectedSection(course: Course): string | null {
         const selectedCourse = this.getSelectedCourse(course);

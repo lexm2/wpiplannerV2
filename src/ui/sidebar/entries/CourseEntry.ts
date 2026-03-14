@@ -2,7 +2,7 @@
 // Course Entry - Sidebar entry for displaying a selected course
 // =============================================================================
 
-import type { Course, Section } from '../../../types/types';
+import type { Section } from '../../../types/types';
 import type { SelectedCourse } from '../../../types/schedule';
 import type { SidebarEntry, CourseEntryOptions } from '../types';
 import { CourseDataService } from '../../../services/data/courseDataService';

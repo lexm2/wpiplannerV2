@@ -10,7 +10,6 @@ import { getInlineSVG } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
 import { Validators } from '../../utils/validators';
 import { BaseSidebarPanel } from '../sidebar/BaseSidebarPanel';
-import type { SidebarListItem, SidebarListGroup } from '../sidebar/types';
 import '../../styles/components/component-wizard.css';
 
 type WizardStep = 'lecture' | 'discussion' | 'lab';
@@ -19,11 +18,6 @@ interface WizardSelections {
     lecture: Section | null;
     discussion: Section | null;
     lab: Section | null;
-}
-
-/** List item representing a section card in the wizard */
-interface WizardSectionItem extends SidebarListItem {
-    section: Section;
 }
 
 /**
@@ -158,23 +152,6 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     }
 
     /**
-     * Check if a section has at least one period with a valid time slot
-     * Async sections are valid even with 12:00-12:00 times
-     */
-    private hasValidTimeSlot(section: Section): boolean {
-        return section.periods.some(period => {
-            // Async periods are always valid
-            if (period.isAsync) {
-                return true;
-            }
-            // Compare actual time values, not object references
-            // A valid time slot has different start and end times
-            return period.startTime.hours !== period.endTime.hours ||
-                   period.startTime.minutes !== period.endTime.minutes;
-        });
-    }
-
-    /**
      * Check if a specific step has options available
      */
     hasOptionsForStep(step: WizardStep): boolean {
@@ -257,14 +234,6 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      */
     private applyScheduleFilters(sections: Section[], step: WizardStep): Section[] {
         if (!this.scheduleFilterService) return sections;
-
-        const activeFilters = this.scheduleFilterService.getActiveFilters();
-
-        // Check for RMP filter specifically
-        const rmpFilter = activeFilters.find(f => f.id === 'periodRmpRating');
-
-        // Check for conflict filter specifically
-        const conflictFilter = activeFilters.find(f => f.id === 'periodConflict');
 
         // Filter sections individually through the schedule filter service
         const filteredSections = sections.filter(section => {
@@ -722,7 +691,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             lab: 'Lab'
         };
 
-        const breadcrumbs = this.availableSteps.map((step, index) => {
+        const breadcrumbs = this.availableSteps.map((step, _index) => {
             const isActive = step === this.currentStep;
             const isCompleted = this.selections[step] !== null;
 

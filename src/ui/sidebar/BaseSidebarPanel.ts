@@ -5,7 +5,6 @@
 import type {
     SidebarPanel,
     SidebarPanelOptions,
-    PanelAnimationType,
     SidebarListItem,
     SidebarListGroup,
     AnimatedListOptions,

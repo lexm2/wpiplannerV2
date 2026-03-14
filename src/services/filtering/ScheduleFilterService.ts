@@ -6,7 +6,7 @@ import { PeriodTermFilter } from '../../core/filtering/filters/PeriodTermFilter'
 import { PeriodAvailabilityFilter } from '../../core/filtering/filters/PeriodAvailabilityFilter';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import { SectionCodeFilter } from '../../core/filtering/filters/SectionCodeFilter';
-import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter, PeriodConflictFilterCriteria, ConflictFilterCriteria } from '../../types/filters';
+import { SectionFilter, SelectedCourseFilter, FilterEventListener, BaseFilter, PeriodConflictFilterCriteria } from '../../types/filters';
 import { SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
 import { FilterState } from '../../core/filtering/FilterState';
 import { RequiredStatusFilter } from '../../core/filtering/filters/RequiredStatusFilter';

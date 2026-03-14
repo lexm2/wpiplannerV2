@@ -267,7 +267,7 @@ export class TransactionalStorageManager {
         }
     }
 
-    async exportData(options: { compressed?: boolean } = {}): Promise<{ data: string | null; valid: boolean; error?: string }> {
+    async exportData(_options: { compressed?: boolean } = {}): Promise<{ data: string | null; valid: boolean; error?: string }> {
         try {
             const schedulesResult = await this.loadAllSchedules();
             const fullSchedules = schedulesResult.data ?? [];
@@ -502,35 +502,6 @@ export class TransactionalStorageManager {
         } catch (error) {
             return { valid: false, error: `Integrity check failed: ${error}` };
         }
-    }
-
-    private async generateChecksum(data: string): Promise<string> {
-        if (typeof crypto !== 'undefined' && crypto.subtle) {
-            try {
-                const encoder = new TextEncoder();
-                const dataBuffer = encoder.encode(data);
-                const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            } catch (error) {
-                console.warn('Web Crypto API failed, falling back to simple hash:', error);
-                return this.fallbackChecksum(data);
-            }
-        }
-        return this.fallbackChecksum(data);
-    }
-
-    private fallbackChecksum(data: string): string {
-        let hash = 0;
-        if (data.length === 0) return hash.toString();
-
-        for (let i = 0; i < data.length; i++) {
-            const char = data.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-
-        return hash.toString();
     }
 
     isHealthy(): { healthy: boolean; issues: string[] } {
