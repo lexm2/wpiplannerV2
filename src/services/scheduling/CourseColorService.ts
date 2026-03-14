@@ -1,6 +1,5 @@
 import { SelectedCourse } from '../../types/schedule'
 import { CourseSelectionService } from '../selection/CourseSelectionService'
-import { perfMonitor } from '../../utils/PerformanceMonitor'
 
 const DEFAULT_COLORS = [
     '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336',
@@ -29,8 +28,6 @@ export class CourseColorService {
     }
 
     precomputeCourseColors(selectedCourses: SelectedCourse[]): void {
-        const startTime = perfMonitor.startMeasure('color-precompute');
-
         for (const sc of selectedCourses) {
             const courseId = sc.course.id;
 
@@ -51,8 +48,6 @@ export class CourseColorService {
                 this.usedColors.add(assignedColor);
             }
         }
-
-        perfMonitor.endMeasure('color-precompute', startTime);
     }
 
     getCourseColor(courseId: string): string {

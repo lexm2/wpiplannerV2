@@ -15,7 +15,6 @@ import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { ModalService } from '../../services/ui/ModalService'
-import { perfMonitor } from '../../utils/PerformanceMonitor'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator, type CalendarEventProvider } from '../../services/scheduling/AutoScheduleOrchestrator'
 
@@ -76,7 +75,7 @@ export class ScheduleController implements CalendarEventProvider {
     private currentCacheKey: string = '';
     private conflictMap: Map<number, Set<number>> = new Map();
     private lastConflictCacheKey: string = '';
-    private autoScheduleE2EStartTime: number | null = null;
+
 
     constructor(courseSelectionService: CourseSelectionService, colorService: CourseColorService, autoScheduleOrchestrator: AutoScheduleOrchestrator) {
         this.courseSelectionService = courseSelectionService;
@@ -944,8 +943,6 @@ export class ScheduleController implements CalendarEventProvider {
         ).sort().join(',');
         if (cacheKey === this.lastConflictCacheKey) return;
 
-        const startTime = perfMonitor.startMeasure('conflict-precompute');
-
         this.conflictMap.clear();
         this.lastConflictCacheKey = cacheKey;
 
@@ -957,13 +954,10 @@ export class ScheduleController implements CalendarEventProvider {
         }
 
         if (!this.conflictDetector) {
-            perfMonitor.endMeasure('conflict-precompute', startTime);
             return;
         }
 
         this.conflictMap = buildConflictMatrix(allSections, this.conflictDetector);
-
-        perfMonitor.endMeasure('conflict-precompute', startTime);
     }
 
     private precomputeCourseColors(selectedCourses: SelectedCourse[]): void {
@@ -989,8 +983,6 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     renderScheduleGrids(): void {
-        const renderStartTime = perfMonitor.startMeasure('grid-render-total');
-
         let rawSelectedCourses = this.courseSelectionService.getSelectedCourses();
 
         if (this.wizardPreviewCourse && this.wizardPreviewSelections) {
@@ -1012,7 +1004,6 @@ export class ScheduleController implements CalendarEventProvider {
         const hoverCourse = this.buildHoverCourse(selectedCourses);
 
         grids.forEach(term => {
-            const termStart = performance.now();
             const gridContainer = document.getElementById(`schedule-grid-${term}`);
             if (!gridContainer) return;
 
@@ -1040,8 +1031,6 @@ export class ScheduleController implements CalendarEventProvider {
 
             this.renderPopulatedGrid(gridContainer, termCourses, term, termHoverCourse);
         });
-
-        perfMonitor.endMeasure('grid-render-total', renderStartTime);
     }
 
     public renderAffectedTerms(affectedCourseIds: string[]): void {
@@ -1080,7 +1069,6 @@ export class ScheduleController implements CalendarEventProvider {
             }
         });
 
-        this.autoScheduleE2EStartTime = null;
     }
 
     private renderPopulatedGrid(container: HTMLElement, courses: SelectedCourse[], term: string, hoverCourse: SelectedCourse | null): void {
@@ -1599,7 +1587,7 @@ export class ScheduleController implements CalendarEventProvider {
         if (prevBtn) {
             prevBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_BAR_LEFT', 'schedule-nav-icon'));
             prevBtn.addEventListener('click', async () => {
-                this.autoScheduleE2EStartTime = performance.now();
+
                 await this.autoScheduleOrchestrator.navigateSchedule(-1);
                 this.renderScheduleGrids();
                 this.updateAutoScheduleButtonUI();
@@ -1609,7 +1597,7 @@ export class ScheduleController implements CalendarEventProvider {
         if (nextBtn) {
             nextBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_BAR_RIGHT', 'schedule-nav-icon'));
             nextBtn.addEventListener('click', async () => {
-                this.autoScheduleE2EStartTime = performance.now();
+
                 await this.autoScheduleOrchestrator.navigateSchedule(1);
                 this.renderScheduleGrids();
                 this.updateAutoScheduleButtonUI();

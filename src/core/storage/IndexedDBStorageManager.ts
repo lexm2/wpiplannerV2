@@ -7,7 +7,6 @@ import { setReplacer, setReviver } from '../../utils/jsonSerializer';
 import LZString from 'lz-string';
 import { StorageWorkerManager } from '../../workers/StorageWorkerManager';
 import { WorkerTaskType } from '../../workers/protocol';
-import { perfMonitor } from '../../utils/PerformanceMonitor';
 
 interface StorageResult<T> {
     success: boolean;
@@ -93,13 +92,11 @@ export class IndexedDBStorageManager {
                 timestamp: Date.now()
             };
 
-            const startTime = perfMonitor.startMeasure('save-compression');
             const workerPool = StorageWorkerManager.getInstance();
             const compressed = await workerPool.executeTask<string>(
                 WorkerTaskType.COMPRESS_DATA,
                 { data: scheduleWithTimestamp }
             );
-            perfMonitor.endMeasure('save-compression', startTime);
 
             return new Promise((resolve) => {
                 const transaction = db.transaction(
@@ -154,13 +151,11 @@ export class IndexedDBStorageManager {
                         const stored = request.result;
                         if (stored.serializedData) {
                             if (stored.compressed) {
-                                const startTime = perfMonitor.startMeasure('load-decompression');
                                 const workerPool = StorageWorkerManager.getInstance();
                                 const decompressed = await workerPool.executeTask<string>(
                                     WorkerTaskType.DECOMPRESS_DATA,
                                     { compressed: stored.serializedData }
                                 );
-                                perfMonitor.endMeasure('load-decompression', startTime);
 
                                 if (!decompressed) {
                                     resolve({
