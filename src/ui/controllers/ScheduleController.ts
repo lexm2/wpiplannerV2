@@ -1251,17 +1251,18 @@ export class ScheduleController {
                 return displayTerms.includes(term);
             });
 
-            const hasLocalEvents = this.getLocalEventSlotsForTerm(term).length > 0;
-
-            if (termCourses.length === 0 && !hasLocalEvents) {
-                this.renderEmptyGrid(gridContainer);
-                const termEnd = performance.now();
-                console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms (empty)`);
-                return;
+            // Determine hover course for THIS term based on hovered section's actual term
+            let termHoverCourse: SelectedCourse | null = null;
+            if (hoverCourse) {
+                const hoverTerm = getComputedTerm(hoverCourse);
+                if (hoverTerm) {
+                    const hoverDisplayTerms = getDisplayTerms(hoverTerm);
+                    if (hoverDisplayTerms.includes(term)) {
+                        termHoverCourse = hoverCourse;
+                    }
+                }
             }
 
-            const termHoverCourse = hoverCourse && termCourses.some(sc => sc.course.id === hoverCourse.course.id)
-                ? hoverCourse : null;
             this.renderPopulatedGrid(gridContainer, termCourses, term, termHoverCourse);
             const termEnd = performance.now();
             console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms`);
@@ -1302,15 +1303,6 @@ export class ScheduleController {
                     return displayTerms.includes(term);
                 });
 
-                const hasLocalEvents = this.getLocalEventSlotsForTerm(term).length > 0;
-
-                if (termCourses.length === 0 && !hasLocalEvents) {
-                    this.renderEmptyGrid(gridContainer);
-                    const termEnd = performance.now();
-                    console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms (empty)`);
-                    return;
-                }
-
                 this.renderPopulatedGrid(gridContainer, termCourses, term, null);
                 const termEnd = performance.now();
                 console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms`);
@@ -1322,11 +1314,6 @@ export class ScheduleController {
             console.log(`[PERF E2E] Auto-schedule navigation (button click → schedule-cell updated): ${e2eTime.toFixed(2)}ms`);
             this.autoScheduleE2EStartTime = null;
         }
-    }
-
-    private renderEmptyGrid(container: HTMLElement): void {
-        container.innerHTML = '';
-        container.classList.add('empty');
     }
 
     private renderPopulatedGrid(container: HTMLElement, courses: SelectedCourse[], term: string, hoverCourse: SelectedCourse | null): void {

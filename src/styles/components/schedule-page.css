@@ -802,20 +802,6 @@
   color: var(--color-text);
 }
 
-/* Empty grid state */
-.schedule-grid.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.schedule-grid.empty::after {
-  content: "Select sections to see schedule";
-  color: var(--color-text-secondary);
-  font-style: italic;
-  font-size: 0.8rem;
-}
-
 /* Calendar Events Button in Sidebar */
 .calendar-events-section {
   margin-bottom: 1rem;
