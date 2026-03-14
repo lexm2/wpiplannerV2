@@ -337,29 +337,6 @@ export class ScheduleController {
     }
 
     /**
-     * Open modal to edit an existing local event.
-     */
-    private openEditLocalEventModal(eventId: string): void {
-        if (!this.modalService || !this.currentSchedule) {
-            console.warn('[ScheduleController] Cannot open edit event modal - missing service or schedule');
-            return;
-        }
-
-        const localEvents = this.currentSchedule.localEvents || [];
-        const existingEvent = localEvents.find(e => e.id === eventId);
-        if (!existingEvent) {
-            console.warn('[ScheduleController] Cannot find event to edit:', eventId);
-            return;
-        }
-
-        const modal = new LocalEventModal(this.modalService, {
-            existingEvent,
-            onSave: (eventData) => this.updateLocalEvent(eventId, eventData),
-        });
-        modal.show();
-    }
-
-    /**
      * Add a new local event.
      */
     private addLocalEvent(eventData: Omit<LocalCalendarEvent, 'id' | 'createdAt' | 'updatedAt'>): void {
@@ -375,92 +352,6 @@ export class ScheduleController {
 
         const currentEvents = this.currentSchedule.localEvents || [];
         const updatedLocalEvents = [...currentEvents, newEvent];
-
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            localEvents: updatedLocalEvents,
-        };
-
-        this.renderScheduleGrids();
-
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            localEvents: updatedLocalEvents,
-        });
-    }
-
-    /**
-     * Update an existing local event.
-     */
-    private updateLocalEvent(eventId: string, eventData: Omit<LocalCalendarEvent, 'id' | 'createdAt' | 'updatedAt'>): void {
-        if (!this.currentSchedule || !this.onScheduleUpdate) return;
-
-        const currentEvents = this.currentSchedule.localEvents || [];
-        const eventIndex = currentEvents.findIndex(e => e.id === eventId);
-
-        if (eventIndex === -1) {
-            console.warn('[ScheduleController] Event not found for update:', eventId);
-            return;
-        }
-
-        const existingEvent = currentEvents[eventIndex];
-        const updatedEvent: LocalCalendarEvent = {
-            ...eventData,
-            id: eventId,
-            createdAt: existingEvent.createdAt,
-            updatedAt: Date.now(),
-        };
-
-        const updatedLocalEvents = [
-            ...currentEvents.slice(0, eventIndex),
-            updatedEvent,
-            ...currentEvents.slice(eventIndex + 1),
-        ];
-
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            localEvents: updatedLocalEvents,
-        };
-
-        this.renderScheduleGrids();
-
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            localEvents: updatedLocalEvents,
-        });
-    }
-
-    /**
-     * Delete a local event.
-     */
-    private deleteLocalEvent(eventId: string): void {
-        if (!this.currentSchedule || !this.onScheduleUpdate) return;
-
-        const currentEvents = this.currentSchedule.localEvents || [];
-        const updatedLocalEvents = currentEvents.filter(e => e.id !== eventId);
-
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            localEvents: updatedLocalEvents,
-        };
-
-        this.renderScheduleGrids();
-
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            localEvents: updatedLocalEvents,
-        });
-    }
-
-    /**
-     * Toggle visibility of a local event.
-     */
-    private toggleLocalEventVisibility(eventId: string): void {
-        if (!this.currentSchedule || !this.onScheduleUpdate) return;
-
-        const currentEvents = this.currentSchedule.localEvents || [];
-        const updatedLocalEvents = currentEvents.map(event =>
-            event.id === eventId
-                ? { ...event, visible: !event.visible }
-                : event
-        );
 
         this.currentSchedule = {
             ...this.currentSchedule,
@@ -1251,7 +1142,6 @@ export class ScheduleController {
                 return displayTerms.includes(term);
             });
 
-            // Determine hover course for THIS term based on hovered section's actual term
             let termHoverCourse: SelectedCourse | null = null;
             if (hoverCourse) {
                 const hoverTerm = getComputedTerm(hoverCourse);
