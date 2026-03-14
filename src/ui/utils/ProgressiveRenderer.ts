@@ -55,7 +55,39 @@ export class ProgressiveRenderer {
 
             const termSectionsHtml = sortedTerms.map(term => {
                 const sections = sectionsByTerm.get(term)!;
-                const sectionBadgesHtml = sections.map((section: any) => {
+
+                // Deduplicate: if a section code has both a named professor and a TBA entry, drop the TBA one
+                const sectionsByNumber = new Map<string, any[]>();
+                sections.forEach((section: any) => {
+                    const num = section.number;
+                    if (!sectionsByNumber.has(num)) sectionsByNumber.set(num, []);
+                    sectionsByNumber.get(num)!.push(section);
+                });
+                const dedupedSections: any[] = [];
+                sectionsByNumber.forEach(group => {
+                    if (group.length <= 1) {
+                        dedupedSections.push(...group);
+                        return;
+                    }
+                    // Check which entries have a real (non-TBA) professor
+                    const withProf = group.filter((s: any) =>
+                        s.periods.some((p: { professor: string }) =>
+                            p.professor && p.professor !== 'TBA' && p.professor !== 'Not Assigned' && p.professor.trim() !== ''
+                        )
+                    );
+                    if (withProf.length > 0) {
+                        dedupedSections.push(...withProf);
+                    } else {
+                        // All TBA — just keep one
+                        dedupedSections.push(group[0]);
+                    }
+                });
+
+                const maxBadges = 100;
+                const totalSections = dedupedSections.length;
+                const displaySections = dedupedSections.slice(0, maxBadges);
+
+                const sectionBadgesHtml = displaySections.map((section: any) => {
                     const isFull = section.seatsAvailable <= 0;
                     const professors = new Set<string>();
                     section.periods.forEach((period: { professor: string }) => {
@@ -79,6 +111,10 @@ export class ProgressiveRenderer {
                     return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${escapedSectionNumber}" title="${escapedProfListPlain}: ${escapedSectionNumber}">${profListHtml}: ${escapedSectionNumber}</span>`;
                 }).join('');
 
+                const overflowHtml = totalSections > maxBadges
+                    ? `<span class="section-badge section-badge-overflow" title="View course details for all sections">+${totalSections - maxBadges} more — see course details</span>`
+                    : '';
+
                 const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
                 return `<div class="term-sections-container" data-term="${Validators.escapeHtml(term)}" style="display: none;">
                     <span class="term-badge active ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}"${allFull ? ' title="All sections full"' : ''}>
@@ -86,6 +122,7 @@ export class ProgressiveRenderer {
                         ${getInlineSVG('PLUS', 'term-icon')}
                     </span>
                     ${sectionBadgesHtml}
+                    ${overflowHtml}
                 </div>`;
             }).join('');
 

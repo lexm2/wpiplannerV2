@@ -441,10 +441,11 @@ export class MainController {
                     clickedTermContainer.style.cssText = '';
                     clickedTermContainer.style.display = 'none';
 
-                    // Rotate icon back
+                    // Rotate icon back and clear inline styles from expansion
                     const termIcon = clickedTermContainer.querySelector('.term-badge.active .term-icon') as HTMLElement;
                     if (termIcon) {
-                        termIcon.style.transform = 'rotate(0deg)';
+                        termIcon.style.transform = '';
+                        termIcon.style.transition = '';
                     }
 
                     // 3. Measure target height (temporarily unlock to get true content height)
@@ -470,8 +471,7 @@ export class MainController {
                         });
 
                         // Clean up after transition
-                        const onEnd = (e: TransitionEvent) => {
-                            if (e.propertyName !== 'height') return;
+                        const cleanup = () => {
                             courseItem.style.height = '';
                             courseItem.style.transition = '';
                             courseItem.style.overflow = '';
@@ -480,9 +480,18 @@ export class MainController {
                             termBadges.forEach(badge => {
                                 badge.style.cssText = '';
                             });
+                        };
+                        const onEnd = (e: TransitionEvent) => {
+                            if (e.propertyName !== 'height') return;
+                            clearTimeout(fallbackTimer);
                             courseItem.removeEventListener('transitionend', onEnd);
+                            cleanup();
                         };
                         courseItem.addEventListener('transitionend', onEnd);
+                        const fallbackTimer = setTimeout(() => {
+                            courseItem.removeEventListener('transitionend', onEnd);
+                            cleanup();
+                        }, collapseDuration * 1000 + 100);
                     });
                 } else {
                     // Update state: term is being expanded
@@ -908,18 +917,12 @@ export class MainController {
         clickedTermContainer.style.paddingTop = '0.5rem';
 
         const sectionBadges = clickedTermContainer.querySelectorAll('.section-badge') as NodeListOf<HTMLElement>;
-        const tooMany = sectionBadges.length > 50;
 
-        if (tooMany) {
-            // Hide container — one style write instead of N
-            clickedTermContainer.style.opacity = '0';
-        } else {
-            sectionBadges.forEach(badge => {
-                badge.style.opacity = '0';
-                badge.style.transform = 'translateX(-10px)';
-                badge.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
-            });
-        }
+        sectionBadges.forEach(badge => {
+            badge.style.opacity = '0';
+            badge.style.transform = 'translateX(-10px)';
+            badge.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+        });
 
         // 3. Measure target height (temporarily unlock to get true content height)
         courseItem.style.height = 'auto';
@@ -934,38 +937,50 @@ export class MainController {
         requestAnimationFrame(() => {
             courseItem.style.height = `${targetItemHeight}px`;
 
-            if (tooMany) {
-                // Fade the whole container in at once
-                clickedTermContainer.style.transition = 'opacity 0.2s ease';
-                clickedTermContainer.style.opacity = '1';
-            } else {
-                // Stagger animate badges in
-                sectionBadges.forEach((badge, i) => {
-                    setTimeout(() => {
-                        badge.style.opacity = '1';
-                        badge.style.transform = 'translateX(0)';
-                    }, i * 15);
-                });
-            }
+            // Stagger animate badges in
+            const staggerTimers: ReturnType<typeof setTimeout>[] = [];
+            sectionBadges.forEach((badge, i) => {
+                staggerTimers.push(setTimeout(() => {
+                    badge.style.opacity = '1';
+                    badge.style.transform = 'translateX(0)';
+                }, i * 15));
+            });
 
             // Clean up after transition
-            const onEnd = (e: TransitionEvent) => {
-                if (e.propertyName !== 'height') return;
+            const cleanup = () => {
+                // Cancel any pending stagger timeouts first
+                staggerTimers.forEach(t => clearTimeout(t));
                 courseItem.style.height = '';
                 courseItem.style.transition = '';
                 courseItem.style.overflow = '';
                 courseItem.style.willChange = '';
-                courseItem.removeEventListener('transitionend', onEnd);
                 // Clean up inline styles so they don't slow down future interactions
                 clickedTermContainer.style.transition = '';
-                if (!tooMany) {
-                    sectionBadges.forEach(badge => {
-                        badge.style.cssText = '';
-                    });
-                }
+                sectionBadges.forEach(badge => {
+                    badge.style.cssText = '';
+                });
                 if (onComplete) onComplete();
             };
+            // Wait for both height transition AND all stagger animations to finish
+            const staggerEnd = sectionBadges.length * 15 + 200;
+            const cleanupDelay = Math.max(expandDuration * 1000, staggerEnd) + 100;
+            const onEnd = (e: TransitionEvent) => {
+                if (e.propertyName !== 'height') return;
+                clearTimeout(fallbackTimer);
+                courseItem.removeEventListener('transitionend', onEnd);
+                // Delay cleanup until stagger animations are done
+                const remaining = staggerEnd - (expandDuration * 1000);
+                if (remaining > 0) {
+                    setTimeout(cleanup, remaining + 50);
+                } else {
+                    cleanup();
+                }
+            };
             courseItem.addEventListener('transitionend', onEnd);
+            const fallbackTimer = setTimeout(() => {
+                courseItem.removeEventListener('transitionend', onEnd);
+                cleanup();
+            }, cleanupDelay);
         });
 
         // Rotate icon
