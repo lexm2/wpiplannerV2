@@ -32,7 +32,7 @@ export class CourseController {
         this.courseSelectionService = courseSelectionService;
         this.courseDataService = courseDataService;
         this.progressiveRenderer = new ProgressiveRenderer({
-            onComplete: (_totalRendered, _totalTime) => {
+            onComplete: () => {
                 this.onRenderCompleteCallback?.();
             }
         });

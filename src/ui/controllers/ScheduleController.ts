@@ -1054,7 +1054,6 @@ export class ScheduleController implements CalendarEventProvider {
         const grids = ['A', 'B', 'C', 'D'];
         grids.forEach(term => {
             if (termsToRender.has(term)) {
-                const termStart = performance.now();
                 const gridContainer = document.getElementById(`schedule-grid-${term}`);
                 if (!gridContainer) return;
 

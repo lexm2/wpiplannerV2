@@ -7,7 +7,7 @@ import { Validators } from '../../utils/validators';
 import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 
 export interface ProgressiveRenderOptions {
-    onComplete?: (totalRendered: number, totalTime: number) => void;
+    onComplete?: (totalRendered: number) => void;
 }
 
 export class ProgressiveRenderer {
@@ -22,7 +22,6 @@ export class ProgressiveRenderer {
         isLoadMore: boolean = false
     ): void {
         const stateManager = ProfileStateManager.getInstance();
-        const startTime = performance.now();
 
         const html = courses.map(course => {
             const isSelected = courseSelectionService.isCourseSelected(course);
@@ -176,7 +175,7 @@ export class ProgressiveRenderer {
             });
         }
 
-        this.options.onComplete?.(courses.length, performance.now() - startTime);
+        this.options.onComplete?.(courses.length);
     }
 
     renderCourseGrid(
@@ -188,7 +187,6 @@ export class ProgressiveRenderer {
         isLoadMore: boolean = false
     ): void {
         const stateManager = ProfileStateManager.getInstance();
-        const startTime = performance.now();
 
         const html = courses.map(course => {
             const isSelected = courseSelectionService.isCourseSelected(course);
@@ -239,7 +237,7 @@ export class ProgressiveRenderer {
             });
         }
 
-        this.options.onComplete?.(courses.length, performance.now() - startTime);
+        this.options.onComplete?.(courses.length);
     }
 
     cancelCurrentRender(): void {}

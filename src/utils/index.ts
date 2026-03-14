@@ -10,12 +10,6 @@ export {
 } from './typeGuards';
 export type { IconName } from './iconPaths';
 export { ICONS, INLINE_SVGS, getInlineSVG } from './iconPaths';
-export type {
-  PerformanceMetric,
-  PerformanceReport,
-  FilterPerformanceMetrics,
-} from './PerformanceMetrics';
-export { PerformanceMetrics } from './PerformanceMetrics';
 export { setReplacer, setReviver } from './jsonSerializer';
 export {
   getAllSections,

@@ -16,5 +16,4 @@ export interface WorkerResponse {
   success: boolean;
   data?: any;
   error?: string;
-  duration?: number;
 }

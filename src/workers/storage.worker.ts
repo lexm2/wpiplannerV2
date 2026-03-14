@@ -4,7 +4,6 @@ import { setReplacer } from '../utils/jsonSerializer';
 
 self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
   const { id, type, payload } = event.data;
-  const startTime = performance.now();
 
   try {
     let result: any;
@@ -29,8 +28,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
       id,
       type,
       success: true,
-      data: result,
-      duration: performance.now() - startTime
+      data: result
     };
 
     self.postMessage(response);
