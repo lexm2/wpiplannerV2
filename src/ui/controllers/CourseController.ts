@@ -488,9 +488,12 @@ export class CourseController {
 
         descriptionContainer.innerHTML = html;
 
-        // Attach tab event listeners if hierarchical
         if (isHierarchical || isLabOnly) {
             this.attachTabEventListeners();
+            const activePanel = descriptionContainer.querySelector('.tab-panel.active') as HTMLElement | null;
+            if (activePanel) {
+                this.populatePanel(activePanel, course);
+            }
         }
     }
 
@@ -524,16 +527,16 @@ export class CourseController {
         html += '<div class="component-tab-content">';
 
         if (showLectures) {
-            html += this.renderLecturesTab(course);
+            html += this.renderLecturesTab();
         }
         if (showDiscussions) {
-            html += this.renderDiscussionsTab(course);
+            html += this.renderDiscussionsTab();
         }
         if (showLabs) {
-            html += this.renderLabsTab(course, isLabOnly);
+            html += this.renderLabsTab();
         }
         if (showInterestLists) {
-            html += this.renderInterestListsTab(course);
+            html += this.renderInterestListsTab();
         }
 
         html += '</div>'; // end component-tab-content
@@ -542,81 +545,63 @@ export class CourseController {
         return html;
     }
 
-    private renderLecturesTab(course: Course): string {
-        // Filter out interest lists - they have their own tab
-        const lectures = this.courseDataService.getLecturesForCourse(course)
-            .filter(lg => !lg.section.isInterestList);
-
-        let html = '<div class="tab-panel active" data-panel="lectures">';
-        html += `<h3>Available Lectures (${lectures.length})</h3>`;
-        html += '<div class="sections-list">';
-
-        for (const lectureGroup of lectures) {
-            html += this.renderSectionCard(lectureGroup.section, 'Lecture');
-        }
-
-        html += '</div></div>';
-        return html;
+    private renderLecturesTab(): string {
+        return '<div class="tab-panel active" data-panel="lectures" data-loaded="false"></div>';
     }
 
-    private renderInterestListsTab(course: Course): string {
-        const interestLists = this.courseDataService.getLecturesForCourse(course)
-            .filter(lg => lg.section.isInterestList);
-
-        let html = '<div class="tab-panel" data-panel="interest-lists">';
-        html += `<h3>Interest Lists (${interestLists.length})</h3>`;
-        html += '<div class="sections-list">';
-
-        for (const lectureGroup of interestLists) {
-            html += this.renderSectionCard(lectureGroup.section, 'Interest List');
-        }
-
-        html += '</div></div>';
-        return html;
+    private renderInterestListsTab(): string {
+        return '<div class="tab-panel" data-panel="interest-lists" data-loaded="false"></div>';
     }
 
-    private renderDiscussionsTab(course: Course): string {
-        const discussions = this.courseDataService.getLecturesForCourse(course)
-            .flatMap(lg => lg.compatibleDiscussions);
-
-        let html = '<div class="tab-panel" data-panel="discussions">';
-        html += `<h3>Available Discussions (${discussions.length})</h3>`;
-        html += '<div class="sections-list">';
-
-        for (const discussion of discussions) {
-            html += this.renderSectionCard(discussion, 'Discussion');
-        }
-
-        html += '</div></div>';
-        return html;
+    private renderDiscussionsTab(): string {
+        return '<div class="tab-panel" data-panel="discussions" data-loaded="false"></div>';
     }
 
-    private renderLabsTab(course: Course, isLabOnly: boolean): string {
-        let html = '<div class="tab-panel" data-panel="labs">';
+    private renderLabsTab(): string {
+        return '<div class="tab-panel" data-panel="labs" data-loaded="false"></div>';
+    }
 
-        if (isLabOnly) {
-            const labs = this.courseDataService.getStandaloneLabs(course);
-            html += `<h3>Available Lab Sections (${labs.length})</h3>`;
-            html += '<div class="sections-list">';
+    private populatePanel(panel: HTMLElement, course: Course): void {
+        if (panel.dataset.loaded === 'true') return;
 
-            for (const lab of labs) {
-                html += this.renderSectionCard(lab, 'Lab');
+        const panelName = panel.dataset.panel;
+        let html = '';
+
+        if (panelName === 'lectures') {
+            const lectures = this.courseDataService.getLecturesForCourse(course)
+                .filter(lg => !lg.section.isInterestList);
+            html = `<h3>Available Lectures (${lectures.length})</h3><div class="sections-list">`;
+            for (const lg of lectures) html += this.renderSectionCard(lg.section, 'Lecture');
+            html += '</div>';
+        } else if (panelName === 'discussions') {
+            const discussions = this.courseDataService.getLecturesForCourse(course)
+                .flatMap(lg => lg.compatibleDiscussions);
+            html = `<h3>Available Discussions (${discussions.length})</h3><div class="sections-list">`;
+            for (const d of discussions) html += this.renderSectionCard(d, 'Discussion');
+            html += '</div>';
+        } else if (panelName === 'labs') {
+            const isLabOnly = this.courseDataService.isLabOnlyCourse(course);
+            if (isLabOnly) {
+                const labs = this.courseDataService.getStandaloneLabs(course);
+                html = `<h3>Available Lab Sections (${labs.length})</h3><div class="sections-list">`;
+                for (const lab of labs) html += this.renderSectionCard(lab, 'Lab');
+            } else {
+                const labs = this.courseDataService.getLecturesForCourse(course)
+                    .flatMap(lg => lg.compatibleLabs);
+                html = `<h3>Available Labs (${labs.length})</h3><div class="sections-list">`;
+                for (const lab of labs) html += this.renderSectionCard(lab, 'Lab');
             }
-        } else {
-            const labs = this.courseDataService.getLecturesForCourse(course)
-                .flatMap(lg => lg.compatibleLabs);
-            html += `<h3>Available Labs (${labs.length})</h3>`;
-            html += '<div class="sections-list">';
-
-            for (const lab of labs) {
-                html += this.renderSectionCard(lab, 'Lab');
-            }
-
+            html += '</div>';
+        } else if (panelName === 'interest-lists') {
+            const interestLists = this.courseDataService.getLecturesForCourse(course)
+                .filter(lg => lg.section.isInterestList);
+            html = `<h3>Interest Lists (${interestLists.length})</h3><div class="sections-list">`;
+            for (const lg of interestLists) html += this.renderSectionCard(lg.section, 'Interest List');
             html += '</div>';
         }
 
-        html += '</div></div>';
-        return html;
+        panel.innerHTML = html;
+        panel.dataset.loaded = 'true';
     }
 
     private renderSectionCard(section: Section, type: string): string {
@@ -702,16 +687,15 @@ export class CourseController {
                 const tabName = target.dataset.tab;
                 if (!tabName) return;
 
-                // Update active tab
                 tabs.forEach(t => t.classList.remove('active'));
                 target.classList.add('active');
 
-                // Update active panel
                 const panels = document.querySelectorAll('.tab-panel');
                 panels.forEach(p => p.classList.remove('active'));
 
-                const activePanel = document.querySelector(`.tab-panel[data-panel="${tabName}"]`);
-                if (activePanel) {
+                const activePanel = document.querySelector(`.tab-panel[data-panel="${tabName}"]`) as HTMLElement | null;
+                if (activePanel && this.selectedCourse) {
+                    this.populatePanel(activePanel, this.selectedCourse);
                     activePanel.classList.add('active');
                 }
             });
