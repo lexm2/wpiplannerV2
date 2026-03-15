@@ -9,6 +9,7 @@
 - Calendar event conflict filter and auto-schedule modal mode
 
 ### Improved
+- Reduced DOM queries by caching element references and using event delegation for faster interactions
 - Course component tabs (lectures, labs, discussions) now load sections lazily for faster course description rendering
 - Department sidebar course counts now update when filters change
 - Courses are now removed from results when filters eliminate all sections of a required component type

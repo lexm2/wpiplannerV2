@@ -680,25 +680,27 @@ export class CourseController {
     }
 
     private attachTabEventListeners(): void {
-        const tabs = document.querySelectorAll('.component-tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const target = e.target as HTMLElement;
-                const tabName = target.dataset.tab;
-                if (!tabName) return;
+        const descriptionContainer = document.getElementById('course-description');
+        if (!descriptionContainer) return;
 
-                tabs.forEach(t => t.classList.remove('active'));
-                target.classList.add('active');
+        const tabsContainer = descriptionContainer.querySelector<HTMLElement>('.component-tabs');
+        const tabContent = descriptionContainer.querySelector<HTMLElement>('.component-tab-content');
+        if (!tabsContainer || !tabContent) return;
 
-                const panels = document.querySelectorAll('.tab-panel');
-                panels.forEach(p => p.classList.remove('active'));
+        tabsContainer.addEventListener('click', (e) => {
+            const tab = (e.target as HTMLElement).closest<HTMLElement>('.component-tab');
+            if (!tab?.dataset.tab) return;
 
-                const activePanel = document.querySelector(`.tab-panel[data-panel="${tabName}"]`) as HTMLElement | null;
-                if (activePanel && this.selectedCourse) {
-                    this.populatePanel(activePanel, this.selectedCourse);
-                    activePanel.classList.add('active');
-                }
-            });
+            tabsContainer.querySelectorAll('.component-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            tabContent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            const activePanel = tabContent.querySelector<HTMLElement>(`.tab-panel[data-panel="${tab.dataset.tab}"]`);
+            if (activePanel && this.selectedCourse) {
+                this.populatePanel(activePanel, this.selectedCourse);
+                activePanel.classList.add('active');
+            }
         });
     }
 
