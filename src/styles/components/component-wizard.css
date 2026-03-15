@@ -541,3 +541,40 @@ html.is-mobile .wizard-sections-grid {
     }
 }
 
+/* Filtered out notice */
+.wizard-filtered-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+    background-color: var(--color-surface-alt, var(--color-surface));
+    border: 1px solid var(--color-border);
+    border-radius: var(--effect-border-radius);
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+}
+
+.wizard-filtered-notice-text {
+    flex: 1;
+}
+
+.wizard-filtered-notice-btn {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--effect-border-radius);
+    color: var(--color-primary);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    margin-left: 0.75rem;
+    transition: var(--effect-transition);
+    white-space: nowrap;
+}
+
+.wizard-filtered-notice-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-on-primary, #fff);
+    border-color: var(--color-primary);
+}
+

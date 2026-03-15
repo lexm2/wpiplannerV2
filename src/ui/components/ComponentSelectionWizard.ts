@@ -163,44 +163,38 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      * Get available sections for a specific step
      */
     getOptionsForStep(step: WizardStep): Section[] {
+        return this.getOptionsWithFilterInfo(step).filtered;
+    }
+
+    private getOptionsWithFilterInfo(step: WizardStep): { filtered: Section[], totalBeforeFilter: number } {
         let sections: Section[] = [];
 
         if (step === 'lecture') {
-            // Lab-only course
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
                 sections = this.courseDataService.getStandaloneLabs(this.course);
             } else {
-                // Regular hierarchical course
                 const lectureGroups = this.courseDataService.getLecturesForCourse(this.course);
                 sections = lectureGroups.map(lg => lg.section);
             }
         } else if (step === 'discussion') {
             if (!this.selections.lecture) {
-                // No lecture selected - show ALL discussions from all lecture groups
                 sections = this.getAllDiscussionsForCourse();
             } else {
-                // Lecture selected - show only compatible discussions
                 sections = this.courseDataService.getDiscussionsForLecture(this.course, this.selections.lecture);
             }
         } else if (step === 'lab') {
-            // Lab-only course
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
                 sections = this.courseDataService.getStandaloneLabs(this.course);
             } else {
-                // Regular course
                 if (!this.selections.lecture) {
-                    // No lecture selected - show ALL labs from all lecture groups
                     sections = this.getAllLabsForCourse();
                 } else {
-                    // Lecture selected - show only compatible labs
                     sections = this.courseDataService.getLabsForLecture(this.course, this.selections.lecture);
                 }
             }
         }
 
         // Apply term filtering ONLY for child components (discussions/labs)
-        // based on the selected lecture's term
-        // NEVER filter lectures - users must be able to select any term freely
         if (step !== 'lecture' && this.selections.lecture && sections.length > 0) {
             const lectureTerm = this.selections.lecture.computedTerm;
             sections = this.filterSectionsByTerm(sections, lectureTerm);
@@ -209,13 +203,15 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         // Filter out interest list placeholder sections
         sections = sections.filter(section => !section.isInterestList);
 
+        const totalBeforeFilter = sections.length;
+
         // Apply schedule filters if available
-        if (this.filterService && sections.length > 0) {
-            const filteredSections = this.applyScheduleFilters(sections, step);
-            return filteredSections;
+        if (this.filterService && !this.filterService.isEmpty() && sections.length > 0) {
+            const filtered = this.applyScheduleFilters(sections, step);
+            return { filtered, totalBeforeFilter };
         }
 
-        return sections;
+        return { filtered: sections, totalBeforeFilter };
     }
 
     /**
@@ -701,7 +697,8 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      * Render the current step
      */
     private renderCurrentStep(): string {
-        const options = this.getOptionsForStep(this.currentStep);
+        const { filtered: options, totalBeforeFilter } = this.getOptionsWithFilterInfo(this.currentStep);
+        const hiddenCount = totalBeforeFilter - options.length;
 
         if (options.length === 0) {
             return `
@@ -709,6 +706,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
                     <div class="wizard-empty-state">
                         <p>No ${this.currentStep}s available for this course.</p>
                     </div>
+                    ${hiddenCount > 0 ? this.renderFilteredOutNotice(hiddenCount) : ''}
                 </div>
             `;
         }
@@ -739,6 +737,21 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             <div class="wizard-step active slide-in-right" data-step="${this.currentStep}">
                 <h3 class="wizard-step-title">${stepTitles[this.currentStep]}</h3>
                 ${sectionsHTML}
+                ${hiddenCount > 0 ? this.renderFilteredOutNotice(hiddenCount) : ''}
+            </div>
+        `;
+    }
+
+    private renderFilteredOutNotice(hiddenCount: number): string {
+        const sectionWord = hiddenCount === 1 ? 'section' : 'sections';
+        return `
+            <div class="wizard-filtered-notice">
+                <span class="wizard-filtered-notice-text">
+                    ${hiddenCount} ${sectionWord} hidden by filters
+                </span>
+                <button class="wizard-filtered-notice-btn" id="wizard-clear-filters-btn">
+                    Clear Filters
+                </button>
             </div>
         `;
     }
@@ -953,6 +966,14 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
                 const step = (e.currentTarget as HTMLElement).dataset.step as WizardStep;
                 this.jumpToStep(step);
             });
+        });
+
+        // Clear filters button
+        const clearFiltersBtn = this.panel.querySelector('#wizard-clear-filters-btn');
+        clearFiltersBtn?.addEventListener('click', () => {
+            if (this.filterService) {
+                this.filterService.clearFilters();
+            }
         });
 
         // Section cards
