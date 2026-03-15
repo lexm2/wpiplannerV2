@@ -684,13 +684,6 @@ export class FilterModalController extends BaseModal {
         }
     }
 
-    private setupBookmarkFilter(modalElement: HTMLElement): void {
-        const checkbox = modalElement.querySelector('#bookmarked-only-filter') as HTMLInputElement;
-        if (checkbox) {
-            checkbox.addEventListener('change', () => this.updateBookmarkFilter(modalElement));
-        }
-    }
-
     private setupCreditRangeFilter(modalElement: HTMLElement): void {
         const minInput = modalElement.querySelector('#credit-min') as HTMLInputElement;
         const maxInput = modalElement.querySelector('#credit-max') as HTMLInputElement;

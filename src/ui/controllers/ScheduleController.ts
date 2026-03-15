@@ -115,10 +115,6 @@ export class ScheduleController implements CalendarEventProvider {
         return schedulePage ? getComputedStyle(schedulePage).display !== 'none' : false;
     }
 
-    // =========================================================================
-    // Schedule Loading
-    // =========================================================================
-
     /**
      * Set the callback for updating schedules (used for saving exclusion changes).
      */
@@ -477,21 +473,6 @@ export class ScheduleController implements CalendarEventProvider {
         }
 
         this.setupDOMElementMapping(selectedCoursesContainer, sortedCourses);
-
-        this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
-    }
-
-    /**
-     * Set up click handler for the calendar events button.
-     */
-    private setupCalendarEventsButtonHandler(container: HTMLElement): void {
-        const calendarBtn = container.querySelector('#calendar-events-btn');
-        if (calendarBtn) {
-            calendarBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.openAddLocalEventModal();
-            });
-        }
 
         this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
     }
@@ -874,8 +855,6 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     renderScheduleGrids(): void {
-        const renderStartTime = perfMonitor.startMeasure('grid-render-total');
-
         let rawSelectedCourses = this.courseSelectionService.getSelectedCourses();
 
         if (this.wizardPreviewCourse && this.wizardPreviewSelections) {
@@ -897,7 +876,6 @@ export class ScheduleController implements CalendarEventProvider {
         const hoverCourse = this.buildHoverCourse(selectedCourses);
 
         grids.forEach(term => {
-            const termStart = performance.now();
             const gridContainer = document.getElementById(`schedule-grid-${term}`);
             if (!gridContainer) return;
 
@@ -1267,19 +1245,6 @@ export class ScheduleController implements CalendarEventProvider {
 
     setCourseColor(courseId: string, color: string): void {
         this.colorService.setCourseColor(courseId, color);
-        this.renderScheduleGrids();
-    }
-
-    /**
-     * Set a custom color for a course and persist it
-     */
-    setCourseColor(courseId: string, color: string): void {
-        // Update local cache
-        this.courseColorMap.set(courseId, color);
-        this.usedColors.add(color);
-        // Persist via CourseSelectionService
-        this.courseSelectionService.setCourseColor(courseId, color);
-        // Re-render
         this.renderScheduleGrids();
     }
 

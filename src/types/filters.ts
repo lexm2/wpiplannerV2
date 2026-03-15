@@ -116,11 +116,6 @@ export interface ConflictCriteria extends ConflictFilterCriteria {
     selectedCourses?: SelectedCourse[];
 }
 
-export interface ConflictFilterCriteria {
-    avoidConflicts: boolean;
-    blockedSlots: WeeklyTimeSlot[];
-}
-
 export interface SectionCodeFilterCriteria {
     codes: string[];
 }

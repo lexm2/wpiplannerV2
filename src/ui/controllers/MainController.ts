@@ -233,59 +233,6 @@ export class MainController {
         }
     }
 
-    private initializeSwipeNavigation(): void {
-        if (!DeviceDetection.isMobilePhone()) return;
-
-        const plannerPage = document.getElementById('planner-page');
-        const schedulePage = document.getElementById('schedule-page');
-
-        if (plannerPage) {
-            new SwipeGestureHandler(
-                plannerPage,
-                () => this.handleSwipeLeft(),
-                () => this.handleSwipeRight()
-            );
-        }
-
-        if (schedulePage) {
-            new SwipeGestureHandler(
-                schedulePage,
-                () => this.handleSwipeLeft(),
-                () => this.handleSwipeRight()
-            );
-        }
-    }
-
-    private handleSwipeLeft(): void {
-        if (this.uiStateManager.getCurrentPage() === 'planner') {
-            this.uiStateManager.switchToPage('schedule');
-            this.scheduleController.displayScheduleSelectedCourses();
-            this.scheduleController.renderScheduleGrids();
-        }
-    }
-
-    private handleSwipeRight(): void {
-        if (this.uiStateManager.getCurrentPage() === 'schedule') {
-            this.scheduleController.closeComponentWizard();
-            this.uiStateManager.switchToPage('planner');
-        }
-    }
-
-    private setupWindowUnloadHandler(): void {
-        window.addEventListener('beforeunload', async (e) => {
-            const profileStateManager = ProfileStateManager.getInstance();
-
-            if (profileStateManager.hasPendingSaves()) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            }
-
-            const workerPool = WorkerPoolManager.getInstance();
-            workerPool.terminate();
-        });
-    }
-
 
     private setupEventListeners(): void {
         // Department selection

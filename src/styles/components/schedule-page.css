@@ -863,66 +863,6 @@
   color: var(--color-text-secondary);
 }
 
-/* Calendar Events Button in Sidebar */
-.calendar-events-section {
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.calendar-events-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  cursor: pointer;
-  transition: var(--effect-transition);
-  text-align: left;
-}
-
-.calendar-events-btn:hover {
-  background: var(--color-background-alt);
-  border-color: var(--color-primary);
-}
-
-.calendar-events-btn-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.calendar-events-btn-icon .calendar-btn-icon {
-  width: 20px;
-  height: 20px;
-  color: var(--color-primary);
-}
-
-.calendar-events-btn-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.calendar-events-btn-name {
-  font-size: 0.85rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.calendar-events-btn-count {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-}
-
 /* Responsive breakpoints */
 @media (max-width: 1024px) {
   .schedule-page-layout {
