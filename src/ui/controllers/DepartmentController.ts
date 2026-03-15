@@ -22,6 +22,7 @@ export class DepartmentController {
     syncVisualState(): void {
         const activeDepts = this.getActiveDepartments();
         this.updateVisualState(activeDepts);
+        this.updateCourseCounts();
     }
 
     setAllDepartments(departments: Department[]): void {
@@ -149,6 +150,40 @@ export class DepartmentController {
 
         this.updateVisualState(newDepts);
         return department;
+    }
+
+    private updateCourseCounts(): void {
+        if (!this.filterService || this.allDepartments.length === 0) return;
+
+        const hasNonDeptFilters = this.filterService.getActiveFilters().some(
+            f => f.id !== 'department'
+        );
+
+        // Get courses that pass all filters except department
+        const allCourses = this.allDepartments.flatMap(d => d.courses);
+        const passingCourses = hasNonDeptFilters
+            ? new Set(this.filterService.filterCoursesExcluding(allCourses, ['department']).map(c => c.id))
+            : null;
+
+        // Update each department item's count
+        let totalCount = 0;
+        this.allDepartments.forEach(dept => {
+            const count = passingCourses
+                ? dept.courses.filter(c => passingCourses.has(c.id)).length
+                : dept.courses.length;
+            totalCount += count;
+
+            const item = document.querySelector(`.department-item[data-dept-id="${dept.abbreviation}"]`);
+            if (item) {
+                item.textContent = `${dept.name} (${count})`;
+            }
+        });
+
+        // Update "All Departments" count
+        const allItem = document.querySelector('.department-item[data-dept-id="all"]');
+        if (allItem) {
+            allItem.textContent = `All Departments (${totalCount})`;
+        }
     }
 
     private getActiveDepartments(): string[] {

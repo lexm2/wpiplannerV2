@@ -196,6 +196,23 @@ export class FilterService {
         return filteredCourses;
     }
 
+    // Apply filters excluding specific filter IDs, resolve to courses
+    filterCoursesExcluding(courses: Course[], excludeIds: string[]): Course[] {
+        const criteriaMap = this.getCriteriaMap();
+        criteriaMap.delete('bookmark');
+        for (const id of excludeIds) {
+            criteriaMap.delete(id);
+        }
+
+        if (criteriaMap.size === 0) {
+            return courses;
+        }
+
+        const sections = this.sectionPipeline.flattenCoursesToSections(courses);
+        const filtered = this.sectionPipeline.applyFilters(sections, criteriaMap);
+        return this.sectionPipeline.reconstructCourses(filtered);
+    }
+
     // Filter options for UI
     getFilterOptions(filterId: string, courses: Course[]): any {
         switch (filterId) {
