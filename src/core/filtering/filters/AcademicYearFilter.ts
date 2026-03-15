@@ -1,23 +1,22 @@
-import { SelectedCourse } from '../../../types/schedule';
-import { SelectedCourseFilter, AcademicYearFilterCriteria } from '../../../types/filters';
+import { AcademicYearFilterCriteria } from '../../../types/filters';
+import { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { FilterableSection } from '../../../types/filterableUnit';
 
-export class AcademicYearFilter implements SelectedCourseFilter {
+export class AcademicYearFilter implements SectionBasedFilter {
     readonly id = 'academicYear';
     readonly name = 'Academic Year';
     readonly description = 'Filter courses by academic year';
     readonly priority = 75;
 
-    apply(selectedCourses: any[], criteria: any): any[] {
-        return this.applyToSelectedCourses(selectedCourses, criteria);
+    apply(sections: FilterableSection[], criteria: AcademicYearFilterCriteria): FilterableSection[] {
+        if (criteria.year === 'all') return sections;
+        return sections.filter(fs => fs.course.academicYear === criteria.year);
     }
 
-    applyToSelectedCourses(selectedCourses: SelectedCourse[], criteria: AcademicYearFilterCriteria): SelectedCourse[] {
-        if (criteria.year === 'all') return selectedCourses;
-        return selectedCourses.filter(sc => sc.course.academicYear === criteria.year);
-    }
-
-    isValidCriteria(criteria: any): criteria is AcademicYearFilterCriteria {
-        return criteria && typeof criteria === 'object' && 'year' in criteria;
+    isValidCriteria(criteria: unknown): criteria is AcademicYearFilterCriteria {
+        if (!criteria || typeof criteria !== 'object' || !('year' in criteria)) return false;
+        const c = criteria as Record<string, unknown>;
+        return c.year === 'all' || typeof c.year === 'number';
     }
 
     getDisplayValue(criteria: AcademicYearFilterCriteria): string {

@@ -1,4 +1,4 @@
-import { DayOfWeek, PeriodType, Section, SimpleTime, TimeSlot } from './types';
+import { DayOfWeek, SimpleTime, TimeSlot } from './types';
 import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
 
 export interface FilterMetadata {
@@ -6,18 +6,6 @@ export interface FilterMetadata {
     readonly name: string;
     readonly description: string;
     readonly priority?: number;
-}
-
-export interface SectionFilter<TCriteria = unknown> extends FilterMetadata {
-    apply(sections: Section[], criteria: TCriteria, activeFilters?: Map<string, unknown>): Section[];
-    isValidCriteria(criteria: unknown): criteria is TCriteria;
-    getDisplayValue(criteria: TCriteria): string;
-}
-
-export interface SelectedCourseFilter<TCriteria = unknown> extends FilterMetadata {
-    apply(selectedCourses: SelectedCourse[], criteria: TCriteria, activeFilters?: Map<string, unknown>): SelectedCourse[];
-    isValidCriteria(criteria: unknown): criteria is TCriteria;
-    getDisplayValue(criteria: TCriteria): string;
 }
 
 export interface BaseFilter<TCriteria = unknown> extends FilterMetadata {
@@ -119,22 +107,13 @@ export interface PeriodDaysFilterCriteria {
     days: DayOfWeek[];
 }
 
-export interface PeriodProfessorFilterCriteria {
-    professors: string[];
-}
-
-export interface PeriodTermFilterCriteria {
-    terms: AcademicTerm[];
-}
-
-export interface PeriodAvailabilityFilterCriteria {
-    availableOnly: boolean;
-    minAvailable?: number;
-}
-
-export interface PeriodConflictFilterCriteria {
+export interface ConflictFilterCriteria {
     avoidConflicts: boolean;
-    selectedCourses?: SelectedCourse[]; // Array of SelectedCourse objects for context-aware conflict detection
+    blockedSlots: WeeklyTimeSlot[];
+}
+
+export interface ConflictCriteria extends ConflictFilterCriteria {
+    selectedCourses?: SelectedCourse[];
 }
 
 export interface ConflictFilterCriteria {
@@ -161,13 +140,7 @@ export interface BookmarkFilterCriteria {
 }
 
 export interface BlockedTimesFilterCriteria {
-    blockedTimes: Array<{
-        id: string;
-        day: DayOfWeek;
-        startTime: SimpleTime;
-        endTime: SimpleTime;
-        term: AcademicTerm;
-    }>;
+    blockedTimes: WeeklyTimeSlot[];
 }
 
 export interface WakeUpTimeFilterCriteria {

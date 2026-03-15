@@ -1,93 +1,61 @@
-import { DayOfWeek, Course, Section, Period } from '../../types/types'
+import { DayOfWeek, Course, Section, Period, LectureGroup } from '../../types/types'
 import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm, EventType } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
-import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService'
-import { ScheduleManagementService } from '../../services/selection/ScheduleManagementService'
+import { FilterService } from '../../services/filtering/FilterService'
 import { SectionInfoModalController } from './SectionInfoModalController'
-import { ScheduleFilterModalController } from './ScheduleFilterModalController'
+import { FilterModalController } from './FilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
 import { LocalEventModal } from '../components/LocalEventModal'
 import { SidebarManager } from '../sidebar/SidebarManager'
-import type { SidebarPanel } from '../sidebar/types'
 import { TimeUtils } from '../utils/timeUtils'
-import { ConflictDetector } from '../../core/scheduling/ConflictEngine'
+import { BitMaskEngine, buildConflictMatrix } from '../../core/scheduling/BitMaskEngine'
 import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../../utils/typeGuards'
-import { AutoScheduler, type ScheduleResult } from '../../services/scheduling/AutoScheduler'
-import type { AutoScheduleSettings, WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
+import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
-import { getAllSections } from '../../utils/courseUtils'
 import { ModalService } from '../../services/ui/ModalService'
-import { perfMonitor } from '../../utils/PerformanceMonitor'
+import { CourseColorService } from '../../services/scheduling/CourseColorService'
+import { AutoScheduleOrchestrator, type CalendarEventProvider } from '../../services/scheduling/AutoScheduleOrchestrator'
+import type { ComponentSelections, SectionOccupant, CalendarOccupant, CellData, CellContentResult } from '../../types/scheduling'
 
-interface WizardSelections {
-    lecture: Section | null;
-    discussion: Section | null;
-    lab: Section | null;
-}
-
-interface SectionOccupant {
-    course: SelectedCourse;
-    section: Section;
-    periodsOnThisDay: Period[];
-    startSlot: number;
-    endSlot: number;
-    isFirstSlot: boolean;
-    startMinutes: number;
-    endMinutes: number;
-}
-
-interface CalendarOccupant {
-    slot: DisplayableTimeSlot;
-    startSlot: number;
-    endSlot: number;
-    isFirstSlot: boolean;
-    startMinutes: number;
-    endMinutes: number;
-}
-
-interface CellData {
-    sections: SectionOccupant[];
-    calendar: CalendarOccupant[];
-}
-
-export class ScheduleController {
+export class ScheduleController implements CalendarEventProvider {
     private courseSelectionService: CourseSelectionService;
     private courseDataService: CourseDataService | null = null;
-    private scheduleFilterService: ScheduleFilterService | null = null;
+    private filterService: FilterService | null = null;
     private sectionInfoModalController: SectionInfoModalController | null = null;
-    private conflictDetector: ConflictDetector | null = null;
+    private conflictDetector: BitMaskEngine | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private containerEventListeners = new Map<HTMLElement, EventListener>();
     private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
-    private wizardPreviewSelections: WizardSelections | null = null;
-    private hoverPreviewSections: Set<number> = new Set(); // Track CRNs of sections being previewed
-    private courseColorMap: Map<string, string> = new Map();
-    private usedColors: Set<string> = new Set();
-    private colorCache: Map<string, string> = new Map();
-    private generatedSchedules: ScheduleResult[][] = [];
-    private currentScheduleIndex: number = 0;
-    private isApplyingAutoSchedule: boolean = false;
+    private wizardPreviewSelections: ComponentSelections | null = null;
+    private hoverPreviewSelections: ComponentSelections | null = null;
+    private colorService: CourseColorService;
+    private autoScheduleOrchestrator: AutoScheduleOrchestrator;
     private currentSchedule: Schedule | null = null;
     private onScheduleUpdate: ((scheduleId: string, updates: Partial<Schedule>) => void) | null = null;
     private sidebarManager: SidebarManager;
     private modalService: ModalService | null = null;
 
     // Performance optimization: Caching infrastructure for grid rendering
-    private cellContentCache: Map<string, any> = new Map();
+    private cellContentCache: Map<string, CellContentResult> = new Map();
     private currentCacheKey: string = '';
-    private conflictMap: Map<string, Set<string>> = new Map();
+    private conflictMap: Map<number, Set<number>> = new Map();
     private lastConflictCacheKey: string = '';
-    private autoScheduleE2EStartTime: number | null = null;
 
-    constructor(courseSelectionService: CourseSelectionService) {
+
+    constructor(courseSelectionService: CourseSelectionService, colorService: CourseColorService, autoScheduleOrchestrator: AutoScheduleOrchestrator) {
         this.courseSelectionService = courseSelectionService;
+        this.colorService = colorService;
+        this.autoScheduleOrchestrator = autoScheduleOrchestrator;
         this.sidebarManager = new SidebarManager('schedule-sidebar-content');
         this.setupTermFocusHandlers();
-        this.setupColorManagement();
+
+        this.autoScheduleOrchestrator.onStateChange(() => {
+            this.updateAutoScheduleButtonUI();
+        });
     }
 
     /**
@@ -95,21 +63,6 @@ export class ScheduleController {
      */
     setModalService(modalService: ModalService): void {
         this.modalService = modalService;
-    }
-
-    /**
-     * Set up listener to clean up colors when courses are removed
-     */
-    private setupColorManagement(): void {
-        this.courseSelectionService.addSelectionListener((event) => {
-            if (event.type === 'course_removed' && event.course) {
-                this.releaseCourseColor(event.course.id);
-            } else if (event.type === 'selection_cleared') {
-                // Clear all color assignments
-                this.courseColorMap.clear();
-                this.usedColors.clear();
-            }
-        });
     }
 
     setCourseDataService(courseDataService: CourseDataService): void {
@@ -120,35 +73,25 @@ export class ScheduleController {
         this.sectionInfoModalController = sectionInfoModalController;
     }
 
-    setConflictDetector(conflictDetector: ConflictDetector): void {
-        this.conflictDetector = conflictDetector;
+    setConflictDetector(engine: BitMaskEngine): void {
+        this.conflictDetector = engine;
         
-        // If we already have ScheduleFilterService, update it with ConflictDetector
-        if (this.scheduleFilterService) {
-            this.scheduleFilterService.setConflictDetector(conflictDetector);
+        if (this.filterService) {
+            this.filterService.setConflictDetector();
         }
     }
 
-    setScheduleFilterService(scheduleFilterService: ScheduleFilterService): void {
-        this.scheduleFilterService = scheduleFilterService;
-        
-        // If we already have ConflictDetector, pass it to the service
+    setFilterService(filterService: FilterService): void {
+        this.filterService = filterService;
+
         if (this.conflictDetector) {
-            this.scheduleFilterService.setConflictDetector(this.conflictDetector);
+            this.filterService.setConflictDetector();
         }
-        
+
         // Set up filter change listener to refresh display
-        this.scheduleFilterService.addEventListener(() => {
+        this.filterService.addEventListener(() => {
             this.applyFiltersAndRefresh();
         });
-    }
-
-    setScheduleFilterModalController(_scheduleFilterModalController: ScheduleFilterModalController): void {
-        // Intentionally empty - kept for backward compatibility
-    }
-
-    setScheduleManagementService(_scheduleManagementService: ScheduleManagementService): void {
-        // Intentionally empty - kept for backward compatibility
     }
 
     // =========================================================================
@@ -167,20 +110,14 @@ export class ScheduleController {
         this.displayScheduleSelectedCourses();
     }
 
-    /**
-     * Clear the current schedule.
-     */
-    clearExternalEvents(): void {
-        this.currentSchedule = null;
-        if (this.isSchedulePageVisible()) {
-            this.renderScheduleGrids();
-        }
-    }
-
     private isSchedulePageVisible(): boolean {
         const schedulePage = document.getElementById('schedule-page');
         return schedulePage ? getComputedStyle(schedulePage).display !== 'none' : false;
     }
+
+    // =========================================================================
+    // Schedule Loading
+    // =========================================================================
 
     /**
      * Set the callback for updating schedules (used for saving exclusion changes).
@@ -268,7 +205,7 @@ export class ScheduleController {
     /**
      * Get all blocked times from local events for auto-scheduler.
      */
-    private getAllLocalEventBlockedTimes(): WeeklyTimeSlot[] {
+    getAllLocalEventBlockedTimes(): WeeklyTimeSlot[] {
         if (!this.currentSchedule?.localEvents) return [];
 
         const blockedTimes: WeeklyTimeSlot[] = [];
@@ -295,10 +232,6 @@ export class ScheduleController {
         }
 
         return blockedTimes;
-    }
-
-    getCalendarEventCount(): number {
-        return 0;
     }
 
     getLocalEventCount(): number {
@@ -339,29 +272,6 @@ export class ScheduleController {
     }
 
     /**
-     * Open modal to edit an existing local event.
-     */
-    private openEditLocalEventModal(eventId: string): void {
-        if (!this.modalService || !this.currentSchedule) {
-            console.warn('[ScheduleController] Cannot open edit event modal - missing service or schedule');
-            return;
-        }
-
-        const localEvents = this.currentSchedule.localEvents || [];
-        const existingEvent = localEvents.find(e => e.id === eventId);
-        if (!existingEvent) {
-            console.warn('[ScheduleController] Cannot find event to edit:', eventId);
-            return;
-        }
-
-        const modal = new LocalEventModal(this.modalService, {
-            existingEvent,
-            onSave: (eventData) => this.updateLocalEvent(eventId, eventData),
-        });
-        modal.show();
-    }
-
-    /**
      * Add a new local event.
      */
     private addLocalEvent(eventData: Omit<LocalCalendarEvent, 'id' | 'createdAt' | 'updatedAt'>): void {
@@ -391,96 +301,10 @@ export class ScheduleController {
     }
 
     /**
-     * Update an existing local event.
-     */
-    private updateLocalEvent(eventId: string, eventData: Omit<LocalCalendarEvent, 'id' | 'createdAt' | 'updatedAt'>): void {
-        if (!this.currentSchedule || !this.onScheduleUpdate) return;
-
-        const currentEvents = this.currentSchedule.localEvents || [];
-        const eventIndex = currentEvents.findIndex(e => e.id === eventId);
-
-        if (eventIndex === -1) {
-            console.warn('[ScheduleController] Event not found for update:', eventId);
-            return;
-        }
-
-        const existingEvent = currentEvents[eventIndex];
-        const updatedEvent: LocalCalendarEvent = {
-            ...eventData,
-            id: eventId,
-            createdAt: existingEvent.createdAt,
-            updatedAt: Date.now(),
-        };
-
-        const updatedLocalEvents = [
-            ...currentEvents.slice(0, eventIndex),
-            updatedEvent,
-            ...currentEvents.slice(eventIndex + 1),
-        ];
-
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            localEvents: updatedLocalEvents,
-        };
-
-        this.renderScheduleGrids();
-
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            localEvents: updatedLocalEvents,
-        });
-    }
-
-    /**
-     * Delete a local event.
-     */
-    private deleteLocalEvent(eventId: string): void {
-        if (!this.currentSchedule || !this.onScheduleUpdate) return;
-
-        const currentEvents = this.currentSchedule.localEvents || [];
-        const updatedLocalEvents = currentEvents.filter(e => e.id !== eventId);
-
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            localEvents: updatedLocalEvents,
-        };
-
-        this.renderScheduleGrids();
-
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            localEvents: updatedLocalEvents,
-        });
-    }
-
-    /**
-     * Toggle visibility of a local event.
-     */
-    private toggleLocalEventVisibility(eventId: string): void {
-        if (!this.currentSchedule || !this.onScheduleUpdate) return;
-
-        const currentEvents = this.currentSchedule.localEvents || [];
-        const updatedLocalEvents = currentEvents.map(event =>
-            event.id === eventId
-                ? { ...event, visible: !event.visible }
-                : event
-        );
-
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            localEvents: updatedLocalEvents,
-        };
-
-        this.renderScheduleGrids();
-
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            localEvents: updatedLocalEvents,
-        });
-    }
-
-    /**
      * Open the component selection wizard for a course.
      * Uses SidebarManager for consistent panel management.
      */
-    openComponentWizard(course: Course, existingSelections?: any): void {
+    openComponentWizard(course: Course, existingSelections?: SelectedCourse): void {
         if (!this.courseDataService) {
             console.error('CourseDataService not available');
             return;
@@ -512,7 +336,7 @@ export class ScheduleController {
             () => this.closeComponentWizard(),
             existingSelections,
             (selections) => this.onWizardSelectionChange(freshCourse, selections),
-            this.scheduleFilterService || undefined,
+            this.filterService || undefined,
             otherSelectedCourses,
             (selections) => this.onWizardHoverPreview(freshCourse, selections)
         );
@@ -531,6 +355,7 @@ export class ScheduleController {
         const hadPreview = this.wizardPreviewCourse !== null;
         this.wizardPreviewCourse = null;
         this.wizardPreviewSelections = null;
+        this.hoverPreviewSelections = null;
         if (hadPreview) {
             this.renderScheduleGrids();
         }
@@ -539,10 +364,11 @@ export class ScheduleController {
     /**
      * Handle wizard completion - save component selections
      */
-    private async onWizardComplete(course: Course, selections: any): Promise<void> {
+    private async onWizardComplete(course: Course, selections: ComponentSelections): Promise<void> {
         // Clear preview first
         this.wizardPreviewCourse = null;
         this.wizardPreviewSelections = null;
+        this.hoverPreviewSelections = null;
 
         try {
             const result = await this.courseSelectionService.setSelectedComponents(
@@ -570,34 +396,17 @@ export class ScheduleController {
     /**
      * Handle wizard selection changes - update calendar preview
      */
-    private onWizardSelectionChange(course: Course, selections: WizardSelections): void {
+    private onWizardSelectionChange(course: Course, selections: ComponentSelections): void {
         this.wizardPreviewCourse = course;
         this.wizardPreviewSelections = selections;
-        this.hoverPreviewSections.clear();
+        this.hoverPreviewSelections = null;
         this.cellContentCache.clear();
         this.renderScheduleGrids();
     }
 
-    /**
-     * Handle hover preview changes from the wizard (shows dashed preview)
-     */
-    onWizardHoverPreview(course: Course, selections: WizardSelections): void {
+    onWizardHoverPreview(course: Course, selections: ComponentSelections): void {
         this.wizardPreviewCourse = course;
-
-        // wizardPreviewSelections holds the clicked state here because clearSectionPreview()
-        // (mouseleave) always fires before showSectionPreview() (mouseenter), restoring it.
-        this.hoverPreviewSections.clear();
-        if (selections.lecture && selections.lecture.crn !== this.wizardPreviewSelections?.lecture?.crn) {
-            this.hoverPreviewSections.add(selections.lecture.crn);
-        }
-        if (selections.discussion && selections.discussion.crn !== this.wizardPreviewSelections?.discussion?.crn) {
-            this.hoverPreviewSections.add(selections.discussion.crn);
-        }
-        if (selections.lab && selections.lab.crn !== this.wizardPreviewSelections?.lab?.crn) {
-            this.hoverPreviewSections.add(selections.lab.crn);
-        }
-
-        this.wizardPreviewSelections = selections;
+        this.hoverPreviewSelections = selections;
         this.cellContentCache.clear();
         this.renderScheduleGrids();
     }
@@ -607,23 +416,14 @@ export class ScheduleController {
         const countElement = document.getElementById('schedule-selected-count');
 
         if (!selectedCoursesContainer) {
-            console.log('ERROR: Missing DOM element - selectedCoursesContainer not found');
+            console.error('Missing DOM element - selectedCoursesContainer not found');
             return;
         }
 
         let selectedCourses = this.courseSelectionService.getSelectedCourses();
 
-        let filteredSections: Array<{course: any, section: any}> = [];
-        let hasActiveFilters = false;
-
-        if (this.scheduleFilterService && !this.scheduleFilterService.isEmpty()) {
-            filteredSections = this.scheduleFilterService.filterSections(selectedCourses);
-            hasActiveFilters = true;
-        }
-        
         // Always show calendar button - users can add local events even without courses
         if (selectedCourses.length === 0) {
-            console.log('No courses selected - showing calendar button and empty state');
             if (countElement) {
                 countElement.textContent = '(0)';
             }
@@ -651,41 +451,16 @@ export class ScheduleController {
             return;
         }
 
-        if (hasActiveFilters && filteredSections.length === 0) {
-            console.log('Early return: 0 sections match active filters - displaying empty state');
-            if (countElement) {
-                countElement.textContent = '(0 sections match filters)';
-            }
+        // Always show all selected courses - filters only apply inside the component wizard
+        const sortedCourses = selectedCourses.sort((a, b) => {
+            const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
+            if (deptCompare !== 0) return deptCompare;
+            return a.course.number.localeCompare(b.course.number);
+        });
 
-            // Preserve wizard if open
-            const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
-            selectedCoursesContainer.innerHTML = '<div class="empty-state">No sections match the current filters</div>';
-            if (wizardPanel) {
-                selectedCoursesContainer.appendChild(wizardPanel);
-            }
-            return;
-        }
-
-        let html = '';
-
-        if (hasActiveFilters) {
-            html = this.buildFilteredSectionsHTML(filteredSections, selectedCourses);
-
-            if (countElement) {
-                const uniqueCourses = new Set(filteredSections.map(fs => fs.course.course.id)).size;
-                countElement.textContent = `(${filteredSections.length} sections in ${uniqueCourses} courses)`;
-            }
-        } else {
-            const sortedCourses = selectedCourses.sort((a, b) => {
-                const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
-                if (deptCompare !== 0) return deptCompare;
-                return a.course.number.localeCompare(b.course.number);
-            });
-
-            html = this.buildAllCoursesHTML(sortedCourses);
-            if (countElement) {
-                countElement.textContent = `(${selectedCourses.length})`;
-            }
+        const html = this.buildAllCoursesHTML(sortedCourses);
+        if (countElement) {
+            countElement.textContent = `(${selectedCourses.length})`;
         }
 
         const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
@@ -701,15 +476,21 @@ export class ScheduleController {
             selectedCoursesContainer.appendChild(sidebarPanel);
         }
 
-        if (!hasActiveFilters) {
-            const sortedCourses = selectedCourses.sort((a, b) => {
-                const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
-                if (deptCompare !== 0) return deptCompare;
-                return a.course.number.localeCompare(b.course.number);
+        this.setupDOMElementMapping(selectedCoursesContainer, sortedCourses);
+
+        this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
+    }
+
+    /**
+     * Set up click handler for the calendar events button.
+     */
+    private setupCalendarEventsButtonHandler(container: HTMLElement): void {
+        const calendarBtn = container.querySelector('#calendar-events-btn');
+        if (calendarBtn) {
+            calendarBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.openAddLocalEventModal();
             });
-            this.setupDOMElementMapping(selectedCoursesContainer, sortedCourses);
-        } else {
-            this.setupFilteredDOMElementMapping(selectedCoursesContainer, filteredSections);
         }
 
         this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
@@ -728,48 +509,8 @@ export class ScheduleController {
         }
     }
     
-    private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, _selectedCourses: any[], dropdownStates?: Map<string, boolean>): string {
-        // Group filtered sections by course
-        const sectionsByCourse = new Map();
-
-        filteredSections.forEach(fs => {
-            const courseId = fs.course.course.id;
-            if (!sectionsByCourse.has(courseId)) {
-                sectionsByCourse.set(courseId, {
-                    selectedCourse: fs.course,
-                    sections: []
-                });
-            }
-            sectionsByCourse.get(courseId).sections.push(fs.section);
-        });
-
-        // Calendar button at top if connected
-        let html = this.buildCalendarEventsButtonHTML();
-        
-        // Sort courses by department and number
-        const sortedEntries = Array.from(sectionsByCourse.entries()).sort((a, b) => {
-            const courseA = a[1].selectedCourse.course;
-            const courseB = b[1].selectedCourse.course;
-            const deptCompare = courseA.department.abbreviation.localeCompare(courseB.department.abbreviation);
-            if (deptCompare !== 0) return deptCompare;
-            return courseA.number.localeCompare(courseB.number);
-        });
-        
-        sortedEntries.forEach(([courseId, data]) => {
-            const selectedCourse = data.selectedCourse;
-            const course = selectedCourse.course;
-
-            // Check dropdown state, default to expanded if not specified
-            const isExpanded = dropdownStates ? (dropdownStates.get(courseId) ?? true) : true;
-
-            html += this.buildCourseHeaderHTML(course, selectedCourse, isExpanded);
-            html += '</div>'; // Close schedule-course-item
-        });
-        
-        return html;
-    }
     
-    private buildCourseHeaderHTML(course: any, selectedCourse: any, isExpanded: boolean = false): string {
+    private buildCourseHeaderHTML(course: Course, selectedCourse: SelectedCourse | undefined, isExpanded: boolean = false): string {
         const credits = course.minCredits === course.maxCredits
             ? `${course.minCredits} credits`
             : `${course.minCredits}-${course.maxCredits} credits`;
@@ -812,10 +553,10 @@ export class ScheduleController {
                         <div class="schedule-course-credits">${credits}</div>
                     </div>
                     <div class="course-item-controls">
-                        <button class="course-clear-sections-btn" title="Clear selected sections">
+                        <button class="course-clear-sections-btn" data-course-id="${course.id}" title="Clear selected sections">
                             ${getInlineSVG('ERASER', 'eraser-icon')}
                         </button>
-                        <button class="course-remove-btn" title="Remove from selection">
+                        <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
                             ${getInlineSVG('TRASH', 'trash-icon')}
                         </button>
                     </div>
@@ -827,8 +568,8 @@ export class ScheduleController {
      * Check if a section has at least one period with a valid time slot
      * Async sections are valid even with 12:00-12:00 times
      */
-    private hasValidTimeSlot(section: any): boolean {
-        return section.periods.some((period: any) => {
+    private hasValidTimeSlot(section: Section): boolean {
+        return section.periods.some((period: Period) => {
             // Async periods are always valid
             if (period.isAsync) {
                 return true;
@@ -845,7 +586,7 @@ export class ScheduleController {
      * Returns information about what's missing
      * This logic matches the wizard's determineAvailableSteps() to ensure consistency
      */
-    private getIncompleteSelectionInfo(selectedCourse: any): { isIncomplete: boolean; message: string } {
+    private getIncompleteSelectionInfo(selectedCourse: SelectedCourse): { isIncomplete: boolean; message: string } {
         const course = selectedCourse.course;
 
         // Skip check for lab-only courses
@@ -869,7 +610,7 @@ export class ScheduleController {
         const missingComponents: string[] = [];
 
         // Check if lectures with valid time slots exist
-        const validLectures = course.lectures.filter((lg: any) => this.hasValidTimeSlot(lg.section));
+        const validLectures = course.lectures.filter((lg: LectureGroup) => this.hasValidTimeSlot(lg.section));
         if (validLectures.length === 0) {
             // No valid lectures available, nothing to warn about
             return { isIncomplete: false, message: '' };
@@ -882,11 +623,11 @@ export class ScheduleController {
 
         // Check if ANY lecture has discussions/labs with valid time slots
         // This matches the wizard's logic for determining available steps
-        const hasValidDiscussions = course.lectures.some((lg: any) =>
-            lg.compatibleDiscussions && lg.compatibleDiscussions.some((d: any) => this.hasValidTimeSlot(d))
+        const hasValidDiscussions = course.lectures.some((lg: LectureGroup) =>
+            lg.compatibleDiscussions && lg.compatibleDiscussions.some((d: Section) => this.hasValidTimeSlot(d))
         );
-        const hasValidLabs = course.lectures.some((lg: any) =>
-            lg.compatibleLabs && lg.compatibleLabs.some((l: any) => this.hasValidTimeSlot(l))
+        const hasValidLabs = course.lectures.some((lg: LectureGroup) =>
+            lg.compatibleLabs && lg.compatibleLabs.some((l: Section) => this.hasValidTimeSlot(l))
         );
 
         // Only warn about missing components if they would appear in the wizard
@@ -905,7 +646,7 @@ export class ScheduleController {
         return { isIncomplete: true, message };
     }
     
-    private buildAllCoursesHTML(sortedCourses: any[]): string {
+    private buildAllCoursesHTML(sortedCourses: SelectedCourse[]): string {
         // Calendar button at top if connected
         let html = this.buildCalendarEventsButtonHTML();
 
@@ -945,7 +686,7 @@ export class ScheduleController {
     }
 
 
-    private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: any[]): void {
+    private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: SelectedCourse[]): void {
         // Associate DOM elements with Course objects
         const courseElements = selectedCoursesContainer.querySelectorAll('.schedule-course-item');
         const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
@@ -988,68 +729,6 @@ export class ScheduleController {
         });
     }
     
-    private setupFilteredDOMElementMapping(selectedCoursesContainer: HTMLElement, filteredSections: Array<{course: any, section: any}>): void {
-        // For filtered view, we need to map elements to courses differently
-        const courseElements = selectedCoursesContainer.querySelectorAll('.schedule-course-item');
-        const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
-        
-        // Get unique courses from filtered sections in the same order as displayed
-        const uniqueCourses: any[] = [];
-        const seenCourseIds = new Set();
-        
-        filteredSections.forEach(fs => {
-            const courseId = fs.course.course.id;
-            if (!seenCourseIds.has(courseId)) {
-                seenCourseIds.add(courseId);
-                uniqueCourses.push(fs.course);
-            }
-        });
-        
-        // Sort by department and number (same as display order)
-        uniqueCourses.sort((a, b) => {
-            const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
-            if (deptCompare !== 0) return deptCompare;
-            return a.course.number.localeCompare(b.course.number);
-        });
-        
-        courseElements.forEach((element, index) => {
-            const course = uniqueCourses[index]?.course;
-            this.elementToCourseMap.set(element as HTMLElement, course);
-        });
-        
-        removeButtons.forEach((button, index) => {
-            const course = uniqueCourses[index]?.course;
-            this.elementToCourseMap.set(button as HTMLElement, course);
-        });
-
-        // Associate clear sections buttons with their Course objects
-        const clearSectionsButtons = selectedCoursesContainer.querySelectorAll('.course-clear-sections-btn');
-        clearSectionsButtons.forEach((button, index) => {
-            const course = uniqueCourses[index]?.course;
-            this.elementToCourseMap.set(button as HTMLElement, course);
-        });
-
-        // Associate edit buttons with their Course objects
-        const editButtons = selectedCoursesContainer.querySelectorAll('.course-edit-btn');
-        editButtons.forEach((button, index) => {
-            const course = uniqueCourses[index]?.course;
-            this.elementToCourseMap.set(button as HTMLElement, course);
-        });
-
-        // Associate section buttons with their Course objects
-        const sectionButtons = selectedCoursesContainer.querySelectorAll('.section-select-btn');
-        sectionButtons.forEach(button => {
-            const courseItem = button.closest('.schedule-course-item') as HTMLElement;
-            if (courseItem) {
-                const courseIndex = Array.from(courseElements).indexOf(courseItem);
-                if (courseIndex >= 0 && courseIndex < uniqueCourses.length) {
-                    const course = uniqueCourses[courseIndex].course;
-                    this.elementToCourseMap.set(button as HTMLElement, course);
-                }
-            }
-        });
-    }
-
     async handleSectionSelection(course: Course, sectionNumber: string): Promise<void> {
         const currentSelectedSection = this.courseSelectionService.getSelectedSection(course);
         
@@ -1151,10 +830,10 @@ export class ScheduleController {
     }
 
     private precomputeConflicts(selectedCourses: SelectedCourse[]): void {
-        const cacheKey = selectedCourses.map(sc => sc.course.id).sort().join(',');
+        const cacheKey = selectedCourses.map(sc =>
+            `${sc.course.id}:${sc.selectedLecture?.crn ?? ''}-${sc.selectedDiscussion?.crn ?? ''}-${sc.selectedLab?.crn ?? ''}`
+        ).sort().join(',');
         if (cacheKey === this.lastConflictCacheKey) return;
-
-        const startTime = perfMonitor.startMeasure('conflict-precompute');
 
         this.conflictMap.clear();
         this.lastConflictCacheKey = cacheKey;
@@ -1167,65 +846,31 @@ export class ScheduleController {
         }
 
         if (!this.conflictDetector) {
-            perfMonitor.endMeasure('conflict-precompute', startTime);
             return;
         }
 
-        this.conflictMap = this.conflictDetector.detectConflicts(allSections);
-
-        perfMonitor.endMeasure('conflict-precompute', startTime);
+        this.conflictMap = buildConflictMatrix(allSections, this.conflictDetector);
     }
 
     private precomputeCourseColors(selectedCourses: SelectedCourse[]): void {
-        const startTime = perfMonitor.startMeasure('color-precompute');
+        this.colorService.precomputeCourseColors(selectedCourses);
+    }
 
-        this.colorCache.clear();
+    private buildHoverCourse(selectedCourses: SelectedCourse[]): SelectedCourse | null {
+        if (!this.wizardPreviewCourse || !this.hoverPreviewSelections) return null;
 
-        const colors = [
-            '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336',
-            '#00BCD4', '#795548', '#607D8B', '#3F51B5', '#E91E63'
-        ];
+        const hover = this.hoverPreviewSelections;
 
-        const shuffledColors = [...colors];
-        for (let i = shuffledColors.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffledColors[i], shuffledColors[j]] = [shuffledColors[j], shuffledColors[i]];
-        }
+        const lecture = hover.lecture || null;
+        const discussion = hover.discussion || null;
+        const lab = hover.lab || null;
 
-        let colorIndex = 0;
-        for (const sc of selectedCourses) {
-            const courseId = sc.course.id;
+        if (!lecture && !discussion && !lab) return null;
 
-            if (sc.customColor) {
-                this.colorCache.set(courseId, sc.customColor);
-                this.courseColorMap.set(courseId, sc.customColor);
-                this.usedColors.add(sc.customColor);
-            } else if (this.courseColorMap.has(courseId)) {
-                this.colorCache.set(courseId, this.courseColorMap.get(courseId)!);
-            } else {
-                while (colorIndex < shuffledColors.length && this.usedColors.has(shuffledColors[colorIndex])) {
-                    colorIndex++;
-                }
+        const base = selectedCourses.find(sc => sc.course.id === this.wizardPreviewCourse!.id);
+        if (!base) return null;
 
-                let assignedColor: string;
-                if (colorIndex < shuffledColors.length) {
-                    assignedColor = shuffledColors[colorIndex];
-                    colorIndex++;
-                } else {
-                    let hash = 0;
-                    for (let i = 0; i < courseId.length; i++) {
-                        hash = courseId.charCodeAt(i) + ((hash << 5) - hash);
-                    }
-                    assignedColor = colors[Math.abs(hash) % colors.length];
-                }
-
-                this.colorCache.set(courseId, assignedColor);
-                this.courseColorMap.set(courseId, assignedColor);
-                this.usedColors.add(assignedColor);
-            }
-        }
-
-        perfMonitor.endMeasure('color-precompute', startTime);
+        return { ...base, selectedLecture: lecture, selectedDiscussion: discussion, selectedLab: lab };
     }
 
     renderScheduleGrids(): void {
@@ -1249,7 +894,7 @@ export class ScheduleController {
         }
 
         const grids = ['A', 'B', 'C', 'D'];
-
+        const hoverCourse = this.buildHoverCourse(selectedCourses);
 
         grids.forEach(term => {
             const termStart = performance.now();
@@ -1260,7 +905,6 @@ export class ScheduleController {
                 const computedTerm = getComputedTerm(sc);
 
                 if (!computedTerm) {
-                    console.warn(`Course ${sc.course.departmentAbbr}${sc.course.number} has no valid section data`);
                     return false;
                 }
 
@@ -1268,21 +912,19 @@ export class ScheduleController {
                 return displayTerms.includes(term);
             });
 
-            const hasLocalEvents = this.getLocalEventSlotsForTerm(term).length > 0;
-
-            if (termCourses.length === 0 && !hasLocalEvents) {
-                this.renderEmptyGrid(gridContainer);
-                const termEnd = performance.now();
-                console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms (empty)`);
-                return;
+            let termHoverCourse: SelectedCourse | null = null;
+            if (hoverCourse) {
+                const hoverTerm = getComputedTerm(hoverCourse);
+                if (hoverTerm) {
+                    const hoverDisplayTerms = getDisplayTerms(hoverTerm);
+                    if (hoverDisplayTerms.includes(term)) {
+                        termHoverCourse = hoverCourse;
+                    }
+                }
             }
 
-            this.renderPopulatedGrid(gridContainer, termCourses, term);
-            const termEnd = performance.now();
-            console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms`);
+            this.renderPopulatedGrid(gridContainer, termCourses, term, termHoverCourse);
         });
-
-        perfMonitor.endMeasure('grid-render-total', renderStartTime);
     }
 
     public renderAffectedTerms(affectedCourseIds: string[]): void {
@@ -1306,7 +948,6 @@ export class ScheduleController {
         const grids = ['A', 'B', 'C', 'D'];
         grids.forEach(term => {
             if (termsToRender.has(term)) {
-                const termStart = performance.now();
                 const gridContainer = document.getElementById(`schedule-grid-${term}`);
                 if (!gridContainer) return;
 
@@ -1317,34 +958,13 @@ export class ScheduleController {
                     return displayTerms.includes(term);
                 });
 
-                const hasLocalEvents = this.getLocalEventSlotsForTerm(term).length > 0;
-
-                if (termCourses.length === 0 && !hasLocalEvents) {
-                    this.renderEmptyGrid(gridContainer);
-                    const termEnd = performance.now();
-                    console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms (empty)`);
-                    return;
-                }
-
-                this.renderPopulatedGrid(gridContainer, termCourses, term);
-                const termEnd = performance.now();
-                console.log(`[ScheduleController] Rendered term ${term} in ${(termEnd - termStart).toFixed(2)}ms`);
+                this.renderPopulatedGrid(gridContainer, termCourses, term, null);
             }
         });
 
-        if (this.autoScheduleE2EStartTime !== null) {
-            const e2eTime = performance.now() - this.autoScheduleE2EStartTime;
-            console.log(`[PERF E2E] Auto-schedule navigation (button click → schedule-cell updated): ${e2eTime.toFixed(2)}ms`);
-            this.autoScheduleE2EStartTime = null;
-        }
     }
 
-    private renderEmptyGrid(container: HTMLElement): void {
-        container.innerHTML = '';
-        container.classList.add('empty');
-    }
-
-    private renderPopulatedGrid(container: HTMLElement, courses: any[], term: string): void {
+    private renderPopulatedGrid(container: HTMLElement, courses: SelectedCourse[], term: string, hoverCourse: SelectedCourse | null): void {
         container.classList.remove('empty');
 
         // Clean up existing event listeners before replacing DOM content
@@ -1368,9 +988,8 @@ export class ScheduleController {
         });
 
         const localEventSlots = this.getLocalEventSlotsForTerm(term);
-        console.log(`[ScheduleController] Rendering term ${term} with ${localEventSlots.length} local calendar slots`);
 
-        const cellMap = this.buildCellOccupancyMap(courses, localEventSlots, weekdays);
+        const cellMap = this.buildCellOccupancyMap(courses, localEventSlots, weekdays, hoverCourse);
 
         // Time rows: time label + 5 schedule cells
         for (let slot = 0; slot < timeSlots; slot++) {
@@ -1382,9 +1001,7 @@ export class ScheduleController {
 
             weekdays.forEach(day => {
                 const cell = this.getCellFromMap(cellMap.get(day)?.get(slot), slot, day, term);
-                if (cell.classes.includes('has-conflict')) {
-                    hasConflicts = true;
-                }
+                if (cell.hasConflict) hasConflicts = true;
                 htmlParts.push(`<div class="schedule-cell ${cell.classes}" data-day="${day}" data-slot="${slot}" style="position: relative;">${cell.content}</div>`);
             });
         }
@@ -1422,7 +1039,8 @@ export class ScheduleController {
     private buildCellOccupancyMap(
         courses: SelectedCourse[],
         calendarSlotsForTerm: DisplayableTimeSlot[],
-        weekdays: DayOfWeek[]
+        weekdays: DayOfWeek[],
+        hoverCourse: SelectedCourse | null
     ): Map<DayOfWeek, Map<number, CellData>> {
         const map = new Map<DayOfWeek, Map<number, CellData>>();
         for (const day of weekdays) map.set(day, new Map());
@@ -1433,7 +1051,7 @@ export class ScheduleController {
             return dayMap.get(slot)!;
         };
 
-        for (const selectedCourse of courses) {
+        const addCourse = (selectedCourse: SelectedCourse, isPreview: boolean) => {
             const sections = [
                 selectedCourse.selectedLecture,
                 selectedCourse.selectedDiscussion,
@@ -1471,11 +1089,15 @@ export class ScheduleController {
                             isFirstSlot: slot === sectionStartSlot,
                             startMinutes: earliestStartMinutes,
                             endMinutes: latestEndMinutes,
+                            isPreview,
                         });
                     }
                 }
             }
-        }
+        };
+
+        for (const selectedCourse of courses) addCourse(selectedCourse, false);
+        if (hoverCourse) addCourse(hoverCourse, true);
 
         for (const calSlot of calendarSlotsForTerm) {
             if (!map.has(calSlot.day)) continue;
@@ -1498,19 +1120,19 @@ export class ScheduleController {
         return map;
     }
 
-    private getCellFromMap(cellData: CellData | undefined, timeSlot: number, day: DayOfWeek, term: string): { content: string, classes: string } {
+    private getCellFromMap(cellData: CellData | undefined, timeSlot: number, day: DayOfWeek, term: string): { content: string, classes: string, hasConflict: boolean } {
         const calendarKey = cellData?.calendar.map(c => c.slot.id).join(',') || '';
         const cacheKey = `${term}-${day}-${timeSlot}-${calendarKey}`;
 
         if (this.cellContentCache.has(cacheKey)) {
-            return this.cellContentCache.get(cacheKey);
+            return this.cellContentCache.get(cacheKey)!;
         }
 
         const occupyingSections: SectionOccupant[] = cellData?.sections ?? [];
         const occupyingCalendarSlots: CalendarOccupant[] = cellData?.calendar ?? [];
 
         if (occupyingSections.length === 0 && occupyingCalendarSlots.length === 0) {
-            return { content: '', classes: '' };
+            return { content: '', classes: '', hasConflict: false };
         }
 
         let hasConflict = false;
@@ -1518,10 +1140,10 @@ export class ScheduleController {
 
         if (occupyingSections.length > 1) {
             for (let i = 0; i < occupyingSections.length; i++) {
-                const crn1 = occupyingSections[i].section.crn.toString();
+                const crn1 = occupyingSections[i].section.crn;
 
                 for (let j = i + 1; j < occupyingSections.length; j++) {
-                    const crn2 = occupyingSections[j].section.crn.toString();
+                    const crn2 = occupyingSections[j].section.crn;
 
                     if (this.conflictMap.get(crn1)?.has(crn2)) {
                         hasConflict = true;
@@ -1544,7 +1166,7 @@ export class ScheduleController {
             }
 
             const courseColor = this.getCourseColor(occupyingSection.course.course.id);
-            const isPreview = this.hoverPreviewSections.has(occupyingSection.section.crn);
+            const isPreview = occupyingSection.isPreview;
             const blockClass = isPreview ? 'section-preview' : 'section-block';
 
             const durationMinutes = occupyingSection.endMinutes - occupyingSection.startMinutes;
@@ -1558,27 +1180,7 @@ export class ScheduleController {
                      data-course-id="${occupyingSection.course.course.id}"
                      data-section-number="${occupyingSection.section.number}"
                      data-section-crn="${occupyingSection.section.crn}"
-                     data-selected-course-index="${occupyingSection.courseIndex || 0}"
-                     style="
-                    ${isPreview ? `border-color: ${courseColor};` : `background-color: ${courseColor};`}
-                    height: ${heightPercent}%;
-                    width: 100%;
-                    position: absolute;
-                    top: ${topOffsetPercent}%;
-                    left: 0;
-                    z-index: ${isPreview ? '15' : '10'};
-                    ${!isPreview ? `border: 1px solid rgba(0,0,0,0.2);` : ''}
-                    border-radius: 3px;
-                    box-sizing: border-box;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    text-align: center;
-                    font-weight: bold;
-                    font-size: 0.8rem;
-                    ${isPreview ? `color: var(--color-text-primary);` : `color: white; text-shadow: 1px 1px 1px rgba(0,0,0,0.3);`}
-                    cursor: pointer;
-                ">
+                     style="${isPreview ? `border-color: ${courseColor}; --preview-color: ${courseColor};` : `background-color: ${courseColor};`} height: ${heightPercent}%; top: ${topOffsetPercent}%;">
                     ${occupyingSection.course.course.departmentAbbr}${occupyingSection.course.course.number}
                 </div>
             `);
@@ -1599,14 +1201,8 @@ export class ScheduleController {
             // Build conflict information
             const conflictInfo = allConflictingSections.map(s => {
                 const conflictCourse = occupyingSections.find(os => os.section.crn === s.crn)?.course.course;
-                return conflictCourse ? `${conflictCourse.department.abbreviation}${conflictCourse.number} ${s.number}` : '';
+                return conflictCourse ? `${conflictCourse.departmentAbbr}${conflictCourse.number} ${s.number}` : '';
             }).filter(info => info).join(', ');
-
-            // Log conflict details (moved outside overlayStartsInThisSlot to always log)
-            const startHours = Math.floor(overlapStartMinutes / 60);
-            const startMins = overlapStartMinutes % 60;
-            const endHours = Math.floor(overlapEndMinutes / 60);
-            const endMins = overlapEndMinutes % 60;
 
             // Only add overlay if it starts in this slot
             // timeSlot is 0-indexed grid row, need to add START_HOUR to get actual hour
@@ -1648,34 +1244,16 @@ export class ScheduleController {
                 <div class="external-event-block"
                      data-event-id="${eventId}"
                      title="${eventTitle}"
-                     style="
-                    height: ${heightPercent}%;
-                    width: 100%;
-                    position: absolute;
-                    top: ${topOffsetPercent}%;
-                    left: 0;
-                    z-index: 5;
-                    border-radius: 3px;
-                    box-sizing: border-box;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    text-align: center;
-                    font-weight: 500;
-                    font-size: 0.7rem;
-                    overflow: hidden;
-                ">
+                     style="height: ${heightPercent}%; top: ${topOffsetPercent}%;">
                     ${eventTitle}
                 </div>
             `);
         }
 
         const hasAnyFirstSlot = occupyingSections.some(os => os.isFirstSlot) || occupyingCalendarSlots.some(s => s.isFirstSlot);
-        const classes = hasAnyFirstSlot ?
-            `occupied section-start ${hasConflict ? 'has-conflict' : ''}` :
-            '';
+        const classes = hasAnyFirstSlot ? 'occupied section-start' : '';
 
-        const result = { content: contentParts.join(''), classes };
+        const result = { content: contentParts.join(''), classes, hasConflict };
 
         // Performance optimization: Store result in cache
         this.cellContentCache.set(cacheKey, result);
@@ -1684,18 +1262,12 @@ export class ScheduleController {
     }
 
     private getCourseColor(courseId: string): string {
-        return this.colorCache.get(courseId) || '#6B7280';
+        return this.colorService.getCourseColor(courseId);
     }
 
-    /**
-     * Release a course's color assignment when it's removed from the schedule
-     */
-    releaseCourseColor(courseId: string): void {
-        const color = this.courseColorMap.get(courseId);
-        if (color) {
-            this.usedColors.delete(color);
-            this.courseColorMap.delete(courseId);
-        }
+    setCourseColor(courseId: string, color: string): void {
+        this.colorService.setCourseColor(courseId, color);
+        this.renderScheduleGrids();
     }
 
     /**
@@ -1722,9 +1294,9 @@ export class ScheduleController {
 
     private updateScheduleFilterButtonState(): void {
         const scheduleFilterButton = document.getElementById('schedule-filter-btn');
-        if (scheduleFilterButton && this.scheduleFilterService) {
-            const hasActiveFilters = !this.scheduleFilterService.isEmpty();
-            const filterCount = this.scheduleFilterService.getFilterCount();
+        if (scheduleFilterButton && this.filterService) {
+            const hasActiveFilters = !this.filterService.isEmpty();
+            const filterCount = this.filterService.getFilterCount();
             
             if (hasActiveFilters) {
                 scheduleFilterButton.classList.add('active');
@@ -1920,17 +1492,21 @@ export class ScheduleController {
 
         if (prevBtn) {
             prevBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_BAR_LEFT', 'schedule-nav-icon'));
-            prevBtn.addEventListener('click', () => {
-                this.autoScheduleE2EStartTime = performance.now();
-                this.handlePrevSchedule();
+            prevBtn.addEventListener('click', async () => {
+
+                await this.autoScheduleOrchestrator.navigateSchedule(-1);
+                this.renderScheduleGrids();
+                this.updateAutoScheduleButtonUI();
             });
         }
 
         if (nextBtn) {
             nextBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_BAR_RIGHT', 'schedule-nav-icon'));
-            nextBtn.addEventListener('click', () => {
-                this.autoScheduleE2EStartTime = performance.now();
-                this.handleNextSchedule();
+            nextBtn.addEventListener('click', async () => {
+
+                await this.autoScheduleOrchestrator.navigateSchedule(1);
+                this.renderScheduleGrids();
+                this.updateAutoScheduleButtonUI();
             });
         }
     }
@@ -1944,15 +1520,6 @@ export class ScheduleController {
 
         clearAllBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'clear-all-eraser-icon'));
         clearAllBtn.addEventListener('click', () => this.handleClearAllSections());
-    }
-
-    setupCourseSelectionChangeListener(): void {
-        this.courseSelectionService.onSelectionChange(() => {
-            if (this.isApplyingAutoSchedule) return;
-            this.generatedSchedules = [];
-            this.currentScheduleIndex = 0;
-            this.updateAutoScheduleButtonUI();
-        });
     }
 
     private async handleClearAllSections(): Promise<void> {
@@ -1988,49 +1555,23 @@ export class ScheduleController {
         const counter = document.getElementById('schedule-counter');
         if (!btn) return;
 
-        if (this.generatedSchedules.length === 0) {
-            // Show auto-schedule button, hide nav buttons
+        const generatedSchedules = this.autoScheduleOrchestrator.getGeneratedSchedules();
+
+        if (generatedSchedules.length === 0) {
             btn.style.display = '';
             btn.innerHTML = `${getInlineSVG('WAND', 'auto-schedule-icon')}<span>Auto-Schedule</span>`;
             btn.disabled = false;
             btn.title = 'Automatically generate a schedule';
             if (navButtons) navButtons.style.display = 'none';
         } else {
-            // Hide auto-schedule button, show nav buttons
             btn.style.display = 'none';
             if (navButtons) navButtons.style.display = 'flex';
-            if (counter) counter.textContent = `${this.currentScheduleIndex + 1}/${this.generatedSchedules.length}`;
+            if (counter) counter.textContent = `${this.autoScheduleOrchestrator.getCurrentScheduleIndex() + 1}/${generatedSchedules.length}`;
         }
-    }
-
-    private async handlePrevSchedule(): Promise<void> {
-        if (this.generatedSchedules.length === 0) return;
-
-        if (this.currentScheduleIndex === 0) {
-            this.currentScheduleIndex = this.generatedSchedules.length - 1;
-        } else {
-            this.currentScheduleIndex--;
-        }
-
-        await this.applyScheduleAtIndex(this.currentScheduleIndex);
-        this.updateAutoScheduleButtonUI();
-    }
-
-    private async handleNextSchedule(): Promise<void> {
-        if (this.generatedSchedules.length === 0) return;
-
-        if (this.currentScheduleIndex >= this.generatedSchedules.length - 1) {
-            this.currentScheduleIndex = 0;
-        } else {
-            this.currentScheduleIndex++;
-        }
-
-        await this.applyScheduleAtIndex(this.currentScheduleIndex);
-        this.updateAutoScheduleButtonUI();
     }
 
     private async handleAutoSchedule(): Promise<void> {
-        if (!this.scheduleFilterService) {
+        if (!this.filterService) {
             console.error('[Auto-Schedule] Filter service not available');
             alert('Filter service not available. Please try again.');
             return;
@@ -2044,42 +1585,29 @@ export class ScheduleController {
             return;
         }
 
-        // Populate lockedSections with currently selected components
-        for (const selectedCourse of selectedCourses) {
-            selectedCourse.lockedSections = new Set();
-
-            if (selectedCourse.selectedLecture) {
-                selectedCourse.lockedSections.add(String(selectedCourse.selectedLecture.crn));
-            }
-            if (selectedCourse.selectedDiscussion) {
-                selectedCourse.lockedSections.add(String(selectedCourse.selectedDiscussion.crn));
-            }
-            if (selectedCourse.selectedLab) {
-                selectedCourse.lockedSections.add(String(selectedCourse.selectedLab.crn));
-            }
-        }
+        this.autoScheduleOrchestrator.prepareLockedSections(selectedCourses);
 
         if (!this.modalService) {
             console.error('[Auto-Schedule] Modal service not available');
-            await this.generateSchedulesWithSettings({ blockedTimes: [] }, selectedCourses);
+            await this.doGenerateSchedules(selectedCourses, { blockedTimes: [] });
             return;
         }
 
-        const scheduleFilterModal = new ScheduleFilterModalController(this.modalService, this);
-        scheduleFilterModal.setScheduleFilterService(this.scheduleFilterService);
-        scheduleFilterModal.setSelectedCourses(selectedCourses);
+        const scheduleFilterModal = new FilterModalController(this.modalService);
+        scheduleFilterModal.setFilterService(this.filterService);
+        scheduleFilterModal.setCourseSelectionService(this.courseSelectionService);
+        scheduleFilterModal.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
         scheduleFilterModal.setMode('auto-schedule');
+        scheduleFilterModal.setOnGenerate(() => {
+            this.doGenerateSchedules(selectedCourses);
+        });
+        if (this.courseDataService) {
+            scheduleFilterModal.setCourseData(this.courseDataService.getAllDepartments());
+        }
         scheduleFilterModal.show();
     }
 
-    /**
-     * Generate schedules with the given settings.
-     * Called after user configures settings in the modal.
-     */
-    private async generateSchedulesWithSettings(
-        settings: AutoScheduleSettings,
-        selectedCourses: SelectedCourse[]
-    ): Promise<void> {
+    private async doGenerateSchedules(selectedCourses: SelectedCourse[], settings?: { blockedTimes: WeeklyTimeSlot[] }): Promise<void> {
         const autoScheduleBtn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
         if (autoScheduleBtn) {
             autoScheduleBtn.disabled = true;
@@ -2087,129 +1615,19 @@ export class ScheduleController {
         }
 
         try {
-            const autoScheduler = new AutoScheduler(this.scheduleFilterService!);
+            const success = await this.autoScheduleOrchestrator.generateSchedules(selectedCourses, settings);
 
-            let blockedTimes = [...settings.blockedTimes];
-            if (settings.avoidCalendarEvents) {
-                const calendarBlockedTimes = this.getAllLocalEventBlockedTimes();
-                blockedTimes = [...blockedTimes, ...calendarBlockedTimes];
-            }
-
-            if (blockedTimes.length > 0) {
-                this.scheduleFilterService!.addFilter('blockedTimes', {
-                    blockedTimes
-                });
-            }
-
-            if (settings.wakeUpTime) {
-                this.scheduleFilterService!.addFilter('wakeUpTime', {
-                    wakeUpTime: settings.wakeUpTime
-                });
-            }
-
-            const allSchedules = autoScheduler.generateSchedules(selectedCourses, 100);
-
-            this.scheduleFilterService!.removeFilter('blockedTimes');
-            this.scheduleFilterService!.removeFilter('wakeUpTime');
-
-            if (allSchedules.length === 0) {
+            if (!success) {
                 console.warn('[Auto-Schedule] No valid schedules found');
                 alert('Could not generate a valid schedule.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts');
-                this.updateAutoScheduleButtonUI();
-                return;
-            }
-
-            this.generatedSchedules = allSchedules;
-            this.currentScheduleIndex = 0;
-
-            // Apply the first schedule
-            await this.applyScheduleAtIndex(0);
-            this.updateAutoScheduleButtonUI();
-
-        } catch (error) {
-            console.error('[Auto-Schedule] Error generating schedules:', error);
-            alert('An error occurred while generating the schedule. Please try again.');
-            this.generatedSchedules = [];
-            this.currentScheduleIndex = 0;
-            this.updateAutoScheduleButtonUI();
-
-            this.scheduleFilterService!.removeFilter('blockedTimes');
-            this.scheduleFilterService!.removeFilter('wakeUpTime');
-        }
-    }
-
-    async generateSchedulesWithActiveFilters(selectedCourses: SelectedCourse[]): Promise<void> {
-        const autoScheduleBtn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
-        if (autoScheduleBtn) {
-            autoScheduleBtn.disabled = true;
-            autoScheduleBtn.textContent = 'Generating...';
-        }
-
-        try {
-            const autoScheduler = new AutoScheduler(this.scheduleFilterService!);
-
-            const allSchedules = autoScheduler.generateSchedules(selectedCourses, 100);
-
-            if (allSchedules.length === 0) {
-                console.warn('[Auto-Schedule] No valid schedules found');
-                alert('Could not generate a valid schedule.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts');
-                this.updateAutoScheduleButtonUI();
-                return;
-            }
-
-            this.generatedSchedules = allSchedules;
-            this.currentScheduleIndex = 0;
-
-            await this.applyScheduleAtIndex(0);
-            this.updateAutoScheduleButtonUI();
-
-        } catch (error) {
-            console.error('[Auto-Schedule] Error generating schedules:', error);
-            alert('An error occurred while generating the schedule. Please try again.');
-            this.generatedSchedules = [];
-            this.currentScheduleIndex = 0;
-            this.updateAutoScheduleButtonUI();
-        }
-    }
-
-    private async applyScheduleAtIndex(index: number): Promise<void> {
-        const schedule = this.generatedSchedules[index];
-        if (!schedule) {
-            console.warn(`[Auto-Schedule] No schedule found at index ${index}`);
-            return;
-        }
-
-        this.isApplyingAutoSchedule = true;
-        try {
-            let lockedCount = 0;
-
-            const selections: Array<{
-                course: any;
-                lecture: any;
-                discussion: any;
-                lab: any;
-            }> = [];
-
-            for (const result of schedule) {
-                if (result.isLocked) {
-                    lockedCount++;
-                    continue;
-                }
-
-                selections.push({
-                    course: result.course,
-                    lecture: result.combination.lecture,
-                    discussion: result.combination.discussion,
-                    lab: result.combination.lab
-                });
-            }
-
-            if (selections.length > 0) {
-                await this.courseSelectionService.batchSetSelectedComponents(selections, true);
+            } else {
                 this.renderScheduleGrids();
             }
-        } finally {
-            this.isApplyingAutoSchedule = false;
+            this.updateAutoScheduleButtonUI();
+        } catch (error) {
+            console.error('[Auto-Schedule] Error generating schedules:', error);
+            alert('An error occurred while generating the schedule. Please try again.');
+            this.updateAutoScheduleButtonUI();
         }
     }
 

@@ -1,6 +1,7 @@
 import { Course, Department, Section } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
-import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../../core/state/ProfileStateManager'
+import type { ComponentSelections, CourseComponentSelections } from '../../types/scheduling'
+import { ProfileStateManager, StateChangeEvent, StateChangeListener, ScheduleChangedData } from '../../core/state/ProfileStateManager'
 import { DataValidator } from '../../core/validation/DataValidator'
 import { Validators } from '../../utils/validators'
 
@@ -38,7 +39,6 @@ export class CourseSelectionService {
     private selectionListeners = new Set<SelectionChangeListener>();
     private isInitialized = false;
     private initializationPromise: Promise<boolean> | null = null;
-    private sectionIndexCache = new WeakMap<Course, Map<string, Section>>();
 
     constructor(
         profileStateManager?: ProfileStateManager,
@@ -282,6 +282,7 @@ export class CourseSelectionService {
             this.notifySelectionListeners({
                 type: 'components_changed',
                 course,
+                affectedCourseIds: [course.id],
                 selectedCourses: this.profileStateManager.getSelectedCourses(),
                 timestamp: Date.now()
             });
@@ -390,12 +391,7 @@ export class CourseSelectionService {
      * This is optimized for auto-scheduler to avoid triggering listeners on each update
      */
     async batchSetSelectedComponents(
-        selections: Array<{
-            course: Course;
-            lecture: Section | null;
-            discussion: Section | null;
-            lab: Section | null;
-        }>,
+        selections: CourseComponentSelections[],
         skipSnapshot = false
     ): Promise<CourseSelectionResult> {
         await this.ensureInitialized();
@@ -474,11 +470,7 @@ export class CourseSelectionService {
     /**
      * Get the currently selected components for a course
      */
-    getSelectedComponents(course: Course): {
-        lecture: Section | null;
-        discussion: Section | null;
-        lab: Section | null;
-    } {
+    getSelectedComponents(course: Course): ComponentSelections {
         if (!this.isInitialized) {
             return { lecture: null, discussion: null, lab: null };
         }
@@ -633,22 +625,6 @@ export class CourseSelectionService {
         return this.profileStateManager.getSelectedCourses();
     }
 
-    private getSectionIndex(course: Course): Map<string, Section> {
-        let index = this.sectionIndexCache.get(course);
-
-        if (!index) {
-            index = new Map<string, Section>();
-            const allSections = this.getAllSectionsForCourse(course);
-
-            allSections.forEach(section => {
-                index!.set(section.number, section);
-            });
-
-            this.sectionIndexCache.set(course, index);
-        }
-
-        return index;
-    }
 
     getSelectedSection(course: Course): string | null {
         const selectedCourse = this.getSelectedCourse(course);
@@ -828,10 +804,10 @@ export class CourseSelectionService {
             await this.ensureInitialized();
             this.profileStateManager.save();
             return { success: true };
-        } catch (error: any) {
+        } catch (error: unknown) {
             return {
                 success: false,
-                error: error?.message || `Save failed: ${error}`
+                error: error instanceof Error ? error.message : String(error)
             };
         }
     }
@@ -915,9 +891,10 @@ export class CourseSelectionService {
                         });
                     }, 10);
                     break;
-                case 'schedule_changed':
+                case 'schedule_changed': {
                     // Handle imported data - trigger complete UI refresh
-                    if (event.data?.action === 'imported') {
+                    const scheduleData = event.data as ScheduleChangedData;
+                    if (scheduleData?.action === 'imported') {
                         const importedCourses = this.profileStateManager.getSelectedCourses();
 
                         // Clear and reload pattern for complete sync
@@ -936,6 +913,7 @@ export class CourseSelectionService {
                         }, 10);
                     }
                     break;
+                }
             }
         };
 

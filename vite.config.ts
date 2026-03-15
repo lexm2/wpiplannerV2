@@ -14,11 +14,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Microsoft/Azure libraries (largest dependencies)
-          'vendor-microsoft': [
-            '@azure/msal-browser',
-            '@microsoft/microsoft-graph-client'
-          ],
           // Other vendor libraries
           'vendor-utils': [
             'lz-string',

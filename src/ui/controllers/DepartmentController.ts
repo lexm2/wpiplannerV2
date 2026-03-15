@@ -1,15 +1,15 @@
 import { Department } from '../../types/types'
-import { CourseFilterService } from '../../services/filtering/CourseFilterService'
+import { FilterService } from '../../services/filtering/FilterService'
 import { groupDepartmentsByCategory } from '../../utils/departmentUtils'
 
 export class DepartmentController {
     private allDepartments: Department[] = [];
-    private filterService: CourseFilterService | null = null;
+    private filterService: FilterService | null = null;
     private expandedCategories: Set<string> = new Set();
 
     constructor() {}
 
-    setFilterService(filterService: CourseFilterService): void {
+    setFilterService(filterService: FilterService): void {
         this.filterService = filterService;
 
         // Listen for filter changes to sync sidebar visual state
@@ -22,6 +22,7 @@ export class DepartmentController {
     syncVisualState(): void {
         const activeDepts = this.getActiveDepartments();
         this.updateVisualState(activeDepts);
+        this.updateCourseCounts();
     }
 
     setAllDepartments(departments: Department[]): void {
@@ -89,7 +90,7 @@ export class DepartmentController {
 
     private setupCategoryToggleListeners(): void {
         document.querySelectorAll('.category-header[data-category]').forEach(header => {
-            header.addEventListener('click', (e) => {
+            header.addEventListener('click', (_e) => {
                 const categoryName = (header as HTMLElement).dataset.category;
                 if (categoryName) {
                     this.toggleCategory(categoryName);
@@ -149,6 +150,40 @@ export class DepartmentController {
 
         this.updateVisualState(newDepts);
         return department;
+    }
+
+    private updateCourseCounts(): void {
+        if (!this.filterService || this.allDepartments.length === 0) return;
+
+        const hasNonDeptFilters = this.filterService.getActiveFilters().some(
+            f => f.id !== 'department'
+        );
+
+        // Get courses that pass all filters except department
+        const allCourses = this.allDepartments.flatMap(d => d.courses);
+        const passingCourses = hasNonDeptFilters
+            ? new Set(this.filterService.filterCoursesExcluding(allCourses, ['department']).map(c => c.id))
+            : null;
+
+        // Update each department item's count
+        let totalCount = 0;
+        this.allDepartments.forEach(dept => {
+            const count = passingCourses
+                ? dept.courses.filter(c => passingCourses.has(c.id)).length
+                : dept.courses.length;
+            totalCount += count;
+
+            const item = document.querySelector(`.department-item[data-dept-id="${dept.abbreviation}"]`);
+            if (item) {
+                item.textContent = `${dept.name} (${count})`;
+            }
+        });
+
+        // Update "All Departments" count
+        const allItem = document.querySelector('.department-item[data-dept-id="all"]');
+        if (allItem) {
+            allItem.textContent = `All Departments (${totalCount})`;
+        }
     }
 
     private getActiveDepartments(): string[] {

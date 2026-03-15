@@ -1,18 +1,14 @@
-import type { Course, Section, DayOfWeek } from '../../types/types';
-import type { SelectedCourse } from '../../types/schedule';
+import type { Course, Section } from '../../types/types';
+import type { SelectedCourse, WeeklyTimeSlot } from '../../types/schedule';
+import type { SectionCandidate, ComponentSelections } from '../../types/scheduling';
 import { sectionToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
-import type { ScheduleFilterService } from '../filtering/ScheduleFilterService';
+import type { FilterService } from '../filtering/FilterService';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
-
-export interface SectionCombination {
-  lecture: Section | null;
-  discussion: Section | null;
-  lab: Section | null;
-}
+import type { ConflictCriteria } from '../../types/filters';
 
 export interface ScheduleResult {
   course: Course;
-  combination: SectionCombination;
+  combination: ComponentSelections;
   isLocked?: boolean;
 }
 
@@ -24,7 +20,7 @@ interface CourseTypeInfo {
 }
 
 interface MaskedCandidate {
-  combination: SectionCombination;
+  combination: ComponentSelections;
   mask: bigint;
   term: string;
 }
@@ -34,7 +30,7 @@ interface MaskedCandidate {
  * Conflict check: (mask1 & mask2) !== 0n - O(1)
  */
 export class AutoScheduler {
-  constructor(private scheduleFilterService: ScheduleFilterService) {}
+  constructor(private filterService: FilterService) {}
 
   generateSchedules(
     selectedCourses: SelectedCourse[],
@@ -109,22 +105,23 @@ export class AutoScheduler {
   }
 
   private getBlockedMasksByTerm(): Map<string, bigint> {
-    const activeFilters = this.scheduleFilterService.getActiveFilters();
+    const activeFilters = this.filterService.getActiveFilters();
 
-    const sectionBasedFilter = this.scheduleFilterService.getSectionBasedFilter('periodConflict');
-    if (sectionBasedFilter instanceof ConflictFilter) {
+    const conflictFilter = this.filterService.getRegisteredFilter('periodConflict');
+    if (conflictFilter instanceof ConflictFilter) {
       const criteria = activeFilters.find(f => f.id === 'periodConflict')?.criteria;
-      if (criteria && sectionBasedFilter.isValidCriteria(criteria)) {
-        return sectionBasedFilter.getBlockedMasksByTerm(criteria as any);
+      if (criteria && conflictFilter.isValidCriteria(criteria)) {
+        return conflictFilter.getBlockedMasksByTerm(criteria as ConflictCriteria);
       }
     }
 
-    const blockedTimesCriteria = activeFilters.find(f => f.id === 'blockedTimes')?.criteria as any;
-    if (blockedTimesCriteria?.blockedTimes?.length > 0) {
+    const blockedTimesCriteria = activeFilters.find(f => f.id === 'blockedTimes')?.criteria as { blockedTimes?: WeeklyTimeSlot[] } | undefined;
+    const blockedTimes = blockedTimesCriteria?.blockedTimes;
+    if (blockedTimes && blockedTimes.length > 0) {
       const tempFilter = new ConflictFilter();
       return tempFilter.getBlockedMasksByTerm({
         avoidConflicts: true,
-        blockedSlots: blockedTimesCriteria.blockedTimes
+        blockedSlots: blockedTimes
       });
     }
 
@@ -230,7 +227,7 @@ export class AutoScheduler {
       const lectureMask = sectionToMask(lecture);
 
       // Get valid discussion candidates - must be same term as lecture
-      const discussionCandidates: Array<{ section: Section | null; mask: bigint }> = [];
+      const discussionCandidates: SectionCandidate[] = [];
       if (typeInfo.hasDiscussions) {
         const discussions = lectureGroup.compatibleDiscussions || [];
 
@@ -246,7 +243,7 @@ export class AutoScheduler {
       }
 
       // Get valid lab candidates - must be same term as lecture
-      const labCandidates: Array<{ section: Section | null; mask: bigint }> = [];
+      const labCandidates: SectionCandidate[] = [];
       if (typeInfo.hasLabs) {
         const labs = lectureGroup.compatibleLabs || [];
 
@@ -312,7 +309,7 @@ export class AutoScheduler {
   /**
    * Convert a section combination to a combined bitmask
    */
-  private combinationToMask(combo: SectionCombination): bigint {
+  private combinationToMask(combo: ComponentSelections): bigint {
     let mask = 0n;
     if (combo.lecture) mask |= sectionToMask(combo.lecture);
     if (combo.discussion) mask |= sectionToMask(combo.discussion);
@@ -323,7 +320,7 @@ export class AutoScheduler {
   /**
    * Get the term of a section combination
    */
-  private getCombinationTerm(combo: SectionCombination): string | null {
+  private getCombinationTerm(combo: ComponentSelections): string | null {
     return combo.lecture?.computedTerm ||
            combo.discussion?.computedTerm ||
            combo.lab?.computedTerm ||
@@ -333,7 +330,7 @@ export class AutoScheduler {
   /**
    * Get a locked combination if all required components are locked.
    */
-  private getLockedCombination(selectedCourse: SelectedCourse): SectionCombination | null {
+  private getLockedCombination(selectedCourse: SelectedCourse): ComponentSelections | null {
     const lockedSections = selectedCourse.lockedSections || new Set();
     const typeInfo = this.detectCourseTypes(selectedCourse.course);
 
@@ -411,7 +408,7 @@ export class AutoScheduler {
   private sectionPassesFilters(section: Section, selectedCourse: SelectedCourse): boolean {
     if (!this.hasValidTimeSlot(section)) return false;
 
-    const filteredSections = this.scheduleFilterService.filterSections([selectedCourse]);
+    const filteredSections = this.filterService.apply([selectedCourse.course]);
     return filteredSections.some(fs => fs.section.crn === section.crn);
   }
 }

@@ -1,85 +1,48 @@
 import { Course, Department, Section } from '../../types/types'
+import { SelectedCourse } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
-import { CourseFilterService } from '../../services/filtering/CourseFilterService'
+import { FilterService } from '../../services/filtering/FilterService'
 import { CourseDataService } from '../../services/data/courseDataService'
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService'
-import { ProgressiveRenderer, ProgressiveRenderOptions } from '../utils/ProgressiveRenderer'
+import { ProgressiveRenderer } from '../utils/ProgressiveRenderer'
 import { CancellationToken } from '../../utils/RequestCancellation'
-import { PerformanceMetrics } from '../../utils/PerformanceMetrics'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
-import { DeviceDetection } from '../../utils/deviceDetection'
 
 // Course listing and interaction management with optimistic UI integration
 // Provides progressive rendering for large datasets with instant visual feedback
 export class CourseController {
     private allDepartments: Department[] = [];
     private selectedCourse: Course | null = null;
+    private activeElement: HTMLElement | null = null;
     private courseSelectionService: CourseSelectionService;
     private courseDataService: CourseDataService;
-    private filterService: CourseFilterService | null = null;
+    private filterService: FilterService | null = null;
     private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private progressiveRenderer: ProgressiveRenderer;
-    private performanceMetrics: PerformanceMetrics;
-
     // Pagination state
     private allCoursesToDisplay: Course[] = [];
     private displayedCourses: Course[] = [];
     private readonly INITIAL_PAGE_SIZE = 100;
     private hasMore: boolean = false;
 
-    // Callbacks
-    private onBatchCallback?: () => void;
     private onRenderCompleteCallback?: () => void;
 
     constructor(courseSelectionService: CourseSelectionService, courseDataService: CourseDataService) {
         this.courseSelectionService = courseSelectionService;
         this.courseDataService = courseDataService;
-        
-        // Initialize performance metrics
-        this.performanceMetrics = new PerformanceMetrics();
-        
-        // Initialize progressive renderer with performance callbacks
-        const renderOptions: ProgressiveRenderOptions = {
-            batchSize: 10,
-            batchDelay: 16, // 60 FPS
-            performanceMetrics: this.performanceMetrics,
-            onBatch: (batchIndex, totalBatches, totalCount) => {
-                // Update any progress indicators if needed
-                console.log(`Rendered batch ${batchIndex}/${totalBatches} (${totalCount} total courses)`);
-
-                // Call external batch callback if registered
-                this.onBatchCallback?.();
-            },
-            onComplete: (totalRendered, totalTime) => {
-                console.log(`Progressive rendering complete: ${totalRendered} courses in ${totalTime.toFixed(2)}ms`);
-
-                // Log performance insights periodically
-                if (Math.random() < 0.1) { // 10% chance to log insights
-                    const insights = this.performanceMetrics.getInsights();
-                    console.log('Performance insights:', insights.join(', '));
-
-                    // Auto-adjust batch size based on performance
-                    const optimalBatchSize = this.performanceMetrics.getOptimalBatchSize(this.progressiveRenderer.getBatchSize());
-                    if (optimalBatchSize !== this.progressiveRenderer.getBatchSize()) {
-                        console.log(`Adjusting batch size from ${this.progressiveRenderer.getBatchSize()} to ${optimalBatchSize}`);
-                        this.progressiveRenderer.setBatchSize(optimalBatchSize);
-                    }
-                }
-
-                // Call external completion callback if registered
+        this.progressiveRenderer = new ProgressiveRenderer({
+            onComplete: () => {
                 this.onRenderCompleteCallback?.();
             }
-        };
-        
-        this.progressiveRenderer = new ProgressiveRenderer(renderOptions);
+        });
 
         // Initialize selected courses expander
         this.initializeSelectedCoursesExpander();
     }
 
-    setFilterService(filterService: CourseFilterService): void {
+    setFilterService(filterService: FilterService): void {
         this.filterService = filterService;
     }
 
@@ -90,7 +53,7 @@ export class CourseController {
 
         if (!header || !content || !chevronContainer) return;
 
-        // Inject chevron icon (without adding the chevron-icon class to avoid double rotation)
+        // Inject chevron icon
         chevronContainer.innerHTML = getInlineSVG('CHEVRON_DOWN');
 
         // Load saved state from localStorage (default: collapsed)
@@ -103,35 +66,7 @@ export class CourseController {
             content.classList.add('expanded');
         }
 
-        // Get backdrop element
-        const getBackdrop = (): HTMLElement | null => {
-            return document.querySelector('.mobile-backdrop');
-        };
-
-        const isMobile = (): boolean => {
-            return DeviceDetection.isMobilePhone();
-        };
-
-        // Mobile overlay toggle
-        const toggleMobileOverlay = () => {
-            const backdrop = getBackdrop();
-            const isOpen = content.classList.contains('mobile-open');
-
-            if (isOpen) {
-                content.classList.remove('mobile-open');
-                if (backdrop) {
-                    backdrop.classList.remove('active');
-                }
-            } else {
-                content.classList.add('mobile-open');
-                if (backdrop) {
-                    backdrop.classList.add('active');
-                }
-            }
-        };
-
-        // Desktop expander toggle
-        const toggleDesktopExpander = () => {
+        const toggleExpander = () => {
             const currentState = header.getAttribute('aria-expanded') === 'true';
             const newState = !currentState;
 
@@ -142,54 +77,15 @@ export class CourseController {
                 content.classList.remove('expanded');
             }
 
-            // Save state to localStorage
             localStorage.setItem('selectedCoursesExpanded', newState.toString());
         };
 
-        // Unified toggle function
-        const toggleExpander = () => {
-            if (isMobile()) {
-                toggleMobileOverlay();
-            } else {
-                toggleDesktopExpander();
-            }
-        };
-
-        // Add click handler
         header.addEventListener('click', toggleExpander);
 
-        // Add keyboard handler for accessibility
         header.addEventListener('keydown', (e: KeyboardEvent) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 toggleExpander();
-            }
-        });
-
-        // Handle backdrop clicks to close mobile overlay
-        const handleBackdropClick = (e: MouseEvent) => {
-            const backdrop = e.target as HTMLElement;
-            if (backdrop.classList.contains('mobile-backdrop') && content.classList.contains('mobile-open')) {
-                content.classList.remove('mobile-open');
-                backdrop.classList.remove('active');
-            }
-        };
-
-        // Add backdrop listener
-        document.addEventListener('click', handleBackdropClick);
-
-        // Handle window resize to clean up state
-        window.addEventListener('resize', () => {
-            if (!isMobile()) {
-                // Switched to desktop - clean up mobile state
-                content.classList.remove('mobile-open');
-                const backdrop = getBackdrop();
-                if (backdrop) {
-                    backdrop.classList.remove('active');
-                }
-            } else {
-                // Switched to mobile - clean up desktop state
-                content.classList.remove('expanded');
             }
         });
     }
@@ -238,9 +134,6 @@ export class CourseController {
     }
     
     async displayCoursesWithCancellation(courses: Course[], currentView: 'list' | 'grid', cancellationToken?: CancellationToken, isLoadMore: boolean = false): Promise<void> {
-        // Cancel any existing render operations
-        this.progressiveRenderer.cancelCurrentRender();
-        
         // Handle pagination setup for initial load
         if (!isLoadMore) {
             this.resetPagination();
@@ -288,7 +181,7 @@ export class CourseController {
         }
 
         // Only sort by course number when not searching
-        // When searching, preserve relevance ranking from SearchService
+        // When searching, preserve relevance ranking from searchUtils
         const displayCourses = (this.filterService && this.filterService.hasFilter('searchText'))
             ? courses
             : courses.sort((a, b) => a.number.localeCompare(b.number));
@@ -317,7 +210,7 @@ export class CourseController {
         }
 
         // Only sort by course number when not searching
-        // When searching, preserve relevance ranking from SearchService
+        // When searching, preserve relevance ranking from searchUtils
         const displayCourses = (this.filterService && this.filterService.hasFilter('searchText'))
             ? courses
             : courses.sort((a, b) => a.number.localeCompare(b.number));
@@ -424,13 +317,12 @@ export class CourseController {
 
         this.selectedCourse = course;
         this.displayCourseDescription(course);
-        
-        // Update active state for course items
-        document.querySelectorAll('.course-item, .course-card').forEach(item => {
-            item.classList.remove('active');
-        });
-        
+
+        if (this.activeElement && this.activeElement !== element) {
+            this.activeElement.classList.remove('active');
+        }
         element.classList.add('active');
+        this.activeElement = element;
         return course;
     }
 
@@ -524,7 +416,7 @@ export class CourseController {
      * @param selectedCourses Array of currently selected courses
      * @param previousSelections Map of previously selected course IDs
      */
-    refreshCourseSelectionUI(selectedCourses: any[], previousSelections: Map<string, any>): void {
+    refreshCourseSelectionUI(selectedCourses: SelectedCourse[], previousSelections: Map<string, unknown>): void {
         const currentIds = new Set(selectedCourses.map(sc => sc.course.id));
         const previousIds = new Set(previousSelections.keys());
         
@@ -835,6 +727,7 @@ export class CourseController {
 
     clearCourseSelection(): void {
         this.selectedCourse = null;
+        this.activeElement = null;
         this.clearCourseDescription();
     }
 
@@ -875,7 +768,7 @@ export class CourseController {
                         <div class="selected-course-name">${Validators.escapeHtml(course.name)}</div>
                         <div class="selected-course-credits">${credits}</div>
                     </div>
-                    <button class="course-remove-btn" title="Remove from selection">
+                    <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
                         ${getInlineSVG('TRASH', 'trash-icon')}
                     </button>
                 </div>
@@ -959,12 +852,10 @@ export class CourseController {
     }
 
     isRendering(): boolean {
-        return this.progressiveRenderer.isCurrentlyRendering();
+        return false;
     }
 
-    setOnBatchCallback(callback: () => void): void {
-        this.onBatchCallback = callback;
-    }
+    setOnBatchCallback(_callback: () => void): void {}
 
     setOnRenderCompleteCallback(callback: () => void): void {
         this.onRenderCompleteCallback = callback;

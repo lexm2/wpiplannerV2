@@ -3,6 +3,7 @@ import { DayOfWeek, PeriodType } from '../../types'
 import { AcademicTerm } from '../../types/schedule'
 import { getAllSections } from '../../utils'
 import type { CourseDataEventType, CourseDataEvent, CourseDataEventListener } from './types'
+import type { RawDepartment, RawCourse, RawSection, RawLectureGroup, RawPeriod } from '../../types/rawData'
 
 /**
  * Fetches and transforms WPI course catalog data with duplicate resolution and HTML sanitization.
@@ -52,7 +53,7 @@ export class CourseDataService {
         return this.parseJSONData(jsonData);
     }
 
-    private parseJSONData(jsonData: any): ScheduleDB {
+    private parseJSONData(jsonData: { departments?: RawDepartment[]; generated?: string }): ScheduleDB {
         
         if (!jsonData.departments || !Array.isArray(jsonData.departments)) {
             console.error('Invalid JSON data structure:', jsonData);
@@ -70,7 +71,7 @@ export class CourseDataService {
         return scheduleDB;
     }
 
-    private parseConstructedDepartments(departments: any[]): Department[] {
+    private parseConstructedDepartments(departments: RawDepartment[]): Department[] {
         const seenIds = new Set<string>();
         const duplicateIds = new Set<string>();
         let totalCoursesProcessed = 0;
@@ -83,7 +84,7 @@ export class CourseDataService {
                 courses: []
             };
             
-            department.courses = deptData.courses.map((courseData: any) => {
+            department.courses = deptData.courses.map((courseData: RawCourse) => {
                 totalCoursesProcessed++;
                 let courseId = courseData.id;
                 
@@ -168,7 +169,7 @@ export class CourseDataService {
         return result;
     }
 
-    private parseConstructedSections(sections: any[]): Section[] {
+    private parseConstructedSections(sections: RawSection[]): Section[] {
         return sections.map(sectionData => {
             const section: Section = {
                 crn: sectionData.crn || 0,
@@ -191,7 +192,7 @@ export class CourseDataService {
      * Parses lecture groups from the NEW hierarchical structure
      * Each lecture group contains a lecture section with compatible discussions and labs
      */
-    private parseLectureGroups(lectureGroups: any[]): LectureGroup[] {
+    private parseLectureGroups(lectureGroups: RawLectureGroup[]): LectureGroup[] {
         return lectureGroups.map(groupData => {
             const lectureSection = this.parseConstructedSections([groupData.section])[0];
             const compatibleDiscussions = this.parseConstructedSections(groupData.compatibleDiscussions || []);
@@ -205,7 +206,7 @@ export class CourseDataService {
         });
     }
 
-    private parseConstructedPeriods(periods: any[]): Period[] {
+    private parseConstructedPeriods(periods: RawPeriod[]): Period[] {
         return periods.map(periodData => {
             const period: Period = {
                 type: this.parsePeriodType(periodData.type || 'Lecture'),
@@ -297,11 +298,6 @@ export class CourseDataService {
 
         return daySet;
     }
-
-    private logMA1024Sections(_scheduleDB: ScheduleDB): void {
-        // Debug logging method - keeping for development purposes but not logging on boot
-    }
-
 
 
     private stripHtml(html: string): string {

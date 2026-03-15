@@ -26,33 +26,47 @@ export class SearchTextFilter implements SectionBasedFilter {
                 courseCode
             ].join(' ').toLowerCase();
 
-            return courseText.includes(query) || this.fuzzyMatch(courseText, query);
+            if (courseText.includes(query) || this.fuzzyMatch(courseText, query)) {
+                return true;
+            }
+
+            // Search in section-level fields
+            const section = fs.section;
+            if (section.number.toLowerCase().includes(query)) {
+                return true;
+            }
+
+            return section.periods.some(period =>
+                period.professor.toLowerCase().includes(query) ||
+                period.type.toLowerCase().includes(query) ||
+                period.building.toLowerCase().includes(query) ||
+                period.room.toLowerCase().includes(query) ||
+                period.location.toLowerCase().includes(query)
+            );
         });
     }
-    
+
     private fuzzyMatch(text: string, query: string): boolean {
-        // Allow for partial matches for better search experience
         if (query.length <= 3) {
             return text.includes(query);
         }
-        
+
         const words = query.split(/\s+/);
         return words.every(word => {
             if (word.length <= 2) return text.includes(word);
-            
-            // Allow partial matches for longer words
+
             const partial = word.substring(0, Math.floor(word.length * 0.8));
             return text.includes(partial);
         });
     }
-    
-    isValidCriteria(criteria: any): criteria is SearchTextFilterCriteria {
+
+    isValidCriteria(criteria: unknown): criteria is SearchTextFilterCriteria {
         return !!(criteria &&
                typeof criteria === 'object' &&
                'query' in criteria &&
                typeof criteria.query === 'string');
     }
-    
+
     getDisplayValue(criteria: SearchTextFilterCriteria): string {
         return `"${criteria.query.trim()}"`;
     }

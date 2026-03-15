@@ -9,16 +9,28 @@ export interface SectionBasedFilter {
     readonly description: string;
     readonly priority: number;
 
-    apply(sections: FilterableSection[], criteria: any, activeFilters?: Map<string, any>): FilterableSection[];
-    isValidCriteria(criteria: any): boolean;
-    getDisplayValue(criteria: any): string;
+    apply(sections: FilterableSection[], criteria: unknown, activeFilters?: Map<string, unknown>): FilterableSection[];
+    isValidCriteria(criteria: unknown): boolean;
+    getDisplayValue(criteria: unknown): string;
 }
 
 type ActiveSectionFilter = {
     id: string;
     filter: SectionBasedFilter;
-    criteria: any;
+    criteria: unknown;
 };
+
+interface ReconstructedLectureGroup {
+    section: Section;
+    discussions: Section[];
+    labs: Section[];
+}
+
+interface ReconstructedCourse {
+    course: Course;
+    lectureGroups: Map<string, ReconstructedLectureGroup>;
+    standaloneLabs: Section[];
+}
 
 export class SectionFilterPipeline {
     private registeredFilters = new Map<string, SectionBasedFilter>();
@@ -79,15 +91,9 @@ export class SectionFilterPipeline {
     }
 
     reconstructCourses(filteredSections: FilterableSection[]): Course[] {
-        const courseMap = new Map<string, {
-            course: Course,
-            lectureGroups: Map<string, {
-                section: Section,
-                discussions: Section[],
-                labs: Section[]
-            }>,
-            standaloneLabs: Section[]
-        }>();
+        // Track which lecture CRNs actually survived filtering
+        const survivingLectureCrns = new Set<string>();
+        const courseMap = new Map<string, ReconstructedCourse>();
 
         for (const fs of filteredSections) {
             const courseId = fs.course.id;
@@ -105,6 +111,7 @@ export class SectionFilterPipeline {
 
             if (fs.sectionType === SectionType.LECTURE) {
                 const lectureCrn = String(fs.section.crn);
+                survivingLectureCrns.add(lectureCrn);
                 if (!courseData.lectureGroups.has(lectureCrn)) {
                     courseData.lectureGroups.set(lectureCrn, {
                         section: fs.section,
@@ -145,9 +152,54 @@ export class SectionFilterPipeline {
             }
         }
 
+        // Prune lecture groups where required components are missing
+        for (const courseData of courseMap.values()) {
+            const originalCourse = courseData.course;
+            const prunedKeys: string[] = [];
+
+            for (const [lectureCrn, lg] of courseData.lectureGroups) {
+                // If the lecture section itself was filtered out, remove this group
+                if (!survivingLectureCrns.has(lectureCrn)) {
+                    prunedKeys.push(lectureCrn);
+                    continue;
+                }
+
+                // Find the original lecture group to check required components
+                const originalLg = originalCourse.lectures?.find(
+                    ol => String(ol.section.crn) === lectureCrn
+                );
+                if (!originalLg) continue;
+
+                // If original had labs but filtered result has none, remove this lecture group
+                if (originalLg.compatibleLabs.length > 0 && lg.labs.length === 0) {
+                    prunedKeys.push(lectureCrn);
+                    continue;
+                }
+                // If original had discussions but filtered result has none, remove this lecture group
+                if (originalLg.compatibleDiscussions.length > 0 && lg.discussions.length === 0) {
+                    prunedKeys.push(lectureCrn);
+                }
+            }
+
+            for (const key of prunedKeys) {
+                courseData.lectureGroups.delete(key);
+            }
+        }
+
         const reconstructedCourses: Course[] = [];
 
         for (const courseData of courseMap.values()) {
+            const originalCourse = courseData.course;
+            const hadLectures = originalCourse.lectures && originalCourse.lectures.length > 0;
+            const hadStandaloneLabs = originalCourse.standaloneLabs && originalCourse.standaloneLabs.length > 0;
+
+            const hasLectures = courseData.lectureGroups.size > 0;
+            const hasStandaloneLabs = courseData.standaloneLabs.length > 0;
+
+            // Skip course if all required component types were filtered out
+            if (hadLectures && !hasLectures && !hasStandaloneLabs) continue;
+            if (hadStandaloneLabs && !hasStandaloneLabs && !hasLectures) continue;
+
             const lectures: LectureGroup[] = Array.from(courseData.lectureGroups.values()).map(lg => ({
                 section: lg.section,
                 compatibleDiscussions: lg.discussions,
@@ -164,12 +216,10 @@ export class SectionFilterPipeline {
         return reconstructedCourses;
     }
 
-    filterCourses(
-        courses: Course[],
-        activeFilters: Map<string, any>
-    ): Course[] {
-        const sections = this.flattenCoursesToSections(courses);
-
+    applyFilters(
+        sections: FilterableSection[],
+        activeFilters: Map<string, unknown>
+    ): FilterableSection[] {
         const filtersToApply: ActiveSectionFilter[] = [];
 
         for (const [filterId, criteria] of activeFilters.entries()) {
@@ -185,14 +235,22 @@ export class SectionFilterPipeline {
         }
 
         let filteredSections = sections;
-        const criteriaMap = activeFilters;
 
         while (!priorityQueue.isEmpty()) {
             const activeFilter = priorityQueue.extractMin();
             if (!activeFilter) break;
-            filteredSections = activeFilter.filter.apply(filteredSections, activeFilter.criteria, criteriaMap);
+            filteredSections = activeFilter.filter.apply(filteredSections, activeFilter.criteria, activeFilters);
         }
 
+        return filteredSections;
+    }
+
+    filterCourses(
+        courses: Course[],
+        activeFilters: Map<string, unknown>
+    ): Course[] {
+        const sections = this.flattenCoursesToSections(courses);
+        const filteredSections = this.applyFilters(sections, activeFilters);
         return this.reconstructCourses(filteredSections);
     }
 }

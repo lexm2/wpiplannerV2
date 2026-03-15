@@ -1,12 +1,3 @@
-/**
- * RateMyProfessorService - Service for loading and querying Rate My Professor data
- *
- * Provides methods to:
- * - Load professor ratings from JSON file
- * - Search for professors by name
- * - Get rating information for display
- */
-
 interface Professor {
     id: string;
     legacyId: number;
@@ -39,17 +30,10 @@ export class RateMyProfessorService {
     private loading: boolean = false;
     private loadError: Error | null = null;
 
-    /**
-     * Load Rate My Professor data from JSON file
-     */
     async loadData(): Promise<void> {
-        if (this.data) {
-            // Already loaded
-            return;
-        }
+        if (this.data) return;
 
         if (this.loading) {
-            // Wait for existing load to complete
             while (this.loading) {
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
@@ -66,17 +50,13 @@ export class RateMyProfessorService {
 
             this.data = await response.json();
 
-            // Build professor maps for quick lookups
-            // Normalize names for better matching (lowercase, trim)
             if (this.data && this.data.professors) {
                 for (const professor of this.data.professors) {
                     const fullName = this.normalizeName(`${professor.firstName} ${professor.lastName}`);
                     const lastName = this.normalizeName(professor.lastName);
 
-                    // Store by full name (unique)
                     this.professorsByFullName.set(fullName, professor);
 
-                    // Store by last name (may have multiple professors per last name)
                     if (!this.professorsByLastName.has(lastName)) {
                         this.professorsByLastName.set(lastName, []);
                     }
@@ -90,27 +70,18 @@ export class RateMyProfessorService {
         }
     }
 
-    /**
-     * Normalize a name for matching (lowercase, trim, remove extra spaces)
-     */
     private normalizeName(name: string): string {
         return name.toLowerCase().trim().replace(/\s+/g, ' ');
     }
 
-    /**
-     * Extract last name from a professor name
-     * Handles "First Last" and "Last, First" formats
-     */
     private extractLastName(professorName: string): string {
         const normalized = this.normalizeName(professorName);
         const nameParts = normalized.split(/[,\s]+/).filter(p => p.length > 0);
 
-        // Handle "Last, First" format
         if (normalized.includes(',')) {
             return nameParts[0] || '';
         }
 
-        // Handle "First Last" format (most common)
         if (nameParts.length > 0) {
             return nameParts[nameParts.length - 1];
         }
@@ -118,20 +89,14 @@ export class RateMyProfessorService {
         return normalized;
     }
 
-    /**
-     * Extract first name from a professor name
-     * Handles "First Last" and "Last, First" formats
-     */
     private extractFirstName(professorName: string): string {
         const normalized = this.normalizeName(professorName);
         const nameParts = normalized.split(/[,\s]+/).filter(p => p.length > 0);
 
-        // Handle "Last, First" format
         if (normalized.includes(',')) {
             return nameParts.slice(1).join(' ');
         }
 
-        // Handle "First Last" format - everything except last part
         if (nameParts.length > 1) {
             return nameParts.slice(0, -1).join(' ');
         }
@@ -139,34 +104,20 @@ export class RateMyProfessorService {
         return '';
     }
 
-    /**
-     * Calculate similarity between two first names for disambiguation
-     * Returns a score from 0-100
-     */
     private calculateFirstNameSimilarity(query: string, candidate: string): number {
-        // Exact match
         if (query === candidate) return 100;
-
-        // Starts with (e.g., "moh" matches "mohammed")
         if (candidate.startsWith(query)) return 80;
         if (query.startsWith(candidate)) return 70;
-
-        // Contains
         if (candidate.includes(query)) return 50;
         if (query.includes(candidate)) return 40;
 
-        // Levenshtein distance for similarity
         const distance = this.levenshteinDistance(query, candidate);
         const maxLen = Math.max(query.length, candidate.length);
         const similarity = 1 - (distance / maxLen);
 
-        return similarity * 30; // Scale to 0-30 points
+        return similarity * 30;
     }
 
-    /**
-     * Calculate Levenshtein distance between two strings
-     * Measures how many single-character edits are needed to change one string into another
-     */
     private levenshteinDistance(a: string, b: string): number {
         const matrix: number[][] = [];
 
@@ -184,9 +135,9 @@ export class RateMyProfessorService {
                     matrix[i][j] = matrix[i - 1][j - 1];
                 } else {
                     matrix[i][j] = Math.min(
-                        matrix[i - 1][j - 1] + 1, // substitution
-                        matrix[i][j - 1] + 1,     // insertion
-                        matrix[i - 1][j] + 1      // deletion
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
                     );
                 }
             }
@@ -196,68 +147,39 @@ export class RateMyProfessorService {
     }
 
     /**
-     * Find a professor by name using conservative matching strategy
-     *
-     * Strategy:
-     * 1. Try exact full name match (fast path)
-     * 2. Extract last name and lookup candidates
-     * 3a. If ONLY ONE professor with that last name → return it (no ambiguity)
-     * 3b. If MULTIPLE professors with same last name → use fuzzy matching on first name to disambiguate
+     * Find a professor by name using conservative matching:
+     * 1. Exact full name match
+     * 2. Last name lookup — if unique, return directly
+     * 3. If multiple share a last name, disambiguate via first name fuzzy matching
      */
     findProfessor(professorName: string): Professor | null {
-        if (!this.data || !professorName) {
-            return null;
-        }
+        if (!this.data || !professorName) return null;
 
         const normalized = this.normalizeName(professorName);
 
-        // Step 1: Try exact full name match (fast path)
         if (this.professorsByFullName.has(normalized)) {
             return this.professorsByFullName.get(normalized) || null;
         }
 
-        // Step 2: Extract last name and lookup candidates
         const lastName = this.extractLastName(professorName);
-
         const candidates = this.professorsByLastName.get(lastName);
 
-        if (!candidates || candidates.length === 0) {
-            return null;
-        }
+        if (!candidates || candidates.length === 0) return null;
+        if (candidates.length === 1) return candidates[0];
 
-        // Step 3a: If ONLY ONE professor with this last name → return it
-        if (candidates.length === 1) {
-            return candidates[0];
-        }
-
-        // Step 3b: MULTIPLE professors with same last name → disambiguate using first name
         const queryFirstName = this.extractFirstName(professorName);
+        if (!queryFirstName) return candidates[0];
 
-        if (!queryFirstName) {
-            // No first name to disambiguate with, return first candidate
-            return candidates[0];
-        }
+        const scored = candidates.map(prof => ({
+            professor: prof,
+            score: this.calculateFirstNameSimilarity(queryFirstName, this.normalizeName(prof.firstName))
+        }));
 
-        // Use fuzzy matching on first name to pick best match
-        const scored = candidates.map(prof => {
-            const profFirstName = this.normalizeName(prof.firstName);
-            const score = this.calculateFirstNameSimilarity(queryFirstName, profFirstName);
-            return {
-                professor: prof,
-                score: score
-            };
-        });
-
-        // Sort by score descending
         scored.sort((a, b) => b.score - a.score);
 
         return scored[0].professor;
     }
 
-    /**
-     * Get formatted rating display for a professor
-     * Returns null if professor not found or has no ratings
-     */
     getRatingDisplay(professorName: string): {
         rating: string;
         difficulty: string;
@@ -267,13 +189,7 @@ export class RateMyProfessorService {
     } | null {
         const professor = this.findProfessor(professorName);
 
-        if (!professor) {
-            return null;
-        }
-
-        if (professor.numRatings === 0) {
-            return null;
-        }
+        if (!professor || professor.numRatings === 0) return null;
 
         return {
             rating: professor.avgRating.toFixed(1),
@@ -286,49 +202,28 @@ export class RateMyProfessorService {
         };
     }
 
-    /**
-     * Get RateMyProfessors URL for a professor
-     * Returns null if professor not found
-     */
     getProfessorRMPUrl(professorName: string): string | null {
         const professor = this.findProfessor(professorName);
-
-        if (!professor) {
-            return null;
-        }
-
+        if (!professor) return null;
         return professor.profileUrl;
     }
 
-    /**
-     * Get all professors (for debugging/admin purposes)
-     */
     getAllProfessors(): Professor[] {
         return this.data?.professors || [];
     }
 
-    /**
-     * Check if data is loaded
-     */
     isLoaded(): boolean {
         return this.data !== null;
     }
 
-    /**
-     * Get load error if any
-     */
     getLoadError(): Error | null {
         return this.loadError;
     }
 
-    /**
-     * Get last updated timestamp
-     */
     getLastUpdated(): Date | null {
         if (!this.data) return null;
         return new Date(this.data.lastUpdated);
     }
 }
 
-// Export singleton instance
 export const rateMyProfessorService = new RateMyProfessorService();

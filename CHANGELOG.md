@@ -1,6 +1,62 @@
 # Changelog
 
+## [2026-03-15]
+
+### Added
+- Academic year mismatch notice in wizard with a switch button when course year differs from active filter
+- Filtered sections notice in wizard with a clear filters button
+- Wizard section toggle-unselect and hover glow preview
+- Calendar event conflict filter and auto-schedule modal mode
+
+### Improved
+- Department sidebar course counts now update when filters change
+- Courses are now removed from results when filters eliminate all sections of a required component type
+- Unified CourseFilterService and ScheduleFilterService into a single FilterService
+- Course selection bugs fixed with filter instances scoped to wizard only
+- Separated non-UI concerns from MainController and ScheduleController
+- Renamed WorkerPoolManager to StorageWorkerManager and simplified to single worker
+- Course sections expand/collapse animation rewritten for smooth transitions
+- Merged duplicated ScheduleController methods and removed dead code
+- Moved TermBoundsService to utils
+- Replaced ConflictEngine with BitMaskEngine for conflict detection
+- Search logic consolidated into utilities (removed SearchService)
+- Refactored mobile notice to use ModalService/BaseModal
+- Schedule grid fixes: conflict overlay, dead CSS cleanup, preview pipeline refactor
+- Strong typing overhaul: replaced all `any` types with proper types, extracted shared interfaces, removed dead/duplicate type definitions
+
+### Fixed
+- Fixed permanent performance degradation after expanding large courses
+- Fixed term graph preview rendering in wrong term
+- Fixed course button lag with optimistic updates and bookmark handler
+- Fixed clear sections refresh
+
+### Removed
+- Removed all tests and test infrastructure
+- Removed PerformanceMonitor, PerformanceMetrics, and all perf instrumentation
+- Removed verbose console logs from MainController and ScheduleController
+- Removed unused variables, imports, and dead code across codebase
+- Removed unused UIStateBuffer and constants files
+- Removed empty vendor-microsoft chunk and unused dependencies
+- Removed excessive comments from RateMyProfessorService and sidebar module
+- Removed mobile overlay UI (hamburger, backdrop, swipe-to-open panels)
+
+## [2026-03-06]
+
+### Fixed
+- Creating a new schedule no longer inherits courses from the previously active schedule — new schedules start empty
+- Creating a new schedule now automatically switches to it
+- Clicking the bookmark or select button on a course card no longer feels sluggish — buttons now respond instantly without triggering unintended side effects
+- Course list now renders all at once instead of in small batches, eliminating a race condition where button clicks during loading would revert
+
+### Changed
+- Removed mobile hamburger/overlay UI; panels follow standard responsive layout at all screen sizes
+- Mobile devices now see a notice that mobile support is temporarily unavailable
+- Improved internal conflict detection performance by switching to a bitmask-based engine
+
 ## [2026-03-03]
+
+### Improved
+- The course component wizard now shows only the steps relevant to the selected lecture — lectures with no labs or discussions skip those steps entirely and go straight to Finish
 
 ### Fixed
 - ICS export now uses each course's own academic year for event dates instead of defaulting to the most recent year
@@ -10,6 +66,7 @@
 
 ### Fixed
 - Hovering a section in the wizard after clicking it no longer shows it as a dashed preview — it stays solid
+- Re-opening the wizard in editing mode no longer shows already-confirmed sections (like discussions) as ghost previews when hovering a lecture card
 
 ## [2026-02-28]
 

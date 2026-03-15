@@ -22,10 +22,12 @@ export class DepartmentFilter implements SectionBasedFilter {
         );
     }
     
-    isValidCriteria(criteria: any): criteria is DepartmentFilterCriteria {
-        return criteria && 
-               Array.isArray(criteria.departments) &&
-               criteria.departments.every((dept: any) => typeof dept === 'string');
+    isValidCriteria(criteria: unknown): criteria is DepartmentFilterCriteria {
+        return !!(criteria &&
+               typeof criteria === 'object' &&
+               'departments' in criteria &&
+               Array.isArray((criteria as DepartmentFilterCriteria).departments) &&
+               (criteria as DepartmentFilterCriteria).departments.every((dept: unknown) => typeof dept === 'string'));
     }
     
     getDisplayValue(criteria: DepartmentFilterCriteria): string {

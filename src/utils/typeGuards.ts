@@ -1,5 +1,5 @@
 import { SelectedCourse } from '../types/schedule';
-import { Section } from '../types/types';
+import { Course, Section } from '../types/types';
 
 /**
  * Type guards and validation utilities for runtime data integrity checks
@@ -8,40 +8,44 @@ import { Section } from '../types/types';
 /**
  * Validates that a Section object has all required properties
  */
-export function isValidSection(section: any): section is Section {
+export function isValidSection(section: unknown): section is Section {
     if (!section || typeof section !== 'object') return false;
-    
+
+    const s = section as Record<string, unknown>;
+
     return (
-        typeof section.crn === 'number' &&
-        typeof section.number === 'string' &&
-        typeof section.seats === 'number' &&
-        typeof section.seatsAvailable === 'number' &&
-        typeof section.actualWaitlist === 'number' &&
-        typeof section.maxWaitlist === 'number' &&
-        typeof section.computedTerm === 'string' &&
-        ['A', 'B', 'C', 'D', 'F', 'S'].includes(section.computedTerm)
+        typeof s.crn === 'number' &&
+        typeof s.number === 'string' &&
+        typeof s.seats === 'number' &&
+        typeof s.seatsAvailable === 'number' &&
+        typeof s.actualWaitlist === 'number' &&
+        typeof s.maxWaitlist === 'number' &&
+        typeof s.computedTerm === 'string' &&
+        ['A', 'B', 'C', 'D', 'F', 'S'].includes(s.computedTerm)
     );
 }
 
 /**
  * Validates that a SelectedCourse object has valid structure and data
  */
-export function isValidSelectedCourse(sc: any): sc is SelectedCourse {
+export function isValidSelectedCourse(sc: unknown): sc is SelectedCourse {
     if (!sc || typeof sc !== 'object') return false;
-    
-    if (!sc.course || typeof sc.course !== 'object') return false;
-    
-    if (typeof sc.isRequired !== 'boolean') return false;
-    
-    if (sc.selectedLecture !== null && !isValidSection(sc.selectedLecture)) {
+
+    const scObj = sc as Record<string, unknown>;
+
+    if (!scObj.course || typeof scObj.course !== 'object') return false;
+
+    if (typeof scObj.isRequired !== 'boolean') return false;
+
+    if (scObj.selectedLecture !== null && !isValidSection(scObj.selectedLecture)) {
         return false;
     }
 
-    if (sc.selectedDiscussion !== null && !isValidSection(sc.selectedDiscussion)) {
+    if (scObj.selectedDiscussion !== null && !isValidSection(scObj.selectedDiscussion)) {
         return false;
     }
 
-    if (sc.selectedLab !== null && !isValidSection(sc.selectedLab)) {
+    if (scObj.selectedLab !== null && !isValidSection(scObj.selectedLab)) {
         return false;
     }
 
@@ -52,14 +56,14 @@ export function isValidSelectedCourse(sc: any): sc is SelectedCourse {
  * Validates an array of SelectedCourse objects
  * Automatically attempts to repair invalid courses when possible
  */
-export function validateSelectedCourses(selectedCourses: any[], attemptRepair: boolean = true): SelectedCourse[] {
+export function validateSelectedCourses(selectedCourses: unknown[], attemptRepair: boolean = true): SelectedCourse[] {
     if (!Array.isArray(selectedCourses)) {
         console.warn('validateSelectedCourses: Expected array, got:', typeof selectedCourses);
         return [];
     }
 
     const validCourses: SelectedCourse[] = [];
-    const invalidCourses: any[] = [];
+    const invalidCourses: { index: number; data: unknown }[] = [];
     const repairedCourses: SelectedCourse[] = [];
 
     selectedCourses.forEach((sc, index) => {
@@ -70,7 +74,9 @@ export function validateSelectedCourses(selectedCourses: any[], attemptRepair: b
             if (attemptRepair) {
                 const repaired = repairSelectedCourse(sc);
                 if (repaired && isValidSelectedCourse(repaired)) {
-                    console.log(`validateSelectedCourses: Successfully repaired course at index ${index} (${sc.course?.departmentAbbr}${sc.course?.number})`);
+                    const scAny = sc as Record<string, unknown>;
+                    const courseInfo = scAny.course as Record<string, unknown> | undefined;
+                    console.log(`validateSelectedCourses: Successfully repaired course at index ${index} (${courseInfo?.departmentAbbr}${courseInfo?.number})`);
                     validCourses.push(repaired);
                     repairedCourses.push(repaired);
                 } else {
@@ -98,58 +104,52 @@ export function validateSelectedCourses(selectedCourses: any[], attemptRepair: b
  * Attempts to repair a SelectedCourse object by fixing common issues
  * Uses getAllSections to properly extract sections from hierarchical course structure
  */
-export function repairSelectedCourse(sc: any): SelectedCourse | null {
-    if (!sc || typeof sc !== 'object' || !sc.course) return null;
+export function repairSelectedCourse(sc: unknown): SelectedCourse | null {
+    if (!sc || typeof sc !== 'object') return null;
 
-    // Import getAllSections dynamically to avoid circular dependencies
-    // This is safe because getAllSections is a pure utility function
-    let getAllSections: any;
-    try {
-        getAllSections = require('./courseUtils').getAllSections;
-    } catch (e) {
-        console.error('repairSelectedCourse: Could not import getAllSections', e);
-        return null;
-    }
+    const scObj = sc as Partial<SelectedCourse> & Record<string, unknown>;
+
+    if (!scObj.course) return null;
 
     // Create a repaired version with defaults
     const repaired: SelectedCourse = {
-        course: sc.course,
+        course: scObj.course as Course,
         selectedLecture: null,
         selectedDiscussion: null,
         selectedLab: null,
-        isRequired: Boolean(sc.isRequired),
-        lockedSections: sc.lockedSections instanceof Set ? sc.lockedSections : new Set()
+        isRequired: Boolean(scObj.isRequired),
+        lockedSections: scObj.lockedSections instanceof Set ? scObj.lockedSections : new Set()
     };
 
     // Migrate old selectedSection data to component fields
-    if (sc.selectedSection && !sc.selectedLecture && !sc.selectedLab) {
-        const allSections = getAllSections(sc.course);
-        const hasLectures = allSections.some((s: any) => s.type === 'Lecture' || s.type === 'LEC');
+    if (scObj.selectedSection && !scObj.selectedLecture && !scObj.selectedLab) {
+        const course = scObj.course as Course;
+        const hasLectures = Boolean(course.lectures && course.lectures.length > 0);
 
-        repaired.selectedLab = hasLectures ? null : sc.selectedSection;
-        repaired.selectedLecture = hasLectures ? sc.selectedSection : null;
+        repaired.selectedLab = hasLectures ? null : scObj.selectedSection as Section;
+        repaired.selectedLecture = hasLectures ? scObj.selectedSection as Section : null;
     }
 
     // Try to repair hierarchical selections (selectedLecture, selectedDiscussion, selectedLab)
-    if (sc.selectedLecture && !isValidSection(sc.selectedLecture)) {
-        console.warn(`repairSelectedCourse: Invalid selectedLecture, clearing it for course ${sc.course.departmentAbbr}${sc.course.number}`);
+    if (scObj.selectedLecture && !isValidSection(scObj.selectedLecture)) {
+        console.warn(`repairSelectedCourse: Invalid selectedLecture, clearing it for course ${(scObj.course as Course).departmentAbbr}${(scObj.course as Course).number}`);
         repaired.selectedLecture = null;
-    } else if (sc.selectedLecture) {
-        repaired.selectedLecture = sc.selectedLecture;
+    } else if (scObj.selectedLecture) {
+        repaired.selectedLecture = scObj.selectedLecture;
     }
 
-    if (sc.selectedDiscussion && !isValidSection(sc.selectedDiscussion)) {
-        console.warn(`repairSelectedCourse: Invalid selectedDiscussion, clearing it for course ${sc.course.departmentAbbr}${sc.course.number}`);
+    if (scObj.selectedDiscussion && !isValidSection(scObj.selectedDiscussion)) {
+        console.warn(`repairSelectedCourse: Invalid selectedDiscussion, clearing it for course ${(scObj.course as Course).departmentAbbr}${(scObj.course as Course).number}`);
         repaired.selectedDiscussion = null;
-    } else if (sc.selectedDiscussion) {
-        repaired.selectedDiscussion = sc.selectedDiscussion;
+    } else if (scObj.selectedDiscussion) {
+        repaired.selectedDiscussion = scObj.selectedDiscussion;
     }
 
-    if (sc.selectedLab && !isValidSection(sc.selectedLab)) {
-        console.warn(`repairSelectedCourse: Invalid selectedLab, clearing it for course ${sc.course.departmentAbbr}${sc.course.number}`);
+    if (scObj.selectedLab && !isValidSection(scObj.selectedLab)) {
+        console.warn(`repairSelectedCourse: Invalid selectedLab, clearing it for course ${(scObj.course as Course).departmentAbbr}${(scObj.course as Course).number}`);
         repaired.selectedLab = null;
-    } else if (sc.selectedLab) {
-        repaired.selectedLab = sc.selectedLab;
+    } else if (scObj.selectedLab) {
+        repaired.selectedLab = scObj.selectedLab;
     }
 
     return repaired;
@@ -180,7 +180,7 @@ export function getComputedTerm(sc: SelectedCourse): string | null {
 /**
  * Validates that a computed term is valid
  */
-export function isValidComputedTerm(term: any): term is string {
+export function isValidComputedTerm(term: unknown): term is string {
     return typeof term === 'string' && ['A', 'B', 'C', 'D', 'F', 'S'].includes(term);
 }
 

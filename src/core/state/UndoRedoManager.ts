@@ -1,10 +1,11 @@
 import { setReplacer, setReviver } from '../../utils/jsonSerializer';
+import type { Schedule, SchedulePreferences } from '../../types/schedule';
 
-interface StateSnapshot {
+export interface StateSnapshot {
   timestamp: number;
   activeScheduleId: string | null;
-  schedules: Map<string, any>;
-  preferences: any;
+  schedules: Map<string, Schedule>;
+  preferences: SchedulePreferences;
 }
 
 export class UndoRedoManager {
@@ -15,8 +16,8 @@ export class UndoRedoManager {
 
   captureSnapshot(
     activeScheduleId: string | null,
-    schedules: Map<string, any>,
-    preferences: any
+    schedules: Map<string, Schedule>,
+    preferences: SchedulePreferences
   ): void {
     if (this.currentIndex < this.history.length - 1) {
       this.history = this.history.slice(0, this.currentIndex + 1);
@@ -87,7 +88,7 @@ export class UndoRedoManager {
     return JSON.parse(JSON.stringify(obj, setReplacer), setReviver);
   }
 
-  private deepCloneSchedulesMap(schedules: Map<string, any>): Map<string, any> {
+  private deepCloneSchedulesMap(schedules: Map<string, Schedule>): Map<string, Schedule> {
     const schedulesArray = Array.from(schedules.entries());
     const clonedArray = this.deepClone(schedulesArray);
     return new Map(clonedArray);

@@ -1,528 +1,252 @@
-import { Course } from '../../types/types';
-import { CancellationToken, CancellationError } from '../../utils/RequestCancellation';
-import { PerformanceMetrics } from '../../utils/PerformanceMetrics';
+import { Course, Section } from '../../types/types';
+import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
+import { CancellationToken } from '../../utils/RequestCancellation';
 import { getAllSections } from '../../utils/courseUtils';
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { Validators } from '../../utils/validators';
 import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 
-export interface RenderBatchCallback {
-    (batchIndex: number, batchCount: number, totalCount: number): void;
-}
-
-export interface RenderCompleteCallback {
-    (totalRendered: number, totalTime: number): void;
-}
-
 export interface ProgressiveRenderOptions {
-    batchSize?: number;
-    batchDelay?: number;
-    onBatch?: RenderBatchCallback;
-    onComplete?: RenderCompleteCallback;
-    enableVirtualization?: boolean;
-    performanceMetrics?: PerformanceMetrics;
+    onComplete?: (totalRendered: number) => void;
 }
 
 export class ProgressiveRenderer {
-    private batchSize: number = 10;
-    private batchDelay: number = 16; // 60 FPS
-    private currentRenderToken: number | null = null;
-    private isRendering: boolean = false;
-    private renderStartTime: number = 0;
-    private performanceMetrics?: PerformanceMetrics;
+    constructor(private options: ProgressiveRenderOptions = {}) {}
 
-    constructor(private options: ProgressiveRenderOptions = {}) {
-        this.batchSize = options.batchSize || 10;
-        this.batchDelay = options.batchDelay || 16;
-        this.performanceMetrics = options.performanceMetrics;
-    }
-
-    async renderCoursesBatched(
-        courses: Course[], 
-        renderFunction: (courses: Course[], isFirstBatch: boolean, isComplete: boolean) => void,
-        _container: HTMLElement,
-        cancellationToken?: CancellationToken
-    ): Promise<void> {
-        // Cancel any existing render operation
-        this.cancelCurrentRender();
-        
-        if (courses.length === 0) {
-            renderFunction([], true, true);
-            return;
-        }
-
-        this.isRendering = true;
-        this.renderStartTime = performance.now();
-        const renderToken = Date.now() + Math.random(); // Unique token for this render
-        this.currentRenderToken = renderToken;
-
-        const totalBatches = Math.ceil(courses.length / this.batchSize);
-        
-        // Start performance tracking
-        const operationId = this.performanceMetrics?.startOperation('batch-render');
-
-        try {
-            // Check for cancellation before starting
-            cancellationToken?.throwIfCancelled();
-            
-            // Render first batch immediately for instant feedback
-            const firstBatch = courses.slice(0, this.batchSize);
-            renderFunction(firstBatch, true, courses.length <= this.batchSize);
-            
-            // Call batch callback
-            this.options.onBatch?.(1, totalBatches, courses.length);
-
-            if (courses.length <= this.batchSize) {
-                // Single batch, we're done
-                this.completeRender(courses.length);
-                return;
-            }
-
-            // Render remaining batches progressively
-            for (let i = 1; i < totalBatches; i++) {
-                // Check if this render was cancelled (internal token)
-                if (this.currentRenderToken !== renderToken) {
-                    return; // Render was cancelled
-                }
-                
-                // Check external cancellation token
-                cancellationToken?.throwIfCancelled();
-
-                await this.wait(this.batchDelay, cancellationToken);
-
-                // Check again after delay
-                if (this.currentRenderToken !== renderToken) {
-                    return; // Render was cancelled
-                }
-                
-                cancellationToken?.throwIfCancelled();
-
-                const start = i * this.batchSize;
-                const end = Math.min((i + 1) * this.batchSize, courses.length);
-                const batch = courses.slice(start, end);
-                
-                renderFunction(batch, false, i === totalBatches - 1);
-                
-                // Call batch callback
-                this.options.onBatch?.(i + 1, totalBatches, courses.length);
-            }
-
-            this.completeRender(courses.length);
-            
-            // End performance tracking
-            if (operationId) {
-                this.performanceMetrics?.endOperation(operationId, {
-                    completed: true,
-                    cancelled: false,
-                    itemCount: courses.length,
-                    batchSize: this.batchSize,
-                    batchCount: totalBatches
-                });
-            }
-            
-        } catch (error) {
-            if (error instanceof CancellationError) {
-                // Clean cancellation, not an error
-                this.isRendering = false;
-                this.currentRenderToken = null;
-                
-                // Track cancellation
-                if (operationId) {
-                    this.performanceMetrics?.endOperation(operationId, {
-                        completed: false,
-                        cancelled: true
-                    });
-                }
-                return;
-            }
-            console.error('Progressive rendering error:', error);
-            this.isRendering = false;
-            this.currentRenderToken = null;
-            
-            // Track error
-            if (operationId) {
-                this.performanceMetrics?.endOperation(operationId, {
-                    completed: false,
-                    cancelled: false,
-                    error: error instanceof Error ? error.message : String(error)
-                });
-            }
-        }
-    }
-
-    // Specialized method for course list rendering
-    async renderCourseList(
-        courses: Course[], 
-        courseSelectionService: any, 
+    renderCourseList(
+        courses: Course[],
+        courseSelectionService: CourseSelectionService,
         container: HTMLElement,
         elementToCourseMap: WeakMap<HTMLElement, Course>,
-        cancellationToken?: CancellationToken,
+        _cancellationToken?: CancellationToken,
         isLoadMore: boolean = false
-    ): Promise<void> {
-        let allHtml = '';
-        let renderedCourses: Course[] = [];
+    ): void {
+        const stateManager = ProfileStateManager.getInstance();
 
-        const renderFunction = (batchCourses: Course[], isFirstBatch: boolean, isComplete: boolean) => {
-            if (isFirstBatch && !isLoadMore) {
-                // Clear container and start fresh (only for initial load)
-                container.innerHTML = '<div class="course-list"></div>';
-                allHtml = '';
-                renderedCourses = [];
-            } else if (isFirstBatch && isLoadMore) {
-                // Find existing course list for append
-                allHtml = '';
-                renderedCourses = [];
-                // Clean up any existing loading indicators from previous renders
-                const existingIndicators = container.querySelectorAll('.loading-indicator');
-                existingIndicators.forEach(indicator => indicator.remove());
-            }
+        const html = courses.map(course => {
+            const isSelected = courseSelectionService.isCourseSelected(course);
+            const isBookmarked = stateManager.isBookmarked(course.id);
+            const hasWarning = this.courseHasWarning(course);
 
-            // Build HTML for this batch
-            const stateManager = ProfileStateManager.getInstance();
-            const batchHtml = batchCourses.map(course => {
-                const isSelected = courseSelectionService.isCourseSelected(course);
-                const isBookmarked = stateManager.isBookmarked(course.id);
-                const hasWarning = this.courseHasWarning(course);
+            const sectionsByTerm = new Map<string, Section[]>();
+            getAllSections(course).forEach((section: Section) => {
+                const term = section.computedTerm || 'Unknown';
+                if (!sectionsByTerm.has(term)) sectionsByTerm.set(term, []);
+                sectionsByTerm.get(term)!.push(section);
+            });
 
-                return `
-                    <div class="course-item ${isSelected ? 'selected' : ''}" data-course-id="${Validators.escapeHtml(course.id)}">
-                        <div class="course-header">
-                            <div class="course-header-controls">
-                                <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
-                                    ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
-                                </button>
-                                <button class="course-bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" title="${isBookmarked ? 'Remove bookmark' : 'Add bookmark'}">
-                                    ${isBookmarked ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon') : getInlineSVG('BOOKMARK', 'bookmark-icon')}
-                                </button>
-                                <div class="course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
-                                <div class="course-name">
-                                    <span class="course-name-text">${Validators.escapeHtml(course.name)}</span>
-                                </div>
-                            </div>
-                            ${(() => {
-                                // Group sections by term
-                                const sectionsByTerm = new Map<string, any[]>();
-                                getAllSections(course).forEach((section: any) => {
-                                    const term = section.computedTerm || 'Unknown';
-                                    if (!sectionsByTerm.has(term)) {
-                                        sectionsByTerm.set(term, []);
-                                    }
-                                    sectionsByTerm.get(term)!.push(section);
-                                });
+            const allTerms = ['A', 'B', 'C', 'D'];
+            const sortedTerms = allTerms.filter(t => sectionsByTerm.has(t));
 
-                                // Fixed term order: A, B, C, D
-                                const allTerms = ['A', 'B', 'C', 'D'];
-                                // Terms that have sections (for section containers)
-                                const sortedTerms = allTerms.filter(t => sectionsByTerm.has(t));
-
-                                // Create term badges container (initial view) with fixed positions
-                                const termBadgesHtml = allTerms.map(term => {
-                                    const sections = sectionsByTerm.get(term);
-                                    if (!sections) {
-                                        // Term not available for this course
-                                        return `<span class="term-badge unavailable" data-term="${Validators.escapeHtml(term)}">
-                                            <span class="term-letter">${Validators.escapeHtml(term)}</span>
-                                        </span>`;
-                                    }
-                                    const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
-                                    return `<span class="term-badge ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}"${allFull ? ' title="All sections full"' : ''}>
-                                        <span class="term-letter">${Validators.escapeHtml(term)}</span>
-                                        ${getInlineSVG('PLUS', 'term-icon')}
-                                    </span>`;
-                                }).join('');
-
-                                // Create term-specific section containers (hidden by default)
-                                const termSectionsHtml = sortedTerms.map(term => {
-                                    const sections = sectionsByTerm.get(term)!;
-                                    const sectionBadgesHtml = sections.map((section: any) => {
-                                        const isFull = section.seatsAvailable <= 0;
-                                        const professors = new Set<string>();
-                                        section.periods.forEach((period: { professor: string; }) => {
-                                            if (period.professor &&
-                                                period.professor !== 'TBA' &&
-                                                period.professor !== 'Not Assigned' &&
-                                                period.professor.trim() !== '') {
-                                                professors.add(period.professor);
-                                            }
-                                        });
-                                        const profArray = Array.from(professors);
-                                        const profListPlain = profArray.join(', ') || 'TBA';
-                                        const profListHtml = profArray.length > 0
-                                            ? profArray.map(prof => {
-                                                const escapedProf = Validators.escapeHtml(prof);
-                                                const rmpUrl = rateMyProfessorService.getProfessorRMPUrl(prof);
-                                                return rmpUrl
-                                                    ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProf}</a>`
-                                                    : escapedProf;
-                                            }).join(', ')
-                                            : 'TBA';
-                                        const escapedSectionNumber = Validators.escapeHtml(section.number);
-                                        const escapedProfListPlain = Validators.escapeHtml(profListPlain);
-                                        return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${escapedSectionNumber}" title="${escapedProfListPlain}: ${escapedSectionNumber}">${profListHtml}: ${escapedSectionNumber}</span>`;
-                                    }).join('');
-
-                                    const allFull = sections.every((section: any) => section.seatsAvailable <= 0);
-                                    return `<div class="term-sections-container" data-term="${Validators.escapeHtml(term)}" style="display: none;">
-                                        <span class="term-badge active ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}"${allFull ? ' title="All sections full"' : ''}>
-                                            <span class="term-letter">${Validators.escapeHtml(term)}</span>
-                                            ${getInlineSVG('PLUS', 'term-icon')}
-                                        </span>
-                                        ${sectionBadgesHtml}
-                                    </div>`;
-                                }).join('');
-
-                                const capacityBadgeHtml = hasWarning ? `<span class="capacity-badge">At capacity</span>` : '';
-
-                                return `<div class="course-sections" data-course-id="${Validators.escapeHtml(course.id)}">
-                                    <div class="term-badges-container" style="opacity: 1; transform: translateX(0);">
-                                        ${capacityBadgeHtml}
-                                        ${termBadgesHtml}
-                                    </div>
-                                    ${termSectionsHtml}
-                                </div>`;
-                            })()}
-                        </div>
-                    </div>
-                `;
+            const termBadgesHtml = allTerms.map(term => {
+                const sections = sectionsByTerm.get(term);
+                if (!sections) {
+                    return `<span class="term-badge unavailable" data-term="${Validators.escapeHtml(term)}">
+                        <span class="term-letter">${Validators.escapeHtml(term)}</span>
+                    </span>`;
+                }
+                const allFull = sections.every((section: Section) => section.seatsAvailable <= 0);
+                return `<span class="term-badge ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}"${allFull ? ' title="All sections full"' : ''}>
+                    <span class="term-letter">${Validators.escapeHtml(term)}</span>
+                    ${getInlineSVG('PLUS', 'term-icon')}
+                </span>`;
             }).join('');
 
-            allHtml += batchHtml;
-            renderedCourses.push(...batchCourses);
+            const termSectionsHtml = sortedTerms.map(term => {
+                const sections = sectionsByTerm.get(term)!;
 
-            // Update DOM
+                // Deduplicate: if a section code has both a named professor and a TBA entry, drop the TBA one
+                const sectionsByNumber = new Map<string, Section[]>();
+                sections.forEach((section: Section) => {
+                    const num = section.number;
+                    if (!sectionsByNumber.has(num)) sectionsByNumber.set(num, []);
+                    sectionsByNumber.get(num)!.push(section);
+                });
+                const dedupedSections: Section[] = [];
+                sectionsByNumber.forEach(group => {
+                    if (group.length <= 1) {
+                        dedupedSections.push(...group);
+                        return;
+                    }
+                    // Check which entries have a real (non-TBA) professor
+                    const withProf = group.filter((s: Section) =>
+                        s.periods.some((p: { professor: string }) =>
+                            p.professor && p.professor !== 'TBA' && p.professor !== 'Not Assigned' && p.professor.trim() !== ''
+                        )
+                    );
+                    if (withProf.length > 0) {
+                        dedupedSections.push(...withProf);
+                    } else {
+                        // All TBA — just keep one
+                        dedupedSections.push(group[0]);
+                    }
+                });
+
+                const maxBadges = 100;
+                const totalSections = dedupedSections.length;
+                const displaySections = dedupedSections.slice(0, maxBadges);
+
+                const sectionBadgesHtml = displaySections.map((section: Section) => {
+                    const isFull = section.seatsAvailable <= 0;
+                    const professors = new Set<string>();
+                    section.periods.forEach((period: { professor: string }) => {
+                        if (period.professor && period.professor !== 'TBA' && period.professor !== 'Not Assigned' && period.professor.trim() !== '') {
+                            professors.add(period.professor);
+                        }
+                    });
+                    const profArray = Array.from(professors);
+                    const profListPlain = profArray.join(', ') || 'TBA';
+                    const profListHtml = profArray.length > 0
+                        ? profArray.map(prof => {
+                            const escapedProf = Validators.escapeHtml(prof);
+                            const rmpUrl = rateMyProfessorService.getProfessorRMPUrl(prof);
+                            return rmpUrl
+                                ? `<a href="${Validators.escapeHtml(rmpUrl)}" target="_blank" rel="noopener noreferrer" class="professor-link">${escapedProf}</a>`
+                                : escapedProf;
+                        }).join(', ')
+                        : 'TBA';
+                    const escapedSectionNumber = Validators.escapeHtml(section.number);
+                    const escapedProfListPlain = Validators.escapeHtml(profListPlain);
+                    return `<span class="section-badge ${isFull ? 'full' : ''}" data-section="${escapedSectionNumber}" title="${escapedProfListPlain}: ${escapedSectionNumber}">${profListHtml}: ${escapedSectionNumber}</span>`;
+                }).join('');
+
+                const overflowHtml = totalSections > maxBadges
+                    ? `<span class="section-badge section-badge-overflow" title="View course details for all sections">+${totalSections - maxBadges} more — see course details</span>`
+                    : '';
+
+                const allFull = sections.every((section: Section) => section.seatsAvailable <= 0);
+                return `<div class="term-sections-container" data-term="${Validators.escapeHtml(term)}" style="display: none;">
+                    <span class="term-badge active ${allFull ? 'full' : ''}" data-term="${Validators.escapeHtml(term)}"${allFull ? ' title="All sections full"' : ''}>
+                        <span class="term-letter">${Validators.escapeHtml(term)}</span>
+                        ${getInlineSVG('PLUS', 'term-icon')}
+                    </span>
+                    ${sectionBadgesHtml}
+                    ${overflowHtml}
+                </div>`;
+            }).join('');
+
+            const capacityBadgeHtml = hasWarning ? `<span class="capacity-badge">At capacity</span>` : '';
+
+            return `
+                <div class="course-item ${isSelected ? 'selected' : ''}" data-course-id="${Validators.escapeHtml(course.id)}">
+                    <div class="course-header">
+                        <div class="course-header-controls">
+                            <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
+                                ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
+                            </button>
+                            <button class="course-bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" title="${isBookmarked ? 'Remove bookmark' : 'Add bookmark'}">
+                                ${isBookmarked ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon') : getInlineSVG('BOOKMARK', 'bookmark-icon')}
+                            </button>
+                            <div class="course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
+                            <div class="course-name">
+                                <span class="course-name-text">${Validators.escapeHtml(course.name)}</span>
+                            </div>
+                        </div>
+                        <div class="course-sections" data-course-id="${Validators.escapeHtml(course.id)}">
+                            <div class="term-badges-container" style="opacity: 1; transform: translateX(0);">
+                                ${capacityBadgeHtml}
+                                ${termBadgesHtml}
+                            </div>
+                            ${termSectionsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        if (isLoadMore) {
             const courseListContainer = container.querySelector('.course-list');
-            if (courseListContainer) {
-                if (isLoadMore) {
-                    // Remove load more button before appending
-                    const loadMoreContainer = container.querySelector('.load-more-container');
-                    if (loadMoreContainer) {
-                        loadMoreContainer.remove();
-                    }
-                    courseListContainer.insertAdjacentHTML('beforeend', batchHtml);
-                    
-                    // Map only the newly added elements
-                    const allElements = courseListContainer.querySelectorAll('.course-item');
-                    const startIndex = allElements.length - batchCourses.length;
-                    for (let i = 0; i < batchCourses.length; i++) {
-                        const element = allElements[startIndex + i];
-                        if (element) {
-                            elementToCourseMap.set(element as HTMLElement, batchCourses[i]);
-                        }
-                    }
-                } else {
-                    // Replace content completely
-                    courseListContainer.innerHTML = allHtml;
-                    
-                    // Update course mapping for all rendered elements
-                    const courseElements = courseListContainer.querySelectorAll('.course-item');
-                    courseElements.forEach((element, index) => {
-                        if (index < renderedCourses.length) {
-                            elementToCourseMap.set(element as HTMLElement, renderedCourses[index]);
-                        }
-                    });
-                }
+            if (!courseListContainer) return;
+            container.querySelector('.load-more-container')?.remove();
+            courseListContainer.querySelectorAll('.loading-indicator').forEach(el => el.remove());
+            courseListContainer.insertAdjacentHTML('beforeend', html);
+            const allElements = courseListContainer.querySelectorAll('.course-item');
+            const startIndex = allElements.length - courses.length;
+            for (let i = 0; i < courses.length; i++) {
+                const element = allElements[startIndex + i];
+                if (element) elementToCourseMap.set(element as HTMLElement, courses[i]);
             }
+        } else {
+            container.innerHTML = '<div class="course-list"></div>';
+            const courseListContainer = container.querySelector('.course-list')!;
+            courseListContainer.innerHTML = html;
+            courseListContainer.querySelectorAll('.course-item').forEach((el, i) => {
+                if (i < courses.length) elementToCourseMap.set(el as HTMLElement, courses[i]);
+            });
+        }
 
-            // Handle loading indicator
-            if (isComplete && courseListContainer) {
-                // Remove any existing loading indicators when rendering is complete
-                const existingIndicators = courseListContainer.querySelectorAll('.loading-indicator');
-                existingIndicators.forEach(indicator => indicator.remove());
-            } else if (!isComplete && courseListContainer) {
-                // Remove any existing loading indicators before adding new one
-                const existingIndicators = courseListContainer.querySelectorAll('.loading-indicator');
-                existingIndicators.forEach(indicator => indicator.remove());
-                
-                // Add new loading indicator
-                const loadingIndicator = document.createElement('div');
-                loadingIndicator.className = 'loading-indicator';
-                loadingIndicator.innerHTML = `
-                    <div class="loading-spinner"></div>
-                    <span>Loading more courses... (${renderedCourses.length} of ${courses.length})</span>
-                `;
-                courseListContainer.appendChild(loadingIndicator);
-            }
-        };
-
-        await this.renderCoursesBatched(courses, renderFunction, container, cancellationToken);
+        this.options.onComplete?.(courses.length);
     }
 
-    // Specialized method for course grid rendering
-    async renderCourseGrid(
-        courses: Course[], 
-        courseSelectionService: any, 
+    renderCourseGrid(
+        courses: Course[],
+        courseSelectionService: CourseSelectionService,
         container: HTMLElement,
         elementToCourseMap: WeakMap<HTMLElement, Course>,
-        cancellationToken?: CancellationToken,
+        _cancellationToken?: CancellationToken,
         isLoadMore: boolean = false
-    ): Promise<void> {
-        let allHtml = '';
-        let renderedCourses: Course[] = [];
+    ): void {
+        const stateManager = ProfileStateManager.getInstance();
 
-        const renderFunction = (batchCourses: Course[], isFirstBatch: boolean, isComplete: boolean) => {
-            if (isFirstBatch && !isLoadMore) {
-                // Clear container and start fresh (only for initial load)
-                container.innerHTML = '<div class="course-grid"></div>';
-                allHtml = '';
-                renderedCourses = [];
-            } else if (isFirstBatch && isLoadMore) {
-                // Find existing course grid for append
-                allHtml = '';
-                renderedCourses = [];
-                // Clean up any existing loading indicators from previous renders
-                const existingIndicators = container.querySelectorAll('.loading-indicator, .grid-loading');
-                existingIndicators.forEach(indicator => indicator.remove());
-            }
+        const html = courses.map(course => {
+            const isSelected = courseSelectionService.isCourseSelected(course);
+            const isBookmarked = stateManager.isBookmarked(course.id);
+            const hasWarning = this.courseHasWarning(course);
 
-            const stateManager = ProfileStateManager.getInstance();
-            const batchHtml = batchCourses.map(course => {
-                const isSelected = courseSelectionService.isCourseSelected(course);
-                const isBookmarked = stateManager.isBookmarked(course.id);
-                const hasWarning = this.courseHasWarning(course);
-
-                return `
-                    <div class="course-card ${isSelected ? 'selected' : ''}" data-course-id="${Validators.escapeHtml(course.id)}">
-                        <div class="course-card-header">
-                            <div class="course-card-info">
-                                <div class="course-title-main">${Validators.escapeHtml(course.name)}</div>
-                                <div class="course-code-row">
-                                    <div class="course-code-badge">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
-                                    ${hasWarning ? `<span class="capacity-badge">At capacity</span>` : ''}
-                                </div>
-                            </div>
-                            <div class="course-card-buttons">
-                                <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
-                                    ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
-                                </button>
-                                <button class="course-bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" title="${isBookmarked ? 'Remove bookmark' : 'Add bookmark'}">
-                                    ${isBookmarked ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon') : getInlineSVG('BOOKMARK', 'bookmark-icon')}
-                                </button>
+            return `
+                <div class="course-card ${isSelected ? 'selected' : ''}" data-course-id="${Validators.escapeHtml(course.id)}">
+                    <div class="course-card-header">
+                        <div class="course-card-info">
+                            <div class="course-title-main">${Validators.escapeHtml(course.name)}</div>
+                            <div class="course-code-row">
+                                <div class="course-code-badge">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
+                                ${hasWarning ? `<span class="capacity-badge">At capacity</span>` : ''}
                             </div>
                         </div>
+                        <div class="course-card-buttons">
+                            <button class="course-select-btn ${isSelected ? 'selected' : ''}" title="${isSelected ? 'Remove from selection' : 'Add to selection'}">
+                                ${isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}
+                            </button>
+                            <button class="course-bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" title="${isBookmarked ? 'Remove bookmark' : 'Add bookmark'}">
+                                ${isBookmarked ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon') : getInlineSVG('BOOKMARK', 'bookmark-icon')}
+                            </button>
+                        </div>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `;
+        }).join('');
 
-            allHtml += batchHtml;
-            renderedCourses.push(...batchCourses);
-
+        if (isLoadMore) {
             const courseGridContainer = container.querySelector('.course-grid');
-            if (courseGridContainer) {
-                if (isLoadMore) {
-                    // Remove load more button before appending
-                    const loadMoreContainer = container.querySelector('.load-more-container');
-                    if (loadMoreContainer) {
-                        loadMoreContainer.remove();
-                    }
-                    courseGridContainer.insertAdjacentHTML('beforeend', batchHtml);
-                    
-                    // Map only the newly added elements
-                    const allElements = courseGridContainer.querySelectorAll('.course-card');
-                    const startIndex = allElements.length - batchCourses.length;
-                    for (let i = 0; i < batchCourses.length; i++) {
-                        const element = allElements[startIndex + i];
-                        if (element) {
-                            elementToCourseMap.set(element as HTMLElement, batchCourses[i]);
-                        }
-                    }
-                } else {
-                    // Replace content completely
-                    courseGridContainer.innerHTML = allHtml;
-                    
-                    // Update course mapping for all elements
-                    const courseElements = courseGridContainer.querySelectorAll('.course-card');
-                    courseElements.forEach((element, index) => {
-                        if (index < renderedCourses.length) {
-                            elementToCourseMap.set(element as HTMLElement, renderedCourses[index]);
-                        }
-                    });
-                }
+            if (!courseGridContainer) return;
+            container.querySelector('.load-more-container')?.remove();
+            courseGridContainer.querySelectorAll('.loading-indicator, .grid-loading').forEach(el => el.remove());
+            courseGridContainer.insertAdjacentHTML('beforeend', html);
+            const allElements = courseGridContainer.querySelectorAll('.course-card');
+            const startIndex = allElements.length - courses.length;
+            for (let i = 0; i < courses.length; i++) {
+                const element = allElements[startIndex + i];
+                if (element) elementToCourseMap.set(element as HTMLElement, courses[i]);
             }
-
-            // Handle loading indicator
-            if (isComplete && courseGridContainer) {
-                // Remove any existing loading indicators when rendering is complete
-                const existingIndicators = courseGridContainer.querySelectorAll('.loading-indicator, .grid-loading');
-                existingIndicators.forEach(indicator => indicator.remove());
-            } else if (!isComplete && courseGridContainer) {
-                // Remove any existing loading indicators before adding new one
-                const existingIndicators = courseGridContainer.querySelectorAll('.loading-indicator, .grid-loading');
-                existingIndicators.forEach(indicator => indicator.remove());
-                
-                // Add new loading indicator
-                const loadingIndicator = document.createElement('div');
-                loadingIndicator.className = 'loading-indicator grid-loading';
-                loadingIndicator.innerHTML = `
-                    <div class="loading-spinner"></div>
-                    <span>Loading more courses... (${renderedCourses.length} of ${courses.length})</span>
-                `;
-                courseGridContainer.appendChild(loadingIndicator);
-            }
-        };
-
-        await this.renderCoursesBatched(courses, renderFunction, container, cancellationToken);
-    }
-
-    cancelCurrentRender(): void {
-        if (this.currentRenderToken !== null) {
-            this.currentRenderToken = null;
-            this.isRendering = false;
-            
-            // Clean up any loading indicators from cancelled renders
-            const loadingIndicators = document.querySelectorAll('.loading-indicator, .grid-loading');
-            loadingIndicators.forEach(indicator => indicator.remove());
+        } else {
+            container.innerHTML = '<div class="course-grid"></div>';
+            const courseGridContainer = container.querySelector('.course-grid')!;
+            courseGridContainer.innerHTML = html;
+            courseGridContainer.querySelectorAll('.course-card').forEach((el, i) => {
+                if (i < courses.length) elementToCourseMap.set(el as HTMLElement, courses[i]);
+            });
         }
+
+        this.options.onComplete?.(courses.length);
     }
 
-    isCurrentlyRendering(): boolean {
-        return this.isRendering;
-    }
+    cancelCurrentRender(): void {}
 
-    setBatchSize(size: number): void {
-        this.batchSize = Math.max(1, Math.min(100, size)); // Clamp between 1-100
-    }
-    
-    getBatchSize(): number {
-        return this.batchSize;
-    }
-
-    setBatchDelay(delay: number): void {
-        this.batchDelay = Math.max(0, Math.min(100, delay)); // Clamp between 0-100ms
-    }
-
-    private wait(ms: number, cancellationToken?: CancellationToken): Promise<void> {
-        return new Promise((resolve, reject) => {
-            if (cancellationToken?.isCancelled) {
-                reject(new CancellationError(cancellationToken.reason));
-                return;
-            }
-            
-            const timeoutId = setTimeout(() => {
-                if (cancellationToken?.isCancelled) {
-                    reject(new CancellationError(cancellationToken.reason));
-                } else {
-                    resolve();
-                }
-            }, ms);
-            
-            // Clean up timeout if cancelled
-            if (cancellationToken?.isCancelled) {
-                clearTimeout(timeoutId);
-                reject(new CancellationError(cancellationToken.reason));
-            }
-        });
-    }
+    isCurrentlyRendering(): boolean { return false; }
 
     private courseHasWarning(course: Course): boolean {
         const sections = getAllSections(course);
-        return sections.length > 0 && sections.every((section: any) => section.seatsAvailable <= 0);
-    }
-
-    private completeRender(totalRendered: number): void {
-        const totalTime = performance.now() - this.renderStartTime;
-        this.isRendering = false;
-        this.currentRenderToken = null;
-        this.options.onComplete?.(totalRendered, totalTime);
+        return sections.length > 0 && sections.every((section: Section) => section.seatsAvailable <= 0);
     }
 }

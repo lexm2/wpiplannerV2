@@ -3,28 +3,18 @@
 
 import { Course, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
+import { AcademicYearFilterCriteria } from '../../types/filters';
+import type { ComponentSelections } from '../../types/scheduling';
 import { CourseDataService } from '../../services/data/courseDataService';
-import { ScheduleFilterService } from '../../services/filtering/ScheduleFilterService';
+import { FilterService } from '../../services/filtering/FilterService';
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
 import { Validators } from '../../utils/validators';
 import { BaseSidebarPanel } from '../sidebar/BaseSidebarPanel';
-import type { SidebarListItem, SidebarListGroup } from '../sidebar/types';
 import '../../styles/components/component-wizard.css';
 
 type WizardStep = 'lecture' | 'discussion' | 'lab';
-
-interface WizardSelections {
-    lecture: Section | null;
-    discussion: Section | null;
-    lab: Section | null;
-}
-
-/** List item representing a section card in the wizard */
-interface WizardSectionItem extends SidebarListItem {
-    section: Section;
-}
 
 /**
  * Sidebar wizard for selecting course components.
@@ -35,13 +25,13 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     readonly panelClass = 'wizard-active';
     private course: Course;
     private courseDataService: CourseDataService;
-    private scheduleFilterService: ScheduleFilterService | null;
+    private filterService: FilterService | null;
     private currentStep: WizardStep;
-    private selections: WizardSelections;
-    private onComplete: (selections: WizardSelections) => void;
+    private selections: ComponentSelections;
+    private onComplete: (selections: ComponentSelections) => void;
     private onCancel: () => void;
-    private onSelectionChange?: (selections: WizardSelections) => void;
-    private onHoverPreview?: (selections: WizardSelections) => void;
+    private onSelectionChange?: (selections: ComponentSelections) => void;
+    private onHoverPreview?: (selections: ComponentSelections) => void;
     private availableSteps: WizardStep[] = [];
     private filterChangeHandler: (() => void) | null = null;
     private allSelectedCourses: SelectedCourse[] = [];
@@ -49,13 +39,13 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     constructor(
         course: Course,
         courseDataService: CourseDataService,
-        onComplete: (selections: WizardSelections) => void,
+        onComplete: (selections: ComponentSelections) => void,
         onCancel: () => void,
         existingSelections?: SelectedCourse,
-        onSelectionChange?: (selections: WizardSelections) => void,
-        scheduleFilterService?: ScheduleFilterService,
+        onSelectionChange?: (selections: ComponentSelections) => void,
+        filterService?: FilterService,
         allSelectedCourses?: SelectedCourse[],
-        onHoverPreview?: (selections: WizardSelections) => void
+        onHoverPreview?: (selections: ComponentSelections) => void
     ) {
         // Initialize base panel with animated list support
         super({
@@ -78,7 +68,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         this.onCancel = onCancel;
         this.onSelectionChange = onSelectionChange;
         this.onHoverPreview = onHoverPreview;
-        this.scheduleFilterService = scheduleFilterService || null;
+        this.filterService = filterService || null;
         this.allSelectedCourses = allSelectedCourses || [];
 
         // Initialize selections from existing if editing
@@ -93,9 +83,9 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         this.currentStep = this.determineStartStep();
 
         // Set up filter change listener if filter service is available
-        if (this.scheduleFilterService) {
+        if (this.filterService) {
             this.filterChangeHandler = () => this.onFilterChange();
-            this.scheduleFilterService.addEventListener(this.filterChangeHandler);
+            this.filterService.addEventListener(this.filterChangeHandler);
         }
 
         // RMP data is loaded centrally by MainController during app initialization
@@ -118,22 +108,16 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
                 steps.push('lab');
             }
         } else if (isHierarchical) {
-            // Hierarchical course
             const lectures = this.courseDataService.getLecturesForCourse(this.course);
-
             if (lectures.length > 0) {
                 steps.push('lecture');
 
-                // Check if any lecture has discussions
-                const hasDiscussions = lectures.some(lg =>
-                    lg.compatibleDiscussions.length > 0
-                );
+                if (this.selections.lecture) {
+                    return this.computeStepsForLecture(this.selections.lecture);
+                }
 
-                // Check if any lecture has labs
-                const hasLabs = lectures.some(lg =>
-                    lg.compatibleLabs.length > 0
-                );
-
+                const hasDiscussions = lectures.some(lg => lg.compatibleDiscussions.length > 0);
+                const hasLabs = lectures.some(lg => lg.compatibleLabs.length > 0);
                 if (hasDiscussions) steps.push('discussion');
                 if (hasLabs) steps.push('lab');
             }
@@ -150,20 +134,17 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     }
 
     /**
-     * Check if a section has at least one period with a valid time slot
-     * Async sections are valid even with 12:00-12:00 times
+     * Compute the wizard steps relevant to a specific lecture section
      */
-    private hasValidTimeSlot(section: Section): boolean {
-        return section.periods.some(period => {
-            // Async periods are always valid
-            if (period.isAsync) {
-                return true;
-            }
-            // Compare actual time values, not object references
-            // A valid time slot has different start and end times
-            return period.startTime.hours !== period.endTime.hours ||
-                   period.startTime.minutes !== period.endTime.minutes;
-        });
+    private computeStepsForLecture(lecture: Section): WizardStep[] {
+        const steps: WizardStep[] = ['lecture'];
+        const discussions = this.courseDataService.getDiscussionsForLecture(this.course, lecture)
+            .filter(s => !s.isInterestList);
+        const labs = this.courseDataService.getLabsForLecture(this.course, lecture)
+            .filter(s => !s.isInterestList);
+        if (discussions.length > 0) steps.push('discussion');
+        if (labs.length > 0) steps.push('lab');
+        return steps;
     }
 
     /**
@@ -178,44 +159,38 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      * Get available sections for a specific step
      */
     getOptionsForStep(step: WizardStep): Section[] {
+        return this.getOptionsWithFilterInfo(step).filtered;
+    }
+
+    private getOptionsWithFilterInfo(step: WizardStep): { filtered: Section[], totalBeforeFilter: number } {
         let sections: Section[] = [];
 
         if (step === 'lecture') {
-            // Lab-only course
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
                 sections = this.courseDataService.getStandaloneLabs(this.course);
             } else {
-                // Regular hierarchical course
                 const lectureGroups = this.courseDataService.getLecturesForCourse(this.course);
                 sections = lectureGroups.map(lg => lg.section);
             }
         } else if (step === 'discussion') {
             if (!this.selections.lecture) {
-                // No lecture selected - show ALL discussions from all lecture groups
                 sections = this.getAllDiscussionsForCourse();
             } else {
-                // Lecture selected - show only compatible discussions
                 sections = this.courseDataService.getDiscussionsForLecture(this.course, this.selections.lecture);
             }
         } else if (step === 'lab') {
-            // Lab-only course
             if (this.courseDataService.isLabOnlyCourse(this.course)) {
                 sections = this.courseDataService.getStandaloneLabs(this.course);
             } else {
-                // Regular course
                 if (!this.selections.lecture) {
-                    // No lecture selected - show ALL labs from all lecture groups
                     sections = this.getAllLabsForCourse();
                 } else {
-                    // Lecture selected - show only compatible labs
                     sections = this.courseDataService.getLabsForLecture(this.course, this.selections.lecture);
                 }
             }
         }
 
         // Apply term filtering ONLY for child components (discussions/labs)
-        // based on the selected lecture's term
-        // NEVER filter lectures - users must be able to select any term freely
         if (step !== 'lecture' && this.selections.lecture && sections.length > 0) {
             const lectureTerm = this.selections.lecture.computedTerm;
             sections = this.filterSectionsByTerm(sections, lectureTerm);
@@ -224,13 +199,15 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         // Filter out interest list placeholder sections
         sections = sections.filter(section => !section.isInterestList);
 
+        const totalBeforeFilter = sections.length;
+
         // Apply schedule filters if available
-        if (this.scheduleFilterService && sections.length > 0) {
-            const filteredSections = this.applyScheduleFilters(sections, step);
-            return filteredSections;
+        if (this.filterService && !this.filterService.isEmpty() && sections.length > 0) {
+            const filtered = this.applyScheduleFilters(sections, step);
+            return { filtered, totalBeforeFilter };
         }
 
-        return sections;
+        return { filtered: sections, totalBeforeFilter };
     }
 
     /**
@@ -247,48 +224,23 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     /**
      * Apply schedule filters to sections
      */
-    private applyScheduleFilters(sections: Section[], step: WizardStep): Section[] {
-        if (!this.scheduleFilterService) return sections;
+    private applyScheduleFilters(sections: Section[], _step: WizardStep): Section[] {
+        if (!this.filterService) return sections;
 
-        const activeFilters = this.scheduleFilterService.getActiveFilters();
+        // Get all courses for filtering context
+        const allCourses = [this.course, ...this.allSelectedCourses.map(sc => sc.course)];
 
-        // Check for RMP filter specifically
-        const rmpFilter = activeFilters.find(f => f.id === 'periodRmpRating');
+        // Apply filters to all courses
+        const filtered = this.filterService.apply(allCourses);
 
-        // Check for conflict filter specifically
-        const conflictFilter = activeFilters.find(f => f.id === 'periodConflict');
+        // Keep only sections from this course that passed filtering
+        const passingSectionCrns = new Set(
+            filtered
+                .filter(fs => fs.course.id === this.course.id)
+                .map(fs => fs.section.crn)
+        );
 
-        // Filter sections individually through the schedule filter service
-        const filteredSections = sections.filter(section => {
-            // Create a temporary course object with ONLY the section being tested
-            // This ensures filterSections only evaluates this single section
-            const tempCourse: Course = {
-                ...this.course
-            };
-
-            // Create a temporary SelectedCourse with this section in the appropriate slot
-            const tempSelectedCourse: SelectedCourse = {
-                course: tempCourse,
-                selectedLecture: step === 'lecture' ? section : (this.selections.lecture || null),
-                selectedDiscussion: step === 'discussion' ? section : (this.selections.discussion || null),
-                selectedLab: step === 'lab' ? section : (this.selections.lab || null),
-                isRequired: false,
-                lockedSections: new Set()
-            };
-
-            // Combine the temp selected course with all other selected courses for context
-            // This allows conflict detection to check against OTHER courses
-            const allCoursesForFiltering = [tempSelectedCourse, ...this.allSelectedCourses];
-
-            // Test if this section passes the filters
-            const filtered = this.scheduleFilterService?.filterSections(allCoursesForFiltering);
-            const passes = filtered ? filtered.some(item =>
-                item.section.crn === section.crn &&
-                item.course.course.id === this.course.id
-            ) : true;
-
-            return passes;
-        });
+        const filteredSections = sections.filter(section => passingSectionCrns.has(section.crn));
 
         return filteredSections;
     }
@@ -365,8 +317,8 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     protected onClose(): void {
         document.removeEventListener('keydown', this.handleWizardEscapeKey);
 
-        if (this.scheduleFilterService && this.filterChangeHandler) {
-            this.scheduleFilterService.removeEventListener(this.filterChangeHandler);
+        if (this.filterService && this.filterChangeHandler) {
+            this.filterService.removeEventListener(this.filterChangeHandler);
             this.filterChangeHandler = null;
         }
     }
@@ -394,17 +346,74 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      * Select a section for the current step
      */
     selectSection(section: Section): void {
+        // Toggle: if clicking the already-selected section, unselect it
+        if (this.selections[this.currentStep]?.crn === section.crn) {
+            this.selections[this.currentStep] = null;
+
+            // For lecture unselection, clear dependent discussion/lab and recompute steps
+            if (this.currentStep === 'lecture') {
+                this.selections.discussion = null;
+                this.selections.lab = null;
+                this.availableSteps = this.determineAvailableSteps();
+            }
+
+            // Update visual state: remove selected class and badge from the card
+            if (this.panel) {
+                const card = this.panel.querySelector(`.wizard-section-card[data-crn="${section.crn}"]`);
+                if (card) {
+                    card.classList.remove('selected');
+                    const badge = card.querySelector('.section-card-selected-badge');
+                    if (badge) badge.remove();
+                }
+
+                // Update footer: swap Next/Finish → Skip (or remove if last step)
+                const currentIndex = this.availableSteps.indexOf(this.currentStep);
+                const isLastStep = currentIndex === this.availableSteps.length - 1;
+                const nextBtn = this.panel.querySelector('#wizard-next-btn');
+                if (nextBtn) {
+                    nextBtn.remove();
+                    if (!isLastStep) {
+                        const footer = this.panel.querySelector('.wizard-footer');
+                        if (footer && !footer.querySelector('#wizard-skip-btn')) {
+                            footer.insertAdjacentHTML('beforeend',
+                                `<button class="wizard-btn wizard-btn-secondary" id="wizard-skip-btn">Skip</button>`
+                            );
+                            footer.querySelector('#wizard-skip-btn')?.addEventListener('click', () => this.nextStep());
+                        }
+                    }
+                }
+            }
+
+            if (this.onSelectionChange) this.onSelectionChange(this.selections);
+            return;
+        }
+
         // Get previous selection to check if we need to clear dependent selections
         const previousSelection = this.selections[this.currentStep];
 
         // Store selection
         if (this.currentStep === 'lecture') {
-            // Clear dependent selections if changing to a different lecture
             if (previousSelection && previousSelection.crn !== section.crn) {
                 this.selections.discussion = null;
                 this.selections.lab = null;
             }
             this.selections.lecture = section;
+
+            const newSteps = this.computeStepsForLecture(section);
+            const stepsChanged = newSteps.join(',') !== this.availableSteps.join(',');
+            this.availableSteps = newSteps;
+
+            if (stepsChanged) {
+                if (newSteps.length > 1) {
+                    if (this.onSelectionChange) this.onSelectionChange(this.selections);
+                    this.nextStep();
+                } else {
+                    this.rerender();
+                    this.panel?.querySelector('.wizard-step.active')?.classList.remove('slide-in-right');
+                    if (this.onSelectionChange) this.onSelectionChange(this.selections);
+                }
+                return;
+            }
         } else if (this.currentStep === 'discussion') {
             this.selections.discussion = section;
         } else if (this.currentStep === 'lab') {
@@ -621,11 +630,11 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      * Render filter status indicator
      */
     private renderFilterStatus(): string {
-        if (!this.scheduleFilterService || this.scheduleFilterService.isEmpty()) {
+        if (!this.filterService || this.filterService.isEmpty()) {
             return '';
         }
 
-        const activeFilters = this.scheduleFilterService.getActiveFilters();
+        const activeFilters = this.filterService.getActiveFilters();
         const filterDescriptions: string[] = [];
 
         activeFilters.forEach(filter => {
@@ -699,7 +708,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             lab: 'Lab'
         };
 
-        const breadcrumbs = this.availableSteps.map((step, index) => {
+        const breadcrumbs = this.availableSteps.map((step, _index) => {
             const isActive = step === this.currentStep;
             const isCompleted = this.selections[step] !== null;
 
@@ -726,14 +735,13 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      * Render the current step
      */
     private renderCurrentStep(): string {
-        const options = this.getOptionsForStep(this.currentStep);
+        const { filtered: options, totalBeforeFilter } = this.getOptionsWithFilterInfo(this.currentStep);
+        const hiddenCount = totalBeforeFilter - options.length;
 
         if (options.length === 0) {
             return `
-                <div class="wizard-step" data-step="${this.currentStep}">
-                    <div class="wizard-empty-state">
-                        <p>No ${this.currentStep}s available for this course.</p>
-                    </div>
+                <div class="wizard-step active slide-in-right" data-step="${this.currentStep}">
+                    ${this.renderFilteredOutNotice(hiddenCount)}
                 </div>
             `;
         }
@@ -764,6 +772,42 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             <div class="wizard-step active slide-in-right" data-step="${this.currentStep}">
                 <h3 class="wizard-step-title">${stepTitles[this.currentStep]}</h3>
                 ${sectionsHTML}
+                ${hiddenCount > 0 ? this.renderFilteredOutNotice(hiddenCount) : ''}
+            </div>
+        `;
+    }
+
+    private renderFilteredOutNotice(hiddenCount: number): string {
+        // Check for academic year mismatch
+        if (this.filterService && this.course.academicYear) {
+            const yearFilter = this.filterService.getActiveFilters().find(f => f.id === 'academicYear');
+            if (yearFilter) {
+                const filterYear = (yearFilter.criteria as AcademicYearFilterCriteria).year;
+                if (typeof filterYear === 'number' && filterYear !== this.course.academicYear) {
+                    const courseYear = this.course.academicYear;
+                    return `
+                        <div class="wizard-filtered-notice">
+                            <span class="wizard-filtered-notice-text">
+                                This course is from ${courseYear}–${courseYear + 1} but you're viewing ${filterYear}–${filterYear + 1}
+                            </span>
+                            <button class="wizard-filtered-notice-btn" id="wizard-switch-year-btn">
+                                Switch to ${courseYear}–${courseYear + 1}
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        const sectionWord = hiddenCount === 1 ? 'section' : 'sections';
+        return `
+            <div class="wizard-filtered-notice">
+                <span class="wizard-filtered-notice-text">
+                    ${hiddenCount} ${sectionWord} hidden by filters
+                </span>
+                <button class="wizard-filtered-notice-btn" id="wizard-clear-filters-btn">
+                    Clear Filters
+                </button>
             </div>
         `;
     }
@@ -980,6 +1024,22 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             });
         });
 
+        // Clear filters button
+        const clearFiltersBtn = this.panel.querySelector('#wizard-clear-filters-btn');
+        clearFiltersBtn?.addEventListener('click', () => {
+            if (this.filterService) {
+                this.filterService.clearFilters();
+            }
+        });
+
+        // Switch academic year button
+        const switchYearBtn = this.panel.querySelector('#wizard-switch-year-btn');
+        switchYearBtn?.addEventListener('click', () => {
+            if (this.filterService && this.course.academicYear) {
+                this.filterService.updateFilter('academicYear', { year: this.course.academicYear });
+            }
+        });
+
         // Section cards
         const sectionCards = this.panel.querySelectorAll('.wizard-section-card');
         sectionCards.forEach(card => {
@@ -1014,15 +1074,12 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     private showSectionPreview(section: Section): void {
         if (!this.onHoverPreview) return;
 
-        // Create temporary selections including existing selections AND the hovered section
-        // This ensures all components are visible, but only the new hover is marked as preview
-        const tempSelections: WizardSelections = {
-            lecture: this.currentStep === 'lecture' ? section : this.selections.lecture,
-            discussion: this.currentStep === 'discussion' ? section : this.selections.discussion,
-            lab: this.currentStep === 'lab' ? section : this.selections.lab
+        const tempSelections: ComponentSelections = {
+            lecture: this.currentStep === 'lecture' ? section : null,
+            discussion: this.currentStep === 'discussion' ? section : null,
+            lab: this.currentStep === 'lab' ? section : null
         };
 
-        // Trigger hover preview (renders with dashed borders for only the new section)
         this.onHoverPreview(tempSelections);
     }
 

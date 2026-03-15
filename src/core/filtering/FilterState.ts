@@ -7,7 +7,7 @@ export class FilterState {
     private activeFilters: Map<string, ActiveFilter> = new Map();
     private listeners: FilterEventListener[] = [];
     
-    addFilter(id: string, name: string, criteria: any, displayValue: string): void {
+    addFilter(id: string, name: string, criteria: unknown, displayValue: string): void {
         const filter: ActiveFilter = {
             id,
             name,
@@ -36,7 +36,7 @@ export class FilterState {
         return removed;
     }
     
-    updateFilter(id: string, criteria: any, displayValue: string): boolean {
+    updateFilter(id: string, criteria: unknown, displayValue: string): boolean {
         const existing = this.activeFilters.get(id);
         if (existing) {
             existing.criteria = criteria;
