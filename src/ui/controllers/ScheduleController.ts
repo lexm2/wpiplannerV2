@@ -871,12 +871,11 @@ export class ScheduleController implements CalendarEventProvider {
     private buildHoverCourse(selectedCourses: SelectedCourse[]): SelectedCourse | null {
         if (!this.wizardPreviewCourse || !this.hoverPreviewSelections) return null;
 
-        const clicked = this.wizardPreviewSelections;
         const hover = this.hoverPreviewSelections;
 
-        const lecture = hover.lecture?.crn !== clicked?.lecture?.crn ? hover.lecture : null;
-        const discussion = hover.discussion?.crn !== clicked?.discussion?.crn ? hover.discussion : null;
-        const lab = hover.lab?.crn !== clicked?.lab?.crn ? hover.lab : null;
+        const lecture = hover.lecture || null;
+        const discussion = hover.discussion || null;
+        const lab = hover.lab || null;
 
         if (!lecture && !discussion && !lab) return null;
 
@@ -1190,7 +1189,7 @@ export class ScheduleController implements CalendarEventProvider {
                      data-course-id="${occupyingSection.course.course.id}"
                      data-section-number="${occupyingSection.section.number}"
                      data-section-crn="${occupyingSection.section.crn}"
-                     style="${isPreview ? `border-color: ${courseColor};` : `background-color: ${courseColor};`} height: ${heightPercent}%; top: ${topOffsetPercent}%;">
+                     style="${isPreview ? `border-color: ${courseColor}; --preview-color: ${courseColor};` : `background-color: ${courseColor};`} height: ${heightPercent}%; top: ${topOffsetPercent}%;">
                     ${occupyingSection.course.course.departmentAbbr}${occupyingSection.course.course.number}
                 </div>
             `);

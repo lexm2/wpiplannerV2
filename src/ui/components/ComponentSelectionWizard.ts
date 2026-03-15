@@ -350,6 +350,48 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
      * Select a section for the current step
      */
     selectSection(section: Section): void {
+        // Toggle: if clicking the already-selected section, unselect it
+        if (this.selections[this.currentStep]?.crn === section.crn) {
+            this.selections[this.currentStep] = null;
+
+            // For lecture unselection, clear dependent discussion/lab and recompute steps
+            if (this.currentStep === 'lecture') {
+                this.selections.discussion = null;
+                this.selections.lab = null;
+                this.availableSteps = this.determineAvailableSteps();
+            }
+
+            // Update visual state: remove selected class and badge from the card
+            if (this.panel) {
+                const card = this.panel.querySelector(`.wizard-section-card[data-crn="${section.crn}"]`);
+                if (card) {
+                    card.classList.remove('selected');
+                    const badge = card.querySelector('.section-card-selected-badge');
+                    if (badge) badge.remove();
+                }
+
+                // Update footer: swap Next/Finish → Skip (or remove if last step)
+                const currentIndex = this.availableSteps.indexOf(this.currentStep);
+                const isLastStep = currentIndex === this.availableSteps.length - 1;
+                const nextBtn = this.panel.querySelector('#wizard-next-btn');
+                if (nextBtn) {
+                    nextBtn.remove();
+                    if (!isLastStep) {
+                        const footer = this.panel.querySelector('.wizard-footer');
+                        if (footer && !footer.querySelector('#wizard-skip-btn')) {
+                            footer.insertAdjacentHTML('beforeend',
+                                `<button class="wizard-btn wizard-btn-secondary" id="wizard-skip-btn">Skip</button>`
+                            );
+                            footer.querySelector('#wizard-skip-btn')?.addEventListener('click', () => this.nextStep());
+                        }
+                    }
+                }
+            }
+
+            if (this.onSelectionChange) this.onSelectionChange(this.selections);
+            return;
+        }
+
         // Get previous selection to check if we need to clear dependent selections
         const previousSelection = this.selections[this.currentStep];
 

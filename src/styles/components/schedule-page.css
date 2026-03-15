@@ -736,6 +736,7 @@
   z-index: 15;
   overflow: hidden;
   opacity: 0.8;
+  box-shadow: 0 0 8px 2px var(--preview-color, var(--color-primary));
   /* height and top set inline based on actual class duration */
 }
 
