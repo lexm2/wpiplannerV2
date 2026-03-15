@@ -3,12 +3,13 @@ import { FilterService } from '../../services/filtering/FilterService';
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
 import { Course, Department } from '../../types/types';
-import { AcademicTerm } from '../../types/schedule';
+import { AcademicTerm, WeeklyTimeSlot } from '../../types/schedule';
 import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
-import { SharedFilterSetup } from '../components/SharedFilterSetup';
-import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria } from '../../types/filters';
+import { SharedFilterSetup, FilterServiceLike } from '../components/SharedFilterSetup';
+import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria, WakeUpTimeFilterCriteria, ConflictCriteria } from '../../types/filters';
+import { DualRangeSlider } from '../components/DualRangeSlider';
 
 export class FilterModalController extends BaseModal {
     private filterService: FilterService | null = null;
@@ -391,12 +392,12 @@ export class FilterModalController extends BaseModal {
 
         // Get conflict filter state
         const conflictFilter = this.filterService.getActiveFilters().find(f => f.id === 'periodConflict');
-        const conflictCriteria = conflictFilter?.criteria as { avoidConflicts?: boolean; blockedSlots?: any[] } | undefined;
+        const conflictCriteria = conflictFilter?.criteria as ConflictCriteria | undefined;
         const avoidConflicts = conflictCriteria?.avoidConflicts || false;
 
         // Check if calendar events are currently blocked
         const blockedSlots = conflictCriteria?.blockedSlots || [];
-        const hasCalendarEvents = blockedSlots.some((slot: any) =>
+        const hasCalendarEvents = blockedSlots.some((slot: WeeklyTimeSlot) =>
             slot.id?.includes('calendar-') || slot.id?.match(/^[0-9a-f-]{36}/)
         );
         const localEventCount = this.autoScheduleOrchestrator?.getLocalEventCount() ?? 0;
@@ -479,7 +480,7 @@ export class FilterModalController extends BaseModal {
         if (!this.filterService) return '';
 
         const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'wakeUpTime');
-        const criteria = activeFilter?.criteria as any;
+        const criteria = activeFilter?.criteria as WakeUpTimeFilterCriteria | undefined;
         const activeWakeUpTime = criteria?.wakeUpTime || null;
         const timeValue = activeWakeUpTime
             ? `${String(activeWakeUpTime.hours).padStart(2, '0')}:${String(activeWakeUpTime.minutes).padStart(2, '0')}`
@@ -643,12 +644,12 @@ export class FilterModalController extends BaseModal {
         const selectNone = modalElement.querySelector('.filter-select-none[data-filter="department"]');
 
         selectAll?.addEventListener('click', () => {
-            checkboxes.forEach((cb: any) => cb.checked = true);
+            checkboxes.forEach((cb) => (cb as HTMLInputElement).checked = true);
             this.updateDepartmentFilter(modalElement);
         });
 
         selectNone?.addEventListener('click', () => {
-            checkboxes.forEach((cb: any) => cb.checked = false);
+            checkboxes.forEach((cb) => (cb as HTMLInputElement).checked = false);
             this.updateDepartmentFilter(modalElement);
         });
     }
@@ -714,7 +715,7 @@ export class FilterModalController extends BaseModal {
 
         SharedFilterSetup.setupProfessorFilter({
             modalElement,
-            filterService: this.filterService as any,
+            filterService: this.filterService as FilterServiceLike,
             idPrefix: '',
             filterId: 'professor',
             professors,
@@ -732,12 +733,12 @@ export class FilterModalController extends BaseModal {
     private setupRMPRatingFilter(modalElement: HTMLElement): void {
         if (!this.filterService) return;
 
-        const sliderRefs: { rating?: any, difficulty?: any, retake?: any } = {};
+        const sliderRefs: { rating?: DualRangeSlider, difficulty?: DualRangeSlider, retake?: DualRangeSlider } = {};
 
         SharedFilterSetup.setupRMPRatingFilter(
             {
                 modalElement,
-                filterService: this.filterService as any,
+                filterService: this.filterService as FilterServiceLike,
                 idPrefix: '',
                 filterId: 'rmpRating',
                 updatePreview: (element: HTMLElement) => this.updatePreview(element)
@@ -751,7 +752,7 @@ export class FilterModalController extends BaseModal {
 
         SharedFilterSetup.setupTermFilter({
             modalElement,
-            filterService: this.filterService as any,
+            filterService: this.filterService as FilterServiceLike,
             filterId: 'term',
             updateFilter: () => this.updateTermFilter(modalElement)
         });
@@ -821,11 +822,12 @@ export class FilterModalController extends BaseModal {
                     const checkboxes = modalElement.querySelector('#department-checkboxes');
                     if (checkboxes) {
                         const labels = checkboxes.querySelectorAll('.department-checkbox-label');
-                        labels.forEach((label: any) => {
+                        labels.forEach((labelEl) => {
+                            const label = labelEl as HTMLElement;
                             const checkbox = label.querySelector('input[type="checkbox"]') as HTMLInputElement;
                             const value = checkbox ? checkbox.value : '';
                             let matches = false;
-                            
+
                             if (this.isCategoryMode) {
                                 // In category mode, search category names directly
                                 matches = value.toLowerCase().includes(query);
@@ -833,7 +835,7 @@ export class FilterModalController extends BaseModal {
                                 // In individual mode, use the enhanced search (dept + category)
                                 matches = this.departmentMatchesSearch(value, query);
                             }
-                            
+
                             label.style.display = matches ? 'flex' : 'none';
                         });
                     }
@@ -1050,7 +1052,7 @@ export class FilterModalController extends BaseModal {
             const selectedCourses = this.courseSelectionService?.getSelectedCourses() || [];
             // Preserve existing calendar blocked slots
             const existingFilter = this.filterService?.getActiveFilters().find(f => f.id === 'periodConflict');
-            const existingSlots = (existingFilter?.criteria as any)?.blockedSlots || [];
+            const existingSlots = (existingFilter?.criteria as ConflictCriteria | undefined)?.blockedSlots || [];
             this.filterService?.addFilter('periodConflict', {
                 avoidConflicts: true,
                 selectedCourses: selectedCourses,
@@ -1059,7 +1061,7 @@ export class FilterModalController extends BaseModal {
         } else {
             // Preserve calendar blocked slots even when unchecking section conflicts
             const existingFilter = this.filterService?.getActiveFilters().find(f => f.id === 'periodConflict');
-            const existingSlots = (existingFilter?.criteria as any)?.blockedSlots || [];
+            const existingSlots = (existingFilter?.criteria as ConflictCriteria | undefined)?.blockedSlots || [];
             if (existingSlots.length > 0) {
                 this.filterService?.addFilter('periodConflict', {
                     avoidConflicts: false,
@@ -1076,14 +1078,14 @@ export class FilterModalController extends BaseModal {
         if (!this.autoScheduleOrchestrator) return;
 
         const existingFilter = this.filterService?.getActiveFilters().find(f => f.id === 'periodConflict');
-        const existingCriteria = existingFilter?.criteria as any;
-        const existingSlots: any[] = existingCriteria?.blockedSlots || [];
+        const existingCriteria = existingFilter?.criteria as ConflictCriteria | undefined;
+        const existingSlots: WeeklyTimeSlot[] = existingCriteria?.blockedSlots || [];
         const avoidConflicts = existingCriteria?.avoidConflicts || false;
         const selectedCourses = existingCriteria?.selectedCourses || this.courseSelectionService?.getSelectedCourses() || [];
 
         // Separate calendar slots from non-calendar slots
-        const isCalendarSlot = (slot: any) => slot.id?.includes('calendar-') || slot.id?.match(/^[0-9a-f-]{36}/);
-        const nonCalendarSlots = existingSlots.filter((slot: any) => !isCalendarSlot(slot));
+        const isCalendarSlot = (slot: WeeklyTimeSlot) => slot.id?.includes('calendar-') || slot.id?.match(/^[0-9a-f-]{36}/);
+        const nonCalendarSlots = existingSlots.filter((slot: WeeklyTimeSlot) => !isCalendarSlot(slot));
 
         if (checked) {
             const calendarSlots = this.autoScheduleOrchestrator.getAllCalendarBlockedTimes();

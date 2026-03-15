@@ -1,4 +1,5 @@
 import { DualRangeSlider } from './DualRangeSlider';
+import { RMPRatingFilterCriteria } from '../../types/filters';
 
 export interface FilterServiceLike {
     addFilter(filterId: string, criteria: unknown): boolean;
@@ -100,7 +101,7 @@ export class SharedFilterSetup {
             if (isDefaultRating && isDefaultDifficulty && isDefaultRetake && isDefaultInclude) {
                 filterService.removeFilter(filterId);
             } else {
-                const criteria: any = {
+                const criteria: RMPRatingFilterCriteria = {
                     minRating,
                     maxRating,
                     minDifficulty,

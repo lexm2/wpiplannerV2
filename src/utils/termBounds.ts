@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { DateRange } from '../types/common';
 
 export interface TermBoundInfo {
     startDate: string;
@@ -72,7 +73,7 @@ export class TermBoundsService {
         }
     }
 
-    public getTermDates(termLetter: 'A' | 'B' | 'C' | 'D', year?: number): { start: Date, end: Date } | null {
+    public getTermDates(termLetter: 'A' | 'B' | 'C' | 'D', year?: number): DateRange | null {
         if (!this.termBoundsCache) return null;
         const fallYear = year ?? Math.max(...Object.keys(this.termBoundsCache.years).map(Number));
         const yearBounds = this.termBoundsCache.years[fallYear];

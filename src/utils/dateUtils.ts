@@ -1,4 +1,5 @@
 import { SimpleTime } from '../types/types';
+import type { DateRange } from '../types/common';
 
 export class DateUtils {
     private static readonly AUGUST_MONTH = 7;
@@ -43,7 +44,7 @@ export class DateUtils {
         }
     }
 
-    static getSemesterDateRange(year: number, semester: 'fall' | 'spring' | 'summer'): { start: Date; end: Date } {
+    static getSemesterDateRange(year: number, semester: 'fall' | 'spring' | 'summer'): DateRange {
         switch (semester) {
             case 'fall':
                 return {

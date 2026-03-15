@@ -1,4 +1,5 @@
 import { Course, Department, Section } from '../../types/types'
+import { SelectedCourse } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { FilterService } from '../../services/filtering/FilterService'
 import { CourseDataService } from '../../services/data/courseDataService'
@@ -415,7 +416,7 @@ export class CourseController {
      * @param selectedCourses Array of currently selected courses
      * @param previousSelections Map of previously selected course IDs
      */
-    refreshCourseSelectionUI(selectedCourses: any[], previousSelections: Map<string, any>): void {
+    refreshCourseSelectionUI(selectedCourses: SelectedCourse[], previousSelections: Map<string, unknown>): void {
         const currentIds = new Set(selectedCourses.map(sc => sc.course.id));
         const previousIds = new Set(previousSelections.keys());
         

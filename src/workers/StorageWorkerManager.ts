@@ -1,6 +1,11 @@
 import type { WorkerRequest, WorkerResponse, WorkerTaskType } from './protocol';
 import LZString from 'lz-string';
 
+interface PendingTask {
+  resolve: (value: unknown) => void;
+  reject: (reason: Error) => void;
+}
+
 /**
  * Manages the storage web worker for off-thread compression/decompression.
  * Falls back to main-thread execution if workers are unavailable.
@@ -8,10 +13,7 @@ import LZString from 'lz-string';
 export class StorageWorkerManager {
   private static instance: StorageWorkerManager | null = null;
   private worker: Worker | null = null;
-  private pendingTasks: Map<string, {
-    resolve: (value: any) => void;
-    reject: (error: Error) => void;
-  }> = new Map();
+  private pendingTasks: Map<string, PendingTask> = new Map();
   private fallbackMode = false;
   private taskCounter = 0;
 
@@ -67,7 +69,7 @@ export class StorageWorkerManager {
     }
   }
 
-  async executeTask<T>(type: WorkerTaskType, payload: any): Promise<T> {
+  async executeTask<T>(type: WorkerTaskType, payload: unknown): Promise<T> {
     if (this.fallbackMode || !this.worker) {
       return this.executeFallback<T>(type, payload);
     }
@@ -81,7 +83,7 @@ export class StorageWorkerManager {
     };
 
     return new Promise((resolve, reject) => {
-      this.pendingTasks.set(taskId, { resolve, reject });
+      this.pendingTasks.set(taskId, { resolve: resolve as (value: unknown) => void, reject });
       this.worker!.postMessage(request);
 
       setTimeout(() => {
@@ -93,15 +95,16 @@ export class StorageWorkerManager {
     });
   }
 
-  private async executeFallback<T>(type: WorkerTaskType, payload: any): Promise<T> {
+  private async executeFallback<T>(type: WorkerTaskType, payload: unknown): Promise<T> {
+    const typedPayload = payload as { data?: unknown; compressed?: string };
     switch (type) {
       case 'compress_data': {
-        const serialized = JSON.stringify(payload.data);
+        const serialized = JSON.stringify(typedPayload.data);
         return LZString.compress(serialized) as T;
       }
 
       case 'decompress_data': {
-        const decompressed = LZString.decompress(payload.compressed);
+        const decompressed = LZString.decompress(typedPayload.compressed!);
         return JSON.parse(decompressed || 'null') as T;
       }
 

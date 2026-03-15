@@ -22,10 +22,12 @@ export class TermFilter implements SectionBasedFilter {
         });
     }
     
-    isValidCriteria(criteria: any): criteria is TermFilterCriteria {
-        return criteria && 
-               Array.isArray(criteria.terms) &&
-               criteria.terms.every((term: any) => typeof term === 'string');
+    isValidCriteria(criteria: unknown): criteria is TermFilterCriteria {
+        return !!(criteria &&
+               typeof criteria === 'object' &&
+               'terms' in criteria &&
+               Array.isArray((criteria as TermFilterCriteria).terms) &&
+               (criteria as TermFilterCriteria).terms.every((term: unknown) => typeof term === 'string'));
     }
     
     getDisplayValue(criteria: TermFilterCriteria): string {

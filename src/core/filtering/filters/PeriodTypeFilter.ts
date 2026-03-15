@@ -28,13 +28,13 @@ export class PeriodTypeFilter implements SectionBasedFilter {
         );
     }
 
-    isValidCriteria(criteria: any): criteria is PeriodTypeFilterCriteria {
+    isValidCriteria(criteria: unknown): criteria is PeriodTypeFilterCriteria {
         return !!(
             criteria &&
             typeof criteria === 'object' &&
             'types' in criteria &&
-            Array.isArray(criteria.types) &&
-            criteria.types.every((t: any) => typeof t === 'string')
+            Array.isArray((criteria as PeriodTypeFilterCriteria).types) &&
+            (criteria as PeriodTypeFilterCriteria).types.every((t: unknown) => typeof t === 'string')
         );
     }
 

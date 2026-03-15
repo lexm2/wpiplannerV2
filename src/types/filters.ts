@@ -107,27 +107,13 @@ export interface PeriodDaysFilterCriteria {
     days: DayOfWeek[];
 }
 
-export interface PeriodProfessorFilterCriteria {
-    professors: string[];
-}
-
-export interface PeriodTermFilterCriteria {
-    terms: AcademicTerm[];
-}
-
-export interface PeriodAvailabilityFilterCriteria {
-    availableOnly: boolean;
-    minAvailable?: number;
-}
-
-export interface PeriodConflictFilterCriteria {
-    avoidConflicts: boolean;
-    selectedCourses?: SelectedCourse[]; // Array of SelectedCourse objects for context-aware conflict detection
-}
-
 export interface ConflictFilterCriteria {
     avoidConflicts: boolean;
     blockedSlots: WeeklyTimeSlot[];
+}
+
+export interface ConflictCriteria extends ConflictFilterCriteria {
+    selectedCourses?: SelectedCourse[];
 }
 
 export interface SectionCodeFilterCriteria {
@@ -149,13 +135,7 @@ export interface BookmarkFilterCriteria {
 }
 
 export interface BlockedTimesFilterCriteria {
-    blockedTimes: Array<{
-        id: string;
-        day: DayOfWeek;
-        startTime: SimpleTime;
-        endTime: SimpleTime;
-        term: AcademicTerm;
-    }>;
+    blockedTimes: WeeklyTimeSlot[];
 }
 
 export interface WakeUpTimeFilterCriteria {

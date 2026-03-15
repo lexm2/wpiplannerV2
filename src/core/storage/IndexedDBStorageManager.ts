@@ -209,14 +209,15 @@ export class IndexedDBStorageManager {
 
                 request.onsuccess = () => {
                     const results = request.result || [];
-                    const deserialized = results.map((stored: any) => {
+                    const deserialized = results.map((stored: Record<string, unknown>) => {
                         if (stored.serializedData) {
                             // Handle both compressed and legacy uncompressed data
+                            const serialized = stored.serializedData as string;
                             const json = stored.compressed
-                                ? LZString.decompress(stored.serializedData)
-                                : stored.serializedData;
+                                ? LZString.decompress(serialized)
+                                : serialized;
 
-                            return JSON.parse(json || stored.serializedData, setReviver);
+                            return JSON.parse(json || serialized, setReviver);
                         }
                         return stored;
                     });

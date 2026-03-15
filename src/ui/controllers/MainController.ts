@@ -9,16 +9,17 @@ import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
-import { getInlineSVG } from '../../utils/iconPaths'
+import { getInlineSVG, type IconName } from '../../utils/iconPaths'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
 import { DeviceDetection } from '../../utils/deviceDetection'
-import { DebouncedOperation } from '../../utils/RequestCancellation'
+import { DebouncedOperation, CancellationToken } from '../../utils/RequestCancellation'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator'
 import { AppBootstrap } from '../../bootstrap/AppBootstrap'
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer'
 import type { ModalService } from '../../services/ui/ModalService'
+import type { SelectionSnapshot } from '../../types/scheduling'
 
 /**
  * UI controller managing DOM event binding, view refreshing, and sub-controller coordination
@@ -901,7 +902,7 @@ export class MainController {
         this.syncSearchInputFromFilters();
     }
     
-    private async displayCoursesWithCancellation(coursesToDisplay: Course[], cancellationToken: any): Promise<void> {
+    private async displayCoursesWithCancellation(coursesToDisplay: Course[], cancellationToken: CancellationToken): Promise<void> {
         try {
             // Pass cancellation token to the progressive renderer
             await this.courseController.displayCoursesWithCancellation(
@@ -1027,7 +1028,7 @@ export class MainController {
 
 
     private previousSelectedCoursesCount = 0;
-    private previousSelectedCoursesMap = new Map<string, { lecture: string | null; discussion: string | null; lab: string | null }>();
+    private previousSelectedCoursesMap = new Map<string, SelectionSnapshot>();
 
     private setupScheduleChangeListener(): void {
         this.services.scheduleManagementService.onActiveScheduleChange((_activeSchedule, event) => {
@@ -1093,7 +1094,7 @@ export class MainController {
             }
             
             // Create current state map for comparison
-            const currentCoursesMap = new Map<string, { lecture: string | null; discussion: string | null; lab: string | null }>();
+            const currentCoursesMap = new Map<string, SelectionSnapshot>();
             selectedCourses.forEach(sc => {
                 currentCoursesMap.set(sc.course.id, {
                     lecture: sc.selectedLecture?.number || null,
@@ -1276,7 +1277,7 @@ export class MainController {
             if (item.id) menuItem.id = item.id;
 
             // Add icon
-            menuItem.insertAdjacentHTML('afterbegin', getInlineSVG(item.icon as any, 'menu-item-icon'));
+            menuItem.insertAdjacentHTML('afterbegin', getInlineSVG(item.icon as IconName, 'menu-item-icon'));
 
             // Add label
             const label = document.createElement('span');

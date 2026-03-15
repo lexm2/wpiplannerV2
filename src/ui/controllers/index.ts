@@ -1,4 +1,3 @@
-export type { InfoModalType } from './InfoModalController';
 export { InfoModalController } from './InfoModalController';
 export type { SectionData } from './SectionInfoModalController';
 export { SectionInfoModalController } from './SectionInfoModalController';

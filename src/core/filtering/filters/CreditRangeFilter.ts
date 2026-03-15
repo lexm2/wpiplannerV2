@@ -15,12 +15,13 @@ export class CreditRangeFilter implements SectionBasedFilter {
         });
     }
     
-    isValidCriteria(criteria: any): criteria is CreditRangeFilterCriteria {
-        return criteria && 
-               typeof criteria.min === 'number' &&
-               typeof criteria.max === 'number' &&
-               criteria.min >= 0 &&
-               criteria.max >= criteria.min;
+    isValidCriteria(criteria: unknown): criteria is CreditRangeFilterCriteria {
+        if (!criteria || typeof criteria !== 'object') return false;
+        const c = criteria as Record<string, unknown>;
+        return typeof c.min === 'number' &&
+               typeof c.max === 'number' &&
+               c.min >= 0 &&
+               c.max >= c.min;
     }
     
     getDisplayValue(criteria: CreditRangeFilterCriteria): string {

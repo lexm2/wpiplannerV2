@@ -1,11 +1,12 @@
 import { Course } from '../../types/types';
-import { FilterEventListener, ActiveFilter, BookmarkFilterCriteria } from '../../types/filters';
+import { FilterEventListener, ActiveFilter, BookmarkFilterCriteria, SearchTextFilterCriteria } from '../../types/filters';
 import { FilterState } from '../../core/filtering/FilterState';
 import { rankCoursesByRelevance, getAvailableProfessors } from '../../utils/searchUtils';
 import { SectionFilterPipeline, SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import { FilterableSection } from '../../types/filterableUnit';
 import { getAllSections } from '../../utils/courseUtils';
+import type { FilterOption } from '../../types/common';
 
 export class FilterService {
     private filterState: FilterState;
@@ -48,10 +49,11 @@ export class FilterService {
     }
 
     // Filter State Management
-    addFilter(filterId: string, criteria: any): boolean {
+    addFilter(filterId: string, criteria: unknown): boolean {
         // Handle bookmark filter specially (course-level, not in pipeline)
         if (filterId === 'bookmark') {
-            const displayValue = criteria.showBookmarkedOnly ? 'Bookmarked Only' : 'All Courses';
+            const bookmarkCriteria = criteria as BookmarkFilterCriteria;
+            const displayValue = bookmarkCriteria.showBookmarkedOnly ? 'Bookmarked Only' : 'All Courses';
             this.filterState.addFilter(filterId, 'Bookmarks', criteria, displayValue);
             return true;
         }
@@ -72,9 +74,10 @@ export class FilterService {
         return true;
     }
 
-    updateFilter(filterId: string, criteria: any): boolean {
+    updateFilter(filterId: string, criteria: unknown): boolean {
         if (filterId === 'bookmark') {
-            const displayValue = criteria.showBookmarkedOnly ? 'Bookmarked Only' : 'All Courses';
+            const bookmarkCriteria = criteria as BookmarkFilterCriteria;
+            const displayValue = bookmarkCriteria.showBookmarkedOnly ? 'Bookmarked Only' : 'All Courses';
             return this.filterState.updateFilter(filterId, criteria, displayValue);
         }
 
@@ -99,7 +102,7 @@ export class FilterService {
         this.filterState.clearFilters();
     }
 
-    toggleFilter(filterId: string, criteria: any): boolean {
+    toggleFilter(filterId: string, criteria: unknown): boolean {
         if (this.hasFilter(filterId)) {
             return this.removeFilter(filterId);
         } else {
@@ -188,7 +191,7 @@ export class FilterService {
         }
 
         // Apply search text ranking (reorder by relevance)
-        const searchCriteria = criteriaMap.get('searchText');
+        const searchCriteria = criteriaMap.get('searchText') as SearchTextFilterCriteria | undefined;
         if (searchCriteria && searchCriteria.query) {
             filteredCourses = rankCoursesByRelevance(filteredCourses, searchCriteria.query);
         }
@@ -214,7 +217,7 @@ export class FilterService {
     }
 
     // Filter options for UI
-    getFilterOptions(filterId: string, courses: Course[]): any {
+    getFilterOptions(filterId: string, courses: Course[]): string[] | FilterOption[] | null {
         switch (filterId) {
             case 'department':
                 return this.getDepartmentOptions(courses);
@@ -237,8 +240,8 @@ export class FilterService {
         }
     }
 
-    private getCriteriaMap(): Map<string, any> {
-        const criteriaMap = new Map<string, any>();
+    private getCriteriaMap(): Map<string, unknown> {
+        const criteriaMap = new Map<string, unknown>();
         const activeFilters = this.getActiveFilters();
         for (const filter of activeFilters) {
             criteriaMap.set(filter.id, filter.criteria);
@@ -269,7 +272,7 @@ export class FilterService {
         return Array.from(terms).sort();
     }
 
-    private getSectionCodeOptions(courses: Course[]): { value: string; label: string }[] {
+    private getSectionCodeOptions(courses: Course[]): FilterOption[] {
         const sectionCodes = new Set<string>();
         courses.forEach(course => {
             const sections = getAllSections(course);

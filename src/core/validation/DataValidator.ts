@@ -2,6 +2,7 @@
  * Validates course data integrity and format consistency
  */
 import { Schedule, SelectedCourse } from '../../types/schedule'
+import type { Course } from '../../types/types'
 import { getAllSections } from '../../utils/courseUtils'
 
 export interface ValidationResult {
@@ -83,7 +84,7 @@ export class DataValidator {
 
         // Auto-repair missing fields if requested
         if (options.repairInPlace && result.valid) {
-            this.repairSchedule(scheduleObj as any as Schedule);
+            this.repairSchedule(scheduleObj as unknown as Schedule);
         }
 
         return result;
@@ -202,7 +203,7 @@ export class DataValidator {
         this.validateRequiredField(courseObj, 'departmentName', 'string', result);
 
         // Validate sections (hierarchical structure)
-        const allSections = getAllSections(courseObj as any);
+        const allSections = getAllSections(courseObj as unknown as Course);
         if (allSections.length === 0) {
             result.warnings.push({
                 field: 'sections',

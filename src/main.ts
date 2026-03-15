@@ -14,4 +14,9 @@ if (DeviceDetection.isMobilePhone()) {
 }
 
 // Expose main controller globally for development/testing
-(window as any).mainController = mainController;
+declare global {
+    interface Window {
+        mainController: MainController;
+    }
+}
+window.mainController = mainController;

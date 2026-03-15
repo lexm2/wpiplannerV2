@@ -9,16 +9,28 @@ export interface SectionBasedFilter {
     readonly description: string;
     readonly priority: number;
 
-    apply(sections: FilterableSection[], criteria: any, activeFilters?: Map<string, any>): FilterableSection[];
-    isValidCriteria(criteria: any): boolean;
-    getDisplayValue(criteria: any): string;
+    apply(sections: FilterableSection[], criteria: unknown, activeFilters?: Map<string, unknown>): FilterableSection[];
+    isValidCriteria(criteria: unknown): boolean;
+    getDisplayValue(criteria: unknown): string;
 }
 
 type ActiveSectionFilter = {
     id: string;
     filter: SectionBasedFilter;
-    criteria: any;
+    criteria: unknown;
 };
+
+interface ReconstructedLectureGroup {
+    section: Section;
+    discussions: Section[];
+    labs: Section[];
+}
+
+interface ReconstructedCourse {
+    course: Course;
+    lectureGroups: Map<string, ReconstructedLectureGroup>;
+    standaloneLabs: Section[];
+}
 
 export class SectionFilterPipeline {
     private registeredFilters = new Map<string, SectionBasedFilter>();
@@ -81,15 +93,7 @@ export class SectionFilterPipeline {
     reconstructCourses(filteredSections: FilterableSection[]): Course[] {
         // Track which lecture CRNs actually survived filtering
         const survivingLectureCrns = new Set<string>();
-        const courseMap = new Map<string, {
-            course: Course,
-            lectureGroups: Map<string, {
-                section: Section,
-                discussions: Section[],
-                labs: Section[]
-            }>,
-            standaloneLabs: Section[]
-        }>();
+        const courseMap = new Map<string, ReconstructedCourse>();
 
         for (const fs of filteredSections) {
             const courseId = fs.course.id;
@@ -214,7 +218,7 @@ export class SectionFilterPipeline {
 
     applyFilters(
         sections: FilterableSection[],
-        activeFilters: Map<string, any>
+        activeFilters: Map<string, unknown>
     ): FilterableSection[] {
         const filtersToApply: ActiveSectionFilter[] = [];
 
@@ -243,7 +247,7 @@ export class SectionFilterPipeline {
 
     filterCourses(
         courses: Course[],
-        activeFilters: Map<string, any>
+        activeFilters: Map<string, unknown>
     ): Course[] {
         const sections = this.flattenCoursesToSections(courses);
         const filteredSections = this.applyFilters(sections, activeFilters);

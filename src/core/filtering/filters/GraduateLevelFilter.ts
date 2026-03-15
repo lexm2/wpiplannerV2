@@ -26,11 +26,10 @@ export class GraduateLevelFilter implements SectionBasedFilter {
         });
     }
 
-    isValidCriteria(criteria: any): criteria is GraduateLevelFilterCriteria {
-        return criteria &&
-               typeof criteria === 'object' &&
-               'level' in criteria &&
-               ['all', 'undergraduate', 'graduate'].includes(criteria.level);
+    isValidCriteria(criteria: unknown): criteria is GraduateLevelFilterCriteria {
+        if (!criteria || typeof criteria !== 'object' || !('level' in criteria)) return false;
+        const c = criteria as Record<string, unknown>;
+        return typeof c.level === 'string' && ['all', 'undergraduate', 'graduate'].includes(c.level);
     }
 
     getDisplayValue(criteria: GraduateLevelFilterCriteria): string {

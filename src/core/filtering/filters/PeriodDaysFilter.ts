@@ -24,12 +24,12 @@ export class PeriodDaysFilter implements SectionBasedFilter {
         });
     }
 
-    isValidCriteria(criteria: any): criteria is PeriodDaysFilterCriteria {
+    isValidCriteria(criteria: unknown): criteria is PeriodDaysFilterCriteria {
         return !!(criteria &&
                  typeof criteria === 'object' &&
                  'days' in criteria &&
-                 Array.isArray(criteria.days) &&
-                 criteria.days.every((day: any) => typeof day === 'string'));
+                 Array.isArray((criteria as PeriodDaysFilterCriteria).days) &&
+                 (criteria as PeriodDaysFilterCriteria).days.every((day: unknown) => typeof day === 'string'));
     }
 
     getDisplayValue(criteria: PeriodDaysFilterCriteria): string {

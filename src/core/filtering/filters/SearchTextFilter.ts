@@ -60,7 +60,7 @@ export class SearchTextFilter implements SectionBasedFilter {
         });
     }
 
-    isValidCriteria(criteria: any): criteria is SearchTextFilterCriteria {
+    isValidCriteria(criteria: unknown): criteria is SearchTextFilterCriteria {
         return !!(criteria &&
                typeof criteria === 'object' &&
                'query' in criteria &&

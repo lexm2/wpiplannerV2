@@ -8,12 +8,12 @@ export class AvailabilityFilter implements SectionBasedFilter {
     readonly description = 'Show only courses with available seats';
     readonly priority = 50;
 
-    apply(sections: FilterableSection[], criteria: AvailabilityFilterCriteria, activeFilters?: Map<string, any>): FilterableSection[] {
+    apply(sections: FilterableSection[], criteria: AvailabilityFilterCriteria, activeFilters?: Map<string, unknown>): FilterableSection[] {
         if (!criteria.availableOnly && !criteria.minAvailable) {
             return sections;
         }
 
-        const termCriteria = activeFilters?.get('term');
+        const termCriteria = activeFilters?.get('term') as { terms?: string[] } | undefined;
         const activeTerms = termCriteria?.terms
             ? new Set(termCriteria.terms.map((t: string) => t.toUpperCase()))
             : null;
@@ -37,11 +37,13 @@ export class AvailabilityFilter implements SectionBasedFilter {
         });
     }
     
-    isValidCriteria(criteria: any): criteria is AvailabilityFilterCriteria {
-        if (!criteria || typeof criteria.availableOnly !== 'boolean') {
+    isValidCriteria(criteria: unknown): criteria is AvailabilityFilterCriteria {
+        if (!criteria || typeof criteria !== 'object') return false;
+        const c = criteria as Record<string, unknown>;
+        if (typeof c.availableOnly !== 'boolean') {
             return false;
         }
-        if (criteria.minAvailable !== undefined && typeof criteria.minAvailable !== 'number') {
+        if (c.minAvailable !== undefined && typeof c.minAvailable !== 'number') {
             return false;
         }
         return true;

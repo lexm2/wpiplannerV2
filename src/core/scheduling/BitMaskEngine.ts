@@ -34,14 +34,16 @@ export interface SectionMask {
   term: string;
 }
 
+export interface MaskCombination {
+  lecture: SectionMask | null;
+  discussion: SectionMask | null;
+  lab: SectionMask | null;
+  combinedMask: bigint;
+}
+
 export interface CourseMasks {
   courseId: string;
-  combinations: Array<{
-    lecture: SectionMask | null;
-    discussion: SectionMask | null;
-    lab: SectionMask | null;
-    combinedMask: bigint;
-  }>;
+  combinations: MaskCombination[];
 }
 
 function timeToSlot(hours: number, minutes: number): number {

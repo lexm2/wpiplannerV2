@@ -1,6 +1,7 @@
 import { Course, Department, Section } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
-import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../../core/state/ProfileStateManager'
+import type { ComponentSelections, CourseComponentSelections } from '../../types/scheduling'
+import { ProfileStateManager, StateChangeEvent, StateChangeListener, ScheduleChangedData } from '../../core/state/ProfileStateManager'
 import { DataValidator } from '../../core/validation/DataValidator'
 import { Validators } from '../../utils/validators'
 
@@ -390,12 +391,7 @@ export class CourseSelectionService {
      * This is optimized for auto-scheduler to avoid triggering listeners on each update
      */
     async batchSetSelectedComponents(
-        selections: Array<{
-            course: Course;
-            lecture: Section | null;
-            discussion: Section | null;
-            lab: Section | null;
-        }>,
+        selections: CourseComponentSelections[],
         skipSnapshot = false
     ): Promise<CourseSelectionResult> {
         await this.ensureInitialized();
@@ -474,11 +470,7 @@ export class CourseSelectionService {
     /**
      * Get the currently selected components for a course
      */
-    getSelectedComponents(course: Course): {
-        lecture: Section | null;
-        discussion: Section | null;
-        lab: Section | null;
-    } {
+    getSelectedComponents(course: Course): ComponentSelections {
         if (!this.isInitialized) {
             return { lecture: null, discussion: null, lab: null };
         }
@@ -812,10 +804,10 @@ export class CourseSelectionService {
             await this.ensureInitialized();
             this.profileStateManager.save();
             return { success: true };
-        } catch (error: any) {
+        } catch (error: unknown) {
             return {
                 success: false,
-                error: error?.message || `Save failed: ${error}`
+                error: error instanceof Error ? error.message : String(error)
             };
         }
     }
@@ -899,9 +891,10 @@ export class CourseSelectionService {
                         });
                     }, 10);
                     break;
-                case 'schedule_changed':
+                case 'schedule_changed': {
                     // Handle imported data - trigger complete UI refresh
-                    if (event.data?.action === 'imported') {
+                    const scheduleData = event.data as ScheduleChangedData;
+                    if (scheduleData?.action === 'imported') {
                         const importedCourses = this.profileStateManager.getSelectedCourses();
 
                         // Clear and reload pattern for complete sync
@@ -920,6 +913,7 @@ export class CourseSelectionService {
                         }, 10);
                     }
                     break;
+                }
             }
         };
 

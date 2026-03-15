@@ -13,8 +13,10 @@ export class AcademicYearFilter implements SectionBasedFilter {
         return sections.filter(fs => fs.course.academicYear === criteria.year);
     }
 
-    isValidCriteria(criteria: any): criteria is AcademicYearFilterCriteria {
-        return criteria && typeof criteria === 'object' && 'year' in criteria;
+    isValidCriteria(criteria: unknown): criteria is AcademicYearFilterCriteria {
+        if (!criteria || typeof criteria !== 'object' || !('year' in criteria)) return false;
+        const c = criteria as Record<string, unknown>;
+        return c.year === 'all' || typeof c.year === 'number';
     }
 
     getDisplayValue(criteria: AcademicYearFilterCriteria): string {

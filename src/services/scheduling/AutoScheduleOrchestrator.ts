@@ -1,5 +1,7 @@
 import { SelectedCourse } from '../../types/schedule'
 import type { AutoScheduleSettings, WeeklyTimeSlot } from '../../types/schedule'
+import type { Course, Section } from '../../types/types'
+import type { CourseComponentSelections } from '../../types/scheduling'
 import { CourseSelectionService } from '../selection/CourseSelectionService'
 import { FilterService } from '../filtering/FilterService'
 import { AutoScheduler, type ScheduleResult } from './AutoScheduler'
@@ -152,12 +154,7 @@ export class AutoScheduleOrchestrator {
 
         this.isApplyingAutoSchedule = true;
         try {
-            const selections: Array<{
-                course: any;
-                lecture: any;
-                discussion: any;
-                lab: any;
-            }> = [];
+            const selections: CourseComponentSelections[] = [];
 
             for (const result of schedule) {
                 if (result.isLocked) {

@@ -4,6 +4,7 @@
 import { Course, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
 import { AcademicYearFilterCriteria } from '../../types/filters';
+import type { ComponentSelections } from '../../types/scheduling';
 import { CourseDataService } from '../../services/data/courseDataService';
 import { FilterService } from '../../services/filtering/FilterService';
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
@@ -14,12 +15,6 @@ import { BaseSidebarPanel } from '../sidebar/BaseSidebarPanel';
 import '../../styles/components/component-wizard.css';
 
 type WizardStep = 'lecture' | 'discussion' | 'lab';
-
-interface WizardSelections {
-    lecture: Section | null;
-    discussion: Section | null;
-    lab: Section | null;
-}
 
 /**
  * Sidebar wizard for selecting course components.
@@ -32,11 +27,11 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     private courseDataService: CourseDataService;
     private filterService: FilterService | null;
     private currentStep: WizardStep;
-    private selections: WizardSelections;
-    private onComplete: (selections: WizardSelections) => void;
+    private selections: ComponentSelections;
+    private onComplete: (selections: ComponentSelections) => void;
     private onCancel: () => void;
-    private onSelectionChange?: (selections: WizardSelections) => void;
-    private onHoverPreview?: (selections: WizardSelections) => void;
+    private onSelectionChange?: (selections: ComponentSelections) => void;
+    private onHoverPreview?: (selections: ComponentSelections) => void;
     private availableSteps: WizardStep[] = [];
     private filterChangeHandler: (() => void) | null = null;
     private allSelectedCourses: SelectedCourse[] = [];
@@ -44,13 +39,13 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     constructor(
         course: Course,
         courseDataService: CourseDataService,
-        onComplete: (selections: WizardSelections) => void,
+        onComplete: (selections: ComponentSelections) => void,
         onCancel: () => void,
         existingSelections?: SelectedCourse,
-        onSelectionChange?: (selections: WizardSelections) => void,
+        onSelectionChange?: (selections: ComponentSelections) => void,
         filterService?: FilterService,
         allSelectedCourses?: SelectedCourse[],
-        onHoverPreview?: (selections: WizardSelections) => void
+        onHoverPreview?: (selections: ComponentSelections) => void
     ) {
         // Initialize base panel with animated list support
         super({
@@ -1079,7 +1074,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     private showSectionPreview(section: Section): void {
         if (!this.onHoverPreview) return;
 
-        const tempSelections: WizardSelections = {
+        const tempSelections: ComponentSelections = {
             lecture: this.currentStep === 'lecture' ? section : null,
             discussion: this.currentStep === 'discussion' ? section : null,
             lab: this.currentStep === 'lab' ? section : null

@@ -1,15 +1,11 @@
 import { Period, Section } from '../../../types/types';
 import { SelectedCourse, AcademicTerm, WeeklyTimeSlot } from '../../../types/schedule';
-import { ConflictFilterCriteria } from '../../../types/filters';
+import { ConflictFilterCriteria, ConflictCriteria } from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { FilterableSection } from '../../../types/filterableUnit';
 import { logger } from '../../../utils/logger';
 import { periodToWeeklySlots, sectionToWeeklySlots, slotsOverlap } from '../../../utils/timeSlotUtils';
 import { weeklySlotToMask } from '../../scheduling/BitMaskEngine';
-
-export interface ConflictCriteria extends ConflictFilterCriteria {
-    selectedCourses?: SelectedCourse[];
-}
 
 export class ConflictFilter implements SectionBasedFilter {
     readonly id = 'periodConflict';
@@ -19,8 +15,8 @@ export class ConflictFilter implements SectionBasedFilter {
 
     private blockedMasksByTerm: Map<string, bigint> = new Map();
 
-    apply(sections: FilterableSection[], criteria: any, _activeFilters?: Map<string, any>): FilterableSection[] {
-        return this.applyToFilterableSections(sections, criteria);
+    apply(sections: FilterableSection[], criteria: unknown, _activeFilters?: Map<string, unknown>): FilterableSection[] {
+        return this.applyToFilterableSections(sections, criteria as ConflictCriteria);
     }
 
     private applyToFilterableSections(sections: FilterableSection[], criteria: ConflictCriteria): FilterableSection[] {
@@ -232,16 +228,18 @@ export class ConflictFilter implements SectionBasedFilter {
         return slotsOverlap(slot1, slot2);
     }
 
-    isValidCriteria(criteria: any): boolean {
+    isValidCriteria(criteria: unknown): boolean {
         if (!criteria || typeof criteria !== 'object') {
             return false;
         }
-        return typeof criteria.avoidConflicts === 'boolean';
+        return typeof (criteria as Record<string, unknown>).avoidConflicts === 'boolean';
     }
 
-    getDisplayValue(criteria: any): string {
-        if (criteria && criteria.avoidConflicts) {
-            const blockedSlots = this.getBlockedSlots(criteria);
+    getDisplayValue(criteria: unknown): string {
+        if (!criteria || typeof criteria !== 'object') return 'Conflicts allowed';
+        const c = criteria as ConflictCriteria;
+        if (c.avoidConflicts) {
+            const blockedSlots = this.getBlockedSlots(c);
             if (blockedSlots.length > 0) {
                 return `Avoiding conflicts (${blockedSlots.length} blocked slots)`;
             }

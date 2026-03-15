@@ -143,7 +143,7 @@ export class DebouncedOperation {
 
 // Utility functions for promise-based cancellation
 export function createCancellablePromise<T>(
-    executor: (resolve: (value: T) => void, reject: (reason?: any) => void, cancellationToken: CancellationToken) => void,
+    executor: (resolve: (value: T) => void, reject: (reason?: unknown) => void, cancellationToken: CancellationToken) => void,
     cancellationToken: CancellationToken
 ): Promise<T> {
     return new Promise<T>((resolve, reject) => {

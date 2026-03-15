@@ -71,7 +71,7 @@ export class ThemeManager {
     }
 
     static resetInstance(): void {
-        ThemeManager.instance = null as any;
+        ThemeManager.instance = null!;
     }
 
     setStorage(storage: ThemeStorage): void {
@@ -111,15 +111,16 @@ export class ThemeManager {
         this.themes.set(theme.id, theme);
     }
 
-    private isValidTheme(theme: any): theme is ThemeDefinition {
-        return theme &&
-            typeof theme.name === 'string' &&
-            typeof theme.id === 'string' &&
-            typeof theme.description === 'string' &&
-            theme.colors &&
-            theme.typography &&
-            theme.spacing &&
-            theme.effects;
+    private isValidTheme(theme: unknown): theme is ThemeDefinition {
+        if (!theme || typeof theme !== 'object') return false;
+        const t = theme as Record<string, unknown>;
+        return typeof t.name === 'string' &&
+            typeof t.id === 'string' &&
+            typeof t.description === 'string' &&
+            !!t.colors &&
+            !!t.typography &&
+            !!t.spacing &&
+            !!t.effects;
     }
 
     getAvailableThemes(): ThemeDefinition[] {

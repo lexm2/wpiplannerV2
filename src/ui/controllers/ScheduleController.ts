@@ -1,4 +1,4 @@
-import { DayOfWeek, Course, Section, Period } from '../../types/types'
+import { DayOfWeek, Course, Section, Period, LectureGroup } from '../../types/types'
 import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm, EventType } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
@@ -17,38 +17,7 @@ import { Validators } from '../../utils/validators'
 import { ModalService } from '../../services/ui/ModalService'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator, type CalendarEventProvider } from '../../services/scheduling/AutoScheduleOrchestrator'
-
-interface WizardSelections {
-    lecture: Section | null;
-    discussion: Section | null;
-    lab: Section | null;
-}
-
-interface SectionOccupant {
-    course: SelectedCourse;
-    section: Section;
-    periodsOnThisDay: Period[];
-    startSlot: number;
-    endSlot: number;
-    isFirstSlot: boolean;
-    startMinutes: number;
-    endMinutes: number;
-    isPreview: boolean;
-}
-
-interface CalendarOccupant {
-    slot: DisplayableTimeSlot;
-    startSlot: number;
-    endSlot: number;
-    isFirstSlot: boolean;
-    startMinutes: number;
-    endMinutes: number;
-}
-
-interface CellData {
-    sections: SectionOccupant[];
-    calendar: CalendarOccupant[];
-}
+import type { ComponentSelections, SectionOccupant, CalendarOccupant, CellData, CellContentResult } from '../../types/scheduling'
 
 export class ScheduleController implements CalendarEventProvider {
     private courseSelectionService: CourseSelectionService;
@@ -61,8 +30,8 @@ export class ScheduleController implements CalendarEventProvider {
     private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
-    private wizardPreviewSelections: WizardSelections | null = null;
-    private hoverPreviewSelections: WizardSelections | null = null;
+    private wizardPreviewSelections: ComponentSelections | null = null;
+    private hoverPreviewSelections: ComponentSelections | null = null;
     private colorService: CourseColorService;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator;
     private currentSchedule: Schedule | null = null;
@@ -71,7 +40,7 @@ export class ScheduleController implements CalendarEventProvider {
     private modalService: ModalService | null = null;
 
     // Performance optimization: Caching infrastructure for grid rendering
-    private cellContentCache: Map<string, any> = new Map();
+    private cellContentCache: Map<string, CellContentResult> = new Map();
     private currentCacheKey: string = '';
     private conflictMap: Map<number, Set<number>> = new Map();
     private lastConflictCacheKey: string = '';
@@ -331,7 +300,7 @@ export class ScheduleController implements CalendarEventProvider {
      * Open the component selection wizard for a course.
      * Uses SidebarManager for consistent panel management.
      */
-    openComponentWizard(course: Course, existingSelections?: any): void {
+    openComponentWizard(course: Course, existingSelections?: SelectedCourse): void {
         if (!this.courseDataService) {
             console.error('CourseDataService not available');
             return;
@@ -391,7 +360,7 @@ export class ScheduleController implements CalendarEventProvider {
     /**
      * Handle wizard completion - save component selections
      */
-    private async onWizardComplete(course: Course, selections: any): Promise<void> {
+    private async onWizardComplete(course: Course, selections: ComponentSelections): Promise<void> {
         // Clear preview first
         this.wizardPreviewCourse = null;
         this.wizardPreviewSelections = null;
@@ -423,7 +392,7 @@ export class ScheduleController implements CalendarEventProvider {
     /**
      * Handle wizard selection changes - update calendar preview
      */
-    private onWizardSelectionChange(course: Course, selections: WizardSelections): void {
+    private onWizardSelectionChange(course: Course, selections: ComponentSelections): void {
         this.wizardPreviewCourse = course;
         this.wizardPreviewSelections = selections;
         this.hoverPreviewSelections = null;
@@ -431,7 +400,7 @@ export class ScheduleController implements CalendarEventProvider {
         this.renderScheduleGrids();
     }
 
-    onWizardHoverPreview(course: Course, selections: WizardSelections): void {
+    onWizardHoverPreview(course: Course, selections: ComponentSelections): void {
         this.wizardPreviewCourse = course;
         this.hoverPreviewSelections = selections;
         this.cellContentCache.clear();
@@ -522,7 +491,7 @@ export class ScheduleController implements CalendarEventProvider {
     }
     
     
-    private buildCourseHeaderHTML(course: any, selectedCourse: any, isExpanded: boolean = false): string {
+    private buildCourseHeaderHTML(course: Course, selectedCourse: SelectedCourse | undefined, isExpanded: boolean = false): string {
         const credits = course.minCredits === course.maxCredits
             ? `${course.minCredits} credits`
             : `${course.minCredits}-${course.maxCredits} credits`;
@@ -580,8 +549,8 @@ export class ScheduleController implements CalendarEventProvider {
      * Check if a section has at least one period with a valid time slot
      * Async sections are valid even with 12:00-12:00 times
      */
-    private hasValidTimeSlot(section: any): boolean {
-        return section.periods.some((period: any) => {
+    private hasValidTimeSlot(section: Section): boolean {
+        return section.periods.some((period: Period) => {
             // Async periods are always valid
             if (period.isAsync) {
                 return true;
@@ -598,7 +567,7 @@ export class ScheduleController implements CalendarEventProvider {
      * Returns information about what's missing
      * This logic matches the wizard's determineAvailableSteps() to ensure consistency
      */
-    private getIncompleteSelectionInfo(selectedCourse: any): { isIncomplete: boolean; message: string } {
+    private getIncompleteSelectionInfo(selectedCourse: SelectedCourse): { isIncomplete: boolean; message: string } {
         const course = selectedCourse.course;
 
         // Skip check for lab-only courses
@@ -622,7 +591,7 @@ export class ScheduleController implements CalendarEventProvider {
         const missingComponents: string[] = [];
 
         // Check if lectures with valid time slots exist
-        const validLectures = course.lectures.filter((lg: any) => this.hasValidTimeSlot(lg.section));
+        const validLectures = course.lectures.filter((lg: LectureGroup) => this.hasValidTimeSlot(lg.section));
         if (validLectures.length === 0) {
             // No valid lectures available, nothing to warn about
             return { isIncomplete: false, message: '' };
@@ -635,11 +604,11 @@ export class ScheduleController implements CalendarEventProvider {
 
         // Check if ANY lecture has discussions/labs with valid time slots
         // This matches the wizard's logic for determining available steps
-        const hasValidDiscussions = course.lectures.some((lg: any) =>
-            lg.compatibleDiscussions && lg.compatibleDiscussions.some((d: any) => this.hasValidTimeSlot(d))
+        const hasValidDiscussions = course.lectures.some((lg: LectureGroup) =>
+            lg.compatibleDiscussions && lg.compatibleDiscussions.some((d: Section) => this.hasValidTimeSlot(d))
         );
-        const hasValidLabs = course.lectures.some((lg: any) =>
-            lg.compatibleLabs && lg.compatibleLabs.some((l: any) => this.hasValidTimeSlot(l))
+        const hasValidLabs = course.lectures.some((lg: LectureGroup) =>
+            lg.compatibleLabs && lg.compatibleLabs.some((l: Section) => this.hasValidTimeSlot(l))
         );
 
         // Only warn about missing components if they would appear in the wizard
@@ -658,7 +627,7 @@ export class ScheduleController implements CalendarEventProvider {
         return { isIncomplete: true, message };
     }
     
-    private buildAllCoursesHTML(sortedCourses: any[]): string {
+    private buildAllCoursesHTML(sortedCourses: SelectedCourse[]): string {
         // Calendar button at top if connected
         let html = this.buildCalendarEventsButtonHTML();
 
@@ -698,7 +667,7 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
 
-    private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: any[]): void {
+    private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: SelectedCourse[]): void {
         // Associate DOM elements with Course objects
         const courseElements = selectedCoursesContainer.querySelectorAll('.schedule-course-item');
         const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
@@ -1134,7 +1103,7 @@ export class ScheduleController implements CalendarEventProvider {
         const cacheKey = `${term}-${day}-${timeSlot}-${calendarKey}`;
 
         if (this.cellContentCache.has(cacheKey)) {
-            return this.cellContentCache.get(cacheKey);
+            return this.cellContentCache.get(cacheKey)!;
         }
 
         const occupyingSections: SectionOccupant[] = cellData?.sections ?? [];

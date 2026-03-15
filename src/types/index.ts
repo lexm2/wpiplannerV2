@@ -29,12 +29,9 @@ export type {
   GraduateLevelFilterCriteria,
   CourseSelectionFilterCriteria,
   PeriodDaysFilterCriteria,
-  PeriodProfessorFilterCriteria,
-  PeriodTermFilterCriteria,
-  PeriodAvailabilityFilterCriteria,
-  PeriodConflictFilterCriteria,
   SectionCodeFilterCriteria,
   RMPRatingFilterCriteria,
+  ConflictCriteria,
 } from './filters';
 export type {
   LectureGroup,
@@ -51,21 +48,30 @@ export type {
 export { PeriodType, DayOfWeek, Semester, SectionType } from './types';
 export { ApplicationState } from './ApplicationState';
 export type {
-  SearchFilter,
-  CourseDisplayProps,
-  GridTimeSlot,
-  ScheduleGridCell,
-  DragDropState,
-  ViewState,
-  ModalButton,
-  Modal,
-  TemplateModal,
-} from './ui';
-export { ViewType, ModalType, ButtonStyle } from './ui';
-export type {
   IModal,
   ModalOptions,
   ModalType as BaseModalType,
   ModalEventType,
   ModalEvent,
 } from './modal';
+export type {
+  ComponentSelections,
+  CourseComponentSelections,
+  SelectionSnapshot,
+  SectionOccupant,
+  CalendarOccupant,
+  CellData,
+  CellContentResult,
+  SectionCandidate,
+} from './scheduling';
+export type {
+  DateRange,
+  FilterOption,
+} from './common';
+export type {
+  RawPeriod,
+  RawSection,
+  RawLectureGroup,
+  RawCourse,
+  RawDepartment,
+} from './rawData';

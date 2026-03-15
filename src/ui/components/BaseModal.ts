@@ -19,7 +19,7 @@ export abstract class BaseModal implements IModal {
     /**
      * Display the modal - must be implemented by subclasses
      */
-    abstract show(...args: any[]): void | Promise<void> | string;
+    abstract show(...args: unknown[]): void | Promise<void> | string;
 
     /**
      * Hide the modal via ModalService

@@ -7,9 +7,52 @@ import { getAllSections, setReplacer, setReviver, logger } from '../../utils'
 import { UndoRedoManager } from './UndoRedoManager'
 import { ModalService } from '../../services/ui'
 
+export interface ScheduleChangedData {
+    schedule?: Schedule;
+    action: 'created' | 'updated' | 'deleted' | 'duplicated' | 'imported';
+}
+
+export interface ActiveScheduleChangedData {
+    schedule: Schedule;
+}
+
+export interface CoursesChangedData {
+    course?: Course;
+    action: string;
+    isRequired?: boolean;
+    sectionNumber?: string | null;
+    sectionCrn?: string;
+    schedule?: Schedule;
+    affectedCourseIds?: string[];
+    skipCourseSidebarUpdate?: boolean;
+    lecture?: string;
+    discussion?: string;
+    lab?: string;
+    courseId?: string;
+    color?: string;
+}
+
+export interface PreferencesChangedData {
+    preferences?: SchedulePreferences;
+    bookmarkedCourseIds?: string[];
+    courseId?: string;
+    bookmarked?: boolean;
+}
+
+export interface SaveStateChangedData {
+    hasUnsavedChanges: boolean;
+}
+
+export type StateChangeEventData =
+    | ScheduleChangedData
+    | ActiveScheduleChangedData
+    | CoursesChangedData
+    | PreferencesChangedData
+    | SaveStateChangedData;
+
 export interface StateChangeEvent {
     type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
-    data: any;
+    data: StateChangeEventData;
     timestamp: number;
     source: string;
 }
@@ -523,7 +566,7 @@ export class ProfileStateManager {
         }
     }
 
-    private restoreFromSnapshot(snapshot: any): void {
+    private restoreFromSnapshot(snapshot: { activeScheduleId: string | null; schedules: Map<string, Schedule>; preferences: SchedulePreferences }): void {
         this.state.activeScheduleId = snapshot.activeScheduleId;
 
         const schedulesArray = Array.from(snapshot.schedules.values()) as Schedule[];
@@ -975,7 +1018,7 @@ export class ProfileStateManager {
         }
     }
 
-    private emitEvent(type: StateChangeEvent['type'], data: any, source: string): void {
+    private emitEvent(type: StateChangeEvent['type'], data: StateChangeEventData, source: string): void {
         // Skip event emission if we're in batch update mode
         if (this.isBatchUpdate) {
             return;

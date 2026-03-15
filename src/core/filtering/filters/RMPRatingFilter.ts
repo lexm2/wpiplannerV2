@@ -67,32 +67,34 @@ export class RMPRatingFilter implements SectionBasedFilter {
     /**
      * Validate that the criteria is properly formatted
      */
-    isValidCriteria(criteria: any): criteria is RMPRatingFilterCriteria {
+    isValidCriteria(criteria: unknown): criteria is RMPRatingFilterCriteria {
         if (!criteria || typeof criteria !== 'object') {
             return false;
         }
 
+        const c = criteria as Record<string, unknown>;
+
         // Validate rating range if set
-        if (criteria.minRating !== undefined && (criteria.minRating < 0 || criteria.minRating > 5)) {
+        if (c.minRating !== undefined && (typeof c.minRating !== 'number' || c.minRating < 0 || c.minRating > 5)) {
             return false;
         }
-        if (criteria.maxRating !== undefined && (criteria.maxRating < 0 || criteria.maxRating > 5)) {
+        if (c.maxRating !== undefined && (typeof c.maxRating !== 'number' || c.maxRating < 0 || c.maxRating > 5)) {
             return false;
         }
 
         // Validate difficulty range if set
-        if (criteria.minDifficulty !== undefined && (criteria.minDifficulty < 0 || criteria.minDifficulty > 5)) {
+        if (c.minDifficulty !== undefined && (typeof c.minDifficulty !== 'number' || c.minDifficulty < 0 || c.minDifficulty > 5)) {
             return false;
         }
-        if (criteria.maxDifficulty !== undefined && (criteria.maxDifficulty < 0 || criteria.maxDifficulty > 5)) {
+        if (c.maxDifficulty !== undefined && (typeof c.maxDifficulty !== 'number' || c.maxDifficulty < 0 || c.maxDifficulty > 5)) {
             return false;
         }
 
         // Validate "would take again" range if set
-        if (criteria.minWouldTakeAgain !== undefined && (criteria.minWouldTakeAgain < 0 || criteria.minWouldTakeAgain > 100)) {
+        if (c.minWouldTakeAgain !== undefined && (typeof c.minWouldTakeAgain !== 'number' || c.minWouldTakeAgain < 0 || c.minWouldTakeAgain > 100)) {
             return false;
         }
-        if (criteria.maxWouldTakeAgain !== undefined && (criteria.maxWouldTakeAgain < 0 || criteria.maxWouldTakeAgain > 100)) {
+        if (c.maxWouldTakeAgain !== undefined && (typeof c.maxWouldTakeAgain !== 'number' || c.maxWouldTakeAgain < 0 || c.maxWouldTakeAgain > 100)) {
             return false;
         }
 

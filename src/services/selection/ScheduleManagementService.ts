@@ -1,5 +1,5 @@
 import { Schedule, SelectedCourse } from '../../types/schedule'
-import { ProfileStateManager, StateChangeEvent, StateChangeListener } from '../../core/state/ProfileStateManager'
+import { ProfileStateManager, StateChangeEvent, StateChangeListener, ScheduleChangedData, ActiveScheduleChangedData, SaveStateChangedData } from '../../core/state/ProfileStateManager'
 import { DataValidator } from '../../core/validation/DataValidator'
 import { CourseSelectionService } from './CourseSelectionService'
 import { ICSGenerator, ICSExportOptions, ICSExportResult } from '../../utils/icsGenerator'
@@ -667,7 +667,8 @@ export class ScheduleManagementService {
     onSaveStateChange(callback: (hasUnsavedChanges: boolean) => void): void {
         const stateListener = (event: StateChangeEvent) => {
             if (event.type === 'save_state_changed') {
-                callback(event.data.hasUnsavedChanges);
+                const data = event.data as SaveStateChangedData;
+                callback(data.hasUnsavedChanges);
             }
         };
         this.profileStateManager.addListener(stateListener);
@@ -725,35 +726,39 @@ export class ScheduleManagementService {
         const stateListener: StateChangeListener = (event: StateChangeEvent) => {
             // Convert state events to schedule events as needed
             switch (event.type) {
-                case 'schedule_changed':
-                    if (event.data.action === 'created') {
+                case 'schedule_changed': {
+                    const data = event.data as ScheduleChangedData;
+                    if (data.action === 'created') {
                         this.notifyScheduleListeners({
                             type: 'schedule_created',
-                            schedule: event.data.schedule,
+                            schedule: data.schedule,
                             timestamp: event.timestamp
                         });
-                    } else if (event.data.action === 'deleted') {
+                    } else if (data.action === 'deleted') {
                         this.notifyScheduleListeners({
                             type: 'schedule_deleted',
-                            schedule: event.data.schedule,
+                            schedule: data.schedule,
                             timestamp: event.timestamp
                         });
-                    } else if (event.data.action === 'updated') {
+                    } else if (data.action === 'updated') {
                         this.notifyScheduleListeners({
                             type: 'schedule_updated',
-                            schedule: event.data.schedule,
+                            schedule: data.schedule,
                             timestamp: event.timestamp
                         });
                     }
                     break;
-                case 'active_schedule_changed':
+                }
+                case 'active_schedule_changed': {
+                    const data = event.data as ActiveScheduleChangedData;
                     this.notifyScheduleListeners({
                         type: 'schedule_activated',
-                        schedule: event.data.schedule,
+                        schedule: data.schedule,
                         timestamp: event.timestamp,
                         source: event.source
                     });
                     break;
+                }
             }
         };
 

@@ -6,7 +6,7 @@ export enum WorkerTaskType {
 export interface WorkerRequest {
   id: string;
   type: WorkerTaskType;
-  payload: any;
+  payload: unknown;
   timestamp: number;
 }
 
@@ -14,6 +14,6 @@ export interface WorkerResponse {
   id: string;
   type: WorkerTaskType;
   success: boolean;
-  data?: any;
+  data?: unknown;
   error?: string;
 }

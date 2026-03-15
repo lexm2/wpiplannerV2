@@ -11,14 +11,14 @@ export interface StorageTransaction {
     id: string;
     operations: StorageOperation[];
     timestamp: number;
-    backupData: Map<string, any>;
+    backupData: Map<string, string | null>;
 }
 
 export interface StorageOperation {
     type: 'save' | 'delete';
     key: string;
-    value?: any;
-    previousValue?: any;
+    value?: string | null;
+    previousValue?: string | null;
 }
 
 export interface TransactionResult {

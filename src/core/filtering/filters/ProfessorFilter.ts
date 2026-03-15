@@ -24,10 +24,12 @@ export class ProfessorFilter implements SectionBasedFilter {
         );
     }
     
-    isValidCriteria(criteria: any): criteria is ProfessorFilterCriteria {
-        return criteria && 
-               Array.isArray(criteria.professors) &&
-               criteria.professors.every((prof: any) => typeof prof === 'string');
+    isValidCriteria(criteria: unknown): criteria is ProfessorFilterCriteria {
+        return !!(criteria &&
+               typeof criteria === 'object' &&
+               'professors' in criteria &&
+               Array.isArray((criteria as ProfessorFilterCriteria).professors) &&
+               (criteria as ProfessorFilterCriteria).professors.every((prof: unknown) => typeof prof === 'string'));
     }
     
     getDisplayValue(criteria: ProfessorFilterCriteria): string {

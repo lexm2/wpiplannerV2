@@ -5,29 +5,29 @@ class Logger {
         this.isDev = import.meta.env.DEV;
     }
 
-    log(...args: any[]): void {
+    log(...args: unknown[]): void {
         if (this.isDev) {
             console.log(...args);
         }
     }
 
-    warn(...args: any[]): void {
+    warn(...args: unknown[]): void {
         if (this.isDev) {
             console.warn(...args);
         }
     }
 
-    error(...args: any[]): void {
+    error(...args: unknown[]): void {
         console.error(...args);
     }
 
-    debug(...args: any[]): void {
+    debug(...args: unknown[]): void {
         if (this.isDev) {
             console.debug(...args);
         }
     }
 
-    info(...args: any[]): void {
+    info(...args: unknown[]): void {
         if (this.isDev) {
             console.info(...args);
         }

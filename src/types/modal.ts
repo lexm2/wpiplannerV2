@@ -2,7 +2,7 @@
  * Core modal interface that all modals must implement
  */
 export interface IModal {
-    show(...args: any[]): void | Promise<void> | string;
+    show(...args: unknown[]): void | Promise<void> | string;
     hide(): void;
     isOpen(): boolean;
 

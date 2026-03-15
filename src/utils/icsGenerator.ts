@@ -1,6 +1,7 @@
 import ical, { ICalEventRepeatingFreq, ICalWeekday, ICalCalendarMethod } from 'ical-generator';
 import { Schedule, SelectedCourse, EventType } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';
+import type { DateRange } from '../types/common';
 import { TermBoundsService } from './termBounds';
 
 export interface ICSExportOptions {
@@ -40,7 +41,7 @@ export class ICSGenerator {
         [DayOfWeek.SATURDAY]: 6
     };
 
-    private static getTermDates(term: string, year: number): { start: Date, end: Date } | null {
+    private static getTermDates(term: string, year: number): DateRange | null {
         if (!term || term === 'TBA') {
             return null;
         }
