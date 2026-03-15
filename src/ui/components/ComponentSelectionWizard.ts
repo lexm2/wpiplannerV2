@@ -3,6 +3,7 @@
 
 import { Course, Section } from '../../types/types';
 import { SelectedCourse } from '../../types/schedule';
+import { AcademicYearFilterCriteria } from '../../types/filters';
 import { CourseDataService } from '../../services/data/courseDataService';
 import { FilterService } from '../../services/filtering/FilterService';
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
@@ -744,11 +745,8 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
 
         if (options.length === 0) {
             return `
-                <div class="wizard-step" data-step="${this.currentStep}">
-                    <div class="wizard-empty-state">
-                        <p>No ${this.currentStep}s available for this course.</p>
-                    </div>
-                    ${hiddenCount > 0 ? this.renderFilteredOutNotice(hiddenCount) : ''}
+                <div class="wizard-step active slide-in-right" data-step="${this.currentStep}">
+                    ${this.renderFilteredOutNotice(hiddenCount)}
                 </div>
             `;
         }
@@ -785,6 +783,27 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     }
 
     private renderFilteredOutNotice(hiddenCount: number): string {
+        // Check for academic year mismatch
+        if (this.filterService && this.course.academicYear) {
+            const yearFilter = this.filterService.getActiveFilters().find(f => f.id === 'academicYear');
+            if (yearFilter) {
+                const filterYear = (yearFilter.criteria as AcademicYearFilterCriteria).year;
+                if (typeof filterYear === 'number' && filterYear !== this.course.academicYear) {
+                    const courseYear = this.course.academicYear;
+                    return `
+                        <div class="wizard-filtered-notice">
+                            <span class="wizard-filtered-notice-text">
+                                This course is from ${courseYear}–${courseYear + 1} but you're viewing ${filterYear}–${filterYear + 1}
+                            </span>
+                            <button class="wizard-filtered-notice-btn" id="wizard-switch-year-btn">
+                                Switch to ${courseYear}–${courseYear + 1}
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
         const sectionWord = hiddenCount === 1 ? 'section' : 'sections';
         return `
             <div class="wizard-filtered-notice">
@@ -1015,6 +1034,14 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         clearFiltersBtn?.addEventListener('click', () => {
             if (this.filterService) {
                 this.filterService.clearFilters();
+            }
+        });
+
+        // Switch academic year button
+        const switchYearBtn = this.panel.querySelector('#wizard-switch-year-btn');
+        switchYearBtn?.addEventListener('click', () => {
+            if (this.filterService && this.course.academicYear) {
+                this.filterService.updateFilter('academicYear', { year: this.course.academicYear });
             }
         });
 
