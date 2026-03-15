@@ -14,16 +14,16 @@ export class AutoScheduleOrchestrator {
     private currentScheduleIndex: number = 0;
     private isApplyingAutoSchedule: boolean = false;
     private courseSelectionService: CourseSelectionService;
-    private scheduleFilterService: FilterService;
+    private filterService: FilterService;
     private calendarEventProvider: CalendarEventProvider | null = null;
     private onStateChangeCallback: (() => void) | null = null;
 
     constructor(
         courseSelectionService: CourseSelectionService,
-        scheduleFilterService: FilterService
+        filterService: FilterService
     ) {
         this.courseSelectionService = courseSelectionService;
-        this.scheduleFilterService = scheduleFilterService;
+        this.filterService = filterService;
     }
 
     setCalendarEventProvider(provider: CalendarEventProvider): void {
@@ -101,20 +101,20 @@ export class AutoScheduleOrchestrator {
                 }
 
                 if (blockedTimes.length > 0) {
-                    this.scheduleFilterService.addFilter('blockedTimes', { blockedTimes });
+                    this.filterService.addFilter('blockedTimes', { blockedTimes });
                 }
 
                 if (settings.wakeUpTime) {
-                    this.scheduleFilterService.addFilter('wakeUpTime', { wakeUpTime: settings.wakeUpTime });
+                    this.filterService.addFilter('wakeUpTime', { wakeUpTime: settings.wakeUpTime });
                 }
             }
 
-            const autoScheduler = new AutoScheduler(this.scheduleFilterService);
+            const autoScheduler = new AutoScheduler(this.filterService);
             const allSchedules = autoScheduler.generateSchedules(selectedCourses, 100);
 
             if (settings) {
-                this.scheduleFilterService.removeFilter('blockedTimes');
-                this.scheduleFilterService.removeFilter('wakeUpTime');
+                this.filterService.removeFilter('blockedTimes');
+                this.filterService.removeFilter('wakeUpTime');
             }
 
             if (allSchedules.length === 0) {
@@ -135,8 +135,8 @@ export class AutoScheduleOrchestrator {
             this.currentScheduleIndex = 0;
 
             if (settings) {
-                this.scheduleFilterService.removeFilter('blockedTimes');
-                this.scheduleFilterService.removeFilter('wakeUpTime');
+                this.filterService.removeFilter('blockedTimes');
+                this.filterService.removeFilter('wakeUpTime');
             }
 
             throw error;

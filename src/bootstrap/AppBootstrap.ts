@@ -31,10 +31,9 @@ export class AppBootstrap {
         const modalService = new ModalService();
         profileStateManager.setModalService(modalService);
 
-        const catalogFilterService = new FilterService({
+        const filterService = new FilterService({
             getBookmarkedCourseIds: () => profileStateManager.getBookmarkedCourseIds()
         });
-        const scheduleFilterService = new FilterService();
 
         const scheduleManagementService = new ScheduleManagementService(profileStateManager, courseSelectionService);
 
@@ -49,8 +48,7 @@ export class AppBootstrap {
             courseSelectionService,
             conflictDetector,
             modalService,
-            catalogFilterService,
-            scheduleFilterService,
+            filterService,
             scheduleManagementService,
             themeManager,
             operationManager,
@@ -68,7 +66,7 @@ export class AppBootstrap {
         }
     ): void {
         const {
-            courseDataService, profileStateManager, catalogFilterService,
+            courseDataService, profileStateManager, filterService,
             courseSelectionService, scheduleManagementService, timestampManager
         } = services;
 
@@ -82,10 +80,10 @@ export class AppBootstrap {
             scheduleManagementService.initializeDefaultScheduleIfNeeded();
             timestampManager.updateClientTimestamp();
 
-            if (!catalogFilterService.hasFilter('academicYear')) {
+            if (!filterService.hasFilter('academicYear')) {
                 const years = [...new Set(allCourses.map(c => c.academicYear).filter(Boolean) as number[])].sort();
                 if (years.length > 1) {
-                    catalogFilterService.addFilter('academicYear', { year: years[years.length - 1] });
+                    filterService.addFilter('academicYear', { year: years[years.length - 1] });
                 }
             }
 
@@ -104,26 +102,16 @@ export class AppBootstrap {
     }
 
     static initializeFilters(services: ServiceContainer): void {
-        const { catalogFilterService, scheduleFilterService } = services;
+        const { filterService } = services;
 
-        const catalogFilters = createDefaultFilters(rateMyProfessorService);
-        catalogFilters.forEach(filter => {
-            catalogFilterService.registerFilter(filter);
+        const filters = createDefaultFilters(rateMyProfessorService);
+        filters.forEach(filter => {
+            filterService.registerFilter(filter);
         });
 
         const searchTextFilter = new SearchTextFilter();
-        catalogFilterService.registerFilter(searchTextFilter);
-        catalogFilterService.setConflictDetector();
-
-        // Schedule filter service gets its own instances of all filters
-        const scheduleFilters = createDefaultFilters(rateMyProfessorService);
-        scheduleFilters.forEach(filter => {
-            scheduleFilterService.registerFilter(filter);
-        });
-
-        const scheduleSearchTextFilter = new SearchTextFilter();
-        scheduleFilterService.registerFilter(scheduleSearchTextFilter);
-        scheduleFilterService.setConflictDetector();
+        filterService.registerFilter(searchTextFilter);
+        filterService.setConflictDetector();
     }
 
     static async initializeAsyncServices(services: ServiceContainer): Promise<void> {

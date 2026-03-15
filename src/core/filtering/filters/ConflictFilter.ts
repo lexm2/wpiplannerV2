@@ -33,10 +33,37 @@ export class ConflictFilter implements SectionBasedFilter {
             return sections;
         }
 
+        // Build set of selected section CRNs so we don't filter them out
+        const selectedCrns = new Set<string>();
+        if (criteria.selectedCourses) {
+            for (const sc of criteria.selectedCourses) {
+                if (sc.selectedLecture) selectedCrns.add(String(sc.selectedLecture.crn));
+                if (sc.selectedDiscussion) selectedCrns.add(String(sc.selectedDiscussion.crn));
+                if (sc.selectedLab) selectedCrns.add(String(sc.selectedLab.crn));
+            }
+        }
+
         return sections.filter(fs => {
+            const currentCrn = String(fs.section.crn);
+
+            // Never filter out a currently selected section
+            if (selectedCrns.has(currentCrn)) {
+                return true;
+            }
+
+            // Exclude blocked slots that came from this section's own CRN
+            const relevantBlockedSlots = blockedSlots.filter(slot => {
+                const slotCrn = slot.id.split('-')[0];
+                return slotCrn !== currentCrn;
+            });
+
+            if (relevantBlockedSlots.length === 0) {
+                return true;
+            }
+
             for (const currentPeriod of fs.section.periods) {
                 const periodSlots = periodToWeeklySlots(currentPeriod, fs.section.computedTerm || AcademicTerm.ALL);
-                if (this.hasConflictWithBlockedSlots(periodSlots, blockedSlots)) {
+                if (this.hasConflictWithBlockedSlots(periodSlots, relevantBlockedSlots)) {
                     return false;
                 }
             }

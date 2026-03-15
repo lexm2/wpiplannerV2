@@ -449,20 +449,6 @@ export class ScheduleController implements CalendarEventProvider {
 
         let selectedCourses = this.courseSelectionService.getSelectedCourses();
 
-        let filteredSections: Array<{course: SelectedCourse, section: any}> = [];
-        let hasActiveFilters = false;
-
-        if (this.filterService && !this.filterService.isEmpty()) {
-            const courses = selectedCourses.map(sc => sc.course);
-            const filtered = this.filterService.apply(courses);
-            // Map FilterableSection[] back to {course: SelectedCourse, section} shape
-            const courseMap = new Map(selectedCourses.map(sc => [sc.course.id, sc]));
-            filteredSections = filtered
-                .map(fs => ({ course: courseMap.get(fs.course.id)!, section: fs.section }))
-                .filter(fs => fs.course != null);
-            hasActiveFilters = true;
-        }
-        
         // Always show calendar button - users can add local events even without courses
         if (selectedCourses.length === 0) {
             if (countElement) {
@@ -492,40 +478,16 @@ export class ScheduleController implements CalendarEventProvider {
             return;
         }
 
-        if (hasActiveFilters && filteredSections.length === 0) {
-            if (countElement) {
-                countElement.textContent = '(0 sections match filters)';
-            }
+        // Always show all selected courses - filters only apply inside the component wizard
+        const sortedCourses = selectedCourses.sort((a, b) => {
+            const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
+            if (deptCompare !== 0) return deptCompare;
+            return a.course.number.localeCompare(b.course.number);
+        });
 
-            // Preserve wizard if open
-            const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
-            selectedCoursesContainer.innerHTML = '<div class="empty-state">No sections match the current filters</div>';
-            if (wizardPanel) {
-                selectedCoursesContainer.appendChild(wizardPanel);
-            }
-            return;
-        }
-
-        let html = '';
-
-        if (hasActiveFilters) {
-            html = this.buildFilteredSectionsHTML(filteredSections, selectedCourses);
-
-            if (countElement) {
-                const uniqueCourses = new Set(filteredSections.map(fs => fs.course.course.id)).size;
-                countElement.textContent = `(${filteredSections.length} sections in ${uniqueCourses} courses)`;
-            }
-        } else {
-            const sortedCourses = selectedCourses.sort((a, b) => {
-                const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
-                if (deptCompare !== 0) return deptCompare;
-                return a.course.number.localeCompare(b.course.number);
-            });
-
-            html = this.buildAllCoursesHTML(sortedCourses);
-            if (countElement) {
-                countElement.textContent = `(${selectedCourses.length})`;
-            }
+        const html = this.buildAllCoursesHTML(sortedCourses);
+        if (countElement) {
+            countElement.textContent = `(${selectedCourses.length})`;
         }
 
         const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
@@ -541,31 +503,7 @@ export class ScheduleController implements CalendarEventProvider {
             selectedCoursesContainer.appendChild(sidebarPanel);
         }
 
-        if (!hasActiveFilters) {
-            const sortedCourses = selectedCourses.sort((a, b) => {
-                const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
-                if (deptCompare !== 0) return deptCompare;
-                return a.course.number.localeCompare(b.course.number);
-            });
-            this.setupDOMElementMapping(selectedCoursesContainer, sortedCourses);
-        } else {
-            // Deduplicate and sort filtered sections into unique courses
-            const uniqueCourses: any[] = [];
-            const seenCourseIds = new Set();
-            filteredSections.forEach(fs => {
-                const courseId = fs.course.course.id;
-                if (!seenCourseIds.has(courseId)) {
-                    seenCourseIds.add(courseId);
-                    uniqueCourses.push(fs.course);
-                }
-            });
-            uniqueCourses.sort((a, b) => {
-                const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
-                if (deptCompare !== 0) return deptCompare;
-                return a.course.number.localeCompare(b.course.number);
-            });
-            this.setupDOMElementMapping(selectedCoursesContainer, uniqueCourses);
-        }
+        this.setupDOMElementMapping(selectedCoursesContainer, sortedCourses);
 
         this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
     }
@@ -583,46 +521,6 @@ export class ScheduleController implements CalendarEventProvider {
         }
     }
     
-    private buildFilteredSectionsHTML(filteredSections: Array<{course: any, section: any}>, _selectedCourses: any[], dropdownStates?: Map<string, boolean>): string {
-        // Group filtered sections by course
-        const sectionsByCourse = new Map();
-
-        filteredSections.forEach(fs => {
-            const courseId = fs.course.course.id;
-            if (!sectionsByCourse.has(courseId)) {
-                sectionsByCourse.set(courseId, {
-                    selectedCourse: fs.course,
-                    sections: []
-                });
-            }
-            sectionsByCourse.get(courseId).sections.push(fs.section);
-        });
-
-        // Calendar button at top if connected
-        let html = this.buildCalendarEventsButtonHTML();
-        
-        // Sort courses by department and number
-        const sortedEntries = Array.from(sectionsByCourse.entries()).sort((a, b) => {
-            const courseA = a[1].selectedCourse.course;
-            const courseB = b[1].selectedCourse.course;
-            const deptCompare = courseA.department.abbreviation.localeCompare(courseB.department.abbreviation);
-            if (deptCompare !== 0) return deptCompare;
-            return courseA.number.localeCompare(courseB.number);
-        });
-        
-        sortedEntries.forEach(([courseId, data]) => {
-            const selectedCourse = data.selectedCourse;
-            const course = selectedCourse.course;
-
-            // Check dropdown state, default to expanded if not specified
-            const isExpanded = dropdownStates ? (dropdownStates.get(courseId) ?? true) : true;
-
-            html += this.buildCourseHeaderHTML(course, selectedCourse, isExpanded);
-            html += '</div>'; // Close schedule-course-item
-        });
-        
-        return html;
-    }
     
     private buildCourseHeaderHTML(course: any, selectedCourse: any, isExpanded: boolean = false): string {
         const credits = course.minCredits === course.maxCredits
@@ -667,10 +565,10 @@ export class ScheduleController implements CalendarEventProvider {
                         <div class="schedule-course-credits">${credits}</div>
                     </div>
                     <div class="course-item-controls">
-                        <button class="course-clear-sections-btn" title="Clear selected sections">
+                        <button class="course-clear-sections-btn" data-course-id="${course.id}" title="Clear selected sections">
                             ${getInlineSVG('ERASER', 'eraser-icon')}
                         </button>
-                        <button class="course-remove-btn" title="Remove from selection">
+                        <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
                             ${getInlineSVG('TRASH', 'trash-icon')}
                         </button>
                     </div>

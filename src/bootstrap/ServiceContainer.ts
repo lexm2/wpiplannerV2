@@ -18,8 +18,7 @@ export interface ServiceContainer {
     courseSelectionService: CourseSelectionService;
     conflictDetector: BitMaskEngine;
     modalService: ModalService;
-    catalogFilterService: FilterService;
-    scheduleFilterService: FilterService;
+    filterService: FilterService;
     scheduleManagementService: ScheduleManagementService;
     themeManager: ThemeManager;
     operationManager: OperationManager;

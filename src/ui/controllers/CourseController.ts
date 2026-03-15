@@ -767,7 +767,7 @@ export class CourseController {
                         <div class="selected-course-name">${Validators.escapeHtml(course.name)}</div>
                         <div class="selected-course-credits">${credits}</div>
                     </div>
-                    <button class="course-remove-btn" title="Remove from selection">
+                    <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
                         ${getInlineSVG('TRASH', 'trash-icon')}
                     </button>
                 </div>

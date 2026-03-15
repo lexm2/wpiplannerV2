@@ -46,7 +46,7 @@ export class MainController {
 
         const {
             profileStateManager, courseDataService, courseSelectionService,
-            conflictDetector, modalService, catalogFilterService, scheduleFilterService,
+            conflictDetector, modalService, filterService,
             scheduleManagementService, operationManager, uiStateManager
         } = services;
 
@@ -55,7 +55,7 @@ export class MainController {
 
         // Initialize extracted services
         this.colorService = new CourseColorService(courseSelectionService);
-        this.autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, scheduleFilterService);
+        this.autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, filterService);
 
         // Initialize controllers
         this.departmentController = new DepartmentController();
@@ -67,7 +67,7 @@ export class MainController {
         this.scheduleFilterModalController = new FilterModalController(modalService);
 
         // Connect filter service to course controller
-        this.courseController.setFilterService(catalogFilterService);
+        this.courseController.setFilterService(filterService);
 
         // Register rendering callbacks for term expansion state management
         this.courseController.setOnBatchCallback(() => {
@@ -78,17 +78,17 @@ export class MainController {
         });
 
         // Connect filter service and course data to filter modal
-        this.filterModalController.setFilterService(catalogFilterService);
+        this.filterModalController.setFilterService(filterService);
         this.filterModalController.setCourseSelectionService(courseSelectionService);
         this.filterModalController.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
 
         // Connect schedule filter service to controllers
-        this.scheduleFilterModalController.setFilterService(scheduleFilterService);
+        this.scheduleFilterModalController.setFilterService(filterService);
         this.scheduleFilterModalController.setCourseSelectionService(courseSelectionService);
         this.scheduleFilterModalController.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
         this.scheduleController.setCourseDataService(courseDataService);
         this.scheduleController.setConflictDetector(conflictDetector);
-        this.scheduleController.setFilterService(scheduleFilterService);
+        this.scheduleController.setFilterService(filterService);
 
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
@@ -100,7 +100,7 @@ export class MainController {
         });
 
         // Connect filter service to department controller
-        this.departmentController.setFilterService(catalogFilterService);
+        this.departmentController.setFilterService(filterService);
 
         // Set up course data event subscriptions via AppBootstrap
         AppBootstrap.setupCourseDataSubscriptions(services, {
@@ -136,11 +136,8 @@ export class MainController {
         // Initialize filters and wire up filter change listeners
         AppBootstrap.initializeFilters(services);
 
-        catalogFilterService.addEventListener((_event) => {
+        filterService.addEventListener((_event) => {
             this.refreshCurrentView();
-        });
-
-        scheduleFilterService.addEventListener((_event) => {
             this.scheduleController.applyFiltersAndRefresh();
         });
 
@@ -408,42 +405,33 @@ export class MainController {
             }
 
             if (target.classList.contains('course-remove-btn')) {
-                // Determine which page we're on and use the appropriate controller
-                let course;
-                if (this.services.uiStateManager.currentPage === 'schedule') {
-                    course = this.scheduleController.getCourseFromElement(target as HTMLElement);
-                } else {
-                    course = this.courseController.getCourseFromElement(target as HTMLElement);
-                }
+                e.stopPropagation();
+                const courseId = (target as HTMLElement).dataset.courseId;
 
-                if (course) {
-                    // Directly remove course (remove button means always unselect)
-                    this.services.courseSelectionService.unselectCourse(course).catch(error => {
-                        console.error('Failed to unselect course:', error);
-                        this.services.uiStateManager.showErrorMessage('Failed to remove course. Please try again.');
-                    });
+                if (courseId) {
+                    const selectedCourse = this.services.profileStateManager.getSelectedCourses().find(sc => sc.course.id === courseId);
+                    if (selectedCourse) {
+                        this.services.courseSelectionService.unselectCourse(selectedCourse.course).catch(error => {
+                            console.error('Failed to unselect course:', error);
+                            this.services.uiStateManager.showErrorMessage('Failed to remove course. Please try again.');
+                        });
+                    }
                 }
+                return;
             }
 
-            if (target.classList.contains('course-clear-sections-btn') || target.closest('.course-clear-sections-btn')) {
+            if (target.classList.contains('course-clear-sections-btn')) {
                 e.stopPropagation();
+                const courseId = (target as HTMLElement).dataset.courseId;
 
-                const button = target.classList.contains('course-clear-sections-btn')
-                    ? target
-                    : target.closest('.course-clear-sections-btn') as HTMLElement;
-
-                let course;
-                if (this.services.uiStateManager.currentPage === 'schedule') {
-                    course = this.scheduleController.getCourseFromElement(button);
-                } else {
-                    course = this.courseController.getCourseFromElement(button);
-                }
-
-                if (course) {
-                    this.services.courseSelectionService.clearCourseComponents(course).catch(error => {
-                        console.error('Failed to clear course components:', error);
-                        this.services.uiStateManager.showErrorMessage('Failed to clear sections. Please try again.');
-                    });
+                if (courseId) {
+                    const selectedCourse = this.services.profileStateManager.getSelectedCourses().find(sc => sc.course.id === courseId);
+                    if (selectedCourse) {
+                        this.services.courseSelectionService.clearCourseComponents(selectedCourse.course).catch(error => {
+                            console.error('Failed to clear course components:', error);
+                            this.services.uiStateManager.showErrorMessage('Failed to clear sections. Please try again.');
+                        });
+                    }
                 }
                 return;
             }
@@ -502,9 +490,9 @@ export class MainController {
                     // Update search text filter in FilterService
                     // Only trim for the check, but pass the original query with spaces
                     if (query.trim().length > 0) {
-                        this.services.catalogFilterService.addFilter('searchText', { query });
+                        this.services.filterService.addFilter('searchText', { query });
                     } else {
-                        this.services.catalogFilterService.removeFilter('searchText');
+                        this.services.filterService.removeFilter('searchText');
                     }
 
                     cancellationToken.throwIfCancelled();
@@ -587,10 +575,10 @@ export class MainController {
         if (bookmarkFilterButton) {
             // Icon is set by updateBookmarkFilterButtonState during initialization
             bookmarkFilterButton.addEventListener('click', () => {
-                if (this.services.catalogFilterService.hasFilter('bookmark')) {
-                    this.services.catalogFilterService.removeFilter('bookmark');
+                if (this.services.filterService.hasFilter('bookmark')) {
+                    this.services.filterService.removeFilter('bookmark');
                 } else {
-                    this.services.catalogFilterService.addFilter('bookmark', { showBookmarkedOnly: true });
+                    this.services.filterService.addFilter('bookmark', { showBookmarkedOnly: true });
                 }
                 this.updateBookmarkFilterButtonState();
             });
@@ -601,8 +589,8 @@ export class MainController {
         if (clearFiltersButton) {
             clearFiltersButton.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'eraser-icon'));
             clearFiltersButton.addEventListener('click', () => {
-                if (this.services.catalogFilterService) {
-                    this.services.catalogFilterService.clearFilters();
+                if (this.services.filterService) {
+                    this.services.filterService.clearFilters();
                     this.updateFilterButtonState();
                     this.updateClearFiltersButtonState();
                     this.updateBookmarkFilterButtonState();
@@ -624,8 +612,8 @@ export class MainController {
         if (scheduleClearFiltersButton) {
             scheduleClearFiltersButton.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'eraser-icon'));
             scheduleClearFiltersButton.addEventListener('click', () => {
-                if (this.services.scheduleFilterService) {
-                    this.services.scheduleFilterService.clearFilters();
+                if (this.services.filterService) {
+                    this.services.filterService.clearFilters();
                     this.updateScheduleFilterButtonState();
                     this.updateScheduleClearFiltersButtonState();
                 }
@@ -639,9 +627,9 @@ export class MainController {
                 const query = scheduleSearchInput.value;
 
                 if (query.trim().length > 0) {
-                    this.services.scheduleFilterService.addFilter('searchText', { query });
+                    this.services.filterService.addFilter('searchText', { query });
                 } else {
-                    this.services.scheduleFilterService.removeFilter('searchText');
+                    this.services.filterService.removeFilter('searchText');
                 }
 
                 // Refresh the schedule page display
@@ -861,10 +849,10 @@ export class MainController {
     private refreshCurrentView(): void {
         this.expandedTerms.clear();
 
-        const hasFilters = !this.services.catalogFilterService.isEmpty();
+        const hasFilters = !this.services.filterService.isEmpty();
 
         // Check if department filter is active
-        const departmentFilter = this.services.catalogFilterService.getActiveFilters()
+        const departmentFilter = this.services.filterService.getActiveFilters()
             .find(f => f.id === 'department');
         const departmentCriteria = departmentFilter?.criteria as { departments?: string[] } | undefined;
         const activeDepartmentIds = departmentCriteria?.departments || [];
@@ -884,10 +872,10 @@ export class MainController {
                 baseCourses = this.getAllCourses();
             }
 
-            coursesToDisplay = this.services.catalogFilterService.filterCourses(baseCourses);
+            coursesToDisplay = this.services.filterService.filterCourses(baseCourses);
 
             // Update header based on filter state
-            if (activeDepartmentIds.length === 1 && this.services.catalogFilterService.getActiveFilters().length === 1) {
+            if (activeDepartmentIds.length === 1 && this.services.filterService.getActiveFilters().length === 1) {
                 // Single department filter only
                 const dept = this.departmentController.getDepartmentById(activeDepartmentIds[0]);
                 if (dept) {
@@ -937,9 +925,9 @@ export class MainController {
 
     private updateFilterButtonState(): void {
         const filterButton = document.getElementById('filter-btn');
-        if (filterButton && this.services.catalogFilterService) {
-            const hasActiveFilters = !this.services.catalogFilterService.isEmpty();
-            const filterCount = this.services.catalogFilterService.getFilterCount();
+        if (filterButton && this.services.filterService) {
+            const hasActiveFilters = !this.services.filterService.isEmpty();
+            const filterCount = this.services.filterService.getFilterCount();
 
             if (hasActiveFilters) {
                 filterButton.classList.add('active');
@@ -954,8 +942,8 @@ export class MainController {
 
     private updateClearFiltersButtonState(): void {
         const clearFiltersButton = document.getElementById('clear-filters-btn') as HTMLButtonElement | null;
-        if (clearFiltersButton && this.services.catalogFilterService) {
-            const hasActiveFilters = !this.services.catalogFilterService.isEmpty();
+        if (clearFiltersButton && this.services.filterService) {
+            const hasActiveFilters = !this.services.filterService.isEmpty();
 
             if (hasActiveFilters) {
                 clearFiltersButton.style.display = '';
@@ -968,8 +956,8 @@ export class MainController {
 
     private updateBookmarkFilterButtonState(): void {
         const button = document.getElementById('bookmark-filter-btn');
-        if (button && this.services.catalogFilterService) {
-            const isActive = this.services.catalogFilterService.hasFilter('bookmark');
+        if (button && this.services.filterService) {
+            const isActive = this.services.filterService.hasFilter('bookmark');
             button.classList.toggle('active', isActive);
 
             // Swap icon between outline and filled
@@ -988,9 +976,9 @@ export class MainController {
 
     private updateScheduleFilterButtonState(): void {
         const scheduleFilterButton = document.getElementById('schedule-filter-btn');
-        if (scheduleFilterButton && this.services.scheduleFilterService) {
-            const hasActiveFilters = !this.services.scheduleFilterService.isEmpty();
-            const filterCount = this.services.scheduleFilterService.getFilterCount();
+        if (scheduleFilterButton && this.services.filterService) {
+            const hasActiveFilters = !this.services.filterService.isEmpty();
+            const filterCount = this.services.filterService.getFilterCount();
 
             if (hasActiveFilters) {
                 scheduleFilterButton.classList.add('active');
@@ -1005,8 +993,8 @@ export class MainController {
 
     private updateScheduleClearFiltersButtonState(): void {
         const scheduleClearFiltersButton = document.getElementById('schedule-clear-filters-btn') as HTMLButtonElement | null;
-        if (scheduleClearFiltersButton && this.services.scheduleFilterService) {
-            const hasActiveFilters = !this.services.scheduleFilterService.isEmpty();
+        if (scheduleClearFiltersButton && this.services.filterService) {
+            const hasActiveFilters = !this.services.filterService.isEmpty();
 
             if (hasActiveFilters) {
                 scheduleClearFiltersButton.style.display = '';
@@ -1408,7 +1396,7 @@ export class MainController {
     private syncSearchInputFromFilters(): void {
         const searchInput = document.getElementById('search-input') as HTMLInputElement;
         if (searchInput) {
-            const searchTextFilter = this.services.catalogFilterService.getActiveFilters().find(f => f.id === 'searchText');
+            const searchTextFilter = this.services.filterService.getActiveFilters().find(f => f.id === 'searchText');
             const searchCriteria = searchTextFilter?.criteria as { query?: string } | undefined;
             const currentQuery = searchCriteria?.query || '';
             if (searchInput.value !== currentQuery) {
@@ -1420,7 +1408,7 @@ export class MainController {
     private updateFilteredHeader(resultCount: number, _selectedDepartment: Department | null): void {
         const contentHeader = document.querySelector('.content-header h2');
         if (contentHeader) {
-            const filters = this.services.catalogFilterService.getActiveFilters();
+            const filters = this.services.filterService.getActiveFilters();
             const searchTextFilter = filters.find(f => f.id === 'searchText');
 
             if (searchTextFilter && filters.length === 1) {
