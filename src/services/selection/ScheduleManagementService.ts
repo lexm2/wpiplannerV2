@@ -610,6 +610,36 @@ export class ScheduleManagementService {
         }
     }
 
+    async importScheduleInto(scheduleId: string, jsonData: string): Promise<ScheduleOperationResult> {
+        try {
+            await this.ensureInitialized();
+
+            const data = JSON.parse(jsonData);
+            if (!data.v?.startsWith("4")) {
+                return { success: false, error: 'Unsupported import format. Please export your schedules again using the latest version.' };
+            }
+
+            const importedCourses = this.profileStateManager.parseImportCourses(jsonData);
+            const existing = this.profileStateManager.getAllSchedules().find(s => s.id === scheduleId);
+            if (!existing) {
+                return { success: false, error: 'Schedule not found' };
+            }
+
+            const existingIds = new Set(existing.selectedCourses.map(c => c.course.id));
+            const merged = [...existing.selectedCourses, ...importedCourses.filter(c => !existingIds.has(c.course.id))];
+
+            const result = await this.updateSchedule(scheduleId, { selectedCourses: merged });
+
+            if (result.success && scheduleId === this.getActiveScheduleId()) {
+                this.profileStateManager.setActiveSchedule(scheduleId, 'api');
+            }
+
+            return result;
+        } catch (error) {
+            return { success: false, error: `Import failed: ${error}` };
+        }
+    }
+
     async importSchedule(jsonData: string): Promise<ScheduleOperationResult> {
         try {
             await this.ensureInitialized();

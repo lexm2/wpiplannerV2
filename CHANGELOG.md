@@ -4,6 +4,7 @@
 
 ### Improved
 - Added a "New Schedule" button at the bottom of the schedule list for quicker access
+- Import button on each schedule now imports courses directly into that schedule
 
 ## [2026-03-15]
 
