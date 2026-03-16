@@ -49,6 +49,7 @@
   font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
+  transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -98,6 +99,7 @@
   background: var(--color-surface);
   color: var(--color-text-secondary);
   cursor: pointer;
+  transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
