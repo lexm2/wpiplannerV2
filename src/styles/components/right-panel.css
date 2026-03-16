@@ -62,12 +62,37 @@
 }
 
 .course-category {
+  position: relative;
   font-size: 0.75rem;
   line-height: 1.6;
   color: var(--color-text-secondary);
   border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 0 0.35rem;
+}
+
+.course-category-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  padding: 0.5rem 0.65rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  text-align: left;
+  white-space: normal;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.course-category:hover .course-category-tooltip {
+  display: block;
 }
 
 .course-year {

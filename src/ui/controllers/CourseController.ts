@@ -13,6 +13,12 @@ import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 // Course listing and interaction management with optimistic UI integration
 // Provides progressive rendering for large datasets with instant visual feedback
 export class CourseController {
+    static readonly CATEGORY_DESCRIPTIONS: Record<1 | 2 | 3, string> = {
+        1: 'Cat. I courses cover core material of interest to large numbers of students and are offered at least once a year.',
+        2: 'Cat. II courses are offered at least every other year.',
+        3: 'Cat. III courses are offered at the discretion of the department or program.',
+    };
+
     private allDepartments: Department[] = [];
     private selectedCourse: Course | null = null;
     private activeElement: HTMLElement | null = null;
@@ -467,18 +473,29 @@ export class CourseController {
                 <div class="course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)} (${credits})</div>
                 <div class="course-meta">
                     ${yearLabel ? `<div class="course-year">${yearLabel}</div>` : ''}
-                    ${course.category != null ? `<div class="course-category">Cat ${course.category}</div>` : ''}
                 </div>
             </div>
             <div class="course-description-text">${Validators.escapeHtml(course.description)}</div>
         `;
 
-        // Add tabs for hierarchical courses
         if (isHierarchical || isLabOnly) {
             html += this.renderComponentTabs(course, isHierarchical, isLabOnly);
         }
 
         descriptionContainer.innerHTML = html;
+
+        if (course.category != null) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'course-category-tooltip';
+            tooltip.textContent = CourseController.CATEGORY_DESCRIPTIONS[course.category];
+
+            const btn = document.createElement('div');
+            btn.className = 'course-category';
+            btn.textContent = `Cat ${course.category}`;
+            btn.appendChild(tooltip);
+
+            descriptionContainer.querySelector('.course-meta')!.appendChild(btn);
+        }
 
         if (isHierarchical || isLabOnly) {
             this.attachTabEventListeners();
