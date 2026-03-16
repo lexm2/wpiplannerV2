@@ -6,6 +6,7 @@
 - Courses now include a WPI category (1, 2, or 3) parsed from their description
 
 ### Improved
+- Course and bookmark buttons now respond instantly with no delay
 - Added a "New Schedule" button at the bottom of the schedule list for quicker access
 - Import button on each schedule now imports courses directly into that schedule
 - Switching schedules and importing now update the UI in a single pass instead of multiple renders, making transitions noticeably faster

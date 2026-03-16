@@ -8,6 +8,7 @@ import { ProgressiveRenderer } from '../utils/ProgressiveRenderer'
 import { CancellationToken } from '../../utils/RequestCancellation'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
+import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 
 // Course listing and interaction management with optimistic UI integration
 // Provides progressive rendering for large datasets with instant visual feedback
@@ -363,11 +364,25 @@ export class CourseController {
     }
 
     toggleCourseBookmark(element: HTMLElement): void {
-        const bookmarkBtn = element.querySelector('.course-bookmark-btn');
-        if (!bookmarkBtn) return;
+        const courseId = element.dataset.courseId;
+        if (!courseId) return;
 
-        const isBookmarked = bookmarkBtn.classList.contains('bookmarked');
-        this.updateCourseBookmarkUI(element, !isBookmarked);
+        const stateManager = ProfileStateManager.getInstance();
+        const wasBookmarked = stateManager.isBookmarked(courseId);
+        this.updateCourseBookmarkUI(element, !wasBookmarked);
+
+        // rAF + setTimeout ensures the optimistic update paints before the service call runs
+        requestAnimationFrame(() => setTimeout(() => {
+            try {
+                if (wasBookmarked) {
+                    stateManager.unbookmarkCourse(courseId);
+                } else {
+                    stateManager.bookmarkCourse(courseId);
+                }
+            } catch {
+                this.updateCourseBookmarkUI(element, wasBookmarked);
+            }
+        }, 0));
     }
 
     private updateCourseBookmarkUI(element: HTMLElement, isBookmarked: boolean): void {
