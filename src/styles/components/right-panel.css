@@ -63,6 +63,7 @@
 
 .course-category {
   font-size: 0.75rem;
+  line-height: 1.6;
   color: var(--color-text-secondary);
   border: 1px solid var(--color-border);
   border-radius: 4px;
@@ -71,6 +72,7 @@
 
 .course-year {
   font-size: 0.9rem;
+  line-height: 1;
   color: var(--color-text-secondary);
 }
 
