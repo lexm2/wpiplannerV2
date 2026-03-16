@@ -1103,19 +1103,25 @@ export class MainController {
                 });
             });
 
-            // Use targeted updates instead of global refresh for better performance
             if (isCoursesAddedOrRemoved) {
-                this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
-            }
+                const currentIds = new Set(selectedCourses.map(sc => sc.course.id));
+                const previousIds = new Set(this.previousSelectedCoursesMap.keys());
 
-            // Always update the selected courses sidebar
-            this.courseController.displaySelectedCourses();
+                for (const sc of selectedCourses) {
+                    if (!previousIds.has(sc.course.id)) {
+                        this.courseController.addSelectedCourseToSidebar(sc.course);
+                        this.courseController.updateCourseUIById(sc.course.id, true);
+                    }
+                }
+                for (const id of previousIds) {
+                    if (!currentIds.has(id)) {
+                        this.courseController.removeSelectedCourseFromSidebar(id);
+                        this.courseController.updateCourseUIById(id, false);
+                    }
+                }
 
-            if (isCoursesAddedOrRemoved) {
-                // Full refresh needed when courses are added/removed
                 this.scheduleController.displayScheduleSelectedCourses();
 
-                // Also refresh schedule grids if we're on the schedule page
                 if (this.services.uiStateManager.currentPage === 'schedule') {
                     this.scheduleController.renderScheduleGrids();
                 }

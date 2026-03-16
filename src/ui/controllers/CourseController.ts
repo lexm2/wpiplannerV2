@@ -333,8 +333,8 @@ export class CourseController {
         const wasSelected = this.courseSelectionService.isCourseSelected(course);
         this.updateCourseUIById(course.id, !wasSelected);
 
-        // Defer service call until after the browser paints the optimistic update
-        setTimeout(() => {
+        // rAF + setTimeout ensures the optimistic update paints before the service call runs
+        requestAnimationFrame(() => setTimeout(() => {
             this.courseSelectionService.toggleCourseSelection(course)
                 .then(result => {
                     if (!result.success) {
@@ -344,28 +344,22 @@ export class CourseController {
                 .catch(() => {
                     this.updateCourseUIById(course.id, wasSelected);
                 });
-        }, 0);
+        }, 0));
     }
 
 
     private updateCourseSelectionUI(element: HTMLElement, isSelected: boolean): void {
         const selectBtn = element.querySelector('.course-select-btn');
+        if (!selectBtn) return;
 
-        if (selectBtn) {
-            const newIcon = isSelected
-                ? getInlineSVG('CHECK', 'check-icon')
-                : getInlineSVG('PLUS', 'plus-icon');
+        if (selectBtn.classList.contains('selected') === isSelected) return;
 
-            selectBtn.innerHTML = newIcon;
+        selectBtn.innerHTML = isSelected
+            ? getInlineSVG('CHECK', 'check-icon')
+            : getInlineSVG('PLUS', 'plus-icon');
 
-            if (isSelected) {
-                element.classList.add('selected');
-                selectBtn.classList.add('selected');
-            } else {
-                element.classList.remove('selected');
-                selectBtn.classList.remove('selected');
-            }
-        }
+        element.classList.toggle('selected', isSelected);
+        selectBtn.classList.toggle('selected', isSelected);
     }
 
     toggleCourseBookmark(element: HTMLElement): void {
@@ -733,14 +727,15 @@ export class CourseController {
                 ? `${course.minCredits} credits` 
                 : `${course.minCredits}-${course.maxCredits} credits`;
 
+            const sortKey = `${course.departmentAbbr}${course.number}`;
             html += `
-                <div class="selected-course-item" data-course-id="${Validators.escapeHtml(course.id)}">
+                <div class="selected-course-item" data-course-id="${Validators.escapeHtml(course.id)}" data-sort-key="${Validators.escapeHtml(sortKey)}">
                     <div class="selected-course-info">
                         <div class="selected-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
                         <div class="selected-course-name">${Validators.escapeHtml(course.name)}</div>
                         <div class="selected-course-credits">${credits}</div>
                     </div>
-                    <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
+                    <button class="course-remove-btn" data-course-id="${Validators.escapeHtml(course.id)}" title="Remove from selection">
                         ${getInlineSVG('TRASH', 'trash-icon')}
                     </button>
                 </div>
@@ -759,6 +754,72 @@ export class CourseController {
         removeButtons.forEach((button, index) => {
             this.elementToCourseMap.set(button as HTMLElement, sortedCourses[index].course);
         });
+    }
+
+    addSelectedCourseToSidebar(course: Course): void {
+        const container = document.getElementById('selected-courses-list');
+        const countElement = document.getElementById('selected-count');
+        if (!container) return;
+
+        if (container.querySelector('.empty-state')) {
+            container.innerHTML = '';
+        }
+
+        const credits = course.minCredits === course.maxCredits
+            ? `${course.minCredits} credits`
+            : `${course.minCredits}-${course.maxCredits} credits`;
+        const sortKey = `${course.departmentAbbr}${course.number}`;
+
+        const item = document.createElement('div');
+        item.className = 'selected-course-item';
+        item.dataset.courseId = course.id;
+        item.dataset.sortKey = sortKey;
+        item.innerHTML = `
+            <div class="selected-course-info">
+                <div class="selected-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
+                <div class="selected-course-name">${Validators.escapeHtml(course.name)}</div>
+                <div class="selected-course-credits">${credits}</div>
+            </div>
+            <button class="course-remove-btn" data-course-id="${Validators.escapeHtml(course.id)}" title="Remove from selection">
+                ${getInlineSVG('TRASH', 'trash-icon')}
+            </button>
+        `;
+
+        const existing = Array.from(container.querySelectorAll<HTMLElement>('.selected-course-item'));
+        const insertBefore = existing.find(el => (el.dataset.sortKey ?? '') > sortKey);
+        if (insertBefore) {
+            container.insertBefore(item, insertBefore);
+        } else {
+            container.appendChild(item);
+        }
+
+        this.elementToCourseMap.set(item, course);
+        const removeBtn = item.querySelector('.course-remove-btn') as HTMLElement | null;
+        if (removeBtn) this.elementToCourseMap.set(removeBtn, course);
+
+        if (countElement) {
+            countElement.textContent = `(${container.querySelectorAll('.selected-course-item').length})`;
+        }
+    }
+
+    removeSelectedCourseFromSidebar(courseId: string): void {
+        const container = document.getElementById('selected-courses-list');
+        const countElement = document.getElementById('selected-count');
+        if (!container) return;
+
+        const item = container.querySelector<HTMLElement>(`.selected-course-item[data-course-id="${courseId}"]`);
+        if (item) {
+            const removeBtn = item.querySelector('.course-remove-btn') as HTMLElement | null;
+            if (removeBtn) this.elementToCourseMap.delete(removeBtn);
+            this.elementToCourseMap.delete(item);
+            item.remove();
+        }
+
+        const remaining = container.querySelectorAll('.selected-course-item').length;
+        if (remaining === 0) {
+            container.innerHTML = '<div class="empty-state">No courses selected yet</div>';
+        }
+        if (countElement) countElement.textContent = `(${remaining})`;
     }
 
     getCourseFromElement(element: HTMLElement): Course | undefined {
