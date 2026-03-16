@@ -8,7 +8,6 @@ import { ProgressiveRenderer } from '../utils/ProgressiveRenderer'
 import { CancellationToken } from '../../utils/RequestCancellation'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
-import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 
 // Course listing and interaction management with optimistic UI integration
 // Provides progressive rendering for large datasets with instant visual feedback
@@ -329,26 +328,23 @@ export class CourseController {
 
     toggleCourseSelection(element: HTMLElement): void {
         const course = this.elementToCourseMap.get(element);
-
-        if (!course) {
-            console.error('Course not found in element map');
-            return;
-        }
+        if (!course) return;
 
         const wasSelected = this.courseSelectionService.isCourseSelected(course);
         this.updateCourseUIById(course.id, !wasSelected);
 
-        this.courseSelectionService.toggleCourseSelection(course)
-            .then(result => {
-                if (!result.success) {
-                    console.error('Failed to toggle course selection:', result.error);
+        // Defer service call until after the browser paints the optimistic update
+        setTimeout(() => {
+            this.courseSelectionService.toggleCourseSelection(course)
+                .then(result => {
+                    if (!result.success) {
+                        this.updateCourseUIById(course.id, wasSelected);
+                    }
+                })
+                .catch(() => {
                     this.updateCourseUIById(course.id, wasSelected);
-                }
-            })
-            .catch(error => {
-                console.error('Error toggling course selection:', error);
-                this.updateCourseUIById(course.id, wasSelected);
-            });
+                });
+        }, 0);
     }
 
 
@@ -373,27 +369,17 @@ export class CourseController {
     }
 
     toggleCourseBookmark(element: HTMLElement): void {
-        const courseId = element.dataset.courseId;
-        if (!courseId) return;
+        const bookmarkBtn = element.querySelector('.course-bookmark-btn');
+        if (!bookmarkBtn) return;
 
-        const stateManager = ProfileStateManager.getInstance();
-        const wasBookmarked = stateManager.isBookmarked(courseId);
+        const isBookmarked = bookmarkBtn.classList.contains('bookmarked');
+        this.updateCourseBookmarkUI(element, !isBookmarked);
 
-        try {
-            // Show immediate optimistic feedback
-            this.updateCourseBookmarkUI(element, !wasBookmarked);
-
-            // Perform the state change
-            if (wasBookmarked) {
-                stateManager.unbookmarkCourse(courseId);
-            } else {
-                stateManager.bookmarkCourse(courseId);
-            }
-        } catch (error) {
-            console.error('Error toggling course bookmark:', error);
-            // Rollback optimistic change on error
-            this.updateCourseBookmarkUI(element, wasBookmarked);
-        }
+        // TODO: connect to ProfileStateManager
+        // const courseId = element.dataset.courseId;
+        // if (!courseId) return;
+        // const stateManager = ProfileStateManager.getInstance();
+        // stateManager[isBookmarked ? 'unbookmarkCourse' : 'bookmarkCourse'](courseId);
     }
 
     private updateCourseBookmarkUI(element: HTMLElement, isBookmarked: boolean): void {
