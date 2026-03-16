@@ -5,6 +5,7 @@
 ### Improved
 - Added a "New Schedule" button at the bottom of the schedule list for quicker access
 - Import button on each schedule now imports courses directly into that schedule
+- Switching schedules and importing now update the UI in a single pass instead of multiple renders, making transitions noticeably faster
 
 ## [2026-03-15]
 

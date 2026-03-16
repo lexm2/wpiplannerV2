@@ -870,26 +870,11 @@ export class CourseSelectionService {
                     // Force complete UI refresh for schedule changes
                     const newSelectedCourses = this.profileStateManager.getSelectedCourses();
 
-                    // Dispatch data_loaded event to trigger complete UI refresh
                     this.notifySelectionListeners({
                         type: 'data_loaded',
                         selectedCourses: newSelectedCourses,
                         timestamp: event.timestamp
                     });
-
-                    // Also dispatch a specific schedule change event for components that need it
-                    setTimeout(() => {
-                        this.notifySelectionListeners({
-                            type: 'selection_cleared',
-                            selectedCourses: [],
-                            timestamp: event.timestamp
-                        });
-                        this.notifySelectionListeners({
-                            type: 'data_loaded',
-                            selectedCourses: newSelectedCourses,
-                            timestamp: event.timestamp + 1
-                        });
-                    }, 10);
                     break;
                 case 'schedule_changed': {
                     // Handle imported data - trigger complete UI refresh
@@ -897,20 +882,11 @@ export class CourseSelectionService {
                     if (scheduleData?.action === 'imported') {
                         const importedCourses = this.profileStateManager.getSelectedCourses();
 
-                        // Clear and reload pattern for complete sync
                         this.notifySelectionListeners({
-                            type: 'selection_cleared',
-                            selectedCourses: [],
+                            type: 'data_loaded',
+                            selectedCourses: importedCourses,
                             timestamp: event.timestamp
                         });
-
-                        setTimeout(() => {
-                            this.notifySelectionListeners({
-                                type: 'data_loaded',
-                                selectedCourses: importedCourses,
-                                timestamp: event.timestamp + 1
-                            });
-                        }, 10);
                     }
                     break;
                 }

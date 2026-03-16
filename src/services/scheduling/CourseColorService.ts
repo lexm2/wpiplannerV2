@@ -20,7 +20,7 @@ export class CourseColorService {
         this.courseSelectionService.addSelectionListener((event) => {
             if (event.type === 'course_removed' && event.course) {
                 this.releaseCourseColor(event.course.id);
-            } else if (event.type === 'selection_cleared') {
+            } else if (event.type === 'selection_cleared' || event.type === 'data_loaded') {
                 this.courseColorMap.clear();
                 this.usedColors.clear();
             }
