@@ -1,5 +1,16 @@
 # Changelog
 
+## [2026-03-16]
+
+### Added
+- Courses now include a WPI category (1, 2, or 3) parsed from their description
+
+### Improved
+- Course and bookmark buttons now respond instantly with no delay
+- Added a "New Schedule" button at the bottom of the schedule list for quicker access
+- Import button on each schedule now imports courses directly into that schedule
+- Switching schedules and importing now update the UI in a single pass instead of multiple renders, making transitions noticeably faster
+
 ## [2026-03-15]
 
 ### Added
@@ -9,6 +20,8 @@
 - Calendar event conflict filter and auto-schedule modal mode
 
 ### Improved
+- Reduced DOM queries by caching element references and using event delegation for faster interactions
+- Course component tabs (lectures, labs, discussions) now load sections lazily for faster course description rendering
 - Department sidebar course counts now update when filters change
 - Courses are now removed from results when filters eliminate all sections of a required component type
 - Unified CourseFilterService and ScheduleFilterService into a single FilterService

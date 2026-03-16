@@ -74,6 +74,12 @@
   padding: 0;
 }
 
+.schedule-picker-modal-dialog .schedule-list-add-btn {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.75rem auto 1rem;
+}
+
 .schedule-picker-modal-dialog .schedule-list-empty {
   padding: 3rem 1.5rem;
   text-align: center;

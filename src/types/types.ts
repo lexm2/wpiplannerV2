@@ -12,6 +12,7 @@ export interface Course {
     number: string;
     name: string;
     description: string;
+    category?: 1 | 2 | 3 | null;
     departmentAbbr: string;
     departmentName: string;
     lectures?: LectureGroup[];

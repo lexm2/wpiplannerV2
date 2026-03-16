@@ -106,7 +106,7 @@ export class SchedulePickerModal extends BaseModal {
             return '<div class="schedule-list-empty">No schedules found</div>';
         }
 
-        return schedules.map(schedule => {
+        const items = schedules.map(schedule => {
             const isActive = schedule.id === activeScheduleId;
             const courseCount = isActive ?
                 this.scheduleManagementService.getCourseSelectionService().getSelectedCourses().length :
@@ -123,6 +123,7 @@ export class SchedulePickerModal extends BaseModal {
                         <button class="btn-link inline-action-btn" data-action="duplicate">Duplicate</button>
                         <button class="btn-link inline-action-btn" data-action="export">Export</button>
                         <button class="btn-link inline-action-btn" data-action="export-ics">Export ICS</button>
+                        <button class="btn-link inline-action-btn" data-action="import">Import</button>
                         ${schedules.length > 1 ? '<button class="btn-link inline-action-btn danger" data-action="delete">Delete</button>' : ''}
                         <button class="btn-link ${styles['menuBtn']}" title="More options">⋮</button>
                     </div>
@@ -131,11 +132,14 @@ export class SchedulePickerModal extends BaseModal {
                         <button class="${styles['menuAction']}" data-action="duplicate">Duplicate</button>
                         <button class="${styles['menuAction']}" data-action="export">Export</button>
                         <button class="${styles['menuAction']}" data-action="export-ics">Export ICS</button>
+                        <button class="${styles['menuAction']}" data-action="import">Import</button>
                         ${schedules.length > 1 ? `<button class="${styles['menuAction']} danger" data-action="delete">Delete</button>` : ''}
                     </div>
                 </div>
             `;
         }).join('');
+
+        return items;
     }
 
     private updateScheduleList(): void {
@@ -145,6 +149,12 @@ export class SchedulePickerModal extends BaseModal {
         if (listContainer) {
             listContainer.innerHTML = this.renderScheduleList();
             this.setupScheduleItemListeners();
+
+            const addBtn = document.createElement('button');
+            addBtn.className = 'btn btn-primary schedule-list-add-btn';
+            addBtn.innerHTML = `${getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')}<span class="btn-text"> New Schedule</span>`;
+            addBtn.addEventListener('click', () => this.createNewSchedule());
+            listContainer.appendChild(addBtn);
         }
     }
 
@@ -164,7 +174,15 @@ export class SchedulePickerModal extends BaseModal {
 
         newScheduleBtnHeader?.addEventListener('click', () => this.createNewSchedule());
         newScheduleBtnSettings?.addEventListener('click', () => this.createNewSchedule());
-        importBtn?.addEventListener('click', () => this.importSchedule());
+        importBtn?.addEventListener('click', async () => {
+            const name = prompt('Enter name for imported schedule:');
+            if (!name?.trim()) return;
+            const result = await this.scheduleManagementService.createNewSchedule(name.trim());
+            if (result.success && result.schedule?.id) {
+                this.updateScheduleList();
+                await this.importSchedule(result.schedule.id);
+            }
+        });
         exportIcsBtn?.addEventListener('click', () => {
             const activeId = this.scheduleManagementService.getActiveScheduleId();
             if (activeId) this.exportScheduleICS(activeId);
@@ -343,6 +361,9 @@ export class SchedulePickerModal extends BaseModal {
                 case 'export-ics':
                     await this.exportScheduleICS(scheduleId);
                     break;
+                case 'import':
+                    await this.importSchedule(scheduleId);
+                    break;
                 case 'delete':
                     await this.deleteSchedule(scheduleId);
                     break;
@@ -467,7 +488,7 @@ export class SchedulePickerModal extends BaseModal {
         }
     }
 
-    private async importSchedule(): Promise<void> {
+    private async importSchedule(scheduleId: string): Promise<void> {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json';
@@ -477,14 +498,10 @@ export class SchedulePickerModal extends BaseModal {
             if (file) {
                 try {
                     const text = await file.text();
-                    const result = await this.scheduleManagementService.importSchedule(text);
+                    const result = await this.scheduleManagementService.importScheduleInto(scheduleId, text);
 
                     if (result.success) {
                         this.updateScheduleList();
-                        if (result.message) alert(result.message);
-                        if (result.warnings && result.warnings.length > 0) {
-                            console.warn('Import warnings:', result.warnings);
-                        }
                     } else {
                         alert(`Import failed: ${result.error}`);
                     }

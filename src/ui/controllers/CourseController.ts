@@ -13,6 +13,12 @@ import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 // Course listing and interaction management with optimistic UI integration
 // Provides progressive rendering for large datasets with instant visual feedback
 export class CourseController {
+    static readonly CATEGORY_DESCRIPTIONS: Record<1 | 2 | 3, string> = {
+        1: 'Cat. I courses cover core material of interest to large numbers of students and are offered at least once a year.',
+        2: 'Cat. II courses are offered at least every other year.',
+        3: 'Cat. III courses are offered at the discretion of the department or program.',
+    };
+
     private allDepartments: Department[] = [];
     private selectedCourse: Course | null = null;
     private activeElement: HTMLElement | null = null;
@@ -329,47 +335,38 @@ export class CourseController {
 
     toggleCourseSelection(element: HTMLElement): void {
         const course = this.elementToCourseMap.get(element);
-
-        if (!course) {
-            console.error('Course not found in element map');
-            return;
-        }
+        if (!course) return;
 
         const wasSelected = this.courseSelectionService.isCourseSelected(course);
         this.updateCourseUIById(course.id, !wasSelected);
 
-        this.courseSelectionService.toggleCourseSelection(course)
-            .then(result => {
-                if (!result.success) {
-                    console.error('Failed to toggle course selection:', result.error);
+        // rAF + setTimeout ensures the optimistic update paints before the service call runs
+        requestAnimationFrame(() => setTimeout(() => {
+            this.courseSelectionService.toggleCourseSelection(course)
+                .then(result => {
+                    if (!result.success) {
+                        this.updateCourseUIById(course.id, wasSelected);
+                    }
+                })
+                .catch(() => {
                     this.updateCourseUIById(course.id, wasSelected);
-                }
-            })
-            .catch(error => {
-                console.error('Error toggling course selection:', error);
-                this.updateCourseUIById(course.id, wasSelected);
-            });
+                });
+        }, 0));
     }
 
 
     private updateCourseSelectionUI(element: HTMLElement, isSelected: boolean): void {
         const selectBtn = element.querySelector('.course-select-btn');
+        if (!selectBtn) return;
 
-        if (selectBtn) {
-            const newIcon = isSelected
-                ? getInlineSVG('CHECK', 'check-icon')
-                : getInlineSVG('PLUS', 'plus-icon');
+        if (selectBtn.classList.contains('selected') === isSelected) return;
 
-            selectBtn.innerHTML = newIcon;
+        selectBtn.innerHTML = isSelected
+            ? getInlineSVG('CHECK', 'check-icon')
+            : getInlineSVG('PLUS', 'plus-icon');
 
-            if (isSelected) {
-                element.classList.add('selected');
-                selectBtn.classList.add('selected');
-            } else {
-                element.classList.remove('selected');
-                selectBtn.classList.remove('selected');
-            }
-        }
+        element.classList.toggle('selected', isSelected);
+        selectBtn.classList.toggle('selected', isSelected);
     }
 
     toggleCourseBookmark(element: HTMLElement): void {
@@ -378,22 +375,20 @@ export class CourseController {
 
         const stateManager = ProfileStateManager.getInstance();
         const wasBookmarked = stateManager.isBookmarked(courseId);
+        this.updateCourseBookmarkUI(element, !wasBookmarked);
 
-        try {
-            // Show immediate optimistic feedback
-            this.updateCourseBookmarkUI(element, !wasBookmarked);
-
-            // Perform the state change
-            if (wasBookmarked) {
-                stateManager.unbookmarkCourse(courseId);
-            } else {
-                stateManager.bookmarkCourse(courseId);
+        // rAF + setTimeout ensures the optimistic update paints before the service call runs
+        requestAnimationFrame(() => setTimeout(() => {
+            try {
+                if (wasBookmarked) {
+                    stateManager.unbookmarkCourse(courseId);
+                } else {
+                    stateManager.bookmarkCourse(courseId);
+                }
+            } catch {
+                this.updateCourseBookmarkUI(element, wasBookmarked);
             }
-        } catch (error) {
-            console.error('Error toggling course bookmark:', error);
-            // Rollback optimistic change on error
-            this.updateCourseBookmarkUI(element, wasBookmarked);
-        }
+        }, 0));
     }
 
     private updateCourseBookmarkUI(element: HTMLElement, isBookmarked: boolean): void {
@@ -476,21 +471,38 @@ export class CourseController {
             <div class="course-info">
                 <div class="course-desc-title">${Validators.escapeHtml(course.name)}</div>
                 <div class="course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)} (${credits})</div>
-                ${yearLabel ? `<div class="course-year">${yearLabel}</div>` : ''}
+                <div class="course-meta">
+                    ${yearLabel ? `<div class="course-year">${yearLabel}</div>` : ''}
+                </div>
             </div>
             <div class="course-description-text">${Validators.escapeHtml(course.description)}</div>
         `;
 
-        // Add tabs for hierarchical courses
         if (isHierarchical || isLabOnly) {
             html += this.renderComponentTabs(course, isHierarchical, isLabOnly);
         }
 
         descriptionContainer.innerHTML = html;
 
-        // Attach tab event listeners if hierarchical
+        if (course.category != null) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'course-category-tooltip';
+            tooltip.textContent = CourseController.CATEGORY_DESCRIPTIONS[course.category];
+
+            const btn = document.createElement('div');
+            btn.className = 'course-category';
+            btn.textContent = `Cat ${course.category}`;
+            btn.appendChild(tooltip);
+
+            descriptionContainer.querySelector('.course-meta')!.appendChild(btn);
+        }
+
         if (isHierarchical || isLabOnly) {
             this.attachTabEventListeners();
+            const activePanel = descriptionContainer.querySelector('.tab-panel.active') as HTMLElement | null;
+            if (activePanel) {
+                this.populatePanel(activePanel, course);
+            }
         }
     }
 
@@ -524,16 +536,16 @@ export class CourseController {
         html += '<div class="component-tab-content">';
 
         if (showLectures) {
-            html += this.renderLecturesTab(course);
+            html += this.renderLecturesTab();
         }
         if (showDiscussions) {
-            html += this.renderDiscussionsTab(course);
+            html += this.renderDiscussionsTab();
         }
         if (showLabs) {
-            html += this.renderLabsTab(course, isLabOnly);
+            html += this.renderLabsTab();
         }
         if (showInterestLists) {
-            html += this.renderInterestListsTab(course);
+            html += this.renderInterestListsTab();
         }
 
         html += '</div>'; // end component-tab-content
@@ -542,81 +554,63 @@ export class CourseController {
         return html;
     }
 
-    private renderLecturesTab(course: Course): string {
-        // Filter out interest lists - they have their own tab
-        const lectures = this.courseDataService.getLecturesForCourse(course)
-            .filter(lg => !lg.section.isInterestList);
-
-        let html = '<div class="tab-panel active" data-panel="lectures">';
-        html += `<h3>Available Lectures (${lectures.length})</h3>`;
-        html += '<div class="sections-list">';
-
-        for (const lectureGroup of lectures) {
-            html += this.renderSectionCard(lectureGroup.section, 'Lecture');
-        }
-
-        html += '</div></div>';
-        return html;
+    private renderLecturesTab(): string {
+        return '<div class="tab-panel active" data-panel="lectures" data-loaded="false"></div>';
     }
 
-    private renderInterestListsTab(course: Course): string {
-        const interestLists = this.courseDataService.getLecturesForCourse(course)
-            .filter(lg => lg.section.isInterestList);
-
-        let html = '<div class="tab-panel" data-panel="interest-lists">';
-        html += `<h3>Interest Lists (${interestLists.length})</h3>`;
-        html += '<div class="sections-list">';
-
-        for (const lectureGroup of interestLists) {
-            html += this.renderSectionCard(lectureGroup.section, 'Interest List');
-        }
-
-        html += '</div></div>';
-        return html;
+    private renderInterestListsTab(): string {
+        return '<div class="tab-panel" data-panel="interest-lists" data-loaded="false"></div>';
     }
 
-    private renderDiscussionsTab(course: Course): string {
-        const discussions = this.courseDataService.getLecturesForCourse(course)
-            .flatMap(lg => lg.compatibleDiscussions);
-
-        let html = '<div class="tab-panel" data-panel="discussions">';
-        html += `<h3>Available Discussions (${discussions.length})</h3>`;
-        html += '<div class="sections-list">';
-
-        for (const discussion of discussions) {
-            html += this.renderSectionCard(discussion, 'Discussion');
-        }
-
-        html += '</div></div>';
-        return html;
+    private renderDiscussionsTab(): string {
+        return '<div class="tab-panel" data-panel="discussions" data-loaded="false"></div>';
     }
 
-    private renderLabsTab(course: Course, isLabOnly: boolean): string {
-        let html = '<div class="tab-panel" data-panel="labs">';
+    private renderLabsTab(): string {
+        return '<div class="tab-panel" data-panel="labs" data-loaded="false"></div>';
+    }
 
-        if (isLabOnly) {
-            const labs = this.courseDataService.getStandaloneLabs(course);
-            html += `<h3>Available Lab Sections (${labs.length})</h3>`;
-            html += '<div class="sections-list">';
+    private populatePanel(panel: HTMLElement, course: Course): void {
+        if (panel.dataset.loaded === 'true') return;
 
-            for (const lab of labs) {
-                html += this.renderSectionCard(lab, 'Lab');
+        const panelName = panel.dataset.panel;
+        let html = '';
+
+        if (panelName === 'lectures') {
+            const lectures = this.courseDataService.getLecturesForCourse(course)
+                .filter(lg => !lg.section.isInterestList);
+            html = `<h3>Available Lectures (${lectures.length})</h3><div class="sections-list">`;
+            for (const lg of lectures) html += this.renderSectionCard(lg.section, 'Lecture');
+            html += '</div>';
+        } else if (panelName === 'discussions') {
+            const discussions = this.courseDataService.getLecturesForCourse(course)
+                .flatMap(lg => lg.compatibleDiscussions);
+            html = `<h3>Available Discussions (${discussions.length})</h3><div class="sections-list">`;
+            for (const d of discussions) html += this.renderSectionCard(d, 'Discussion');
+            html += '</div>';
+        } else if (panelName === 'labs') {
+            const isLabOnly = this.courseDataService.isLabOnlyCourse(course);
+            if (isLabOnly) {
+                const labs = this.courseDataService.getStandaloneLabs(course);
+                html = `<h3>Available Lab Sections (${labs.length})</h3><div class="sections-list">`;
+                for (const lab of labs) html += this.renderSectionCard(lab, 'Lab');
+            } else {
+                const labs = this.courseDataService.getLecturesForCourse(course)
+                    .flatMap(lg => lg.compatibleLabs);
+                html = `<h3>Available Labs (${labs.length})</h3><div class="sections-list">`;
+                for (const lab of labs) html += this.renderSectionCard(lab, 'Lab');
             }
-        } else {
-            const labs = this.courseDataService.getLecturesForCourse(course)
-                .flatMap(lg => lg.compatibleLabs);
-            html += `<h3>Available Labs (${labs.length})</h3>`;
-            html += '<div class="sections-list">';
-
-            for (const lab of labs) {
-                html += this.renderSectionCard(lab, 'Lab');
-            }
-
+            html += '</div>';
+        } else if (panelName === 'interest-lists') {
+            const interestLists = this.courseDataService.getLecturesForCourse(course)
+                .filter(lg => lg.section.isInterestList);
+            html = `<h3>Interest Lists (${interestLists.length})</h3><div class="sections-list">`;
+            for (const lg of interestLists) html += this.renderSectionCard(lg.section, 'Interest List');
             html += '</div>';
         }
 
-        html += '</div></div>';
-        return html;
+        panel.innerHTML = html;
+        panel.dataset.loaded = 'true';
     }
 
     private renderSectionCard(section: Section, type: string): string {
@@ -695,26 +689,27 @@ export class CourseController {
     }
 
     private attachTabEventListeners(): void {
-        const tabs = document.querySelectorAll('.component-tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const target = e.target as HTMLElement;
-                const tabName = target.dataset.tab;
-                if (!tabName) return;
+        const descriptionContainer = document.getElementById('course-description');
+        if (!descriptionContainer) return;
 
-                // Update active tab
-                tabs.forEach(t => t.classList.remove('active'));
-                target.classList.add('active');
+        const tabsContainer = descriptionContainer.querySelector<HTMLElement>('.component-tabs');
+        const tabContent = descriptionContainer.querySelector<HTMLElement>('.component-tab-content');
+        if (!tabsContainer || !tabContent) return;
 
-                // Update active panel
-                const panels = document.querySelectorAll('.tab-panel');
-                panels.forEach(p => p.classList.remove('active'));
+        tabsContainer.addEventListener('click', (e) => {
+            const tab = (e.target as HTMLElement).closest<HTMLElement>('.component-tab');
+            if (!tab?.dataset.tab) return;
 
-                const activePanel = document.querySelector(`.tab-panel[data-panel="${tabName}"]`);
-                if (activePanel) {
-                    activePanel.classList.add('active');
-                }
-            });
+            tabsContainer.querySelectorAll('.component-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            tabContent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            const activePanel = tabContent.querySelector<HTMLElement>(`.tab-panel[data-panel="${tab.dataset.tab}"]`);
+            if (activePanel && this.selectedCourse) {
+                this.populatePanel(activePanel, this.selectedCourse);
+                activePanel.classList.add('active');
+            }
         });
     }
 
@@ -761,14 +756,15 @@ export class CourseController {
                 ? `${course.minCredits} credits` 
                 : `${course.minCredits}-${course.maxCredits} credits`;
 
+            const sortKey = `${course.departmentAbbr}${course.number}`;
             html += `
-                <div class="selected-course-item" data-course-id="${Validators.escapeHtml(course.id)}">
+                <div class="selected-course-item" data-course-id="${Validators.escapeHtml(course.id)}" data-sort-key="${Validators.escapeHtml(sortKey)}">
                     <div class="selected-course-info">
                         <div class="selected-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
                         <div class="selected-course-name">${Validators.escapeHtml(course.name)}</div>
                         <div class="selected-course-credits">${credits}</div>
                     </div>
-                    <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
+                    <button class="course-remove-btn" data-course-id="${Validators.escapeHtml(course.id)}" title="Remove from selection">
                         ${getInlineSVG('TRASH', 'trash-icon')}
                     </button>
                 </div>
@@ -787,6 +783,72 @@ export class CourseController {
         removeButtons.forEach((button, index) => {
             this.elementToCourseMap.set(button as HTMLElement, sortedCourses[index].course);
         });
+    }
+
+    addSelectedCourseToSidebar(course: Course): void {
+        const container = document.getElementById('selected-courses-list');
+        const countElement = document.getElementById('selected-count');
+        if (!container) return;
+
+        if (container.querySelector('.empty-state')) {
+            container.innerHTML = '';
+        }
+
+        const credits = course.minCredits === course.maxCredits
+            ? `${course.minCredits} credits`
+            : `${course.minCredits}-${course.maxCredits} credits`;
+        const sortKey = `${course.departmentAbbr}${course.number}`;
+
+        const item = document.createElement('div');
+        item.className = 'selected-course-item';
+        item.dataset.courseId = course.id;
+        item.dataset.sortKey = sortKey;
+        item.innerHTML = `
+            <div class="selected-course-info">
+                <div class="selected-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
+                <div class="selected-course-name">${Validators.escapeHtml(course.name)}</div>
+                <div class="selected-course-credits">${credits}</div>
+            </div>
+            <button class="course-remove-btn" data-course-id="${Validators.escapeHtml(course.id)}" title="Remove from selection">
+                ${getInlineSVG('TRASH', 'trash-icon')}
+            </button>
+        `;
+
+        const existing = Array.from(container.querySelectorAll<HTMLElement>('.selected-course-item'));
+        const insertBefore = existing.find(el => (el.dataset.sortKey ?? '') > sortKey);
+        if (insertBefore) {
+            container.insertBefore(item, insertBefore);
+        } else {
+            container.appendChild(item);
+        }
+
+        this.elementToCourseMap.set(item, course);
+        const removeBtn = item.querySelector('.course-remove-btn') as HTMLElement | null;
+        if (removeBtn) this.elementToCourseMap.set(removeBtn, course);
+
+        if (countElement) {
+            countElement.textContent = `(${container.querySelectorAll('.selected-course-item').length})`;
+        }
+    }
+
+    removeSelectedCourseFromSidebar(courseId: string): void {
+        const container = document.getElementById('selected-courses-list');
+        const countElement = document.getElementById('selected-count');
+        if (!container) return;
+
+        const item = container.querySelector<HTMLElement>(`.selected-course-item[data-course-id="${courseId}"]`);
+        if (item) {
+            const removeBtn = item.querySelector('.course-remove-btn') as HTMLElement | null;
+            if (removeBtn) this.elementToCourseMap.delete(removeBtn);
+            this.elementToCourseMap.delete(item);
+            item.remove();
+        }
+
+        const remaining = container.querySelectorAll('.selected-course-item').length;
+        if (remaining === 0) {
+            container.innerHTML = '<div class="empty-state">No courses selected yet</div>';
+        }
+        if (countElement) countElement.textContent = `(${remaining})`;
     }
 
     getCourseFromElement(element: HTMLElement): Course | undefined {

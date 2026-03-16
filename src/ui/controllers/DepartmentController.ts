@@ -6,6 +6,8 @@ export class DepartmentController {
     private allDepartments: Department[] = [];
     private filterService: FilterService | null = null;
     private expandedCategories: Set<string> = new Set();
+    private departmentItemMap: Map<string, HTMLElement> = new Map();
+    private departmentList: HTMLElement | null = null;
 
     constructor() {}
 
@@ -34,8 +36,15 @@ export class DepartmentController {
     }
 
     displayDepartments(): void {
-        const departmentList = document.getElementById('department-list');
-        if (!departmentList) return;
+        if (!this.departmentList) {
+            this.departmentList = document.getElementById('department-list');
+            if (!this.departmentList) return;
+            this.departmentList.addEventListener('click', (e) => {
+                const header = (e.target as HTMLElement).closest<HTMLElement>('.category-header[data-category]');
+                if (header?.dataset.category) this.toggleCategory(header.dataset.category);
+            });
+        }
+        const departmentList = this.departmentList;
 
         const totalCourseCount = this.allDepartments.reduce((total, dept) => total + dept.courses.length, 0);
 
@@ -85,22 +94,16 @@ export class DepartmentController {
         });
 
         departmentList.innerHTML = html;
-        this.setupCategoryToggleListeners();
-    }
 
-    private setupCategoryToggleListeners(): void {
-        document.querySelectorAll('.category-header[data-category]').forEach(header => {
-            header.addEventListener('click', (_e) => {
-                const categoryName = (header as HTMLElement).dataset.category;
-                if (categoryName) {
-                    this.toggleCategory(categoryName);
-                }
-            });
+        this.departmentItemMap.clear();
+        departmentList.querySelectorAll<HTMLElement>('.department-item').forEach(item => {
+            const deptId = item.dataset.deptId;
+            if (deptId) this.departmentItemMap.set(deptId, item);
         });
     }
 
     toggleCategory(categoryName: string): void {
-        const header = document.querySelector(`.category-header[data-category="${categoryName}"]`);
+        const header = this.departmentList?.querySelector<HTMLElement>(`.category-header[data-category="${categoryName}"]`);
         if (!header) return;
 
         const departmentList = header.nextElementSibling as HTMLElement;
@@ -165,7 +168,6 @@ export class DepartmentController {
             ? new Set(this.filterService.filterCoursesExcluding(allCourses, ['department']).map(c => c.id))
             : null;
 
-        // Update each department item's count
         let totalCount = 0;
         this.allDepartments.forEach(dept => {
             const count = passingCourses
@@ -173,17 +175,12 @@ export class DepartmentController {
                 : dept.courses.length;
             totalCount += count;
 
-            const item = document.querySelector(`.department-item[data-dept-id="${dept.abbreviation}"]`);
-            if (item) {
-                item.textContent = `${dept.name} (${count})`;
-            }
+            const item = this.departmentItemMap.get(dept.abbreviation);
+            if (item) item.textContent = `${dept.name} (${count})`;
         });
 
-        // Update "All Departments" count
-        const allItem = document.querySelector('.department-item[data-dept-id="all"]');
-        if (allItem) {
-            allItem.textContent = `All Departments (${totalCount})`;
-        }
+        const allItem = this.departmentItemMap.get('all');
+        if (allItem) allItem.textContent = `All Departments (${totalCount})`;
     }
 
     private getActiveDepartments(): string[] {
@@ -195,19 +192,14 @@ export class DepartmentController {
     }
 
     private updateVisualState(activeDepts: string[]): void {
-        document.querySelectorAll('.department-item').forEach(item => {
-            item.classList.remove('active');
-        });
+        this.departmentItemMap.forEach(item => item.classList.remove('active'));
 
         if (activeDepts.length === 0) {
-            document.querySelector('[data-dept-id="all"]')?.classList.add('active');
+            this.departmentItemMap.get('all')?.classList.add('active');
         } else {
-            activeDepts.forEach(id => {
-                document.querySelector(`[data-dept-id="${id}"]`)?.classList.add('active');
-            });
+            activeDepts.forEach(id => this.departmentItemMap.get(id)?.classList.add('active'));
         }
 
-        // Update sidebar header for multi-selection
         const sidebarHeader = document.querySelector('.sidebar-header h2');
         if (sidebarHeader) {
             if (activeDepts.length === 0) {
@@ -219,13 +211,11 @@ export class DepartmentController {
             }
         }
 
-        // Update multi-select indicator
-        const departmentList = document.getElementById('department-list');
-        if (departmentList) {
+        if (this.departmentList) {
             if (activeDepts.length > 1) {
-                departmentList.classList.add('multi-select-active');
+                this.departmentList.classList.add('multi-select-active');
             } else {
-                departmentList.classList.remove('multi-select-active');
+                this.departmentList.classList.remove('multi-select-active');
             }
         }
     }

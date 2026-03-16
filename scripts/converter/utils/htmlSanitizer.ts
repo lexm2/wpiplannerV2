@@ -3,6 +3,30 @@
  * Workday provides descriptions with HTML markup that needs to be cleaned
  */
 
+export function extractCategory(html: string | null): { category: 1 | 2 | 3 | null, cleanedHtml: string } {
+    if (!html) return { category: null, cleanedHtml: '' };
+
+    // No word-boundary lookahead: handles "Cat. IAn intensive..." where text immediately follows the numeral
+    const match = html.match(/Cat\.\s*(III|II|I|[123])/i);
+    if (!match) return { category: null, cleanedHtml: html };
+
+    const catStr = match[1].toUpperCase();
+    let category: 1 | 2 | 3;
+    if (catStr === 'I' || catStr === '1') category = 1;
+    else if (catStr === 'II' || catStr === '2') category = 2;
+    else if (catStr === 'III' || catStr === '3') category = 3;
+    else return { category: null, cleanedHtml: html };
+
+    const cleanedHtml = html
+        .replace(/<p>(?:<i>)?Cat\.\s*(?:III|II|I|[123])(?:<\/i>)?<\/p>/gi, '')
+        .replace(/Cat\.\s*(?:III|II|I|[123])(?:<br\s*\/?>\s*)*/gi, '')
+        .replace(/;\s*Cat\.\s*(?:III|II|I|[123])/gi, '')
+        .replace(/Cat\.\s*(?:III|II|I|[123])/gi, '')
+        .replace(/;\s*\)/g, ')');
+
+    return { category, cleanedHtml };
+}
+
 /**
  * Removes HTML tags and decodes entities from Workday descriptions
  */

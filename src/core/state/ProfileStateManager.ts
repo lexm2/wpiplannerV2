@@ -768,6 +768,12 @@ export class ProfileStateManager {
         );
     }
 
+    parseImportCourses(data: string): SelectedCourse[] {
+        const parsed = JSON.parse(data);
+        const appState = ApplicationState.fromMinimalFormat(parsed, this.allDepartments);
+        return appState.schedules[0]?.toSchedule().selectedCourses ?? [];
+    }
+
     async importData(data: string): Promise<TransactionResult> {
         try {
             const parsed = JSON.parse(data);

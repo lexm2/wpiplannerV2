@@ -4,9 +4,9 @@
   "description": "Modern WPI course planner built with TypeScript",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000",
-    "build": "bun run generate-icons && vite build",
-    "preview": "vite preview",
+    "dev": "bun ./node_modules/vite/bin/vite.js --port 3000",
+    "build": "bun run generate-icons && bun ./node_modules/vite/bin/vite.js build",
+    "preview": "bun ./node_modules/vite/bin/vite.js preview",
     "convert": "bun run scripts/convert-course-data.ts",
     "generate-icons": "bun run scripts/generate-icon-paths.ts",
     "fetch-data": "bun run scripts/fetch-course-data.ts",
