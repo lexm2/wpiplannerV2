@@ -186,6 +186,8 @@ export class MainController {
 
             // Initial UI sync for selected courses (use efficient targeted updates)
             this.syncInitialCourseSelectionUI();
+
+            this.updateSelectedCoursesState(this.services.courseSelectionService.getSelectedCourses());
         } catch (error) {
             console.error('Failed to initialize application:', error);
             this.services.uiStateManager.showErrorMessage(

@@ -368,12 +368,6 @@ export class CourseController {
 
         const isBookmarked = bookmarkBtn.classList.contains('bookmarked');
         this.updateCourseBookmarkUI(element, !isBookmarked);
-
-        // TODO: connect to ProfileStateManager
-        // const courseId = element.dataset.courseId;
-        // if (!courseId) return;
-        // const stateManager = ProfileStateManager.getInstance();
-        // stateManager[isBookmarked ? 'unbookmarkCourse' : 'bookmarkCourse'](courseId);
     }
 
     private updateCourseBookmarkUI(element: HTMLElement, isBookmarked: boolean): void {
