@@ -6,7 +6,7 @@ import { WorkdaySection } from '../types/workdayTypes.js';
 import { PlannerCourse } from '../types/outputTypes.js';
 import { transformSection, categorizeSections } from './sectionTransformer.js';
 import { buildLectureGroups } from './lectureGroupBuilder.js';
-import { sanitizeHTML } from '../utils/htmlSanitizer.js';
+import { sanitizeHTML, extractCategory } from '../utils/htmlSanitizer.js';
 import { ConverterConfig } from '../ConverterConfig.js';
 
 /**
@@ -47,7 +47,8 @@ export function transformCourse(
         ? firstSection.Course_Description
         : firstSection.Course_Section_Description;
 
-    const description = sanitizeHTML(descriptionRaw);
+    const { category, cleanedHtml } = extractCategory(descriptionRaw);
+    const description = sanitizeHTML(cleanedHtml);
 
     // Parse credits
     const credits = parseFloat(firstSection.Credits);
@@ -78,6 +79,7 @@ export function transformCourse(
         number: courseNumber,
         name: courseName,
         description,
+        category,
         minCredits: credits,
         maxCredits: credits,
         isGraduate,

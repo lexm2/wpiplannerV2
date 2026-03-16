@@ -2,6 +2,9 @@
 
 ## [2026-03-16]
 
+### Added
+- Courses now include a WPI category (1, 2, or 3) parsed from their description
+
 ### Improved
 - Added a "New Schedule" button at the bottom of the schedule list for quicker access
 - Import button on each schedule now imports courses directly into that schedule

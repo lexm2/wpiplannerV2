@@ -18,6 +18,7 @@ export interface PlannerCourse {
     number: string;
     name: string;
     description: string;
+    category: 1 | 2 | 3 | null;
     minCredits: number;
     maxCredits: number;
     isGraduate: boolean;
