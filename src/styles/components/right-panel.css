@@ -54,10 +54,24 @@
   flex-shrink: 0;
 }
 
+.course-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.course-category {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 0 0.35rem;
+}
+
 .course-year {
   font-size: 0.9rem;
   color: var(--color-text-secondary);
-  flex-shrink: 0;
 }
 
 .course-description-text {

@@ -450,7 +450,10 @@ export class CourseController {
             <div class="course-info">
                 <div class="course-desc-title">${Validators.escapeHtml(course.name)}</div>
                 <div class="course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)} (${credits})</div>
-                ${yearLabel ? `<div class="course-year">${yearLabel}</div>` : ''}
+                <div class="course-meta">
+                    ${yearLabel ? `<div class="course-year">${yearLabel}</div>` : ''}
+                    ${course.category != null ? `<div class="course-category">Cat ${course.category}</div>` : ''}
+                </div>
             </div>
             <div class="course-description-text">${Validators.escapeHtml(course.description)}</div>
         `;

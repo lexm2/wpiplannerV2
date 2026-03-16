@@ -141,6 +141,7 @@ export class CourseDataService {
                     number: courseData.number,
                     name: courseData.name,
                     description: this.stripHtml(courseData.description || ''),
+                    category: courseData.category ?? null,
                     departmentAbbr: department.abbreviation,
                     departmentName: department.name,
                     lectures: lectures.length > 0 ? lectures : undefined,

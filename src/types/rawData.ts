@@ -44,6 +44,7 @@ export interface RawCourse {
     number: string;
     name: string;
     description?: string;
+    category?: 1 | 2 | 3 | null;
     lectures?: RawLectureGroup[];
     standaloneLabs?: RawSection[];
     minCredits?: number;
