@@ -106,7 +106,7 @@ export class SchedulePickerModal extends BaseModal {
             return '<div class="schedule-list-empty">No schedules found</div>';
         }
 
-        return schedules.map(schedule => {
+        const items = schedules.map(schedule => {
             const isActive = schedule.id === activeScheduleId;
             const courseCount = isActive ?
                 this.scheduleManagementService.getCourseSelectionService().getSelectedCourses().length :
@@ -136,6 +136,8 @@ export class SchedulePickerModal extends BaseModal {
                 </div>
             `;
         }).join('');
+
+        return items;
     }
 
     private updateScheduleList(): void {
@@ -145,6 +147,12 @@ export class SchedulePickerModal extends BaseModal {
         if (listContainer) {
             listContainer.innerHTML = this.renderScheduleList();
             this.setupScheduleItemListeners();
+
+            const addBtn = document.createElement('button');
+            addBtn.className = 'btn btn-primary schedule-list-add-btn';
+            addBtn.innerHTML = `${getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')}<span class="btn-text"> New Schedule</span>`;
+            addBtn.addEventListener('click', () => this.createNewSchedule());
+            listContainer.appendChild(addBtn);
         }
     }
 

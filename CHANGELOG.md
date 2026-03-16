@@ -1,5 +1,10 @@
 # Changelog
 
+## [2026-03-16]
+
+### Improved
+- Added a "New Schedule" button at the bottom of the schedule list for quicker access
+
 ## [2026-03-15]
 
 ### Added
