@@ -56,10 +56,12 @@
   flex-shrink: 0;
 }
 
-.course-select-btn:hover {
+.course-select-btn:hover,
+.course-select-btn:focus {
   border-color: var(--color-primary);
   color: var(--color-primary);
   background: var(--color-primary-background);
+  outline: none;
 }
 
 .course-select-btn.selected {
@@ -86,7 +88,8 @@
   stroke: var(--color-text-secondary);
 }
 
-.course-select-btn:not(.selected):hover .plus-icon {
+.course-select-btn:not(.selected):hover .plus-icon,
+.course-select-btn:not(.selected):focus .plus-icon {
   stroke: var(--color-primary);
 }
 
@@ -106,10 +109,12 @@
   flex-shrink: 0;
 }
 
-.course-bookmark-btn:hover {
+.course-bookmark-btn:hover,
+.course-bookmark-btn:focus {
   border-color: var(--color-warning);
   color: var(--color-warning);
   background: var(--color-warning-background);
+  outline: none;
 }
 
 .course-bookmark-btn.bookmarked {
@@ -129,7 +134,8 @@
   stroke: var(--color-text-secondary);
 }
 
-.course-bookmark-btn:not(.bookmarked):hover .bookmark-icon {
+.course-bookmark-btn:not(.bookmarked):hover .bookmark-icon,
+.course-bookmark-btn:not(.bookmarked):focus .bookmark-icon {
   stroke: var(--color-warning);
 }
 

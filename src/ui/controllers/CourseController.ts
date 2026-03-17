@@ -356,7 +356,7 @@ export class CourseController {
 
 
     private updateCourseSelectionUI(element: HTMLElement, isSelected: boolean): void {
-        const selectBtn = element.querySelector('.course-select-btn');
+        const selectBtn = element.querySelector<HTMLButtonElement>('.course-select-btn');
         if (!selectBtn) return;
 
         if (selectBtn.classList.contains('selected') === isSelected) return;
@@ -367,6 +367,8 @@ export class CourseController {
 
         element.classList.toggle('selected', isSelected);
         selectBtn.classList.toggle('selected', isSelected);
+
+        if (!isSelected) setTimeout(() => selectBtn.blur(), 100);
     }
 
     toggleCourseBookmark(element: HTMLElement): void {
@@ -392,7 +394,7 @@ export class CourseController {
     }
 
     private updateCourseBookmarkUI(element: HTMLElement, isBookmarked: boolean): void {
-        const bookmarkBtn = element.querySelector('.course-bookmark-btn');
+        const bookmarkBtn = element.querySelector<HTMLButtonElement>('.course-bookmark-btn');
         if (bookmarkBtn) {
             if (isBookmarked) {
                 bookmarkBtn.innerHTML = getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon');
@@ -402,6 +404,7 @@ export class CourseController {
                 bookmarkBtn.innerHTML = getInlineSVG('BOOKMARK', 'bookmark-icon');
                 bookmarkBtn.classList.remove('bookmarked');
                 bookmarkBtn.setAttribute('title', 'Add bookmark');
+                setTimeout(() => bookmarkBtn.blur(), 100);
             }
         }
     }

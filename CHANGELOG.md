@@ -5,6 +5,9 @@
 ### Added
 - Courses now include a WPI category (1, 2, or 3) parsed from their description
 
+### Fixed
+- Course select and bookmark buttons no longer flash when deselected while hovering
+
 ### Improved
 - Course and bookmark buttons now respond instantly with no delay
 - Added a "New Schedule" button at the bottom of the schedule list for quicker access
