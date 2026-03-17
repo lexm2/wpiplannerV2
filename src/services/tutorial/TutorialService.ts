@@ -114,11 +114,9 @@ export class TutorialService {
         const htmlEl = el as HTMLElement;
         const pad = 5;
 
-        // Void elements (input, img, etc.) cannot have children — append SVG to offsetParent instead
+        // Void elements (input, img, etc.) cannot have children — append SVG to parent instead
         const voidEl = ['INPUT', 'IMG', 'TEXTAREA', 'HR', 'BR'].includes(htmlEl.tagName);
-        const container: HTMLElement = voidEl
-            ? (htmlEl.offsetParent as HTMLElement | null ?? htmlEl.parentElement!)
-            : htmlEl;
+        const container: HTMLElement = voidEl ? htmlEl.parentElement! : htmlEl;
 
         if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
         this.svgContainer = container;
@@ -145,8 +143,16 @@ export class TutorialService {
             const cs = getComputedStyle(htmlEl);
             const borderTop = parseFloat(cs.borderTopWidth) || 0;
             const borderLeft = parseFloat(cs.borderLeftWidth) || 0;
-            const top = voidEl ? htmlEl.offsetTop - pad - borderTop : -(pad + borderTop);
-            const left = voidEl ? htmlEl.offsetLeft - pad - borderLeft : -(pad + borderLeft);
+            let top: number, left: number;
+            if (voidEl) {
+                const er = htmlEl.getBoundingClientRect();
+                const cr = container.getBoundingClientRect();
+                top = (er.top - cr.top) + container.scrollTop - pad - borderTop;
+                left = (er.left - cr.left) + container.scrollLeft - pad - borderLeft;
+            } else {
+                top = -(pad + borderTop);
+                left = -(pad + borderLeft);
+            }
             svg.style.top = `${top}px`;
             svg.style.left = `${left}px`;
             svg.setAttribute('width', String(w));
