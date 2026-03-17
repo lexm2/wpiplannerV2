@@ -74,6 +74,12 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         },
         steps: [
             {
+                selector: '[data-tutorial-next]',
+                title: 'WPI Planner Tutorials',
+                description: "Welcome to the WPI planner, I have set up 4 quick tutorials to bring you through most of the important aspects of the planner. Hit next when you're ready to start.",
+                waitFor: 'manual',
+            },
+            {
                 selector: '[data-course-id="TUT-1001"] .course-select-btn',
                 title: 'Select a course',
                 description: 'Click the + button on the Tutorial course to add it to your planner.',
@@ -87,7 +93,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             {
                 selector: '#schedule-tab',
                 title: 'Go to the Schedule tab',
-                description: 'Head to the Schedule tab to start setting up your sections.',
+                description: 'Head to the Schedule tab, this is where you will select your sections and see your schedule.',
                 waitFor: 'click',
                 action: () => services.uiStateManager.switchToPage('schedule'),
             },
@@ -102,9 +108,15 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 },
             },
             {
+                selector: '[data-tutorial-next]',
+                title: 'Section selection',
+                description: 'Section selection on the new WPI planner allows you to select lectures/discussions/labs separately.',
+                waitFor: 'manual',
+            },
+            {
                 selector: '.wizard-section-card',
                 title: 'Pick a lecture',
-                description: 'Select a lecture section.',
+                description: 'Select the only lecture section.',
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('.wizard-section-card')?.click(),
             },
@@ -118,21 +130,21 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             {
                 selector: '.wizard-section-card[data-crn="99902"]',
                 title: 'Pick a lab',
-                description: 'Select a lab section.',
+                description: 'Select the top lab section. Notice how you can hover the different sections to see how they fit into your schedule.',
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="99902"]')?.click(),
             },
             {
                 selector: '#wizard-next-btn',
                 title: 'Finish',
-                description: 'Click Finish to confirm your selections and see your course on the schedule.',
+                description: 'Click Finish to confirm your selections, if you hit cancel the selections will be lost.',
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('#wizard-next-btn')?.click(),
             },
             {
                 selector: '[data-tutorial-next]',
-                title: "You're all set!",
-                description: "You've added a course and picked your sections. Up next: filtering the course list to find what you need.",
+                title: 'Next Tutorial: Filtering',
+                description: 'You now know the basic functionality of the planner. The next tutorial will go over how to quickly find courses that work for you. If you want to skip over a tutorial for any reason just hit skip tutorial and it will move onto the next one. If you want to restart a tutorial, go to the schedules button at the top right then settings then click on tutorials.',
                 waitFor: 'manual',
             },
         ],
@@ -182,7 +194,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 {
                     selector: `.segmented-btn[data-year="${priorYear}"]`,
                     title: 'Change the academic year',
-                    description: `Switch to ${priorYear}–${priorYear + 1} to see courses from a prior year.`,
+                    description: 'Normally your schedule could never have courses from multiple years but this is just for demonstration purposes.',
                     waitFor: 'click',
                     scrollArrow: true,
                     action: () => document.querySelector<HTMLElement>(`.segmented-btn[data-year="${priorYear}"]`)?.click(),
@@ -190,7 +202,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 {
                     selector: '.professor-search',
                     title: 'Filter by professor',
-                    description: 'Search for "Tutorial" to filter courses by professor.',
+                    description: 'Search for "Tutorial" to filter courses by professor. As you type you should see search suggestions show up.',
                     waitFor: 'appear',
                     scrollArrow: true,
                     waitForSelector: '.filter-chip-remove[data-professor="Tutorial"]',
@@ -205,7 +217,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 {
                     selector: '#avoid-conflicts-filter',
                     title: 'Avoid schedule conflicts',
-                    description: 'Toggle this to hide courses that conflict with your current schedule.',
+                    description: 'Toggle this to hide courses that cannot fit into your current schedule.',
                     waitFor: 'click',
                     scrollArrow: true,
                     action: () => document.querySelector<HTMLElement>('#avoid-conflicts-filter')?.click(),
@@ -261,8 +273,8 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 },
                 {
                     selector: '[data-tutorial-next]',
-                    title: 'All done!',
-                    description: "You've filtered by term, academic year, professor, and availability. Up next: auto-scheduling.",
+                    title: 'Next Tutorial: Auto Scheduling',
+                    description: "The next tutorial will go over how to use the auto scheduler to automatically select your course sections.",
                     waitFor: 'manual',
                 },
             ],
@@ -300,7 +312,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             {
                 selector: '#modal-primary-btn',
                 title: 'Generate schedules',
-                description: 'Click Generate to run the scheduler. It will find all valid section combinations based on your filters and show you the results.',
+                description: 'The filters have already been set up for you. Click Generate to run the scheduler. It will find all valid section combinations based on your filters and show you the results.',
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('#modal-primary-btn')?.click(),
             },
@@ -313,8 +325,8 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             },
             {
                 selector: '[data-tutorial-next]',
-                title: 'Schedules generated!',
-                description: "You've used Auto Schedule to find valid section combinations. Up next: managing multiple schedules.",
+                title: 'Next Tutorial: schedule manager',
+                description: "The next tutorial goes over how to create a new schedule and some of the settings available.",
                 waitFor: 'manual',
             },
         ],
@@ -337,14 +349,26 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             {
                 selector: '.nav-tab[data-tab="settings"]',
                 title: 'Settings tab',
-                description: 'Click the Settings tab to see all options. New Schedule / Import create schedules; Export to Calendar saves your current schedule as an ICS file for Google Calendar or similar; Export All backs up everything as JSON; Toggle Theme switches light/dark mode; Undo/Redo step through changes; What\'s New shows recent updates; Tutorials reopens this menu; Clear All Data wipes everything.',
+                description: 'Click the Settings tab to see all options.',
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('.nav-tab[data-tab="settings"]')?.click(),
             },
             {
+                selector: '[data-tutorial-next]',
+                title: 'Export ICS',
+                description: "The Export ICS button will export this schedule to a format that you can drag into your calendar to import.",
+                waitFor: 'manual',
+            },
+            {
+                selector: '[data-tutorial-next]',
+                title: 'Export/Import',
+                description: "This will export the course to a JSON file which then can be imported on another device. Note that if you import into an existing schedule it will add all the courses from the exported schedule onto that schedule.",
+                waitFor: 'manual',
+            },
+            {
                 selector: '#new-schedule-btn-settings',
-                title: 'Create a schedule',
-                description: "Click New Schedule, type a name, and you're all set. You'll be taken to your new schedule automatically.",
+                title: 'All done',
+                description: "Click New Schedule, type a name, and you're all set. The tutorial will end, and you'll be taken to your new schedule automatically. The modal will not automatically close.",
                 waitFor: 'click',
                 action: async () => {
                     const result = await services.scheduleManagementService.createNewSchedule('My Schedule');
@@ -355,8 +379,8 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             },
             {
                 selector: '[data-tutorial-next]',
-                title: 'Tutorial complete!',
-                description: "You know the essentials: adding courses, filtering, auto-scheduling, and managing schedules. Happy planning!",
+                title: 'Uh oh',
+                description: "You should not be able to see this, if you can then make a issue on github and explain how you made it appear.",
                 waitFor: 'manual',
             },
         ],
