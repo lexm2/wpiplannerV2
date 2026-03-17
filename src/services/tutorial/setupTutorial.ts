@@ -138,13 +138,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             },
             steps: [
                 {
-                    selector: '#planner-tab',
-                    title: 'Go to the planner',
-                    description: 'Head back to the Classes tab to see your courses.',
-                    waitFor: 'click',
-                    action: () => services.uiStateManager.switchToPage('planner'),
-                },
-                {
                     selector: '#filter-btn',
                     title: 'Open filters',
                     description: 'Click the filter button to open course filters.',
