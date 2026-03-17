@@ -9,7 +9,6 @@
 
 .tutorial-highlight-svg {
     position: absolute;
-    inset: -5px;
     pointer-events: none;
     z-index: 10000;
     overflow: visible;

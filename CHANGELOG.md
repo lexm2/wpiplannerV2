@@ -2,6 +2,10 @@
 
 ## [2026-03-17]
 
+### Fixed
+- Tutorial highlight outline is now perfectly centered around bordered elements
+- Tutorial highlight now appears correctly on elements that are hidden or not yet laid out when a step starts
+
 ### Improved
 - Tutorial highlight now uses an animated marching dashes border instead of a static outline
 - Tutorial box is now larger by default and text scales as you resize it

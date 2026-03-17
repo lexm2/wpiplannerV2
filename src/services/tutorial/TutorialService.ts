@@ -16,6 +16,8 @@ export class TutorialService {
     private actionCleanup: (() => void) | null = null;
     private highlightObserver: MutationObserver | null = null;
     private actionObserver: MutationObserver | null = null;
+    private resizeObserver: ResizeObserver | null = null;
+    private svgContainer: HTMLElement | null = null;
 
     register(tutorial: Tutorial): void { this.tutorials.set(tutorial.id, tutorial); }
 
@@ -106,32 +108,55 @@ export class TutorialService {
         this.svgOverlay?.remove();
         this.arrowOverlay?.remove();
         this.intersectionObserver?.disconnect();
+        this.resizeObserver?.disconnect();
         if (this.positionFrame !== null) { cancelAnimationFrame(this.positionFrame); this.positionFrame = null; }
 
         const htmlEl = el as HTMLElement;
-        if (getComputedStyle(el).position === 'static') htmlEl.style.position = 'relative';
+        const pad = 5;
 
-        const w = htmlEl.offsetWidth + 10;
-        const h = htmlEl.offsetHeight + 10;
+        // Void elements (input, img, etc.) cannot have children — append SVG to offsetParent instead
+        const voidEl = ['INPUT', 'IMG', 'TEXTAREA', 'HR', 'BR'].includes(htmlEl.tagName);
+        const container: HTMLElement = voidEl
+            ? (htmlEl.offsetParent as HTMLElement | null ?? htmlEl.parentElement!)
+            : htmlEl;
+
+        if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
+        this.svgContainer = container;
 
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.classList.add('tutorial-highlight-svg');
-        svg.setAttribute('width', String(w));
-        svg.setAttribute('height', String(h));
 
         const rectEl = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         rectEl.setAttribute('x', '1');
         rectEl.setAttribute('y', '1');
-        rectEl.setAttribute('width', String(w - 2));
-        rectEl.setAttribute('height', String(h - 2));
         rectEl.setAttribute('rx', '6');
         rectEl.setAttribute('fill', 'none');
         rectEl.setAttribute('stroke-width', '2');
         rectEl.setAttribute('stroke-dasharray', '8 6');
 
         svg.appendChild(rectEl);
-        el.appendChild(svg);
+        container.appendChild(svg);
         this.svgOverlay = svg;
+
+        const updateSize = () => {
+            const w = htmlEl.offsetWidth + pad * 2;
+            const h = htmlEl.offsetHeight + pad * 2;
+            if (w <= pad * 2 || h <= pad * 2) return;
+            const cs = getComputedStyle(htmlEl);
+            const borderTop = parseFloat(cs.borderTopWidth) || 0;
+            const borderLeft = parseFloat(cs.borderLeftWidth) || 0;
+            const top = voidEl ? htmlEl.offsetTop - pad - borderTop : -(pad + borderTop);
+            const left = voidEl ? htmlEl.offsetLeft - pad - borderLeft : -(pad + borderLeft);
+            svg.style.top = `${top}px`;
+            svg.style.left = `${left}px`;
+            svg.setAttribute('width', String(w));
+            svg.setAttribute('height', String(h));
+            rectEl.setAttribute('width', String(w - 2));
+            rectEl.setAttribute('height', String(h - 2));
+        };
+        this.resizeObserver = new ResizeObserver(updateSize);
+        this.resizeObserver.observe(el);
+        updateSize();
 
         if (scrollArrow) {
             const arrow = document.createElement('div');
@@ -166,9 +191,12 @@ export class TutorialService {
         this.arrowOverlay = null;
         this.intersectionObserver?.disconnect();
         this.intersectionObserver = null;
+        this.resizeObserver?.disconnect();
+        this.resizeObserver = null;
         if (this.positionFrame !== null) { cancelAnimationFrame(this.positionFrame); this.positionFrame = null; }
-        if (this.highlightedElement) {
-            (this.highlightedElement as HTMLElement).style.position = '';
+        if (this.svgContainer) {
+            this.svgContainer.style.position = '';
+            this.svgContainer = null;
         }
         this.highlightedElement = null;
     }
