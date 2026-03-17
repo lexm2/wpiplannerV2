@@ -2,6 +2,10 @@
 
 ## [2026-03-17]
 
+### Improved
+- Tutorial box is now larger by default and text scales as you resize it
+- Tutorial box repositions itself to stay on screen when step text changes
+
 ### Added
 - Tutorial now creates a dedicated "Tutorial" schedule so your real schedules stay untouched
 - Added individual tutorial buttons to the settings panel so you can restart specific tutorials

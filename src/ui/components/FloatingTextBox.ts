@@ -41,7 +41,10 @@ export class FloatingTextBox {
         this.stepTitleEl.textContent = step.title;
         this.stepDescEl.textContent = step.description;
         this.stepCounterEl.textContent = `Step ${index + 1} of ${total}`;
-        this.repositionIfObstructed(step.selector);
+        requestAnimationFrame(() => {
+            this.repositionIfObstructed(step.selector);
+            this.clampToViewport();
+        });
     }
 
     private createElement(): HTMLElement {
@@ -106,6 +109,24 @@ export class FloatingTextBox {
         this.el.style.transition = '';
         document.removeEventListener('mousemove', this.boundMouseMove);
         document.removeEventListener('mouseup', this.boundMouseUp);
+    }
+
+    private clampToViewport(): void {
+        const rect = this.el.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        let left = rect.left;
+        let top = rect.top;
+
+        if (rect.bottom > vh) top = vh - rect.height - 8;
+        if (top < 0) top = 8;
+        if (rect.left < 0) left = 8;
+
+        if (left !== rect.left || top !== rect.top) {
+            this.el.style.left = `${left}px`;
+            this.el.style.top = `${top}px`;
+            this.el.style.bottom = 'auto';
+        }
     }
 
     private repositionIfObstructed(selector: string): void {
