@@ -12,6 +12,7 @@ import type { RawDepartment, RawCourse, RawSection, RawLectureGroup, RawPeriod }
 export class CourseDataService {
     private static readonly WPI_COURSE_DATA_URL = './course-data-constructed.json';
     private scheduleDB: ScheduleDB | null = null;
+    private latestAcademicYear: number | undefined;
     private listeners = new Map<CourseDataEventType | '*', Set<CourseDataEventListener>>();
 
     constructor() {}
@@ -63,6 +64,7 @@ export class CourseDataService {
 
         const realDepartments = this.parseConstructedDepartments(jsonData.departments);
         const latestYear = Math.max(...realDepartments.flatMap(d => d.courses.map(c => c.academicYear ?? 0)));
+        this.latestAcademicYear = latestYear || undefined;
 
         const scheduleDB: ScheduleDB = {
             departments: [this.createTutorialDepartment(latestYear || undefined), ...realDepartments],
@@ -114,13 +116,10 @@ export class CourseDataService {
         });
 
         const lecture = makeSection(99901, 'A01', [
-            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY], [10, 0], [10, 50]),
+            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [11, 0], [11, 50]),
         ]);
-        const lab1 = makeSection(99902, 'B01', [
-            makePeriod(PeriodType.LAB, [DayOfWeek.TUESDAY], [14, 0], [16, 50]),
-        ]);
-        const lab2 = makeSection(99903, 'B02', [
-            makePeriod(PeriodType.LAB, [DayOfWeek.THURSDAY], [14, 0], [16, 50]),
+        const lab = makeSection(99902, 'B01', [
+            makePeriod(PeriodType.LAB, [DayOfWeek.FRIDAY], [12, 0], [14, 0]),
         ]);
 
         const course: Course = {
@@ -135,16 +134,19 @@ export class CourseDataService {
             maxCredits: 1,
             isGraduate: false,
             academicYear,
-            lectures: [{ section: lecture, compatibleDiscussions: [], compatibleLabs: [lab1, lab2] }],
+            lectures: [{ section: lecture, compatibleDiscussions: [], compatibleLabs: [lab] }],
         };
 
         const tut1002Lecture = makeSection(99904, 'A01', [
-            makePeriod(PeriodType.LECTURE, [DayOfWeek.TUESDAY, DayOfWeek.THURSDAY], [9, 0], [10, 15]),
+            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [8, 0], [8, 50]),
+        ]);
+        const tut1002Lab = makeSection(99906, 'B01', [
+            makePeriod(PeriodType.LAB, [DayOfWeek.WEDNESDAY], [8, 0], [10, 0]),
         ]);
         const tut1002Course: Course = {
             id: 'TUT-1002',
             number: '1002',
-            name: 'Schedule Basics',
+            name: 'Introduction to the WPI Planner 2',
             description: 'A placeholder course used to demonstrate schedule grid layout.',
             category: 1,
             departmentAbbr: 'TUT',
@@ -153,11 +155,11 @@ export class CourseDataService {
             maxCredits: 1,
             isGraduate: false,
             academicYear,
-            lectures: [{ section: tut1002Lecture, compatibleDiscussions: [], compatibleLabs: [] }],
+            lectures: [{ section: tut1002Lecture, compatibleDiscussions: [], compatibleLabs: [tut1002Lab] }],
         };
 
         const tut9001Lecture = makeSection(99905, 'A01', [
-            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY], [13, 0], [13, 50]),
+            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [10, 0], [11, 0]),
         ]);
         const tut9001Course: Course = {
             id: 'TUT-9001',
@@ -598,6 +600,10 @@ export class CourseDataService {
                 console.error('[CourseDataService] Error in wildcard listener:', error);
             }
         });
+    }
+
+    getLatestAcademicYear(): number | undefined {
+        return this.latestAcademicYear;
     }
 
     hideTutorialDepartment(): void {

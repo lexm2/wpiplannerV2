@@ -5,7 +5,9 @@
 ### Added
 - Added an interactive tutorial that walks new users through adding a course and setting up sections
 - Added a built-in Tutorial course (TUT-1001) to practice with before diving into real courses
+- Updated tutorial course schedules to better reflect realistic WPI timetables
 - Added two more tutorial courses (TUT-1002 and TUT-9001) to support upcoming tutorial steps
+- Added a second tutorial that teaches the academic year filter, chaining automatically after the first
 - Tutorial courses are removed from the course list once the tutorial is complete
 - The app now remembers if you've visited before
 - Courses now include a WPI category (1, 2, or 3) parsed from their description

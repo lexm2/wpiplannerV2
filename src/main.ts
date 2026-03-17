@@ -70,7 +70,83 @@ tutorialService.register({
     ],
 });
 
-tutorialService.onComplete(() => services.courseDataService.hideTutorialDepartment());
+function getTutorialCourse(id: string) {
+    return services.courseDataService.getAllDepartments()
+        .flatMap(d => d.courses)
+        .find(c => c.id === id);
+}
+
+async function startFilteringTutorial() {
+    const priorYear = services.courseDataService.getLatestAcademicYear()! - 1;
+
+    const tut1002 = getTutorialCourse('TUT-1002');
+    if (tut1002) {
+        await services.courseSelectionService.selectCourse(tut1002);
+        const lecture = tut1002.lectures[0].section;
+        const lab = tut1002.lectures[0].compatibleLabs[0] ?? null;
+        await services.courseSelectionService.setSelectedComponents(tut1002, lecture, null, lab);
+    }
+
+    tutorialService.register({
+        id: 'filtering',
+        steps: [
+            {
+                selector: '#planner-tab',
+                title: 'Go to the planner',
+                description: 'Head back to the Classes tab to see your courses.',
+                waitFor: 'click',
+            },
+            {
+                selector: '#filter-btn',
+                title: 'Open filters',
+                description: 'Click the filter button to open course filters.',
+                waitFor: 'click',
+            },
+            {
+                selector: 'input.filter-toggle[value="A"][data-filter="term"]',
+                title: 'Filter by term',
+                description: 'Check the A term box to filter courses by term.',
+                waitFor: 'click',
+            },
+            {
+                selector: `.segmented-btn[data-year="${priorYear}"]`,
+                title: 'Change the academic year',
+                description: `Switch to ${priorYear}–${priorYear + 1} to see courses from a prior year.`,
+                waitFor: 'click',
+            },
+            {
+                selector: '#available-only-filter',
+                title: 'Show available courses only',
+                description: 'Toggle this to hide courses with no open seats.',
+                waitFor: 'click',
+            },
+            {
+                selector: '#avoid-conflicts-filter',
+                title: 'Avoid schedule conflicts',
+                description: 'Toggle this to hide courses that conflict with your current schedule.',
+                waitFor: 'click',
+            },
+            {
+                selector: '#modal-primary-btn',
+                title: 'Apply filters',
+                description: 'Click Apply to close the filter panel and see your filtered results.',
+                waitFor: 'click',
+            },
+        ],
+    });
+
+    tutorialService.start('filtering');
+}
+
+let filteringStarted = false;
+tutorialService.onComplete(() => {
+    if (!filteringStarted) {
+        filteringStarted = true;
+        startFilteringTutorial();
+    } else {
+        services.courseDataService.hideTutorialDepartment();
+    }
+});
 
 new FloatingTextBox(tutorialService).mount();
 
