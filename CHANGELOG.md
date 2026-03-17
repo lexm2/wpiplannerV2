@@ -8,6 +8,7 @@
 
 ### Fixed
 - Course select and bookmark buttons no longer flash when deselected while hovering
+- Deleting a local calendar event now correctly updates the event count on the calendar button
 
 ### Improved
 - Removed the course listing header label — the content header now only shows the search and filter controls

@@ -279,6 +279,7 @@ export class ScheduleController implements CalendarEventProvider {
         };
 
         this.renderScheduleGrids();
+        this.displayScheduleSelectedCourses();
 
         this.onScheduleUpdate(this.currentSchedule.id, {
             localEvents: updatedLocalEvents,
@@ -308,6 +309,7 @@ export class ScheduleController implements CalendarEventProvider {
         };
 
         this.renderScheduleGrids();
+        this.displayScheduleSelectedCourses();
 
         this.onScheduleUpdate(this.currentSchedule.id, {
             localEvents: updatedLocalEvents,
