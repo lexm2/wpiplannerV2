@@ -45,18 +45,32 @@ tutorialService.register({
         },
         {
             selector: '.wizard-section-card',
-            title: 'Pick your sections',
-            description: 'Select a section for each component (lecture, lab, etc.).',
+            title: 'Pick a lecture',
+            description: 'Select a lecture section.',
             waitFor: 'click',
         },
         {
-            selector: '#__no-highlight__',
+            selector: '.wizard-btn.wizard-btn-primary',
+            title: 'Continue to labs',
+            description: 'Click Next to move on to selecting a lab.',
+            waitFor: 'click',
+        },
+        {
+            selector: '.wizard-section-card[data-crn="99902"]',
+            title: 'Pick a lab',
+            description: 'Select a lab section.',
+            waitFor: 'click',
+        },
+        {
+            selector: '[data-tutorial-next]',
             title: 'See it on the grid',
             description: 'Your course now appears on the schedule. You\'re all set!',
             waitFor: 'manual',
         },
     ],
 });
+
+tutorialService.onComplete(() => services.courseDataService.hideTutorialDepartment());
 
 new FloatingTextBox(tutorialService).mount();
 

@@ -138,7 +138,43 @@ export class CourseDataService {
             lectures: [{ section: lecture, compatibleDiscussions: [], compatibleLabs: [lab1, lab2] }],
         };
 
-        return { abbreviation: 'TUT', name: 'Tutorial', courses: [course] };
+        const tut1002Lecture = makeSection(99904, 'A01', [
+            makePeriod(PeriodType.LECTURE, [DayOfWeek.TUESDAY, DayOfWeek.THURSDAY], [9, 0], [10, 15]),
+        ]);
+        const tut1002Course: Course = {
+            id: 'TUT-1002',
+            number: '1002',
+            name: 'Schedule Basics',
+            description: 'A placeholder course used to demonstrate schedule grid layout.',
+            category: 1,
+            departmentAbbr: 'TUT',
+            departmentName: 'Tutorial',
+            minCredits: 1,
+            maxCredits: 1,
+            isGraduate: false,
+            academicYear,
+            lectures: [{ section: tut1002Lecture, compatibleDiscussions: [], compatibleLabs: [] }],
+        };
+
+        const tut9001Lecture = makeSection(99905, 'A01', [
+            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY], [13, 0], [13, 50]),
+        ]);
+        const tut9001Course: Course = {
+            id: 'TUT-9001',
+            number: '9001',
+            name: 'Filtering Example',
+            description: 'A placeholder course from a prior year used to demonstrate academic year filtering.',
+            category: 1,
+            departmentAbbr: 'TUT',
+            departmentName: 'Tutorial',
+            minCredits: 1,
+            maxCredits: 1,
+            isGraduate: false,
+            academicYear: academicYear ? academicYear - 1 : undefined,
+            lectures: [{ section: tut9001Lecture, compatibleDiscussions: [], compatibleLabs: [] }],
+        };
+
+        return { abbreviation: 'TUT', name: 'Tutorial', courses: [course, tut1002Course, tut9001Course] };
     }
 
     private parseConstructedDepartments(departments: RawDepartment[]): Department[] {
@@ -562,6 +598,15 @@ export class CourseDataService {
                 console.error('[CourseDataService] Error in wildcard listener:', error);
             }
         });
+    }
+
+    hideTutorialDepartment(): void {
+        if (!this.scheduleDB) return;
+        this.scheduleDB = {
+            ...this.scheduleDB,
+            departments: this.scheduleDB.departments.filter(d => d.abbreviation !== 'TUT'),
+        };
+        this.notifyDataRefreshed();
     }
 
     /**

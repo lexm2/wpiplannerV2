@@ -119,6 +119,8 @@ export class MainController {
                 this.scheduleFilterModalController.setCourseData(departments);
                 this.departmentController.setAllDepartments(departments);
                 this.courseController.setAllDepartments(departments);
+                this.departmentController.displayDepartments();
+                this.refreshCurrentView();
             },
         });
 

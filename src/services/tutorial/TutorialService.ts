@@ -7,6 +7,7 @@ export class TutorialService {
     private activeTutorial: Tutorial | null = null;
     private currentStepIndex = 0;
     private stepChangeCallback: StepChangeCallback | null = null;
+    private completionCallback: (() => void) | null = null;
     private highlightedElement: Element | null = null;
     private actionCleanup: (() => void) | null = null;
     private highlightObserver: MutationObserver | null = null;
@@ -26,6 +27,7 @@ export class TutorialService {
         this.cleanup();
         this.activeTutorial = null;
         this.stepChangeCallback?.(null, 0, 0);
+        this.completionCallback?.();
     }
 
     nextStep(): void {
@@ -35,12 +37,15 @@ export class TutorialService {
         if (this.currentStepIndex >= this.activeTutorial.steps.length) {
             this.activeTutorial = null;
             this.stepChangeCallback?.(null, 0, 0);
+            this.completionCallback?.();
         } else {
             this.applyStep();
         }
     }
 
     onStepChange(cb: StepChangeCallback): void { this.stepChangeCallback = cb; }
+
+    onComplete(cb: () => void): void { this.completionCallback = cb; }
 
     private applyStep(): void {
         if (!this.activeTutorial) return;

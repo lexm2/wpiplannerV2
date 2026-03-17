@@ -59,7 +59,7 @@ export class FloatingTextBox {
             </div>
             <div class="${styles.footer}">
                 <span class="${styles.stepCounter}"></span>
-                <button class="${styles.nextBtn} ${styles.hidden}">Next</button>
+                <button class="${styles.nextBtn} ${styles.hidden}" data-tutorial-next>Next</button>
             </div>
         `;
 
