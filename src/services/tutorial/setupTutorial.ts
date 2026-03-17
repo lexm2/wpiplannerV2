@@ -78,6 +78,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 title: 'Select a course',
                 description: 'Click the + button on the Tutorial course to add it to your planner.',
                 waitFor: 'click',
+                scrollArrow: true,
                 action: () => {
                     const c = getTutorialCourse('TUT-1001');
                     if (c) services.courseSelectionService.selectCourse(c);

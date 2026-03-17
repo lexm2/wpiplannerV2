@@ -7,6 +7,7 @@ export interface TutorialStep {
     waitFor: TutorialWaitFor;
     waitForSelector?: string;
     action?: () => void;
+    scrollArrow?: boolean;
 }
 
 export interface Tutorial {
