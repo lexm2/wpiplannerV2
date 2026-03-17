@@ -17,6 +17,7 @@ export interface TutorialSetup {
 export function setupTutorial(services: ServiceContainer, mainController: MainController): TutorialSetup {
     const tutorialService = new TutorialService();
     let filteringStarted = false;
+    let autoScheduleStarted = false;
     let previousScheduleId: string | null = null;
     let tutorialScheduleId: string | null = null;
     let cleaningUp = false;
@@ -255,6 +256,49 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     }
 
     tutorialService.register({
+        id: 'autoSchedule',
+        onStart: async () => {
+            mainController.closeWizard();
+            for (const id of ['TUT-1001', 'TUT-1002', 'TUT-9001']) {
+                const c = getTutorialCourse(id);
+                if (c) await services.courseSelectionService.selectCourse(c);
+            }
+            services.filterService.clearFilters();
+            services.filterService.addFilter('term', { terms: ['A'] });
+            services.filterService.addFilter('professor', { professors: ['Tutorial'] });
+            services.filterService.addFilter('periodConflict', {
+                avoidConflicts: true,
+                selectedCourses: services.courseSelectionService.getSelectedCourses(),
+            });
+            services.filterService.addFilter('availability', { availableOnly: true });
+            services.uiStateManager.switchToPage('schedule');
+        },
+        steps: [
+            {
+                selector: '#auto-schedule-btn',
+                title: 'Auto Schedule',
+                description: 'Click Auto Schedule to let the planner automatically find a combination of sections that fit together. It uses your active filters to avoid conflicts and respect your preferences.',
+                waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('#auto-schedule-btn')?.click(),
+            },
+            {
+                selector: '#modal-primary-btn',
+                title: 'Generate schedules',
+                description: 'Click Generate to run the scheduler. It will find all valid section combinations based on your filters and show you the results.',
+                waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('#modal-primary-btn')?.click(),
+            },
+            {
+                selector: '#schedule-next-btn',
+                title: 'Browse results',
+                description: 'Click the next arrow to cycle through the generated schedules and pick the one that works best for you.',
+                waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('#schedule-next-btn')?.click(),
+            },
+        ],
+    });
+
+    tutorialService.register({
         id: 'schedules',
         onStart: () => {
             mainController.closeWizard();
@@ -295,6 +339,9 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             filteringStarted = true;
             registerFilteringTutorial();
             tutorialService.start('filtering');
+        } else if (!autoScheduleStarted) {
+            autoScheduleStarted = true;
+            tutorialService.start('autoSchedule');
         } else {
             cleanupTutorial();
         }
@@ -305,12 +352,14 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     const tutorials: TutorialEntry[] = [
         { id: 'welcome', label: 'Getting Started' },
         { id: 'filtering', label: 'Filtering Courses' },
+        { id: 'autoSchedule', label: 'Auto Schedule' },
         { id: 'schedules', label: 'Managing Schedules' },
     ];
 
     async function start(id: string) {
         await sharedSetup();
         filteringStarted = id !== 'welcome';
+        autoScheduleStarted = id === 'schedules';
         if (id === 'filtering') registerFilteringTutorial();
         tutorialService.start(id);
     }

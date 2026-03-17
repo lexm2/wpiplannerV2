@@ -110,7 +110,7 @@ export class FloatingTextBox {
 
     private repositionIfObstructed(selector: string): void {
         const target = document.querySelector(selector) as HTMLElement | null;
-        if (!target) return;
+        if (!target || this.el.contains(target)) return;
 
         const targetRect = target.getBoundingClientRect();
         const boxRect = this.el.getBoundingClientRect();
