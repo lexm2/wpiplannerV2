@@ -254,6 +254,42 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         });
     }
 
+    tutorialService.register({
+        id: 'schedules',
+        onStart: () => {
+            mainController.closeWizard();
+            services.uiStateManager.switchToPage('planner');
+        },
+        steps: [
+            {
+                selector: '#schedule-picker-btn',
+                title: 'Open the schedule manager',
+                description: 'Click the Schedules button to open the schedule manager.',
+                waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('#schedule-picker-btn')?.click(),
+            },
+            {
+                selector: '.nav-tab[data-tab="settings"]',
+                title: 'Settings tab',
+                description: 'Click the Settings tab to see all options. New Schedule / Import create schedules; Export to Calendar saves your current schedule as an ICS file for Google Calendar or similar; Export All backs up everything as JSON; Toggle Theme switches light/dark mode; Undo/Redo step through changes; What\'s New shows recent updates; Tutorials reopens this menu; Clear All Data wipes everything.',
+                waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('.nav-tab[data-tab="settings"]')?.click(),
+            },
+            {
+                selector: '#new-schedule-btn-settings',
+                title: 'Create a schedule',
+                description: 'Click New Schedule, type a name, and you\'re all set. This is the end of the tutorial — you\'ll be taken to your new schedule automatically.',
+                waitFor: 'click',
+                action: async () => {
+                    const result = await services.scheduleManagementService.createNewSchedule('My Schedule');
+                    if (result.schedule?.id) {
+                        await services.scheduleManagementService.setActiveSchedule(result.schedule.id);
+                    }
+                },
+            },
+        ],
+    });
+
     tutorialService.onComplete(() => {
         if (!filteringStarted) {
             filteringStarted = true;
@@ -269,6 +305,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     const tutorials: TutorialEntry[] = [
         { id: 'welcome', label: 'Getting Started' },
         { id: 'filtering', label: 'Filtering Courses' },
+        { id: 'schedules', label: 'Managing Schedules' },
     ];
 
     async function start(id: string) {
