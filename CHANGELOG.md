@@ -3,6 +3,7 @@
 ## [2026-03-16]
 
 ### Added
+- The app now remembers if you've visited before
 - Courses now include a WPI category (1, 2, or 3) parsed from their description
 - Click a custom event in the schedule grid to delete it via a confirmation dialog
 

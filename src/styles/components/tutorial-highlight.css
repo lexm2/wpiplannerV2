@@ -1,0 +1,14 @@
+@keyframes tutorial-pulse {
+    0%   { box-shadow: 0 0 0 0   rgba(212, 66, 79, 0.55), 0 0 0 4px rgba(212, 66, 79, 0.2); }
+    60%  { box-shadow: 0 0 0 6px rgba(212, 66, 79, 0.0),  0 0 0 10px rgba(212, 66, 79, 0.0); }
+    100% { box-shadow: 0 0 0 0   rgba(212, 66, 79, 0.55), 0 0 0 4px rgba(212, 66, 79, 0.2); }
+}
+
+.tutorial-highlight {
+    outline: 2px solid var(--color-primary) !important;
+    outline-offset: 3px;
+    border-radius: var(--effect-border-radius);
+    animation: tutorial-pulse 1.8s ease-in-out infinite;
+    position: relative;
+    z-index: 499;
+}
