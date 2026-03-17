@@ -30,7 +30,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     }
 
     async function sharedSetup() {
-        await cleanupTutorial();
+        await cleanupTutorial(false);
         // Delete any stale Tutorial schedules left over from a previous session
         const stale = services.scheduleManagementService.getAllSchedules()
             .filter(s => s.name === 'Tutorial' || s.name.startsWith('Tutorial ('));
@@ -43,7 +43,10 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         tutorialScheduleId = result.schedule?.id ?? null;
     }
 
-    async function cleanupTutorial() {
+    async function cleanupTutorial(setVisited: boolean) {
+        if (setVisited) {
+            localStorage.setItem('wpi_visited', 'true');
+        }
         mainController.closeWizard();
         services.filterService.clearFilters();
         if (previousScheduleId) {
@@ -62,7 +65,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         if (activeSchedule?.id !== tutorialScheduleId) {
             tutorialService.cancel();
             cleaningUp = true;
-            cleanupTutorial().finally(() => { cleaningUp = false; });
+            cleanupTutorial(true).finally(() => { cleaningUp = false; });
         }
     });
 
@@ -392,7 +395,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             schedulesStarted = true;
             tutorialService.start('schedules');
         } else {
-            cleanupTutorial();
+            cleanupTutorial(true);
         }
     });
 

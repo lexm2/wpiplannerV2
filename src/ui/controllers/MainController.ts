@@ -203,7 +203,6 @@ export class MainController {
             this.updateSelectedCoursesState(this.services.courseSelectionService.getSelectedCourses());
 
             if (!localStorage.getItem('wpi_visited')) {
-                localStorage.setItem('wpi_visited', 'true');
                 await this.services.tutorial?.start('welcome');
             }
         } catch (error) {
