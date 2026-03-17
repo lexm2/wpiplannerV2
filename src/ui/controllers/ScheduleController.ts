@@ -7,6 +7,7 @@ import { SectionInfoModalController } from './SectionInfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
 import { LocalEventModal } from '../components/LocalEventModal'
+import { DeleteLocalEventModal } from '../components/DeleteLocalEventModal'
 import { SidebarManager } from '../sidebar/SidebarManager'
 import { TimeUtils } from '../utils/timeUtils'
 import { BitMaskEngine, buildConflictMatrix } from '../../core/scheduling/BitMaskEngine'
@@ -265,6 +266,23 @@ export class ScheduleController implements CalendarEventProvider {
             onSave: (eventData) => this.addLocalEvent(eventData),
         });
         modal.show();
+    }
+
+    private deleteLocalEvent(eventId: string): void {
+        if (!this.currentSchedule || !this.onScheduleUpdate) return;
+
+        const updatedLocalEvents = (this.currentSchedule.localEvents || []).filter(e => e.id !== eventId);
+
+        this.currentSchedule = {
+            ...this.currentSchedule,
+            localEvents: updatedLocalEvents,
+        };
+
+        this.renderScheduleGrids();
+
+        this.onScheduleUpdate(this.currentSchedule.id, {
+            localEvents: updatedLocalEvents,
+        });
     }
 
     /**
@@ -1283,15 +1301,28 @@ export class ScheduleController implements CalendarEventProvider {
         // Create new listener
         const clickListener = (event: Event) => {
             const target = event.target as HTMLElement;
-            
+
+            const externalBlock = target.closest('.external-event-block') as HTMLElement | null;
+            if (externalBlock) {
+                const eventId = externalBlock.dataset.eventId;
+                if (eventId && this.currentSchedule && this.modalService) {
+                    event.stopPropagation();
+                    const localEvent = (this.currentSchedule.localEvents || []).find(e => e.id === eventId);
+                    const title = localEvent?.title || 'Untitled Event';
+                    const modal = new DeleteLocalEventModal(this.modalService, title, () => this.deleteLocalEvent(eventId));
+                    modal.show();
+                }
+                return;
+            }
+
             // Find the section block element (might be the target or a parent)
             const sectionBlock = target.closest('.section-block');
             if (!sectionBlock) return;
-            
+
             // Get section information from data attributes
             const courseId = (sectionBlock as HTMLElement).dataset.courseId;
             const sectionNumber = (sectionBlock as HTMLElement).dataset.sectionNumber;
-            
+
             if (courseId && sectionNumber) {
                 event.stopPropagation(); // Prevent event bubbling
                 this.showSectionInfoModal(courseId, sectionNumber);

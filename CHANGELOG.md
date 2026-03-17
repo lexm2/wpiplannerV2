@@ -4,6 +4,7 @@
 
 ### Added
 - Courses now include a WPI category (1, 2, or 3) parsed from their description
+- Click a custom event in the schedule grid to delete it via a confirmation dialog
 
 ### Fixed
 - Course select and bookmark buttons no longer flash when deselected while hovering
