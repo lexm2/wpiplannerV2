@@ -6,6 +6,7 @@
 - Tutorial now creates a dedicated "Tutorial" schedule so your real schedules stay untouched
 - Added individual tutorial buttons to the settings panel so you can restart specific tutorials
 - Tutorial courses no longer persist to storage between sessions
+- Added a Tutorials menu accessible from Settings — browse and launch any tutorial from one place
 
 ### Fixed
 - Tutorial step 11 (Open section selection) now correctly highlights the course on the Schedule tab

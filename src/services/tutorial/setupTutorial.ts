@@ -127,7 +127,12 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 mainController.closeWizard();
                 services.uiStateManager.switchToPage('planner');
                 const tut1001 = getTutorialCourse('TUT-1001');
-                if (tut1001) await services.courseSelectionService.selectCourse(tut1001);
+                if (tut1001 && tut1001.lectures) {
+                    await services.courseSelectionService.selectCourse(tut1001);
+                    const lecture = tut1001.lectures[0].section;
+                    const lab = tut1001.lectures[0].compatibleLabs[0] ?? null;
+                    await services.courseSelectionService.setSelectedComponents(tut1001, lecture, null, lab);
+                }
                 const tut1002 = getTutorialCourse('TUT-1002');
                 if (tut1002 && tut1002.lectures) {
                     await services.courseSelectionService.selectCourse(tut1002);
@@ -162,20 +167,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     action: () => document.querySelector<HTMLElement>(`.segmented-btn[data-year="${priorYear}"]`)?.click(),
                 },
                 {
-                    selector: '#available-only-filter',
-                    title: 'Show available courses only',
-                    description: 'Toggle this to hide courses with no open seats.',
-                    waitFor: 'click',
-                    action: () => document.querySelector<HTMLElement>('#available-only-filter')?.click(),
-                },
-                {
-                    selector: '#avoid-conflicts-filter',
-                    title: 'Avoid schedule conflicts',
-                    description: 'Toggle this to hide courses that conflict with your current schedule.',
-                    waitFor: 'click',
-                    action: () => document.querySelector<HTMLElement>('#avoid-conflicts-filter')?.click(),
-                },
-                {
                     selector: '.professor-search',
                     title: 'Filter by professor',
                     description: 'Search for "Tutorial" to filter courses by professor.',
@@ -187,6 +178,20 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                         search.dispatchEvent(new Event('input', { bubbles: true }));
                         document.querySelector<HTMLElement>('.professor-option[data-professor="Tutorial"]')?.click();
                     },
+                },
+                {
+                    selector: '#avoid-conflicts-filter',
+                    title: 'Avoid schedule conflicts',
+                    description: 'Toggle this to hide courses that conflict with your current schedule.',
+                    waitFor: 'click',
+                    action: () => document.querySelector<HTMLElement>('#avoid-conflicts-filter')?.click(),
+                },
+                {
+                    selector: '#available-only-filter',
+                    title: 'Show available courses only',
+                    description: 'Toggle this to hide courses with no open seats.',
+                    waitFor: 'click',
+                    action: () => document.querySelector<HTMLElement>('#available-only-filter')?.click(),
                 },
                 {
                     selector: '#modal-primary-btn',
