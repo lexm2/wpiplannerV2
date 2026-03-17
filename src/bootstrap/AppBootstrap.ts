@@ -77,7 +77,6 @@ export class AppBootstrap {
 
             courseSelectionService.setAllDepartments(event.departments);
             courseSelectionService.reconstructSectionObjects();
-            scheduleManagementService.initializeDefaultScheduleIfNeeded();
             timestampManager.updateClientTimestamp();
 
             if (!filterService.hasFilter('academicYear')) {

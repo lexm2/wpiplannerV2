@@ -154,6 +154,10 @@ export class MainController {
         this.init();
     }
 
+    closeWizard(): void {
+        this.scheduleController.closeComponentWizard();
+    }
+
     openWizardForCourse(courseId: string): void {
         const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
         const selected = selectedCourses.find(sc => sc.course.id === courseId);
@@ -197,6 +201,8 @@ export class MainController {
             this.syncInitialCourseSelectionUI();
 
             this.updateSelectedCoursesState(this.services.courseSelectionService.getSelectedCourses());
+
+            await this.services.tutorial?.start('welcome');
         } catch (error) {
             console.error('Failed to initialize application:', error);
             this.services.uiStateManager.showErrorMessage(
@@ -1005,7 +1011,7 @@ export class MainController {
 
     private openSchedulePicker(): void {
         if (!this.schedulePickerModal) {
-            this.schedulePickerModal = new SchedulePickerModal(this.services.modalService, this.services.scheduleManagementService);
+            this.schedulePickerModal = new SchedulePickerModal(this.services.modalService, this.services.scheduleManagementService, this.services.tutorial);
         }
         this.schedulePickerModal.show();
     }

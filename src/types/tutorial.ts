@@ -11,5 +11,6 @@ export interface TutorialStep {
 
 export interface Tutorial {
     id: string;
+    onStart?: () => void | Promise<void>;
     steps: TutorialStep[];
 }

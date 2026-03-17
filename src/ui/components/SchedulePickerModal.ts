@@ -3,6 +3,7 @@ import { ModalService } from '../../services/ui/ModalService';
 import { BaseModal } from './BaseModal';
 import { ChangelogModal } from './ChangelogModal';
 import { getInlineSVG } from '../../utils/iconPaths';
+import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
 import styles from '../../styles/components/schedule-picker-modal.module.css';
 
 export class SchedulePickerModal extends BaseModal {
@@ -12,15 +13,18 @@ export class SchedulePickerModal extends BaseModal {
     private static readonly VIEWPORT_PADDING = 8;
     private scheduleManagementService: ScheduleManagementService;
     private changelogModal: ChangelogModal;
+    private tutorial: TutorialSetup | undefined;
     private scheduleListClickHandler: ((e: Event) => void) | null = null;
     private scheduleListDblClickHandler: ((e: Event) => void) | null = null;
 
     constructor(
         modalService: ModalService,
-        scheduleManagementService: ScheduleManagementService
+        scheduleManagementService: ScheduleManagementService,
+        tutorial?: TutorialSetup
     ) {
         super(modalService);
         this.scheduleManagementService = scheduleManagementService;
+        this.tutorial = tutorial;
         this.changelogModal = new ChangelogModal(modalService);
 
         this.scheduleManagementService.onActiveScheduleChange(() => {
@@ -80,6 +84,7 @@ export class SchedulePickerModal extends BaseModal {
                                 </div>
                                 <!-- keep clear all data at the bottom -->
                                 <button class="btn btn-secondary" id="changelog-btn-settings">${getInlineSVG('CLOCK', 'modal-footer-icon')}<span class="btn-text"> What's New</span></button>
+                                ${(this.tutorial?.tutorials ?? []).map(t => `<button class="btn btn-secondary tutorial-start-btn" data-tutorial-id="${t.id}">${getInlineSVG('CALENDAR_REPEAT', 'modal-footer-icon')}<span class="btn-text"> ${t.label}</span></button>`).join('')}
                                 <button class="btn btn-danger" id="clear-all-data-btn-settings">${getInlineSVG('TRASH', 'modal-footer-icon')}<span class="btn-text"> Clear All Data</span></button>
                             </div>
                         </div>
@@ -189,6 +194,10 @@ export class SchedulePickerModal extends BaseModal {
         });
         exportBtn?.addEventListener('click', () => this.exportAllSchedules());
         changelogBtn?.addEventListener('click', () => this.changelogModal.show());
+        modal.querySelectorAll('.tutorial-start-btn').forEach(btn => {
+            const id = (btn as HTMLElement).dataset.tutorialId!;
+            btn.addEventListener('click', () => { this.tutorial?.start(id); this.hide(); });
+        });
         clearAllBtn?.addEventListener('click', () => this.clearAllData());
         toggleThemeBtn?.addEventListener('click', () => document.getElementById('settings-theme-btn')?.click());
         undoBtn?.addEventListener('click', () => document.getElementById('undo-btn')?.click());

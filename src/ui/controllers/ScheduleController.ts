@@ -26,7 +26,6 @@ export class ScheduleController implements CalendarEventProvider {
     private filterService: FilterService | null = null;
     private sectionInfoModalController: SectionInfoModalController | null = null;
     private conflictDetector: BitMaskEngine | null = null;
-    private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private containerEventListeners = new Map<HTMLElement, EventListener>();
     private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
     private componentWizard: ComponentSelectionWizard | null = null;
@@ -492,8 +491,6 @@ export class ScheduleController implements CalendarEventProvider {
             selectedCoursesContainer.appendChild(sidebarPanel);
         }
 
-        this.setupDOMElementMapping(selectedCoursesContainer, sortedCourses);
-
         this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
     }
 
@@ -545,7 +542,7 @@ export class ScheduleController implements CalendarEventProvider {
         }
 
         return `
-            <div class="sidebar-content-item schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}">
+            <div class="sidebar-content-item schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}" data-course-id="${course.id}">
                 <div class="schedule-course-header">
                     <div class="schedule-course-info">
                         <div class="schedule-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
@@ -687,49 +684,6 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
 
-    private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: SelectedCourse[]): void {
-        // Associate DOM elements with Course objects
-        const courseElements = selectedCoursesContainer.querySelectorAll('.schedule-course-item');
-        const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
-        
-        courseElements.forEach((element, index) => {
-            const course = sortedCourses[index]?.course;
-            this.elementToCourseMap.set(element as HTMLElement, course);
-        });
-        
-        removeButtons.forEach((button, index) => {
-            const course = sortedCourses[index]?.course;
-            this.elementToCourseMap.set(button as HTMLElement, course);
-        });
-
-        // Associate clear sections buttons with their Course objects
-        const clearSectionsButtons = selectedCoursesContainer.querySelectorAll('.course-clear-sections-btn');
-        clearSectionsButtons.forEach((button, index) => {
-            const course = sortedCourses[index]?.course;
-            this.elementToCourseMap.set(button as HTMLElement, course);
-        });
-
-        // Associate edit buttons with their Course objects
-        const editButtons = selectedCoursesContainer.querySelectorAll('.course-edit-btn');
-        editButtons.forEach((button, index) => {
-            const course = sortedCourses[index]?.course;
-            this.elementToCourseMap.set(button as HTMLElement, course);
-        });
-
-        // IMPORTANT: Associate section buttons with their Course objects
-        const sectionButtons = selectedCoursesContainer.querySelectorAll('.section-select-btn');
-        sectionButtons.forEach(button => {
-            const courseItem = button.closest('.schedule-course-item') as HTMLElement;
-            if (courseItem) {
-                const courseIndex = Array.from(courseElements).indexOf(courseItem);
-                if (courseIndex >= 0 && courseIndex < sortedCourses.length) {
-                    const course = sortedCourses[courseIndex].course;
-                    this.elementToCourseMap.set(button as HTMLElement, course);
-                }
-            }
-        });
-    }
-    
     async handleSectionSelection(course: Course, sectionNumber: string): Promise<void> {
         const currentSelectedSection = this.courseSelectionService.getSelectedSection(course);
         
@@ -751,20 +705,8 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     updateSectionButtonStates(course: Course, selectedSection: string | null): void {
-        // Find the schedule course item by matching the associated Course object
-        let courseItem: HTMLElement | null = null;
-        
-        document.querySelectorAll('.schedule-course-item').forEach(item => {
-            const itemCourse = this.elementToCourseMap.get(item as HTMLElement);
-            if (itemCourse && itemCourse.id === course.id) {
-                courseItem = item as HTMLElement;
-            }
-        });
-        
-        if (!courseItem) return;
-
-        // TypeScript assertion to ensure courseItem is HTMLElement
-        const validCourseItem = courseItem as HTMLElement;
+        const validCourseItem = document.querySelector<HTMLElement>(`.schedule-course-item[data-course-id="${course.id}"]`);
+        if (!validCourseItem) return;
         const sectionButtons = validCourseItem.querySelectorAll('.section-select-btn');
         const sectionOptions = validCourseItem.querySelectorAll('.section-option');
 
@@ -1266,7 +1208,9 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     getCourseFromElement(element: HTMLElement): Course | undefined {
-        return this.elementToCourseMap.get(element);
+        const courseId = element.dataset.courseId;
+        if (!courseId) return undefined;
+        return this.courseSelectionService.getSelectedCourses().find(sc => sc.course.id === courseId)?.course;
     }
 
     applyFiltersAndRefresh(): void {

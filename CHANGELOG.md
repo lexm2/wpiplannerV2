@@ -1,5 +1,17 @@
 # Changelog
 
+## [2026-03-17]
+
+### Added
+- Tutorial now creates a dedicated "Tutorial" schedule so your real schedules stay untouched
+- Added individual tutorial buttons to the settings panel so you can restart specific tutorials
+- Tutorial courses no longer persist to storage between sessions
+
+### Fixed
+- Tutorial step 11 (Open section selection) now correctly highlights the course on the Schedule tab
+- Tutorial no longer creates a stray "My Schedule" on every page reload
+- Tutorial schedule is properly cleaned up when the tutorial finishes
+
 ## [2026-03-16]
 
 ### Added

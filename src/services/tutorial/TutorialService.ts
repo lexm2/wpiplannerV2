@@ -20,6 +20,13 @@ export class TutorialService {
         if (!tutorial || tutorial.steps.length === 0) return;
         this.activeTutorial = tutorial;
         this.currentStepIndex = 0;
+        if (tutorial.onStart) {
+            const result = tutorial.onStart();
+            if (result instanceof Promise) {
+                result.then(() => this.applyStep());
+                return;
+            }
+        }
         this.applyStep();
     }
 

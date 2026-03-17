@@ -67,7 +67,7 @@ export class CourseDataService {
         this.latestAcademicYear = latestYear || undefined;
 
         const scheduleDB: ScheduleDB = {
-            departments: [this.createTutorialDepartment(latestYear || undefined), ...realDepartments],
+            departments: [...realDepartments],
             generated: jsonData.generated || new Date().toISOString()
         };
         
@@ -81,7 +81,8 @@ export class CourseDataService {
             type: PeriodType,
             days: DayOfWeek[],
             start: [number, number],
-            end: [number, number]
+            end: [number, number],
+            professor = 'Demo Professor'
         ): Period => {
             const fmt = ([h, m]: [number, number]) => {
                 const dh = h > 12 ? h - 12 : h === 0 ? 12 : h;
@@ -89,7 +90,7 @@ export class CourseDataService {
             };
             return {
                 type,
-                professor: 'Demo Professor',
+                professor,
                 startTime: fmt(start),
                 endTime: fmt(end),
                 location: 'Fuller Labs 320',
@@ -134,6 +135,7 @@ export class CourseDataService {
             maxCredits: 1,
             isGraduate: false,
             academicYear,
+            transient: true,
             lectures: [{ section: lecture, compatibleDiscussions: [], compatibleLabs: [lab] }],
         };
 
@@ -155,11 +157,12 @@ export class CourseDataService {
             maxCredits: 1,
             isGraduate: false,
             academicYear,
+            transient: true,
             lectures: [{ section: tut1002Lecture, compatibleDiscussions: [], compatibleLabs: [tut1002Lab] }],
         };
 
         const tut9001Lecture = makeSection(99905, 'A01', [
-            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [10, 0], [11, 0]),
+            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [10, 0], [11, 0], 'Tutorial'),
         ]);
         const tut9001Course: Course = {
             id: 'TUT-9001',
@@ -173,6 +176,7 @@ export class CourseDataService {
             maxCredits: 1,
             isGraduate: false,
             academicYear: academicYear ? academicYear - 1 : undefined,
+            transient: true,
             lectures: [{ section: tut9001Lecture, compatibleDiscussions: [], compatibleLabs: [] }],
         };
 
@@ -606,11 +610,21 @@ export class CourseDataService {
         return this.latestAcademicYear;
     }
 
-    hideTutorialDepartment(): void {
+    filterDepartments(predicate: (d: Department) => boolean): void {
         if (!this.scheduleDB) return;
         this.scheduleDB = {
             ...this.scheduleDB,
-            departments: this.scheduleDB.departments.filter(d => d.abbreviation !== 'TUT'),
+            departments: this.scheduleDB.departments.filter(predicate),
+        };
+        this.notifyDataRefreshed();
+    }
+
+    addTutorialDepartment(): void {
+        if (!this.scheduleDB) return;
+        const tutDept = this.createTutorialDepartment(this.latestAcademicYear);
+        this.scheduleDB = {
+            ...this.scheduleDB,
+            departments: [tutDept, ...this.scheduleDB.departments.filter(d => d.abbreviation !== 'TUT')],
         };
         this.notifyDataRefreshed();
     }
