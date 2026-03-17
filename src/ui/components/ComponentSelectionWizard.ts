@@ -227,22 +227,9 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     private applyScheduleFilters(sections: Section[], _step: WizardStep): Section[] {
         if (!this.filterService) return sections;
 
-        // Get all courses for filtering context
-        const allCourses = [this.course, ...this.allSelectedCourses.map(sc => sc.course)];
-
-        // Apply filters to all courses
-        const filtered = this.filterService.apply(allCourses);
-
-        // Keep only sections from this course that passed filtering
-        const passingSectionCrns = new Set(
-            filtered
-                .filter(fs => fs.course.id === this.course.id)
-                .map(fs => fs.section.crn)
-        );
-
-        const filteredSections = sections.filter(section => passingSectionCrns.has(section.crn));
-
-        return filteredSections;
+        const filtered = this.filterService.apply([this.course]);
+        const passingSectionCrns = new Set(filtered.map(fs => fs.section.crn));
+        return sections.filter(section => passingSectionCrns.has(section.crn));
     }
 
     /**
