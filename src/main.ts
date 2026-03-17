@@ -29,37 +29,48 @@ tutorialService.register({
             title: 'Select a course',
             description: 'Click the + button on the Tutorial course to add it to your planner.',
             waitFor: 'click',
-            waitForSelector: '[data-course-id="TUT-1001"] .course-select-btn',
+            action: () => {
+                const c = getTutorialCourse('TUT-1001');
+                if (c) services.courseSelectionService.selectCourse(c);
+            },
         },
         {
             selector: '#schedule-tab',
             title: 'Go to the Schedule tab',
             description: 'Head to the Schedule tab to start setting up your sections.',
             waitFor: 'click',
+            action: () => services.uiStateManager.switchToPage('schedule'),
         },
         {
             selector: '.schedule-course-item',
             title: 'Open section selection',
             description: 'Click the course you just added to open the section picker.',
             waitFor: 'click',
+            action: () => {
+                services.uiStateManager.switchToPage('schedule');
+                mainController.openWizardForCourse('TUT-1001');
+            },
         },
         {
             selector: '.wizard-section-card',
             title: 'Pick a lecture',
             description: 'Select a lecture section.',
             waitFor: 'click',
+            action: () => document.querySelector<HTMLElement>('.wizard-section-card')?.click(),
         },
         {
             selector: '.wizard-btn.wizard-btn-primary',
             title: 'Continue to labs',
             description: 'Click Next to move on to selecting a lab.',
             waitFor: 'click',
+            action: () => document.querySelector<HTMLElement>('.wizard-btn.wizard-btn-primary')?.click(),
         },
         {
             selector: '.wizard-section-card[data-crn="99902"]',
             title: 'Pick a lab',
             description: 'Select a lab section.',
             waitFor: 'click',
+            action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="99902"]')?.click(),
         },
         {
             selector: '[data-tutorial-next]',
@@ -95,42 +106,52 @@ async function startFilteringTutorial() {
                 title: 'Go to the planner',
                 description: 'Head back to the Classes tab to see your courses.',
                 waitFor: 'click',
+                action: () => services.uiStateManager.switchToPage('planner'),
             },
             {
                 selector: '#filter-btn',
                 title: 'Open filters',
                 description: 'Click the filter button to open course filters.',
                 waitFor: 'click',
+                action: () => {
+                    services.uiStateManager.switchToPage('planner');
+                    document.querySelector<HTMLElement>('#filter-btn')?.click();
+                },
             },
             {
                 selector: 'input.filter-toggle[value="A"][data-filter="term"]',
                 title: 'Filter by term',
                 description: 'Check the A term box to filter courses by term.',
                 waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('input.filter-toggle[value="A"][data-filter="term"]')?.click(),
             },
             {
                 selector: `.segmented-btn[data-year="${priorYear}"]`,
                 title: 'Change the academic year',
                 description: `Switch to ${priorYear}–${priorYear + 1} to see courses from a prior year.`,
                 waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>(`.segmented-btn[data-year="${priorYear}"]`)?.click(),
             },
             {
                 selector: '#available-only-filter',
                 title: 'Show available courses only',
                 description: 'Toggle this to hide courses with no open seats.',
                 waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('#available-only-filter')?.click(),
             },
             {
                 selector: '#avoid-conflicts-filter',
                 title: 'Avoid schedule conflicts',
                 description: 'Toggle this to hide courses that conflict with your current schedule.',
                 waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('#avoid-conflicts-filter')?.click(),
             },
             {
                 selector: '#modal-primary-btn',
                 title: 'Apply filters',
                 description: 'Click Apply to close the filter panel and see your filtered results.',
                 waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('#modal-primary-btn')?.click(),
             },
         ],
     });

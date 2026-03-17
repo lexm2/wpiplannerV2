@@ -6,6 +6,7 @@ export interface TutorialStep {
     description: string;
     waitFor: TutorialWaitFor;
     waitForSelector?: string;
+    action?: () => void;
 }
 
 export interface Tutorial {

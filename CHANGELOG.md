@@ -14,6 +14,9 @@
 - Click a custom event in the schedule grid to delete it via a confirmation dialog
 
 ### Fixed
+- Tutorial "Next" button now directly performs each step's action (tab switch, course select, open wizard) instead of simulating clicks
+- Dragging the tutorial box no longer stretches it vertically
+- Tutorial box now repositions to a free corner when it would cover the highlighted element
 - Course select and bookmark buttons no longer flash when deselected while hovering
 - Deleting a local calendar event now correctly updates the event count on the calendar button
 

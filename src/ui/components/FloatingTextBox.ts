@@ -11,6 +11,7 @@ export class FloatingTextBox {
     private dragOffsetX = 0;
     private dragOffsetY = 0;
     private isDragging = false;
+    private currentStep: TutorialStep | null = null;
 
     private boundMouseMove = this.onMouseMove.bind(this);
     private boundMouseUp = this.onMouseUp.bind(this);
@@ -32,17 +33,15 @@ export class FloatingTextBox {
     private onStepChange(step: TutorialStep | null, index: number, total: number): void {
         if (!step) {
             this.el.classList.add(styles.hidden);
+            this.currentStep = null;
             return;
         }
+        this.currentStep = step;
         this.el.classList.remove(styles.hidden);
         this.stepTitleEl.textContent = step.title;
         this.stepDescEl.textContent = step.description;
         this.stepCounterEl.textContent = `Step ${index + 1} of ${total}`;
-        if (step.waitFor === 'manual') {
-            this.nextBtn.classList.remove(styles.hidden);
-        } else {
-            this.nextBtn.classList.add(styles.hidden);
-        }
+        this.repositionIfObstructed(step.selector);
     }
 
     private createElement(): HTMLElement {
@@ -59,7 +58,7 @@ export class FloatingTextBox {
             </div>
             <div class="${styles.footer}">
                 <span class="${styles.stepCounter}"></span>
-                <button class="${styles.nextBtn} ${styles.hidden}" data-tutorial-next>Next</button>
+                <button class="${styles.nextBtn}" data-tutorial-next>Next</button>
             </div>
         `;
 
@@ -72,7 +71,11 @@ export class FloatingTextBox {
 
         const nextBtn = el.querySelector(`.${styles.nextBtn}`) as HTMLButtonElement;
         nextBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-        nextBtn.addEventListener('click', () => this.tutorialService.nextStep());
+        nextBtn.addEventListener('click', () => {
+            this.tutorialService.disarmCurrentListener();
+            this.currentStep?.action?.();
+            this.tutorialService.nextStep();
+        });
 
         return el;
     }
@@ -80,6 +83,9 @@ export class FloatingTextBox {
     private onDragStart(e: MouseEvent): void {
         e.preventDefault();
         const rect = this.el.getBoundingClientRect();
+        this.el.style.transition = 'none';
+        this.el.style.top = `${rect.top}px`;
+        this.el.style.bottom = 'auto';
         this.dragOffsetX = e.clientX - rect.left;
         this.dragOffsetY = e.clientY - rect.top;
         this.isDragging = true;
@@ -93,12 +99,47 @@ export class FloatingTextBox {
         const y = Math.max(0, Math.min(window.innerHeight - this.el.offsetHeight, e.clientY - this.dragOffsetY));
         this.el.style.left = `${x}px`;
         this.el.style.top = `${y}px`;
-        this.el.style.bottom = '';
     }
 
     private onMouseUp(): void {
         this.isDragging = false;
+        this.el.style.transition = '';
         document.removeEventListener('mousemove', this.boundMouseMove);
         document.removeEventListener('mouseup', this.boundMouseUp);
+    }
+
+    private repositionIfObstructed(selector: string): void {
+        const target = document.querySelector(selector) as HTMLElement | null;
+        if (!target) return;
+
+        const targetRect = target.getBoundingClientRect();
+        const boxRect = this.el.getBoundingClientRect();
+
+        const overlaps = (a: DOMRect, b: DOMRect) =>
+            !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+
+        if (!overlaps(boxRect, targetRect)) return;
+
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const boxW = boxRect.width;
+        const boxH = boxRect.height;
+
+        const candidates = [
+            { left: 20, top: vh - boxH - 20 },
+            { left: vw - boxW - 20, top: vh - boxH - 20 },
+            { left: vw - boxW - 20, top: 20 },
+            { left: 20, top: 20 },
+        ];
+
+        for (const pos of candidates) {
+            const candidate = new DOMRect(pos.left, pos.top, boxW, boxH);
+            if (!overlaps(candidate, targetRect)) {
+                this.el.style.left = `${pos.left}px`;
+                this.el.style.top = `${pos.top}px`;
+                this.el.style.bottom = 'auto';
+                return;
+            }
+        }
     }
 }

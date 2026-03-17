@@ -154,6 +154,13 @@ export class MainController {
         this.init();
     }
 
+    openWizardForCourse(courseId: string): void {
+        const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
+        const selected = selectedCourses.find(sc => sc.course.id === courseId);
+        if (!selected) return;
+        this.scheduleController.openComponentWizard(selected.course, selected);
+    }
+
     private async init(): Promise<void> {
         this.services.uiStateManager.showLoadingState();
 

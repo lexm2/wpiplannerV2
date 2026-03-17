@@ -47,6 +47,13 @@ export class TutorialService {
 
     onComplete(cb: () => void): void { this.completionCallback = cb; }
 
+    disarmCurrentListener(): void {
+        this.actionCleanup?.();
+        this.actionCleanup = null;
+        this.actionObserver?.disconnect();
+        this.actionObserver = null;
+    }
+
     private applyStep(): void {
         if (!this.activeTutorial) return;
         const step = this.activeTutorial.steps[this.currentStepIndex];
