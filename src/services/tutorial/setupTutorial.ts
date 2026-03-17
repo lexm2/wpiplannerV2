@@ -18,6 +18,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     const tutorialService = new TutorialService();
     let filteringStarted = false;
     let autoScheduleStarted = false;
+    let schedulesStarted = false;
     let previousScheduleId: string | null = null;
     let tutorialScheduleId: string | null = null;
     let cleaningUp = false;
@@ -261,11 +262,13 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             mainController.closeWizard();
             for (const id of ['TUT-1001', 'TUT-1002', 'TUT-9001']) {
                 const c = getTutorialCourse(id);
-                if (c) await services.courseSelectionService.selectCourse(c);
+                if (c) {
+                    await services.courseSelectionService.selectCourse(c);
+                    await services.courseSelectionService.setSelectedComponents(c, null, null, null);
+                }
             }
             services.filterService.clearFilters();
             services.filterService.addFilter('term', { terms: ['A'] });
-            services.filterService.addFilter('professor', { professors: ['Tutorial'] });
             services.filterService.addFilter('periodConflict', {
                 avoidConflicts: true,
                 selectedCourses: services.courseSelectionService.getSelectedCourses(),
@@ -342,6 +345,9 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         } else if (!autoScheduleStarted) {
             autoScheduleStarted = true;
             tutorialService.start('autoSchedule');
+        } else if (!schedulesStarted) {
+            schedulesStarted = true;
+            tutorialService.start('schedules');
         } else {
             cleanupTutorial();
         }
@@ -359,7 +365,8 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     async function start(id: string) {
         await sharedSetup();
         filteringStarted = id !== 'welcome';
-        autoScheduleStarted = id === 'schedules';
+        autoScheduleStarted = id === 'autoSchedule' || id === 'schedules';
+        schedulesStarted = id === 'schedules';
         if (id === 'filtering') registerFilteringTutorial();
         tutorialService.start(id);
     }
