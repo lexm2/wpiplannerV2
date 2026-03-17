@@ -129,6 +129,12 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('#wizard-next-btn')?.click(),
             },
+            {
+                selector: '[data-tutorial-next]',
+                title: "You're all set!",
+                description: "You've added a course and picked your sections. Up next: filtering the course list to find what you need.",
+                waitFor: 'manual',
+            },
         ],
     });
 
@@ -256,7 +262,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 {
                     selector: '[data-tutorial-next]',
                     title: 'All done!',
-                    description: 'Your prior year course is now on the schedule.',
+                    description: "You've filtered by term, academic year, professor, and availability. Up next: auto-scheduling.",
                     waitFor: 'manual',
                 },
             ],
@@ -305,6 +311,12 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('#schedule-next-btn')?.click(),
             },
+            {
+                selector: '[data-tutorial-next]',
+                title: 'Schedules generated!',
+                description: "You've used Auto Schedule to find valid section combinations. Up next: managing multiple schedules.",
+                waitFor: 'manual',
+            },
         ],
     });
 
@@ -332,7 +344,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             {
                 selector: '#new-schedule-btn-settings',
                 title: 'Create a schedule',
-                description: 'Click New Schedule, type a name, and you\'re all set. This is the end of the tutorial — you\'ll be taken to your new schedule automatically.',
+                description: "Click New Schedule, type a name, and you're all set. You'll be taken to your new schedule automatically.",
                 waitFor: 'click',
                 action: async () => {
                     const result = await services.scheduleManagementService.createNewSchedule('My Schedule');
@@ -340,6 +352,12 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                         await services.scheduleManagementService.setActiveSchedule(result.schedule.id);
                     }
                 },
+            },
+            {
+                selector: '[data-tutorial-next]',
+                title: 'Tutorial complete!',
+                description: "You know the essentials: adding courses, filtering, auto-scheduling, and managing schedules. Happy planning!",
+                waitFor: 'manual',
             },
         ],
     });

@@ -12,6 +12,7 @@
 - Tutorial box repositions itself to stay on screen when step text changes
 
 ### Added
+- Each tutorial now ends with a wrap-up step; the Next button shows "Next Tutorial" on the final step of each tutorial
 - Tutorial now creates a dedicated "Tutorial" schedule so your real schedules stay untouched
 - Added individual tutorial buttons to the settings panel so you can restart specific tutorials
 - Tutorial courses no longer persist to storage between sessions

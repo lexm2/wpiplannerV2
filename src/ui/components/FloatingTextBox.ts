@@ -8,6 +8,7 @@ export class FloatingTextBox {
     private stepDescEl: HTMLElement;
     private stepCounterEl: HTMLElement;
     private nextBtn: HTMLButtonElement;
+    private nextBtnLabel: HTMLSpanElement;
     private dragOffsetX = 0;
     private dragOffsetY = 0;
     private isDragging = false;
@@ -22,6 +23,7 @@ export class FloatingTextBox {
         this.stepDescEl = this.el.querySelector(`.${styles.stepDescription}`) as HTMLElement;
         this.stepCounterEl = this.el.querySelector(`.${styles.stepCounter}`) as HTMLElement;
         this.nextBtn = this.el.querySelector(`.${styles.nextBtn}`) as HTMLButtonElement;
+        this.nextBtnLabel = this.nextBtn.querySelector('span') as HTMLSpanElement;
 
         this.tutorialService.onStepChange((step, index, total) => this.onStepChange(step, index, total));
     }
@@ -41,6 +43,7 @@ export class FloatingTextBox {
         this.stepTitleEl.textContent = step.title;
         this.stepDescEl.textContent = step.description;
         this.stepCounterEl.textContent = `Step ${index + 1} of ${total}`;
+        this.nextBtnLabel.textContent = index + 1 === total ? 'Next Tutorial' : 'Next';
         requestAnimationFrame(() => {
             this.repositionIfObstructed(step.selector);
             this.clampToViewport();
@@ -61,7 +64,7 @@ export class FloatingTextBox {
             </div>
             <div class="${styles.footer}">
                 <span class="${styles.stepCounter}"></span>
-                <button class="${styles.nextBtn}" data-tutorial-next>Next</button>
+                <button class="${styles.nextBtn}" data-tutorial-next><span>Next</span></button>
             </div>
         `;
 
