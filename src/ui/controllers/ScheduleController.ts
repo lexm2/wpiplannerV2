@@ -977,8 +977,8 @@ export class ScheduleController implements CalendarEventProvider {
         const htmlParts: string[] = [];
         let hasConflicts = false;
 
-        // First row: empty time cell + day headers
-        htmlParts.push('<div class="time-label"></div>');
+        // First row: term label + day headers
+        htmlParts.push(`<div class="time-label term-letter-label">${term}</div>`);
         weekdays.forEach(day => {
             htmlParts.push(`<div class="day-header">${TimeUtils.getDayAbbr(day)}</div>`);
         });
@@ -1012,10 +1012,7 @@ export class ScheduleController implements CalendarEventProvider {
         const termGraph = document.querySelector(`.term-graph[data-term="${term}"]`);
         if (!termGraph) return;
 
-        const termHeader = termGraph.querySelector('.term-header');
-        if (!termHeader) return;
-
-        let warningIcon = termHeader.querySelector('.term-conflict-warning') as HTMLElement | null;
+        let warningIcon = termGraph.querySelector('.term-conflict-warning') as HTMLElement | null;
 
         if (hasConflicts) {
             if (!warningIcon) {
@@ -1023,7 +1020,7 @@ export class ScheduleController implements CalendarEventProvider {
                 warningIcon.className = 'term-conflict-warning';
                 warningIcon.innerHTML = getInlineSVG('ALERT_CIRCLE', 'conflict-warning-icon');
                 warningIcon.title = 'This term has overlapping courses';
-                termHeader.appendChild(warningIcon);
+                termGraph.appendChild(warningIcon);
             }
         } else {
             if (warningIcon) {
@@ -1413,10 +1410,10 @@ export class ScheduleController implements CalendarEventProvider {
                 return;
             }
 
-            // Check if term-graph or its header was clicked (but not the schedule grid)
+            // Check if term-graph was clicked while not focused
             const termGraph = target.closest('.term-graph');
             const isMobile = document.documentElement.classList.contains('is-mobile');
-            if (termGraph && !target.closest('.schedule-grid') && !isMobile) {
+            if (termGraph && !isMobile) {
                 const termsGrid = document.querySelector('.terms-grid');
                 // Only focus if not already focused
                 if (termsGrid && !termsGrid.classList.contains('focused')) {

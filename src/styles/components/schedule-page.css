@@ -525,6 +525,7 @@
   min-height: 200px;
   cursor: pointer;
   transition: var(--effect-transition);
+  position: relative;
 }
 
 .term-graph:hover {
@@ -541,34 +542,18 @@
   box-shadow: none;
 }
 
-.term-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-background-alt);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.term-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
-  text-align: center;
-}
-
 .term-conflict-warning {
   position: absolute;
-  right: 1rem;
+  top: 0.4rem;
+  right: 0.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
   animation: pulse-warning 2s infinite;
+  z-index: 30;
+  pointer-events: none;
 }
 
 .conflict-warning-icon {
@@ -591,9 +576,8 @@
 
 .term-back-btn {
   position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 0.5rem;
+  top: 0.5rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
@@ -606,6 +590,7 @@
   justify-content: center;
   width: 2rem;
   height: 2rem;
+  z-index: 30;
 }
 
 .term-back-btn svg {
@@ -631,6 +616,7 @@
   grid-template-columns: 60px repeat(5, 1fr);
   grid-template-rows: auto repeat(12, 1fr);
   gap: 1px;
+  container-type: inline-size;
   background: var(--color-border);
   font-size: 0.7rem;
   overflow: hidden;
@@ -662,10 +648,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.65rem;
+  font-size: clamp(0.6rem, 1.5cqi, 0.9rem);
   color: var(--color-text);
   font-weight: var(--font-weight-medium);
   border-bottom: 2px solid var(--color-border);
+  min-height: 2rem;
+}
+
+.term-letter-label {
+  font-size: 1rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  letter-spacing: 0.05em;
+  min-height: 2rem;
 }
 
 /* Time slot cells */

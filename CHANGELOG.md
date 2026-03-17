@@ -10,6 +10,7 @@
 - Course select and bookmark buttons no longer flash when deselected while hovering
 
 ### Improved
+- Term graphs no longer show a separate header — the term letter (A/B/C/D) is now embedded in the schedule grid's first cell, giving more space to the actual schedule
 - Course and bookmark buttons now respond instantly with no delay
 - Added a "New Schedule" button at the bottom of the schedule list for quicker access
 - Import button on each schedule now imports courses directly into that schedule
