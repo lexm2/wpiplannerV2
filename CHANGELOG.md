@@ -3,6 +3,7 @@
 ## [2026-03-17]
 
 ### Improved
+- Tutorial highlight now uses an animated marching dashes border instead of a static outline
 - Tutorial box is now larger by default and text scales as you resize it
 - Tutorial box repositions itself to stay on screen when step text changes
 

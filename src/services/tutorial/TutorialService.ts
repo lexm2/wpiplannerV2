@@ -9,6 +9,9 @@ export class TutorialService {
     private stepChangeCallback: StepChangeCallback | null = null;
     private completionCallback: (() => void) | null = null;
     private highlightedElement: Element | null = null;
+    private svgOverlay: SVGSVGElement | null = null;
+    private svgRect: SVGRectElement | null = null;
+    private positionFrame: number | null = null;
     private actionCleanup: (() => void) | null = null;
     private highlightObserver: MutationObserver | null = null;
     private actionObserver: MutationObserver | null = null;
@@ -82,8 +85,8 @@ export class TutorialService {
 
         const el = document.querySelector(selector);
         if (el) {
-            el.classList.add('tutorial-highlight');
             this.highlightedElement = el;
+            this.attachSvgOverlay(el);
             return;
         }
 
@@ -92,14 +95,57 @@ export class TutorialService {
             if (!found) return;
             this.highlightObserver!.disconnect();
             this.highlightObserver = null;
-            found.classList.add('tutorial-highlight');
             this.highlightedElement = found;
+            this.attachSvgOverlay(found);
         });
         this.highlightObserver.observe(document.body, { childList: true, subtree: true });
     }
 
+    private attachSvgOverlay(el: Element): void {
+        this.svgOverlay?.remove();
+        if (this.positionFrame !== null) cancelAnimationFrame(this.positionFrame);
+
+        const pad = 5;
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.classList.add('tutorial-highlight-svg');
+
+        const rectEl = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rectEl.setAttribute('x', '1');
+        rectEl.setAttribute('y', '1');
+        rectEl.setAttribute('rx', '6');
+        rectEl.setAttribute('fill', 'none');
+        rectEl.setAttribute('stroke-width', '2');
+        rectEl.setAttribute('stroke-dasharray', '8 6');
+
+        svg.appendChild(rectEl);
+        document.body.appendChild(svg);
+        this.svgOverlay = svg;
+        this.svgRect = rectEl;
+
+        const sync = () => {
+            const r = el.getBoundingClientRect();
+            const w = r.width + pad * 2;
+            const h = r.height + pad * 2;
+            svg.style.top = `${r.top - pad}px`;
+            svg.style.left = `${r.left - pad}px`;
+            svg.style.width = `${w}px`;
+            svg.style.height = `${h}px`;
+            rectEl.setAttribute('width', String(w - 2));
+            rectEl.setAttribute('height', String(h - 2));
+            this.positionFrame = requestAnimationFrame(sync);
+        };
+        this.positionFrame = requestAnimationFrame(sync);
+    }
+
     private removeHighlight(): void {
-        this.highlightedElement?.classList.remove('tutorial-highlight');
+        if (this.positionFrame !== null) {
+            cancelAnimationFrame(this.positionFrame);
+            this.positionFrame = null;
+        }
+        this.svgOverlay?.remove();
+        this.svgOverlay = null;
+        this.svgRect = null;
         this.highlightedElement = null;
     }
 
