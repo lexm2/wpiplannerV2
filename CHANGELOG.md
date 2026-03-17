@@ -3,6 +3,11 @@
 ## [2026-03-17]
 
 ### Fixed
+- Fixed a bug where all sections were filtered out in the course selection wizard when filters were active
+
+
+
+### Fixed
 - Tutorial highlight outline is now perfectly centered around bordered elements
 - Tutorial highlight now appears correctly on elements that are hidden or not yet laid out when a step starts
 
