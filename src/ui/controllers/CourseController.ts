@@ -247,24 +247,19 @@ export class CourseController {
                 this.filterService.removeFilter('searchText');
             }
             
-            const results = this.filterService.filterCourses(baseCourses);
-            this.updateSearchHeader(query, results.length, selectedDepartment);
-            return results;
+            return this.filterService.filterCourses(baseCourses);
         }
-        
+
         // Fallback to simple search if no FilterService
         if (!query.trim()) {
             return baseCourses;
         }
 
-        const filteredCourses = baseCourses.filter(course => 
+        return baseCourses.filter(course =>
             course.name.toLowerCase().includes(query.toLowerCase()) ||
             course.number.toLowerCase().includes(query.toLowerCase()) ||
             course.id.toLowerCase().includes(query.toLowerCase())
         );
-
-        this.updateSearchHeader(query, filteredCourses.length, selectedDepartment);
-        return filteredCourses;
     }
 
     // New method to handle courses with filters (no search query)
@@ -272,9 +267,7 @@ export class CourseController {
         const baseCourses = selectedDepartment ? selectedDepartment.courses : this.getAllCourses();
         
         if (this.filterService && !this.filterService.isEmpty()) {
-            const results = this.filterService.filterCourses(baseCourses);
-            this.updateFilterHeader(results.length, selectedDepartment);
-            return results;
+            return this.filterService.filterCourses(baseCourses);
         }
         
         return baseCourses;
@@ -286,35 +279,6 @@ export class CourseController {
             allCourses.push(...dept.courses);
         });
         return allCourses;
-    }
-
-    private updateSearchHeader(query: string, resultCount: number, selectedDepartment: Department | null): void {
-        const contentHeader = document.querySelector('.content-header h2');
-        if (contentHeader) {
-            if (query.trim()) {
-                contentHeader.textContent = `Search Results (${resultCount})`;
-            } else if (selectedDepartment) {
-                contentHeader.textContent = `${selectedDepartment.name} (${resultCount})`;
-            } else {
-                contentHeader.textContent = `All Courses (${resultCount})`;
-            }
-        }
-    }
-
-    private updateFilterHeader(resultCount: number, selectedDepartment: Department | null): void {
-        const contentHeader = document.querySelector('.content-header h2');
-        if (contentHeader) {
-            let title = selectedDepartment ? selectedDepartment.name : 'All Courses';
-            
-            if (this.filterService && !this.filterService.isEmpty()) {
-                const filterSummary = this.filterService.getFilterSummary();
-                title += ` (${resultCount}) - ${filterSummary}`;
-            } else {
-                title += ` (${resultCount})`;
-            }
-            
-            contentHeader.textContent = title;
-        }
     }
 
     selectCourse(element: HTMLElement): Course | null {

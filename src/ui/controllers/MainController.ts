@@ -877,23 +877,9 @@ export class MainController {
 
             coursesToDisplay = this.services.filterService.filterCourses(baseCourses);
 
-            // Update header based on filter state
-            if (activeDepartmentIds.length === 1 && this.services.filterService.getActiveFilters().length === 1) {
-                // Single department filter only
-                const dept = this.departmentController.getDepartmentById(activeDepartmentIds[0]);
-                if (dept) {
-                    this.updateDepartmentHeader(dept);
-                } else {
-                    this.updateFilteredHeader(coursesToDisplay.length, null);
-                }
-            } else {
-                // Multiple filters or multiple departments
-                this.updateFilteredHeader(coursesToDisplay.length, null);
-            }
         } else {
             // No filters - show all courses
             coursesToDisplay = this.getAllCourses();
-            this.updateAllDepartmentsHeader();
         }
 
         // Display courses with cancellation support
@@ -1411,46 +1397,6 @@ export class MainController {
             if (searchInput.value !== currentQuery) {
                 searchInput.value = currentQuery;
             }
-        }
-    }
-
-    private updateFilteredHeader(resultCount: number, _selectedDepartment: Department | null): void {
-        const contentHeader = document.querySelector('.content-header h2');
-        if (contentHeader) {
-            const filters = this.services.filterService.getActiveFilters();
-            const searchTextFilter = filters.find(f => f.id === 'searchText');
-
-            if (searchTextFilter && filters.length === 1) {
-                // Only search text filter
-                const searchCriteria = searchTextFilter.criteria as { query?: string };
-                const query = searchCriteria.query;
-                contentHeader.textContent = `Search: "${query}" (${resultCount} results)`;
-            } else if (searchTextFilter) {
-                // Search text + other filters
-                const searchCriteria = searchTextFilter.criteria as { query?: string };
-                const query = searchCriteria.query;
-                const otherFilters = filters.length - 1;
-                contentHeader.textContent = `Search: "${query}" + ${otherFilters} filter${otherFilters === 1 ? '' : 's'} (${resultCount} results)`;
-            } else {
-                // Only other filters
-                const filterCount = filters.length;
-                contentHeader.textContent = `Filtered Results: ${filterCount} filter${filterCount === 1 ? '' : 's'} (${resultCount} courses)`;
-            }
-        }
-    }
-
-    private updateDepartmentHeader(department: Department): void {
-        const contentHeader = document.querySelector('.content-header h2');
-        if (contentHeader) {
-            contentHeader.textContent = `${department.name} (${department.abbreviation})`;
-        }
-    }
-
-    private updateAllDepartmentsHeader(): void {
-        const contentHeader = document.querySelector('.content-header h2');
-        if (contentHeader) {
-            const totalCourses = this.getAllCourses().length;
-            contentHeader.textContent = `All Departments (${totalCourses} courses)`;
         }
     }
 
