@@ -41,7 +41,8 @@
 }
 
 .course-desc-title {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-secondary);
   margin-bottom: 0;
   flex-shrink: 0;
