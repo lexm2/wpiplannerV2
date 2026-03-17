@@ -77,7 +77,6 @@ export class AppBootstrap {
 
             courseSelectionService.setAllDepartments(event.departments);
             courseSelectionService.reconstructSectionObjects();
-            scheduleManagementService.initializeDefaultScheduleIfNeeded();
             timestampManager.updateClientTimestamp();
 
             if (!filterService.hasFilter('academicYear')) {
@@ -94,8 +93,8 @@ export class AppBootstrap {
         courseDataService.on('data-refreshed', (event) => {
             profileStateManager.setCourseData(event.departments);
 
-            const allCourses = event.departments.flatMap(d => d.courses);
             courseSelectionService.setAllDepartments(event.departments);
+            callbacks.setAllDepartments(event.departments);
 
             callbacks.onDataRefreshed(event.departments);
         });

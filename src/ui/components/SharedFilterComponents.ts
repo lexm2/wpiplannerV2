@@ -201,7 +201,7 @@ export class SharedFilterComponents {
                         <span class="filter-toggle-text">Hide periods that conflict with selected sections</span>
                     </label>
                     ${calendarToggleHTML}
-                    <label class="filter-toggle-label" style="margin-top: 0.75rem;">
+                    <label class="filter-toggle-label">
                         <input type="checkbox" class="filter-toggle" id="${prefix}available-only-filter"
                                ${availableOnly ? 'checked' : ''}>
                         <span class="filter-toggle-slider"></span>

@@ -12,6 +12,7 @@ import type { RawDepartment, RawCourse, RawSection, RawLectureGroup, RawPeriod }
 export class CourseDataService {
     private static readonly WPI_COURSE_DATA_URL = './course-data-constructed.json';
     private scheduleDB: ScheduleDB | null = null;
+    private latestAcademicYear: number | undefined;
     private listeners = new Map<CourseDataEventType | '*', Set<CourseDataEventListener>>();
 
     constructor() {}
@@ -54,21 +55,135 @@ export class CourseDataService {
     }
 
     private parseJSONData(jsonData: { departments?: RawDepartment[]; generated?: string }): ScheduleDB {
-        
+
         if (!jsonData.departments || !Array.isArray(jsonData.departments)) {
             console.error('Invalid JSON data structure:', jsonData);
             throw new Error('Invalid JSON data structure - missing departments array');
         }
 
-        
+
+        const realDepartments = this.parseConstructedDepartments(jsonData.departments);
+        const latestYear = Math.max(...realDepartments.flatMap(d => d.courses.map(c => c.academicYear ?? 0)));
+        this.latestAcademicYear = latestYear || undefined;
+
         const scheduleDB: ScheduleDB = {
-            departments: this.parseConstructedDepartments(jsonData.departments),
+            departments: [...realDepartments],
             generated: jsonData.generated || new Date().toISOString()
         };
         
         //this.logMA1024Sections(scheduleDB); << Lots of sections for reference
         
         return scheduleDB;
+    }
+
+    private createTutorialDepartment(academicYear?: number): Department {
+        const makePeriod = (
+            type: PeriodType,
+            days: DayOfWeek[],
+            start: [number, number],
+            end: [number, number],
+            professor = 'Demo Professor'
+        ): Period => {
+            const fmt = ([h, m]: [number, number]) => {
+                const dh = h > 12 ? h - 12 : h === 0 ? 12 : h;
+                return { hours: h, minutes: m, displayTime: `${dh}:${m.toString().padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}` };
+            };
+            return {
+                type,
+                professor,
+                startTime: fmt(start),
+                endTime: fmt(end),
+                location: 'Fuller Labs 320',
+                building: 'Fuller Labs',
+                room: '320',
+                seats: 30,
+                seatsAvailable: 20,
+                actualWaitlist: 0,
+                maxWaitlist: 5,
+                days: new Set(days),
+                isAsync: false,
+            };
+        };
+
+        const makeSection = (crn: number, number: string, periods: Period[]): Section => ({
+            crn,
+            number,
+            seats: 30,
+            seatsAvailable: 20,
+            actualWaitlist: 0,
+            maxWaitlist: 5,
+            computedTerm: 'A' as AcademicTerm,
+            periods,
+        });
+
+        const lecture = makeSection(99901, 'A01', [
+            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [11, 0], [11, 50]),
+        ]);
+        const lab = makeSection(99902, 'B01', [
+            makePeriod(PeriodType.LAB, [DayOfWeek.FRIDAY], [12, 0], [14, 0]),
+        ]);
+        const lab2 = makeSection(99903, 'B02', [
+            makePeriod(PeriodType.LAB, [DayOfWeek.MONDAY], [14, 0], [15, 0]),
+        ]);
+
+        const course: Course = {
+            id: 'TUT-1001',
+            number: '1001',
+            name: 'Introduction to the WPI Planner',
+            description: 'A hands-on walkthrough of the WPI Course Planner. Learn to search for courses, build a schedule, and configure your sections.',
+            category: 1,
+            departmentAbbr: 'TUT',
+            departmentName: 'Tutorial',
+            minCredits: 1,
+            maxCredits: 1,
+            isGraduate: false,
+            academicYear,
+            transient: true,
+            lectures: [{ section: lecture, compatibleDiscussions: [], compatibleLabs: [lab, lab2] }],
+        };
+
+        const tut1002Lecture = makeSection(99904, 'A01', [
+            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [8, 0], [8, 50]),
+        ]);
+        const tut1002Lab = makeSection(99906, 'B01', [
+            makePeriod(PeriodType.LAB, [DayOfWeek.WEDNESDAY], [8, 0], [10, 0]),
+        ]);
+        const tut1002Course: Course = {
+            id: 'TUT-1002',
+            number: '1002',
+            name: 'Introduction to the WPI Planner 2',
+            description: 'A placeholder course used to demonstrate schedule grid layout.',
+            category: 1,
+            departmentAbbr: 'TUT',
+            departmentName: 'Tutorial',
+            minCredits: 1,
+            maxCredits: 1,
+            isGraduate: false,
+            academicYear,
+            transient: true,
+            lectures: [{ section: tut1002Lecture, compatibleDiscussions: [], compatibleLabs: [tut1002Lab] }],
+        };
+
+        const tut9001Lecture = makeSection(99905, 'A01', [
+            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [10, 0], [11, 0], 'Tutorial'),
+        ]);
+        const tut9001Course: Course = {
+            id: 'TUT-9001',
+            number: '9001',
+            name: 'Filtering Example',
+            description: 'A placeholder course from a prior year used to demonstrate academic year filtering.',
+            category: 1,
+            departmentAbbr: 'TUT',
+            departmentName: 'Tutorial',
+            minCredits: 1,
+            maxCredits: 1,
+            isGraduate: false,
+            academicYear: academicYear ? academicYear - 1 : undefined,
+            transient: true,
+            lectures: [{ section: tut9001Lecture, compatibleDiscussions: [], compatibleLabs: [] }],
+        };
+
+        return { abbreviation: 'TUT', name: 'Tutorial', courses: [course, tut1002Course, tut9001Course] };
     }
 
     private parseConstructedDepartments(departments: RawDepartment[]): Department[] {
@@ -492,6 +607,29 @@ export class CourseDataService {
                 console.error('[CourseDataService] Error in wildcard listener:', error);
             }
         });
+    }
+
+    getLatestAcademicYear(): number | undefined {
+        return this.latestAcademicYear;
+    }
+
+    filterDepartments(predicate: (d: Department) => boolean): void {
+        if (!this.scheduleDB) return;
+        this.scheduleDB = {
+            ...this.scheduleDB,
+            departments: this.scheduleDB.departments.filter(predicate),
+        };
+        this.notifyDataRefreshed();
+    }
+
+    addTutorialDepartment(): void {
+        if (!this.scheduleDB) return;
+        const tutDept = this.createTutorialDepartment(this.latestAcademicYear);
+        this.scheduleDB = {
+            ...this.scheduleDB,
+            departments: [tutDept, ...this.scheduleDB.departments.filter(d => d.abbreviation !== 'TUT')],
+        };
+        this.notifyDataRefreshed();
     }
 
     /**

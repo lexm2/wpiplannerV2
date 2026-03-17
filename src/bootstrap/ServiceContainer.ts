@@ -10,8 +10,10 @@ import { ThemeManager } from '../themes/ThemeManager'
 import { OperationManager } from '../utils/RequestCancellation'
 import { UIStateManager } from '../services/ui/UIStateManager'
 import { TimestampManager } from '../ui/controllers/TimestampManager'
+import type { TutorialSetup } from '../services/tutorial/setupTutorial'
 
 export interface ServiceContainer {
+    tutorial?: TutorialSetup;
     profileStateManager: ProfileStateManager;
     storageService: StorageService;
     courseDataService: CourseDataService;

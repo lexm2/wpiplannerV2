@@ -1,0 +1,56 @@
+@keyframes tutorial-march {
+    to { stroke-dashoffset: -14; }
+}
+
+@keyframes tutorial-arrow-bob {
+    0%, 100% { transform: var(--arrow-transform); }
+    50%       { transform: var(--arrow-transform-bob); }
+}
+
+.tutorial-highlight-svg {
+    position: absolute;
+    pointer-events: none;
+    z-index: 10000;
+    overflow: visible;
+}
+
+.tutorial-highlight-svg rect {
+    stroke: var(--color-primary);
+    animation: tutorial-march 0.6s linear infinite;
+}
+
+.tutorial-scroll-arrow {
+    position: fixed;
+    background: var(--color-primary);
+    color: #fff;
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10000;
+    animation: tutorial-arrow-bob 0.8s ease-in-out infinite;
+}
+
+.tutorial-scroll-arrow-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.tutorial-scroll-arrow:not([data-direction]) { display: none; }
+
+.tutorial-scroll-arrow[data-direction='up'] {
+    top: 12px; left: 50%;
+    --arrow-transform: translateX(-50%) rotate(180deg);
+    --arrow-transform-bob: translateX(-50%) translateY(-4px) rotate(180deg);
+}
+
+.tutorial-scroll-arrow[data-direction='down'] {
+    bottom: 12px; left: 50%;
+    --arrow-transform: translateX(-50%) rotate(0deg);
+    --arrow-transform-bob: translateX(-50%) translateY(4px) rotate(0deg);
+}
+

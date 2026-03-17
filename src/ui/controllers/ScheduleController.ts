@@ -7,6 +7,7 @@ import { SectionInfoModalController } from './SectionInfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
 import { LocalEventModal } from '../components/LocalEventModal'
+import { DeleteLocalEventModal } from '../components/DeleteLocalEventModal'
 import { SidebarManager } from '../sidebar/SidebarManager'
 import { TimeUtils } from '../utils/timeUtils'
 import { BitMaskEngine, buildConflictMatrix } from '../../core/scheduling/BitMaskEngine'
@@ -25,7 +26,6 @@ export class ScheduleController implements CalendarEventProvider {
     private filterService: FilterService | null = null;
     private sectionInfoModalController: SectionInfoModalController | null = null;
     private conflictDetector: BitMaskEngine | null = null;
-    private elementToCourseMap = new WeakMap<HTMLElement, Course>();
     private containerEventListeners = new Map<HTMLElement, EventListener>();
     private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
     private componentWizard: ComponentSelectionWizard | null = null;
@@ -267,6 +267,24 @@ export class ScheduleController implements CalendarEventProvider {
         modal.show();
     }
 
+    private deleteLocalEvent(eventId: string): void {
+        if (!this.currentSchedule || !this.onScheduleUpdate) return;
+
+        const updatedLocalEvents = (this.currentSchedule.localEvents || []).filter(e => e.id !== eventId);
+
+        this.currentSchedule = {
+            ...this.currentSchedule,
+            localEvents: updatedLocalEvents,
+        };
+
+        this.renderScheduleGrids();
+        this.displayScheduleSelectedCourses();
+
+        this.onScheduleUpdate(this.currentSchedule.id, {
+            localEvents: updatedLocalEvents,
+        });
+    }
+
     /**
      * Add a new local event.
      */
@@ -290,6 +308,7 @@ export class ScheduleController implements CalendarEventProvider {
         };
 
         this.renderScheduleGrids();
+        this.displayScheduleSelectedCourses();
 
         this.onScheduleUpdate(this.currentSchedule.id, {
             localEvents: updatedLocalEvents,
@@ -472,8 +491,6 @@ export class ScheduleController implements CalendarEventProvider {
             selectedCoursesContainer.appendChild(sidebarPanel);
         }
 
-        this.setupDOMElementMapping(selectedCoursesContainer, sortedCourses);
-
         this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
     }
 
@@ -525,7 +542,7 @@ export class ScheduleController implements CalendarEventProvider {
         }
 
         return `
-            <div class="sidebar-content-item schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}">
+            <div class="sidebar-content-item schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}" data-course-id="${course.id}">
                 <div class="schedule-course-header">
                     <div class="schedule-course-info">
                         <div class="schedule-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
@@ -667,49 +684,6 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
 
-    private setupDOMElementMapping(selectedCoursesContainer: HTMLElement, sortedCourses: SelectedCourse[]): void {
-        // Associate DOM elements with Course objects
-        const courseElements = selectedCoursesContainer.querySelectorAll('.schedule-course-item');
-        const removeButtons = selectedCoursesContainer.querySelectorAll('.course-remove-btn');
-        
-        courseElements.forEach((element, index) => {
-            const course = sortedCourses[index]?.course;
-            this.elementToCourseMap.set(element as HTMLElement, course);
-        });
-        
-        removeButtons.forEach((button, index) => {
-            const course = sortedCourses[index]?.course;
-            this.elementToCourseMap.set(button as HTMLElement, course);
-        });
-
-        // Associate clear sections buttons with their Course objects
-        const clearSectionsButtons = selectedCoursesContainer.querySelectorAll('.course-clear-sections-btn');
-        clearSectionsButtons.forEach((button, index) => {
-            const course = sortedCourses[index]?.course;
-            this.elementToCourseMap.set(button as HTMLElement, course);
-        });
-
-        // Associate edit buttons with their Course objects
-        const editButtons = selectedCoursesContainer.querySelectorAll('.course-edit-btn');
-        editButtons.forEach((button, index) => {
-            const course = sortedCourses[index]?.course;
-            this.elementToCourseMap.set(button as HTMLElement, course);
-        });
-
-        // IMPORTANT: Associate section buttons with their Course objects
-        const sectionButtons = selectedCoursesContainer.querySelectorAll('.section-select-btn');
-        sectionButtons.forEach(button => {
-            const courseItem = button.closest('.schedule-course-item') as HTMLElement;
-            if (courseItem) {
-                const courseIndex = Array.from(courseElements).indexOf(courseItem);
-                if (courseIndex >= 0 && courseIndex < sortedCourses.length) {
-                    const course = sortedCourses[courseIndex].course;
-                    this.elementToCourseMap.set(button as HTMLElement, course);
-                }
-            }
-        });
-    }
-    
     async handleSectionSelection(course: Course, sectionNumber: string): Promise<void> {
         const currentSelectedSection = this.courseSelectionService.getSelectedSection(course);
         
@@ -731,20 +705,8 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     updateSectionButtonStates(course: Course, selectedSection: string | null): void {
-        // Find the schedule course item by matching the associated Course object
-        let courseItem: HTMLElement | null = null;
-        
-        document.querySelectorAll('.schedule-course-item').forEach(item => {
-            const itemCourse = this.elementToCourseMap.get(item as HTMLElement);
-            if (itemCourse && itemCourse.id === course.id) {
-                courseItem = item as HTMLElement;
-            }
-        });
-        
-        if (!courseItem) return;
-
-        // TypeScript assertion to ensure courseItem is HTMLElement
-        const validCourseItem = courseItem as HTMLElement;
+        const validCourseItem = document.querySelector<HTMLElement>(`.schedule-course-item[data-course-id="${course.id}"]`);
+        if (!validCourseItem) return;
         const sectionButtons = validCourseItem.querySelectorAll('.section-select-btn');
         const sectionOptions = validCourseItem.querySelectorAll('.section-option');
 
@@ -959,8 +921,8 @@ export class ScheduleController implements CalendarEventProvider {
         const htmlParts: string[] = [];
         let hasConflicts = false;
 
-        // First row: empty time cell + day headers
-        htmlParts.push('<div class="time-label"></div>');
+        // First row: term label + day headers
+        htmlParts.push(`<div class="time-label term-letter-label">${term}</div>`);
         weekdays.forEach(day => {
             htmlParts.push(`<div class="day-header">${TimeUtils.getDayAbbr(day)}</div>`);
         });
@@ -994,10 +956,7 @@ export class ScheduleController implements CalendarEventProvider {
         const termGraph = document.querySelector(`.term-graph[data-term="${term}"]`);
         if (!termGraph) return;
 
-        const termHeader = termGraph.querySelector('.term-header');
-        if (!termHeader) return;
-
-        let warningIcon = termHeader.querySelector('.term-conflict-warning') as HTMLElement | null;
+        let warningIcon = termGraph.querySelector('.term-conflict-warning') as HTMLElement | null;
 
         if (hasConflicts) {
             if (!warningIcon) {
@@ -1005,7 +964,7 @@ export class ScheduleController implements CalendarEventProvider {
                 warningIcon.className = 'term-conflict-warning';
                 warningIcon.innerHTML = getInlineSVG('ALERT_CIRCLE', 'conflict-warning-icon');
                 warningIcon.title = 'This term has overlapping courses';
-                termHeader.appendChild(warningIcon);
+                termGraph.appendChild(warningIcon);
             }
         } else {
             if (warningIcon) {
@@ -1249,7 +1208,9 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     getCourseFromElement(element: HTMLElement): Course | undefined {
-        return this.elementToCourseMap.get(element);
+        const courseId = element.dataset.courseId;
+        if (!courseId) return undefined;
+        return this.courseSelectionService.getSelectedCourses().find(sc => sc.course.id === courseId)?.course;
     }
 
     applyFiltersAndRefresh(): void {
@@ -1283,15 +1244,28 @@ export class ScheduleController implements CalendarEventProvider {
         // Create new listener
         const clickListener = (event: Event) => {
             const target = event.target as HTMLElement;
-            
+
+            const externalBlock = target.closest('.external-event-block') as HTMLElement | null;
+            if (externalBlock) {
+                const eventId = externalBlock.dataset.eventId;
+                if (eventId && this.currentSchedule && this.modalService) {
+                    event.stopPropagation();
+                    const localEvent = (this.currentSchedule.localEvents || []).find(e => e.id === eventId);
+                    const title = localEvent?.title || 'Untitled Event';
+                    const modal = new DeleteLocalEventModal(this.modalService, title, () => this.deleteLocalEvent(eventId));
+                    modal.show();
+                }
+                return;
+            }
+
             // Find the section block element (might be the target or a parent)
             const sectionBlock = target.closest('.section-block');
             if (!sectionBlock) return;
-            
+
             // Get section information from data attributes
             const courseId = (sectionBlock as HTMLElement).dataset.courseId;
             const sectionNumber = (sectionBlock as HTMLElement).dataset.sectionNumber;
-            
+
             if (courseId && sectionNumber) {
                 event.stopPropagation(); // Prevent event bubbling
                 this.showSectionInfoModal(courseId, sectionNumber);
@@ -1382,10 +1356,10 @@ export class ScheduleController implements CalendarEventProvider {
                 return;
             }
 
-            // Check if term-graph or its header was clicked (but not the schedule grid)
+            // Check if term-graph was clicked while not focused
             const termGraph = target.closest('.term-graph');
             const isMobile = document.documentElement.classList.contains('is-mobile');
-            if (termGraph && !target.closest('.schedule-grid') && !isMobile) {
+            if (termGraph && !isMobile) {
                 const termsGrid = document.querySelector('.terms-grid');
                 // Only focus if not already focused
                 if (termsGrid && !termsGrid.classList.contains('focused')) {

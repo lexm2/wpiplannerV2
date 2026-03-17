@@ -21,6 +21,7 @@ export interface Course {
     maxCredits: number;
     isGraduate?: boolean;
     academicYear?: number;
+    transient?: boolean;
 }
 
 export interface Department {

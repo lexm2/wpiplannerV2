@@ -10,9 +10,7 @@
   padding: 1rem 2rem 1rem;
   border-bottom: 1px solid var(--color-border);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
 }
 
 .content-controls {
@@ -82,20 +80,6 @@
   color: inherit;
 }
 
-.content-header h2 {
-  font-size: 1rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
-  margin: 0;
-  min-width: 280px;
-  max-width: 400px;
-  flex-shrink: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
 .course-container {
   flex: 1;
   padding: 1.5rem 2rem;
@@ -124,12 +108,7 @@
   color: var(--color-text-secondary);
 }
 
-/* Responsive breakpoints for content-header */
 @media (max-width: 1600px) {
-  .content-header h2 {
-    display: none;
-  }
-
   #view-list,
   #view-grid {
     display: none;

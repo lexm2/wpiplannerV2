@@ -623,9 +623,13 @@ export class ProfileStateManager {
 
             this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
 
-            const savePromises = this.state.schedules.map(schedule =>
-                this.storageManager.saveSchedule(schedule)
-            );
+            const savePromises = this.state.schedules.map(schedule => {
+                const scheduleToSave = {
+                    ...schedule,
+                    selectedCourses: schedule.selectedCourses.filter(sc => !sc.course.transient),
+                };
+                return this.storageManager.saveSchedule(scheduleToSave);
+            });
             await Promise.all(savePromises);
 
             this.storageManager.savePreferences(this.state.preferences);

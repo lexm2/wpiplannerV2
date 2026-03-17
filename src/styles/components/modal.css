@@ -1975,6 +1975,19 @@ html.is-mobile .changelog-modal-body {
   gap: 1rem;
 }
 
+.tutorials-modal-body {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  padding: 1.5rem;
+}
+
+.tutorials-modal-body .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* Wake-Up Time Filter Styles */
 .wake-up-time-label {
   display: block;
