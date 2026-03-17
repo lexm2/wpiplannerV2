@@ -1,4 +1,4 @@
-export type TutorialWaitFor = 'click' | 'input' | 'manual';
+export type TutorialWaitFor = 'click' | 'input' | 'manual' | 'appear';
 
 export interface TutorialStep {
     selector: string;

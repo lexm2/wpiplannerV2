@@ -182,7 +182,8 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     selector: '.professor-search',
                     title: 'Filter by professor',
                     description: 'Search for "Tutorial" to filter courses by professor.',
-                    waitFor: 'click',
+                    waitFor: 'appear',
+                    waitForSelector: '.filter-chip-remove[data-professor="Tutorial"]',
                     action: () => {
                         const search = document.querySelector<HTMLInputElement>('.professor-search');
                         if (!search) return;

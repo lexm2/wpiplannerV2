@@ -104,6 +104,22 @@ export class TutorialService {
     }
 
     private listenForAction(step: TutorialStep): void {
+        if (step.waitFor === 'appear') {
+            const selector = step.waitForSelector ?? step.selector;
+            if (document.querySelector(selector)) {
+                this.nextStep();
+                return;
+            }
+            this.actionObserver = new MutationObserver(() => {
+                if (!document.querySelector(selector)) return;
+                this.actionObserver!.disconnect();
+                this.actionObserver = null;
+                this.nextStep();
+            });
+            this.actionObserver.observe(document.body, { childList: true, subtree: true });
+            return;
+        }
+
         const selector = step.waitForSelector ?? step.selector;
         const eventType = step.waitFor === 'input' ? 'input' : 'click';
         const handler = () => this.nextStep();
