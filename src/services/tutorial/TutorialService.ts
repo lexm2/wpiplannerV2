@@ -1,4 +1,5 @@
 import type { Tutorial, TutorialStep } from '../../types/tutorial';
+import { getInlineSVG } from '../../utils';
 
 type StepChangeCallback = (step: TutorialStep | null, index: number, total: number) => void;
 
@@ -167,6 +168,7 @@ export class TutorialService {
         if (scrollArrow) {
             const arrow = document.createElement('div');
             arrow.classList.add('tutorial-scroll-arrow');
+            arrow.innerHTML = getInlineSVG('CHEVRON_DOWN', 'tutorial-scroll-arrow-icon');
             document.body.appendChild(arrow);
             this.arrowOverlay = arrow;
 

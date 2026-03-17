@@ -24,41 +24,44 @@
     background: var(--color-primary);
     color: #fff;
     border-radius: 20px;
-    padding: 6px 10px;
-    font-size: 16px;
-    font-weight: bold;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     pointer-events: none;
     z-index: 10000;
-    line-height: 1;
     animation: tutorial-arrow-bob 0.8s ease-in-out infinite;
+}
+
+.tutorial-scroll-arrow-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
 }
 
 .tutorial-scroll-arrow:not([data-direction]) { display: none; }
 
 .tutorial-scroll-arrow[data-direction='up'] {
     top: 12px; left: 50%;
-    --arrow-transform: translateX(-50%);
-    --arrow-transform-bob: translateX(-50%) translateY(-4px);
+    --arrow-transform: translateX(-50%) rotate(180deg);
+    --arrow-transform-bob: translateX(-50%) translateY(-4px) rotate(180deg);
 }
-.tutorial-scroll-arrow[data-direction='up']::before { content: '↑'; }
 
 .tutorial-scroll-arrow[data-direction='down'] {
     bottom: 12px; left: 50%;
-    --arrow-transform: translateX(-50%);
-    --arrow-transform-bob: translateX(-50%) translateY(4px);
+    --arrow-transform: translateX(-50%) rotate(0deg);
+    --arrow-transform-bob: translateX(-50%) translateY(4px) rotate(0deg);
 }
-.tutorial-scroll-arrow[data-direction='down']::before { content: '↓'; }
 
 .tutorial-scroll-arrow[data-direction='left'] {
     left: 12px; top: 50%;
-    --arrow-transform: translateY(-50%);
-    --arrow-transform-bob: translateY(-50%) translateX(-4px);
+    --arrow-transform: translateY(-50%) rotate(90deg);
+    --arrow-transform-bob: translateY(-50%) translateX(-4px) rotate(90deg);
 }
-.tutorial-scroll-arrow[data-direction='left']::before { content: '←'; }
 
 .tutorial-scroll-arrow[data-direction='right'] {
     right: 12px; top: 50%;
-    --arrow-transform: translateY(-50%);
-    --arrow-transform-bob: translateY(-50%) translateX(4px);
+    --arrow-transform: translateY(-50%) rotate(-90deg);
+    --arrow-transform-bob: translateY(-50%) translateX(4px) rotate(-90deg);
 }
-.tutorial-scroll-arrow[data-direction='right']::before { content: '→'; }
