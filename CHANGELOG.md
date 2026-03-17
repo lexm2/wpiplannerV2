@@ -5,26 +5,17 @@
 ### Fixed
 - Fixed a bug where all sections were filtered out in the course selection wizard when filters were active
 
-
-
 ### Fixed
 - Tutorial highlight outline is now perfectly centered around bordered elements
 - Tutorial highlight now appears correctly on elements that are hidden or not yet laid out when a step starts
-
-### Improved
-- Tutorial highlight now uses an animated marching dashes border instead of a static outline
-- Tutorial box is now larger by default and text scales as you resize it
-- Tutorial box repositions itself to stay on screen when step text changes
 
 ### Added
 - Each tutorial now ends with a wrap-up step; the Next button shows "Next Tutorial" on the final step of each tutorial
 - Tutorial now creates a dedicated "Tutorial" schedule so your real schedules stay untouched
 - Added individual tutorial buttons to the settings panel so you can restart specific tutorials
 - Tutorial courses no longer persist to storage between sessions
-- Added a Tutorials menu accessible from Settings — browse and launch any tutorial from one place
 
 ### Fixed
-- Tutorial step 11 (Open section selection) now correctly highlights the course on the Schedule tab
 - Tutorial no longer creates a stray "My Schedule" on every page reload
 - Tutorial schedule is properly cleaned up when the tutorial finishes
 
@@ -32,20 +23,16 @@
 
 ### Added
 - Added an interactive tutorial that walks new users through adding a course and setting up sections
-- Added a built-in Tutorial course (TUT-1001) to practice with before diving into real courses
-- Updated tutorial course schedules to better reflect realistic WPI timetables
-- Added two more tutorial courses (TUT-1002 and TUT-9001) to support upcoming tutorial steps
-- Added a second tutorial that teaches the academic year filter, chaining automatically after the first
 - Tutorial courses are removed from the course list once the tutorial is complete
 - The app now remembers if you've visited before
 - Courses now include a WPI category (1, 2, or 3) parsed from their description
 - Click a custom event in the schedule grid to delete it via a confirmation dialog
 
 ### Fixed
-- Tutorial "Next" button now directly performs each step's action (tab switch, course select, open wizard) instead of simulating clicks
+- Tutorial "Next" button now directly performs each step's action
 - Dragging the tutorial box no longer stretches it vertically
 - Tutorial box now repositions to a free corner when it would cover the highlighted element
-- Course select and bookmark buttons no longer flash when deselected while hovering
+- Course select and bookmark buttons no longer flash when deselected while hovering (Most annoying bug ever)
 - Deleting a local calendar event now correctly updates the event count on the calendar button
 
 ### Improved
