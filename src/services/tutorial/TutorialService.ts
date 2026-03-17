@@ -181,11 +181,7 @@ export class TutorialService {
                     const r = entry.boundingClientRect;
                     const cr = this.getScrollParent(el).getBoundingClientRect();
                     const elCY = r.top + r.height / 2;
-                    const elCX = r.left + r.width / 2;
-                    if (elCY < cr.top)         arrow.dataset.direction = 'up';
-                    else if (elCY > cr.bottom) arrow.dataset.direction = 'down';
-                    else if (elCX < cr.left)   arrow.dataset.direction = 'left';
-                    else                       arrow.dataset.direction = 'right';
+                    arrow.dataset.direction = elCY < cr.top + cr.height / 2 ? 'up' : 'down';
                 }
             }, { threshold: 0 });
             this.intersectionObserver.observe(el);

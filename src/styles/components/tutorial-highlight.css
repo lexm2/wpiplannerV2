@@ -54,14 +54,3 @@
     --arrow-transform-bob: translateX(-50%) translateY(4px) rotate(0deg);
 }
 
-.tutorial-scroll-arrow[data-direction='left'] {
-    left: 12px; top: 50%;
-    --arrow-transform: translateY(-50%) rotate(90deg);
-    --arrow-transform-bob: translateY(-50%) translateX(-4px) rotate(90deg);
-}
-
-.tutorial-scroll-arrow[data-direction='right'] {
-    right: 12px; top: 50%;
-    --arrow-transform: translateY(-50%) rotate(-90deg);
-    --arrow-transform-bob: translateY(-50%) translateX(4px) rotate(-90deg);
-}

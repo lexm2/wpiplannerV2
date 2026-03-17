@@ -122,6 +122,9 @@ export class CourseDataService {
         const lab = makeSection(99902, 'B01', [
             makePeriod(PeriodType.LAB, [DayOfWeek.FRIDAY], [12, 0], [14, 0]),
         ]);
+        const lab2 = makeSection(99903, 'B02', [
+            makePeriod(PeriodType.LAB, [DayOfWeek.MONDAY], [14, 0], [15, 0]),
+        ]);
 
         const course: Course = {
             id: 'TUT-1001',
@@ -136,7 +139,7 @@ export class CourseDataService {
             isGraduate: false,
             academicYear,
             transient: true,
-            lectures: [{ section: lecture, compatibleDiscussions: [], compatibleLabs: [lab] }],
+            lectures: [{ section: lecture, compatibleDiscussions: [], compatibleLabs: [lab, lab2] }],
         };
 
         const tut1002Lecture = makeSection(99904, 'A01', [
