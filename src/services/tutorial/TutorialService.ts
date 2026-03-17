@@ -37,6 +37,12 @@ export class TutorialService {
         this.completionCallback?.();
     }
 
+    cancel(): void {
+        this.cleanup();
+        this.activeTutorial = null;
+        this.stepChangeCallback?.(null, 0, 0);
+    }
+
     nextStep(): void {
         if (!this.activeTutorial) return;
         this.cleanup();

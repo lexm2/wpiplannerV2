@@ -19,6 +19,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     let filteringStarted = false;
     let previousScheduleId: string | null = null;
     let tutorialScheduleId: string | null = null;
+    let cleaningUp = false;
 
     function getTutorialCourse(id: string) {
         return services.courseDataService.getAllDepartments()
@@ -53,6 +54,15 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         }
         services.courseDataService.filterDepartments(d => d.abbreviation !== 'TUT');
     }
+
+    services.scheduleManagementService.onActiveScheduleChange((activeSchedule) => {
+        if (cleaningUp || !tutorialScheduleId) return;
+        if (activeSchedule?.id !== tutorialScheduleId) {
+            tutorialService.cancel();
+            cleaningUp = true;
+            cleanupTutorial().finally(() => { cleaningUp = false; });
+        }
+    });
 
     tutorialService.register({
         id: 'welcome',
