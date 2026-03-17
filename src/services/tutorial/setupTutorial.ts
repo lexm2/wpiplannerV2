@@ -170,6 +170,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     title: 'Filter by term',
                     description: 'Check the A term box to filter courses by term.',
                     waitFor: 'click',
+                    scrollArrow: true,
                     action: () => document.querySelector<HTMLElement>('input.filter-toggle[value="A"][data-filter="term"]')?.click(),
                 },
                 {
@@ -177,6 +178,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     title: 'Change the academic year',
                     description: `Switch to ${priorYear}–${priorYear + 1} to see courses from a prior year.`,
                     waitFor: 'click',
+                    scrollArrow: true,
                     action: () => document.querySelector<HTMLElement>(`.segmented-btn[data-year="${priorYear}"]`)?.click(),
                 },
                 {
@@ -184,6 +186,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     title: 'Filter by professor',
                     description: 'Search for "Tutorial" to filter courses by professor.',
                     waitFor: 'appear',
+                    scrollArrow: true,
                     waitForSelector: '.filter-chip-remove[data-professor="Tutorial"]',
                     action: () => {
                         const search = document.querySelector<HTMLInputElement>('.professor-search');
@@ -198,6 +201,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     title: 'Avoid schedule conflicts',
                     description: 'Toggle this to hide courses that conflict with your current schedule.',
                     waitFor: 'click',
+                    scrollArrow: true,
                     action: () => document.querySelector<HTMLElement>('#avoid-conflicts-filter')?.click(),
                 },
                 {
@@ -205,6 +209,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     title: 'Show available courses only',
                     description: 'Toggle this to hide courses with no open seats.',
                     waitFor: 'click',
+                    scrollArrow: true,
                     action: () => document.querySelector<HTMLElement>('#available-only-filter')?.click(),
                 },
                 {
