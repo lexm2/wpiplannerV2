@@ -134,6 +134,20 @@ export class FloatingTextBox {
         if (!target || this.el.contains(target)) return;
 
         const targetRect = target.getBoundingClientRect();
+
+        if (targetRect.width === 0 && targetRect.height === 0) {
+            const obs = new MutationObserver(() => {
+                const r = target.getBoundingClientRect();
+                if (r.width === 0 && r.height === 0) return;
+                obs.disconnect();
+                this.repositionIfObstructed(selector);
+                this.clampToViewport();
+            });
+            obs.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class', 'style'] });
+            setTimeout(() => obs.disconnect(), 1000);
+            return;
+        }
+
         const boxRect = this.el.getBoundingClientRect();
 
         const overlaps = (a: DOMRect, b: DOMRect) =>
