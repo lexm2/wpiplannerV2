@@ -3,6 +3,8 @@
 ## [2026-03-16]
 
 ### Added
+- Added an interactive tutorial that walks new users through adding a course and setting up sections
+- Added a built-in Tutorial course (TUT-1001) to practice with before diving into real courses
 - The app now remembers if you've visited before
 - Courses now include a WPI category (1, 2, or 3) parsed from their description
 - Click a custom event in the schedule grid to delete it via a confirmation dialog
