@@ -54,21 +54,91 @@ export class CourseDataService {
     }
 
     private parseJSONData(jsonData: { departments?: RawDepartment[]; generated?: string }): ScheduleDB {
-        
+
         if (!jsonData.departments || !Array.isArray(jsonData.departments)) {
             console.error('Invalid JSON data structure:', jsonData);
             throw new Error('Invalid JSON data structure - missing departments array');
         }
 
-        
+
+        const realDepartments = this.parseConstructedDepartments(jsonData.departments);
+        const latestYear = Math.max(...realDepartments.flatMap(d => d.courses.map(c => c.academicYear ?? 0)));
+
         const scheduleDB: ScheduleDB = {
-            departments: this.parseConstructedDepartments(jsonData.departments),
+            departments: [this.createTutorialDepartment(latestYear || undefined), ...realDepartments],
             generated: jsonData.generated || new Date().toISOString()
         };
         
         //this.logMA1024Sections(scheduleDB); << Lots of sections for reference
         
         return scheduleDB;
+    }
+
+    private createTutorialDepartment(academicYear?: number): Department {
+        const makePeriod = (
+            type: PeriodType,
+            days: DayOfWeek[],
+            start: [number, number],
+            end: [number, number]
+        ): Period => {
+            const fmt = ([h, m]: [number, number]) => {
+                const dh = h > 12 ? h - 12 : h === 0 ? 12 : h;
+                return { hours: h, minutes: m, displayTime: `${dh}:${m.toString().padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}` };
+            };
+            return {
+                type,
+                professor: 'Demo Professor',
+                startTime: fmt(start),
+                endTime: fmt(end),
+                location: 'Fuller Labs 320',
+                building: 'Fuller Labs',
+                room: '320',
+                seats: 30,
+                seatsAvailable: 20,
+                actualWaitlist: 0,
+                maxWaitlist: 5,
+                days: new Set(days),
+                isAsync: false,
+            };
+        };
+
+        const makeSection = (crn: number, number: string, periods: Period[]): Section => ({
+            crn,
+            number,
+            seats: 30,
+            seatsAvailable: 20,
+            actualWaitlist: 0,
+            maxWaitlist: 5,
+            computedTerm: 'A' as AcademicTerm,
+            periods,
+        });
+
+        const lecture = makeSection(99901, 'A01', [
+            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY], [10, 0], [10, 50]),
+        ]);
+        const lab1 = makeSection(99902, 'B01', [
+            makePeriod(PeriodType.LAB, [DayOfWeek.TUESDAY], [14, 0], [16, 50]),
+        ]);
+        const lab2 = makeSection(99903, 'B02', [
+            makePeriod(PeriodType.LAB, [DayOfWeek.THURSDAY], [14, 0], [16, 50]),
+        ]);
+
+        const course: Course = {
+            id: 'TUT-1001',
+            number: '1001',
+            name: 'Introduction to the WPI Planner',
+            description: 'A hands-on walkthrough of the WPI Course Planner. Learn to search for courses, build a schedule, and configure your sections.',
+            category: 1,
+            departmentAbbr: 'TUT',
+            departmentName: 'Tutorial',
+            minCredits: 1,
+            maxCredits: 1,
+            isGraduate: false,
+            academicYear,
+            lectures: [{ section: lecture, compatibleDiscussions: [], compatibleLabs: [lab1, lab2] }],
+        };
+
+        return { abbreviation: 'TUT', name: 'Tutorial', courses: [course] };
     }
 
     private parseConstructedDepartments(departments: RawDepartment[]): Department[] {

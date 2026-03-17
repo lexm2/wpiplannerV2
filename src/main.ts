@@ -25,10 +25,11 @@ tutorialService.register({
     id: 'welcome',
     steps: [
         {
-            selector: '.course-select-btn',
+            selector: '[data-course-id="TUT-1001"] .course-select-btn',
             title: 'Select a course',
-            description: 'Click the + button on any course to add it to your planner.',
+            description: 'Click the + button on the Tutorial course to add it to your planner.',
             waitFor: 'click',
+            waitForSelector: '[data-course-id="TUT-1001"] .course-select-btn',
         },
         {
             selector: '#schedule-tab',
