@@ -28,6 +28,12 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
 
     async function sharedSetup() {
         await cleanupTutorial();
+        // Delete any stale Tutorial schedules left over from a previous session
+        const stale = services.scheduleManagementService.getAllSchedules()
+            .filter(s => s.name === 'Tutorial' || s.name.startsWith('Tutorial ('));
+        for (const s of stale) {
+            await services.scheduleManagementService.deleteSchedule(s.id, { force: true });
+        }
         previousScheduleId = services.scheduleManagementService.getActiveScheduleId();
         services.courseDataService.addTutorialDepartment();
         const result = await services.scheduleManagementService.createNewSchedule('Tutorial');

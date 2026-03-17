@@ -93,8 +93,8 @@ export class AppBootstrap {
         courseDataService.on('data-refreshed', (event) => {
             profileStateManager.setCourseData(event.departments);
 
-            const allCourses = event.departments.flatMap(d => d.courses);
             courseSelectionService.setAllDepartments(event.departments);
+            callbacks.setAllDepartments(event.departments);
 
             callbacks.onDataRefreshed(event.departments);
         });
