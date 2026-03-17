@@ -108,12 +108,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 },
             },
             {
-                selector: '[data-tutorial-next]',
-                title: 'Section selection',
-                description: 'Section selection on the new WPI planner allows you to select lectures/discussions/labs separately.',
-                waitFor: 'manual',
-            },
-            {
                 selector: '.wizard-section-card',
                 title: 'Pick a lecture',
                 description: 'Select the only lecture section.',

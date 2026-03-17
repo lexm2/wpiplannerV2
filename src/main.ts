@@ -7,11 +7,6 @@ import { setupTutorial } from './services/tutorial/setupTutorial'
 
 DeviceDetection.initialize();
 
-const isFirstVisit = !localStorage.getItem('wpi_visited');
-if (isFirstVisit) {
-    localStorage.setItem('wpi_visited', 'true');
-}
-
 const services = AppBootstrap.createServices();
 const mainController = new MainController(services);
 

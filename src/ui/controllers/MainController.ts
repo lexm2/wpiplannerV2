@@ -202,7 +202,10 @@ export class MainController {
 
             this.updateSelectedCoursesState(this.services.courseSelectionService.getSelectedCourses());
 
-            await this.services.tutorial?.start('welcome');
+            if (!localStorage.getItem('wpi_visited')) {
+                localStorage.setItem('wpi_visited', 'true');
+                await this.services.tutorial?.start('welcome');
+            }
         } catch (error) {
             console.error('Failed to initialize application:', error);
             this.services.uiStateManager.showErrorMessage(
