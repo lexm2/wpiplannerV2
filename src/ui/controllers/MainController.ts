@@ -640,23 +640,6 @@ export class MainController {
             });
         }
 
-        // Schedule search functionality
-        const scheduleSearchInput = document.getElementById('schedule-search-input') as HTMLInputElement;
-        if (scheduleSearchInput) {
-            scheduleSearchInput.addEventListener('input', () => {
-                const query = scheduleSearchInput.value;
-
-                if (query.trim().length > 0) {
-                    this.services.filterService.addFilter('searchText', { query });
-                } else {
-                    this.services.filterService.removeFilter('searchText');
-                }
-
-                // Refresh the schedule page display
-                this.scheduleController.applyFiltersAndRefresh();
-            });
-        }
-
         // Undo/Redo button event listeners
         const undoBtn = document.getElementById('undo-btn');
         const redoBtn = document.getElementById('redo-btn');

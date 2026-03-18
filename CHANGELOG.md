@@ -2,6 +2,9 @@
 
 ## [2026-03-18]
 
+### Changed
+- Moved Calendar Events button to the schedule sidebar header, replacing the search bar
+
 ### Fixed
 - Fixed course color picker freezing/crashing the page when used multiple times
 - Custom course colors now persist correctly after page reload
