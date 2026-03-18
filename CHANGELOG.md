@@ -8,7 +8,7 @@
 ### Fixed
 - Fixed course color picker freezing/crashing the page when used multiple times
 - Custom course colors now persist correctly after page reload
-
+- Fixed undo/redo requiring multiple steps after navigating between views, theme changes and automated updates
 ## [2026-03-17]
 
 ### Fixed

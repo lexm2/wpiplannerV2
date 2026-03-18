@@ -8,7 +8,6 @@ import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
-import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { getInlineSVG, type IconName } from '../../utils/iconPaths'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
@@ -554,12 +553,8 @@ export class MainController {
             scheduleTab.addEventListener('click', async () => {
                 this.services.uiStateManager.switchToPage('schedule');
 
-                // Wrap display operations in batch mode to prevent multiple saves
-                const stateManager = ProfileStateManager.getInstance();
-                stateManager.withBatchSync(() => {
-                    this.scheduleController.displayScheduleSelectedCourses();
-                    this.scheduleController.renderScheduleGrids();
-                });
+                this.scheduleController.displayScheduleSelectedCourses();
+                this.scheduleController.renderScheduleGrids();
             });
         }
 
