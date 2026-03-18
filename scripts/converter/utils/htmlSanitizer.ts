@@ -7,7 +7,8 @@ export function extractCategory(html: string | null): { category: 1 | 2 | 3 | nu
     if (!html) return { category: null, cleanedHtml: '' };
 
     // No word-boundary lookahead: handles "Cat. IAn intensive..." where text immediately follows the numeral
-    const match = html.match(/Cat\.\s*(III|II|I|[123])/i);
+    // \.? makes the period after "Cat" optional to also match "Cat II." format
+    const match = html.match(/Cat\.?\s*(III|II|I|[123])\.?/i);
     if (!match) return { category: null, cleanedHtml: html };
 
     const catStr = match[1].toUpperCase();
@@ -18,10 +19,10 @@ export function extractCategory(html: string | null): { category: 1 | 2 | 3 | nu
     else return { category: null, cleanedHtml: html };
 
     const cleanedHtml = html
-        .replace(/<p>(?:<i>)?Cat\.\s*(?:III|II|I|[123])(?:<\/i>)?<\/p>/gi, '')
-        .replace(/Cat\.\s*(?:III|II|I|[123])(?:<br\s*\/?>\s*)*/gi, '')
-        .replace(/;\s*Cat\.\s*(?:III|II|I|[123])/gi, '')
-        .replace(/Cat\.\s*(?:III|II|I|[123])/gi, '')
+        .replace(/<p>(?:<i>)?Cat\.?\s*(?:III|II|I|[123])\.?(?:<\/i>)?<\/p>/gi, '')
+        .replace(/Cat\.?\s*(?:III|II|I|[123])\.?(?:<br\s*\/?>\s*)*/gi, '')
+        .replace(/;\s*Cat\.?\s*(?:III|II|I|[123])\.?/gi, '')
+        .replace(/Cat\.?\s*(?:III|II|I|[123])\.?/gi, '')
         .replace(/;\s*\)/g, ')');
 
     return { category, cleanedHtml };
@@ -55,6 +56,9 @@ export function sanitizeHTML(html: string | null): string {
 
     // Trim whitespace
     cleaned = cleaned.trim();
+
+    // Strip leading punctuation artifacts left after category marker removal (e.g. ", " or "- ")
+    cleaned = cleaned.replace(/^[,;:\-–—.]+\s*/, '').trim();
 
     return cleaned;
 }
