@@ -884,7 +884,8 @@ export class ProfileStateManager {
                 selectedDiscussion: resolveSection(selectedCourse.selectedDiscussion),
                 selectedLab: resolveSection(selectedCourse.selectedLab),
                 isRequired: selectedCourse.isRequired,
-                lockedSections
+                lockedSections,
+                ...(selectedCourse.customColor && { customColor: selectedCourse.customColor })
             };
 
             return resolved;

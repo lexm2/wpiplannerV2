@@ -1,5 +1,11 @@
 # Changelog
 
+## [2026-03-18]
+
+### Fixed
+- Fixed course color picker freezing/crashing the page when used multiple times
+- Custom course colors now persist correctly after page reload
+
 ## [2026-03-17]
 
 ### Fixed
