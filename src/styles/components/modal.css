@@ -2033,7 +2033,7 @@ html.is-mobile .changelog-modal-body {
   background: var(--color-surface-hover);
 }
 
-.calendar-events-btn {
+.calendar-events-section .calendar-events-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -2048,6 +2048,6 @@ html.is-mobile .changelog-modal-body {
   transition: var(--effect-transition);
 }
 
-.calendar-events-btn:hover {
+.calendar-events-section .calendar-events-btn:hover {
   background: var(--color-surface-hover);
 }

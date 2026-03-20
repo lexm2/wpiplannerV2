@@ -399,20 +399,22 @@ export class ProfileStateManager {
     }
 
     updateSchedule(scheduleId: string, updates: Partial<Schedule>, source: string = 'user'): boolean {
-        return this.withStateUpdateSync(() => {
+        const isAutomated = source === 'calendar-event-exclusion' || source === 'storage-service';
+        const update = () => {
             const index = this.state.schedules.findIndex(s => s.id === scheduleId);
             if (index < 0) return false;
 
             this.state.schedules[index] = { ...this.state.schedules[index], ...updates };
-            
+
             // If this is the active schedule, emit active schedule changed event
             if (scheduleId === this.state.activeScheduleId) {
                 this.emitEvent('active_schedule_changed', { schedule: this.state.schedules[index] }, source);
             }
-            
+
             this.emitEvent('schedule_changed', { schedule: this.state.schedules[index], action: 'updated' }, source);
             return true;
-        });
+        };
+        return isAutomated ? this.withPersistSync(update) : this.withStateUpdateSync(update);
     }
 
     async deleteSchedule(scheduleId: string, source: string = 'user'): Promise<boolean> {
@@ -472,7 +474,7 @@ export class ProfileStateManager {
 
     // Preferences management
     updatePreferences(updates: Partial<SchedulePreferences>, source: string = 'user'): void {
-        this.withStateUpdate(() => {
+        this.withPersist(() => {
             this.state.preferences = { ...this.state.preferences, ...updates };
             this.emitEvent('preferences_changed', { preferences: this.state.preferences }, source);
         });
@@ -884,7 +886,8 @@ export class ProfileStateManager {
                 selectedDiscussion: resolveSection(selectedCourse.selectedDiscussion),
                 selectedLab: resolveSection(selectedCourse.selectedLab),
                 isRequired: selectedCourse.isRequired,
-                lockedSections
+                lockedSections,
+                ...(selectedCourse.customColor && { customColor: selectedCourse.customColor })
             };
 
             return resolved;
@@ -954,6 +957,35 @@ export class ProfileStateManager {
         // Skip save if in batch mode - batch will handle save at the end
         if (!this.isBatchUpdate) {
             this.save();
+        }
+        return result;
+    }
+
+    private withPersist(updateFn: () => void): void {
+        const previousUnsavedState = this.state.hasUnsavedChanges;
+        updateFn();
+        this.state.hasUnsavedChanges = true;
+
+        if (!previousUnsavedState) {
+            this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
+        }
+
+        if (!this.isBatchUpdate) {
+            this.save(true);
+        }
+    }
+
+    private withPersistSync<T>(updateFn: () => T): T {
+        const previousUnsavedState = this.state.hasUnsavedChanges;
+        const result = updateFn();
+        this.state.hasUnsavedChanges = true;
+
+        if (!previousUnsavedState) {
+            this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
+        }
+
+        if (!this.isBatchUpdate) {
+            this.save(true);
         }
         return result;
     }

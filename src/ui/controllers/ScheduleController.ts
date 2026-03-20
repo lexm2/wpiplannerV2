@@ -447,11 +447,9 @@ export class ScheduleController implements CalendarEventProvider {
             const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
             const sidebarPanel = selectedCoursesContainer.querySelector('.sidebar-panel');
 
-            // Build calendar events button + empty state message
-            const html = `
-                ${this.buildCalendarEventsButtonHTML()}
-                <div class="empty-state">No courses selected yet</div>
-            `;
+            this.renderCalendarEventsHeader();
+
+            const html = `<div class="empty-state">No courses selected yet</div>`;
             selectedCoursesContainer.innerHTML = html;
 
             if (wizardPanel) {
@@ -461,8 +459,6 @@ export class ScheduleController implements CalendarEventProvider {
                 selectedCoursesContainer.appendChild(sidebarPanel);
             }
 
-            // Set up calendar events button click handler
-            this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
             return;
         }
 
@@ -472,6 +468,8 @@ export class ScheduleController implements CalendarEventProvider {
             if (deptCompare !== 0) return deptCompare;
             return a.course.number.localeCompare(b.course.number);
         });
+
+        this.renderCalendarEventsHeader();
 
         const html = this.buildAllCoursesHTML(sortedCourses);
         if (countElement) {
@@ -490,15 +488,13 @@ export class ScheduleController implements CalendarEventProvider {
         if (sidebarPanel) {
             selectedCoursesContainer.appendChild(sidebarPanel);
         }
-
-        this.setupCalendarEventsButtonHandler(selectedCoursesContainer);
     }
 
-    /**
-     * Set up click handler for the calendar events button.
-     */
-    private setupCalendarEventsButtonHandler(container: HTMLElement): void {
-        const calendarBtn = container.querySelector('#calendar-events-btn');
+    private renderCalendarEventsHeader(): void {
+        const slot = document.getElementById('calendar-events-header-slot');
+        if (!slot) return;
+        slot.innerHTML = this.buildCalendarEventsButtonHTML();
+        const calendarBtn = slot.querySelector('#calendar-events-btn');
         if (calendarBtn) {
             calendarBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -645,8 +641,7 @@ export class ScheduleController implements CalendarEventProvider {
     }
     
     private buildAllCoursesHTML(sortedCourses: SelectedCourse[]): string {
-        // Calendar button at top if connected
-        let html = this.buildCalendarEventsButtonHTML();
+        let html = '';
 
         sortedCourses.forEach(selectedCourse => {
             const course = selectedCourse.course;
@@ -662,24 +657,11 @@ export class ScheduleController implements CalendarEventProvider {
      * Build HTML for the calendar events button (always shown for local events).
      */
     private buildCalendarEventsButtonHTML(): string {
-        const localEvents = this.currentSchedule?.localEvents || [];
-        const localEventCount = localEvents.length;
-        const visibleLocalCount = localEvents.filter(e => e.visible).length;
-
-        const buttonText = localEventCount > 0
-            ? `${visibleLocalCount} local event${visibleLocalCount !== 1 ? 's' : ''}`
-            : 'Add events to avoid';
-
         return `
-            <div class="sidebar-content-item calendar-events-section">
-                <button class="calendar-events-btn" id="calendar-events-btn">
-                    <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
-                    <span class="calendar-events-btn-info">
-                        <span class="calendar-events-btn-name">Calendar Events</span>
-                        <span class="calendar-events-btn-count">${buttonText}</span>
-                    </span>
-                </button>
-            </div>
+            <button class="calendar-events-btn" id="calendar-events-btn">
+                <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
+                <span class="calendar-events-btn-name">Calendar Events</span>
+            </button>
         `;
     }
 

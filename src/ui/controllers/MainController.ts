@@ -8,7 +8,6 @@ import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
-import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { getInlineSVG, type IconName } from '../../utils/iconPaths'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
@@ -554,12 +553,8 @@ export class MainController {
             scheduleTab.addEventListener('click', async () => {
                 this.services.uiStateManager.switchToPage('schedule');
 
-                // Wrap display operations in batch mode to prevent multiple saves
-                const stateManager = ProfileStateManager.getInstance();
-                stateManager.withBatchSync(() => {
-                    this.scheduleController.displayScheduleSelectedCourses();
-                    this.scheduleController.renderScheduleGrids();
-                });
+                this.scheduleController.displayScheduleSelectedCourses();
+                this.scheduleController.renderScheduleGrids();
             });
         }
 
@@ -637,23 +632,6 @@ export class MainController {
                     this.updateScheduleFilterButtonState();
                     this.updateScheduleClearFiltersButtonState();
                 }
-            });
-        }
-
-        // Schedule search functionality
-        const scheduleSearchInput = document.getElementById('schedule-search-input') as HTMLInputElement;
-        if (scheduleSearchInput) {
-            scheduleSearchInput.addEventListener('input', () => {
-                const query = scheduleSearchInput.value;
-
-                if (query.trim().length > 0) {
-                    this.services.filterService.addFilter('searchText', { query });
-                } else {
-                    this.services.filterService.removeFilter('searchText');
-                }
-
-                // Refresh the schedule page display
-                this.scheduleController.applyFiltersAndRefresh();
             });
         }
 

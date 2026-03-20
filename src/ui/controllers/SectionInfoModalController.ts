@@ -59,7 +59,7 @@ export class SectionInfoModalController extends BaseModal {
         // Add color picker event listener
         const colorInput = backdrop.querySelector('.course-color-input');
         if (colorInput && data.onColorChange) {
-            colorInput.addEventListener('input', (e) => {
+            colorInput.addEventListener('change', (e) => {
                 data.onColorChange!((e.target as HTMLInputElement).value);
             });
         }
