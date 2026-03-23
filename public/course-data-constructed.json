@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 23, 2026, 9:00 PM",
+  "generated": "Mar 23, 2026, 9:46 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -6080,7 +6080,7 @@
                 "crn": 337245,
                 "number": "D02",
                 "seats": 30,
-                "seatsAvailable": 8,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -6097,7 +6097,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D02",
@@ -328646,7 +328646,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": -1,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -328663,7 +328663,7 @@
                     "room": "Higgins Labs 202",
                     "seats": 30,
                     "seatsAvailable": -1,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
@@ -341499,7 +341499,7 @@
                 "number": "D01",
                 "seats": 30,
                 "seatsAvailable": -1,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -341516,7 +341516,7 @@
                     "room": "Higgins Labs 202",
                     "seats": 30,
                     "seatsAvailable": -1,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
