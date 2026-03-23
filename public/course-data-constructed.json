@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 23, 2026, 8:34 PM",
+  "generated": "Mar 23, 2026, 9:00 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -16612,7 +16612,7 @@
                 "number": "D01",
                 "seats": 100,
                 "seatsAvailable": -2,
-                "actualWaitlist": 12,
+                "actualWaitlist": 11,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "D",
@@ -16629,7 +16629,7 @@
                     "room": "Unity Hall 400",
                     "seats": 100,
                     "seatsAvailable": -2,
-                    "actualWaitlist": 12,
+                    "actualWaitlist": 11,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
