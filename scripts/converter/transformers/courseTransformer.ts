@@ -75,7 +75,7 @@ export function transformCourse(
         : undefined;
 
     return {
-        id: `${departmentAbbrev}-${courseNumber}`,
+        id: `${departmentAbbrev}-${courseNumber}-${academicYear}`,
         number: courseNumber,
         name: courseName,
         description,
