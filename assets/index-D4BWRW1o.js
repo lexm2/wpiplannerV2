@@ -84,6 +84,11 @@ VERSION:2.0\r
                 </div>
             `}),this.optionsElement.innerHTML=s}selectTheme(e){this.themeManager.setTheme(e)&&(this.updateCurrentThemeDisplay(),this.updateActiveOption(e),this.closeDropdown())}updateCurrentThemeDisplay(){if(!this.currentThemeNameElement)return;const e=this.themeManager.getCurrentTheme();e&&(this.currentThemeNameElement.textContent=e.name)}updateActiveOption(e){if(!this.optionsElement)return;this.optionsElement.querySelectorAll(`.${Y["theme-option"]}`).forEach(s=>{s.classList.remove(Y.active)});const t=this.optionsElement.querySelector(`[data-theme-id="${e}"]`);t&&t.classList.add(Y.active)}refresh(){this.renderThemeOptions(),this.updateCurrentThemeDisplay()}setTheme(e){this.selectTheme(e)}destroy(){this.dropdownElement&&this.dropdownElement.removeEventListener("click",this.boundDropdownClick),this.optionsElement&&this.optionsElement.removeEventListener("click",this.boundOptionsClick),document.removeEventListener("click",this.boundDocumentClick)}}class de{constructor(e){this.modalId=null,this.modalElement=null,this.closeCallbacks=[],this.modalService=e}hide(){this.modalId&&(this.modalService.hideModal(this.modalId),this.triggerCloseCallbacks(),this.modalId=null,this.modalElement=null)}isOpen(){return this.modalId!==null&&this.modalService.isModalOpen(this.modalId)}onClose(e){this.closeCallbacks.push(e)}destroy(){this.isOpen()&&this.hide(),this.closeCallbacks=[]}showModal(e,t={}){return this.modalId=this.modalService.generateId(),this.modalElement=e,this.modalService.showModal(this.modalId,e),this.modalService.setupModalBehavior(e,this.modalId,{closeOnBackdrop:t.closeOnBackdrop??!0,closeOnEscape:t.closeOnEscape??!0}),this.modalId}getModalId(){return this.modalId}escapeHtml(e){const t=document.createElement("div");return t.textContent=e,t.innerHTML}triggerCloseCallbacks(){this.closeCallbacks.forEach(e=>e())}}const ci=`# Changelog
 
+## [2026-03-23]
+
+### Fixed
+- Fixed courses from 2026–2027 not appearing when the year filter defaulted to 2026. The course data converter now correctly separates sections by academic year, so each year's offering of a course is listed independently with accurate sections and calendar dates.
+
 ## [2026-03-18]
 
 ### Changed
