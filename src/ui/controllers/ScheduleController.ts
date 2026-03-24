@@ -16,6 +16,8 @@ import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { ModalService } from '../../services/ui/ModalService'
+import { ModalQueue } from '../../services/ui/ModalQueue'
+import { AutoScheduleIntroModal } from '../components/AutoScheduleIntroModal'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator, type CalendarEventProvider } from '../../services/scheduling/AutoScheduleOrchestrator'
 import type { ComponentSelections, SectionOccupant, CalendarOccupant, CellData, CellContentResult } from '../../types/scheduling'
@@ -1514,18 +1516,39 @@ export class ScheduleController implements CalendarEventProvider {
             return;
         }
 
-        const scheduleFilterModal = new FilterModalController(this.modalService);
-        scheduleFilterModal.setFilterService(this.filterService);
-        scheduleFilterModal.setCourseSelectionService(this.courseSelectionService);
-        scheduleFilterModal.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
-        scheduleFilterModal.setMode('auto-schedule');
-        scheduleFilterModal.setOnGenerate(() => {
-            this.doGenerateSchedules(selectedCourses);
+        const queue = new ModalQueue();
+        let coursesToSchedule = selectedCourses;
+
+        queue.add((q) => {
+            const introModal = new AutoScheduleIntroModal(
+                this.modalService!,
+                selectedCourses,
+                (id) => this.colorService.getCourseColor(id)
+            );
+            introModal.setOnNext((filtered) => {
+                coursesToSchedule = filtered;
+                q.next();
+            });
+            introModal.show();
         });
-        if (this.courseDataService) {
-            scheduleFilterModal.setCourseData(this.courseDataService.getAllDepartments());
-        }
-        scheduleFilterModal.show();
+
+        queue.add(() => {
+            const scheduleFilterModal = new FilterModalController(this.modalService!);
+            scheduleFilterModal.setFilterService(this.filterService!);
+            scheduleFilterModal.setCourseSelectionService(this.courseSelectionService);
+            scheduleFilterModal.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
+            scheduleFilterModal.setMode('auto-schedule');
+            scheduleFilterModal.setCoursesToSchedule(coursesToSchedule);
+            scheduleFilterModal.setOnGenerate(() => {
+                this.doGenerateSchedules(coursesToSchedule);
+            });
+            if (this.courseDataService) {
+                scheduleFilterModal.setCourseData(this.courseDataService.getAllDepartments());
+            }
+            scheduleFilterModal.show();
+        });
+
+        queue.start();
     }
 
     private async doGenerateSchedules(selectedCourses: SelectedCourse[], settings?: { blockedTimes: WeeklyTimeSlot[] }): Promise<void> {

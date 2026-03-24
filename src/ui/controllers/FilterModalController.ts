@@ -3,7 +3,7 @@ import { FilterService } from '../../services/filtering/FilterService';
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
 import { Course, Department } from '../../types/types';
-import { AcademicTerm, WeeklyTimeSlot } from '../../types/schedule';
+import { AcademicTerm, WeeklyTimeSlot, SelectedCourse } from '../../types/schedule';
 import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
@@ -20,6 +20,7 @@ export class FilterModalController extends BaseModal {
     private isUpdatingFilter: boolean = false;
     private mode: 'filter' | 'auto-schedule' = 'filter';
     private onGenerate: (() => void) | null = null;
+    private coursesToSchedule: SelectedCourse[] | null = null;
 
     constructor(modalService: ModalService) {
         super(modalService);
@@ -43,6 +44,10 @@ export class FilterModalController extends BaseModal {
 
     setOnGenerate(callback: () => void): void {
         this.onGenerate = callback;
+    }
+
+    setCoursesToSchedule(courses: SelectedCourse[]): void {
+        this.coursesToSchedule = courses;
     }
 
     setCourseData(departments: Department[]): void {
@@ -1158,7 +1163,7 @@ export class FilterModalController extends BaseModal {
         if (!this.filterService || !this.autoScheduleOrchestrator) {
             return 'Configure filters then generate';
         }
-        const selectedCourses = this.courseSelectionService?.getSelectedCourses() || [];
+        const selectedCourses = this.coursesToSchedule ?? this.courseSelectionService?.getSelectedCourses() ?? [];
         if (selectedCourses.length === 0) {
             return 'No courses selected';
         }

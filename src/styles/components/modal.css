@@ -2051,3 +2051,97 @@ html.is-mobile .changelog-modal-body {
 .calendar-events-section .calendar-events-btn:hover {
   background: var(--color-surface-hover);
 }
+
+.as-course-picker-body {
+  padding: 1rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.as-picker-hint {
+  margin: 0 0 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.as-course-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.as-course-card {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius-large);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+  opacity: 0.45;
+  user-select: none;
+}
+
+.as-course-card.selected {
+  border-color: var(--color-primary);
+  box-shadow: var(--effect-shadow-hover);
+  transform: translateX(6px);
+  opacity: 1;
+}
+
+.as-course-card-accent {
+  width: 8px;
+  flex-shrink: 0;
+}
+
+.as-course-card-content {
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.as-course-code {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.as-course-name {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.as-course-year {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.as-card-terms {
+  padding: 0 1rem;
+  pointer-events: none;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.as-card-terms .term-badge {
+  cursor: default;
+}
+
+.as-card-terms .term-badge:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.as-picker-count {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
