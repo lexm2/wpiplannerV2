@@ -102,15 +102,17 @@
 
 /* Auto-schedule footer */
 .schedule-sidebar-content-footer {
-  padding: 1rem 1.5rem;
   border-top: 1px solid var(--color-border);
   background: var(--color-background-alt);
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.schedule-sidebar-content-footer {
+.schedule-footer-row {
   display: flex;
   gap: 0.5rem;
+  padding: 1rem 1.5rem;
 }
 
 .auto-schedule-btn {
@@ -137,6 +139,32 @@
 .schedule-filter-controls .clear-all-sections-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.schedule-generating-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: var(--effect-border-radius);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.schedule-generating-overlay.visible {
+  opacity: 1;
+}
+
+.auto-schedule-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
 }
 
 .auto-schedule-icon,
@@ -170,12 +198,19 @@
   stroke: currentColor;
 }
 
-.schedule-counter {
-  font-size: 0.875rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-secondary);
-  min-width: 3rem;
-  text-align: center;
+/* Schedule progress bar */
+.schedule-progress-track {
+  height: 0.2rem;
+  background: var(--color-border);
+  width: 100%;
+}
+
+.schedule-progress-bar {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 0 9999px 9999px 0;
+  width: 0%;
+  transition: width 0.25s ease;
 }
 
 /* Schedule course items with sections */
@@ -493,6 +528,7 @@
   padding: 1rem;
   overflow: hidden;
   position: relative;
+  border-radius: var(--effect-border-radius);
 }
 
 .terms-grid.focused .term-graph {

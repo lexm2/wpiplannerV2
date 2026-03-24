@@ -6,14 +6,16 @@ import { Validators } from '../../utils/validators';
 export class AutoScheduleIntroModal extends BaseModal {
     private selectedCourses: SelectedCourse[];
     private getColor: (courseId: string) => string;
-    private selectedIds: Set<string>;
+    private selectedTermsByCourseid: Map<string, Set<string>>;
     private onNext: ((filtered: SelectedCourse[]) => void) | null = null;
 
     constructor(modalService: ModalService, selectedCourses: SelectedCourse[], getColor: (courseId: string) => string) {
         super(modalService);
         this.selectedCourses = selectedCourses;
         this.getColor = getColor;
-        this.selectedIds = new Set(selectedCourses.map(sc => sc.course.id));
+        this.selectedTermsByCourseid = new Map(
+            selectedCourses.map(sc => [sc.course.id, this.availableTerms(sc)])
+        );
     }
 
     setOnNext(callback: (filtered: SelectedCourse[]) => void): void {
@@ -31,13 +33,12 @@ export class AutoScheduleIntroModal extends BaseModal {
                         <button class="modal-close" aria-label="Close">&times;</button>
                     </div>
                     <div class="modal-body as-course-picker-body">
-                        <p class="as-picker-hint">Select the courses to include in schedule generation.</p>
+                        <p class="as-picker-hint">Select which terms to include for each course.</p>
                         <div class="as-course-grid">
                             ${this.renderCards()}
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <span class="as-picker-count">${this.selectedCourses.length} of ${this.selectedCourses.length} selected</span>
                         <button class="modal-btn btn-primary" data-action="next">Next</button>
                     </div>
                 </div>
@@ -48,11 +49,25 @@ export class AutoScheduleIntroModal extends BaseModal {
         backdrop.querySelector('.modal-close')?.addEventListener('click', () => this.hide());
 
         backdrop.querySelectorAll<HTMLElement>('.as-course-card').forEach(card => {
-            card.addEventListener('click', () => this.toggleCard(card, backdrop));
+            card.addEventListener('click', () => this.toggleCard(card));
+        });
+
+        backdrop.querySelectorAll<HTMLElement>('.as-card-terms .term-badge:not(.unavailable)').forEach(badge => {
+            badge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const courseId = badge.dataset.courseId;
+                const term = badge.dataset.term;
+                if (courseId && term) this.toggleTerm(courseId, term, badge);
+            });
         });
 
         backdrop.querySelector('[data-action="next"]')?.addEventListener('click', () => {
-            const filtered = this.selectedCourses.filter(sc => this.selectedIds.has(sc.course.id));
+            const filtered = this.selectedCourses.map(sc => {
+                const available = this.availableTerms(sc);
+                const selected = this.selectedTermsByCourseid.get(sc.course.id) ?? available;
+                if ([...available].every(t => selected.has(t))) return sc;
+                return { ...sc, allowedTerms: [...selected] };
+            });
             this.hide();
             this.onNext?.(filtered);
         });
@@ -60,13 +75,22 @@ export class AutoScheduleIntroModal extends BaseModal {
         this.showModal(backdrop, { closeOnBackdrop: true, closeOnEscape: true });
     }
 
+    private availableTerms(sc: SelectedCourse): Set<string> {
+        const terms = new Set<string>();
+        sc.course.lectures?.forEach(lg => terms.add(lg.section.computedTerm));
+        sc.course.standaloneLabs?.forEach(s => terms.add(s.computedTerm));
+        return terms;
+    }
+
     private renderTermBadges(sc: SelectedCourse): string {
-        const available = new Set<string>();
-        sc.course.lectures?.forEach(lg => available.add(lg.section.computedTerm));
-        sc.course.standaloneLabs?.forEach(s => available.add(s.computedTerm));
+        const available = this.availableTerms(sc);
+        const selectedTerms = this.selectedTermsByCourseid.get(sc.course.id) ?? available;
         return ['A', 'B', 'C', 'D'].map(t => {
-            const cls = available.has(t) ? 'term-badge' : 'term-badge unavailable';
-            return `<span class="${cls}"><span class="term-letter">${t}</span></span>`;
+            if (!available.has(t)) {
+                return `<span class="term-badge unavailable" data-term="${t}" data-course-id="${Validators.escapeHtml(sc.course.id)}"><span class="term-letter">${t}</span></span>`;
+            }
+            const sel = selectedTerms.has(t) ? ' selected' : '';
+            return `<span class="term-badge${sel}" data-term="${t}" data-course-id="${Validators.escapeHtml(sc.course.id)}"><span class="term-letter">${t}</span></span>`;
         }).join('');
     }
 
@@ -90,22 +114,37 @@ export class AutoScheduleIntroModal extends BaseModal {
         }).join('');
     }
 
-    private toggleCard(card: HTMLElement, backdrop: HTMLElement): void {
-        const id = card.dataset.courseId;
-        if (!id) return;
+    private toggleCard(card: HTMLElement): void {
+        const courseId = card.dataset.courseId;
+        if (!courseId) return;
+        const termSet = this.selectedTermsByCourseid.get(courseId);
+        if (!termSet) return;
 
-        if (this.selectedIds.has(id)) {
-            this.selectedIds.delete(id);
+        if (termSet.size > 0) {
+            termSet.clear();
             card.classList.remove('selected');
+            card.querySelectorAll<HTMLElement>('.term-badge.selected').forEach(b => b.classList.remove('selected'));
         } else {
-            this.selectedIds.add(id);
+            const sc = this.selectedCourses.find(c => c.course.id === courseId);
+            if (sc) this.availableTerms(sc).forEach(t => termSet.add(t));
             card.classList.add('selected');
+            card.querySelectorAll<HTMLElement>('.term-badge:not(.unavailable)').forEach(b => b.classList.add('selected'));
+        }
+    }
+
+    private toggleTerm(courseId: string, term: string, badgeEl: HTMLElement): void {
+        const termSet = this.selectedTermsByCourseid.get(courseId);
+        if (!termSet) return;
+
+        if (termSet.has(term)) {
+            termSet.delete(term);
+            badgeEl.classList.remove('selected');
+        } else {
+            termSet.add(term);
+            badgeEl.classList.add('selected');
         }
 
-        const count = backdrop.querySelector('.as-picker-count');
-        if (count) count.textContent = `${this.selectedIds.size} of ${this.selectedCourses.length} selected`;
-
-        const nextBtn = backdrop.querySelector<HTMLButtonElement>('[data-action="next"]');
-        if (nextBtn) nextBtn.disabled = this.selectedIds.size === 0;
+        const card = badgeEl.closest<HTMLElement>('.as-course-card');
+        if (card) card.classList.toggle('selected', termSet.size > 0);
     }
 }

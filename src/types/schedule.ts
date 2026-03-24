@@ -8,6 +8,7 @@ export interface SelectedCourse {
     isRequired: boolean;
     lockedSections: Set<string>;
     customColor?: string;
+    allowedTerms?: string[];
 }
 
 

@@ -165,15 +165,21 @@
                         <div class="empty-state">No courses selected yet</div>
                     </div>
                     <div class="schedule-sidebar-content-footer">
-                        <button id="auto-schedule-btn" class="btn btn-primary auto-schedule-btn" title="Automatically generate a schedule" aria-label="Auto-generate schedule">
-                            <span>Auto-Schedule</span>
-                        </button>
-                        <div id="schedule-nav-buttons" class="schedule-nav-buttons" style="display: none;">
-                            <button id="schedule-prev-btn" class="btn btn-secondary schedule-nav-btn" title="Previous schedule" aria-label="Previous schedule">
+                        <div class="schedule-footer-row">
+                            <button id="auto-schedule-btn" class="btn btn-primary auto-schedule-btn" title="Automatically generate a schedule" aria-label="Auto-generate schedule">
+                                <span>Auto-Schedule</span>
                             </button>
-                            <span id="schedule-counter" class="schedule-counter">1/1</span>
-                            <button id="schedule-next-btn" class="btn btn-secondary schedule-nav-btn" title="Next schedule" aria-label="Next schedule">
-                            </button>
+                            <div id="schedule-nav-buttons" class="schedule-nav-buttons" style="display: none;">
+                                <button id="schedule-prev-btn" class="btn btn-secondary schedule-nav-btn" title="Previous schedule" aria-label="Previous schedule">
+                                </button>
+                                <button id="schedule-restart-btn" class="btn btn-secondary schedule-nav-btn" title="Restart auto-schedule" aria-label="Restart auto-schedule">
+                                </button>
+                                <button id="schedule-next-btn" class="btn btn-secondary schedule-nav-btn" title="Next schedule" aria-label="Next schedule">
+                                </button>
+                            </div>
+                        </div>
+                        <div id="schedule-progress-track" class="schedule-progress-track" style="display: none;">
+                            <div id="schedule-progress-bar" class="schedule-progress-bar"></div>
                         </div>
                     </div>
                 </aside>

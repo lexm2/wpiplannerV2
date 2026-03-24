@@ -2127,21 +2127,13 @@ html.is-mobile .changelog-modal-body {
 
 .as-card-terms {
   padding: 0 1rem;
-  pointer-events: none;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
-.as-card-terms .term-badge {
-  cursor: default;
+.as-card-terms .term-badge.selected {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
 }
 
-.as-card-terms .term-badge:hover {
-  transform: none;
-  box-shadow: none;
-}
-
-.as-picker-count {
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
-}

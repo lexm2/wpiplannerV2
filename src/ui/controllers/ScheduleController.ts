@@ -1432,6 +1432,12 @@ export class ScheduleController implements CalendarEventProvider {
                 this.updateAutoScheduleButtonUI();
             });
         }
+
+        const restartBtn = document.getElementById('schedule-restart-btn');
+        if (restartBtn) {
+            restartBtn.insertAdjacentHTML('afterbegin', getInlineSVG('REFRESH', 'schedule-nav-icon'));
+            restartBtn.addEventListener('click', () => this.handleAutoSchedule());
+        }
     }
 
     setupClearAllSectionsButton(): void {
@@ -1475,7 +1481,8 @@ export class ScheduleController implements CalendarEventProvider {
     private updateAutoScheduleButtonUI(): void {
         const btn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
         const navButtons = document.getElementById('schedule-nav-buttons');
-        const counter = document.getElementById('schedule-counter');
+        const progressTrack = document.getElementById('schedule-progress-track');
+        const progressBar = document.getElementById('schedule-progress-bar') as HTMLElement | null;
         if (!btn) return;
 
         const generatedSchedules = this.autoScheduleOrchestrator.getGeneratedSchedules();
@@ -1486,10 +1493,14 @@ export class ScheduleController implements CalendarEventProvider {
             btn.disabled = false;
             btn.title = 'Automatically generate a schedule';
             if (navButtons) navButtons.style.display = 'none';
+            if (progressTrack) progressTrack.style.display = 'none';
+            if (progressBar) progressBar.style.width = '0%';
         } else {
             btn.style.display = 'none';
             if (navButtons) navButtons.style.display = 'flex';
-            if (counter) counter.textContent = `${this.autoScheduleOrchestrator.getCurrentScheduleIndex() + 1}/${generatedSchedules.length}`;
+            if (progressTrack) progressTrack.style.display = '';
+            const pct = ((this.autoScheduleOrchestrator.getCurrentScheduleIndex() + 1) / generatedSchedules.length) * 100;
+            if (progressBar) progressBar.style.width = `${pct}%`;
         }
     }
 
@@ -1552,11 +1563,13 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     private async doGenerateSchedules(selectedCourses: SelectedCourse[], settings?: { blockedTimes: WeeklyTimeSlot[] }): Promise<void> {
-        const autoScheduleBtn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
-        if (autoScheduleBtn) {
-            autoScheduleBtn.disabled = true;
-            autoScheduleBtn.textContent = 'Generating...';
-        }
+        const termsGrid = document.querySelector('.terms-grid');
+        const overlay = document.createElement('div');
+        overlay.className = 'schedule-generating-overlay';
+        overlay.innerHTML = '<span class="auto-schedule-spinner"></span>';
+        termsGrid?.appendChild(overlay);
+        overlay.getBoundingClientRect();
+        overlay.classList.add('visible');
 
         try {
             const success = await this.autoScheduleOrchestrator.generateSchedules(selectedCourses, settings);
@@ -1572,6 +1585,9 @@ export class ScheduleController implements CalendarEventProvider {
             console.error('[Auto-Schedule] Error generating schedules:', error);
             alert('An error occurred while generating the schedule. Please try again.');
             this.updateAutoScheduleButtonUI();
+        } finally {
+            overlay.classList.remove('visible');
+            overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
         }
     }
 
