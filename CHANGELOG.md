@@ -2,6 +2,9 @@
 
 ## [2026-03-24]
 
+### Fixed
+- Fixed the Import button in the Schedules settings tab — it now opens a file picker immediately and names the new schedule after the imported file
+
 ### Removed
 - Removed the "Clear Filters" button from the schedule sidebar header
 

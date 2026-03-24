@@ -183,14 +183,27 @@ export class SchedulePickerModal extends BaseModal {
 
         newScheduleBtnHeader?.addEventListener('click', () => this.createNewSchedule());
         newScheduleBtnSettings?.addEventListener('click', () => this.createNewSchedule());
-        importBtn?.addEventListener('click', async () => {
-            const name = prompt('Enter name for imported schedule:');
-            if (!name?.trim()) return;
-            const result = await this.scheduleManagementService.createNewSchedule(name.trim());
-            if (result.success && result.schedule?.id) {
-                this.updateScheduleList();
-                await this.importSchedule(result.schedule.id);
-            }
+        importBtn?.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = async () => {
+                const file = input.files?.[0];
+                if (!file) return;
+                const name = file.name.replace(/\.json$/i, '');
+                try {
+                    const text = await file.text();
+                    const result = await this.scheduleManagementService.createNewSchedule(name);
+                    if (result.success && result.schedule?.id) {
+                        const importResult = await this.scheduleManagementService.importScheduleInto(result.schedule.id, text);
+                        if (!importResult.success) alert(`Import failed: ${importResult.error}`);
+                        this.updateScheduleList();
+                    }
+                } catch {
+                    alert('Failed to import schedule. Please check the file format.');
+                }
+            };
+            input.click();
         });
         exportIcsBtn?.addEventListener('click', () => {
             const activeId = this.scheduleManagementService.getActiveScheduleId();
