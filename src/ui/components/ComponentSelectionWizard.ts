@@ -438,10 +438,9 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             const nextBtn = this.panel.querySelector('#wizard-next-btn');
             const skipBtn = this.panel.querySelector('#wizard-skip-btn');
 
-            if (!hasSelection && nextBtn) {
-                // Remove Next button and add Skip button (if not last step)
+            if (!hasSelection && nextBtn && !isLastStep) {
                 nextBtn.remove();
-                if (!isLastStep && !skipBtn) {
+                if (!skipBtn) {
                     const footer = this.panel.querySelector('.wizard-footer');
                     if (footer) {
                         const skipBtnHTML = `
@@ -473,7 +472,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
                         const currentIndex = this.availableSteps.indexOf(this.currentStep);
                         const isLastStep = currentIndex === this.availableSteps.length - 1;
                         if (isLastStep) {
-                            this.complete();
+                            this.tryComplete();
                         } else {
                             this.nextStep();
                         }
@@ -578,6 +577,17 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     private complete(): void {
         this.close();
         this.onComplete(this.selections);
+    }
+
+    private tryComplete(): void {
+        const missing = this.availableSteps
+            .filter(step => this.selections[step] === null)
+            .map(step => step === 'lecture' ? 'a lecture' : step === 'discussion' ? 'a discussion section' : 'a lab section');
+
+        if (missing.length > 0 && !confirm(`This course is incomplete — you need to select ${missing.join(' and ')}. Are you sure you want to finish anyway?`)) {
+            return;
+        }
+        this.complete();
     }
 
     /**
@@ -953,15 +963,15 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             <button class="wizard-btn wizard-btn-text" id="wizard-cancel-btn">
                 Cancel
             </button>
-            ${hasSelection ? `
+            ${hasSelection || isLastStep ? `
                 <button class="wizard-btn wizard-btn-primary" id="wizard-next-btn">
                     ${isLastStep ? 'Finish' : 'Next'}
                 </button>
-            ` : !isLastStep ? `
+            ` : `
                 <button class="wizard-btn wizard-btn-secondary" id="wizard-skip-btn">
                     Skip
                 </button>
-            ` : ''}
+            `}
         `;
     }
 
@@ -990,7 +1000,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             const currentIndex = this.availableSteps.indexOf(this.currentStep);
             const isLastStep = currentIndex === this.availableSteps.length - 1;
             if (isLastStep) {
-                this.complete();
+                this.tryComplete();
             } else {
                 this.nextStep();
             }
