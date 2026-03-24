@@ -191,11 +191,14 @@ export class AutoScheduler {
     const candidates: MaskedCandidate[] = [];
     const typeInfo = this.detectCourseTypes(course);
 
+    const allowedTerms = selectedCourse.allowedTerms;
+
     // Handle standalone lab courses
     if (typeInfo.isStandaloneLab) {
       const labs = course.standaloneLabs || [];
 
       for (const lab of labs) {
+        if (allowedTerms && !allowedTerms.includes(lab.computedTerm)) continue;
         if (!this.isValidSection(lab, blockedMasksByTerm, selectedCourse)) continue;
 
         const mask = sectionToMask(lab);
@@ -218,6 +221,7 @@ export class AutoScheduler {
 
     for (const lectureGroup of course.lectures) {
       const lecture = lectureGroup.section;
+      if (allowedTerms && !allowedTerms.includes(lecture.computedTerm)) continue;
       if (!this.isValidSection(lecture, blockedMasksByTerm, selectedCourse)) continue;
 
       const lectureMask = sectionToMask(lecture);

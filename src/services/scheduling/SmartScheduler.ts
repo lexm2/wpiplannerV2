@@ -43,18 +43,21 @@ export class SmartScheduler {
         }
 
         const candidatesPerCourse: MaskedCandidate[][] = [];
+        const scheduledCourses: Course[] = [];
         for (const sc of unlocked) {
+            if (sc.allowedTerms?.length === 0) continue;
             const candidates = autoScheduler.getMaskedCandidates(sc, blockedMasks);
             if (candidates.length === 0) {
                 console.warn(`[SmartScheduler] No valid candidates for ${sc.course.departmentAbbr}${sc.course.number}`);
                 return null;
             }
             candidatesPerCourse.push(candidates);
+            scheduledCourses.push(sc.course);
         }
 
         return {
             candidatesPerCourse,
-            courses: unlocked.map(sc => sc.course),
+            courses: scheduledCourses,
             lockedResults,
             lockedMaskByTerm,
         };
