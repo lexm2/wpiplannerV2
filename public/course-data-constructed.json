@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 24, 2026, 4:43 PM",
+  "generated": "Mar 24, 2026, 5:39 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -114821,7 +114821,7 @@
                     "type": "Lecture",
                     "professor": "Shahin Tajik",
                     "startTime": "18:00",
-                    "endTime": "19:30",
+                    "endTime": "20:50",
                     "location": "Washburn 323",
                     "building": "",
                     "room": "Washburn 323",
@@ -114831,7 +114831,6 @@
                     "maxWaitlist": 10,
                     "specificSection": "S01 - ST: Physical Security of Microelectronic Systems",
                     "days": [
-                      "T",
                       "W"
                     ],
                     "isAsync": false
@@ -331036,7 +331035,7 @@
                 "crn": 341324,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": 24,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -331053,7 +331052,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -434256,20 +434255,20 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "16:00",
-                    "endTime": "17:50",
-                    "location": "Washburn 323",
+                    "professor": "Guanrui Li",
+                    "startTime": "10:00",
+                    "endTime": "11:50",
+                    "location": "Higgins Labs 154",
                     "building": "",
-                    "room": "Washburn 323",
+                    "room": "Higgins Labs 154",
                     "seats": 20,
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [
-                      "T",
-                      "F"
+                      "M",
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -437185,20 +437184,20 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Wei Xiao",
-                    "startTime": "16:00",
-                    "endTime": "17:50",
-                    "location": "Washburn 323",
+                    "professor": "Guanrui Li",
+                    "startTime": "10:00",
+                    "endTime": "11:50",
+                    "location": "Higgins Labs 154",
                     "building": "",
-                    "room": "Washburn 323",
+                    "room": "Higgins Labs 154",
                     "seats": 20,
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01 - ST: Deep learning For Perception",
                     "days": [
-                      "T",
-                      "F"
+                      "M",
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -441145,11 +441144,11 @@
                   {
                     "type": "Lecture",
                     "professor": "Angel Rivera",
-                    "startTime": "09:00",
-                    "endTime": "09:50",
-                    "location": "Atwater Kent 232",
+                    "startTime": "13:00",
+                    "endTime": "13:50",
+                    "location": "Stratton Hall 313",
                     "building": "",
-                    "room": "Atwater Kent 232",
+                    "room": "Stratton Hall 313",
                     "seats": 20,
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
@@ -452062,8 +452061,8 @@
                 "crn": 337288,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "seatsAvailable": -1,
+                "actualWaitlist": 5,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "D",
@@ -452079,8 +452078,8 @@
                     "building": "",
                     "room": "Athletic Field",
                     "seats": 30,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "seatsAvailable": -1,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
