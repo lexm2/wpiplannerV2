@@ -51,8 +51,9 @@ if ! git merge Development --no-commit --no-ff; then
   fi
 fi
 
-# Always use Development's public/ directory
+# Use Development's public/ directory, but keep master's JSON data files
 git checkout MERGE_HEAD -- public/
+git checkout HEAD -- public/*.json
 git add public/
 
 git commit -m "Merge Development into master"
