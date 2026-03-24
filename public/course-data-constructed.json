@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 24, 2026, 9:51 PM",
+  "generated": "Mar 24, 2026, 10:25 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -129142,7 +129142,7 @@
                 "crn": 337459,
                 "number": "D01",
                 "seats": 15,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 2,
                 "maxWaitlist": 5,
                 "note": null,
@@ -129159,7 +129159,7 @@
                     "building": "",
                     "room": "Higgins Labs 234 Cad/Design Lab (ARC Approval Needed)",
                     "seats": 15,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 2,
                     "maxWaitlist": 5,
                     "specificSection": "D01",
