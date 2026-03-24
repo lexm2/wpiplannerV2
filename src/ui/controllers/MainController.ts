@@ -622,19 +622,6 @@ export class MainController {
             });
         }
 
-        // Schedule clear filters button
-        const scheduleClearFiltersButton = document.getElementById('schedule-clear-filters-btn');
-        if (scheduleClearFiltersButton) {
-            scheduleClearFiltersButton.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'eraser-icon'));
-            scheduleClearFiltersButton.addEventListener('click', () => {
-                if (this.services.filterService) {
-                    this.services.filterService.clearFilters();
-                    this.updateScheduleFilterButtonState();
-                    this.updateScheduleClearFiltersButtonState();
-                }
-            });
-        }
-
         // Undo/Redo button event listeners
         const undoBtn = document.getElementById('undo-btn');
         const redoBtn = document.getElementById('redo-btn');
@@ -970,21 +957,6 @@ export class MainController {
             } else {
                 scheduleFilterButton.classList.remove('active');
                 scheduleFilterButton.title = 'Filter selected courses';
-            }
-        }
-        this.updateScheduleClearFiltersButtonState();
-    }
-
-    private updateScheduleClearFiltersButtonState(): void {
-        const scheduleClearFiltersButton = document.getElementById('schedule-clear-filters-btn') as HTMLButtonElement | null;
-        if (scheduleClearFiltersButton && this.services.filterService) {
-            const hasActiveFilters = !this.services.filterService.isEmpty();
-
-            if (hasActiveFilters) {
-                scheduleClearFiltersButton.style.display = '';
-                scheduleClearFiltersButton.disabled = false;
-            } else {
-                scheduleClearFiltersButton.style.display = 'none';
             }
         }
     }
