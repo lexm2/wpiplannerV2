@@ -200,7 +200,7 @@
 
 /* Schedule progress bar */
 .schedule-progress-track {
-  height: 2rem;
+  height: 0.2rem;
   background: var(--color-border);
   width: 100%;
 }
