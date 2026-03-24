@@ -1432,6 +1432,12 @@ export class ScheduleController implements CalendarEventProvider {
                 this.updateAutoScheduleButtonUI();
             });
         }
+
+        const restartBtn = document.getElementById('schedule-restart-btn');
+        if (restartBtn) {
+            restartBtn.insertAdjacentHTML('afterbegin', getInlineSVG('REFRESH', 'schedule-nav-icon'));
+            restartBtn.addEventListener('click', () => this.handleRestartSchedule());
+        }
     }
 
     setupClearAllSectionsButton(): void {
@@ -1475,7 +1481,8 @@ export class ScheduleController implements CalendarEventProvider {
     private updateAutoScheduleButtonUI(): void {
         const btn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
         const navButtons = document.getElementById('schedule-nav-buttons');
-        const counter = document.getElementById('schedule-counter');
+        const progressTrack = document.getElementById('schedule-progress-track');
+        const progressBar = document.getElementById('schedule-progress-bar') as HTMLElement | null;
         if (!btn) return;
 
         const generatedSchedules = this.autoScheduleOrchestrator.getGeneratedSchedules();
@@ -1486,10 +1493,14 @@ export class ScheduleController implements CalendarEventProvider {
             btn.disabled = false;
             btn.title = 'Automatically generate a schedule';
             if (navButtons) navButtons.style.display = 'none';
+            if (progressTrack) progressTrack.style.display = 'none';
+            if (progressBar) progressBar.style.width = '0%';
         } else {
             btn.style.display = 'none';
             if (navButtons) navButtons.style.display = 'flex';
-            if (counter) counter.textContent = `${this.autoScheduleOrchestrator.getCurrentScheduleIndex() + 1}/${generatedSchedules.length}`;
+            if (progressTrack) progressTrack.style.display = '';
+            const pct = ((this.autoScheduleOrchestrator.getCurrentScheduleIndex() + 1) / generatedSchedules.length) * 100;
+            if (progressBar) progressBar.style.width = `${pct}%`;
         }
     }
 
@@ -1578,6 +1589,13 @@ export class ScheduleController implements CalendarEventProvider {
             overlay.classList.remove('visible');
             overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
         }
+    }
+
+    private async handleRestartSchedule(): Promise<void> {
+        const lastCourses = this.autoScheduleOrchestrator.getLastCoursesToSchedule();
+        if (!lastCourses || lastCourses.length === 0) return;
+        this.autoScheduleOrchestrator.restoreLockedSections(lastCourses);
+        await this.doGenerateSchedules(lastCourses, this.autoScheduleOrchestrator.getLastSettings() ?? { blockedTimes: [] });
     }
 
     // Performance optimization: Generate cache key for invalidation

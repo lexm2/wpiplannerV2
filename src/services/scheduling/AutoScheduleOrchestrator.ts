@@ -20,6 +20,9 @@ export class AutoScheduleOrchestrator {
     private filterService: FilterService;
     private calendarEventProvider: CalendarEventProvider | null = null;
     private onStateChangeCallback: (() => void) | null = null;
+    private savedLockedSections: Map<string, Set<string>> = new Map();
+    private lastCoursesToSchedule: SelectedCourse[] | null = null;
+    private lastSettings: AutoScheduleSettings | null = null;
 
     constructor(
         courseSelectionService: CourseSelectionService,
@@ -92,10 +95,31 @@ export class AutoScheduleOrchestrator {
                 selectedCourse.lockedSections.add(String(selectedCourse.selectedLab.crn));
             }
         }
+        this.savedLockedSections = new Map(
+            selectedCourses.map(sc => [sc.course.id, new Set(sc.lockedSections)])
+        );
+    }
+
+    restoreLockedSections(selectedCourses: SelectedCourse[]): void {
+        for (const sc of selectedCourses) {
+            const saved = this.savedLockedSections.get(sc.course.id);
+            sc.lockedSections = saved ? new Set(saved) : new Set();
+        }
+    }
+
+    getLastCoursesToSchedule(): SelectedCourse[] | null {
+        return this.lastCoursesToSchedule;
+    }
+
+    getLastSettings(): AutoScheduleSettings | null {
+        return this.lastSettings;
     }
 
     async generateSchedules(selectedCourses: SelectedCourse[], settings?: AutoScheduleSettings): Promise<boolean> {
         try {
+            this.lastCoursesToSchedule = selectedCourses;
+            this.lastSettings = settings ?? null;
+
             if (settings) {
                 let blockedTimes = [...settings.blockedTimes];
                 if (settings.avoidCalendarEvents && this.calendarEventProvider) {
