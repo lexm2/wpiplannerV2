@@ -4,6 +4,7 @@
 
 ### Fixed
 - Fixed the Import button in the Schedules settings tab — it now opens a file picker immediately and names the new schedule after the imported file
+- Auto-scheduler now respects locked sections when distributing courses across terms — a locked course in a term counts toward that term's course limit
 
 ### Removed
 - Removed the "Clear Filters" button from the schedule sidebar header

@@ -72,14 +72,22 @@ export class SmartScheduler {
             [...new Set(candidates.map(c => c.term))]
         );
 
+        const lockedCountByTerm = new Map<string, number>();
+        for (const result of lockedResults) {
+            const term = result.combination.lecture?.computedTerm
+                ?? result.combination.discussion?.computedTerm
+                ?? result.combination.lab?.computedTerm;
+            if (term) lockedCountByTerm.set(term, (lockedCountByTerm.get(term) ?? 0) + 1);
+        }
+
         const numDistinctTerms = new Set(termOptionsPerCourse.flat()).size;
-        let assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, 3);
+        let assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, 3, lockedCountByTerm);
         if (assignments.length === 0) {
             const relaxed = Math.ceil(courses.length / Math.max(numDistinctTerms, 1));
-            assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, relaxed);
+            assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, relaxed, lockedCountByTerm);
         }
         if (assignments.length === 0) {
-            assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, Infinity);
+            assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, Infinity, lockedCountByTerm);
         }
 
         const results: ScheduleResult[][] = [];
@@ -129,9 +137,9 @@ export class SmartScheduler {
         return SmartScheduler.findSchedules(input, maxResults);
     }
 
-    private static enumerateTermAssignments(termOptions: string[][], maxPerTerm: number): string[][] {
+    private static enumerateTermAssignments(termOptions: string[][], maxPerTerm: number, initialCounts: Map<string, number> = new Map()): string[][] {
         const results: string[][] = [];
-        const counts = new Map<string, number>();
+        const counts = new Map<string, number>(initialCounts);
 
         const dfs = (i: number, current: string[]): void => {
             if (i === termOptions.length) {
