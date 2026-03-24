@@ -1552,11 +1552,13 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     private async doGenerateSchedules(selectedCourses: SelectedCourse[], settings?: { blockedTimes: WeeklyTimeSlot[] }): Promise<void> {
-        const autoScheduleBtn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
-        if (autoScheduleBtn) {
-            autoScheduleBtn.disabled = true;
-            autoScheduleBtn.textContent = 'Generating...';
-        }
+        const termsGrid = document.querySelector('.terms-grid');
+        const overlay = document.createElement('div');
+        overlay.className = 'schedule-generating-overlay';
+        overlay.innerHTML = '<span class="auto-schedule-spinner"></span>';
+        termsGrid?.appendChild(overlay);
+        overlay.getBoundingClientRect();
+        overlay.classList.add('visible');
 
         try {
             const success = await this.autoScheduleOrchestrator.generateSchedules(selectedCourses, settings);
@@ -1572,6 +1574,9 @@ export class ScheduleController implements CalendarEventProvider {
             console.error('[Auto-Schedule] Error generating schedules:', error);
             alert('An error occurred while generating the schedule. Please try again.');
             this.updateAutoScheduleButtonUI();
+        } finally {
+            overlay.classList.remove('visible');
+            overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
         }
     }
 

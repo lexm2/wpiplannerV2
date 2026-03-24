@@ -139,6 +139,32 @@
   cursor: not-allowed;
 }
 
+.schedule-generating-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: var(--effect-border-radius);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.schedule-generating-overlay.visible {
+  opacity: 1;
+}
+
+.auto-schedule-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
 .auto-schedule-icon,
 .clear-all-eraser-icon {
   width: 18px;
@@ -493,6 +519,7 @@
   padding: 1rem;
   overflow: hidden;
   position: relative;
+  border-radius: var(--effect-border-radius);
 }
 
 .terms-grid.focused .term-graph {
