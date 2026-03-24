@@ -1436,7 +1436,7 @@ export class ScheduleController implements CalendarEventProvider {
         const restartBtn = document.getElementById('schedule-restart-btn');
         if (restartBtn) {
             restartBtn.insertAdjacentHTML('afterbegin', getInlineSVG('REFRESH', 'schedule-nav-icon'));
-            restartBtn.addEventListener('click', () => this.handleRestartSchedule());
+            restartBtn.addEventListener('click', () => this.handleAutoSchedule());
         }
     }
 
@@ -1589,13 +1589,6 @@ export class ScheduleController implements CalendarEventProvider {
             overlay.classList.remove('visible');
             overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
         }
-    }
-
-    private async handleRestartSchedule(): Promise<void> {
-        const lastCourses = this.autoScheduleOrchestrator.getLastCoursesToSchedule();
-        if (!lastCourses || lastCourses.length === 0) return;
-        this.autoScheduleOrchestrator.restoreLockedSections(lastCourses);
-        await this.doGenerateSchedules(lastCourses, this.autoScheduleOrchestrator.getLastSettings() ?? { blockedTimes: [] });
     }
 
     // Performance optimization: Generate cache key for invalidation
