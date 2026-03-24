@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 24, 2026, 3:45 PM",
+  "generated": "Mar 24, 2026, 4:43 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -332,8 +332,8 @@
               "section": {
                 "crn": 354688,
                 "number": "B01",
-                "seats": 18,
-                "seatsAvailable": 18,
+                "seats": 25,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -346,11 +346,11 @@
                     "professor": "Mohammed El Hamzaoui",
                     "startTime": "11:00",
                     "endTime": "11:50",
-                    "location": "Salisbury Labs 011",
+                    "location": "Atwater Kent 232",
                     "building": "",
-                    "room": "Salisbury Labs 011",
-                    "seats": 18,
-                    "seatsAvailable": 18,
+                    "room": "Atwater Kent 232",
+                    "seats": 25,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "B01",
@@ -90257,7 +90257,7 @@
                 "crn": 337476,
                 "number": "D01",
                 "seats": 64,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -90274,7 +90274,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 64,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -98849,16 +98849,16 @@
                     "professor": "Berk Sunar",
                     "startTime": "18:00",
                     "endTime": "20:50",
-                    "location": "Stratton Hall 205",
+                    "location": "Higgins Labs 114",
                     "building": "",
-                    "room": "Stratton Hall 205",
+                    "room": "Higgins Labs 114",
                     "seats": 35,
                     "seatsAvailable": 35,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
-                      "T"
+                      "M"
                     ],
                     "isAsync": false
                   }
@@ -103051,16 +103051,16 @@
                     "professor": "Koksal Mus",
                     "startTime": "18:00",
                     "endTime": "20:50",
-                    "location": "Atwater Kent 219",
+                    "location": "Atwater Kent 232",
                     "building": "",
-                    "room": "Atwater Kent 219",
+                    "room": "Atwater Kent 232",
                     "seats": 25,
                     "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
-                      "T"
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -113442,16 +113442,16 @@
                     "professor": "Christo Kurisummoottil Thomas",
                     "startTime": "18:00",
                     "endTime": "20:50",
-                    "location": "Unity Hall 405",
+                    "location": "Washburn 323",
                     "building": "",
-                    "room": "Unity Hall 405",
+                    "room": "Washburn 323",
                     "seats": 20,
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
-                      "T"
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -113487,7 +113487,7 @@
                     "maxWaitlist": 0,
                     "specificSection": "S02",
                     "days": [
-                      "T"
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -114591,16 +114591,16 @@
                     "professor": "Koksal Mus",
                     "startTime": "18:00",
                     "endTime": "20:50",
-                    "location": "Atwater Kent 219",
+                    "location": "Atwater Kent 232",
                     "building": "",
-                    "room": "Atwater Kent 219",
+                    "room": "Atwater Kent 232",
                     "seats": 25,
                     "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
-                      "T"
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -115253,16 +115253,16 @@
                     "professor": "Berk Sunar",
                     "startTime": "18:00",
                     "endTime": "20:50",
-                    "location": "Stratton Hall 205",
+                    "location": "Higgins Labs 114",
                     "building": "",
-                    "room": "Stratton Hall 205",
+                    "room": "Higgins Labs 114",
                     "seats": 35,
                     "seatsAvailable": 35,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [
-                      "T"
+                      "M"
                     ],
                     "isAsync": false
                   }
@@ -121897,7 +121897,7 @@
                 "crn": 337540,
                 "number": "DL01",
                 "seats": 64,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 8,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4509",
@@ -121914,7 +121914,7 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 64,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 8,
                     "maxWaitlist": 15,
                     "specificSection": "DL01",
@@ -121964,7 +121964,7 @@
                   "crn": 337573,
                   "number": "DX02",
                   "seats": 32,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 2,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4509",
@@ -121981,7 +121981,7 @@
                       "building": "",
                       "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                       "seats": 32,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 2,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX02",
@@ -144673,9 +144673,9 @@
                     "professor": "Esther (Stella) Rosario",
                     "startTime": "11:00",
                     "endTime": "12:50",
-                    "location": "Washburn 323",
+                    "location": "Salisbury Labs 226 HUA Seminar Room",
                     "building": "",
-                    "room": "Washburn 323",
+                    "room": "Salisbury Labs 226 HUA Seminar Room",
                     "seats": 12,
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
@@ -146208,42 +146208,6 @@
                     "specificSection": "C23 - INQ SEM IN HUA: Mic Check: The Rhetoric of Hip-Hop",
                     "days": [
                       "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 350992,
-                "number": "C24 - INQ SEM IN HUA: African Literature",
-                "seats": 12,
-                "seatsAvailable": 12,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "C",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "Kristin Boudreau",
-                    "startTime": "10:00",
-                    "endTime": "11:50",
-                    "location": "Salisbury Labs 124 Conference Room",
-                    "building": "",
-                    "room": "Salisbury Labs 124 Conference Room",
-                    "seats": 12,
-                    "seatsAvailable": 12,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "C24 - INQ SEM IN HUA: African Literature",
-                    "days": [
-                      "T"
                     ],
                     "isAsync": false
                   }
@@ -329773,7 +329737,7 @@
                 "crn": 336953,
                 "number": "D02",
                 "seats": 30,
-                "seatsAvailable": -1,
+                "seatsAvailable": -2,
                 "actualWaitlist": 12,
                 "maxWaitlist": 25,
                 "note": null,
@@ -329790,7 +329754,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": -1,
+                    "seatsAvailable": -2,
                     "actualWaitlist": 12,
                     "maxWaitlist": 25,
                     "specificSection": "D02",
@@ -331487,7 +331451,7 @@
                 "crn": 336953,
                 "number": "D02",
                 "seats": 30,
-                "seatsAvailable": -1,
+                "seatsAvailable": -2,
                 "actualWaitlist": 12,
                 "maxWaitlist": 25,
                 "note": null,
@@ -331504,7 +331468,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": -1,
+                    "seatsAvailable": -2,
                     "actualWaitlist": 12,
                     "maxWaitlist": 25,
                     "specificSection": "D02",
@@ -425487,8 +425451,8 @@
               "section": {
                 "crn": 349341,
                 "number": "B01",
-                "seats": 55,
-                "seatsAvailable": 55,
+                "seats": 50,
+                "seatsAvailable": 50,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -425504,8 +425468,8 @@
                     "location": "Salisbury Labs 305",
                     "building": "",
                     "room": "Salisbury Labs 305",
-                    "seats": 55,
-                    "seatsAvailable": 55,
+                    "seats": 50,
+                    "seatsAvailable": 50,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -425674,8 +425638,8 @@
               "section": {
                 "crn": 354444,
                 "number": "B01",
-                "seats": 50,
-                "seatsAvailable": 50,
+                "seats": 45,
+                "seatsAvailable": 45,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -425691,8 +425655,8 @@
                     "location": "Atwater Kent 233",
                     "building": "",
                     "room": "Atwater Kent 233",
-                    "seats": 50,
-                    "seatsAvailable": 50,
+                    "seats": 45,
+                    "seatsAvailable": 45,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "B01",
@@ -425711,8 +425675,8 @@
               "section": {
                 "crn": 354466,
                 "number": "D01",
-                "seats": 50,
-                "seatsAvailable": 50,
+                "seats": 45,
+                "seatsAvailable": 45,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -425728,8 +425692,8 @@
                     "location": "Salisbury Labs 305",
                     "building": "",
                     "room": "Salisbury Labs 305",
-                    "seats": 50,
-                    "seatsAvailable": 50,
+                    "seats": 45,
+                    "seatsAvailable": 45,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
@@ -425811,8 +425775,8 @@
               "section": {
                 "crn": 354417,
                 "number": "A01",
-                "seats": 48,
-                "seatsAvailable": 47,
+                "seats": 45,
+                "seatsAvailable": 44,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -425828,8 +425792,8 @@
                     "location": "Fuller Labs 320",
                     "building": "",
                     "room": "Fuller Labs 320",
-                    "seats": 48,
-                    "seatsAvailable": 47,
+                    "seats": 45,
+                    "seatsAvailable": 44,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "A01",
@@ -426148,8 +426112,8 @@
               "section": {
                 "crn": 351986,
                 "number": "D01",
-                "seats": 55,
-                "seatsAvailable": 55,
+                "seats": 45,
+                "seatsAvailable": 45,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -426165,8 +426129,8 @@
                     "location": "Salisbury Labs 411",
                     "building": "",
                     "room": "Salisbury Labs 411",
-                    "seats": 55,
-                    "seatsAvailable": 55,
+                    "seats": 45,
+                    "seatsAvailable": 45,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -426385,8 +426349,8 @@
               "section": {
                 "crn": 350027,
                 "number": "B01",
-                "seats": 50,
-                "seatsAvailable": 50,
+                "seats": 45,
+                "seatsAvailable": 45,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -426402,8 +426366,8 @@
                     "location": "Salisbury Labs 105",
                     "building": "",
                     "room": "Salisbury Labs 105",
-                    "seats": 50,
-                    "seatsAvailable": 50,
+                    "seats": 45,
+                    "seatsAvailable": 45,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "B01",
@@ -426422,8 +426386,8 @@
               "section": {
                 "crn": 352245,
                 "number": "D01",
-                "seats": 55,
-                "seatsAvailable": 55,
+                "seats": 45,
+                "seatsAvailable": 45,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -426439,8 +426403,8 @@
                     "location": "Salisbury Labs 104",
                     "building": "",
                     "room": "Salisbury Labs 104",
-                    "seats": 55,
-                    "seatsAvailable": 55,
+                    "seats": 45,
+                    "seatsAvailable": 45,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
