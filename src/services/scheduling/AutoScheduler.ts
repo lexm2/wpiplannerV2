@@ -19,7 +19,7 @@ interface CourseTypeInfo {
   isStandaloneLab: boolean;
 }
 
-interface MaskedCandidate {
+export interface MaskedCandidate {
   combination: ComponentSelections;
   mask: bigint;
   term: string;
@@ -104,7 +104,7 @@ export class AutoScheduler {
     return validSchedules;
   }
 
-  private getBlockedMasksByTerm(): Map<string, bigint> {
+  getBlockedMasksByTerm(): Map<string, bigint> {
     const activeFilters = this.filterService.getActiveFilters();
 
     const conflictFilter = this.filterService.getRegisteredFilter('periodConflict');
@@ -183,11 +183,7 @@ export class AutoScheduler {
     return schedules.length > 0 ? schedules[0] : null;
   }
 
-  /**
-   * Get all valid candidate combinations for a course, precomputed with bitmasks.
-   * Filters out candidates that conflict with blocked times or have internal conflicts.
-   */
-  private getMaskedCandidates(
+  getMaskedCandidates(
     selectedCourse: SelectedCourse,
     blockedMasksByTerm: Map<string, bigint>
   ): MaskedCandidate[] {
@@ -327,10 +323,7 @@ export class AutoScheduler {
            null;
   }
 
-  /**
-   * Get a locked combination if all required components are locked.
-   */
-  private getLockedCombination(selectedCourse: SelectedCourse): ComponentSelections | null {
+  getLockedCombination(selectedCourse: SelectedCourse): ComponentSelections | null {
     const lockedSections = selectedCourse.lockedSections || new Set();
     const typeInfo = this.detectCourseTypes(selectedCourse.course);
 
