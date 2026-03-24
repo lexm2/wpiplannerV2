@@ -118,46 +118,28 @@ export class WorkdayConverter {
     }
 
     /**
-     * Groups sections by course only (all terms combined)
-     * Assumes sections are pre-sorted by course (as they are in Workday data)
+     * Groups sections by course AND academic year (all terms combined within a year).
+     * Uses a Map because the Workday feed interleaves years per section
+     * (e.g. CS-1101-2025, CS-1101-2026, CS-1102-2025, CS-1102-2026, ...)
+     * rather than grouping all sections for a course consecutively.
      */
     private groupSectionsByCourse(sections: WorkdaySection[]): WorkdaySection[][] {
-        const groups: WorkdaySection[][] = [];
-        let currentGroup: WorkdaySection[] = [];
+        const groupMap = new Map<string, WorkdaySection[]>();
 
         for (const section of sections) {
             const courseSection = section.Course_Section;
             const dashIndex = courseSection.indexOf('-');
             const courseId = courseSection.substring(0, dashIndex); // e.g., "CS 1101"
+            const academicYear = parseInt(section.Academic_Year);
+            const key = `${courseId}|${academicYear}`;
 
-            // Check if this section belongs to current group
-            if (currentGroup.length > 0) {
-                const prevSection = currentGroup[0];
-                const prevCourseSection = prevSection.Course_Section;
-                const prevDashIndex = prevCourseSection.indexOf('-');
-                const prevCourseId = prevCourseSection.substring(0, prevDashIndex);
-
-                // Same course? (ignore term - all terms go in same course)
-                if (courseId === prevCourseId) {
-                    currentGroup.push(section);
-                    continue;
-                }
-
-                // Different course - start new group
-                groups.push(currentGroup);
-                currentGroup = [section];
-            } else {
-                // First section
-                currentGroup = [section];
+            if (!groupMap.has(key)) {
+                groupMap.set(key, []);
             }
+            groupMap.get(key)!.push(section);
         }
 
-        // Don't forget the last group
-        if (currentGroup.length > 0) {
-            groups.push(currentGroup);
-        }
-
-        return groups;
+        return Array.from(groupMap.values());
     }
 
     /**

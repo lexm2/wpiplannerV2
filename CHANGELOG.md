@@ -1,5 +1,10 @@
 # Changelog
 
+## [2026-03-23]
+
+### Fixed
+- Fixed courses from 2026–2027 not appearing when the year filter defaulted to 2026. The course data converter now correctly separates sections by academic year, so each year's offering of a course is listed independently with accurate sections and calendar dates.
+
 ## [2026-03-18]
 
 ### Changed
