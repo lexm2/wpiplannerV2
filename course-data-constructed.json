@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 24, 2026, 12:00 AM",
+  "generated": "Mar 24, 2026, 2:50 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -39896,7 +39896,7 @@
                 "crn": 337031,
                 "number": "D01",
                 "seats": 60,
-                "seatsAvailable": 26,
+                "seatsAvailable": 27,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -39913,7 +39913,7 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 60,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
