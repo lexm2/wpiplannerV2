@@ -5,7 +5,7 @@ import { CourseSelectionService } from '../selection/CourseSelectionService'
 import { FilterService } from '../filtering/FilterService'
 import type { ScheduleResult } from './AutoScheduler'
 import { SmartScheduler } from './SmartScheduler'
-import { ScheduleScorer } from './ScheduleScorer'
+import { ScheduleWorkerManager } from '../../workers/ScheduleWorkerManager'
 
 export interface CalendarEventProvider {
     getAllLocalEventBlockedTimes(): WeeklyTimeSlot[];
@@ -113,12 +113,21 @@ export class AutoScheduleOrchestrator {
             }
 
             const scheduler = new SmartScheduler(this.filterService);
-            const allSchedules = scheduler.generateSchedules(selectedCourses, 500);
+            const input = scheduler.buildCandidateData(selectedCourses);
 
             if (settings) {
                 this.filterService.removeFilter('blockedTimes');
                 this.filterService.removeFilter('wakeUpTime');
             }
+
+            if (!input) {
+                this.generatedSchedules = [];
+                this.currentScheduleIndex = 0;
+                return false;
+            }
+
+            const effectiveSettings = settings ?? { blockedTimes: [] };
+            const allSchedules = await ScheduleWorkerManager.getInstance().generate(input, effectiveSettings, 500);
 
             if (allSchedules.length === 0) {
                 this.generatedSchedules = [];
@@ -126,9 +135,6 @@ export class AutoScheduleOrchestrator {
                 return false;
             }
 
-            const scorer = new ScheduleScorer();
-            const effectiveSettings = settings ?? { blockedTimes: [] };
-            allSchedules.sort((a, b) => scorer.score(b, effectiveSettings) - scorer.score(a, effectiveSettings));
             this.generatedSchedules = allSchedules;
             this.currentScheduleIndex = 0;
 
@@ -139,12 +145,6 @@ export class AutoScheduleOrchestrator {
             console.error('[Auto-Schedule] Error generating schedules:', error);
             this.generatedSchedules = [];
             this.currentScheduleIndex = 0;
-
-            if (settings) {
-                this.filterService.removeFilter('blockedTimes');
-                this.filterService.removeFilter('wakeUpTime');
-            }
-
             throw error;
         }
     }

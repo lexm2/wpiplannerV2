@@ -1,15 +1,22 @@
 import type { SelectedCourse } from '../../types/schedule';
 import type { ComponentSelections } from '../../types/scheduling';
-import type { Section } from '../../types/types';
+import type { Course, Section } from '../../types/types';
 import { AutoScheduler, type ScheduleResult, type MaskedCandidate } from './AutoScheduler';
 import { sectionToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { FilterService } from '../filtering/FilterService';
 
+export interface SchedulerInput {
+    candidatesPerCourse: MaskedCandidate[][];
+    courses: Course[];
+    lockedResults: ScheduleResult[];
+    lockedMaskByTerm: Map<string, bigint>;
+}
+
 export class SmartScheduler {
     constructor(private filterService: FilterService) {}
 
-    generateSchedules(selectedCourses: SelectedCourse[], maxResults: number): ScheduleResult[][] {
-        if (selectedCourses.length === 0) return [];
+    buildCandidateData(selectedCourses: SelectedCourse[]): SchedulerInput | null {
+        if (selectedCourses.length === 0) return { candidatesPerCourse: [], courses: [], lockedResults: [], lockedMaskByTerm: new Map() };
 
         const autoScheduler = new AutoScheduler(this.filterService);
         const blockedMasks = autoScheduler.getBlockedMasksByTerm();
@@ -35,30 +42,41 @@ export class SmartScheduler {
             }
         }
 
-        if (unlocked.length === 0) return [lockedResults];
-
         const candidatesPerCourse: MaskedCandidate[][] = [];
         for (const sc of unlocked) {
             const candidates = autoScheduler.getMaskedCandidates(sc, blockedMasks);
             if (candidates.length === 0) {
                 console.warn(`[SmartScheduler] No valid candidates for ${sc.course.departmentAbbr}${sc.course.number}`);
-                return [];
+                return null;
             }
             candidatesPerCourse.push(candidates);
         }
+
+        return {
+            candidatesPerCourse,
+            courses: unlocked.map(sc => sc.course),
+            lockedResults,
+            lockedMaskByTerm,
+        };
+    }
+
+    static findSchedules(input: SchedulerInput, maxResults: number): ScheduleResult[][] {
+        const { candidatesPerCourse, courses, lockedResults, lockedMaskByTerm } = input;
+
+        if (candidatesPerCourse.length === 0) return lockedResults.length > 0 ? [lockedResults] : [];
 
         const termOptionsPerCourse = candidatesPerCourse.map(candidates =>
             [...new Set(candidates.map(c => c.term))]
         );
 
         const numDistinctTerms = new Set(termOptionsPerCourse.flat()).size;
-        let assignments = this.enumerateTermAssignments(termOptionsPerCourse, 3);
+        let assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, 3);
         if (assignments.length === 0) {
-            const relaxed = Math.ceil(unlocked.length / Math.max(numDistinctTerms, 1));
-            assignments = this.enumerateTermAssignments(termOptionsPerCourse, relaxed);
+            const relaxed = Math.ceil(courses.length / Math.max(numDistinctTerms, 1));
+            assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, relaxed);
         }
         if (assignments.length === 0) {
-            assignments = this.enumerateTermAssignments(termOptionsPerCourse, Infinity);
+            assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, Infinity);
         }
 
         const results: ScheduleResult[][] = [];
@@ -67,7 +85,7 @@ export class SmartScheduler {
             if (results.length >= maxResults) break;
 
             const termGroups = new Map<string, number[]>();
-            for (let i = 0; i < unlocked.length; i++) {
+            for (let i = 0; i < courses.length; i++) {
                 const term = assignment[i];
                 if (!termGroups.has(term)) termGroups.set(term, []);
                 termGroups.get(term)!.push(i);
@@ -81,7 +99,7 @@ export class SmartScheduler {
                     candidatesPerCourse[i].filter(c => c.term === term)
                 );
                 const lockedMask = lockedMaskByTerm.get(term) ?? 0n;
-                const combos = this.bestForTermGroup(groupCandidates, lockedMask);
+                const combos = SmartScheduler.bestForTermGroup(groupCandidates, lockedMask);
                 if (!combos) { valid = false; break; }
                 indices.forEach((courseIdx, i) => {
                     allSelections.push({ courseIdx, combo: combos[i] });
@@ -93,7 +111,7 @@ export class SmartScheduler {
             results.push([
                 ...lockedResults,
                 ...allSelections.map(({ courseIdx, combo }) => ({
-                    course: unlocked[courseIdx].course,
+                    course: courses[courseIdx],
                     combination: combo,
                 })),
             ]);
@@ -102,7 +120,13 @@ export class SmartScheduler {
         return results;
     }
 
-    private enumerateTermAssignments(termOptions: string[][], maxPerTerm: number): string[][] {
+    generateSchedules(selectedCourses: SelectedCourse[], maxResults: number): ScheduleResult[][] {
+        const input = this.buildCandidateData(selectedCourses);
+        if (!input) return [];
+        return SmartScheduler.findSchedules(input, maxResults);
+    }
+
+    private static enumerateTermAssignments(termOptions: string[][], maxPerTerm: number): string[][] {
         const results: string[][] = [];
         const counts = new Map<string, number>();
 
@@ -126,7 +150,7 @@ export class SmartScheduler {
         return results;
     }
 
-    private bestForTermGroup(
+    private static bestForTermGroup(
         candidatesPerCourse: MaskedCandidate[][],
         lockedMask: bigint
     ): ComponentSelections[] | null {
@@ -155,7 +179,7 @@ export class SmartScheduler {
             }
 
             if (!conflict) {
-                const gap = this.gapForSelections(selections);
+                const gap = SmartScheduler.gapForSelections(selections);
                 if (gap < bestGap) {
                     bestGap = gap;
                     bestCombo = selections.slice();
@@ -175,7 +199,7 @@ export class SmartScheduler {
         return bestCombo;
     }
 
-    private gapForSelections(selections: ComponentSelections[]): number {
+    private static gapForSelections(selections: ComponentSelections[]): number {
         const byDay = new Map<string, { start: number; end: number }[]>();
 
         for (const combo of selections) {
