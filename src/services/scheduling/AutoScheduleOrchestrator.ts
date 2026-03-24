@@ -1,10 +1,10 @@
 import { SelectedCourse } from '../../types/schedule'
 import type { AutoScheduleSettings, WeeklyTimeSlot } from '../../types/schedule'
-import type { Course, Section } from '../../types/types'
 import type { CourseComponentSelections } from '../../types/scheduling'
 import { CourseSelectionService } from '../selection/CourseSelectionService'
 import { FilterService } from '../filtering/FilterService'
-import { AutoScheduler, type ScheduleResult } from './AutoScheduler'
+import type { ScheduleResult } from './AutoScheduler'
+import { SmartScheduler } from './SmartScheduler'
 import { ScheduleScorer } from './ScheduleScorer'
 
 export interface CalendarEventProvider {
@@ -112,8 +112,8 @@ export class AutoScheduleOrchestrator {
                 }
             }
 
-            const autoScheduler = new AutoScheduler(this.filterService);
-            const allSchedules = autoScheduler.generateSchedules(selectedCourses, 100);
+            const scheduler = new SmartScheduler(this.filterService);
+            const allSchedules = scheduler.generateSchedules(selectedCourses, 500);
 
             if (settings) {
                 this.filterService.removeFilter('blockedTimes');
