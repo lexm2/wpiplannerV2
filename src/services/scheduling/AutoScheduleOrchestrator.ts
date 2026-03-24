@@ -5,6 +5,7 @@ import type { CourseComponentSelections } from '../../types/scheduling'
 import { CourseSelectionService } from '../selection/CourseSelectionService'
 import { FilterService } from '../filtering/FilterService'
 import { AutoScheduler, type ScheduleResult } from './AutoScheduler'
+import { ScheduleScorer } from './ScheduleScorer'
 
 export interface CalendarEventProvider {
     getAllLocalEventBlockedTimes(): WeeklyTimeSlot[];
@@ -125,6 +126,9 @@ export class AutoScheduleOrchestrator {
                 return false;
             }
 
+            const scorer = new ScheduleScorer();
+            const effectiveSettings = settings ?? { blockedTimes: [] };
+            allSchedules.sort((a, b) => scorer.score(b, effectiveSettings) - scorer.score(a, effectiveSettings));
             this.generatedSchedules = allSchedules;
             this.currentScheduleIndex = 0;
 
