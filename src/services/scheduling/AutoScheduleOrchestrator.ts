@@ -16,6 +16,7 @@ export class AutoScheduleOrchestrator {
     private generatedSchedules: ScheduleResult[][] = [];
     private currentScheduleIndex: number = 0;
     private isApplyingAutoSchedule: boolean = false;
+    private autoAppliedCRNs: Set<string> = new Set();
     private courseSelectionService: CourseSelectionService;
     private filterService: FilterService;
     private calendarEventProvider: CalendarEventProvider | null = null;
@@ -82,13 +83,13 @@ export class AutoScheduleOrchestrator {
         for (const selectedCourse of selectedCourses) {
             selectedCourse.lockedSections = new Set();
 
-            if (selectedCourse.selectedLecture) {
+            if (selectedCourse.selectedLecture && !this.autoAppliedCRNs.has(String(selectedCourse.selectedLecture.crn))) {
                 selectedCourse.lockedSections.add(String(selectedCourse.selectedLecture.crn));
             }
-            if (selectedCourse.selectedDiscussion) {
+            if (selectedCourse.selectedDiscussion && !this.autoAppliedCRNs.has(String(selectedCourse.selectedDiscussion.crn))) {
                 selectedCourse.lockedSections.add(String(selectedCourse.selectedDiscussion.crn));
             }
-            if (selectedCourse.selectedLab) {
+            if (selectedCourse.selectedLab && !this.autoAppliedCRNs.has(String(selectedCourse.selectedLab.crn))) {
                 selectedCourse.lockedSections.add(String(selectedCourse.selectedLab.crn));
             }
         }
@@ -157,19 +158,23 @@ export class AutoScheduleOrchestrator {
         }
 
         this.isApplyingAutoSchedule = true;
+        this.autoAppliedCRNs = new Set();
         try {
             const selections: CourseComponentSelections[] = [];
 
             for (const result of schedule) {
-                if (result.isLocked) {
-                    continue;
-                }
+                if (result.isLocked) continue;
+
+                const { lecture, discussion, lab } = result.combination;
+                if (lecture) this.autoAppliedCRNs.add(String(lecture.crn));
+                if (discussion) this.autoAppliedCRNs.add(String(discussion.crn));
+                if (lab) this.autoAppliedCRNs.add(String(lab.crn));
 
                 selections.push({
                     course: result.course,
-                    lecture: result.combination.lecture,
-                    discussion: result.combination.discussion,
-                    lab: result.combination.lab
+                    lecture,
+                    discussion,
+                    lab
                 });
             }
 
