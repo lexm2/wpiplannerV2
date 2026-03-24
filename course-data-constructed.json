@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 24, 2026, 6:38 PM",
+  "generated": "Mar 24, 2026, 7:39 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -38090,8 +38090,8 @@
               "section": {
                 "crn": 351991,
                 "number": "D01",
-                "seats": 25,
-                "seatsAvailable": 25,
+                "seats": 50,
+                "seatsAvailable": 50,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -38101,22 +38101,20 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Suzanne LePage",
-                    "startTime": "14:00",
-                    "endTime": "14:50",
-                    "location": "Kaven Hall 116",
+                    "professor": "Jeanine Dudle",
+                    "startTime": "12:00",
+                    "endTime": "13:50",
+                    "location": "Salisbury Labs 305",
                     "building": "",
-                    "room": "Kaven Hall 116",
-                    "seats": 25,
-                    "seatsAvailable": 25,
+                    "room": "Salisbury Labs 305",
+                    "seats": 50,
+                    "seatsAvailable": 50,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
                       "M",
-                      "T",
-                      "R",
-                      "F"
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -40322,58 +40320,6 @@
           ]
         },
         {
-          "id": "CE-3074-2026",
-          "number": "3074",
-          "name": "Environmental Analysis",
-          "description": "This course provides a background in the principles and techniques of assessing areas of natural environment and applying environmental assessments to evaluate the inherent suitability of these areas for sustainable urban and resource-based uses. Topic areas include basic concepts in sustainability, landscape characterization and analysis, and environmental impact assessment and planning. The concepts and techniques developed in this course are useful for land use planning, site design, natural resources management, and the determination of the impact of engineering projects on the environment. Suggested background: CE 3059 or CE 3070.",
-          "category": 1,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 349317,
-                "number": "B01",
-                "seats": 40,
-                "seatsAvailable": 40,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "B",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Suzanne LePage",
-                    "startTime": "12:00",
-                    "endTime": "12:50",
-                    "location": "Higgins Labs 116",
-                    "building": "",
-                    "room": "Higgins Labs 116",
-                    "seats": 40,
-                    "seatsAvailable": 40,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "B01",
-                    "days": [
-                      "M",
-                      "T",
-                      "R",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
           "id": "CE-333X-2026",
           "number": "333X",
           "name": "Exploratory Data Analysis in the Built and Natural Environment",
@@ -41870,53 +41816,6 @@
                       "R"
                     ],
                     "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "CE-534-2026",
-          "number": "534",
-          "name": "Structural Design For Fire Conditions",
-          "description": "The development of structural analysis and design methods for steel and reinforced concrete members subjected to elevated temperatures caused by building fires. Beams, columns and rigid frames will be covered. The course is based on research conducted during the past three decades in Europe, Canada and the United States. Course may be offered by special arrangement. (Prerequisites: Knowledge of statically indeterminate structural analysis, structural steel design and reinforced concrete design.)",
-          "category": null,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": true,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 350916,
-                "number": "X cancel 10.29.25",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "X cancel 10.29.25",
-                    "days": [],
-                    "isAsync": true
                   }
                 ]
               },
@@ -113857,6 +113756,87 @@
           ]
         },
         {
+          "id": "ECE-5500-2026",
+          "number": "5500",
+          "name": "Power System Analysis",
+          "description": "This graduate level course examines the principles of Power System Analysis. It will begin with a review of AC circuit analysis. The course will then cover the topics of transmission line parameter calculation, symmetrical component analysis, transformer and load modeling, symmetrical and unsymmetrical fault analysis, power flow, and power systems stability. Prerequisites: Knowledge of circuit analysis, basic calculus and differential equations, elementary matrix analysis and basic computer programming.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350475,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mahmood Mirheydar",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350757,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mahmood Mirheydar",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "ECE-5511-2025",
           "number": "5511",
           "name": "Transients In Power Systems",
@@ -113904,6 +113884,53 @@
           ]
         },
         {
+          "id": "ECE-5511-2026",
+          "number": "5511",
+          "name": "Transients In Power Systems",
+          "description": "This graduate level course introduces the student to the effects of electromagnetic transients in distribution systems. Topics include transient analysis, lightning and switching surges, mechanisms of transient generation, insulation coordination, grounding, surge protection devices, and shielding. Prerequisite: ECE 5500 Power System Analysis.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350756,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Edvina Uzunovic",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "ECE-5512-2025",
           "number": "5512",
           "name": "Electromechanical Energy Conversion",
@@ -113937,6 +113964,53 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 13,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ECE-5512-2026",
+          "number": "5512",
+          "name": "Electromechanical Energy Conversion",
+          "description": "This graduate level course will further explore alternating current circuits, three phase circuits, basics of electromagnetic field theory, magnetic circuits, inductance, and electromechanical energy conversion. Topics also include ideal transformer, iron-core transformer, voltage regulation, efficiency equivalent circuit, and three phase transformers. Induction machine construction, equivalent circuit, torque speed characteristics, and single phase motors, synchronous machine construction, equivalent circuit, power relationships phasor diagrams, and synchronous motors will be covered. Direct current machine construction, types, efficiency, power flow diagram, and external characteristics will be discussed",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350796,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Zeeshan Ahmed",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -113998,6 +114072,53 @@
           ]
         },
         {
+          "id": "ECE-5521-2026",
+          "number": "5521",
+          "name": "Protective Relaying",
+          "description": "This graduate level course is the first of a two course sequence that covers both the principles and practices of power system protective relaying. The course seeks to provide an understanding of how interconnected power systems and their components are protected from abnormal events such as faults (short circuits), over-voltages, off-nominal frequency and unbalanced phase conditions. This subject is presented from a theoretical viewpoint, however, many practical examples are included that emphasize the limitations of existing protective equipment. Course content is not specific to any particular manufacturer’s equipment. The course begins with a brief review of the nature of power system operation, power system faults and other abnormal conditions. The nature and objectives of protective relaying are covered next with emphasis on how the power system can be monitored to detect abnormal conditions. The computational tools needed to analyze system operation and apply protective relaying are covered next, including the per-unit system, phasors and symmetrical components. The modeling of current transformers under steady-state and transient conditions is presented with emphasis on the impact on protective devices. A unit on system grounding and its impact on protective device operation is included. Course emphasis then shifts to protective devices and their principles of operation. Both electromechanical and numeric relay designs are covered. Prerequisite: ECE 5500 Power System Analysis or equivalent background experience is suggested. Familiarity with phasors, derivatives, transfer functions, poles and zeros, block diagram and the notion of feedback with basic understanding power system analysis or similar background is recommended. Note: Credit cannot be awarded for this course if credit has already been received for ECE 5520 Power System Protection and Control.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350305,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Lalitha Devarakonda",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "ECE-5522-2025",
           "number": "5522",
           "name": "Advanced Applications In Protective Relaying",
@@ -114031,6 +114152,53 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 21,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ECE-5522-2026",
+          "number": "5522",
+          "name": "Advanced Applications In Protective Relaying",
+          "description": "This graduate level course covers advanced topics in the principles and practices of power system protective relaying. The course seeks to provide an understanding of how protective relays are applied to protect power system components. While the subject is presented from a theoretical viewpoint, many practical examples are included. Examples specific to both new installations and existing, older facilities will be included. Course content is not specific to any particular manufacturer’s equipment. The course begins with applions of protective devices to generators. This will include distributed generation as well as wind-turbine and inverter-connected sources. Transformer protection is covered next, including applion procedures for older, electromechanical relays as well as modern numeric relay designs. A unit on bus protection is covered next, including all typical high-speed and time backup bus protection schemes. Transmission line and distribution feeder protection is covered in detail including both conventional and communions-assisted schemes. The course ends with a unit on other protection applions such as under frequency load shedding, reclosing and out-of-step relaying. Prerequisite: ECE 5521 Protective Relaying. Note: Credit cannot be awarded for this course if credit has already been received for ECE 5520 Power System Protection and Control.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350746,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Dean Sorensen",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -114092,6 +114260,100 @@
           ]
         },
         {
+          "id": "ECE-5523-2026",
+          "number": "5523",
+          "name": "Power System Dynamics",
+          "description": "This graduate level course is concerned with modeling, analyzing and mitigating power system stability and control problems. The course seeks to provide an understanding of the electromechanical dynamics of the interconnected electric power grid. This subject is presented from a theoretical viewpoint; however, many practical examples are included. The course begins with a description of the physics of the power system, frequency regulation during “steady-state” operation, dynamic characteristics of modern power systems, a review of feedback control systems, power system frequency regulation, and a review of protective relaying. This is followed by material on synchronous machine theory and modeling. Simulation of power system dynamic response, small signal stability, transient stability analysis using SIMULINK and effects of non-traditional power sources on systems dynamics will also be covered. Power system stabilizers, load modeling and under frequency load shedding are covered in the final lectures. Prerequisite: ECE 5500 Power System Analysis and ECE 5511 Transients in Power Systems or equivalent background experience is suggested. Familiarity with the basics of Laplace Transforms, derivatives, transfer functions, poles and zeros, block diagram and the notion of feedback with basic understanding power system analysis topics recommended.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350310,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Zeeshan Ahmed",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ECE-5532-2026",
+          "number": "5532",
+          "name": "Distributed And Renewable Power Generation",
+          "description": "This course introduces the characteristics and challenges of interconnecting increasing numbers of Distributed Energy Resources (DERs) to the Electric Power System (EPS). Topics include: challenges to distribution and transmission system protection; local voltage control; ride through; optimal interconnection transformer configurations; and practical engineering approaches to maintain system reliability and protection. The current and evolving interconnection standard (IEEE 1547) is included. Prerequisites: Since the course material builds on power system analysis capabilities, including system protection and controls, ECE 5500 Power System Analysis and either ECE 5520 Power System Protection & Control or ECE 5521 Protective Relaying are required. Also, it is recommended that students take this course after completing ECE 5530 Power Distribution.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 356414,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Fei Ding",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "ECE-5540-2025",
           "number": "5540",
           "name": "Power Transmission",
@@ -114125,6 +114387,53 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 10,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ECE-5540-2026",
+          "number": "5540",
+          "name": "Power Transmission",
+          "description": "This graduate level course focuses on the theory and current professional practice in problems of electric power transmission. It begins with a review of the theory of AC electric power transmission networks and addresses a range of challenges related to reactive power and voltage control as well as steady-state and transients stability. Students will learn in detail the principles of traditional reactive power compensation (shunt reactors and capacitors); series compensation and modern static reactive compensation like SVC, STATCOM and other Flexible AC Transmission Systems (FACTS) devices. The effects of each of these types of compensation on static and dynamic voltage control, reactive power requirement and steady-state and transient stability problems are covered from theoretical as well as practical aspects. Particular attention is given to the mathematical models and principles of operation of many types of compensation systems. Basic principles of operation and control of High-Voltage DC (HVDC) systems and their impact on steady-state and dynamics of power system will be covered as well. Prerequisite: ECE 5500 Power System Analysis.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350669,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Edvina Uzunovic",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -141024,93 +141333,6 @@
           ]
         },
         {
-          "id": "HI-3317-2026",
-          "number": "3317",
-          "name": "Topics In Environmental History",
-          "description": "HI 3317 Topics in Environmental History () In this seminar course, students will explore one aspect of U.S. or global environmental history in more depth. Topics vary each year but may include environmental thought, environmental reform movements, comparative environmental movements, natural disasters, the history of ecology, built environments, environmental justice, New England environmental history, or the environmental history of South Asia or another region of the world. The course will require substantial reading and writing. This course may be repeated for different topics . This course will be offered in 2022- 23, and in alternating years thereafter. Recommended Background: HI 2400 Topics in Environmental History.",
-          "category": 2,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 354641,
-                "number": "C01 - Topics In Environmental History: American Disaster",
-                "seats": 20,
-                "seatsAvailable": 20,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "C",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Joseph Cullon",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Unity Hall 405",
-                    "building": "",
-                    "room": "Unity Hall 405",
-                    "seats": 20,
-                    "seatsAvailable": 20,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "C01 - Topics In Environmental History: American Disaster",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 356610,
-                "number": "D01 - Topics In Environmental History: European Technological Landscapes",
-                "seats": 20,
-                "seatsAvailable": 20,
-                "actualWaitlist": 0,
-                "maxWaitlist": 5,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Alexander Herbert",
-                    "startTime": "12:00",
-                    "endTime": "13:50",
-                    "location": "Stratton Hall 301",
-                    "building": "",
-                    "room": "Stratton Hall 301",
-                    "seats": 20,
-                    "seatsAvailable": 20,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 5,
-                    "specificSection": "D01 - Topics In Environmental History: European Technological Landscapes",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
           "id": "HI-3317-2025",
           "number": "3317",
           "name": "Topics In Environmental History",
@@ -141150,6 +141372,56 @@
                     "days": [
                       "M",
                       "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "HI-3317-2026",
+          "number": "3317",
+          "name": "Topics In Environmental History",
+          "description": "HI 3317 Topics in Environmental History () In this seminar course, students will explore one aspect of U.S. or global environmental history in more depth. Topics vary each year but may include environmental thought, environmental reform movements, comparative environmental movements, natural disasters, the history of ecology, built environments, environmental justice, New England environmental history, or the environmental history of South Asia or another region of the world. The course will require substantial reading and writing. This course may be repeated for different topics . This course will be offered in 2022- 23, and in alternating years thereafter. Recommended Background: HI 2400 Topics in Environmental History.",
+          "category": 2,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 356610,
+                "number": "D01 - Topics In Environmental History: European Technological Landscapes",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Alexander Herbert",
+                    "startTime": "12:00",
+                    "endTime": "13:50",
+                    "location": "Stratton Hall 301",
+                    "building": "",
+                    "room": "Stratton Hall 301",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "D01 - Topics In Environmental History: European Technological Landscapes",
+                    "days": [
+                      "T",
+                      "F"
                     ],
                     "isAsync": false
                   }
@@ -147815,7 +148087,7 @@
                 "crn": 337422,
                 "number": "D03 - PRAC IN HUA: Jazz Performance",
                 "seats": 12,
-                "seatsAvailable": 4,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -147832,7 +148104,7 @@
                     "building": "",
                     "room": "Alden Hall B19 Lora E. Spaulding Recital Hall",
                     "seats": 12,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D03 - PRAC IN HUA: Jazz Performance",
@@ -148301,7 +148573,7 @@
                 "crn": 356287,
                 "number": "D17 - PRAC IN HUA: Composing",
                 "seats": 12,
-                "seatsAvailable": 4,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -148318,7 +148590,7 @@
                     "building": "",
                     "room": "Alden Hall B30 Music Technology Lab",
                     "seats": 12,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D17 - PRAC IN HUA: Composing",
@@ -157518,25 +157790,6 @@
                       "F"
                     ],
                     "isAsync": false
-                  },
-                  {
-                    "type": "Lecture",
-                    "professor": "Ben Schneider",
-                    "startTime": "12:00",
-                    "endTime": "13:50",
-                    "location": "Kaven Hall 115",
-                    "building": "",
-                    "room": "Kaven Hall 115",
-                    "seats": 24,
-                    "seatsAvailable": 24,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "B01",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
                   }
                 ]
               },
@@ -162783,40 +163036,6 @@
           "isGraduate": false,
           "academicYear": 2026,
           "lectures": [
-            {
-              "section": {
-                "crn": 354750,
-                "number": "B01",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "B",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "B01",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
             {
               "section": {
                 "crn": 351924,
@@ -341702,7 +341921,7 @@
                 "crn": 337237,
                 "number": "D02",
                 "seats": 30,
-                "seatsAvailable": 7,
+                "seatsAvailable": 8,
                 "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
@@ -341719,7 +341938,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
@@ -426346,7 +426565,7 @@
                 "crn": 338501,
                 "number": "D01",
                 "seats": 55,
-                "seatsAvailable": 13,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -426363,7 +426582,7 @@
                     "building": "",
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 55,
-                    "seatsAvailable": 13,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -443247,6 +443466,155 @@
           ]
         },
         {
+          "id": "SYS-501-2026",
+          "number": "501",
+          "name": "Concepts Of Systems Engineering",
+          "description": "Systems Engineering is a multifaceted discipline, involving human, organizational, and various technical variables that work together to create complex systems. This course is an introduction and overview of the methods and disciplines that systems engineers use to define, develop, and deploy systems. It includes specific integrated examples, projects, and team building exercises to aid in understanding and appreciating fundamental principles. Topics covered include; Introduction to Systems Engineering; Requirements Development; Functional Analysis and Requirements Alloon; System Architecture and System Design; Integration, Verifion and Validation; Trade Studies; Systems Analysis, Modeling and Simulation; Specialty Engineering; Risk Management; and Technical Planning and Management. (Prerequisite: an undergraduate degree in engineering or science, or permission of the instructor.)",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350389,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "David Wojcicki",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350313,
+                "number": "F02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Christopher Piccirillo",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350661,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Christopher Piccirillo",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350847,
+                "number": "S02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Donald Gelosh",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "SYS-502-2025",
           "number": "502",
           "name": "Business Practices",
@@ -443280,6 +443648,53 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 12,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "SYS-502-2026",
+          "number": "502",
+          "name": "Business Practices",
+          "description": "This course introduces students to the business aspects of Systems Engineering (SE) and is designed to help SE professionals integrate Systems Engineering concepts into a professional business practice environment and to improve systems engineers’ understanding fundamental business practices and their relationship to systems engineering. This course will cover how to prepare and evaluate professional quality business plans, project budgets, financial proposals, timelines and technical outlines. This course will also cover topics such as working with stakeholders; understanding competitive advantage and perceived value of systems engineering; various roles of systems engineers from a business practices perspective; contracting for systems engineering services, how systems engineers impact and are impacted by the various corporate operating divisions, and how to ensure quality control. The course will consist of lectures, case studies, class projects and student presentations.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350386,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Jamie Monat",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -443341,6 +443756,53 @@
           ]
         },
         {
+          "id": "SYS-510-2026",
+          "number": "510",
+          "name": "Systems Architecture And Design",
+          "description": "This course will study and contrast various important architectural frameworks, representations, tools, and methodologies in order to provide scalable and flexible approaches for enterprises operating in dynamic and complex environments. Enterprise-level system architecting tools will be discussed and demonstrated. At a minimum, the DoDAF, FEAF, Zachman, and TOGAF architectural frameworks will be discussed in depth. Other topics will include analysis of architectural alternatives to meet physical and logical objectives and providing information and systems assurance in an environment that takes people, processes, and technology into account. Modeling tools such as UML/SysML and the use of model-driven architectures will be presented. Validation of the architecture with stakeholders will be discussed. Methods of identifying risks and opportunities associated with the architectural choice will be explored. Practical examples will be included for illustration. (Prerequisite: SYS 501 Concepts of Systems Engineering)",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350664,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Robert Tranchina",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "SYS-511-2025",
           "number": "511",
           "name": "Systems Integration, Verification & Validation",
@@ -443374,6 +443836,53 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 17,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "SYS-511-2026",
+          "number": "511",
+          "name": "Systems Integration, Verification & Validation",
+          "description": "This course examines the use of Systems Engineering principles and best practices with respect to systems and systems-of-systems verifion and validation (V&V). V&V processes, activities and methods as they apply across the product lifecycle will be examined. Case studies, papers and exercises will be used to examine the success and failure of verifion, validation and test processes. Course topics include 1) How early systems engineering activities and solution sets affect integration, verifion, validation and test; 2) V&V activities relative to product development phases; 3) Modeling quality, cost, time and risk; 4) Testing and non-testing methods; 5) V&V planning, execution and reporting; 6) Systems integration; and 7) V&V of critical and complex systems. (Prerequisite: SYS 501 Concepts of Systems Engineering)",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350365,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Robert Tranchina",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -443435,6 +443944,53 @@
           ]
         },
         {
+          "id": "SYS-512-2026",
+          "number": "512",
+          "name": "Requirements Engineering",
+          "description": "Requirements drive system definition and development. Properly managed requirements contribute to project success, while poorly defined and poorly managed requirements often lead to project failure. Modern systems are demanding even more attention to proper requirements definition and management. This course provides processes, techniques, and best practices necessary to develop and manage requirements in today’s complex environments. Prerequisite: SYS 501 Concepts of Systems Engineering",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350660,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Robert Wheeler",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "SYS-521-2025",
           "number": "521",
           "name": "Model Based Systems Engineering",
@@ -443482,6 +444038,53 @@
           ]
         },
         {
+          "id": "SYS-521-2026",
+          "number": "521",
+          "name": "Model Based Systems Engineering",
+          "description": "Model-based systems engineering (MBSE) formalizes the practice of systems engineering through the use of models. This course is intended to answer the why, what and how of MBSE. The course provides background and motivation for transitioning to MBSE from a document centric approach to systems engineering. The course provides a foundation for MBSE by first introducing SysML as a descriptive language for modeling systems in terms of their requirements, structure, behavior, and parametric constraints. The course then introduces the Object-Oriented Systems Engineering Method (OOSEM) as a method for applying SysML to support the specifion, architecture design, analysis, and verifion of complex systems. A systems modeling tool is also introduced and used throughout the course. Applying MBSE on class projects help the student to grasp the fundamentals. This course is expected to provide the foundations of the systems modeling language, method, and tool to enable the student to get started with MBSE on real projects. (Prerequisite: SYS 501 Concepts of Systems Engineering)",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 354575,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Brian Selvy",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "SYS-540-2025",
           "number": "540",
           "name": "Introduction To Systems Thinking",
@@ -443518,6 +444121,168 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "SYS-540-2026",
+          "number": "540",
+          "name": "Introduction To Systems Thinking",
+          "description": "Systems Thinking provides an arsenal of tools that enable program managers and systems engineers to better identify, understand, and control systems, and to improve their performance. In this course, we will study system identifion and delineation, causal loops and feedback, system leverage points, delays and oscillations, mental models and unintended consequences, emergent properties, patterns, events, and self- organization, and use these tools to improve the performance of engineering, biological, business, and complex social systems. We will explore great system failures, how they might have been avoided, and how we can learn from them in developing and participating in current systems. Finally, we will learn how systems thinking explains the conflicting behavior of individuals, departments, businesses, and countries.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350677,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Jamie Monat",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "SYS-579-2026",
+          "number": "579",
+          "name": "Special Topics",
+          "description": "",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 354603,
+                "number": "F01 - ST: Reliability Engineering",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Donald Gelosh",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F01 - ST: Reliability Engineering",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350428,
+                "number": "F02 - ST: Technical Decision and Risk Analysis",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Jamie Monat",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F02 - ST: Technical Decision and Risk Analysis",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350914,
+                "number": "S02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Elizabeth Wilson",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S02",
                     "days": [],
                     "isAsync": true
                   }
@@ -443752,6 +444517,91 @@
                     "specificSection": "S01",
                     "days": [
                       "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "SYS-585-2026",
+          "number": "585",
+          "name": "Systems Engineering Capstone Experience",
+          "description": "One of the central priorities in WPI’s eduonal philosophy is the applion of academic skills and knowledge to real-world problems . The capstone project represents a substantive evaluation and applion of coursework covered in the program. Students are encouraged to select projects with practical significance for the advancement of their company’s competitive position as well as their own personal development. The project is administered, advised, and evaluated by WPI as part of the learning experience, but students are encouraged to seek mentorship from experienced colleagues in the Systems Engineering profession. The presence of or degree of participation from a mentor is made at the discretion of the student or the organization sponsoring the program. (Prerequisite: SYS 501 Concepts of Systems Engineering)",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350534,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Fred Robinson",
+                    "startTime": "18:00",
+                    "endTime": "20:00",
+                    "location": "Online-synchronous",
+                    "building": "",
+                    "room": "Online-synchronous",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "F01",
+                    "days": [
+                      "T"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350658,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mark Flanders",
+                    "startTime": "18:00",
+                    "endTime": "20:00",
+                    "location": "Online-synchronous",
+                    "building": "",
+                    "room": "Online-synchronous",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "S01",
+                    "days": [
+                      "T"
                     ],
                     "isAsync": false
                   }
@@ -447681,25 +448531,6 @@
                       "F"
                     ],
                     "isAsync": false
-                  },
-                  {
-                    "type": "Lecture",
-                    "professor": "Ben Schneider",
-                    "startTime": "12:00",
-                    "endTime": "13:50",
-                    "location": "Kaven Hall 115",
-                    "building": "",
-                    "room": "Kaven Hall 115",
-                    "seats": 24,
-                    "seatsAvailable": 24,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "B01",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
                   }
                 ]
               },
@@ -448542,7 +449373,7 @@
                 "crn": 356235,
                 "number": "B01",
                 "seats": 20,
-                "seatsAvailable": 20,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -448559,7 +449390,7 @@
                     "building": "",
                     "room": "Kaven Hall 115",
                     "seats": 20,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "B01",
