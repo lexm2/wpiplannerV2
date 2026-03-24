@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 24, 2026, 9:07 AM",
+  "generated": "Mar 24, 2026, 10:08 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -450132,7 +450132,7 @@
                 "crn": 337332,
                 "number": "D02",
                 "seats": 30,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -450149,7 +450149,7 @@
                     "building": "",
                     "room": "Athletic Field",
                     "seats": 30,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
@@ -465128,7 +465128,7 @@
                 "number": "D01",
                 "seats": 15,
                 "seatsAvailable": -1,
-                "actualWaitlist": 8,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -465145,7 +465145,7 @@
                     "room": "Daniels Hall 102E",
                     "seats": 15,
                     "seatsAvailable": -1,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
