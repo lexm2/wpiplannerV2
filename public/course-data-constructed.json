@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 24, 2026, 11:08 AM",
+  "generated": "Mar 24, 2026, 11:55 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -236448,9 +236448,9 @@
                     "professor": "Guanying Peng",
                     "startTime": "13:00",
                     "endTime": "13:50",
-                    "location": "Other",
+                    "location": "Stratton Hall 201",
                     "building": "",
-                    "room": "Other",
+                    "room": "Stratton Hall 201",
                     "seats": 35,
                     "seatsAvailable": 35,
                     "actualWaitlist": 0,
