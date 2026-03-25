@@ -4244,7 +4244,7 @@
     {
       "id": "TUT-2001",
       "number": "2001",
-      "name": "Intro to Wheeled Chaos",
+      "name": "Introduction to Robot Wrangling",
       "description": "",
       "category": 1,
       "minCredits": 3,
@@ -4501,7 +4501,7 @@
     {
       "id": "TUT-2002",
       "number": "2002",
-      "name": "Wheeled Chaos II: More Wheels",
+      "name": "Advanced Robot Wrangling",
       "description": "",
       "category": 1,
       "minCredits": 3,

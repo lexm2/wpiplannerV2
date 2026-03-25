@@ -7,17 +7,17 @@ import { readFileSync, writeFileSync } from 'fs';
 const data = JSON.parse(readFileSync('./public/course-data-constructed.json', 'utf8'));
 
 const targetMap: Record<string, { id: string; number: string; name: string; professor: string }> = {
-    'RBE-2001-2026': { id: 'TUT-2001', number: '2001', name: 'Intro to Wheeled Chaos',         professor: 'Prof. Servo McWheels'   },
-    'RBE-2002-2026': { id: 'TUT-2002', number: '2002', name: 'Wheeled Chaos II: More Wheels',   professor: 'Dr. Torque McGee'        },
+    'RBE-2001-2026': { id: 'TUT-2001', number: '2001', name: 'Introduction to Robot Wrangling', professor: 'Prof. Servo McWheels'   },
+    'RBE-2002-2026': { id: 'TUT-2002', number: '2002', name: 'Advanced Robot Wrangling',        professor: 'Dr. Torque McGee'        },
     'ETR-1100-2026': { id: 'TUT-2003', number: '2003', name: 'How to Get Investors',            professor: 'Prof. Cash Moneybags'    },
     'ES-2501-2026':  { id: 'TUT-2004', number: '2004', name: 'Why Things Don\'t Fall Over',     professor: 'Dr. Isaac Newt'          },
     'RBE-2020-2026': { id: 'TUT-2005', number: '2005', name: 'Blinking LEDs 101',               professor: 'Prof. Blinky McBlink'    },
     'RBE-3001-2026': { id: 'TUT-2006', number: '2006', name: 'Robots with Feelings',            professor: 'Dr. Hugs McRobot'        },
-    'CS-3733-2026':  { id: 'TUT-2007', number: '2007', name: 'How to Write Code Good',         professor: 'Prof. Stack Overflow'    },
+    'CS-3733-2026':  { id: 'TUT-2007', number: '2007', name: 'How to Write Code Good',          professor: 'Prof. Stack Overflow'    },
     'HU-3900-2026':  { id: 'TUT-2008', number: '2008', name: 'Reading Old Stuff',               professor: 'Dr. Dusty Booksworth'    },
     'RBE-3002-2026': { id: 'TUT-2009', number: '2009', name: 'Robots with Even More Feelings',  professor: 'Prof. Servo McWheels Jr.' },
     'ES-3001-2026':  { id: 'TUT-2010', number: '2010', name: 'Why Everything Gets Hot',         professor: 'Dr. Temp Rising'         },
-    'RBE-3100-2026': { id: 'TUT-2011', number: '2011', name: 'Should We Even Be Doing This?',  professor: 'Prof. Existential Dread' },
+    'RBE-3100-2026': { id: 'TUT-2011', number: '2011', name: 'Should We Even Be Doing This?',   professor: 'Prof. Existential Dread' },
     'ES-3011-2026':  { id: 'TUT-2012', number: '2012', name: 'Making Things Go Where You Want', professor: 'Dr. PID Tuner'           },
 };
 
