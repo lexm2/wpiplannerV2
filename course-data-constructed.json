@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 25, 2026, 3:47 PM",
+  "generated": "Mar 25, 2026, 4:18 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -7527,40 +7527,6 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 356530,
-                "number": "X Cancel",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "X Cancel",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
             }
           ]
         },
@@ -7574,42 +7540,7 @@
           "maxCredits": 2,
           "isGraduate": true,
           "academicYear": 2025,
-          "lectures": [
-            {
-              "section": {
-                "crn": 355480,
-                "number": "X cancel 1.7.26",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "X cancel 1.7.26",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
+          "lectures": []
         },
         {
           "id": "AE-691-2025",
@@ -40241,7 +40172,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Suzanne LePage",
+                    "professor": "Not Assigned",
                     "startTime": "12:00",
                     "endTime": "12:50",
                     "location": "Kaven Hall 116",
@@ -91615,7 +91546,7 @@
                 "crn": 338754,
                 "number": "D01",
                 "seats": 80,
-                "seatsAvailable": 5,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -91632,7 +91563,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 80,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -125664,40 +125595,6 @@
                 }
               ],
               "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 334617,
-                "number": "X cancel 2.26.25",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4131",
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "X cancel 2.26.25",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
             }
           ]
         },
@@ -133776,40 +133673,6 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 350076,
-                "number": "X cancel 12.18.25 - GPS: Energy, Sustainability, and Development",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "X cancel 12.18.25 - GPS: Energy, Sustainability, and Development",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
             }
           ]
         },
@@ -134562,40 +134425,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "section": {
-                "crn": 351718,
-                "number": "X cancel 12.18.25 - GPS: Humanitarian Engineering",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5310",
-                "computedTerm": "A",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "X cancel 12.18.25 - GPS: Humanitarian Engineering",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
             }
           ]
         },
@@ -147319,40 +147148,6 @@
                       "R"
                     ],
                     "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 351347,
-                "number": "X Cancel - 03/17/2026 - INQ SEM: Writing Suspense",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "X Cancel - 03/17/2026 - INQ SEM: Writing Suspense",
-                    "days": [],
-                    "isAsync": true
                   }
                 ]
               },
@@ -326534,7 +326329,7 @@
                 "crn": 337257,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 1,
                 "maxWaitlist": 15,
                 "note": null,
@@ -326551,7 +326346,7 @@
                     "building": "",
                     "room": "Stratton Hall 205",
                     "seats": 30,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 1,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
@@ -328761,7 +328556,7 @@
                 "crn": 337120,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": -2,
+                "seatsAvailable": -1,
                 "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
@@ -328778,7 +328573,7 @@
                     "building": "",
                     "room": "Higgins Labs 202",
                     "seats": 30,
-                    "seatsAvailable": -2,
+                    "seatsAvailable": -1,
                     "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -341664,7 +341459,7 @@
                 "crn": 337120,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": -2,
+                "seatsAvailable": -1,
                 "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
@@ -341681,7 +341476,7 @@
                     "building": "",
                     "room": "Higgins Labs 202",
                     "seats": 30,
-                    "seatsAvailable": -2,
+                    "seatsAvailable": -1,
                     "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -341714,7 +341509,7 @@
                 "crn": 337259,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 1,
                 "maxWaitlist": 15,
                 "note": null,
@@ -341731,7 +341526,7 @@
                     "building": "",
                     "room": "Stratton Hall 205",
                     "seats": 30,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 1,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
@@ -355804,36 +355599,6 @@
                       "isAsync": false
                     }
                   ]
-                },
-                {
-                  "crn": 336565,
-                  "number": "X cancel 1.8.26",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
-                      "location": "Unknown",
-                      "building": "",
-                      "room": "Unknown",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "X cancel 1.8.26",
-                      "days": [],
-                      "isAsync": true
-                    }
-                  ]
                 }
               ],
               "compatibleLabs": [
@@ -357446,36 +357211,6 @@
                       "isAsync": false
                     }
                   ]
-                },
-                {
-                  "crn": 336565,
-                  "number": "X cancel 1.8.26",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
-                      "location": "Unknown",
-                      "building": "",
-                      "room": "Unknown",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "X cancel 1.8.26",
-                      "days": [],
-                      "isAsync": true
-                    }
-                  ]
                 }
               ],
               "compatibleLabs": [
@@ -358987,36 +358722,6 @@
                         "R"
                       ],
                       "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 336565,
-                  "number": "X cancel 1.8.26",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
-                      "location": "Unknown",
-                      "building": "",
-                      "room": "Unknown",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "X cancel 1.8.26",
-                      "days": [],
-                      "isAsync": true
                     }
                   ]
                 }
@@ -360560,36 +360265,6 @@
                         "W"
                       ],
                       "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 336565,
-                  "number": "X cancel 1.8.26",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
-                      "location": "Unknown",
-                      "building": "",
-                      "room": "Unknown",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "X cancel 1.8.26",
-                      "days": [],
-                      "isAsync": true
                     }
                   ]
                 }
@@ -362197,36 +361872,6 @@
                         "W"
                       ],
                       "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 336565,
-                  "number": "X cancel 1.8.26",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
-                      "location": "Unknown",
-                      "building": "",
-                      "room": "Unknown",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "X cancel 1.8.26",
-                      "days": [],
-                      "isAsync": true
                     }
                   ]
                 }
@@ -363940,36 +363585,6 @@
                       "isAsync": false
                     }
                   ]
-                },
-                {
-                  "crn": 336565,
-                  "number": "X cancel 1.8.26",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
-                      "location": "Unknown",
-                      "building": "",
-                      "room": "Unknown",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "X cancel 1.8.26",
-                      "days": [],
-                      "isAsync": true
-                    }
-                  ]
                 }
               ],
               "compatibleLabs": [
@@ -365483,36 +365098,6 @@
                       "isAsync": false
                     }
                   ]
-                },
-                {
-                  "crn": 336565,
-                  "number": "X cancel 1.8.26",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
-                      "location": "Unknown",
-                      "building": "",
-                      "room": "Unknown",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "X cancel 1.8.26",
-                      "days": [],
-                      "isAsync": true
-                    }
-                  ]
                 }
               ],
               "compatibleLabs": [
@@ -367022,36 +366607,6 @@
                         "W"
                       ],
                       "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 336565,
-                  "number": "X cancel 1.8.26",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
-                      "location": "Unknown",
-                      "building": "",
-                      "room": "Unknown",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "X cancel 1.8.26",
-                      "days": [],
-                      "isAsync": true
                     }
                   ]
                 }
@@ -368659,36 +368214,6 @@
                         "W"
                       ],
                       "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 336565,
-                  "number": "X cancel 1.8.26",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
-                      "location": "Unknown",
-                      "building": "",
-                      "room": "Unknown",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "X cancel 1.8.26",
-                      "days": [],
-                      "isAsync": true
                     }
                   ]
                 }
@@ -423020,36 +422545,6 @@
                       "isAsync": false
                     }
                   ]
-                },
-                {
-                  "crn": 352468,
-                  "number": "X cancel 12.16.25",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
-                      "location": "Unknown",
-                      "building": "",
-                      "room": "Unknown",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "X cancel 12.16.25",
-                      "days": [],
-                      "isAsync": true
-                    }
-                  ]
                 }
               ]
             }
@@ -450242,40 +449737,6 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 334470,
-                "number": "X cancel draft 2",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Workshop",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "X cancel draft 2",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
             }
           ]
         },
@@ -455245,40 +454706,6 @@
                       "R"
                     ],
                     "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 335000,
-                "number": "X cancel draft 2 - Healthy Alternative:  Introduction to Mindfulness",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Workshop",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "X cancel draft 2 - Healthy Alternative:  Introduction to Mindfulness",
-                    "days": [],
-                    "isAsync": true
                   }
                 ]
               },
@@ -468620,40 +468047,6 @@
                       "R"
                     ],
                     "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 350116,
-                "number": "X cancel 2.19.26 - ST in Holistic Well-Being: Strategies for College Learning and Productivity",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Workshop",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "X cancel 2.19.26 - ST in Holistic Well-Being: Strategies for College Learning and Productivity",
-                    "days": [],
-                    "isAsync": true
                   }
                 ]
               },
