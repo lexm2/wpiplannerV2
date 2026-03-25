@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 25, 2026, 11:55 AM",
+  "generated": "Mar 25, 2026, 1:00 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -343578,7 +343578,7 @@
                 "crn": 337323,
                 "number": "D01",
                 "seats": 25,
-                "seatsAvailable": -3,
+                "seatsAvailable": -2,
                 "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
@@ -343595,7 +343595,7 @@
                     "building": "",
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 25,
-                    "seatsAvailable": -3,
+                    "seatsAvailable": -2,
                     "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
