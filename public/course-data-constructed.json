@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 25, 2026, 10:48 PM",
+  "generated": "Mar 25, 2026, 11:30 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -292318,7 +292318,7 @@
                 "crn": 337418,
                 "number": "DL03",
                 "seats": 70,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4535",
@@ -292335,7 +292335,7 @@
                     "building": "",
                     "room": "Atwater Kent 219",
                     "seats": 70,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL03",
@@ -292354,7 +292354,7 @@
                   "crn": 337423,
                   "number": "DD11",
                   "seats": 35,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4535",
@@ -292371,7 +292371,7 @@
                       "building": "",
                       "room": "Higgins Labs 114",
                       "seats": 35,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD11",
