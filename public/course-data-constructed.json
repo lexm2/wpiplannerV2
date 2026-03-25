@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 25, 2026, 6:00 PM",
+  "generated": "Mar 25, 2026, 7:07 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -9173,6 +9173,56 @@
                     "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 12,
+                    "specificSection": "B01",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "AR-174X-2026",
+          "number": "174X",
+          "name": "Introduction to 3D Modeling Technologies",
+          "description": "This course introduces students to the fundamental principles of three-dimensional visual organization through contemporary 3D modeling practices. Students will explore the technological foundations of digital modeling, including 3D scanning, retopology, UV mapping, and prop modeling. The course emphasizes visual perception, graphic expression, and rendering within digital environments. Students gain hands-on experience with industry tools while learning to create and manipulate digital assets suitable for games, 3D printing, interactive media, animation, and visual storytelling. Core skills include modeling, shading, and the presentation of visual ideas through 3D forms. The course also highlights current sculpting, modeling, and workflow technologies, preparing students to adapt to evolving tools and practices in digital art and design. By the end of the course, students will understand how to create shaders, work in 3D dimensional space, have foundational design principles, and develop their ability to translate concepts into digital form. Recommended Background No prerequisites are suggested or recommended",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 356636,
+                "number": "B01",
+                "seats": 24,
+                "seatsAvailable": 24,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Farley Chery",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Fuller Labs 222 IMGD Computer Lab",
+                    "building": "",
+                    "room": "Fuller Labs 222 IMGD Computer Lab",
+                    "seats": 24,
+                    "seatsAvailable": 24,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [
                       "T",
@@ -115813,8 +115863,8 @@
           "name": "Special Topics in Economics",
           "description": "(Credits will be assigned by the instructor, either 1/6 or 1/3 unit) This course provides an opportunity for students with little to no background in economics to learn about a special topic in Economics. Recommended background: none. This course may be repeated for different topics.",
           "category": 3,
-          "minCredits": 1.5,
-          "maxCredits": 1.5,
+          "minCredits": 3,
+          "maxCredits": 3,
           "isGraduate": false,
           "academicYear": 2026,
           "lectures": [
@@ -116200,8 +116250,8 @@
           "name": "Special Topics in Economics",
           "description": "ECON 2800: Special Topics in Economics This course provides an opportunity for students with some background in economics to learn about a special topic in Economics. Recommended background: An introductory background in economics (ECON 1110, ECON 1120, or equivalent). This course may be repeated for different topics. (Credits will be assigned by the instructor, either 1/6 or 1/3 unit)",
           "category": null,
-          "minCredits": 1.5,
-          "maxCredits": 1.5,
+          "minCredits": 3,
+          "maxCredits": 3,
           "isGraduate": false,
           "academicYear": 2026,
           "lectures": [
@@ -124271,18 +124321,21 @@
                   {
                     "type": "Lecture",
                     "professor": "Sarah Jane Wodin-Schwartz",
-                    "startTime": "12:00",
-                    "endTime": "13:50",
-                    "location": "Salisbury Labs 105",
+                    "startTime": "11:00",
+                    "endTime": "11:50",
+                    "location": "Innovation Studio 203 Active Learning Classroom South",
                     "building": "",
-                    "room": "Salisbury Labs 105",
+                    "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 100,
                     "seatsAvailable": 100,
                     "actualWaitlist": 0,
                     "maxWaitlist": 50,
                     "specificSection": "AL03",
                     "days": [
-                      "W"
+                      "M",
+                      "T",
+                      "R",
+                      "F"
                     ],
                     "isAsync": false
                   },
@@ -124306,31 +124359,61 @@
                       "F"
                     ],
                     "isAsync": false
-                  },
-                  {
-                    "type": "Lecture",
-                    "professor": "Sarah Jane Wodin-Schwartz",
-                    "startTime": "11:00",
-                    "endTime": "11:50",
-                    "location": "Innovation Studio 203 Active Learning Classroom South",
-                    "building": "",
-                    "room": "Innovation Studio 203 Active Learning Classroom South",
-                    "seats": 100,
-                    "seatsAvailable": 100,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 50,
-                    "specificSection": "AL03",
-                    "days": [
-                      "M",
-                      "T",
-                      "R",
-                      "F"
-                    ],
-                    "isAsync": false
                   }
                 ]
               },
-              "compatibleDiscussions": [],
+              "compatibleDiscussions": [
+                {
+                  "crn": 348548,
+                  "number": "AD03",
+                  "seats": 100,
+                  "seatsAvailable": 100,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5143",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Sarah Jane Wodin-Schwartz",
+                      "startTime": "12:00",
+                      "endTime": "13:50",
+                      "location": "Innovation Studio 203 Active Learning Classroom South",
+                      "building": "",
+                      "room": "Innovation Studio 203 Active Learning Classroom South",
+                      "seats": 100,
+                      "seatsAvailable": 100,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AD03",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    },
+                    {
+                      "type": "Discussion",
+                      "professor": "Sarah Jane Wodin-Schwartz",
+                      "startTime": "12:00",
+                      "endTime": "13:50",
+                      "location": "Salisbury Labs 105",
+                      "building": "",
+                      "room": "Salisbury Labs 105",
+                      "seats": 100,
+                      "seatsAvailable": 100,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AD03",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                }
+              ],
               "compatibleLabs": []
             },
             {
@@ -128907,7 +128990,7 @@
                 "crn": 337462,
                 "number": "D02",
                 "seats": 15,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -128924,7 +129007,7 @@
                     "building": "",
                     "room": "Higgins Labs 234 Cad/Design Lab (ARC Approval Needed)",
                     "seats": 15,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "D02",
@@ -144734,7 +144817,7 @@
                 "crn": 338967,
                 "number": "D22 - INQ SEM: Playwriting",
                 "seats": 12,
-                "seatsAvailable": 0,
+                "seatsAvailable": -1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -144751,7 +144834,7 @@
                     "building": "",
                     "room": "Olin Hall 218",
                     "seats": 12,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": -1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D22 - INQ SEM: Playwriting",
@@ -155648,56 +155731,6 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D03",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "IMGD-174X-2026",
-          "number": "174X",
-          "name": "Introduction to 3D Modeling Technologies",
-          "description": "This course introduces students to the fundamental principles of three-dimensional visual organization through contemporary 3D modeling practices. Students will explore the technological foundations of digital modeling, including 3D scanning, retopology, UV mapping, and prop modeling. The course emphasizes visual perception, graphic expression, and rendering within digital environments. Students gain hands-on experience with industry tools while learning to create and manipulate digital assets suitable for games, 3D printing, interactive media, animation, and visual storytelling. Core skills include modeling, shading, and the presentation of visual ideas through 3D forms. The course also highlights current sculpting, modeling, and workflow technologies, preparing students to adapt to evolving tools and practices in digital art and design. By the end of the course, students will understand how to create shaders, work in 3D dimensional space, have foundational design principles, and develop their ability to translate concepts into digital form. Recommended Background No prerequisites are suggested or recommended",
-          "category": null,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 356636,
-                "number": "B01",
-                "seats": 24,
-                "seatsAvailable": 24,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "B",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Farley Chery",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Fuller Labs 222 IMGD Computer Lab",
-                    "building": "",
-                    "room": "Fuller Labs 222 IMGD Computer Lab",
-                    "seats": 24,
-                    "seatsAvailable": 24,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "B01",
                     "days": [
                       "T",
                       "F"
