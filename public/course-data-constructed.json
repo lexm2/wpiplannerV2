@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 25, 2026, 4:57 PM",
+  "generated": "Mar 25, 2026, 6:00 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -107944,7 +107944,7 @@
                 "crn": 337531,
                 "number": "DL01",
                 "seats": 80,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4505",
@@ -107961,7 +107961,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 80,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
@@ -107978,7 +107978,7 @@
                   "crn": 337375,
                   "number": "DD01",
                   "seats": 80,
-                  "seatsAvailable": 11,
+                  "seatsAvailable": 10,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4505",
@@ -107995,7 +107995,7 @@
                       "building": "",
                       "room": "Unity Hall 520",
                       "seats": 80,
-                      "seatsAvailable": 11,
+                      "seatsAvailable": 10,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
