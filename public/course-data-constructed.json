@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 25, 2026, 8:34 PM",
+  "generated": "Mar 25, 2026, 9:19 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -425177,7 +425177,7 @@
                 "crn": 337238,
                 "number": "D01",
                 "seats": 55,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -425194,7 +425194,7 @@
                     "building": "",
                     "room": "Unity Hall 420",
                     "seats": 55,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
