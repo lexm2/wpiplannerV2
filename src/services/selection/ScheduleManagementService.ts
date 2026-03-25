@@ -24,6 +24,7 @@ export interface ScheduleChangeEvent {
 export type ScheduleChangeListener = (event: ScheduleChangeEvent) => void;
 
 export interface ScheduleCreationOptions {
+    id?: string;
     includeCurrentCourses?: boolean;
     copyFromSchedule?: string;
     autoActivate?: boolean;
@@ -96,6 +97,7 @@ export class ScheduleManagementService {
         await this.ensureInitialized();
 
         const {
+            id,
             includeCurrentCourses = false,
             copyFromSchedule,
             autoActivate = true,
@@ -136,7 +138,7 @@ export class ScheduleManagementService {
             }
 
             // Create the schedule
-            const schedule = this.profileStateManager.createSchedule(name, 'api');
+            const schedule = this.profileStateManager.createSchedule(name, 'api', id);
 
             // Update with selected courses if needed
             if (selectedCourses.length > 0) {

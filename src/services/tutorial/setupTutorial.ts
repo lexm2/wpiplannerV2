@@ -40,7 +40,8 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         previousScheduleId = services.scheduleManagementService.getActiveScheduleId();
         await services.courseDataService.addTutorialDepartment();
         services.filterService.addFilter('department', { departments: ['TUT'] });
-        const result = await services.scheduleManagementService.createNewSchedule('Tutorial');
+        const tutorialId = `tutorial_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+        const result = await services.scheduleManagementService.createNewSchedule('Tutorial', { id: tutorialId });
         tutorialScheduleId = result.schedule?.id ?? null;
     }
 
@@ -315,11 +316,34 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         },
         steps: [
             {
+                selector: '.schedule-course-item[data-course-id="TUT-2008"]',
+                title: 'Lock a section before generating schedules',
+                description: 'We are going to lock the TUT2008 course so the auto scheduler does not change it. We can do this just by manually selecting the course.',
+                waitFor: 'click',
+                action: () => {
+                    mainController.openWizardForCourse('TUT2008');
+                },
+            },
+            {
+                selector: '.wizard-section-card[data-crn="100105"]',
+                title: 'Pick a lecture',
+                description: 'Select the only lecture section.',
+                waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('.wizard-section-card')?.click(),
+            },
+            {
                 selector: '#auto-schedule-btn',
                 title: 'Auto Schedule',
                 description: 'Click Auto Schedule to let the planner automatically find a combination of sections that fit together. It uses your active filters to avoid conflicts and respect your preferences.',
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('#auto-schedule-btn')?.click(),
+            },
+            {
+                selector: '#btn-primary',
+                title: 'Move onto filters',
+                description: 'After your done selecting what courses you want to auto schedule for.',
+                waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('#modal-primary-btn')?.click(),
             },
             {
                 selector: '#modal-primary-btn',
