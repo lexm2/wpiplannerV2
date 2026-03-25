@@ -1,0 +1,5629 @@
+{
+  "courses": [
+    {
+      "id": "TUT-2007",
+      "number": "2007",
+      "name": "How to Write Code Good",
+      "description": "",
+      "category": 1,
+      "minCredits": 0,
+      "maxCredits": 0,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100000,
+            "number": "TInterest List-A Term",
+            "seats": 0,
+            "seatsAvailable": 0,
+            "actualWaitlist": 0,
+            "maxWaitlist": 999,
+            "note": "IntList",
+            "computedTerm": "A",
+            "isGps": false,
+            "isInterestList": true,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Stack Overflow",
+                "startTime": "12:00",
+                "endTime": "12:00",
+                "location": "Unknown",
+                "building": "",
+                "room": "Unknown",
+                "seats": 0,
+                "seatsAvailable": 0,
+                "actualWaitlist": 0,
+                "maxWaitlist": 999,
+                "specificSection": "Interest List-A Term",
+                "days": [],
+                "isAsync": true
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100001,
+            "number": "TBL01",
+            "seats": 100,
+            "seatsAvailable": 100,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5160",
+            "computedTerm": "B",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Stack Overflow",
+                "startTime": "13:00",
+                "endTime": "13:50",
+                "location": "Unity Hall 500",
+                "building": "",
+                "room": "Unity Hall 500",
+                "seats": 100,
+                "seatsAvailable": 100,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "BL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100002,
+              "number": "TBX01",
+              "seats": 100,
+              "seatsAvailable": 100,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5160",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "13:00",
+                  "endTime": "13:50",
+                  "location": "Unity Hall 500",
+                  "building": "",
+                  "room": "Unity Hall 500",
+                  "seats": 100,
+                  "seatsAvailable": 100,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100003,
+              "number": "TCX02",
+              "seats": 80,
+              "seatsAvailable": 80,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": null,
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "09:00",
+                  "endTime": "10:50",
+                  "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "building": "",
+                  "room": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "seats": 80,
+                  "seatsAvailable": 80,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100004,
+            "number": "TCL01",
+            "seats": 80,
+            "seatsAvailable": 80,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5341",
+            "computedTerm": "C",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Stack Overflow",
+                "startTime": "14:00",
+                "endTime": "14:50",
+                "location": "Unity Hall 400",
+                "building": "",
+                "room": "Unity Hall 400",
+                "seats": 80,
+                "seatsAvailable": 80,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "CL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100005,
+              "number": "TCX01",
+              "seats": 80,
+              "seatsAvailable": 80,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5341",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "14:00",
+                  "endTime": "15:50",
+                  "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "building": "",
+                  "room": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "seats": 80,
+                  "seatsAvailable": 80,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100003,
+              "number": "TCX02",
+              "seats": 80,
+              "seatsAvailable": 80,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": null,
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "09:00",
+                  "endTime": "10:50",
+                  "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "building": "",
+                  "room": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "seats": 80,
+                  "seatsAvailable": 80,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100006,
+            "number": "TCL02",
+            "seats": 80,
+            "seatsAvailable": 80,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Stack Overflow",
+                "startTime": "09:00",
+                "endTime": "09:50",
+                "location": "Unity Hall 520",
+                "building": "",
+                "room": "Unity Hall 520",
+                "seats": 80,
+                "seatsAvailable": 80,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "CL02",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100002,
+              "number": "TBX01",
+              "seats": 100,
+              "seatsAvailable": 100,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5160",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "13:00",
+                  "endTime": "13:50",
+                  "location": "Unity Hall 500",
+                  "building": "",
+                  "room": "Unity Hall 500",
+                  "seats": 100,
+                  "seatsAvailable": 100,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100005,
+              "number": "TCX01",
+              "seats": 80,
+              "seatsAvailable": 80,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5341",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "14:00",
+                  "endTime": "15:50",
+                  "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "building": "",
+                  "room": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "seats": 80,
+                  "seatsAvailable": 80,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100003,
+              "number": "TCX02",
+              "seats": 80,
+              "seatsAvailable": 80,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": null,
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "09:00",
+                  "endTime": "10:50",
+                  "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "building": "",
+                  "room": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "seats": 80,
+                  "seatsAvailable": 80,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100007,
+              "number": "TDX01",
+              "seats": 75,
+              "seatsAvailable": 75,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5446",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "11:00",
+                  "endTime": "12:50",
+                  "location": "Unity Hall 400",
+                  "building": "",
+                  "room": "Unity Hall 400",
+                  "seats": 75,
+                  "seatsAvailable": 75,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100008,
+              "number": "TDX02",
+              "seats": 75,
+              "seatsAvailable": 75,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5445",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "building": "",
+                  "room": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "seats": 75,
+                  "seatsAvailable": 75,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100009,
+            "number": "TDL01",
+            "seats": 75,
+            "seatsAvailable": 75,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5446",
+            "computedTerm": "D",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Stack Overflow",
+                "startTime": "11:00",
+                "endTime": "11:50",
+                "location": "Unity Hall 400",
+                "building": "",
+                "room": "Unity Hall 400",
+                "seats": 75,
+                "seatsAvailable": 75,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "DL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100003,
+              "number": "TCX02",
+              "seats": 80,
+              "seatsAvailable": 80,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": null,
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "09:00",
+                  "endTime": "10:50",
+                  "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "building": "",
+                  "room": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "seats": 80,
+                  "seatsAvailable": 80,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100007,
+              "number": "TDX01",
+              "seats": 75,
+              "seatsAvailable": 75,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5446",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "11:00",
+                  "endTime": "12:50",
+                  "location": "Unity Hall 400",
+                  "building": "",
+                  "room": "Unity Hall 400",
+                  "seats": 75,
+                  "seatsAvailable": 75,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100010,
+            "number": "TDL02",
+            "seats": 75,
+            "seatsAvailable": 75,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5445",
+            "computedTerm": "D",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Stack Overflow",
+                "startTime": "15:00",
+                "endTime": "15:50",
+                "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                "building": "",
+                "room": "Fuller Labs PHL Perreault Hall - Lower Section",
+                "seats": 75,
+                "seatsAvailable": 75,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "DL02",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100003,
+              "number": "TCX02",
+              "seats": 80,
+              "seatsAvailable": 80,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": null,
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "09:00",
+                  "endTime": "10:50",
+                  "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "building": "",
+                  "room": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "seats": 80,
+                  "seatsAvailable": 80,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100008,
+              "number": "TDX02",
+              "seats": 75,
+              "seatsAvailable": 75,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5445",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Stack Overflow",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "building": "",
+                  "room": "Fuller Labs PHL Perreault Hall - Lower Section",
+                  "seats": 75,
+                  "seatsAvailable": 75,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2004",
+      "number": "2004",
+      "name": "Why Things Don't Fall Over",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100011,
+            "number": "TAL01",
+            "seats": 100,
+            "seatsAvailable": 100,
+            "actualWaitlist": 0,
+            "maxWaitlist": 50,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5144",
+            "computedTerm": "A",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Isaac Newt",
+                "startTime": "15:00",
+                "endTime": "15:50",
+                "location": "Unity Hall 400",
+                "building": "",
+                "room": "Unity Hall 400",
+                "seats": 100,
+                "seatsAvailable": 100,
+                "actualWaitlist": 0,
+                "maxWaitlist": 50,
+                "specificSection": "AL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [
+            {
+              "crn": 100012,
+              "number": "TAD01",
+              "seats": 100,
+              "seatsAvailable": 100,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5144",
+              "computedTerm": "A",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Discussion",
+                  "professor": "Dr. Isaac Newt",
+                  "startTime": "14:00",
+                  "endTime": "15:50",
+                  "location": "Innovation Studio 203 Active Learning Classroom South",
+                  "building": "",
+                  "room": "Innovation Studio 203 Active Learning Classroom South",
+                  "seats": 100,
+                  "seatsAvailable": 100,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "AD01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100013,
+            "number": "TAL03",
+            "seats": 100,
+            "seatsAvailable": 100,
+            "actualWaitlist": 0,
+            "maxWaitlist": 50,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5143",
+            "computedTerm": "A",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Isaac Newt",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 105",
+                "building": "",
+                "room": "Salisbury Labs 105",
+                "seats": 100,
+                "seatsAvailable": 100,
+                "actualWaitlist": 0,
+                "maxWaitlist": 50,
+                "specificSection": "AL03",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              },
+              {
+                "type": "Lecture",
+                "professor": "Dr. Isaac Newt",
+                "startTime": "11:00",
+                "endTime": "11:50",
+                "location": "Innovation Studio 205 Active Learning Classroom North",
+                "building": "",
+                "room": "Innovation Studio 205 Active Learning Classroom North",
+                "seats": 100,
+                "seatsAvailable": 100,
+                "actualWaitlist": 0,
+                "maxWaitlist": 50,
+                "specificSection": "AL03",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              },
+              {
+                "type": "Lecture",
+                "professor": "Dr. Isaac Newt",
+                "startTime": "11:00",
+                "endTime": "11:50",
+                "location": "Innovation Studio 203 Active Learning Classroom South",
+                "building": "",
+                "room": "Innovation Studio 203 Active Learning Classroom South",
+                "seats": 100,
+                "seatsAvailable": 100,
+                "actualWaitlist": 0,
+                "maxWaitlist": 50,
+                "specificSection": "AL03",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100014,
+            "number": "TBL01",
+            "seats": 90,
+            "seatsAvailable": 89,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5265",
+            "computedTerm": "B",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Isaac Newt",
+                "startTime": "15:00",
+                "endTime": "15:50",
+                "location": "Unity Hall 400",
+                "building": "",
+                "room": "Unity Hall 400",
+                "seats": 90,
+                "seatsAvailable": 89,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "BL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [
+            {
+              "crn": 100015,
+              "number": "TBD01",
+              "seats": 90,
+              "seatsAvailable": 89,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5265",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Discussion",
+                  "professor": "Dr. Isaac Newt",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Unity Hall 400",
+                  "building": "",
+                  "room": "Unity Hall 400",
+                  "seats": 90,
+                  "seatsAvailable": 89,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BD01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100016,
+            "number": "TCL01",
+            "seats": 90,
+            "seatsAvailable": 90,
+            "actualWaitlist": 0,
+            "maxWaitlist": 15,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5324",
+            "computedTerm": "C",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Isaac Newt",
+                "startTime": "16:00",
+                "endTime": "16:50",
+                "location": "Higgins Labs 116",
+                "building": "",
+                "room": "Higgins Labs 116",
+                "seats": 90,
+                "seatsAvailable": 90,
+                "actualWaitlist": 0,
+                "maxWaitlist": 15,
+                "specificSection": "CL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [
+            {
+              "crn": 100017,
+              "number": "TCD01",
+              "seats": 90,
+              "seatsAvailable": 90,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5324",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Discussion",
+                  "professor": "Dr. Isaac Newt",
+                  "startTime": "16:00",
+                  "endTime": "17:50",
+                  "location": "Unity Hall 500",
+                  "building": "",
+                  "room": "Unity Hall 500",
+                  "seats": 90,
+                  "seatsAvailable": 90,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CD01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100018,
+            "number": "TDL01",
+            "seats": 90,
+            "seatsAvailable": 90,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5479",
+            "computedTerm": "D",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Isaac Newt",
+                "startTime": "09:00",
+                "endTime": "09:50",
+                "location": "Fuller Labs PHU Perreault Hall - Upper Section",
+                "building": "",
+                "room": "Fuller Labs PHU Perreault Hall - Upper Section",
+                "seats": 90,
+                "seatsAvailable": 90,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "DL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [
+            {
+              "crn": 100019,
+              "number": "TDD01",
+              "seats": 90,
+              "seatsAvailable": 90,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5479",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Discussion",
+                  "professor": "Dr. Isaac Newt",
+                  "startTime": "09:00",
+                  "endTime": "09:50",
+                  "location": "Higgins Labs 116",
+                  "building": "",
+                  "room": "Higgins Labs 116",
+                  "seats": 90,
+                  "seatsAvailable": 90,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DD01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100020,
+            "number": "TDL02",
+            "seats": 90,
+            "seatsAvailable": 90,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5419",
+            "computedTerm": "D",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Isaac Newt",
+                "startTime": "12:00",
+                "endTime": "12:50",
+                "location": "Unity Hall 500",
+                "building": "",
+                "room": "Unity Hall 500",
+                "seats": 90,
+                "seatsAvailable": 90,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "DL02",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [
+            {
+              "crn": 100021,
+              "number": "TDD02",
+              "seats": 90,
+              "seatsAvailable": 90,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5419",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Discussion",
+                  "professor": "Dr. Isaac Newt",
+                  "startTime": "12:00",
+                  "endTime": "13:50",
+                  "location": "Unity Hall 500",
+                  "building": "",
+                  "room": "Unity Hall 500",
+                  "seats": 90,
+                  "seatsAvailable": 90,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DD02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ],
+          "compatibleLabs": []
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2010",
+      "number": "2010",
+      "name": "Why Everything Gets Hot",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100022,
+            "number": "TA01",
+            "seats": 70,
+            "seatsAvailable": 70,
+            "actualWaitlist": 0,
+            "maxWaitlist": 40,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Temp Rising",
+                "startTime": "15:00",
+                "endTime": "15:50",
+                "location": "Higgins Labs 218 Discovery Classroom",
+                "building": "",
+                "room": "Higgins Labs 218 Discovery Classroom",
+                "seats": 70,
+                "seatsAvailable": 70,
+                "actualWaitlist": 0,
+                "maxWaitlist": 40,
+                "specificSection": "A01",
+                "days": [
+                  "M",
+                  "T",
+                  "W",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100023,
+            "number": "TB01",
+            "seats": 120,
+            "seatsAvailable": 120,
+            "actualWaitlist": 0,
+            "maxWaitlist": 40,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Temp Rising",
+                "startTime": "09:00",
+                "endTime": "09:50",
+                "location": "Unity Hall 400",
+                "building": "",
+                "room": "Unity Hall 400",
+                "seats": 120,
+                "seatsAvailable": 120,
+                "actualWaitlist": 0,
+                "maxWaitlist": 40,
+                "specificSection": "B01",
+                "days": [
+                  "M",
+                  "T",
+                  "W",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100024,
+            "number": "TB02",
+            "seats": 70,
+            "seatsAvailable": 70,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Temp Rising",
+                "startTime": "10:00",
+                "endTime": "10:50",
+                "location": "Kaven Hall 116",
+                "building": "",
+                "room": "Kaven Hall 116",
+                "seats": 70,
+                "seatsAvailable": 70,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "B02",
+                "days": [
+                  "M",
+                  "T",
+                  "W",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100025,
+            "number": "TC01",
+            "seats": 90,
+            "seatsAvailable": 90,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Temp Rising",
+                "startTime": "13:00",
+                "endTime": "13:50",
+                "location": "Higgins Labs 116",
+                "building": "",
+                "room": "Higgins Labs 116",
+                "seats": 90,
+                "seatsAvailable": 90,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "C01",
+                "days": [
+                  "M",
+                  "T",
+                  "W",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100026,
+            "number": "TD01",
+            "seats": 66,
+            "seatsAvailable": 66,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Temp Rising",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Atwater Kent 233",
+                "building": "",
+                "room": "Atwater Kent 233",
+                "seats": 66,
+                "seatsAvailable": 66,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "D01",
+                "days": [
+                  "T",
+                  "F"
+                ],
+                "isAsync": false
+              },
+              {
+                "type": "Lecture",
+                "professor": "Dr. Temp Rising",
+                "startTime": "14:00",
+                "endTime": "14:50",
+                "location": "Atwater Kent 233",
+                "building": "",
+                "room": "Atwater Kent 233",
+                "seats": 66,
+                "seatsAvailable": 66,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "D01",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2012",
+      "number": "2012",
+      "name": "Making Things Go Where You Want",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100027,
+            "number": "TAL01",
+            "seats": 60,
+            "seatsAvailable": 60,
+            "actualWaitlist": 0,
+            "maxWaitlist": 15,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5071",
+            "computedTerm": "A",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. PID Tuner",
+                "startTime": "10:00",
+                "endTime": "10:50",
+                "location": "Higgins Labs 116",
+                "building": "",
+                "room": "Higgins Labs 116",
+                "seats": 60,
+                "seatsAvailable": 60,
+                "actualWaitlist": 0,
+                "maxWaitlist": 15,
+                "specificSection": "AL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100028,
+              "number": "TAX01",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5071",
+              "computedTerm": "A",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. PID Tuner",
+                  "startTime": "09:00",
+                  "endTime": "10:50",
+                  "location": "Higgins Labs 031 ME Computer Lab",
+                  "building": "",
+                  "room": "Higgins Labs 031 ME Computer Lab",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "AX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100029,
+              "number": "TAX02",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5071",
+              "computedTerm": "A",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. PID Tuner",
+                  "startTime": "11:00",
+                  "endTime": "12:50",
+                  "location": "Higgins Labs 031 ME Computer Lab",
+                  "building": "",
+                  "room": "Higgins Labs 031 ME Computer Lab",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "AX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100030,
+            "number": "TBL01",
+            "seats": 60,
+            "seatsAvailable": 60,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5256",
+            "computedTerm": "B",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. PID Tuner",
+                "startTime": "10:00",
+                "endTime": "10:50",
+                "location": "Goddard Hall 227 Classroom",
+                "building": "",
+                "room": "Goddard Hall 227 Classroom",
+                "seats": 60,
+                "seatsAvailable": 60,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "BL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100031,
+              "number": "TBX01",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5256",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. PID Tuner",
+                  "startTime": "13:00",
+                  "endTime": "14:50",
+                  "location": "Higgins Labs 031 ME Computer Lab",
+                  "building": "",
+                  "room": "Higgins Labs 031 ME Computer Lab",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100032,
+              "number": "TBX02",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5256",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. PID Tuner",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Higgins Labs 031 ME Computer Lab",
+                  "building": "",
+                  "room": "Higgins Labs 031 ME Computer Lab",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100033,
+            "number": "TCL01",
+            "seats": 60,
+            "seatsAvailable": 60,
+            "actualWaitlist": 0,
+            "maxWaitlist": 15,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5337",
+            "computedTerm": "C",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. PID Tuner",
+                "startTime": "10:00",
+                "endTime": "10:50",
+                "location": "Salisbury Labs 411",
+                "building": "",
+                "room": "Salisbury Labs 411",
+                "seats": 60,
+                "seatsAvailable": 60,
+                "actualWaitlist": 0,
+                "maxWaitlist": 15,
+                "specificSection": "CL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100034,
+              "number": "TCX01",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5337",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. PID Tuner",
+                  "startTime": "08:00",
+                  "endTime": "09:50",
+                  "location": "Higgins Labs 031 ME Computer Lab",
+                  "building": "",
+                  "room": "Higgins Labs 031 ME Computer Lab",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100035,
+              "number": "TCX02",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5337",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. PID Tuner",
+                  "startTime": "10:00",
+                  "endTime": "11:50",
+                  "location": "Higgins Labs 031 ME Computer Lab",
+                  "building": "",
+                  "room": "Higgins Labs 031 ME Computer Lab",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2003",
+      "number": "2003",
+      "name": "How to Get Investors",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100036,
+            "number": "TA01",
+            "seats": 50,
+            "seatsAvailable": 50,
+            "actualWaitlist": 0,
+            "maxWaitlist": 10,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Cash Moneybags",
+                "startTime": "08:00",
+                "endTime": "09:50",
+                "location": "Innovation Studio 105 Active Learning Classroom",
+                "building": "",
+                "room": "Innovation Studio 105 Active Learning Classroom",
+                "seats": 50,
+                "seatsAvailable": 50,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "specificSection": "A01",
+                "days": [
+                  "M",
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100037,
+            "number": "TB01",
+            "seats": 50,
+            "seatsAvailable": 50,
+            "actualWaitlist": 0,
+            "maxWaitlist": 10,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Cash Moneybags",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Innovation Studio 105 Active Learning Classroom",
+                "building": "",
+                "room": "Innovation Studio 105 Active Learning Classroom",
+                "seats": 50,
+                "seatsAvailable": 50,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "specificSection": "B01",
+                "days": [
+                  "T",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100038,
+            "number": "TC01",
+            "seats": 50,
+            "seatsAvailable": 50,
+            "actualWaitlist": 0,
+            "maxWaitlist": 10,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Cash Moneybags",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Innovation Studio 105 Active Learning Classroom",
+                "building": "",
+                "room": "Innovation Studio 105 Active Learning Classroom",
+                "seats": 50,
+                "seatsAvailable": 50,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "specificSection": "C01",
+                "days": [
+                  "M",
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100039,
+            "number": "TD01",
+            "seats": 50,
+            "seatsAvailable": 50,
+            "actualWaitlist": 0,
+            "maxWaitlist": 10,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Cash Moneybags",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Innovation Studio 105 Active Learning Classroom",
+                "building": "",
+                "room": "Innovation Studio 105 Active Learning Classroom",
+                "seats": 50,
+                "seatsAvailable": 50,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "specificSection": "D01",
+                "days": [
+                  "M",
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2008",
+      "number": "2008",
+      "name": "Reading Old Stuff",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100040,
+            "number": "TA01 - INQ SEM: Integrating the Humanities in STEM Education",
+            "seats": 12,
+            "seatsAvailable": 0,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 0,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "A01 - INQ SEM: Integrating the Humanities in STEM Education",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100041,
+            "number": "TA03 - INQ SEM: Early American History",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "15:00",
+                "endTime": "16:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "A03 - INQ SEM: Early American History",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100042,
+            "number": "TA04 - INQ SEM:  Latin America and the World",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "A04 - INQ SEM:  Latin America and the World",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100043,
+            "number": "TA05 - INQ SEM: History of Sports",
+            "seats": 12,
+            "seatsAvailable": 0,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 0,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "A05 - INQ SEM: History of Sports",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100044,
+            "number": "TA06 - INQ SEM: Sci-Fi, Horror, and Fantasy Writing",
+            "seats": 12,
+            "seatsAvailable": 10,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 10,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "A06 - INQ SEM: Sci-Fi, Horror, and Fantasy Writing",
+                "days": [
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100045,
+            "number": "TA08 - INQ SEM IN HUA: Rhetoric and Popular Culture",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "A08 - INQ SEM IN HUA: Rhetoric and Popular Culture",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100046,
+            "number": "TA09 - INQ SEM IN HUA: TBA",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Kaven Hall 204",
+                "building": "",
+                "room": "Kaven Hall 204",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "A09 - INQ SEM IN HUA: TBA",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100047,
+            "number": "TA10 - INQ SEM IN HUA: Yin Yang",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Kaven Hall 204",
+                "building": "",
+                "room": "Kaven Hall 204",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "A10 - INQ SEM IN HUA: Yin Yang",
+                "days": [
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100048,
+            "number": "TB01 - INQ SEM: Theory and Practice of Meditation",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "10:50",
+                "location": "Daniels Hall 102E",
+                "building": "",
+                "room": "Daniels Hall 102E",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B01 - INQ SEM: Theory and Practice of Meditation",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              },
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B01 - INQ SEM: Theory and Practice of Meditation",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              },
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "10:50",
+                "location": "Daniels Hall 102E",
+                "building": "",
+                "room": "Daniels Hall 102E",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B01 - INQ SEM: Theory and Practice of Meditation",
+                "days": [
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100049,
+            "number": "TB02 - INQ SEM: Writing Suspense",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B02 - INQ SEM: Writing Suspense",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100050,
+            "number": "TB03 - INQ SEM: Time Travel",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B03 - INQ SEM: Time Travel",
+                "days": [
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100051,
+            "number": "TB04 - INQ SEM: Migrations",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B04 - INQ SEM: Migrations",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100052,
+            "number": "TB05 - INQ SEM: Biomedicine and the Language of Pain",
+            "seats": 12,
+            "seatsAvailable": 9,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 9,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B05 - INQ SEM: Biomedicine and the Language of Pain",
+                "days": [
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100053,
+            "number": "TB06 - INQ SEM: Urban History",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B06 - INQ SEM: Urban History",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100054,
+            "number": "TB07 - INQ SEM: Power of Manifestos",
+            "seats": 12,
+            "seatsAvailable": 6,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 6,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B07 - INQ SEM: Power of Manifestos",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100055,
+            "number": "TB08 - INQ SEM: Communicating Across Cultures",
+            "seats": 12,
+            "seatsAvailable": 10,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 10,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B08 - INQ SEM: Communicating Across Cultures",
+                "days": [
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100056,
+            "number": "TB09 - INQ SEM: The Beatles",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Alden Hall B06 Janet Earle Room",
+                "building": "",
+                "room": "Alden Hall B06 Janet Earle Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B09 - INQ SEM: The Beatles",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100057,
+            "number": "TB10 - INQ SEM: Philosophy of Film",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Stratton Hall 313",
+                "building": "",
+                "room": "Stratton Hall 313",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B10 - INQ SEM: Philosophy of Film",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100058,
+            "number": "TB12 - INQ SEM: Riots and Rebellions in American Cities",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B12 - INQ SEM: Riots and Rebellions in American Cities",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100059,
+            "number": "TB14 - INQ SEM HUA: Short Forms",
+            "seats": 12,
+            "seatsAvailable": 0,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "B",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Olin Hall 109",
+                "building": "",
+                "room": "Olin Hall 109",
+                "seats": 12,
+                "seatsAvailable": 0,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "B14 - INQ SEM HUA: Short Forms",
+                "days": [
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100060,
+            "number": "TC01 - INQ SEM: DDT, Silnt Spr, Am Env",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Kaven Hall 204",
+                "building": "",
+                "room": "Kaven Hall 204",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C01 - INQ SEM: DDT, Silnt Spr, Am Env",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100061,
+            "number": "TC01 - INQ SEM: MCKIM, MEAD & WHITE & AMER ARCH 1870-1929",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C01 - INQ SEM: MCKIM, MEAD & WHITE & AMER ARCH 1870-1929",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100062,
+            "number": "TC02 - INQ SEM: Jazz History Database",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Alden Hall B06 Janet Earle Room",
+                "building": "",
+                "room": "Alden Hall B06 Janet Earle Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C02 - INQ SEM: Jazz History Database",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100063,
+            "number": "TC02 - INQ SEM: Philosophy: TBA",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "13:00",
+                "endTime": "14:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C02 - INQ SEM: Philosophy: TBA",
+                "days": [
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100064,
+            "number": "TC04 - INQ SEM: Literature and the Environment",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C04 - INQ SEM: Literature and the Environment",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100065,
+            "number": "TC05 - INQ SEM: Integrating the Humanities in STEM Education",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C05 - INQ SEM: Integrating the Humanities in STEM Education",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100066,
+            "number": "TC08 - INQ SEM: Biographies in Twentieth-Century Technoscience",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C08 - INQ SEM: Biographies in Twentieth-Century Technoscience",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100067,
+            "number": "TC09 - INQ SEM: Holocaust and Memory",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "15:00",
+                "endTime": "16:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C09 - INQ SEM: Holocaust and Memory",
+                "days": [
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100068,
+            "number": "TC11 - INQ SEM: Native American History",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C11 - INQ SEM: Native American History",
+                "days": [
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100069,
+            "number": "TC14 - INQ SEM: History of Silicon Valley",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C14 - INQ SEM: History of Silicon Valley",
+                "days": [
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100070,
+            "number": "TC15 - INQ SEM: Queerly Religious",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C15 - INQ SEM: Queerly Religious",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100071,
+            "number": "TC16 - INQ SEM: Loaded Language",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Stratton Hall 311",
+                "building": "",
+                "room": "Stratton Hall 311",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C16 - INQ SEM: Loaded Language",
+                "days": [
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100072,
+            "number": "TC17 - INQ SEM: Environmental Phil",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C17 - INQ SEM: Environmental Phil",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100073,
+            "number": "TC18 - INQ SEM: Human Performance in Exercise and Sport",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Stratton Hall 311",
+                "building": "",
+                "room": "Stratton Hall 311",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C18 - INQ SEM: Human Performance in Exercise and Sport",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100074,
+            "number": "TC20 - INQ SEM: Music and Society",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Alden Hall B06 Janet Earle Room",
+                "building": "",
+                "room": "Alden Hall B06 Janet Earle Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C20 - INQ SEM: Music and Society",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100075,
+            "number": "TC23 - INQ SEM IN HUA: Mic Check: The Rhetoric of Hip-Hop",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C23 - INQ SEM IN HUA: Mic Check: The Rhetoric of Hip-Hop",
+                "days": [
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100076,
+            "number": "TC24 - INQ SEM IN HUA: African Literature",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C24 - INQ SEM IN HUA: African Literature",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100077,
+            "number": "TC26 - INQ SEM: Fictions of Time Travel",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C26 - INQ SEM: Fictions of Time Travel",
+                "days": [
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100078,
+            "number": "TC27 - INQ SEM: Global Studies",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C27 - INQ SEM: Global Studies",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100079,
+            "number": "TC28 - INQ SEM: Rhetoric of UX/UI Design",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Higgins Labs 154",
+                "building": "",
+                "room": "Higgins Labs 154",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C28 - INQ SEM: Rhetoric of UX/UI Design",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100080,
+            "number": "TC29 - INQ SEM: Soviet Space Program",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "C29 - INQ SEM: Soviet Space Program",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100081,
+            "number": "TD01 - INQ SEM: Collections of W A M",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D01 - INQ SEM: Collections of W A M",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100082,
+            "number": "TD01 - INQ SEM: Will AI Destroy the World? Critical Theories of Technology",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D01 - INQ SEM: Will AI Destroy the World? Critical Theories of Technology",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100083,
+            "number": "TD02 - INQ SEM: Artificial Composition",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "08:00",
+                "endTime": "09:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D02 - INQ SEM: Artificial Composition",
+                "days": [
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100084,
+            "number": "TD02 - INQ SEM: Dam Infrastructure: Water Control from Hoover to Three Gorge",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D02 - INQ SEM: Dam Infrastructure: Water Control from Hoover to Three Gorge",
+                "days": [
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100085,
+            "number": "TD03 - INQ SEM: Music (TBD)",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Alden Hall B06 Janet Earle Room",
+                "building": "",
+                "room": "Alden Hall B06 Janet Earle Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D03 - INQ SEM: Music (TBD)",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100086,
+            "number": "TD05 - INQ SEM: Frames of War",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D05 - INQ SEM: Frames of War",
+                "days": [
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100087,
+            "number": "TD06 - INQ SEM: Writing the Prose Poem",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Washburn 323",
+                "building": "",
+                "room": "Washburn 323",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D06 - INQ SEM: Writing the Prose Poem",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100088,
+            "number": "TD07 - INQ SEM: Hip Hop",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D07 - INQ SEM: Hip Hop",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100089,
+            "number": "TD08 - INQ SEM: Media Revolutions",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 011",
+                "building": "",
+                "room": "Salisbury Labs 011",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D08 - INQ SEM: Media Revolutions",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100090,
+            "number": "TD09 - INQ SEM: Visions of the City",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Kaven Hall 115",
+                "building": "",
+                "room": "Kaven Hall 115",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D09 - INQ SEM: Visions of the City",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100091,
+            "number": "TD10 - INQ SEM IN HUA: European History",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D10 - INQ SEM IN HUA: European History",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100092,
+            "number": "TD11 - INQ SEM: History of the Atom",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D11 - INQ SEM: History of the Atom",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100093,
+            "number": "TD12 - INQ SEM: Early American History",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D12 - INQ SEM: Early American History",
+                "days": [
+                  "W"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100094,
+            "number": "TD13 - INQ SEM: The Meaning of Life",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D13 - INQ SEM: The Meaning of Life",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100095,
+            "number": "TD14 - INQ SEM: Nationalism in Asia",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D14 - INQ SEM: Nationalism in Asia",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100096,
+            "number": "TD15 - INQ SEM: Jewish Immigrant Fiction",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D15 - INQ SEM: Jewish Immigrant Fiction",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100097,
+            "number": "TD16 - INQ SEM: Mic Check: The Rhetoric of Hip-Hop",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D16 - INQ SEM: Mic Check: The Rhetoric of Hip-Hop",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100098,
+            "number": "TD17 - INQ SEM: Writing About Music",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Alden Hall B06 Janet Earle Room",
+                "building": "",
+                "room": "Alden Hall B06 Janet Earle Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D17 - INQ SEM: Writing About Music",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100099,
+            "number": "TD19 - INQ SEM: Queer Cinema",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D19 - INQ SEM: Queer Cinema",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100100,
+            "number": "TD20 - INQ SEM: ‘Illness Influencers’: Social Media and the Rhetoric of Authentic Suffering",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D20 - INQ SEM: ‘Illness Influencers’: Social Media and the Rhetoric of Authentic Suffering",
+                "days": [
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100101,
+            "number": "TD21 - INQ SEM: Global Studies",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D21 - INQ SEM: Global Studies",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100102,
+            "number": "TD22 - INQ SEM: Writing the Memoir",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D22 - INQ SEM: Writing the Memoir",
+                "days": [
+                  "T"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100103,
+            "number": "TD24 - INQ SEM: TBD",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "08:00",
+                "endTime": "09:50",
+                "location": "Salisbury Labs 124 Conference Room",
+                "building": "",
+                "room": "Salisbury Labs 124 Conference Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D24 - INQ SEM: TBD",
+                "days": [
+                  "M"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100104,
+            "number": "TD25 - INQ SEM: American Political History",
+            "seats": 12,
+            "seatsAvailable": 12,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": null,
+            "computedTerm": "D",
+            "isGps": true,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Seminar",
+                "professor": "Dr. Dusty Booksworth",
+                "startTime": "14:00",
+                "endTime": "15:50",
+                "location": "Salisbury Labs 226 HUA Seminar Room",
+                "building": "",
+                "room": "Salisbury Labs 226 HUA Seminar Room",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "D25 - INQ SEM: American Political History",
+                "days": [
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2001",
+      "number": "2001",
+      "name": "Intro to Wheeled Chaos",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100105,
+            "number": "TAL01",
+            "seats": 72,
+            "seatsAvailable": 72,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5094",
+            "computedTerm": "A",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Servo McWheels",
+                "startTime": "12:00",
+                "endTime": "12:50",
+                "location": "Higgins Labs 218 Discovery Classroom",
+                "building": "",
+                "room": "Higgins Labs 218 Discovery Classroom",
+                "seats": 72,
+                "seatsAvailable": 72,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "AL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100106,
+              "number": "TAX01",
+              "seats": 36,
+              "seatsAvailable": 36,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5094",
+              "computedTerm": "A",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Servo McWheels",
+                  "startTime": "08:00",
+                  "endTime": "09:50",
+                  "location": "Innovation Studio 103 Robotics Lab",
+                  "building": "",
+                  "room": "Innovation Studio 103 Robotics Lab",
+                  "seats": 36,
+                  "seatsAvailable": 36,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "AX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100107,
+              "number": "TAX02",
+              "seats": 36,
+              "seatsAvailable": 36,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5094",
+              "computedTerm": "A",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Servo McWheels",
+                  "startTime": "10:00",
+                  "endTime": "11:50",
+                  "location": "Innovation Studio 103 Robotics Lab",
+                  "building": "",
+                  "room": "Innovation Studio 103 Robotics Lab",
+                  "seats": 36,
+                  "seatsAvailable": 36,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "AX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100108,
+            "number": "TCL01",
+            "seats": 80,
+            "seatsAvailable": 79,
+            "actualWaitlist": 0,
+            "maxWaitlist": 10,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5386",
+            "computedTerm": "C",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Servo McWheels",
+                "startTime": "15:00",
+                "endTime": "15:50",
+                "location": "Unity Hall 520",
+                "building": "",
+                "room": "Unity Hall 520",
+                "seats": 80,
+                "seatsAvailable": 79,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "specificSection": "CL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100109,
+              "number": "TCX01",
+              "seats": 32,
+              "seatsAvailable": 32,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5386",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Servo McWheels",
+                  "startTime": "13:00",
+                  "endTime": "14:50",
+                  "location": "Innovation Studio 103 Robotics Lab",
+                  "building": "",
+                  "room": "Innovation Studio 103 Robotics Lab",
+                  "seats": 32,
+                  "seatsAvailable": 32,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100110,
+              "number": "TCX02",
+              "seats": 24,
+              "seatsAvailable": 24,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5386",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Servo McWheels",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Innovation Studio 103 Robotics Lab",
+                  "building": "",
+                  "room": "Innovation Studio 103 Robotics Lab",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100111,
+              "number": "TCX03",
+              "seats": 24,
+              "seatsAvailable": 23,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5386",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Servo McWheels",
+                  "startTime": "18:00",
+                  "endTime": "19:50",
+                  "location": "Innovation Studio 103 Robotics Lab",
+                  "building": "",
+                  "room": "Innovation Studio 103 Robotics Lab",
+                  "seats": 24,
+                  "seatsAvailable": 23,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX03",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2002",
+      "number": "2002",
+      "name": "Wheeled Chaos II: More Wheels",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100112,
+            "number": "TBL01",
+            "seats": 72,
+            "seatsAvailable": 72,
+            "actualWaitlist": 0,
+            "maxWaitlist": 12,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5200",
+            "computedTerm": "B",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Torque McGee",
+                "startTime": "11:00",
+                "endTime": "11:50",
+                "location": "Unity Hall 420",
+                "building": "",
+                "room": "Unity Hall 420",
+                "seats": 72,
+                "seatsAvailable": 72,
+                "actualWaitlist": 0,
+                "maxWaitlist": 12,
+                "specificSection": "BL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100113,
+              "number": "TBX01",
+              "seats": 36,
+              "seatsAvailable": 36,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5200",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. Torque McGee",
+                  "startTime": "13:00",
+                  "endTime": "14:50",
+                  "location": "Innovation Studio 103 Robotics Lab",
+                  "building": "",
+                  "room": "Innovation Studio 103 Robotics Lab",
+                  "seats": 36,
+                  "seatsAvailable": 36,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100114,
+              "number": "TBX02",
+              "seats": 36,
+              "seatsAvailable": 36,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5200",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. Torque McGee",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Innovation Studio 103 Robotics Lab",
+                  "building": "",
+                  "room": "Innovation Studio 103 Robotics Lab",
+                  "seats": 36,
+                  "seatsAvailable": 36,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100115,
+            "number": "TDL01",
+            "seats": 102,
+            "seatsAvailable": 101,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5451",
+            "computedTerm": "D",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Torque McGee",
+                "startTime": "13:00",
+                "endTime": "13:50",
+                "location": "Olin Hall 107",
+                "building": "",
+                "room": "Olin Hall 107",
+                "seats": 102,
+                "seatsAvailable": 101,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "DL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100116,
+              "number": "TDX01",
+              "seats": 34,
+              "seatsAvailable": 33,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5451",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. Torque McGee",
+                  "startTime": "13:00",
+                  "endTime": "14:50",
+                  "location": "Innovation Studio 103 Robotics Lab",
+                  "building": "",
+                  "room": "Innovation Studio 103 Robotics Lab",
+                  "seats": 34,
+                  "seatsAvailable": 33,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100117,
+              "number": "TDX02",
+              "seats": 34,
+              "seatsAvailable": 34,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5451",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. Torque McGee",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Innovation Studio 103 Robotics Lab",
+                  "building": "",
+                  "room": "Innovation Studio 103 Robotics Lab",
+                  "seats": 34,
+                  "seatsAvailable": 34,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100118,
+              "number": "TDX03",
+              "seats": 34,
+              "seatsAvailable": 34,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5451",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. Torque McGee",
+                  "startTime": "08:00",
+                  "endTime": "09:50",
+                  "location": "Innovation Studio 103 Robotics Lab",
+                  "building": "",
+                  "room": "Innovation Studio 103 Robotics Lab",
+                  "seats": 34,
+                  "seatsAvailable": 34,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DX03",
+                  "days": [
+                    "R"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2005",
+      "number": "2005",
+      "name": "Blinking LEDs 101",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100119,
+            "number": "TAL01",
+            "seats": 60,
+            "seatsAvailable": 60,
+            "actualWaitlist": 0,
+            "maxWaitlist": 15,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5134",
+            "computedTerm": "A",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Blinky McBlink",
+                "startTime": "11:00",
+                "endTime": "11:50",
+                "location": "Goddard Hall 227 Classroom",
+                "building": "",
+                "room": "Goddard Hall 227 Classroom",
+                "seats": 60,
+                "seatsAvailable": 60,
+                "actualWaitlist": 0,
+                "maxWaitlist": 15,
+                "specificSection": "AL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100120,
+              "number": "TAX01",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5134",
+              "computedTerm": "A",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Blinky McBlink",
+                  "startTime": "08:00",
+                  "endTime": "09:50",
+                  "location": "Atwater Kent 227 Lab Restricted Access",
+                  "building": "",
+                  "room": "Atwater Kent 227 Lab Restricted Access",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "AX01",
+                  "days": [
+                    "T"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100121,
+              "number": "TAX02",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5134",
+              "computedTerm": "A",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Blinky McBlink",
+                  "startTime": "14:00",
+                  "endTime": "15:50",
+                  "location": "Atwater Kent 227 Lab Restricted Access",
+                  "building": "",
+                  "room": "Atwater Kent 227 Lab Restricted Access",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "AX02",
+                  "days": [
+                    "T"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100122,
+            "number": "TBL01",
+            "seats": 60,
+            "seatsAvailable": 60,
+            "actualWaitlist": 0,
+            "maxWaitlist": 15,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5207",
+            "computedTerm": "B",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Blinky McBlink",
+                "startTime": "13:00",
+                "endTime": "13:50",
+                "location": "Kaven Hall 116",
+                "building": "",
+                "room": "Kaven Hall 116",
+                "seats": 60,
+                "seatsAvailable": 60,
+                "actualWaitlist": 0,
+                "maxWaitlist": 15,
+                "specificSection": "BL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100123,
+              "number": "TBX01",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5207",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Blinky McBlink",
+                  "startTime": "09:00",
+                  "endTime": "10:50",
+                  "location": "Atwater Kent 227 Lab Restricted Access",
+                  "building": "",
+                  "room": "Atwater Kent 227 Lab Restricted Access",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BX01",
+                  "days": [
+                    "T"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100124,
+              "number": "TBX02",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5207",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Blinky McBlink",
+                  "startTime": "14:00",
+                  "endTime": "15:50",
+                  "location": "Atwater Kent 227 Lab Restricted Access",
+                  "building": "",
+                  "room": "Atwater Kent 227 Lab Restricted Access",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BX02",
+                  "days": [
+                    "R"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100125,
+            "number": "TCL01",
+            "seats": 60,
+            "seatsAvailable": 60,
+            "actualWaitlist": 0,
+            "maxWaitlist": 15,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5357",
+            "computedTerm": "C",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Blinky McBlink",
+                "startTime": "11:00",
+                "endTime": "11:50",
+                "location": "Atwater Kent 233",
+                "building": "",
+                "room": "Atwater Kent 233",
+                "seats": 60,
+                "seatsAvailable": 60,
+                "actualWaitlist": 0,
+                "maxWaitlist": 15,
+                "specificSection": "CL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100126,
+              "number": "TCX01",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5357",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Blinky McBlink",
+                  "startTime": "13:00",
+                  "endTime": "14:50",
+                  "location": "Atwater Kent 227 Lab Restricted Access",
+                  "building": "",
+                  "room": "Atwater Kent 227 Lab Restricted Access",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX01",
+                  "days": [
+                    "R"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100127,
+              "number": "TCX02",
+              "seats": 30,
+              "seatsAvailable": 30,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5357",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Blinky McBlink",
+                  "startTime": "14:00",
+                  "endTime": "15:50",
+                  "location": "Atwater Kent 227 Lab Restricted Access",
+                  "building": "",
+                  "room": "Atwater Kent 227 Lab Restricted Access",
+                  "seats": 30,
+                  "seatsAvailable": 30,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX02",
+                  "days": [
+                    "T"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2006",
+      "number": "2006",
+      "name": "Robots with Feelings",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100128,
+            "number": "TAL01",
+            "seats": 72,
+            "seatsAvailable": 72,
+            "actualWaitlist": 0,
+            "maxWaitlist": 0,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5064",
+            "computedTerm": "A",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Hugs McRobot",
+                "startTime": "11:00",
+                "endTime": "11:50",
+                "location": "Atwater Kent 219",
+                "building": "",
+                "room": "Atwater Kent 219",
+                "seats": 72,
+                "seatsAvailable": 72,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "specificSection": "AL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100129,
+              "number": "TAX01",
+              "seats": 36,
+              "seatsAvailable": 36,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5064",
+              "computedTerm": "A",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. Hugs McRobot",
+                  "startTime": "13:00",
+                  "endTime": "14:50",
+                  "location": "Atwater Kent 120D Robotics Lab",
+                  "building": "",
+                  "room": "Atwater Kent 120D Robotics Lab",
+                  "seats": 36,
+                  "seatsAvailable": 36,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "AX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100130,
+              "number": "TAX02",
+              "seats": 36,
+              "seatsAvailable": 36,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5064",
+              "computedTerm": "A",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. Hugs McRobot",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Atwater Kent 120D Robotics Lab",
+                  "building": "",
+                  "room": "Atwater Kent 120D Robotics Lab",
+                  "seats": 36,
+                  "seatsAvailable": 36,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "AX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100131,
+            "number": "TCL01",
+            "seats": 84,
+            "seatsAvailable": 84,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5384",
+            "computedTerm": "C",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Dr. Hugs McRobot",
+                "startTime": "11:00",
+                "endTime": "11:50",
+                "location": "Unity Hall 500",
+                "building": "",
+                "room": "Unity Hall 500",
+                "seats": 84,
+                "seatsAvailable": 84,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "CL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100132,
+              "number": "TCX01",
+              "seats": 28,
+              "seatsAvailable": 28,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5384",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. Hugs McRobot",
+                  "startTime": "13:00",
+                  "endTime": "14:50",
+                  "location": "Atwater Kent 120D Robotics Lab",
+                  "building": "",
+                  "room": "Atwater Kent 120D Robotics Lab",
+                  "seats": 28,
+                  "seatsAvailable": 28,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100133,
+              "number": "TCX02",
+              "seats": 28,
+              "seatsAvailable": 28,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5384",
+              "computedTerm": "C",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Dr. Hugs McRobot",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Atwater Kent 120D Robotics Lab",
+                  "building": "",
+                  "room": "Atwater Kent 120D Robotics Lab",
+                  "seats": 28,
+                  "seatsAvailable": 28,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "CX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2009",
+      "number": "2009",
+      "name": "Robots with Even More Feelings",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100134,
+            "number": "TBL01",
+            "seats": 72,
+            "seatsAvailable": 72,
+            "actualWaitlist": 0,
+            "maxWaitlist": 30,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5237",
+            "computedTerm": "B",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Servo McWheels Jr.",
+                "startTime": "11:00",
+                "endTime": "11:50",
+                "location": "Atwater Kent 219",
+                "building": "",
+                "room": "Atwater Kent 219",
+                "seats": 72,
+                "seatsAvailable": 72,
+                "actualWaitlist": 0,
+                "maxWaitlist": 30,
+                "specificSection": "BL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100135,
+              "number": "TBX01",
+              "seats": 36,
+              "seatsAvailable": 36,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5237",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Servo McWheels Jr.",
+                  "startTime": "13:00",
+                  "endTime": "14:50",
+                  "location": "Atwater Kent 120D Robotics Lab",
+                  "building": "",
+                  "room": "Atwater Kent 120D Robotics Lab",
+                  "seats": 36,
+                  "seatsAvailable": 36,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100136,
+              "number": "TBX02",
+              "seats": 36,
+              "seatsAvailable": 36,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5237",
+              "computedTerm": "B",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Servo McWheels Jr.",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Atwater Kent 120D Robotics Lab",
+                  "building": "",
+                  "room": "Atwater Kent 120D Robotics Lab",
+                  "seats": 36,
+                  "seatsAvailable": 36,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "BX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": {
+            "crn": 100137,
+            "number": "TDL01",
+            "seats": 72,
+            "seatsAvailable": 72,
+            "actualWaitlist": 0,
+            "maxWaitlist": 20,
+            "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5450",
+            "computedTerm": "D",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Servo McWheels Jr.",
+                "startTime": "11:00",
+                "endTime": "11:50",
+                "location": "Fuller Labs PHU Perreault Hall - Upper Section",
+                "building": "",
+                "room": "Fuller Labs PHU Perreault Hall - Upper Section",
+                "seats": 72,
+                "seatsAvailable": 72,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "specificSection": "DL01",
+                "days": [
+                  "M",
+                  "T",
+                  "R",
+                  "F"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": [
+            {
+              "crn": 100138,
+              "number": "TDX01",
+              "seats": 36,
+              "seatsAvailable": 36,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5450",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Servo McWheels Jr.",
+                  "startTime": "13:00",
+                  "endTime": "14:50",
+                  "location": "Atwater Kent 120D Robotics Lab",
+                  "building": "",
+                  "room": "Atwater Kent 120D Robotics Lab",
+                  "seats": 36,
+                  "seatsAvailable": 36,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DX01",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "crn": 100139,
+              "number": "TDX02",
+              "seats": 36,
+              "seatsAvailable": 36,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5450",
+              "computedTerm": "D",
+              "isGps": false,
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Prof. Servo McWheels Jr.",
+                  "startTime": "15:00",
+                  "endTime": "16:50",
+                  "location": "Atwater Kent 120D Robotics Lab",
+                  "building": "",
+                  "room": "Atwater Kent 120D Robotics Lab",
+                  "seats": 36,
+                  "seatsAvailable": 36,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "specificSection": "DX02",
+                  "days": [
+                    "W"
+                  ],
+                  "isAsync": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    },
+    {
+      "id": "TUT-2011",
+      "number": "2011",
+      "name": "Should We Even Be Doing This?",
+      "description": "",
+      "category": 1,
+      "minCredits": 3,
+      "maxCredits": 3,
+      "isGraduate": false,
+      "academicYear": 2026,
+      "lectures": [
+        {
+          "section": {
+            "crn": 100140,
+            "number": "TA01",
+            "seats": 20,
+            "seatsAvailable": 20,
+            "actualWaitlist": 0,
+            "maxWaitlist": 10,
+            "note": null,
+            "computedTerm": "A",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Existential Dread",
+                "startTime": "10:00",
+                "endTime": "11:50",
+                "location": "Atwater Kent 232",
+                "building": "",
+                "room": "Atwater Kent 232",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "specificSection": "A01",
+                "days": [
+                  "M",
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        },
+        {
+          "section": {
+            "crn": 100141,
+            "number": "TC01",
+            "seats": 20,
+            "seatsAvailable": 20,
+            "actualWaitlist": 0,
+            "maxWaitlist": 10,
+            "note": null,
+            "computedTerm": "C",
+            "isGps": false,
+            "isInterestList": false,
+            "periods": [
+              {
+                "type": "Lecture",
+                "professor": "Prof. Existential Dread",
+                "startTime": "12:00",
+                "endTime": "13:50",
+                "location": "Higgins Labs 114",
+                "building": "",
+                "room": "Higgins Labs 114",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "specificSection": "C01",
+                "days": [
+                  "M",
+                  "R"
+                ],
+                "isAsync": false
+              }
+            ]
+          },
+          "compatibleDiscussions": [],
+          "compatibleLabs": []
+        }
+      ],
+      "departmentAbbr": "TUT",
+      "departmentName": "Tutorial",
+      "transient": true,
+      "standaloneLabs": []
+    }
+  ]
+}

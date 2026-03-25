@@ -38,7 +38,8 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             await services.scheduleManagementService.deleteSchedule(s.id, { force: true });
         }
         previousScheduleId = services.scheduleManagementService.getActiveScheduleId();
-        services.courseDataService.addTutorialDepartment();
+        await services.courseDataService.addTutorialDepartment();
+        services.filterService.addFilter('department', { departments: ['TUT'] });
         const result = await services.scheduleManagementService.createNewSchedule('Tutorial');
         tutorialScheduleId = result.schedule?.id ?? null;
     }
@@ -83,13 +84,13 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 waitFor: 'manual',
             },
             {
-                selector: '[data-course-id="TUT-1001"] .course-select-btn',
+                selector: '[data-course-id="TUT-2001"] .course-select-btn',
                 title: 'Select a course',
                 description: 'Click the + button on the Tutorial course to add it to your planner.',
                 waitFor: 'click',
                 scrollArrow: true,
                 action: () => {
-                    const c = getTutorialCourse('TUT-1001');
+                    const c = getTutorialCourse('TUT-2001');
                     if (c) services.courseSelectionService.selectCourse(c);
                 },
             },
@@ -101,17 +102,17 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 action: () => services.uiStateManager.switchToPage('schedule'),
             },
             {
-                selector: '.schedule-course-item[data-course-id="TUT-1001"]',
+                selector: '.schedule-course-item[data-course-id="TUT-2001"]',
                 title: 'Open section selection',
                 description: 'Click the course you just added to open the section picker.',
                 waitFor: 'click',
                 action: () => {
                     services.uiStateManager.switchToPage('schedule');
-                    mainController.openWizardForCourse('TUT-1001');
+                    mainController.openWizardForCourse('TUT-2001');
                 },
             },
             {
-                selector: '.wizard-section-card',
+                selector: '.wizard-section-card[data-crn="100105"]',
                 title: 'Pick a lecture',
                 description: 'Select the only lecture section.',
                 waitFor: 'click',
@@ -125,11 +126,11 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 action: () => document.querySelector<HTMLElement>('.wizard-btn.wizard-btn-primary')?.click(),
             },
             {
-                selector: '.wizard-section-card[data-crn="99902"]',
+                selector: '.wizard-section-card[data-crn="100107"]',
                 title: 'Pick a lab',
-                description: 'Select the top lab section. Notice how you can hover the different sections to see how they fit into your schedule.',
+                description: 'Select the bottom lab section. Notice how you can hover the different sections to see how they fit into your schedule.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="99902"]')?.click(),
+                action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="100107"]')?.click(),
             },
             {
                 selector: '#wizard-next-btn',
@@ -148,28 +149,43 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     });
 
     function registerFilteringTutorial() {
-        const priorYear = services.courseDataService.getLatestAcademicYear()! - 1;
         tutorialService.register({
             id: 'filtering',
             onStart: async () => {
                 mainController.closeWizard();
-                services.uiStateManager.switchToPage('planner');
-                const tut1001 = getTutorialCourse('TUT-1001');
-                if (tut1001 && tut1001.lectures) {
-                    await services.courseSelectionService.selectCourse(tut1001);
-                    const lecture = tut1001.lectures[0].section;
-                    const lab = tut1001.lectures[0].compatibleLabs[0] ?? null;
-                    await services.courseSelectionService.setSelectedComponents(tut1001, lecture, null, lab);
-                }
-                const tut1002 = getTutorialCourse('TUT-1002');
-                if (tut1002 && tut1002.lectures) {
-                    await services.courseSelectionService.selectCourse(tut1002);
-                    const lecture = tut1002.lectures[0].section;
-                    const lab = tut1002.lectures[0].compatibleLabs[0] ?? null;
-                    await services.courseSelectionService.setSelectedComponents(tut1002, lecture, null, lab);
+                services.uiStateManager.switchToPage('schedule');
+                const selections: Array<[string, string, string | null, string | null]> = [
+                    ['TUT-2001', 'TAL01', null, 'TAX01'],
+                    ['TUT-2002', 'TDL01', null, 'TDX02'],
+                    ['TUT-2003', 'TC01', null, null],
+                    ['TUT-2004', 'TDL02', 'TDD02', null],
+                    ['TUT-2006', 'TAL01', null, 'TAX01'],
+                    ['TUT-2007', 'TCL01', null, 'TCX01'],
+                    ['TUT-2008', 'TA01 - INQ SEM: Integrating the Humanities in STEM Education', null, null],
+                    ['TUT-2009', 'TBL01', null, 'TBX01'],
+                    ['TUT-2010', 'TD01', null, null],
+                    ['TUT-2011', 'TC01', null, null],
+                    ['TUT-2012', 'TBL01', null, 'TBX02'],
+                ];
+                for (const [id, lecNum, discNum, labNum] of selections) {
+                    const course = getTutorialCourse(id);
+                    if (!course?.lectures) continue;
+                    const group = course.lectures.find(g => g.section.number === lecNum);
+                    if (!group) continue;
+                    await services.courseSelectionService.selectCourse(course);
+                    const disc = discNum ? group.compatibleDiscussions.find(d => d.number === discNum) ?? null : null;
+                    const lab = labNum ? group.compatibleLabs.find(l => l.number === labNum) ?? null : null;
+                    await services.courseSelectionService.setSelectedComponents(course, group.section, disc, lab);
                 }
             },
             steps: [
+                {
+                    selector: '#planner-tab',
+                    title: 'Go to the Classes tab',
+                    description: 'We only have 2 classes in B term so we need a new course. Lets head to the schedules page to find one that fits.',
+                    waitFor: 'click',
+                    action: () => services.uiStateManager.switchToPage('planner'),
+                },
                 {
                     selector: '#filter-btn',
                     title: 'Open filters',
@@ -181,40 +197,17 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     },
                 },
                 {
-                    selector: 'input.filter-toggle[value="A"][data-filter="term"]',
+                    selector: 'input.filter-toggle[value="B"][data-filter="term"]',
                     title: 'Filter by term',
-                    description: 'Check the A term box to filter courses by term.',
+                    description: 'Check the B term box to filter for courses/sections that have sections in B term.',
                     waitFor: 'click',
                     scrollArrow: true,
-                    action: () => document.querySelector<HTMLElement>('input.filter-toggle[value="A"][data-filter="term"]')?.click(),
-                },
-                {
-                    selector: `.segmented-btn[data-year="${priorYear}"]`,
-                    title: 'Change the academic year',
-                    description: 'Normally your schedule could never have courses from multiple years but this is just for demonstration purposes.',
-                    waitFor: 'click',
-                    scrollArrow: true,
-                    action: () => document.querySelector<HTMLElement>(`.segmented-btn[data-year="${priorYear}"]`)?.click(),
-                },
-                {
-                    selector: '.professor-search',
-                    title: 'Filter by professor',
-                    description: 'Search for "Tutorial" to filter courses by professor. As you type you should see search suggestions show up.',
-                    waitFor: 'appear',
-                    scrollArrow: true,
-                    waitForSelector: '.filter-chip-remove[data-professor="Tutorial"]',
-                    action: () => {
-                        const search = document.querySelector<HTMLInputElement>('.professor-search');
-                        if (!search) return;
-                        search.value = 'Tutorial';
-                        search.dispatchEvent(new Event('input', { bubbles: true }));
-                        document.querySelector<HTMLElement>('.professor-option[data-professor="Tutorial"]')?.click();
-                    },
+                    action: () => document.querySelector<HTMLElement>('input.filter-toggle[value="B"][data-filter="term"]')?.click(),
                 },
                 {
                     selector: '#avoid-conflicts-filter',
                     title: 'Avoid schedule conflicts',
-                    description: 'Toggle this to hide courses that cannot fit into your current schedule.',
+                    description: 'Toggle this to hide courses/sections that cannot fit into your current schedule.',
                     waitFor: 'click',
                     scrollArrow: true,
                     action: () => document.querySelector<HTMLElement>('#avoid-conflicts-filter')?.click(),
@@ -222,7 +215,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 {
                     selector: '#available-only-filter',
                     title: 'Show available courses only',
-                    description: 'Toggle this to hide courses with no open seats.',
+                    description: 'Toggle this to hide courses/sections with no open seats.',
                     waitFor: 'click',
                     scrollArrow: true,
                     action: () => document.querySelector<HTMLElement>('#available-only-filter')?.click(),
@@ -235,38 +228,60 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     action: () => document.querySelector<HTMLElement>('#modal-primary-btn')?.click(),
                 },
                 {
-                    selector: '[data-course-id="TUT-9001"] .course-select-btn',
-                    title: 'Select the prior year course',
-                    description: 'Click the + button on the Filtering Example course to add it to your planner.',
+                    selector: '[data-course-id="TUT-2005"] .course-select-btn',
+                    title: 'Add Blinking LEDs 101',
+                    description: 'Click the + button on Blinking LEDs 101 to add it.',
                     waitFor: 'click',
+                    scrollArrow: true,
                     action: () => {
-                        const c = getTutorialCourse('TUT-9001');
+                        const c = getTutorialCourse('TUT-2005');
                         if (c) services.courseSelectionService.selectCourse(c);
                     },
                 },
                 {
                     selector: '#schedule-tab',
                     title: 'Go to the Schedule tab',
-                    description: 'Head to the Schedule tab to set up your sections.',
+                    description: 'Head to the Schedule tab to pick your sections.',
                     waitFor: 'click',
                     action: () => services.uiStateManager.switchToPage('schedule'),
                 },
                 {
-                    selector: '.schedule-course-item[data-course-id="TUT-9001"]',
+                    selector: '.schedule-course-item[data-course-id="TUT-2005"]',
                     title: 'Open section selection',
-                    description: 'Click the course to open the section picker.',
+                    description: 'Click Blinking LEDs 101 to open the section picker.',
                     waitFor: 'click',
                     action: () => {
                         services.uiStateManager.switchToPage('schedule');
-                        mainController.openWizardForCourse('TUT-9001');
+                        mainController.openWizardForCourse('TUT-2005');
                     },
                 },
                 {
-                    selector: '.wizard-section-card',
+                    selector: '.wizard-section-card[data-crn="100119"]',
                     title: 'Pick a lecture',
-                    description: 'Select a lecture section.',
+                    description: 'Select the B term lecture section.',
                     waitFor: 'click',
-                    action: () => document.querySelector<HTMLElement>('.wizard-section-card')?.click(),
+                    action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="100122"]')?.click(),
+                },
+                {
+                    selector: '.wizard-btn.wizard-btn-primary',
+                    title: 'Continue to labs',
+                    description: 'Click Next to move on to selecting a lab.',
+                    waitFor: 'click',
+                    action: () => document.querySelector<HTMLElement>('.wizard-btn.wizard-btn-primary')?.click(),
+                },
+                {
+                    selector: '.wizard-section-card[data-crn="100120"]',
+                    title: 'Pick a lab',
+                    description: 'Select the first lab section. Notice how you can hover sections to preview them on the schedule.',
+                    waitFor: 'click',
+                    action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="100123"]')?.click(),
+                },
+                {
+                    selector: '#wizard-next-btn',
+                    title: 'Finish',
+                    description: 'Click Finish to confirm your selections.',
+                    waitFor: 'click',
+                    action: () => document.querySelector<HTMLElement>('#wizard-next-btn')?.click(),
                 },
                 {
                     selector: '[data-tutorial-next]',
@@ -282,7 +297,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         id: 'autoSchedule',
         onStart: async () => {
             mainController.closeWizard();
-            for (const id of ['TUT-1001', 'TUT-1002', 'TUT-9001']) {
+            for (const id of ['TUT-2001', 'TUT-2002', 'TUT-2003', 'TUT-2004', 'TUT-2005', 'TUT-2006', 'TUT-2007', 'TUT-2008', 'TUT-2009', 'TUT-2010', 'TUT-2011', 'TUT-2012']) {
                 const c = getTutorialCourse(id);
                 if (c) {
                     await services.courseSelectionService.selectCourse(c);
