@@ -76,116 +76,6 @@ export class CourseDataService {
         return scheduleDB;
     }
 
-    private createTutorialDepartment(academicYear?: number): Department {
-        const makePeriod = (
-            type: PeriodType,
-            days: DayOfWeek[],
-            start: [number, number],
-            end: [number, number],
-            professor = 'Demo Professor'
-        ): Period => {
-            const fmt = ([h, m]: [number, number]) => {
-                const dh = h > 12 ? h - 12 : h === 0 ? 12 : h;
-                return { hours: h, minutes: m, displayTime: `${dh}:${m.toString().padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}` };
-            };
-            return {
-                type,
-                professor,
-                startTime: fmt(start),
-                endTime: fmt(end),
-                location: 'Fuller Labs 320',
-                building: 'Fuller Labs',
-                room: '320',
-                seats: 30,
-                seatsAvailable: 20,
-                actualWaitlist: 0,
-                maxWaitlist: 5,
-                days: new Set(days),
-                isAsync: false,
-            };
-        };
-
-        const makeSection = (crn: number, number: string, periods: Period[]): Section => ({
-            crn,
-            number,
-            seats: 30,
-            seatsAvailable: 20,
-            actualWaitlist: 0,
-            maxWaitlist: 5,
-            computedTerm: 'A' as AcademicTerm,
-            periods,
-        });
-
-        const lecture = makeSection(99901, 'A01', [
-            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [11, 0], [11, 50]),
-        ]);
-        const lab = makeSection(99902, 'B01', [
-            makePeriod(PeriodType.LAB, [DayOfWeek.FRIDAY], [12, 0], [14, 0]),
-        ]);
-        const lab2 = makeSection(99903, 'B02', [
-            makePeriod(PeriodType.LAB, [DayOfWeek.MONDAY], [14, 0], [15, 0]),
-        ]);
-
-        const course: Course = {
-            id: 'TUT-1001',
-            number: '1001',
-            name: 'Introduction to the WPI Planner',
-            description: 'A hands-on walkthrough of the WPI Course Planner. Learn to search for courses, build a schedule, and configure your sections.',
-            category: 1,
-            departmentAbbr: 'TUT',
-            departmentName: 'Tutorial',
-            minCredits: 1,
-            maxCredits: 1,
-            isGraduate: false,
-            academicYear,
-            transient: true,
-            lectures: [{ section: lecture, compatibleDiscussions: [], compatibleLabs: [lab, lab2] }],
-        };
-
-        const tut1002Lecture = makeSection(99904, 'A01', [
-            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [8, 0], [8, 50]),
-        ]);
-        const tut1002Lab = makeSection(99906, 'B01', [
-            makePeriod(PeriodType.LAB, [DayOfWeek.WEDNESDAY], [8, 0], [10, 0]),
-        ]);
-        const tut1002Course: Course = {
-            id: 'TUT-1002',
-            number: '1002',
-            name: 'Introduction to the WPI Planner 2',
-            description: 'A placeholder course used to demonstrate schedule grid layout.',
-            category: 1,
-            departmentAbbr: 'TUT',
-            departmentName: 'Tutorial',
-            minCredits: 1,
-            maxCredits: 1,
-            isGraduate: false,
-            academicYear,
-            transient: true,
-            lectures: [{ section: tut1002Lecture, compatibleDiscussions: [], compatibleLabs: [tut1002Lab] }],
-        };
-
-        const tut9001Lecture = makeSection(99905, 'A01', [
-            makePeriod(PeriodType.LECTURE, [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY], [10, 0], [11, 0], 'Tutorial'),
-        ]);
-        const tut9001Course: Course = {
-            id: 'TUT-9001',
-            number: '9001',
-            name: 'Filtering Example',
-            description: 'A placeholder course from a prior year used to demonstrate academic year filtering.',
-            category: 1,
-            departmentAbbr: 'TUT',
-            departmentName: 'Tutorial',
-            minCredits: 1,
-            maxCredits: 1,
-            isGraduate: false,
-            academicYear: academicYear ? academicYear - 1 : undefined,
-            transient: true,
-            lectures: [{ section: tut9001Lecture, compatibleDiscussions: [], compatibleLabs: [] }],
-        };
-
-        return { abbreviation: 'TUT', name: 'Tutorial', courses: [course, tut1002Course, tut9001Course] };
-    }
-
     private parseConstructedDepartments(departments: RawDepartment[]): Department[] {
         const seenIds = new Set<string>();
         const duplicateIds = new Set<string>();
@@ -622,9 +512,36 @@ export class CourseDataService {
         this.notifyDataRefreshed();
     }
 
-    addTutorialDepartment(): void {
+    async addTutorialDepartment(): Promise<void> {
         if (!this.scheduleDB) return;
-        const tutDept = this.createTutorialDepartment(this.latestAcademicYear);
+        const response = await fetch('./tutorial-courses.json', { cache: 'no-cache' });
+        const json = await response.json() as { courses: RawCourse[] };
+        const parsedCourses = json.courses.map(raw => {
+            const lectures = this.parseLectureGroups(raw.lectures ?? []);
+            const standaloneLabs = raw.standaloneLabs ? this.parseConstructedSections(raw.standaloneLabs) : undefined;
+            const course: Course = {
+                id: raw.id,
+                number: raw.number,
+                name: raw.name,
+                description: raw.description ?? '',
+                category: raw.category ?? null,
+                departmentAbbr: 'TUT',
+                departmentName: 'Tutorial',
+                minCredits: raw.minCredits ?? 0,
+                maxCredits: raw.maxCredits ?? 0,
+                isGraduate: raw.isGraduate ?? false,
+                academicYear: raw.academicYear,
+                transient: true,
+                lectures: lectures.length > 0 ? lectures : undefined,
+                standaloneLabs,
+            };
+            return course;
+        });
+        const tutDept: Department = {
+            abbreviation: 'TUT',
+            name: 'Tutorial',
+            courses: parsedCourses,
+        };
         this.scheduleDB = {
             ...this.scheduleDB,
             departments: [tutDept, ...this.scheduleDB.departments.filter(d => d.abbreviation !== 'TUT')],

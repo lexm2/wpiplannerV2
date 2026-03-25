@@ -26,6 +26,11 @@ export function transformSection(
     const courseSectionFull = workdaySection.Course_Section;
     const instructionalFormat = workdaySection.Instructional_Format;
 
+    // Skip cancelled sections (e.g. "X Cancel - 03/17/2026 - ...")
+    if (/\bX\s+(Cancel|Cancelled)\b/i.test(courseSectionFull)) {
+        return [];
+    }
+
     // Extract department and course number
     const dashIndex = courseSectionFull.indexOf('-');
     const subjectAndNumber = courseSectionFull.substring(0, dashIndex);

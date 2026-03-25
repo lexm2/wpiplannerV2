@@ -9,6 +9,7 @@ export class TutorialService {
     private currentStepIndex = 0;
     private stepChangeCallback: StepChangeCallback | null = null;
     private completionCallback: (() => void) | null = null;
+    private currentSelector: string | null = null;
     private highlightedElement: Element | null = null;
     private svgOverlay: SVGSVGElement | null = null;
     private arrowOverlay: HTMLElement | null = null;
@@ -30,7 +31,7 @@ export class TutorialService {
         if (tutorial.onStart) {
             const result = tutorial.onStart();
             if (result instanceof Promise) {
-                result.then(() => this.applyStep());
+                result.then(() => requestAnimationFrame(() => this.applyStep()));
                 return;
             }
         }
@@ -83,6 +84,7 @@ export class TutorialService {
     }
 
     private highlightElement(selector: string, scrollArrow: boolean): void {
+        this.currentSelector = selector;
         this.removeHighlight();
         this.highlightObserver?.disconnect();
         this.highlightObserver = null;
@@ -186,6 +188,15 @@ export class TutorialService {
             }, { threshold: 0 });
             this.intersectionObserver.observe(el);
         }
+
+        this.highlightObserver = new MutationObserver(() => {
+            if (el.isConnected && this.svgOverlay?.isConnected) return;
+            this.highlightObserver!.disconnect();
+            this.highlightObserver = null;
+            this.removeHighlight();
+            if (this.currentSelector) this.highlightElement(this.currentSelector, scrollArrow);
+        });
+        this.highlightObserver.observe(document.body, { childList: true, subtree: true });
     }
 
     private removeHighlight(): void {
@@ -234,27 +245,15 @@ export class TutorialService {
 
         const selector = step.waitForSelector ?? step.selector;
         const eventType = step.waitFor === 'input' ? 'input' : 'click';
-        const handler = () => this.nextStep();
-
-        const target = document.querySelector(selector);
-        if (target) {
-            target.addEventListener(eventType, handler, { once: true });
-            this.actionCleanup = () => target.removeEventListener(eventType, handler);
-            return;
-        }
-
-        this.actionObserver = new MutationObserver(() => {
-            const found = document.querySelector(selector);
-            if (!found) return;
-            this.actionObserver!.disconnect();
-            this.actionObserver = null;
-            found.addEventListener(eventType, handler, { once: true });
-            this.actionCleanup = () => found.removeEventListener(eventType, handler);
-        });
-        this.actionObserver.observe(document.body, { childList: true, subtree: true });
+        const handler = (e: Event) => {
+            if ((e.target as Element).closest?.(selector)) this.nextStep();
+        };
+        document.body.addEventListener(eventType, handler, { capture: true });
+        this.actionCleanup = () => document.body.removeEventListener(eventType, handler, { capture: true });
     }
 
     private cleanup(): void {
+        this.currentSelector = null;
         this.removeHighlight();
         this.highlightObserver?.disconnect();
         this.highlightObserver = null;

@@ -359,10 +359,10 @@ export class ProfileStateManager {
     }
 
     // Schedule management methods
-    createSchedule(name: string, source: string = 'user'): Schedule {
+    createSchedule(name: string, source: string = 'user', id?: string): Schedule {
         return this.withStateUpdateSync(() => {
             const schedule: Schedule = {
-                id: this.generateScheduleId(),
+                id: id ?? this.generateScheduleId(),
                 name,
                 selectedCourses: [],
                 generatedSchedules: []
@@ -673,7 +673,7 @@ export class ProfileStateManager {
             const schedulesResult = await this.storageManager.loadAllSchedules();
 
             if (schedulesResult.valid && schedulesResult.data) {
-                this.state.schedules = schedulesResult.data;
+                this.state.schedules = schedulesResult.data.filter(s => !s.id.startsWith('tutorial_'));
 
                 // Resolve course references for all schedules
                 for (const schedule of this.state.schedules) {
