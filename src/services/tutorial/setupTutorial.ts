@@ -168,16 +168,18 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     ['TUT-2011', 'TC01', null, null],
                     ['TUT-2012', 'TBL01', null, 'TBX02'],
                 ];
-                for (const [id, lecNum, discNum, labNum] of selections) {
-                    const course = getTutorialCourse(id);
-                    if (!course?.lectures) continue;
-                    const group = course.lectures.find(g => g.section.number === lecNum);
-                    if (!group) continue;
-                    await services.courseSelectionService.selectCourse(course);
-                    const disc = discNum ? group.compatibleDiscussions.find(d => d.number === discNum) ?? null : null;
-                    const lab = labNum ? group.compatibleLabs.find(l => l.number === labNum) ?? null : null;
-                    await services.courseSelectionService.setSelectedComponents(course, group.section, disc, lab);
-                }
+                await services.profileStateManager.withBatch(async () => {
+                    for (const [id, lecNum, discNum, labNum] of selections) {
+                        const course = getTutorialCourse(id);
+                        if (!course?.lectures) continue;
+                        const group = course.lectures.find(g => g.section.number === lecNum);
+                        if (!group) continue;
+                        await services.courseSelectionService.selectCourse(course);
+                        const disc = discNum ? group.compatibleDiscussions.find(d => d.number === discNum) ?? null : null;
+                        const lab = labNum ? group.compatibleLabs.find(l => l.number === labNum) ?? null : null;
+                        await services.courseSelectionService.setSelectedComponents(course, group.section, disc, lab);
+                    }
+                });
             },
             steps: [
                 {
@@ -257,7 +259,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     },
                 },
                 {
-                    selector: '.wizard-section-card[data-crn="100119"]',
+                    selector: '.wizard-section-card[data-crn="100122"]',
                     title: 'Pick a lecture',
                     description: 'Select the B term lecture section.',
                     waitFor: 'click',
@@ -271,11 +273,11 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     action: () => document.querySelector<HTMLElement>('.wizard-btn.wizard-btn-primary')?.click(),
                 },
                 {
-                    selector: '.wizard-section-card[data-crn="100120"]',
+                    selector: '.wizard-section-card[data-crn="100124"]',
                     title: 'Pick a lab',
                     description: 'Select the first lab section. Notice how you can hover sections to preview them on the schedule.',
                     waitFor: 'click',
-                    action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="100123"]')?.click(),
+                    action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="100124"]')?.click(),
                 },
                 {
                     selector: '#wizard-next-btn',
@@ -298,13 +300,15 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         id: 'autoSchedule',
         onStart: async () => {
             mainController.closeWizard();
-            for (const id of ['TUT-2001', 'TUT-2002', 'TUT-2003', 'TUT-2004', 'TUT-2005', 'TUT-2006', 'TUT-2007', 'TUT-2008', 'TUT-2009', 'TUT-2010', 'TUT-2011', 'TUT-2012']) {
-                const c = getTutorialCourse(id);
-                if (c) {
-                    await services.courseSelectionService.selectCourse(c);
-                    await services.courseSelectionService.setSelectedComponents(c, null, null, null);
+            await services.profileStateManager.withBatch(async () => {
+                for (const id of ['TUT-2001', 'TUT-2002', 'TUT-2003', 'TUT-2004', 'TUT-2005', 'TUT-2006', 'TUT-2007', 'TUT-2008', 'TUT-2009', 'TUT-2010', 'TUT-2011', 'TUT-2012']) {
+                    const c = getTutorialCourse(id);
+                    if (c) {
+                        await services.courseSelectionService.selectCourse(c);
+                        await services.courseSelectionService.setSelectedComponents(c, null, null, null);
+                    }
                 }
-            }
+            });
             services.filterService.clearFilters();
             services.filterService.addFilter('term', { terms: ['A'] });
             services.filterService.addFilter('periodConflict', {
@@ -325,16 +329,30 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 },
             },
             {
-                selector: '.wizard-section-card[data-crn="100105"]',
+                selector: '.wizard-section-card[data-crn="100041"]',
                 title: 'Pick a lecture',
-                description: 'Select the only lecture section.',
+                description: 'We are going to use this lecture.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('.wizard-section-card')?.click(),
+                action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="100041')?.click(),
+            },
+            {
+                selector: '#wizard-next-btn',
+                title: 'Finish',
+                description: 'Click Finish to confirm your selections.',
+                waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('#wizard-next-btn')?.click(),
             },
             {
                 selector: '#auto-schedule-btn',
                 title: 'Auto Schedule',
                 description: 'Click Auto Schedule to let the planner automatically find a combination of sections that fit together. It uses your active filters to avoid conflicts and respect your preferences.',
+                waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('#auto-schedule-btn')?.click(),
+            },
+            {
+                selector: '#auto-schedule-btn',
+                title: 'Change generation parameters',
+                description: 'We are going to make it so TUT2001 and TUT2006 generate only in A term. So we need to unselect the other terms.',
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('#auto-schedule-btn')?.click(),
             },
