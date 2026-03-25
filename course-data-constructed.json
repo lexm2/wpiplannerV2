@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 25, 2026, 11:06 AM",
+  "generated": "Mar 25, 2026, 11:55 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -140611,14 +140611,14 @@
             {
               "section": {
                 "crn": 357462,
-                "number": "A01",
+                "number": "A01 - Topics in American Political History: Parties, Polarization, and Partisanship",
                 "seats": 35,
                 "seatsAvailable": 35,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
-                "isGps": false,
+                "isGps": true,
                 "isInterestList": false,
                 "periods": [
                   {
@@ -140633,7 +140633,7 @@
                     "seatsAvailable": 35,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "A01",
+                    "specificSection": "A01 - Topics in American Political History: Parties, Polarization, and Partisanship",
                     "days": [
                       "M",
                       "R"
@@ -145088,9 +145088,9 @@
                     "professor": "Sarah Lucie",
                     "startTime": "14:00",
                     "endTime": "15:50",
-                    "location": "Salisbury Labs 226 HUA Seminar Room",
+                    "location": "Olin Hall 218",
                     "building": "",
-                    "room": "Salisbury Labs 226 HUA Seminar Room",
+                    "room": "Olin Hall 218",
                     "seats": 12,
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
