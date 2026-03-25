@@ -310,12 +310,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 }
             });
             services.filterService.clearFilters();
-            services.filterService.addFilter('term', { terms: ['A'] });
-            services.filterService.addFilter('periodConflict', {
-                avoidConflicts: true,
-                selectedCourses: services.courseSelectionService.getSelectedCourses(),
-            });
-            services.filterService.addFilter('availability', { availableOnly: true });
             services.uiStateManager.switchToPage('schedule');
         },
         steps: [
@@ -324,6 +318,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 title: 'Lock a section before generating schedules',
                 description: 'We are going to lock the TUT2008 course so the auto scheduler does not change it. We can do this just by manually selecting the course.',
                 waitFor: 'click',
+                scrollArrow: true,
                 action: () => {
                     mainController.openWizardForCourse('TUT2008');
                 },
@@ -350,23 +345,38 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 action: () => document.querySelector<HTMLElement>('#auto-schedule-btn')?.click(),
             },
             {
-                selector: '#auto-schedule-btn',
+                selector: '.as-course-card[data-course-id="TUT-2001"] .term-badge[data-term="C"]',
                 title: 'Change generation parameters',
                 description: 'We are going to make it so TUT2001 and TUT2006 generate only in A term. So we need to unselect the other terms.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('#auto-schedule-btn')?.click(),
+                action: () => document.querySelector<HTMLElement>('.as-course-card[data-course-id="TUT-2001"] .term-badge[data-term="C"]')?.click(),
             },
             {
-                selector: '#btn-primary',
-                title: 'Move onto filters',
-                description: 'After your done selecting what courses you want to auto schedule for.',
+                selector: '.as-course-card[data-course-id="TUT-2006"] .term-badge[data-term="C"]',
+                title: 'Change generation parameters',
+                description: 'Same change for TUT2006.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('#modal-primary-btn')?.click(),
+                action: () => document.querySelector<HTMLElement>('.as-course-card[data-course-id="TUT-2006"] .term-badge[data-term="C"]')?.click(),
             },
+            {
+                selector: '.modal-btn[data-action="next"]',
+                title: 'Move onto filters',
+                description: 'After your done selecting what courses you want to auto schedule for move onto selecting filters.',
+                waitFor: 'click',
+                action: () => document.querySelector<HTMLElement>('.modal-btn[data-action="next"]')?.click(),
+            },
+            {
+                    selector: '#available-only-filter',
+                    title: 'Filter for only avalable courses',
+                    description: 'We only want to generate schedules with courses that are not full so lets filter out the full courses.',
+                    waitFor: 'click',
+                    scrollArrow: true,
+                    action: () => document.querySelector<HTMLElement>('#available-only-filter')?.click(),
+                },
             {
                 selector: '#modal-primary-btn',
                 title: 'Generate schedules',
-                description: 'The filters have already been set up for you. Click Generate to run the scheduler. It will find all valid section combinations based on your filters and show you the results.',
+                description: 'Click Generate to run the scheduler. It will find all valid section combinations based on your filters and show you the results.',
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('#modal-primary-btn')?.click(),
             },

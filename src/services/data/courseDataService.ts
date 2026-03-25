@@ -517,26 +517,26 @@ export class CourseDataService {
         const response = await fetch('./tutorial-courses.json', { cache: 'no-cache' });
         const json = await response.json() as { courses: RawCourse[] };
         const parsedCourses = json.courses.map(raw => {
-                const lectures = this.parseLectureGroups(raw.lectures ?? []);
-                const standaloneLabs = raw.standaloneLabs ? this.parseConstructedSections(raw.standaloneLabs) : undefined;
-                const course: Course = {
-                    id: raw.id,
-                    number: raw.number,
-                    name: raw.name,
-                    description: raw.description ?? '',
-                    category: raw.category ?? null,
-                    departmentAbbr: 'TUT',
-                    departmentName: 'Tutorial',
-                    minCredits: raw.minCredits ?? 0,
-                    maxCredits: raw.maxCredits ?? 0,
-                    isGraduate: raw.isGraduate ?? false,
-                    academicYear: raw.academicYear,
-                    transient: true,
-                    lectures: lectures.length > 0 ? lectures : undefined,
-                    standaloneLabs,
-                };
-                return course;
-            });
+            const lectures = this.parseLectureGroups(raw.lectures ?? []);
+            const standaloneLabs = raw.standaloneLabs ? this.parseConstructedSections(raw.standaloneLabs) : undefined;
+            const course: Course = {
+                id: raw.id,
+                number: raw.number,
+                name: raw.name,
+                description: raw.description ?? '',
+                category: raw.category ?? null,
+                departmentAbbr: 'TUT',
+                departmentName: 'Tutorial',
+                minCredits: raw.minCredits ?? 0,
+                maxCredits: raw.maxCredits ?? 0,
+                isGraduate: raw.isGraduate ?? false,
+                academicYear: raw.academicYear,
+                transient: true,
+                lectures: lectures.length > 0 ? lectures : undefined,
+                standaloneLabs,
+            };
+            return course;
+        });
         const tutDept: Department = {
             abbreviation: 'TUT',
             name: 'Tutorial',

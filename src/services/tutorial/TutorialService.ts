@@ -190,7 +190,7 @@ export class TutorialService {
         }
 
         this.highlightObserver = new MutationObserver(() => {
-            if (el.isConnected) return;
+            if (el.isConnected && this.svgOverlay?.isConnected) return;
             this.highlightObserver!.disconnect();
             this.highlightObserver = null;
             this.removeHighlight();

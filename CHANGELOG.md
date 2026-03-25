@@ -5,6 +5,7 @@
 ### Fixed
 - Tutorials now load significantly faster — course selections during setup are batched into a single storage write instead of one per course
 - Fixed a race condition where the first tutorial highlight would sometimes not appear on the auto-schedule tutorial
+- Fixed tutorial highlight disappearing from the Auto Schedule button after the wizard closes
 
 ## [2026-03-24]
 
