@@ -53,7 +53,7 @@ fi
 
 # Use Development's public/ directory, but keep master's JSON data files
 git checkout MERGE_HEAD -- public/
-git checkout HEAD -- public/*.json
+git checkout HEAD -- $(git ls-tree -r --name-only HEAD -- 'public/*.json' | tr '\n' ' ')
 git add public/
 
 git commit -m "Merge Development into master"
