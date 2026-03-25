@@ -443,9 +443,12 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             },
             {
                 selector: '[data-tutorial-next]',
-                title: 'Uh oh',
-                description: "You should not be able to see this, if you can then make a issue on github and explain how you made it appear.",
+                title: 'You messed up.',
+                description: "Make sure to give the new schedule a name and then hit ok on the prompt.",
                 waitFor: 'manual',
+                action: async () => {
+                    await services.scheduleManagementService.createNewSchedule('Tutorial Done', { autoActivate: true });
+                },
             },
         ],
     });
