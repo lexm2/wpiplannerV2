@@ -1148,7 +1148,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Temp Rising",
+                "professor": "Dr. Fourier",
                 "startTime": "15:00",
                 "endTime": "15:50",
                 "location": "Higgins Labs 218 Discovery Classroom",
@@ -1188,7 +1188,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Temp Rising",
+                "professor": "Dr. Fourier",
                 "startTime": "09:00",
                 "endTime": "09:50",
                 "location": "Unity Hall 400",
@@ -1228,7 +1228,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Temp Rising",
+                "professor": "Dr. Fourier",
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Kaven Hall 116",
@@ -1268,7 +1268,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Temp Rising",
+                "professor": "Dr. Fourier",
                 "startTime": "13:00",
                 "endTime": "13:50",
                 "location": "Higgins Labs 116",
@@ -1308,7 +1308,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Temp Rising",
+                "professor": "Dr. Fourier",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Atwater Kent 233",
@@ -1327,7 +1327,7 @@
               },
               {
                 "type": "Lecture",
-                "professor": "Dr. Temp Rising",
+                "professor": "Dr. Fourier",
                 "startTime": "14:00",
                 "endTime": "14:50",
                 "location": "Atwater Kent 233",
@@ -1380,7 +1380,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. PID Tuner",
+                "professor": "Dr. Rudolf Kalman",
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Higgins Labs 116",
@@ -1417,7 +1417,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. PID Tuner",
+                  "professor": "Dr. Rudolf Kalman",
                   "startTime": "09:00",
                   "endTime": "10:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1449,7 +1449,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. PID Tuner",
+                  "professor": "Dr. Rudolf Kalman",
                   "startTime": "11:00",
                   "endTime": "12:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1484,7 +1484,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. PID Tuner",
+                "professor": "Dr. Rudolf Kalman",
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Goddard Hall 227 Classroom",
@@ -1521,7 +1521,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. PID Tuner",
+                  "professor": "Dr. Rudolf Kalman",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1553,7 +1553,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. PID Tuner",
+                  "professor": "Dr. Rudolf Kalman",
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1588,7 +1588,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. PID Tuner",
+                "professor": "Dr. Rudolf Kalman",
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Salisbury Labs 411",
@@ -1625,7 +1625,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. PID Tuner",
+                  "professor": "Dr. Rudolf Kalman",
                   "startTime": "08:00",
                   "endTime": "09:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1657,7 +1657,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. PID Tuner",
+                  "professor": "Dr. Rudolf Kalman",
                   "startTime": "10:00",
                   "endTime": "11:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1851,7 +1851,7 @@
     {
       "id": "TUT-2008",
       "number": "2008",
-      "name": "Reading Old Stuff",
+      "name": "History: The Prequel",
       "description": "",
       "category": 1,
       "minCredits": 3,
@@ -1874,7 +1874,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -1910,7 +1910,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "15:00",
                 "endTime": "16:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -1946,7 +1946,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -1982,7 +1982,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2018,7 +2018,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2054,7 +2054,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2090,7 +2090,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Kaven Hall 204",
@@ -2126,7 +2126,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Kaven Hall 204",
@@ -2162,7 +2162,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Daniels Hall 102E",
@@ -2180,7 +2180,7 @@
               },
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2198,7 +2198,7 @@
               },
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Daniels Hall 102E",
@@ -2234,7 +2234,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2270,7 +2270,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2306,7 +2306,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2342,7 +2342,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2378,7 +2378,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2414,7 +2414,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2450,7 +2450,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2486,7 +2486,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Alden Hall B06 Janet Earle Room",
@@ -2522,7 +2522,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Stratton Hall 313",
@@ -2558,7 +2558,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2594,7 +2594,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Olin Hall 109",
@@ -2630,7 +2630,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Kaven Hall 204",
@@ -2666,7 +2666,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2702,7 +2702,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Alden Hall B06 Janet Earle Room",
@@ -2738,7 +2738,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "13:00",
                 "endTime": "14:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2774,7 +2774,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2810,7 +2810,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2846,7 +2846,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2882,7 +2882,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "15:00",
                 "endTime": "16:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2918,7 +2918,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2954,7 +2954,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2990,7 +2990,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3026,7 +3026,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Stratton Hall 311",
@@ -3062,7 +3062,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3098,7 +3098,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Stratton Hall 311",
@@ -3134,7 +3134,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Alden Hall B06 Janet Earle Room",
@@ -3170,7 +3170,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3206,7 +3206,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3242,7 +3242,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3278,7 +3278,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3314,7 +3314,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Higgins Labs 154",
@@ -3350,7 +3350,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3386,7 +3386,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3422,7 +3422,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3458,7 +3458,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "08:00",
                 "endTime": "09:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3494,7 +3494,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3530,7 +3530,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Alden Hall B06 Janet Earle Room",
@@ -3566,7 +3566,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3602,7 +3602,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Washburn 323",
@@ -3638,7 +3638,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3674,7 +3674,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 011",
@@ -3710,7 +3710,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Kaven Hall 115",
@@ -3746,7 +3746,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3782,7 +3782,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3818,7 +3818,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3854,7 +3854,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3890,7 +3890,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3926,7 +3926,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3962,7 +3962,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3998,7 +3998,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Alden Hall B06 Janet Earle Room",
@@ -4034,7 +4034,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -4070,7 +4070,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -4106,7 +4106,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -4142,7 +4142,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -4178,7 +4178,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "08:00",
                 "endTime": "09:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -4214,7 +4214,7 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Dusty Booksworth",
+                "professor": "Dr. Harold Bloom",
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -4244,7 +4244,7 @@
     {
       "id": "TUT-2001",
       "number": "2001",
-      "name": "Intro to Wheeled Chaos",
+      "name": "Introduction to Robot Wrangling",
       "description": "",
       "category": 1,
       "minCredits": 3,
@@ -4267,7 +4267,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Servo McWheels",
+                "professor": "Dr. Ty Murray",
                 "startTime": "12:00",
                 "endTime": "12:50",
                 "location": "Higgins Labs 218 Discovery Classroom",
@@ -4304,7 +4304,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Servo McWheels",
+                  "professor": "Dr. Ty Murray",
                   "startTime": "08:00",
                   "endTime": "09:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4336,7 +4336,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Servo McWheels",
+                  "professor": "Dr. Ty Murray",
                   "startTime": "10:00",
                   "endTime": "11:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4371,7 +4371,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Servo McWheels",
+                "professor": "Dr. Ty Murray",
                 "startTime": "15:00",
                 "endTime": "15:50",
                 "location": "Unity Hall 520",
@@ -4408,7 +4408,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Servo McWheels",
+                  "professor": "Dr. Ty Murray",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4440,7 +4440,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Servo McWheels",
+                  "professor": "Dr. Ty Murray",
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4472,7 +4472,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Servo McWheels",
+                  "professor": "Dr. Ty Murray",
                   "startTime": "18:00",
                   "endTime": "19:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4501,7 +4501,7 @@
     {
       "id": "TUT-2002",
       "number": "2002",
-      "name": "Wheeled Chaos II: More Wheels",
+      "name": "Advanced Robot Wrangling",
       "description": "",
       "category": 1,
       "minCredits": 3,
@@ -4524,7 +4524,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Torque McGee",
+                "professor": "Dr. Ty Murray",
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Unity Hall 420",
@@ -4561,7 +4561,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Torque McGee",
+                  "professor": "Dr. Ty Murray",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4593,7 +4593,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Torque McGee",
+                  "professor": "Dr. Ty Murray",
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4628,7 +4628,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Torque McGee",
+                "professor": "Dr. Ty Murray",
                 "startTime": "13:00",
                 "endTime": "13:50",
                 "location": "Olin Hall 107",
@@ -4665,7 +4665,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Torque McGee",
+                  "professor": "Dr. Ty Murray",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4697,7 +4697,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Torque McGee",
+                  "professor": "Dr. Ty Murray",
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4729,7 +4729,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Torque McGee",
+                  "professor": "Dr. Ty Murray",
                   "startTime": "08:00",
                   "endTime": "09:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4781,7 +4781,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Blinky McBlink",
+                "professor": "Prof. Kirchhoff",
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Goddard Hall 227 Classroom",
@@ -4818,7 +4818,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Blinky McBlink",
+                  "professor": "Prof. Kirchhoff",
                   "startTime": "08:00",
                   "endTime": "09:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -4850,7 +4850,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Blinky McBlink",
+                  "professor": "Prof. Kirchhoff",
                   "startTime": "14:00",
                   "endTime": "15:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -4885,7 +4885,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Blinky McBlink",
+                "professor": "Prof. Kirchhoff",
                 "startTime": "13:00",
                 "endTime": "13:50",
                 "location": "Kaven Hall 116",
@@ -4922,7 +4922,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Blinky McBlink",
+                  "professor": "Prof. Kirchhoff",
                   "startTime": "09:00",
                   "endTime": "10:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -4954,7 +4954,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Blinky McBlink",
+                  "professor": "Prof. Kirchhoff",
                   "startTime": "14:00",
                   "endTime": "15:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -4989,7 +4989,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Blinky McBlink",
+                "professor": "Prof. Kirchhoff",
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Atwater Kent 233",
@@ -5026,7 +5026,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Blinky McBlink",
+                  "professor": "Prof. Kirchhoff",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -5058,7 +5058,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Blinky McBlink",
+                  "professor": "Prof. Kirchhoff",
                   "startTime": "14:00",
                   "endTime": "15:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -5110,7 +5110,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Hugs McRobot",
+                "professor": "Prof. Hans Moravec",
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Atwater Kent 219",
@@ -5147,7 +5147,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Hugs McRobot",
+                  "professor": "Prof. Hans Moravec",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5179,7 +5179,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Hugs McRobot",
+                  "professor": "Prof. Hans Moravec",
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5214,7 +5214,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Hugs McRobot",
+                "professor": "Prof. Hans Moravec",
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Unity Hall 500",
@@ -5251,7 +5251,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Hugs McRobot",
+                  "professor": "Prof. Hans Moravec",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5283,7 +5283,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Hugs McRobot",
+                  "professor": "Prof. Hans Moravec",
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5312,7 +5312,7 @@
     {
       "id": "TUT-2009",
       "number": "2009",
-      "name": "Robots with Even More Feelings",
+      "name": "Applied Robot Geometry",
       "description": "",
       "category": 1,
       "minCredits": 3,
@@ -5335,7 +5335,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Servo McWheels Jr.",
+                "professor": "Dr. Russ Tedrake",
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Atwater Kent 219",
@@ -5372,7 +5372,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Servo McWheels Jr.",
+                  "professor": "Dr. Russ Tedrake",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5404,7 +5404,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Servo McWheels Jr.",
+                  "professor": "Dr. Russ Tedrake",
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5439,7 +5439,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Servo McWheels Jr.",
+                "professor": "Dr. Russ Tedrake",
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Fuller Labs PHU Perreault Hall - Upper Section",
@@ -5476,7 +5476,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Servo McWheels Jr.",
+                  "professor": "Dr. Russ Tedrake",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5508,7 +5508,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Servo McWheels Jr.",
+                  "professor": "Dr. Russ Tedrake",
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5560,7 +5560,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Existential Dread",
+                "professor": "Dr. Alan Turing",
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Atwater Kent 232",
@@ -5597,7 +5597,7 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Existential Dread",
+                "professor": "Dr. Alan Turing",
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Higgins Labs 114",
