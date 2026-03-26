@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 26, 2026, 6:00 PM",
+  "generated": "Mar 26, 2026, 7:19 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -144521,7 +144521,7 @@
                 "crn": 337400,
                 "number": "D25 - INQ SEM: Global Energy",
                 "seats": 12,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -144538,7 +144538,7 @@
                     "building": "",
                     "room": "Salisbury Labs 226 HUA Seminar Room",
                     "seats": 12,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D25 - INQ SEM: Global Energy",
@@ -144748,7 +144748,7 @@
             {
               "section": {
                 "crn": 348509,
-                "number": "A08 - INQ SEM IN HUA: Rhetoric and Popular Culture",
+                "number": "A08 - INQ SEM: Rhetoric and Popular Culture",
                 "seats": 12,
                 "seatsAvailable": 12,
                 "actualWaitlist": 0,
@@ -144770,7 +144770,7 @@
                     "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "A08 - INQ SEM IN HUA: Rhetoric and Popular Culture",
+                    "specificSection": "A08 - INQ SEM: Rhetoric and Popular Culture",
                     "days": [
                       "T"
                     ],
@@ -144784,7 +144784,7 @@
             {
               "section": {
                 "crn": 354594,
-                "number": "A09 - INQ SEM IN HUA: TBA",
+                "number": "A09 - INQ SEM: Love and Dating in the Digital Age",
                 "seats": 12,
                 "seatsAvailable": 12,
                 "actualWaitlist": 0,
@@ -144806,7 +144806,7 @@
                     "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "A09 - INQ SEM IN HUA: TBA",
+                    "specificSection": "A09 - INQ SEM: Love and Dating in the Digital Age",
                     "days": [
                       "M"
                     ],
@@ -144820,7 +144820,7 @@
             {
               "section": {
                 "crn": 354652,
-                "number": "A10 - INQ SEM IN HUA: Yin Yang",
+                "number": "A10 - INQ SEM: Yin Yang",
                 "seats": 12,
                 "seatsAvailable": 12,
                 "actualWaitlist": 0,
@@ -144842,7 +144842,7 @@
                     "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "A10 - INQ SEM IN HUA: Yin Yang",
+                    "specificSection": "A10 - INQ SEM: Yin Yang",
                     "days": [
                       "R"
                     ],
@@ -145359,42 +145359,6 @@
             },
             {
               "section": {
-                "crn": 351757,
-                "number": "C01 - INQ SEM: MCKIM, MEAD & WHITE & AMER ARCH 1870-1929",
-                "seats": 12,
-                "seatsAvailable": 12,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "C",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "David Samson",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Salisbury Labs 124 Conference Room",
-                    "building": "",
-                    "room": "Salisbury Labs 124 Conference Room",
-                    "seats": 12,
-                    "seatsAvailable": 12,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "C01 - INQ SEM: MCKIM, MEAD & WHITE & AMER ARCH 1870-1929",
-                    "days": [
-                      "T"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
                 "crn": 351085,
                 "number": "C02 - INQ SEM: Jazz History Database",
                 "seats": 12,
@@ -145431,8 +145395,8 @@
             },
             {
               "section": {
-                "crn": 351622,
-                "number": "C02 - INQ SEM: Philosophy: TBA",
+                "crn": 351757,
+                "number": "C03 - INQ SEM: MCKIM, MEAD & WHITE & AMER ARCH 1870-1929",
                 "seats": 12,
                 "seatsAvailable": 12,
                 "actualWaitlist": 0,
@@ -145444,9 +145408,9 @@
                 "periods": [
                   {
                     "type": "Seminar",
-                    "professor": "Not Assigned",
-                    "startTime": "13:00",
-                    "endTime": "14:50",
+                    "professor": "David Samson",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
                     "location": "Salisbury Labs 124 Conference Room",
                     "building": "",
                     "room": "Salisbury Labs 124 Conference Room",
@@ -145454,9 +145418,9 @@
                     "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "C02 - INQ SEM: Philosophy: TBA",
+                    "specificSection": "C03 - INQ SEM: MCKIM, MEAD & WHITE & AMER ARCH 1870-1929",
                     "days": [
-                      "R"
+                      "T"
                     ],
                     "isAsync": false
                   }
@@ -145529,6 +145493,42 @@
                     "specificSection": "C05 - INQ SEM: Integrating the Humanities in STEM Education",
                     "days": [
                       "T"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 351622,
+                "number": "C06 - INQ SEM: Philosophy: 'Just Friends'",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "C",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Seminar",
+                    "professor": "Esther (Stella) Rosario",
+                    "startTime": "13:00",
+                    "endTime": "14:50",
+                    "location": "Salisbury Labs 124 Conference Room",
+                    "building": "",
+                    "room": "Salisbury Labs 124 Conference Room",
+                    "seats": 12,
+                    "seatsAvailable": 12,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "C06 - INQ SEM: Philosophy: 'Just Friends'",
+                    "days": [
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -160705,11 +160705,11 @@
                   {
                     "type": "Lecture",
                     "professor": "Melissa Kagen",
-                    "startTime": "10:00",
-                    "endTime": "11:50",
-                    "location": "Sports and Recreation Center 412 - '61 Meeting Room 1",
+                    "startTime": "16:00",
+                    "endTime": "17:50",
+                    "location": "Salisbury Labs 407",
                     "building": "",
-                    "room": "Sports and Recreation Center 412 - '61 Meeting Room 1",
+                    "room": "Salisbury Labs 407",
                     "seats": 14,
                     "seatsAvailable": 14,
                     "actualWaitlist": 0,
@@ -160729,6 +160729,25 @@
                     "location": "Sports and Recreation Center - '61 Meeting Room 2",
                     "building": "",
                     "room": "Sports and Recreation Center - '61 Meeting Room 2",
+                    "seats": 14,
+                    "seatsAvailable": 14,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  },
+                  {
+                    "type": "Lecture",
+                    "professor": "Melissa Kagen",
+                    "startTime": "10:00",
+                    "endTime": "11:50",
+                    "location": "Sports and Recreation Center 412 - '61 Meeting Room 1",
+                    "building": "",
+                    "room": "Sports and Recreation Center 412 - '61 Meeting Room 1",
                     "seats": 14,
                     "seatsAvailable": 14,
                     "actualWaitlist": 0,
@@ -309255,7 +309274,7 @@
                 "crn": 337114,
                 "number": "DL01",
                 "seats": 70,
-                "seatsAvailable": 11,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4472",
@@ -309272,7 +309291,7 @@
                     "building": "",
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "seats": 70,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL01",
@@ -309323,7 +309342,7 @@
                   "crn": 337122,
                   "number": "DD02",
                   "seats": 35,
-                  "seatsAvailable": 11,
+                  "seatsAvailable": 12,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4472",
@@ -309340,7 +309359,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 35,
-                      "seatsAvailable": 11,
+                      "seatsAvailable": 12,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -428712,7 +428731,7 @@
             {
               "section": {
                 "crn": 351157,
-                "number": "C01 - Topics In Philosophy",
+                "number": "C01 - Topics In Philosophy: The Self in Philosophy, Psychology, and Neuroscience",
                 "seats": 20,
                 "seatsAvailable": 20,
                 "actualWaitlist": 0,
@@ -428734,7 +428753,7 @@
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "C01 - Topics In Philosophy",
+                    "specificSection": "C01 - Topics In Philosophy: The Self in Philosophy, Psychology, and Neuroscience",
                     "days": [
                       "M",
                       "R"
@@ -438205,7 +438224,7 @@
             {
               "section": {
                 "crn": 351157,
-                "number": "C01 - Topics In Philosophy",
+                "number": "C01 - Topics In Philosophy: The Self in Philosophy, Psychology, and Neuroscience",
                 "seats": 20,
                 "seatsAvailable": 20,
                 "actualWaitlist": 0,
@@ -438227,7 +438246,7 @@
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "C01 - Topics In Philosophy",
+                    "specificSection": "C01 - Topics In Philosophy: The Self in Philosophy, Psychology, and Neuroscience",
                     "days": [
                       "M",
                       "R"
@@ -449971,7 +449990,7 @@
                 "crn": 337328,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 3,
                 "maxWaitlist": 15,
                 "note": null,
@@ -449988,7 +450007,7 @@
                     "building": "",
                     "room": "Athletic Field",
                     "seats": 30,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 3,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
@@ -450008,7 +450027,7 @@
                 "crn": 337332,
                 "number": "D02",
                 "seats": 30,
-                "seatsAvailable": 0,
+                "seatsAvailable": -1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -450025,7 +450044,7 @@
                     "building": "",
                     "room": "Athletic Field",
                     "seats": 30,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": -1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
@@ -453781,7 +453800,7 @@
                 "crn": 337336,
                 "number": "D02",
                 "seats": 30,
-                "seatsAvailable": 2,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -453798,7 +453817,7 @@
                     "building": "",
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D02",
@@ -467691,43 +467710,6 @@
                     "specificSection": "C04 - ST in Holistic Well-Being: Intuitive Eating",
                     "days": [
                       "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 351096,
-                "number": "C05 - ST in Holistic Well-Being: Finding Joy in the Visual Arts",
-                "seats": 18,
-                "seatsAvailable": 18,
-                "actualWaitlist": 0,
-                "maxWaitlist": 15,
-                "note": null,
-                "computedTerm": "C",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Workshop",
-                    "professor": "Michelle Borowski",
-                    "startTime": "12:00",
-                    "endTime": "12:50",
-                    "location": "Other",
-                    "building": "",
-                    "room": "Other",
-                    "seats": 18,
-                    "seatsAvailable": 18,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 15,
-                    "specificSection": "C05 - ST in Holistic Well-Being: Finding Joy in the Visual Arts",
-                    "days": [
-                      "W",
                       "F"
                     ],
                     "isAsync": false
