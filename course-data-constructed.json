@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 26, 2026, 7:19 PM",
+  "generated": "Mar 26, 2026, 8:00 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -441173,7 +441173,7 @@
                 "crn": 340377,
                 "number": "D01",
                 "seats": 50,
-                "seatsAvailable": 17,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -441190,7 +441190,7 @@
                     "building": "",
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 50,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -470089,7 +470089,7 @@
                 "crn": 337286,
                 "number": "D01",
                 "seats": 999,
-                "seatsAvailable": 951,
+                "seatsAvailable": 952,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -470106,7 +470106,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 999,
-                    "seatsAvailable": 951,
+                    "seatsAvailable": 952,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D01",
