@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 26, 2026, 10:24 PM",
+  "generated": "Mar 26, 2026, 10:55 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -85681,7 +85681,7 @@
                 "number": "D02",
                 "seats": 54,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
                 "computedTerm": "D",
@@ -85698,7 +85698,7 @@
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 54,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "D02",
                     "days": [
