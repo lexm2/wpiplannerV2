@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 26, 2026, 2:43 PM",
+  "generated": "Mar 26, 2026, 3:55 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -6080,7 +6080,7 @@
                 "crn": 337245,
                 "number": "D02",
                 "seats": 30,
-                "seatsAvailable": 9,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -6097,7 +6097,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D02",
@@ -8600,50 +8600,13 @@
           "id": "AR-1101-2026",
           "number": "1101",
           "name": "Digital Imaging And Computer Art",
-          "description": "This course focuses on the methods, procedures and techniques of creating andmanipulating images through electronic and digital means. Students will developan understanding of image alteration. Topics may include color theory, displays,modeling, shading, and visual perception.Recommended background: AR 1100.",
+          "description": "This course focuses on the methods, procedures and techniques of creating and manipulating images through electronic and digital means. Students will develop an understanding of image alteration. Topics may include color theory, displays, modeling, shading, and visual perception. Recommended background: AR 1100.",
           "category": 1,
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
           "academicYear": 2026,
           "lectures": [
-            {
-              "section": {
-                "crn": 348923,
-                "number": "A01",
-                "seats": 24,
-                "seatsAvailable": 24,
-                "actualWaitlist": 0,
-                "maxWaitlist": 12,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Roshanak Bigonah",
-                    "startTime": "08:00",
-                    "endTime": "09:50",
-                    "location": "Salisbury Labs 123 Computer Lab",
-                    "building": "",
-                    "room": "Salisbury Labs 123 Computer Lab",
-                    "seats": 24,
-                    "seatsAvailable": 24,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 12,
-                    "specificSection": "A01",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
             {
               "section": {
                 "crn": 349105,
@@ -9039,7 +9002,7 @@
           "id": "AR-1111-2026",
           "number": "1111",
           "name": "Introduction To Art History",
-          "description": "How do we understand a work of art? Through readings and the study of objects at the Worcester Art Museum, the student will survey the major developments in world art and be introduced to various critical perspectives in art history. Students will learn how art historians work with primary materials and formulate arguments. No previous knowledge of art is required. (Formerly HU 1014.)",
+          "description": "How do we understand a work of art? Through readings and the study of objectsat the Worcester Art Museum, the student will survey the major developments inworld art and be introduced to various critical perspectives in art history. Studentswill learn how art historians work with primary materials and formulatearguments. No previous knowledge of art is required. (Formerly HU 1014.)",
           "category": 1,
           "minCredits": 3,
           "maxCredits": 3,
@@ -9048,8 +9011,8 @@
           "lectures": [
             {
               "section": {
-                "crn": 348425,
-                "number": "A02",
+                "crn": 348918,
+                "number": "A01",
                 "seats": 25,
                 "seatsAvailable": 25,
                 "actualWaitlist": 0,
@@ -9061,9 +9024,9 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Michelle Borowski",
-                    "startTime": "13:00",
-                    "endTime": "13:50",
+                    "professor": "David Samson",
+                    "startTime": "14:00",
+                    "endTime": "14:50",
                     "location": "Salisbury Labs 011",
                     "building": "",
                     "room": "Salisbury Labs 011",
@@ -9071,7 +9034,7 @@
                     "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "A02",
+                    "specificSection": "A01",
                     "days": [
                       "M",
                       "T",
@@ -82308,7 +82271,7 @@
                   "crn": 349549,
                   "number": "BX13",
                   "seats": 25,
-                  "seatsAvailable": 25,
+                  "seatsAvailable": 24,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5186",
@@ -82325,7 +82288,7 @@
                       "building": "",
                       "room": "Fuller Labs A21 Zoo Lab Restricted",
                       "seats": 25,
-                      "seatsAvailable": 25,
+                      "seatsAvailable": 24,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX13",
@@ -83460,8 +83423,8 @@
               "section": {
                 "crn": 349472,
                 "number": "B01",
-                "seats": 140,
-                "seatsAvailable": 140,
+                "seats": 125,
+                "seatsAvailable": 125,
                 "actualWaitlist": 0,
                 "maxWaitlist": 70,
                 "note": null,
@@ -83477,8 +83440,8 @@
                     "location": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "building": "",
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
-                    "seats": 140,
-                    "seatsAvailable": 140,
+                    "seats": 125,
+                    "seatsAvailable": 125,
                     "actualWaitlist": 0,
                     "maxWaitlist": 70,
                     "specificSection": "B01",
@@ -91846,7 +91809,7 @@
                 "crn": 336907,
                 "number": "D01",
                 "seats": 95,
-                "seatsAvailable": 3,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -91863,7 +91826,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 95,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -111776,7 +111739,7 @@
                 "crn": 336907,
                 "number": "D01",
                 "seats": 95,
-                "seatsAvailable": 3,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -111793,7 +111756,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 95,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -137537,58 +137500,6 @@
           ]
         },
         {
-          "id": "HI-1311-2026",
-          "number": "1311",
-          "name": "Introduction To American Urban History",
-          "description": "An introduction to the history of the American city as an important phenomenonin itself and as a reflection of national history. The course will take aninterdisciplinary approach to study the political, economic, social, andtechnological patterns that have shaped the growth of urbanization. In additionto reading historical approaches to the study of American urban history, studentsmay also examine appropriate works by sociologists, economists, politicalscientists and city planners who provide historical perspective.",
-          "category": 1,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 348912,
-                "number": "A01",
-                "seats": 25,
-                "seatsAvailable": 25,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Joseph Cullon",
-                    "startTime": "16:00",
-                    "endTime": "16:50",
-                    "location": "Salisbury Labs 407",
-                    "building": "",
-                    "room": "Salisbury Labs 407",
-                    "seats": 25,
-                    "seatsAvailable": 25,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "A01",
-                    "days": [
-                      "M",
-                      "T",
-                      "R",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
           "id": "HI-1313-2026",
           "number": "1313",
           "name": "The US and the World",
@@ -138041,45 +137952,6 @@
           "isGraduate": false,
           "academicYear": 2026,
           "lectures": [
-            {
-              "section": {
-                "crn": 348900,
-                "number": "A01",
-                "seats": 25,
-                "seatsAvailable": 25,
-                "actualWaitlist": 0,
-                "maxWaitlist": 12,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "David Spanagel",
-                    "startTime": "10:00",
-                    "endTime": "10:50",
-                    "location": "Fuller Labs 311",
-                    "building": "",
-                    "room": "Fuller Labs 311",
-                    "seats": 25,
-                    "seatsAvailable": 25,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 12,
-                    "specificSection": "A01",
-                    "days": [
-                      "M",
-                      "T",
-                      "R",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
             {
               "section": {
                 "crn": 349223,
@@ -343283,45 +343155,6 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
-                    "days": [
-                      "M",
-                      "T",
-                      "R",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 348422,
-                "number": "A02",
-                "seats": 25,
-                "seatsAvailable": 25,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Mitchell Lutch",
-                    "startTime": "12:00",
-                    "endTime": "12:50",
-                    "location": "Alden Hall B06 Janet Earle Room",
-                    "building": "",
-                    "room": "Alden Hall B06 Janet Earle Room",
-                    "seats": 25,
-                    "seatsAvailable": 25,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "A02",
                     "days": [
                       "M",
                       "T",
