@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 26, 2026, 10:52 AM",
+  "generated": "Mar 26, 2026, 11:46 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -75693,38 +75693,6 @@
                   ]
                 },
                 {
-                  "crn": 349032,
-                  "number": "AX08",
-                  "seats": 25,
-                  "seatsAvailable": 25,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5052",
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "15:50",
-                      "location": "Salisbury Labs 123 Computer Lab",
-                      "building": "",
-                      "room": "Salisbury Labs 123 Computer Lab",
-                      "seats": 25,
-                      "seatsAvailable": 25,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX08",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
                   "crn": 349030,
                   "number": "AX09",
                   "seats": 25,
@@ -75781,38 +75749,6 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX10",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349028,
-                  "number": "AX11",
-                  "seats": 25,
-                  "seatsAvailable": 25,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5052",
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "16:00",
-                      "endTime": "16:50",
-                      "location": "Salisbury Labs 123 Computer Lab",
-                      "building": "",
-                      "room": "Salisbury Labs 123 Computer Lab",
-                      "seats": 25,
-                      "seatsAvailable": 25,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX11",
                       "days": [
                         "W"
                       ],
@@ -76149,38 +76085,6 @@
                   ]
                 },
                 {
-                  "crn": 349032,
-                  "number": "AX08",
-                  "seats": 25,
-                  "seatsAvailable": 25,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5052",
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "15:50",
-                      "location": "Salisbury Labs 123 Computer Lab",
-                      "building": "",
-                      "room": "Salisbury Labs 123 Computer Lab",
-                      "seats": 25,
-                      "seatsAvailable": 25,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX08",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
                   "crn": 349030,
                   "number": "AX09",
                   "seats": 25,
@@ -76237,38 +76141,6 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX10",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349028,
-                  "number": "AX11",
-                  "seats": 25,
-                  "seatsAvailable": 25,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5052",
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "16:00",
-                      "endTime": "16:50",
-                      "location": "Salisbury Labs 123 Computer Lab",
-                      "building": "",
-                      "room": "Salisbury Labs 123 Computer Lab",
-                      "seats": 25,
-                      "seatsAvailable": 25,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX11",
                       "days": [
                         "W"
                       ],
