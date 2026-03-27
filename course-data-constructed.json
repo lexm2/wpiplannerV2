@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 27, 2026, 7:50 PM",
+  "generated": "Mar 27, 2026, 8:34 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -16555,7 +16555,7 @@
                 "crn": 339594,
                 "number": "D01",
                 "seats": 100,
-                "seatsAvailable": -2,
+                "seatsAvailable": -1,
                 "actualWaitlist": 11,
                 "maxWaitlist": 20,
                 "note": null,
@@ -16572,7 +16572,7 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 100,
-                    "seatsAvailable": -2,
+                    "seatsAvailable": -1,
                     "actualWaitlist": 11,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -125514,7 +125514,7 @@
                 "crn": 348444,
                 "number": "AL02",
                 "seats": 90,
-                "seatsAvailable": 89,
+                "seatsAvailable": 88,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5102",
@@ -125531,7 +125531,7 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 90,
-                    "seatsAvailable": 89,
+                    "seatsAvailable": 88,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "AL02",
@@ -125550,7 +125550,7 @@
                   "crn": 348436,
                   "number": "AD02",
                   "seats": 90,
-                  "seatsAvailable": 89,
+                  "seatsAvailable": 88,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5102",
@@ -125567,7 +125567,7 @@
                       "building": "",
                       "room": "Unity Hall 400",
                       "seats": 90,
-                      "seatsAvailable": 89,
+                      "seatsAvailable": 88,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD02",
@@ -126152,7 +126152,7 @@
                 "crn": 348627,
                 "number": "A01",
                 "seats": 70,
-                "seatsAvailable": 70,
+                "seatsAvailable": 69,
                 "actualWaitlist": 0,
                 "maxWaitlist": 40,
                 "note": null,
@@ -126169,7 +126169,7 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 70,
-                    "seatsAvailable": 70,
+                    "seatsAvailable": 69,
                     "actualWaitlist": 0,
                     "maxWaitlist": 40,
                     "specificSection": "A01",
@@ -127876,7 +127876,7 @@
                 "crn": 350095,
                 "number": "B02",
                 "seats": 75,
-                "seatsAvailable": 75,
+                "seatsAvailable": 74,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -127893,7 +127893,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 75,
-                    "seatsAvailable": 75,
+                    "seatsAvailable": 74,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "B02",
@@ -136088,7 +136088,7 @@
                 "crn": 348914,
                 "number": "A01",
                 "seats": 20,
-                "seatsAvailable": 20,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -136105,7 +136105,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 20,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
@@ -136270,7 +136270,7 @@
                 "crn": 349687,
                 "number": "B01",
                 "seats": 20,
-                "seatsAvailable": 20,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -136287,7 +136287,7 @@
                     "building": "",
                     "room": "Atwater Kent 232",
                     "seats": 20,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -137879,58 +137879,6 @@
                     "room": "Olin Hall 126",
                     "seats": 25,
                     "seatsAvailable": -4,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "A02",
-                    "days": [
-                      "M",
-                      "T",
-                      "R",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "HI-1330-2026",
-          "number": "1330",
-          "name": "Introduction To The History Of Science And Technology",
-          "description": "An introduction to the questions, methods and source materials that shape historical studies of science and technology. Sections vary in content and emphases; some may explore the interplay of science and technology across time, while other sections might exclusively develop themes within either the history of science or the history of technology. Students can receive credit only once for HI 1330, 1331, or 1332.",
-          "category": 1,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 349223,
-                "number": "A02",
-                "seats": 25,
-                "seatsAvailable": 25,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Constance Clark",
-                    "startTime": "13:00",
-                    "endTime": "13:50",
-                    "location": "Higgins Labs 114",
-                    "building": "",
-                    "room": "Higgins Labs 114",
-                    "seats": 25,
-                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A02",
@@ -307707,7 +307655,7 @@
                 "crn": 349705,
                 "number": "BL01",
                 "seats": 50,
-                "seatsAvailable": 50,
+                "seatsAvailable": 49,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5184",
@@ -307724,7 +307672,7 @@
                     "building": "",
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 50,
-                    "seatsAvailable": 50,
+                    "seatsAvailable": 49,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "BL01",
@@ -307776,7 +307724,7 @@
                   "crn": 349640,
                   "number": "BX04",
                   "seats": 25,
-                  "seatsAvailable": 25,
+                  "seatsAvailable": 24,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5184",
@@ -307793,7 +307741,7 @@
                       "building": "",
                       "room": "Salisbury Labs 123 Computer Lab",
                       "seats": 25,
-                      "seatsAvailable": 25,
+                      "seatsAvailable": 24,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -324020,12 +323968,12 @@
             {
               "section": {
                 "crn": 349106,
-                "number": "A01",
+                "number": "AL01",
                 "seats": 40,
                 "seatsAvailable": 40,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
-                "note": null,
+                "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5763",
                 "computedTerm": "A",
                 "isGps": false,
                 "isInterestList": false,
@@ -324042,7 +323990,7 @@
                     "seatsAvailable": 40,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
-                    "specificSection": "A01",
+                    "specificSection": "AL01",
                     "days": [
                       "M",
                       "T",
@@ -324061,7 +324009,7 @@
                   "seatsAvailable": 40,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
-                  "note": null,
+                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5763",
                   "computedTerm": "A",
                   "isGps": false,
                   "isInterestList": false,
@@ -324079,102 +324027,6 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD01",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 356121,
-                  "number": "AD02",
-                  "seats": 40,
-                  "seatsAvailable": 40,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5713",
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Mehdi Mortazavi",
-                      "startTime": "12:00",
-                      "endTime": "12:50",
-                      "location": "Fuller Labs 311",
-                      "building": "",
-                      "room": "Fuller Labs 311",
-                      "seats": 40,
-                      "seatsAvailable": 40,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AD02",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 356111,
-                  "number": "BD01",
-                  "seats": 40,
-                  "seatsAvailable": 40,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5722",
-                  "computedTerm": "B",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Alireza Mahdavi Nejad; Fiona Zoutendyk",
-                      "startTime": "13:00",
-                      "endTime": "13:50",
-                      "location": "Innovation Studio 203 Active Learning Classroom South",
-                      "building": "",
-                      "room": "Innovation Studio 203 Active Learning Classroom South",
-                      "seats": 40,
-                      "seatsAvailable": 40,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "BD01",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 356120,
-                  "number": "CD01",
-                  "seats": 90,
-                  "seatsAvailable": 90,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5712",
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Selcuk Guceri",
-                      "startTime": "15:00",
-                      "endTime": "15:50",
-                      "location": "Olin Hall 107",
-                      "building": "",
-                      "room": "Olin Hall 107",
-                      "seats": 90,
-                      "seatsAvailable": 90,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CD01",
                       "days": [
                         "W"
                       ],
@@ -324254,38 +324106,6 @@
                 ]
               },
               "compatibleDiscussions": [
-                {
-                  "crn": 356112,
-                  "number": "AD01",
-                  "seats": 40,
-                  "seatsAvailable": 40,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Mehdi Mortazavi",
-                      "startTime": "10:00",
-                      "endTime": "10:50",
-                      "location": "Higgins Labs 154",
-                      "building": "",
-                      "room": "Higgins Labs 154",
-                      "seats": 40,
-                      "seatsAvailable": 40,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AD01",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
                 {
                   "crn": 356121,
                   "number": "AD02",
@@ -324391,38 +324211,6 @@
               },
               "compatibleDiscussions": [
                 {
-                  "crn": 356112,
-                  "number": "AD01",
-                  "seats": 40,
-                  "seatsAvailable": 40,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Mehdi Mortazavi",
-                      "startTime": "10:00",
-                      "endTime": "10:50",
-                      "location": "Higgins Labs 154",
-                      "building": "",
-                      "room": "Higgins Labs 154",
-                      "seats": 40,
-                      "seatsAvailable": 40,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AD01",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
                   "crn": 356111,
                   "number": "BD01",
                   "seats": 40,
@@ -324526,38 +324314,6 @@
                 ]
               },
               "compatibleDiscussions": [
-                {
-                  "crn": 356112,
-                  "number": "AD01",
-                  "seats": 40,
-                  "seatsAvailable": 40,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Mehdi Mortazavi",
-                      "startTime": "10:00",
-                      "endTime": "10:50",
-                      "location": "Higgins Labs 154",
-                      "building": "",
-                      "room": "Higgins Labs 154",
-                      "seats": 40,
-                      "seatsAvailable": 40,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AD01",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
                 {
                   "crn": 356120,
                   "number": "CD01",
@@ -324669,7 +324425,7 @@
                   "seatsAvailable": 40,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
-                  "note": null,
+                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5763",
                   "computedTerm": "A",
                   "isGps": false,
                   "isInterestList": false,
@@ -443397,43 +443153,6 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
-                    "days": [
-                      "M",
-                      "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 352484,
-                "number": "D01",
-                "seats": 20,
-                "seatsAvailable": 20,
-                "actualWaitlist": 0,
-                "maxWaitlist": 5,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Yunus Telliel",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Stratton Hall 202 (new)",
-                    "building": "",
-                    "room": "Stratton Hall 202 (new)",
-                    "seats": 20,
-                    "seatsAvailable": 20,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 5,
-                    "specificSection": "D01",
                     "days": [
                       "M",
                       "R"
