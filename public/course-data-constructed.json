@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 27, 2026, 12:57 PM",
+  "generated": "Mar 27, 2026, 2:12 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -145146,7 +145146,7 @@
                 "crn": 350150,
                 "number": "B08 - INQ SEM: Communicating Across Cultures",
                 "seats": 12,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -145163,7 +145163,7 @@
                     "building": "",
                     "room": "Salisbury Labs 226 HUA Seminar Room",
                     "seats": 12,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "B08 - INQ SEM: Communicating Across Cultures",
