@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 27, 2026, 3:08 PM",
+  "generated": "Mar 27, 2026, 4:05 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -113927,6 +113927,53 @@
           ]
         },
         {
+          "id": "ECE-5530-2026",
+          "number": "5530",
+          "name": "Power Distribution",
+          "description": "This graduate level course introduces the fundamentals of power distribution systems, apparatus, and practices suited to new and experienced utility distribution engineers. Topics include distribution system designs, transformers and connections, practical aspects of apparatus and protection, principles of device coordination, grounding, voltage control, and power quality. Prerequisites: Prior courses in magnetism and three-phase circuits. An electric machines course would be recommended.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 356529,
+                "number": "F0",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Edvina Uzunovic",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "F0",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "ECE-5532-2026",
           "number": "5532",
           "name": "Distributed And Renewable Power Generation",
@@ -118346,7 +118393,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Sasha Wiseman",
                     "startTime": "13:00",
                     "endTime": "13:50",
                     "location": "Salisbury Labs 407",
@@ -145428,40 +145475,6 @@
             },
             {
               "section": {
-                "crn": 351610,
-                "number": "C05 - INQ SEM: Integrating the Humanities in STEM Education",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "C",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "C05 - INQ SEM: Integrating the Humanities in STEM Education",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
                 "crn": 351622,
                 "number": "C06 - INQ SEM: Philosophy: 'Just Friends'",
                 "seats": 12,
@@ -146182,42 +146195,6 @@
             },
             {
               "section": {
-                "crn": 352454,
-                "number": "D06 - INQ SEM: Writing the Prose Poem",
-                "seats": 12,
-                "seatsAvailable": 12,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "13:50",
-                    "location": "Washburn 323",
-                    "building": "",
-                    "room": "Washburn 323",
-                    "seats": 12,
-                    "seatsAvailable": 12,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "D06 - INQ SEM: Writing the Prose Poem",
-                    "days": [
-                      "T"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
                 "crn": 352185,
                 "number": "D07 - INQ SEM: Hip Hop",
                 "seats": 12,
@@ -146327,7 +146304,7 @@
             {
               "section": {
                 "crn": 352461,
-                "number": "D10 - INQ SEM IN HUA: European History",
+                "number": "D10 - INQ SEM IN HUA: Working Girl: Women, Labor, and Activism in Modern History",
                 "seats": 12,
                 "seatsAvailable": 12,
                 "actualWaitlist": 0,
@@ -146349,7 +146326,7 @@
                     "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "D10 - INQ SEM IN HUA: European History",
+                    "specificSection": "D10 - INQ SEM IN HUA: Working Girl: Women, Labor, and Activism in Modern History",
                     "days": [
                       "W"
                     ],
