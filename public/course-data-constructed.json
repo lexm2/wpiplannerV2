@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 27, 2026, 2:39 AM",
+  "generated": "Mar 27, 2026, 4:57 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -119829,7 +119829,7 @@
                 "crn": 337138,
                 "number": "D01",
                 "seats": 12,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -119846,7 +119846,7 @@
                     "building": "",
                     "room": "Stratton Hall 311",
                     "seats": 12,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "D01",
@@ -421553,7 +421553,7 @@
                 "crn": 339141,
                 "number": "D01",
                 "seats": 25,
-                "seatsAvailable": 15,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -421570,7 +421570,7 @@
                     "building": "",
                     "room": "Salisbury Labs 011",
                     "seats": 25,
-                    "seatsAvailable": 15,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
