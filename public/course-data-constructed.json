@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 28, 2026, 1:47 PM",
+  "generated": "Mar 28, 2026, 2:28 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -137739,58 +137739,6 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "A02",
-                    "days": [
-                      "M",
-                      "T",
-                      "R",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "HI-1322-2026",
-          "number": "1322",
-          "name": "Introduction To European History",
-          "description": "This course introduces students to the major currents that have defined modern European History. Themes and topics will vary and may include the philosophical impact of science on modern thought, the development of liberalism and socialism, the crisis of culture in the twentieth century. Students read selections on major episodes in European history and develop their skills in critical thinking, analysis, oral and written argument. No prior knowledge of European history is required. Some sections of this course may be offered as Writing Intensive (WI).",
-          "category": 1,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 356565,
-                "number": "B01",
-                "seats": 25,
-                "seatsAvailable": 25,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "B",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Alexander Herbert",
-                    "startTime": "11:00",
-                    "endTime": "11:50",
-                    "location": "Atwater Kent 233",
-                    "building": "",
-                    "room": "Atwater Kent 233",
-                    "seats": 25,
-                    "seatsAvailable": 25,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "B01",
                     "days": [
                       "M",
                       "T",
