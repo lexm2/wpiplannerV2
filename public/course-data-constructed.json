@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 28, 2026, 3:35 PM",
+  "generated": "Mar 28, 2026, 4:00 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -441651,56 +441651,6 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "TH-3300-2026",
-          "number": "3300",
-          "name": "Special Topics in Theater Studies",
-          "description": "TH 3300: Special Topics in Theater Studies (Units: 1/3) This course will use the multidisciplinary approach of theatre studies to examine specific theatrical traditions, movements, or approaches. Through reading/viewing, discussion, and practical exercises, students will explore the interactions of various theatrical sub-disciplines (such as directing, design, playwriting, acting, etc.) as well as the relationship of performance to adjacent fields such as sociology, geography, history, and politics. Each offering will focus on a specific type of performance, such as: Documentary Theatre, Audience Driven/Interactive Performance, Theatre for Social Change, Religious & Ritual Performance, Puppetry, or Physical Theatre. S t udents may repeat this course for credit with different topics . Recommended background: (none)",
-          "category": 3,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 354286,
-                "number": "B01",
-                "seats": 20,
-                "seatsAvailable": 20,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "B",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Sarah Lucie",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Atwater Kent 232",
-                    "building": "",
-                    "room": "Atwater Kent 232",
-                    "seats": 20,
-                    "seatsAvailable": 20,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "B01",
                     "days": [
                       "T",
                       "F"
