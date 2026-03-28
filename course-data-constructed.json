@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 28, 2026, 5:53 PM",
+  "generated": "Mar 28, 2026, 6:34 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -111689,8 +111689,8 @@
               "section": {
                 "crn": 351401,
                 "number": "C01",
-                "seats": 70,
-                "seatsAvailable": 70,
+                "seats": 65,
+                "seatsAvailable": 65,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -111703,11 +111703,11 @@
                     "professor": "Berk Sunar",
                     "startTime": "16:00",
                     "endTime": "17:50",
-                    "location": "Unknown",
+                    "location": "Atwater Kent 233",
                     "building": "",
-                    "room": "Unknown",
-                    "seats": 70,
-                    "seatsAvailable": 70,
+                    "room": "Atwater Kent 233",
+                    "seats": 65,
+                    "seatsAvailable": 65,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
