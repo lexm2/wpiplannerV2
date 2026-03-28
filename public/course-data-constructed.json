@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 28, 2026, 4:00 PM",
+  "generated": "Mar 28, 2026, 4:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -23129,7 +23129,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -23146,7 +23146,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -23758,7 +23758,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5280",
                 "computedTerm": "F",
                 "isGps": false,
@@ -23775,7 +23775,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "FL01",
                     "days": [],
                     "isAsync": true
@@ -23790,7 +23790,7 @@
                   "seats": 30,
                   "seatsAvailable": 30,
                   "actualWaitlist": 0,
-                  "maxWaitlist": 10,
+                  "maxWaitlist": 20,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5280",
                   "computedTerm": "F",
                   "isGps": false,
@@ -23807,7 +23807,7 @@
                       "seats": 30,
                       "seatsAvailable": 30,
                       "actualWaitlist": 0,
-                      "maxWaitlist": 10,
+                      "maxWaitlist": 20,
                       "specificSection": "FX01",
                       "days": [],
                       "isAsync": true
@@ -24272,7 +24272,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": true,
@@ -24289,7 +24289,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01 - ST: Biomanufacturing Process Control and Statistical Tools",
                     "days": [],
                     "isAsync": true
@@ -41786,7 +41786,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -41803,7 +41803,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -42068,7 +42068,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -42085,7 +42085,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -42308,7 +42308,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -42325,7 +42325,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -65955,7 +65955,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "B",
                 "isGps": false,
@@ -65972,7 +65972,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "B01",
                     "days": [],
                     "isAsync": true
@@ -66938,7 +66938,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": true,
@@ -66955,7 +66955,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F02 - AT: Plant Medicinal Chemistry",
                     "days": [],
                     "isAsync": true
@@ -67032,7 +67032,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -67049,7 +67049,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -92208,7 +92208,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -92225,7 +92225,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F02",
                     "days": [],
                     "isAsync": true
@@ -92873,7 +92873,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -92890,7 +92890,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -94287,7 +94287,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -94304,7 +94304,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F02",
                     "days": [],
                     "isAsync": true
@@ -94839,7 +94839,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -94856,7 +94856,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F03",
                     "days": [],
                     "isAsync": true
@@ -97003,7 +97003,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -97020,7 +97020,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -97484,7 +97484,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -97501,7 +97501,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F02",
                     "days": [],
                     "isAsync": true
@@ -97831,7 +97831,7 @@
                 "seats": 10,
                 "seatsAvailable": 10,
                 "actualWaitlist": 0,
-                "maxWaitlist": 0,
+                "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -97848,7 +97848,7 @@
                     "seats": 10,
                     "seatsAvailable": 10,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 0,
+                    "maxWaitlist": 10,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -100482,7 +100482,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -100499,7 +100499,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F02",
                     "days": [],
                     "isAsync": true
@@ -100747,7 +100747,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -100764,7 +100764,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -101040,7 +101040,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -101057,7 +101057,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F02",
                     "days": [],
                     "isAsync": true
@@ -103090,7 +103090,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -103107,7 +103107,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F02",
                     "days": [
                       "W"
@@ -112547,6 +112547,55 @@
           ]
         },
         {
+          "id": "ECE-506-2026",
+          "number": "506",
+          "name": "Introduction To Local And Wide Area Networks",
+          "description": "This course provides an introduction to the theory and practice of the design of computer communions networks according to IEEE 802 standard model for lower layers and IETF standard for TCP/IP higher layers. Analysis of network topologies and protocols, including performance analysis, is treated. Current network types including local area and wide area networks are introduced, as are evolving network technologies. The theory, design and performance of local area networks are emphasized. The course includes applion of queueing analysis to performance analysis of medium access control (MAC) and applion of communion theory in design of physical layer (PHY). Prerequisites: familiarity to MATLAB programming is assumed. Background in undergraduate level courses in networking, probability, statistic, and signal processing.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 357481,
+                "number": "F02",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Shahin Tajik",
+                    "startTime": "18:00",
+                    "endTime": "20:50",
+                    "location": "Atwater Kent 233",
+                    "building": "",
+                    "room": "Atwater Kent 233",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "F02",
+                    "days": [
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "ECE-5105-2025",
           "number": "5105",
           "name": "Introduction To Antenna Design",
@@ -113393,7 +113442,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -113410,7 +113459,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -113709,7 +113758,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -113726,7 +113775,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -113897,7 +113946,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -113914,55 +113963,8 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "ECE-5530-2026",
-          "number": "5530",
-          "name": "Power Distribution",
-          "description": "This graduate level course introduces the fundamentals of power distribution systems, apparatus, and practices suited to new and experienced utility distribution engineers. Topics include distribution system designs, transformers and connections, practical aspects of apparatus and protection, principles of device coordination, grounding, voltage control, and power quality. Prerequisites: Prior courses in magnetism and three-phase circuits. An electric machines course would be recommended.",
-          "category": null,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": true,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 356529,
-                "number": "F0",
-                "seats": 30,
-                "seatsAvailable": 30,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "F",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Edvina Uzunovic",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 30,
-                    "seatsAvailable": 30,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "F0",
                     "days": [],
                     "isAsync": true
                   }
@@ -113991,7 +113993,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -114008,7 +114010,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -114917,7 +114919,7 @@
                 "seats": 10,
                 "seatsAvailable": 10,
                 "actualWaitlist": 0,
-                "maxWaitlist": 0,
+                "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -114934,7 +114936,7 @@
                     "seats": 10,
                     "seatsAvailable": 10,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 0,
+                    "maxWaitlist": 10,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -137456,6 +137458,136 @@
       "name": "History",
       "courses": [
         {
+          "id": "HI-1001-2026",
+          "number": "1001",
+          "name": "Introductory Topics in Historical Thinking",
+          "description": "This course introduces students to the purpose and methods of historical thinking through the exploration of a specific topic situated in time, space, and theme. Through rigorous engagement with primary documents as well as secondary historical interpretations and arguments, students develop their understanding of the nature and limits of historical evidence, their ability to make persuasive claims about change over time, and their capacity to balance the complexity of perspectives and voices. Among the central historical concepts introduced are chronology, context, causation, contingency, agency, and scale. HI 1001 cannot be repeated for different topics.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 357723,
+                "number": "A02",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Holger Droessler",
+                    "startTime": "10:00",
+                    "endTime": "10:50",
+                    "location": "Salisbury Labs 305",
+                    "building": "",
+                    "room": "Salisbury Labs 305",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "A02",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357658,
+                "number": "A05",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Constance Clark",
+                    "startTime": "13:00",
+                    "endTime": "13:50",
+                    "location": "Higgins Labs 114",
+                    "building": "",
+                    "room": "Higgins Labs 114",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "A05",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357754,
+                "number": "B01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Alexander Herbert",
+                    "startTime": "11:00",
+                    "endTime": "11:50",
+                    "location": "Atwater Kent 233",
+                    "building": "",
+                    "room": "Atwater Kent 233",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "B01",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "HI-1311-2025",
           "number": "1311",
           "name": "Introduction To American Urban History",
@@ -156471,6 +156603,56 @@
           ]
         },
         {
+          "id": "IMGD-2200-2026",
+          "number": "2200",
+          "name": "AI in Writing and Communication",
+          "description": "WR 2200/IMGD 2200: AI in Writing and Communion () Generative AI is transforming the practices of writing and communion. It also generates new questions about authorship, responsibility, creativity, authenticity, and other rhetorical constructs that affect us equally as citizens and professionals. This course offers the foundations of critical AI literacy. It aims to help students develop a robust understanding of what this transformation means, and what kind of new sensibilities and skills are needed in response to an AI-led transformation. The course focuses on: 1) technological and cultural trends that shape the perception of generative AI, 2) ethical concerns emerging from the use of generative AI in professional and nonprofessional contexts, and 3) effective and responsible practices of using generative AI in writing and other forms of communion. In addition to reading assignments, students will have the opportunity to experiment with generative AI and assess its limits and possibilities. The assignments include critical annotations, fact-checking procedures, creative workflow processes, ethical analyses, and interaction design inquiries. Recommended Background: None",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 357675,
+                "number": "D01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Yunus Telliel",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Stratton Hall 202 (new)",
+                    "building": "",
+                    "room": "Stratton Hall 202 (new)",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "D01",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "IMGD-2222-2025",
           "number": "2222",
           "name": "2d Animation I",
@@ -162251,6 +162433,43 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "D01",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357485,
+                "number": "D02",
+                "seats": 15,
+                "seatsAvailable": 15,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Esther Boucher-Yip",
+                    "startTime": "10:00",
+                    "endTime": "11:50",
+                    "location": "Olin Hall 218",
+                    "building": "",
+                    "room": "Olin Hall 218",
+                    "seats": 15,
+                    "seatsAvailable": 15,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "D02",
                     "days": [
                       "T",
                       "F"
@@ -315700,7 +315919,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -315717,7 +315936,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F02",
                     "days": [],
                     "isAsync": true
@@ -349587,6 +349806,93 @@
           ]
         },
         {
+          "id": "MU-2502-2026",
+          "number": "2502",
+          "name": "Making Music with Science",
+          "description": "What are the connections between music and science, and what can be achieved when they come together? This course will teach students to create science-inspired musical compositions, providing the opportunity to explore the humanistic side of their STEM experiences at WPI. Students will learn interdisciplinary techniques such as data sonifion, analyze works of science-art in society, and explore the philosophical questions that arise when differing disciplines are brought together. These activities will culminate in the creation of multimedia compositions performed live in a concert of instrumental and electronic music. Those with a science focus at WPI will have the opportunity to explore their work in a musical context, and those with a humanities background will be empowered to compose works inspired by science. Recommended Background: some background in musical performance and/or composing.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 357458,
+                "number": "A01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "David Ibbett",
+                    "startTime": "12:00",
+                    "endTime": "13:50",
+                    "location": "Alden Hall B30 Music Technology Lab",
+                    "building": "",
+                    "room": "Alden Hall B30 Music Technology Lab",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "A01",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 356564,
+                "number": "D01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "David Ibbett",
+                    "startTime": "12:00",
+                    "endTime": "13:50",
+                    "location": "Alden Hall B30 Music Technology Lab",
+                    "building": "",
+                    "room": "Alden Hall B30 Music Technology Lab",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "D01",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "MU-2502-2025",
           "number": "2502",
           "name": "Making Music with Science",
@@ -349622,56 +349928,6 @@
                     "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "D01",
-                    "days": [
-                      "M",
-                      "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "MU-2502-2026",
-          "number": "2502",
-          "name": "Making Music with Science",
-          "description": "What are the connections between music and science, and what can be achieved when they come together? This course will teach students to create science-inspired musical compositions, providing the opportunity to explore the humanistic side of their STEM experiences at WPI. Students will learn interdisciplinary techniques such as data sonifion, analyze works of science-art in society, and explore the philosophical questions that arise when differing disciplines are brought together. These activities will culminate in the creation of multimedia compositions performed live in a concert of instrumental and electronic music. Those with a science focus at WPI will have the opportunity to explore their work in a musical context, and those with a humanities background will be empowered to compose works inspired by science. Recommended Background: some background in musical performance and/or composing.",
-          "category": 1,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 356564,
-                "number": "D01",
-                "seats": 20,
-                "seatsAvailable": 20,
-                "actualWaitlist": 0,
-                "maxWaitlist": 5,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "David Ibbett",
-                    "startTime": "12:00",
-                    "endTime": "13:50",
-                    "location": "Alden Hall B30 Music Technology Lab",
-                    "building": "",
-                    "room": "Alden Hall B30 Music Technology Lab",
-                    "seats": 20,
-                    "seatsAvailable": 20,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 5,
                     "specificSection": "D01",
                     "days": [
                       "M",
@@ -439302,7 +439558,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -439319,42 +439575,8 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 350313,
-                "number": "F02",
-                "seats": 30,
-                "seatsAvailable": 30,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "F",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Christopher Piccirillo",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 30,
-                    "seatsAvailable": 30,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "F02",
                     "days": [],
                     "isAsync": true
                   }
@@ -439498,7 +439720,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -439515,7 +439737,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -439686,7 +439908,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -439703,7 +439925,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -440015,7 +440237,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": true,
@@ -440032,7 +440254,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F01 - ST: Reliability Engineering",
                     "days": [],
                     "isAsync": true
@@ -440049,7 +440271,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": true,
@@ -440066,7 +440288,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "F02 - ST: Technical Decision and Risk Analysis",
                     "days": [],
                     "isAsync": true
@@ -440364,7 +440586,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 0,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
                 "isGps": false,
@@ -440381,7 +440603,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [
                       "T"
@@ -441627,14 +441849,14 @@
           "lectures": [
             {
               "section": {
-                "crn": 354350,
-                "number": "C01",
+                "crn": 357784,
+                "number": "B01",
                 "seats": 20,
                 "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
-                "computedTerm": "C",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": false,
                 "periods": [
@@ -441643,14 +441865,14 @@
                     "professor": "Sarah Lucie",
                     "startTime": "12:00",
                     "endTime": "13:50",
-                    "location": "Atwater Kent 232",
+                    "location": "Salisbury Labs 402",
                     "building": "",
-                    "room": "Atwater Kent 232",
+                    "room": "Salisbury Labs 402",
                     "seats": 20,
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
-                    "specificSection": "C01",
+                    "specificSection": "B01",
                     "days": [
                       "T",
                       "F"
@@ -442067,6 +442289,45 @@
                     "days": [
                       "M",
                       "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357469,
+                "number": "D01",
+                "seats": 18,
+                "seatsAvailable": 18,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Katie Hamilton",
+                    "startTime": "12:00",
+                    "endTime": "12:50",
+                    "location": "Little Theatre",
+                    "building": "",
+                    "room": "Little Theatre",
+                    "seats": 18,
+                    "seatsAvailable": 18,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "D01",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
                     ],
                     "isAsync": false
                   }
@@ -443572,6 +443833,56 @@
                     "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
+                    "specificSection": "D01",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "WR-2200-2026",
+          "number": "2200",
+          "name": "AI in Writing and Communication",
+          "description": "WR 2200/IMGD 2200: AI in Writing and Communion () Generative AI is transforming the practices of writing and communion. It also generates new questions about authorship, responsibility, creativity, authenticity, and other rhetorical constructs that affect us equally as citizens and professionals. This course offers the foundations of critical AI literacy. It aims to help students develop a robust understanding of what this transformation means, and what kind of new sensibilities and skills are needed in response to an AI-led transformation. The course focuses on: 1) technological and cultural trends that shape the perception of generative AI, 2) ethical concerns emerging from the use of generative AI in professional and nonprofessional contexts, and 3) effective and responsible practices of using generative AI in writing and other forms of communion. In addition to reading assignments, students will have the opportunity to experiment with generative AI and assess its limits and possibilities. The assignments include critical annotations, fact-checking procedures, creative workflow processes, ethical analyses, and interaction design inquiries. Recommended Background: None",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 357675,
+                "number": "D01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Yunus Telliel",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Stratton Hall 202 (new)",
+                    "building": "",
+                    "room": "Stratton Hall 202 (new)",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
                     "specificSection": "D01",
                     "days": [
                       "M",
@@ -464230,6 +464541,43 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A05 - ST in Holistic Well-Being: Strategies for College Learning and Productivity",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357071,
+                "number": "A06 - ST in Holistic Well-Being: Sophomore Success- Navigating Your Second Year at WPI",
+                "seats": 50,
+                "seatsAvailable": 50,
+                "actualWaitlist": 0,
+                "maxWaitlist": 15,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Workshop",
+                    "professor": "Lillian Schreiner",
+                    "startTime": "12:00",
+                    "endTime": "12:50",
+                    "location": "Unity Hall 400",
+                    "building": "",
+                    "room": "Unity Hall 400",
+                    "seats": 50,
+                    "seatsAvailable": 50,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 15,
+                    "specificSection": "A06 - ST in Holistic Well-Being: Sophomore Success- Navigating Your Second Year at WPI",
                     "days": [
                       "M",
                       "R"
