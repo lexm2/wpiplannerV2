@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 28, 2026, 5:24 PM",
+  "generated": "Mar 28, 2026, 5:53 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -108195,8 +108195,8 @@
                   {
                     "type": "Lecture",
                     "professor": "Alexander Wyglinski",
-                    "startTime": "16:00",
-                    "endTime": "16:50",
+                    "startTime": "15:00",
+                    "endTime": "15:50",
                     "location": "Atwater Kent 233",
                     "building": "",
                     "room": "Atwater Kent 233",
@@ -111701,8 +111701,8 @@
                   {
                     "type": "Lecture",
                     "professor": "Berk Sunar",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
+                    "startTime": "16:00",
+                    "endTime": "17:50",
                     "location": "Unknown",
                     "building": "",
                     "room": "Unknown",
@@ -111711,8 +111711,11 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
-                    "days": [],
-                    "isAsync": true
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
                   }
                 ]
               },
@@ -315767,7 +315770,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -315784,7 +315787,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S02",
                     "days": [],
                     "isAsync": true
@@ -439309,7 +439312,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -439326,7 +439329,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -439666,7 +439669,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -439683,42 +439686,8 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
-                    "days": [],
-                    "isAsync": true
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 350847,
-                "number": "S02",
-                "seats": 30,
-                "seatsAvailable": 30,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "S",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Donald Gelosh",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
-                    "building": "",
-                    "room": "Unknown",
-                    "seats": 30,
-                    "seatsAvailable": 30,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "S02",
                     "days": [],
                     "isAsync": true
                   }
@@ -439888,7 +439857,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -439905,7 +439874,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -440076,7 +440045,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -440093,7 +440062,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -440170,7 +440139,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -440187,7 +440156,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -440264,7 +440233,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -440281,7 +440250,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -440379,7 +440348,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -440396,7 +440365,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S02",
                     "days": [],
                     "isAsync": true
@@ -440696,7 +440665,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 0,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -440713,7 +440682,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [
                       "T"
@@ -443067,43 +443036,6 @@
                     "days": [
                       "M",
                       "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 352490,
-                "number": "D01",
-                "seats": 20,
-                "seatsAvailable": 20,
-                "actualWaitlist": 0,
-                "maxWaitlist": 5,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Higgins Labs 114",
-                    "building": "",
-                    "room": "Higgins Labs 114",
-                    "seats": 20,
-                    "seatsAvailable": 20,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 5,
-                    "specificSection": "D01",
-                    "days": [
-                      "T",
-                      "F"
                     ],
                     "isAsync": false
                   }
