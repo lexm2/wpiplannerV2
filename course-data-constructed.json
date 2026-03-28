@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 28, 2026, 4:49 PM",
+  "generated": "Mar 28, 2026, 5:24 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -23254,7 +23254,7 @@
                 "seats": 20,
                 "seatsAvailable": 20,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5148",
                 "computedTerm": "S",
                 "isGps": false,
@@ -23271,7 +23271,7 @@
                     "seats": 20,
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "SL01",
                     "days": [],
                     "isAsync": true
@@ -23286,7 +23286,7 @@
                   "seats": 20,
                   "seatsAvailable": 20,
                   "actualWaitlist": 0,
-                  "maxWaitlist": 10,
+                  "maxWaitlist": 20,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5148",
                   "computedTerm": "S",
                   "isGps": false,
@@ -23303,7 +23303,7 @@
                       "seats": 20,
                       "seatsAvailable": 20,
                       "actualWaitlist": 0,
-                      "maxWaitlist": 10,
+                      "maxWaitlist": 20,
                       "specificSection": "SX01",
                       "days": [],
                       "isAsync": true
@@ -24306,7 +24306,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5289",
                 "computedTerm": "S",
                 "isGps": true,
@@ -24323,7 +24323,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "SL02 - ST: Antibody Therapeutics",
                     "days": [],
                     "isAsync": true
@@ -24338,7 +24338,7 @@
                   "seats": 30,
                   "seatsAvailable": 30,
                   "actualWaitlist": 0,
-                  "maxWaitlist": 10,
+                  "maxWaitlist": 20,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5289",
                   "computedTerm": "S",
                   "isGps": true,
@@ -24355,7 +24355,7 @@
                       "seats": 30,
                       "seatsAvailable": 30,
                       "actualWaitlist": 0,
-                      "maxWaitlist": 10,
+                      "maxWaitlist": 20,
                       "specificSection": "SX02 - ST: Antibody Therapeutics",
                       "days": [],
                       "isAsync": true
@@ -24519,7 +24519,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -24536,7 +24536,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -25258,7 +25258,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -25275,7 +25275,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -40773,22 +40773,22 @@
           "lectures": [
             {
               "section": {
-                "crn": 354217,
-                "number": "D01",
+                "crn": 350988,
+                "number": "C01",
                 "seats": 40,
                 "seatsAvailable": 40,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
-                "computedTerm": "D",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": false,
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Suzanne LePage",
+                    "professor": "Not Assigned",
                     "startTime": "16:00",
-                    "endTime": "16:50",
+                    "endTime": "17:50",
                     "location": "Kaven Hall 116",
                     "building": "",
                     "room": "Kaven Hall 116",
@@ -40796,11 +40796,9 @@
                     "seatsAvailable": 40,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "D01",
+                    "specificSection": "C01",
                     "days": [
-                      "M",
                       "T",
-                      "R",
                       "F"
                     ],
                     "isAsync": false
@@ -41185,7 +41183,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -41202,7 +41200,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -41974,7 +41972,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -41991,7 +41989,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -42402,7 +42400,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 0,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -42419,7 +42417,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -42485,7 +42483,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": true,
@@ -42502,7 +42500,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01 - SP: Environmental Organic Chemistry",
                     "days": [],
                     "isAsync": true
@@ -66135,7 +66133,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -66152,7 +66150,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -66329,7 +66327,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "C",
                 "isGps": false,
@@ -66346,7 +66344,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [],
                     "isAsync": true
@@ -66904,7 +66902,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "D",
                 "isGps": true,
@@ -66921,7 +66919,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "D02 - AT: Introduction to Sensor Science and Technology",
                     "days": [],
                     "isAsync": true
@@ -67126,7 +67124,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -67143,7 +67141,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -92242,7 +92240,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -92259,7 +92257,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -92709,7 +92707,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -92726,7 +92724,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -92943,7 +92941,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -92960,7 +92958,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -93913,7 +93911,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -93930,7 +93928,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S03",
                     "days": [],
                     "isAsync": true
@@ -94358,7 +94356,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -94375,7 +94373,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S03",
                     "days": [],
                     "isAsync": true
@@ -94873,7 +94871,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -94890,7 +94888,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -95245,7 +95243,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -95262,7 +95260,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -95547,7 +95545,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -95564,7 +95562,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -96021,7 +96019,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -96038,7 +96036,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S02",
                     "days": [],
                     "isAsync": true
@@ -97865,7 +97863,7 @@
                 "seats": 10,
                 "seatsAvailable": 10,
                 "actualWaitlist": 0,
-                "maxWaitlist": 0,
+                "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -97882,7 +97880,7 @@
                     "seats": 10,
                     "seatsAvailable": 10,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 0,
+                    "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -101870,7 +101868,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -101887,7 +101885,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S02",
                     "days": [],
                     "isAsync": true
@@ -103162,7 +103160,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -103179,7 +103177,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S02",
                     "days": [
                       "M"
@@ -113476,7 +113474,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -113493,7 +113491,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -113570,7 +113568,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -113587,7 +113585,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -113664,7 +113662,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -113681,7 +113679,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -113852,7 +113850,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -113869,7 +113867,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -114087,7 +114085,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -114104,7 +114102,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -114953,7 +114951,7 @@
                 "seats": 10,
                 "seatsAvailable": 10,
                 "actualWaitlist": 0,
-                "maxWaitlist": 0,
+                "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -114970,7 +114968,7 @@
                     "seats": 10,
                     "seatsAvailable": 10,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 0,
+                    "maxWaitlist": 10,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -154384,6 +154382,55 @@
               "compatibleLabs": []
             }
           ]
+        },
+        {
+          "id": "IDG-598-2026",
+          "number": "598",
+          "name": "Systems Engineering Leadership Project",
+          "description": "This project-based course is an interdisciplinary exercise that integrates the technical aspects of systems engineering with the challenges of meeting business goals within the framework of the organizational structure. It allows students to apply the skills and knowledge acquired throughout the Systems Engineering Leadership curriculum. Students are encouraged to select projects with practical significance to their current and future professional responsibilities. Each project is normally conducted in teams of two to four students. They are administered, advised, and evaluated by WPI faculty as part of the learning experience, but students are also encouraged to seek mentorship from experienced systems engineers. (Prerequisites: Since the Capstone Project will draw on knowledge obtained throughout the degree program, it is expected that the student will have completed most or all of the coursework within their plan of study before undertaking the engineering leadership project.)",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350832,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Larry Mallak",
+                    "startTime": "18:00",
+                    "endTime": "20:00",
+                    "location": "Online-synchronous",
+                    "building": "",
+                    "room": "Online-synchronous",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01",
+                    "days": [
+                      "T"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
         }
       ]
     },
@@ -162433,43 +162480,6 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "D01",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 357485,
-                "number": "D02",
-                "seats": 15,
-                "seatsAvailable": 15,
-                "actualWaitlist": 0,
-                "maxWaitlist": 5,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Esther Boucher-Yip",
-                    "startTime": "10:00",
-                    "endTime": "11:50",
-                    "location": "Olin Hall 218",
-                    "building": "",
-                    "room": "Olin Hall 218",
-                    "seats": 15,
-                    "seatsAvailable": 15,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 5,
-                    "specificSection": "D02",
                     "days": [
                       "T",
                       "F"
@@ -292378,16 +292388,48 @@
                     {
                       "type": "Discussion",
                       "professor": "Mayer Humi",
-                      "startTime": "12:00",
-                      "endTime": "12:50",
-                      "location": "Stratton Hall 201",
+                      "startTime": "15:00",
+                      "endTime": "15:50",
+                      "location": "Stratton Hall 313",
                       "building": "",
-                      "room": "Stratton Hall 201",
+                      "room": "Stratton Hall 313",
                       "seats": 35,
                       "seatsAvailable": 35,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD08",
+                      "days": [
+                        "T"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 349068,
+                  "number": "AD09",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5089",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Mayer Humi",
+                      "startTime": "14:00",
+                      "endTime": "14:50",
+                      "location": "Stratton Hall 207 (new)",
+                      "building": "",
+                      "room": "Stratton Hall 207 (new)",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AD09",
                       "days": [
                         "T"
                       ],
@@ -294290,6 +294332,38 @@
                   ]
                 },
                 {
+                  "crn": 348388,
+                  "number": "AD08",
+                  "seats": 35,
+                  "seatsAvailable": 35,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5089",
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Mayer Humi",
+                      "startTime": "15:00",
+                      "endTime": "15:50",
+                      "location": "Stratton Hall 313",
+                      "building": "",
+                      "room": "Stratton Hall 313",
+                      "seats": 35,
+                      "seatsAvailable": 35,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AD08",
+                      "days": [
+                        "T"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
                   "crn": 349068,
                   "number": "AD09",
                   "seats": 35,
@@ -294304,11 +294378,11 @@
                     {
                       "type": "Discussion",
                       "professor": "Mayer Humi",
-                      "startTime": "13:00",
-                      "endTime": "13:50",
-                      "location": "Stratton Hall 205",
+                      "startTime": "14:00",
+                      "endTime": "14:50",
+                      "location": "Stratton Hall 207 (new)",
                       "building": "",
-                      "room": "Stratton Hall 205",
+                      "room": "Stratton Hall 207 (new)",
                       "seats": 35,
                       "seatsAvailable": 35,
                       "actualWaitlist": 0,
@@ -314935,7 +315009,7 @@
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
-                "maxWaitlist": 10,
+                "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
                 "isGps": false,
@@ -314952,7 +315026,7 @@
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 10,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -317435,9 +317509,9 @@
                     "professor": "Marcel Blais",
                     "startTime": "12:00",
                     "endTime": "13:50",
-                    "location": "Other",
+                    "location": "Stratton Hall 207 (new)",
                     "building": "",
-                    "room": "Other",
+                    "room": "Stratton Hall 207 (new)",
                     "seats": 25,
                     "seatsAvailable": 25,
                     "actualWaitlist": 0,
