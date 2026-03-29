@@ -217,6 +217,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     waitFor: 'click',
                     scrollArrow: true,
                     uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
+                    appState: { filters: [{ id: 'term', criteria: { terms: ['B'] } }] },
                 },
                 {
                     selector: '#available-only-filter',
@@ -225,6 +226,10 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     waitFor: 'click',
                     scrollArrow: true,
                     uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
+                    appState: { filters: [
+                        { id: 'term', criteria: { terms: ['B'] } },
+                        { id: 'periodConflict', criteria: { avoidConflicts: true, blockedSlots: [] } },
+                    ] },
                 },
                 {
                     selector: '#modal-primary-btn',
@@ -232,6 +237,11 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     description: 'Click Apply to close the filter panel and see your filtered results.',
                     waitFor: 'click',
                     uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
+                    appState: { filters: [
+                        { id: 'term', criteria: { terms: ['B'] } },
+                        { id: 'periodConflict', criteria: { avoidConflicts: true, blockedSlots: [] } },
+                        { id: 'availability', criteria: { availableOnly: true } },
+                    ] },
                 },
                 {
                     selector: '[data-course-id="TUT-2005"] .course-select-btn',
@@ -239,7 +249,12 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     description: 'Click the + button on Blinking LEDs 101 to add it.',
                     waitFor: 'click',
                     scrollArrow: true,
-                    uiState: { currentPage: 'planner' },
+                    uiState: { currentPage: 'planner', openModals: [] },
+                    appState: { filters: [
+                        { id: 'term', criteria: { terms: ['B'] } },
+                        { id: 'periodConflict', criteria: { avoidConflicts: true, blockedSlots: [] } },
+                        { id: 'availability', criteria: { availableOnly: true } },
+                    ] },
                 },
                 {
                     selector: '#schedule-tab',
@@ -454,23 +469,39 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     });
 
     tutorialService.onAppStateTransition(async (appState) => {
-        for (const cs of appState.selectedCourses) {
-            const course = getTutorialCourse(cs.courseId);
-            if (!course) continue;
-            if (!services.courseSelectionService.isCourseSelected(course)) {
-                await services.courseSelectionService.selectCourse(course);
+        if (appState.selectedCourses) {
+            for (const cs of appState.selectedCourses) {
+                const course = getTutorialCourse(cs.courseId);
+                if (!course) continue;
+                if (!services.courseSelectionService.isCourseSelected(course)) {
+                    await services.courseSelectionService.selectCourse(course);
+                }
+                if (cs.lecture || cs.discussion || cs.lab) {
+                    const group = course.lectures?.find(g => g.section.number === cs.lecture) ?? null;
+                    const disc = cs.discussion && group
+                        ? group.compatibleDiscussions.find(d => d.number === cs.discussion) ?? null
+                        : null;
+                    const lab = cs.lab && group
+                        ? group.compatibleLabs.find(l => l.number === cs.lab) ?? null
+                        : null;
+                    await services.courseSelectionService.setSelectedComponents(
+                        course, group?.section ?? null, disc, lab
+                    );
+                }
             }
-            if (cs.lecture || cs.discussion || cs.lab) {
-                const group = course.lectures?.find(g => g.section.number === cs.lecture) ?? null;
-                const disc = cs.discussion && group
-                    ? group.compatibleDiscussions.find(d => d.number === cs.discussion) ?? null
-                    : null;
-                const lab = cs.lab && group
-                    ? group.compatibleLabs.find(l => l.number === cs.lab) ?? null
-                    : null;
-                await services.courseSelectionService.setSelectedComponents(
-                    course, group?.section ?? null, disc, lab
-                );
+        }
+        if (appState.filters) {
+            for (const f of appState.filters) {
+                let criteria = f.criteria;
+                // Inject current selectedCourses into conflict filter at runtime
+                if (f.id === 'periodConflict') {
+                    const conflictCriteria = criteria as { avoidConflicts: boolean; blockedSlots: unknown[] };
+                    criteria = {
+                        ...conflictCriteria,
+                        selectedCourses: services.courseSelectionService.getSelectedCourses(),
+                    };
+                }
+                services.filterService.addFilter(f.id, criteria);
             }
         }
     });
@@ -487,23 +518,13 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             mainController.closeWizard();
         }
         if (uiState.openModals) {
-            const currentlyOpen = services.uiStateManager.getState().openModals;
-
-            // Close modals that shouldn't be open
-            for (const openId of currentlyOpen) {
-                if (!uiState.openModals.includes(openId)) {
-                    services.modalService.hideAllModals();
-                    break;
-                }
-            }
-
-            // Open modals that aren't already open
+            // Always close and reopen modals so they pick up any app state changes
+            // (e.g., filters applied before the modal renders)
+            services.modalService.hideAllModals();
             for (const modalId of uiState.openModals) {
-                if (!currentlyOpen.includes(modalId)) {
-                    if (modalId === 'filter-modal') mainController.openFilterModal();
-                    if (modalId === 'schedule-picker') mainController.openSchedulePicker();
-                    if (modalId === 'auto-schedule') mainController.openAutoSchedule();
-                }
+                if (modalId === 'filter-modal') mainController.openFilterModal();
+                if (modalId === 'schedule-picker') mainController.openSchedulePicker();
+                if (modalId === 'auto-schedule') mainController.openAutoSchedule();
             }
         }
     });

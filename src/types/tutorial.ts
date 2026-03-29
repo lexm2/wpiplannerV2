@@ -11,8 +11,14 @@ export interface TutorialCourseState {
     lab?: string;
 }
 
+export interface TutorialFilterState {
+    id: string;
+    criteria: unknown;
+}
+
 export interface TutorialAppState {
-    selectedCourses: TutorialCourseState[];
+    selectedCourses?: TutorialCourseState[];
+    filters?: TutorialFilterState[];
 }
 
 export interface TutorialStep {
