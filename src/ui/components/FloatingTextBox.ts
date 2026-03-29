@@ -71,7 +71,9 @@ export class FloatingTextBox {
         });
         this.stepCounterEl.textContent = `Step ${index + 1} of ${total}`;
         this.nextBtnLabel.textContent = index + 1 === total ? 'Next Tutorial' : 'Next';
-        this.backBtn.style.display = index === 0 ? 'none' : '';
+        const showBack = index > 0;
+        this.backBtn.style.display = showBack ? '' : 'none';
+        this.nextBtn.style.marginLeft = showBack ? '' : 'auto';
         requestAnimationFrame(() => {
             this.repositionIfObstructed(step.selector);
             this.clampToViewport();
@@ -92,8 +94,8 @@ export class FloatingTextBox {
                 <div class="${styles.stepDescription}"></div>
             </div>
             <div class="${styles.footer}">
-                <button class="${styles.backBtn}" data-tutorial-back style="display:none"><span>Back</span></button>
                 <span class="${styles.stepCounter}"></span>
+                <button class="${styles.backBtn}" data-tutorial-back style="display:none"><span>Back</span></button>
                 <button class="${styles.nextBtn}" data-tutorial-next><span>Next</span></button>
             </div>
         `;
@@ -113,7 +115,6 @@ export class FloatingTextBox {
         nextBtn.addEventListener('mousedown', (e) => e.stopPropagation());
         nextBtn.addEventListener('click', () => {
             this.tutorialService.disarmCurrentListener();
-            this.currentStep?.action?.();
             this.tutorialService.nextStep();
         });
 
