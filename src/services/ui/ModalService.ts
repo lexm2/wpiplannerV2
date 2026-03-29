@@ -7,6 +7,9 @@ export class ModalService {
         // Remove existing modal with same ID if it exists
         this.hideModal(id);
 
+        // Ensure modal is above page content but below tutorial layers
+        modalElement.classList.add('modal-container');
+
         // Store modal reference
         this.modals.set(id, modalElement);
 
