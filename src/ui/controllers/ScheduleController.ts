@@ -1,3 +1,4 @@
+import type { WizardStep } from '../../types/uiState'
 import { DayOfWeek, Course, Section, Period, LectureGroup } from '../../types/types'
 import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm, EventType } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
@@ -327,7 +328,7 @@ export class ScheduleController implements CalendarEventProvider {
      * Open the component selection wizard for a course.
      * Uses SidebarManager for consistent panel management.
      */
-    openComponentWizard(course: Course, existingSelections?: SelectedCourse): void {
+    openComponentWizard(course: Course, existingSelections?: SelectedCourse, initialStep?: WizardStep): void {
         if (!this.courseDataService) {
             console.error('CourseDataService not available');
             return;
@@ -367,12 +368,19 @@ export class ScheduleController implements CalendarEventProvider {
 
         // Use SidebarManager to open the panel (handles closing existing panels)
         this.sidebarManager.openPanel(this.componentWizard);
-        this.uiStateManager?.wizardOpened(freshCourse.id, 'lecture');
+        if (initialStep && initialStep !== 'lecture') {
+            this.componentWizard.jumpToStep(initialStep);
+        }
+        this.uiStateManager?.wizardOpened(freshCourse.id, initialStep ?? 'lecture');
     }
 
     /**
      * Close the component selection wizard
      */
+    jumpWizardToStep(step: WizardStep): void {
+        this.componentWizard?.jumpToStep(step);
+    }
+
     closeComponentWizard(): void {
         this.componentWizard = null;
         this.sidebarManager.closePanel();
@@ -1416,7 +1424,7 @@ export class ScheduleController implements CalendarEventProvider {
         }
 
         autoScheduleBtn.insertAdjacentHTML('afterbegin', getInlineSVG('WAND', 'auto-schedule-icon'));
-        autoScheduleBtn.addEventListener('click', () => this.handleAutoSchedule());
+        autoScheduleBtn.addEventListener('click', () => this.openAutoSchedule());
 
         // Setup navigation buttons
         const prevBtn = document.getElementById('schedule-prev-btn');
@@ -1445,7 +1453,7 @@ export class ScheduleController implements CalendarEventProvider {
         const restartBtn = document.getElementById('schedule-restart-btn');
         if (restartBtn) {
             restartBtn.insertAdjacentHTML('afterbegin', getInlineSVG('REFRESH', 'schedule-nav-icon'));
-            restartBtn.addEventListener('click', () => this.handleAutoSchedule());
+            restartBtn.addEventListener('click', () => this.openAutoSchedule());
         }
     }
 
@@ -1513,7 +1521,7 @@ export class ScheduleController implements CalendarEventProvider {
         }
     }
 
-    private async handleAutoSchedule(): Promise<void> {
+    async openAutoSchedule(): Promise<void> {
         if (!this.filterService) {
             console.error('[Auto-Schedule] Filter service not available');
             alert('Filter service not available. Please try again.');

@@ -1,8 +1,12 @@
-import type { Tutorial, TutorialStep } from '../../types/tutorial';
+import type { Tutorial, TutorialStep, TutorialAppState } from '../../types/tutorial';
 import { getInlineSVG } from '../../utils';
+
+import type { UIState } from '../../types/uiState';
 
 type StepChangeCallback = (step: TutorialStep | null, index: number, total: number) => void;
 type StepApplyCallback = (index: number) => void;
+type UIStateTransitionCallback = (uiState: Partial<UIState>) => void;
+type AppStateTransitionCallback = (appState: TutorialAppState) => Promise<void>;
 
 export class TutorialService {
     private tutorials: Map<string, Tutorial> = new Map();
@@ -21,6 +25,8 @@ export class TutorialService {
     private actionObserver: MutationObserver | null = null;
     private resizeObserver: ResizeObserver | null = null;
     private svgContainer: HTMLElement | null = null;
+    private uiStateTransitionCallback: UIStateTransitionCallback | null = null;
+    private appStateTransitionCallback: AppStateTransitionCallback | null = null;
     private suppressAutoAdvance = false;
 
     register(tutorial: Tutorial): void { this.tutorials.set(tutorial.id, tutorial); }
@@ -33,7 +39,7 @@ export class TutorialService {
         if (tutorial.onStart) {
             const result = tutorial.onStart();
             if (result instanceof Promise) {
-                result.then(() => requestAnimationFrame(() => this.applyStep()));
+                result.then(() => requestAnimationFrame(() => { this.applyStep(); }));
                 return;
             }
         }
@@ -84,6 +90,10 @@ export class TutorialService {
 
     onComplete(cb: () => void): void { this.completionCallback = cb; }
 
+    onUIStateTransition(cb: UIStateTransitionCallback): void { this.uiStateTransitionCallback = cb; }
+
+    onAppStateTransition(cb: AppStateTransitionCallback): void { this.appStateTransitionCallback = cb; }
+
     disarmCurrentListener(): void {
         this.actionCleanup?.();
         this.actionCleanup = null;
@@ -91,10 +101,14 @@ export class TutorialService {
         this.actionObserver = null;
     }
 
-    private applyStep(): void {
+    private async applyStep(): Promise<void> {
         if (!this.activeTutorial) return;
         this.stepApplyCallback?.(this.currentStepIndex);
         const step = this.activeTutorial.steps[this.currentStepIndex];
+        if (step.appState && this.appStateTransitionCallback) {
+            await this.appStateTransitionCallback(step.appState);
+        }
+        if (step.uiState) this.uiStateTransitionCallback?.(step.uiState);
         this.highlightElement(step.selector, step.scrollArrow ?? false);
         this.stepChangeCallback?.(step, this.currentStepIndex, this.activeTutorial.steps.length);
         if (step.waitFor !== 'manual') this.listenForAction(step);

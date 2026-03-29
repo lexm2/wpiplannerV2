@@ -1,3 +1,4 @@
+import type { WizardStep } from '../../types/uiState'
 import { Course, Department } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
 import { ThemeSelector } from '../components/ThemeSelector'
@@ -158,11 +159,15 @@ export class MainController {
         this.scheduleController.closeComponentWizard();
     }
 
-    openWizardForCourse(courseId: string): void {
+    openWizardForCourse(courseId: string, initialStep?: WizardStep): void {
         const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
         const selected = selectedCourses.find(sc => sc.course.id === courseId);
         if (!selected) return;
-        this.scheduleController.openComponentWizard(selected.course, selected);
+        this.scheduleController.openComponentWizard(selected.course, selected, initialStep);
+    }
+
+    jumpWizardToStep(step: WizardStep): void {
+        this.scheduleController.jumpWizardToStep(step);
     }
 
     private async init(): Promise<void> {
@@ -962,11 +967,19 @@ export class MainController {
         }
     }
 
-    private openSchedulePicker(): void {
+    openSchedulePicker(): void {
         if (!this.schedulePickerModal) {
             this.schedulePickerModal = new SchedulePickerModal(this.services.modalService, this.services.scheduleManagementService, this.services.tutorial, this.services.uiStateManager);
         }
         this.schedulePickerModal.show();
+    }
+
+    openFilterModal(): void {
+        this.filterModalController.show();
+    }
+
+    openAutoSchedule(): void {
+        this.scheduleController.openAutoSchedule();
     }
 
     private async updateSchedulePickerButton(): Promise<void> {

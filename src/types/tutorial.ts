@@ -4,14 +4,26 @@ import type { UIState } from './uiState';
 
 export type TutorialWaitFor = 'click' | 'input' | 'manual' | 'appear';
 
+export interface TutorialCourseState {
+    courseId: string;
+    lecture?: string;     // section number (e.g., 'TAL01')
+    discussion?: string;
+    lab?: string;
+}
+
+export interface TutorialAppState {
+    selectedCourses: TutorialCourseState[];
+}
+
 export interface TutorialStep {
     selector: string;
     title: string;
     description: string;
     waitFor: TutorialWaitFor;
     waitForSelector?: string;
-    action?: () => void;
     scrollArrow?: boolean;
+    uiState?: Partial<UIState>;
+    appState?: TutorialAppState;
 }
 
 export interface Tutorial {

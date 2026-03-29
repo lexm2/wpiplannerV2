@@ -393,14 +393,9 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             this.availableSteps = newSteps;
 
             if (stepsChanged) {
-                if (newSteps.length > 1) {
-                    if (this.onSelectionChange) this.onSelectionChange(this.selections);
-                    this.nextStep();
-                } else {
-                    this.rerender();
-                    this.panel?.querySelector('.wizard-step.active')?.classList.remove('slide-in-right');
-                    if (this.onSelectionChange) this.onSelectionChange(this.selections);
-                }
+                this.rerender();
+                this.panel?.querySelector('.wizard-step.active')?.classList.remove('slide-in-right');
+                if (this.onSelectionChange) this.onSelectionChange(this.selections);
                 return;
             }
         } else if (this.currentStep === 'discussion') {

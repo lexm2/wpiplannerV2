@@ -86,7 +86,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 title: 'WPI Planner Tutorials',
                 description: 'Welcome to the WPI planner! Each step will highlight an element like <span class="tutorial-inline-highlight">this</span>. Try clicking the Find Element button to see where the highlighted element is.',
                 waitFor: 'click',
-                action: () => {},
+                uiState: { currentPage: 'planner' },
             },
             {
                 selector: '[data-course-id="TUT-2001"] .course-select-btn',
@@ -94,61 +94,63 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 description: 'Click the + button on the Tutorial course to add it to your planner.',
                 waitFor: 'click',
                 scrollArrow: true,
-                action: () => {
-                    const c = getTutorialCourse('TUT-2001');
-                    if (c) services.courseSelectionService.selectCourse(c);
-                },
+                uiState: { currentPage: 'planner' },
             },
-                {
+            {
                 selector: '#schedule-tab',
                 title: 'Go to the Schedule tab',
                 description: 'Head to the Schedule tab, this is where you will select your sections and see your schedule.',
                 waitFor: 'click',
-                action: () => services.uiStateManager.switchToPage('schedule'),
+                uiState: { currentPage: 'planner' },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001' }] },
             },
             {
                 selector: '.schedule-course-item[data-course-id="TUT-2001"]',
                 title: 'Open section selection',
                 description: 'Click the course you just added to open the section picker.',
                 waitFor: 'click',
-                action: () => {
-                    services.uiStateManager.switchToPage('schedule');
-                    mainController.openWizardForCourse('TUT-2001');
-                },
+                uiState: { currentPage: 'schedule' },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001' }] },
             },
             {
                 selector: '.wizard-section-card[data-crn="100105"]',
                 title: 'Pick a lecture',
                 description: 'Select the second lecture section.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('.wizard-section-card')?.click(),
+                uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lecture' } },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001' }] },
             },
             {
                 selector: '.wizard-btn.wizard-btn-primary',
                 title: 'Continue to labs',
                 description: 'Click Next to move on to selecting a lab.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('.wizard-btn.wizard-btn-primary')?.click(),
+                uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lecture' } },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TAL01' }] },
             },
             {
                 selector: '.wizard-section-card[data-crn="100107"]',
                 title: 'Pick a lab',
                 description: 'Select the bottom lab section. Notice how you can hover the different sections to see how they fit into your schedule.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="100107"]')?.click(),
+                uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lab' } },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TAL01' }] },
             },
             {
                 selector: '#wizard-next-btn',
                 title: 'Finish',
                 description: 'Click Finish to confirm your selections, if you hit cancel the selections will be lost.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('#wizard-next-btn')?.click(),
+                uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lab' } },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TAL01', lab: 'TAX02' }] },
             },
             {
                 selector: '[data-tutorial-next]',
                 title: 'Next Tutorial: Filtering',
                 description: 'You now know the basic functionality of the planner. The next tutorial will go over how to quickly find courses that work for you. If you want to skip over a tutorial for any reason just hit skip tutorial and it will move onto the next one. If you want to restart a tutorial, go to the schedules button at the top right then settings then click on tutorials.',
                 waitFor: 'manual',
+                uiState: { currentPage: 'schedule', wizard: { isOpen: false, courseId: null, step: null } },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TAL01', lab: 'TAX02' }] },
             },
         ],
     });
@@ -191,17 +193,14 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     title: 'Go to the Classes tab',
                     description: 'We only have 2 classes in B term so we need a new course. Lets head to the schedules page to find one that fits.',
                     waitFor: 'click',
-                    action: () => services.uiStateManager.switchToPage('planner'),
+                    uiState: { currentPage: 'schedule' },
                 },
                 {
                     selector: '#filter-btn',
                     title: 'Open filters',
                     description: 'Click the filter button to open course filters.',
                     waitFor: 'click',
-                    action: () => {
-                        services.uiStateManager.switchToPage('planner');
-                        document.querySelector<HTMLElement>('#filter-btn')?.click();
-                    },
+                    uiState: { currentPage: 'planner' },
                 },
                 {
                     selector: 'input.filter-toggle[value="B"][data-filter="term"]',
@@ -209,7 +208,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     description: 'Check the B term box to filter for courses/sections that have sections in B term.',
                     waitFor: 'click',
                     scrollArrow: true,
-                    action: () => document.querySelector<HTMLElement>('input.filter-toggle[value="B"][data-filter="term"]')?.click(),
+                    uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
                 },
                 {
                     selector: '#avoid-conflicts-filter',
@@ -217,7 +216,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     description: 'Toggle this to hide courses/sections that cannot fit into your current schedule.',
                     waitFor: 'click',
                     scrollArrow: true,
-                    action: () => document.querySelector<HTMLElement>('#avoid-conflicts-filter')?.click(),
+                    uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
                 },
                 {
                     selector: '#available-only-filter',
@@ -225,14 +224,14 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     description: 'Toggle this to hide courses/sections with no open seats.',
                     waitFor: 'click',
                     scrollArrow: true,
-                    action: () => document.querySelector<HTMLElement>('#available-only-filter')?.click(),
+                    uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
                 },
                 {
                     selector: '#modal-primary-btn',
                     title: 'Apply filters',
                     description: 'Click Apply to close the filter panel and see your filtered results.',
                     waitFor: 'click',
-                    action: () => document.querySelector<HTMLElement>('#modal-primary-btn')?.click(),
+                    uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
                 },
                 {
                     selector: '[data-course-id="TUT-2005"] .course-select-btn',
@@ -240,61 +239,62 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     description: 'Click the + button on Blinking LEDs 101 to add it.',
                     waitFor: 'click',
                     scrollArrow: true,
-                    action: () => {
-                        const c = getTutorialCourse('TUT-2005');
-                        if (c) services.courseSelectionService.selectCourse(c);
-                    },
+                    uiState: { currentPage: 'planner' },
                 },
                 {
                     selector: '#schedule-tab',
                     title: 'Go to the Schedule tab',
                     description: 'Head to the Schedule tab to pick your sections.',
                     waitFor: 'click',
-                    action: () => services.uiStateManager.switchToPage('schedule'),
+                    uiState: { currentPage: 'planner' },
                 },
                 {
                     selector: '.schedule-course-item[data-course-id="TUT-2005"]',
                     title: 'Open section selection',
                     description: 'Click Blinking LEDs 101 to open the section picker.',
                     waitFor: 'click',
-                    action: () => {
-                        services.uiStateManager.switchToPage('schedule');
-                        mainController.openWizardForCourse('TUT-2005');
-                    },
+                    uiState: { currentPage: 'schedule' },
+                    appState: { selectedCourses: [{ courseId: 'TUT-2005' }] },
                 },
                 {
                     selector: '.wizard-section-card[data-crn="100122"]',
                     title: 'Pick a lecture',
                     description: 'Select the B term lecture section.',
                     waitFor: 'click',
-                    action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="100122"]')?.click(),
+                    uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lecture' } },
+                    appState: { selectedCourses: [{ courseId: 'TUT-2005' }] },
                 },
                 {
                     selector: '.wizard-btn.wizard-btn-primary',
                     title: 'Continue to labs',
                     description: 'Click Next to move on to selecting a lab.',
                     waitFor: 'click',
-                    action: () => document.querySelector<HTMLElement>('.wizard-btn.wizard-btn-primary')?.click(),
+                    uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lecture' } },
+                    appState: { selectedCourses: [{ courseId: 'TUT-2005', lecture: 'TBL01' }] },
                 },
                 {
                     selector: '.wizard-section-card[data-crn="100124"]',
                     title: 'Pick a lab',
                     description: 'Select the first lab section. Notice how you can hover sections to preview them on the schedule.',
                     waitFor: 'click',
-                    action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="100124"]')?.click(),
+                    uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lab' } },
+                    appState: { selectedCourses: [{ courseId: 'TUT-2005', lecture: 'TBL01' }] },
                 },
                 {
                     selector: '#wizard-next-btn',
                     title: 'Finish',
                     description: 'Click Finish to confirm your selections.',
                     waitFor: 'click',
-                    action: () => document.querySelector<HTMLElement>('#wizard-next-btn')?.click(),
+                    uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lab' } },
+                    appState: { selectedCourses: [{ courseId: 'TUT-2005', lecture: 'TBL01', lab: 'TBX02' }] },
                 },
                 {
                     selector: '[data-tutorial-next]',
                     title: 'Next Tutorial: Auto Scheduling',
                     description: "The next tutorial will go over how to use the auto scheduler to automatically select your course sections.",
                     waitFor: 'manual',
+                    uiState: { currentPage: 'schedule', wizard: { isOpen: false, courseId: null, step: null } },
+                    appState: { selectedCourses: [{ courseId: 'TUT-2005', lecture: 'TBL01', lab: 'TBX02' }] },
                 },
             ],
         });
@@ -323,79 +323,80 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 description: 'We are going to lock the TUT2008 course so the auto scheduler does not change it. We can do this just by manually selecting the course.',
                 waitFor: 'click',
                 scrollArrow: true,
-                action: () => {
-                    mainController.openWizardForCourse('TUT2008');
-                },
+                uiState: { currentPage: 'schedule' },
             },
             {
                 selector: '.wizard-section-card[data-crn="100041"]',
                 title: 'Pick a lecture',
                 description: 'We are going to use this lecture.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('.wizard-section-card[data-crn="100041')?.click(),
+                uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2008', step: 'lecture' } },
+                appState: { selectedCourses: [{ courseId: 'TUT-2008' }] },
             },
             {
                 selector: '#wizard-next-btn',
                 title: 'Finish',
                 description: 'Click Finish to confirm your selections.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('#wizard-next-btn')?.click(),
+                uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2008', step: 'lecture' } },
+                appState: { selectedCourses: [{ courseId: 'TUT-2008', lecture: 'TA03 - INQ SEM: Early American History' }] },
             },
             {
                 selector: '#auto-schedule-btn',
                 title: 'Auto Schedule',
                 description: 'Click Auto Schedule to let the planner automatically find a combination of sections that fit together. It uses your active filters to avoid conflicts and respect your preferences.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('#auto-schedule-btn')?.click(),
+                uiState: { currentPage: 'schedule', wizard: { isOpen: false, courseId: null, step: null } },
             },
             {
                 selector: '.as-course-card[data-course-id="TUT-2001"] .term-badge[data-term="C"]',
                 title: 'Change generation parameters',
                 description: 'We are going to make it so TUT2001 and TUT2006 generate only in A term. So we need to unselect the other terms.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('.as-course-card[data-course-id="TUT-2001"] .term-badge[data-term="C"]')?.click(),
+                uiState: { currentPage: 'schedule', openModals: ['auto-schedule'] },
             },
             {
                 selector: '.as-course-card[data-course-id="TUT-2006"] .term-badge[data-term="C"]',
                 title: 'Change generation parameters',
                 description: 'Same change for TUT2006.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('.as-course-card[data-course-id="TUT-2006"] .term-badge[data-term="C"]')?.click(),
+                uiState: { currentPage: 'schedule', openModals: ['auto-schedule'] },
             },
             {
                 selector: '.modal-btn[data-action="next"]',
                 title: 'Move onto filters',
                 description: 'After your done selecting what courses you want to auto schedule for move onto selecting filters.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('.modal-btn[data-action="next"]')?.click(),
+                uiState: { currentPage: 'schedule', openModals: ['auto-schedule'] },
             },
             {
-                    selector: '#available-only-filter',
-                    title: 'Filter for only avalable courses',
-                    description: 'We only want to generate schedules with courses that are not full so lets filter out the full courses.',
-                    waitFor: 'click',
-                    scrollArrow: true,
-                    action: () => document.querySelector<HTMLElement>('#available-only-filter')?.click(),
-                },
+                selector: '#available-only-filter',
+                title: 'Filter for only avalable courses',
+                description: 'We only want to generate schedules with courses that are not full so lets filter out the full courses.',
+                waitFor: 'click',
+                scrollArrow: true,
+                uiState: { currentPage: 'schedule', openModals: ['auto-schedule'] },
+            },
             {
                 selector: '#modal-primary-btn',
                 title: 'Generate schedules',
                 description: 'Click Generate to run the scheduler. It will find all valid section combinations based on your filters and show you the results.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('#modal-primary-btn')?.click(),
+                uiState: { currentPage: 'schedule', openModals: ['auto-schedule'] },
             },
             {
                 selector: '#schedule-next-btn',
                 title: 'Browse results',
                 description: 'Click the next arrow to cycle through the generated schedules and pick the one that works best for you.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('#schedule-next-btn')?.click(),
+                uiState: { currentPage: 'schedule' },
             },
             {
                 selector: '[data-tutorial-next]',
                 title: 'Next Tutorial: schedule manager',
                 description: "The next tutorial goes over how to create a new schedule and some of the settings available.",
                 waitFor: 'manual',
+                uiState: { currentPage: 'schedule' },
             },
         ],
     });
@@ -412,49 +413,99 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 title: 'Open the schedule manager',
                 description: 'Click the Schedules button to open the schedule manager.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('#schedule-picker-btn')?.click(),
+                uiState: { currentPage: 'planner' },
             },
             {
                 selector: '.nav-tab[data-tab="settings"]',
                 title: 'Settings tab',
                 description: 'Click the Settings tab to see all options.',
                 waitFor: 'click',
-                action: () => document.querySelector<HTMLElement>('.nav-tab[data-tab="settings"]')?.click(),
+                uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
             },
             {
                 selector: '[data-tutorial-next]',
                 title: 'Export ICS',
                 description: "The Export ICS button will export this schedule to a format that you can drag into your calendar to import.",
                 waitFor: 'manual',
+                uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
             },
             {
                 selector: '[data-tutorial-next]',
                 title: 'Export/Import',
                 description: "This will export the course to a JSON file which then can be imported on another device. Note that if you import into an existing schedule it will add all the courses from the exported schedule onto that schedule.",
                 waitFor: 'manual',
+                uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
             },
             {
                 selector: '#new-schedule-btn-settings',
                 title: 'All done',
                 description: "Click New Schedule, type a name, and you're all set. The tutorial will end, and you'll be taken to your new schedule automatically. The modal will not automatically close.",
                 waitFor: 'click',
-                action: async () => {
-                    const result = await services.scheduleManagementService.createNewSchedule('My Schedule');
-                    if (result.schedule?.id) {
-                        await services.scheduleManagementService.setActiveSchedule(result.schedule.id);
-                    }
-                },
+                uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
             },
             {
                 selector: '[data-tutorial-next]',
                 title: 'You messed up.',
                 description: "Make sure to give the new schedule a name and then hit ok on the prompt.",
                 waitFor: 'manual',
-                action: async () => {
-                    await services.scheduleManagementService.createNewSchedule('Tutorial Done', { autoActivate: true });
-                },
+                uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
             },
         ],
+    });
+
+    tutorialService.onAppStateTransition(async (appState) => {
+        for (const cs of appState.selectedCourses) {
+            const course = getTutorialCourse(cs.courseId);
+            if (!course) continue;
+            if (!services.courseSelectionService.isCourseSelected(course)) {
+                await services.courseSelectionService.selectCourse(course);
+            }
+            if (cs.lecture || cs.discussion || cs.lab) {
+                const group = course.lectures?.find(g => g.section.number === cs.lecture) ?? null;
+                const disc = cs.discussion && group
+                    ? group.compatibleDiscussions.find(d => d.number === cs.discussion) ?? null
+                    : null;
+                const lab = cs.lab && group
+                    ? group.compatibleLabs.find(l => l.number === cs.lab) ?? null
+                    : null;
+                await services.courseSelectionService.setSelectedComponents(
+                    course, group?.section ?? null, disc, lab
+                );
+            }
+        }
+    });
+
+    tutorialService.onUIStateTransition((uiState) => {
+        if (uiState.currentPage) {
+            services.uiStateManager.switchToPage(uiState.currentPage);
+        }
+        if (uiState.wizard?.isOpen && uiState.wizard.courseId) {
+            // Always reopen — the wizard reads selections from the service at construction,
+            // so reopening picks up any app state changes (e.g., a lecture was just selected).
+            mainController.openWizardForCourse(uiState.wizard.courseId, uiState.wizard.step ?? undefined);
+        } else if (uiState.wizard && !uiState.wizard.isOpen) {
+            mainController.closeWizard();
+        }
+        if (uiState.openModals) {
+            const currentlyOpen = services.uiStateManager.getState().openModals;
+
+            // Close modals that shouldn't be open
+            for (const openId of currentlyOpen) {
+                if (!uiState.openModals.includes(openId)) {
+                    services.modalService.hideAllModals();
+                    break;
+                }
+            }
+
+            // Open modals that aren't already open
+            for (const modalId of uiState.openModals) {
+                if (!currentlyOpen.includes(modalId)) {
+                    if (modalId === 'filter-modal') mainController.openFilterModal();
+                    if (modalId === 'schedule-picker') mainController.openSchedulePicker();
+                    if (modalId === 'auto-schedule') mainController.openAutoSchedule();
+                }
+            }
+        }
     });
 
     tutorialService.onStepApply((index) => {

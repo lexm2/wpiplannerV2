@@ -50,7 +50,10 @@ export class TutorialStateMachine {
 
         // 5. Re-open wizard if it was open
         if (snapshot.uiState.wizard.isOpen && snapshot.uiState.wizard.courseId) {
-            this.mainController.openWizardForCourse(snapshot.uiState.wizard.courseId);
+            this.mainController.openWizardForCourse(
+                snapshot.uiState.wizard.courseId,
+                snapshot.uiState.wizard.step ?? undefined
+            );
         }
 
         // 6. Re-open modals that were open
@@ -70,10 +73,13 @@ export class TutorialStateMachine {
     private reopenModal(typeId: string): void {
         switch (typeId) {
             case 'filter-modal':
-                document.querySelector<HTMLElement>('#filter-btn')?.click();
+                this.mainController.openFilterModal();
                 break;
             case 'schedule-picker':
-                document.querySelector<HTMLElement>('#schedule-picker-btn')?.click();
+                this.mainController.openSchedulePicker();
+                break;
+            case 'auto-schedule':
+                this.mainController.openAutoSchedule();
                 break;
         }
     }
