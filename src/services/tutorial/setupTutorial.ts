@@ -362,6 +362,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 title: 'Auto Schedule',
                 description: 'Click Auto Schedule to let the planner automatically find a combination of sections that fit together. It uses your active filters to avoid conflicts and respect your preferences.',
                 waitFor: 'click',
+                stopPropagation: true,
                 uiState: { currentPage: 'schedule', wizard: { isOpen: false, courseId: null, step: null } },
             },
             {
@@ -369,21 +370,23 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 title: 'Change generation parameters',
                 description: 'We are going to make it so TUT2001 and TUT2006 generate only in A term. So we need to unselect the other terms.',
                 waitFor: 'click',
-                uiState: { currentPage: 'schedule', openModals: ['auto-schedule'] },
+                uiState: { currentPage: 'schedule', openModals: ['auto-schedule-intro'] },
             },
             {
                 selector: '.as-course-card[data-course-id="TUT-2006"] .term-badge[data-term="C"]',
                 title: 'Change generation parameters',
                 description: 'Same change for TUT2006.',
                 waitFor: 'click',
-                uiState: { currentPage: 'schedule', openModals: ['auto-schedule'] },
+                uiState: { currentPage: 'schedule', openModals: ['auto-schedule-intro'] },
+                appState: { autoScheduleTermPrefs: { 'TUT-2001': ['A'] } },
             },
             {
                 selector: '.modal-btn[data-action="next"]',
                 title: 'Move onto filters',
                 description: 'After your done selecting what courses you want to auto schedule for move onto selecting filters.',
                 waitFor: 'click',
-                uiState: { currentPage: 'schedule', openModals: ['auto-schedule'] },
+                uiState: { currentPage: 'schedule', openModals: ['auto-schedule-intro'] },
+                appState: { autoScheduleTermPrefs: { 'TUT-2001': ['A'], 'TUT-2006': ['A'] } },
             },
             {
                 selector: '#available-only-filter',
@@ -391,14 +394,15 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 description: 'We only want to generate schedules with courses that are not full so lets filter out the full courses.',
                 waitFor: 'click',
                 scrollArrow: true,
-                uiState: { currentPage: 'schedule', openModals: ['auto-schedule'] },
+                uiState: { currentPage: 'schedule', openModals: ['auto-schedule-filter'] },
             },
             {
                 selector: '#modal-primary-btn',
                 title: 'Generate schedules',
                 description: 'Click Generate to run the scheduler. It will find all valid section combinations based on your filters and show you the results.',
                 waitFor: 'click',
-                uiState: { currentPage: 'schedule', openModals: ['auto-schedule'] },
+                uiState: { currentPage: 'schedule', openModals: ['auto-schedule-filter'] },
+                appState: { filters: [{ id: 'availability', criteria: { availableOnly: true } }], refreshFilterUI: true },
             },
             {
                 selector: '#schedule-next-btn',
@@ -505,6 +509,16 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         }
     });
 
+    // Runs AFTER both appState and uiState transitions — safe to update modal internals
+    tutorialService.onPostTransition((appState) => {
+        if (appState?.autoScheduleTermPrefs) {
+            mainController.updateAutoScheduleIntroTerms(appState.autoScheduleTermPrefs);
+        }
+        if (appState?.refreshFilterUI) {
+            mainController.refreshAutoScheduleFilterUI();
+        }
+    });
+
     tutorialService.onUIStateTransition((uiState) => {
         if (uiState.currentPage) {
             services.uiStateManager.switchToPage(uiState.currentPage);
@@ -516,13 +530,31 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         } else if (uiState.wizard && !uiState.wizard.isOpen) {
             mainController.closeWizard();
         }
-        // Always close modals, then reopen only the ones declared for this step
-        services.modalService.hideAllModals();
-        if (uiState.openModals) {
-            for (const modalId of uiState.openModals) {
-                if (modalId === 'filter-modal') mainController.openFilterModal();
-                if (modalId === 'schedule-picker') mainController.openSchedulePicker();
-                if (modalId === 'auto-schedule') mainController.openAutoSchedule();
+        // Close modals, then reopen only the ones declared for this step.
+        // Skip close/reopen if the desired modals already match what's open (preserves modal internal state).
+        const currentTypes = services.uiStateManager.getState().openModals;
+        if (uiState.openModals !== undefined) {
+            const desiredTypes = uiState.openModals;
+            const same = currentTypes.length === desiredTypes.length
+                && desiredTypes.every(t => currentTypes.includes(t));
+            if (!same) {
+                services.modalService.hideAllModals();
+                // Sync UIState — hideAllModals removes DOM but doesn't call modalClosed
+                for (const typeId of [...currentTypes]) {
+                    services.uiStateManager.modalClosed(typeId);
+                }
+                for (const modalId of desiredTypes) {
+                    if (modalId === 'filter-modal') mainController.openFilterModal();
+                    if (modalId === 'schedule-picker') mainController.openSchedulePicker();
+                    if (modalId === 'auto-schedule') mainController.openAutoSchedule();
+                    if (modalId === 'auto-schedule-intro') mainController.openAutoScheduleIntro();
+                    if (modalId === 'auto-schedule-filter') mainController.openAutoScheduleFilter();
+                }
+            }
+        } else {
+            services.modalService.hideAllModals();
+            for (const typeId of [...currentTypes]) {
+                services.uiStateManager.modalClosed(typeId);
             }
         }
     });

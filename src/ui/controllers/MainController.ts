@@ -982,6 +982,21 @@ export class MainController {
         this.scheduleController.openAutoSchedule();
     }
 
+    openAutoScheduleIntro(): void {
+        this.scheduleController.openAutoScheduleIntro();
+    }
+
+    openAutoScheduleFilter(): void {
+        this.scheduleController.openAutoScheduleFilter();
+    }
+
+    updateAutoScheduleIntroTerms(preferences: Record<string, string[]>): void {
+        this.scheduleController.updateAutoScheduleIntroTerms(preferences);
+    }
+
+    refreshAutoScheduleFilterUI(): void {
+        this.scheduleController.refreshAutoScheduleFilterUI();
+    }
 
     private async updateSchedulePickerButton(): Promise<void> {
         const labelElement = document.getElementById('schedule-picker-label');

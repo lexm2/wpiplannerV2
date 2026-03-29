@@ -19,6 +19,8 @@ export interface TutorialFilterState {
 export interface TutorialAppState {
     selectedCourses?: TutorialCourseState[];
     filters?: TutorialFilterState[];
+    autoScheduleTermPrefs?: Record<string, string[]>;
+    refreshFilterUI?: boolean;
 }
 
 export interface TutorialStep {
@@ -28,6 +30,7 @@ export interface TutorialStep {
     waitFor: TutorialWaitFor;
     waitForSelector?: string;
     scrollArrow?: boolean;
+    stopPropagation?: boolean;
     uiState?: Partial<UIState>;
     appState?: TutorialAppState;
 }

@@ -61,16 +61,46 @@ export class FilterModalController extends BaseModal {
 
     // Method to sync search input from main controller
     syncSearchInputFromMain(query: string): void {
-        if (this.modalId) {
-            const modalElement = document.getElementById(this.modalId);
-            if (modalElement) {
-                const searchInput = modalElement.querySelector('.search-text-input') as HTMLInputElement;
-                if (searchInput && searchInput.value !== query) {
-                    searchInput.value = query;
-                    this.updateClearSearchButton(modalElement, query);
-                }
+        if (this.modalElement) {
+            const searchInput = this.modalElement.querySelector('.search-text-input') as HTMLInputElement;
+            if (searchInput && searchInput.value !== query) {
+                searchInput.value = query;
+                this.updateClearSearchButton(this.modalElement, query);
             }
         }
+    }
+
+    // Refresh checkbox UI from current filterService state (used by tutorial back navigation)
+    refreshFilterUI(): void {
+        if (!this.filterService || !this.modalElement) return;
+        const modalElement = this.modalElement;
+
+        const activeFilters = this.filterService.getActiveFilters();
+
+        // Availability
+        const availFilter = activeFilters.find(f => f.id === 'availability');
+        const availCriteria = availFilter?.criteria as AvailabilityFilterCriteria | undefined;
+        const availCheckbox = modalElement.querySelector('#available-only-filter') as HTMLInputElement;
+        if (availCheckbox) availCheckbox.checked = availCriteria?.availableOnly || false;
+        const minSeatsInput = modalElement.querySelector('#min-seats-filter') as HTMLInputElement;
+        if (minSeatsInput) minSeatsInput.value = availCriteria?.minAvailable != null ? String(availCriteria.minAvailable) : '';
+
+        // Conflict
+        const conflictFilter = activeFilters.find(f => f.id === 'periodConflict');
+        const conflictCriteria = conflictFilter?.criteria as ConflictCriteria | undefined;
+        const conflictCheckbox = modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement;
+        if (conflictCheckbox) conflictCheckbox.checked = conflictCriteria?.avoidConflicts || false;
+
+        // Term checkboxes
+        const termFilter = activeFilters.find(f => f.id === 'term');
+        const termCriteria = termFilter?.criteria as TermFilterCriteria | undefined;
+        const activeTerms = termCriteria?.terms || [];
+        modalElement.querySelectorAll<HTMLInputElement>('input[data-filter="term"]').forEach(cb => {
+            cb.checked = activeTerms.includes(cb.value as AcademicTerm);
+        });
+
+        this.updateDepartmentCheckboxes(modalElement);
+        this.updatePreview(modalElement);
     }
 
     // Method to refresh department selection from external changes
@@ -79,11 +109,8 @@ export class FilterModalController extends BaseModal {
             return;
         }
 
-        if (this.modalId) {
-            const modalElement = document.getElementById(this.modalId);
-            if (modalElement) {
-                this.updateDepartmentCheckboxes(modalElement);
-            }
+        if (this.modalElement) {
+            this.updateDepartmentCheckboxes(this.modalElement);
         }
     }
 

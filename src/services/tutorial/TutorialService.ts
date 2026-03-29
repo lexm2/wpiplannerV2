@@ -7,6 +7,7 @@ type StepChangeCallback = (step: TutorialStep | null, index: number, total: numb
 type StepApplyCallback = (index: number) => void;
 type UIStateTransitionCallback = (uiState: Partial<UIState>) => void;
 type AppStateTransitionCallback = (appState: TutorialAppState) => Promise<void>;
+type PostTransitionCallback = (appState: TutorialAppState | undefined) => void;
 
 export class TutorialService {
     private tutorials: Map<string, Tutorial> = new Map();
@@ -27,6 +28,7 @@ export class TutorialService {
     private svgContainer: HTMLElement | null = null;
     private uiStateTransitionCallback: UIStateTransitionCallback | null = null;
     private appStateTransitionCallback: AppStateTransitionCallback | null = null;
+    private postTransitionCallback: PostTransitionCallback | null = null;
     private suppressAutoAdvance = false;
 
     register(tutorial: Tutorial): void { this.tutorials.set(tutorial.id, tutorial); }
@@ -94,6 +96,8 @@ export class TutorialService {
 
     onAppStateTransition(cb: AppStateTransitionCallback): void { this.appStateTransitionCallback = cb; }
 
+    onPostTransition(cb: PostTransitionCallback): void { this.postTransitionCallback = cb; }
+
     disarmCurrentListener(): void {
         this.actionCleanup?.();
         this.actionCleanup = null;
@@ -109,6 +113,7 @@ export class TutorialService {
             await this.appStateTransitionCallback(step.appState);
         }
         if (step.uiState) this.uiStateTransitionCallback?.(step.uiState);
+        this.postTransitionCallback?.(step.appState);
         this.highlightElement(step.selector, step.scrollArrow ?? false);
         this.stepChangeCallback?.(step, this.currentStepIndex, this.activeTutorial.steps.length);
         if (step.waitFor !== 'manual') this.listenForAction(step);
@@ -278,8 +283,12 @@ export class TutorialService {
 
         const selector = step.waitForSelector ?? step.selector;
         const eventType = step.waitFor === 'input' ? 'input' : 'click';
+        const stopProp = step.stopPropagation ?? false;
         const handler = (e: Event) => {
-            if ((e.target as Element).closest?.(selector)) this.nextStep();
+            if ((e.target as Element).closest?.(selector)) {
+                if (stopProp) e.stopPropagation();
+                this.nextStep();
+            }
         };
         document.body.addEventListener(eventType, handler, { capture: true });
         this.actionCleanup = () => document.body.removeEventListener(eventType, handler, { capture: true });

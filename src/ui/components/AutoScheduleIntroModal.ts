@@ -116,6 +116,29 @@ export class AutoScheduleIntroModal extends BaseModal {
         }).join('');
     }
 
+    setTermPreferences(preferences: Record<string, string[]>): void {
+        for (const [courseId, terms] of Object.entries(preferences)) {
+            this.selectedTermsByCourseid.set(courseId, new Set(terms));
+        }
+        for (const sc of this.selectedCourses) {
+            const card = document.querySelector(`.as-course-card[data-course-id="${sc.course.id}"]`);
+            if (!card) continue;
+            const termsContainer = card.querySelector('.as-card-terms');
+            if (!termsContainer) continue;
+            termsContainer.innerHTML = this.renderTermBadges(sc);
+            termsContainer.querySelectorAll<HTMLElement>('.term-badge:not(.unavailable)').forEach(badge => {
+                badge.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const cid = badge.dataset.courseId;
+                    const term = badge.dataset.term;
+                    if (cid && term) this.toggleTerm(cid, term, badge);
+                });
+            });
+            const termSet = this.selectedTermsByCourseid.get(sc.course.id);
+            card.classList.toggle('selected', (termSet?.size ?? 0) > 0);
+        }
+    }
+
     private toggleCard(card: HTMLElement): void {
         const courseId = card.dataset.courseId;
         if (!courseId) return;

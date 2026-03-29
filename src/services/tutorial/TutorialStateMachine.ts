@@ -81,6 +81,12 @@ export class TutorialStateMachine {
             case 'auto-schedule':
                 this.mainController.openAutoSchedule();
                 break;
+            case 'auto-schedule-intro':
+                this.mainController.openAutoScheduleIntro();
+                break;
+            case 'auto-schedule-filter':
+                this.mainController.openAutoScheduleFilter();
+                break;
         }
     }
 

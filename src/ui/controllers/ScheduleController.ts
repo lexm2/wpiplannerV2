@@ -1580,6 +1580,51 @@ export class ScheduleController implements CalendarEventProvider {
         queue.start();
     }
 
+    private currentAutoScheduleIntro: AutoScheduleIntroModal | null = null;
+
+    openAutoScheduleIntro(): void {
+        if (!this.modalService) return;
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        this.autoScheduleOrchestrator.prepareLockedSections(selectedCourses);
+        this.currentAutoScheduleIntro = new AutoScheduleIntroModal(
+            this.modalService,
+            selectedCourses,
+            (id) => this.colorService.getCourseColor(id),
+            this.uiStateManager || undefined
+        );
+        this.currentAutoScheduleIntro.show();
+    }
+
+    updateAutoScheduleIntroTerms(preferences: Record<string, string[]>): void {
+        this.currentAutoScheduleIntro?.setTermPreferences(preferences);
+    }
+
+    private currentAutoScheduleFilter: FilterModalController | null = null;
+
+    openAutoScheduleFilter(): void {
+        if (!this.modalService || !this.filterService) return;
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        this.currentAutoScheduleFilter = new FilterModalController(this.modalService, this.uiStateManager || undefined);
+        // Override modalTypeId so UIState tracks it distinctly from the regular filter modal
+        Object.defineProperty(this.currentAutoScheduleFilter, 'modalTypeId', { get: () => 'auto-schedule-filter' });
+        this.currentAutoScheduleFilter.setFilterService(this.filterService);
+        this.currentAutoScheduleFilter.setCourseSelectionService(this.courseSelectionService);
+        this.currentAutoScheduleFilter.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
+        this.currentAutoScheduleFilter.setMode('auto-schedule');
+        this.currentAutoScheduleFilter.setCoursesToSchedule(selectedCourses);
+        this.currentAutoScheduleFilter.setOnGenerate(() => {
+            this.doGenerateSchedules(selectedCourses);
+        });
+        if (this.courseDataService) {
+            this.currentAutoScheduleFilter.setCourseData(this.courseDataService.getAllDepartments());
+        }
+        this.currentAutoScheduleFilter.show();
+    }
+
+    refreshAutoScheduleFilterUI(): void {
+        this.currentAutoScheduleFilter?.refreshFilterUI();
+    }
+
     private async doGenerateSchedules(selectedCourses: SelectedCourse[], settings?: { blockedTimes: WeeklyTimeSlot[] }): Promise<void> {
         const termsGrid = document.querySelector('.terms-grid');
         const overlay = document.createElement('div');
