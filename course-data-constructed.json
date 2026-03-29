@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 29, 2026, 11:25 AM",
+  "generated": "Mar 29, 2026, 11:50 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -112873,6 +112873,53 @@
                     "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ECE-523-2026",
+          "number": "523",
+          "name": "Power Electronics",
+          "description": "The applion of electronics to energy conversion and control. Electrical and thermal characteristics of power semiconductor devices— diodes, bipolar transistors and thyristors. Magnetic components. State-space averaging and sampleddata models. Emphasis is placed on circuit techniques. Applion examples include dc-dc conversion, controlled rectifiers, high-frequency inverters, resonant converters and excitation of electric machines. Prerequisites: ECE 3204 and undergraduate courses in modern signal theory and control theory; ECE 504 is recommended.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350472,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Edvina Uzunovic",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
