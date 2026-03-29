@@ -406,19 +406,12 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 appState: { filters: [{ id: 'availability', criteria: { availableOnly: true } }], refreshFilterUI: true },
             },
             {
-                selector: '#schedule-next-btn',
-                title: 'Browse results',
-                description: 'Click the next arrow to cycle through the generated schedules and pick the one that works best for you.',
-                waitFor: 'click',
-                uiState: { currentPage: 'schedule' },
-                appState: { runAutoSchedule: true },
-            },
-            {
                 selector: '[data-tutorial-next]',
                 title: 'Next Tutorial: schedule manager',
                 description: "The next tutorial goes over how to create a new schedule and some of the settings available.",
                 waitFor: 'manual',
                 uiState: { currentPage: 'schedule' },
+                appState: { runAutoSchedule: true },
             },
         ],
     });
