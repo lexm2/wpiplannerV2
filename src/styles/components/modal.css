@@ -6,7 +6,7 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 1000;
+  z-index: 90;
 }
 
 /* Modal Backdrop */
@@ -915,7 +915,7 @@ html.is-mobile .section-enrollment-waitlist {
 .filter-search-container {
   position: relative;
   margin-bottom: 0.75rem;
-  z-index: 100;
+  z-index: 50;
 }
 
 .filter-search {
@@ -1231,7 +1231,7 @@ html.is-mobile .section-enrollment-waitlist {
   border-radius: 0 0 var(--effect-border-radius) var(--effect-border-radius);
   max-height: 200px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 90;
   box-shadow: var(--effect-shadow-large);
 }
 

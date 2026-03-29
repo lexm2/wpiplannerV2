@@ -11,7 +11,7 @@
     border: 1px solid var(--color-border);
     border-radius: var(--effect-border-radius-large);
     box-shadow: var(--effect-shadow);
-    z-index: 9999;
+    z-index: 100;
     resize: both;
     overflow: auto;
     display: flex;
@@ -43,6 +43,22 @@
 
 .skipBtn:hover {
     background: rgba(212, 66, 79, 0.6);
+    border-color: var(--color-primary);
+}
+
+.findBtn {
+    margin-left: 6px;
+    background: none;
+    border: 1px solid var(--color-border-hover);
+    color: var(--color-text);
+    font-size: 0.7rem;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: var(--effect-border-radius);
+}
+
+.findBtn:hover {
+    background: rgba(var(--color-primary-rgb, 100, 100, 255), 0.15);
     border-color: var(--color-primary);
 }
 

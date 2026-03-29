@@ -6,7 +6,7 @@
   background: transparent;
   cursor: col-resize;
   position: relative;
-  z-index: 100;
+  z-index: 50;
   flex-shrink: 0;
   transition: background-color 0.15s ease;
 }

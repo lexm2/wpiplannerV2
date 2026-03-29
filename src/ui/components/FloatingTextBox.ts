@@ -77,6 +77,7 @@ export class FloatingTextBox {
             <div class="${styles.header}">
                 <span class="${styles.title}">Tutorial</span>
                 <button class="${styles.skipBtn}">Skip tutorial</button>
+                <button class="${styles.findBtn}">Find Element</button>
             </div>
             <div class="${styles.body}">
                 <div class="${styles.stepTitle}"></div>
@@ -94,6 +95,10 @@ export class FloatingTextBox {
         const skipBtn = el.querySelector(`.${styles.skipBtn}`) as HTMLButtonElement;
         skipBtn.addEventListener('mousedown', (e) => e.stopPropagation());
         skipBtn.addEventListener('click', () => this.tutorialService.skip());
+
+        const findBtn = el.querySelector(`.${styles.findBtn}`) as HTMLButtonElement;
+        findBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+        findBtn.addEventListener('click', () => this.animateFindDot());
 
         const nextBtn = el.querySelector(`.${styles.nextBtn}`) as HTMLButtonElement;
         nextBtn.addEventListener('mousedown', (e) => e.stopPropagation());
@@ -150,6 +155,41 @@ export class FloatingTextBox {
             this.el.style.top = `${top}px`;
             this.el.style.bottom = 'auto';
         }
+    }
+
+    private animateFindDot(): void {
+        if (!this.currentStep) return;
+
+        const target = document.querySelector(this.currentStep.selector) as HTMLElement | null;
+        if (!target) return;
+
+        const targetRect = target.getBoundingClientRect();
+        if (targetRect.width === 0 && targetRect.height === 0) return;
+
+        const startX = window.innerWidth / 2;
+        const startY = window.innerHeight / 2;
+        const endX = targetRect.left + targetRect.width / 2;
+        const endY = targetRect.top + targetRect.height / 2;
+        const dx = endX - startX;
+        const dy = endY - startY;
+
+        const dot = document.createElement('div');
+        dot.className = 'tutorial-find-dot';
+        dot.style.left = `${startX}px`;
+        dot.style.top = `${startY}px`;
+        document.body.appendChild(dot);
+
+        const animation = dot.animate([
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)`, opacity: 1, offset: 0.8 },
+            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.5)`, opacity: 0 },
+        ], {
+            duration: 500,
+            easing: 'ease-in-out',
+            fill: 'forwards',
+        });
+
+        animation.onfinish = () => dot.remove();
     }
 
     private repositionIfObstructed(selector: string): void {
