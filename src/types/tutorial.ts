@@ -40,6 +40,8 @@ export interface Tutorial {
     id: string;
     onStart?: () => void | Promise<void>;
     steps: TutorialStep[];
+    /** Label for the "Next" button on the final step. Defaults to "Next Tutorial". */
+    lastStepLabel?: string;
 }
 
 export interface TutorialSnapshot {

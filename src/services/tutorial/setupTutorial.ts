@@ -191,7 +191,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 {
                     selector: '#planner-tab',
                     title: 'Go to the Classes tab',
-                    description: 'We only have 2 classes in B term so we need a new course. Lets head to the schedules page to find one that fits.',
+                    description: 'We only have 2 classes in B term so we need a new course. Let\'s head to the Classes tab to find one that fits.',
                     waitFor: 'click',
                     uiState: { currentPage: 'schedule' },
                 },
@@ -383,14 +383,14 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             {
                 selector: '.modal-btn[data-action="next"]',
                 title: 'Move onto filters',
-                description: 'After your done selecting what courses you want to auto schedule for move onto selecting filters.',
+                description: 'After you\'re done selecting what courses you want to auto schedule for, move onto selecting filters.',
                 waitFor: 'click',
                 uiState: { currentPage: 'schedule', openModals: ['auto-schedule-intro'] },
                 appState: { autoScheduleTermPrefs: { 'TUT-2001': ['A'], 'TUT-2006': ['A'] } },
             },
             {
                 selector: '#available-only-filter',
-                title: 'Filter for only avalable courses',
+                title: 'Filter for only available courses',
                 description: 'We only want to generate schedules with courses that are not full so lets filter out the full courses.',
                 waitFor: 'click',
                 scrollArrow: true,
@@ -418,6 +418,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
 
     tutorialService.register({
         id: 'schedules',
+        lastStepLabel: 'Finish',
         onStart: () => {
             mainController.closeWizard();
             services.uiStateManager.switchToPage('planner');
@@ -460,8 +461,8 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             },
             {
                 selector: '[data-tutorial-next]',
-                title: 'You messed up.',
-                description: "Make sure to give the new schedule a name and then hit ok on the prompt.",
+                title: 'Almost there!',
+                description: "Make sure to give the new schedule a name and then hit OK on the prompt.",
                 waitFor: 'manual',
                 uiState: { currentPage: 'planner', openModals: ['schedule-picker'], schedulePickerTab: 'settings' },
             },
@@ -566,11 +567,12 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         }
     });
 
+    registerFilteringTutorial();
+
     tutorialService.onComplete(() => {
         stateMachine.clear();
         if (!filteringStarted) {
             filteringStarted = true;
-            registerFilteringTutorial();
             tutorialService.start('filtering');
         } else if (!autoScheduleStarted) {
             autoScheduleStarted = true;
@@ -601,7 +603,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         filteringStarted = id !== 'welcome';
         autoScheduleStarted = id === 'autoSchedule' || id === 'schedules';
         schedulesStarted = id === 'schedules';
-        if (id === 'filtering') registerFilteringTutorial();
         tutorialService.start(id);
     }
 

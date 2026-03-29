@@ -26,10 +26,13 @@ export class TutorialService {
     private actionObserver: MutationObserver | null = null;
     private resizeObserver: ResizeObserver | null = null;
     private svgContainer: HTMLElement | null = null;
+    private originalPosition: string | null = null;
     private uiStateTransitionCallback: UIStateTransitionCallback | null = null;
     private appStateTransitionCallback: AppStateTransitionCallback | null = null;
     private postTransitionCallback: PostTransitionCallback | null = null;
     private suppressAutoAdvance = false;
+    private highlightTimeout: ReturnType<typeof setTimeout> | null = null;
+    private actionTimeout: ReturnType<typeof setTimeout> | null = null;
 
     register(tutorial: Tutorial): void { this.tutorials.set(tutorial.id, tutorial); }
 
@@ -41,11 +44,11 @@ export class TutorialService {
         if (tutorial.onStart) {
             const result = tutorial.onStart();
             if (result instanceof Promise) {
-                result.then(() => requestAnimationFrame(() => { this.applyStep(); }));
+                result.then(() => requestAnimationFrame(() => { void this.applyStep(); }));
                 return;
             }
         }
-        this.applyStep();
+        void this.applyStep();
     }
 
     skip(): void {
@@ -70,7 +73,7 @@ export class TutorialService {
             this.stepChangeCallback?.(null, 0, 0);
             this.completionCallback?.();
         } else {
-            this.applyStep();
+            void this.applyStep();
         }
     }
 
@@ -85,6 +88,8 @@ export class TutorialService {
     }
 
     getCurrentStepIndex(): number { return this.currentStepIndex; }
+
+    getActiveTutorial(): Tutorial | null { return this.activeTutorial; }
 
     onStepChange(cb: StepChangeCallback): void { this.stepChangeCallback = cb; }
 
@@ -136,9 +141,16 @@ export class TutorialService {
             if (!found) return;
             this.highlightObserver!.disconnect();
             this.highlightObserver = null;
+            if (this.highlightTimeout !== null) { clearTimeout(this.highlightTimeout); this.highlightTimeout = null; }
             this.attachSvgOverlay(found, scrollArrow);
         });
         this.highlightObserver.observe(document.body, { childList: true, subtree: true });
+        this.highlightTimeout = setTimeout(() => {
+            this.highlightObserver?.disconnect();
+            this.highlightObserver = null;
+            this.highlightTimeout = null;
+            console.warn(`[Tutorial] Element not found after 10s: ${selector}`);
+        }, 10_000);
     }
 
     private attachSvgOverlay(el: Element, scrollArrow: boolean): void {
@@ -155,6 +167,7 @@ export class TutorialService {
         const voidEl = ['INPUT', 'IMG', 'TEXTAREA', 'HR', 'BR'].includes(htmlEl.tagName);
         const container: HTMLElement = voidEl ? htmlEl.parentElement! : htmlEl;
 
+        this.originalPosition = container.style.position;
         if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
         this.svgContainer = container;
 
@@ -244,8 +257,9 @@ export class TutorialService {
         this.resizeObserver = null;
         if (this.positionFrame !== null) { cancelAnimationFrame(this.positionFrame); this.positionFrame = null; }
         if (this.svgContainer) {
-            this.svgContainer.style.position = '';
+            this.svgContainer.style.position = this.originalPosition ?? '';
             this.svgContainer = null;
+            this.originalPosition = null;
         }
     }
 
@@ -275,9 +289,16 @@ export class TutorialService {
                 if (!document.querySelector(selector)) return;
                 this.actionObserver!.disconnect();
                 this.actionObserver = null;
+                if (this.actionTimeout !== null) { clearTimeout(this.actionTimeout); this.actionTimeout = null; }
                 this.nextStep();
             });
             this.actionObserver.observe(document.body, { childList: true, subtree: true });
+            this.actionTimeout = setTimeout(() => {
+                this.actionObserver?.disconnect();
+                this.actionObserver = null;
+                this.actionTimeout = null;
+                console.warn(`[Tutorial] Waited element not found after 10s: ${selector}`);
+            }, 10_000);
             return;
         }
 
@@ -299,8 +320,10 @@ export class TutorialService {
         this.removeHighlight();
         this.highlightObserver?.disconnect();
         this.highlightObserver = null;
+        if (this.highlightTimeout !== null) { clearTimeout(this.highlightTimeout); this.highlightTimeout = null; }
         this.actionObserver?.disconnect();
         this.actionObserver = null;
+        if (this.actionTimeout !== null) { clearTimeout(this.actionTimeout); this.actionTimeout = null; }
         this.actionCleanup?.();
         this.actionCleanup = null;
     }

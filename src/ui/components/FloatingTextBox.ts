@@ -70,7 +70,11 @@ export class FloatingTextBox {
             });
         });
         this.stepCounterEl.textContent = `Step ${index + 1} of ${total}`;
-        this.nextBtnLabel.textContent = index + 1 === total ? 'Next Tutorial' : 'Next';
+        const isLastStep = index + 1 === total;
+        const activeTutorial = this.tutorialService.getActiveTutorial();
+        this.nextBtnLabel.textContent = isLastStep
+            ? (activeTutorial?.lastStepLabel ?? 'Next Tutorial')
+            : 'Next';
         const showBack = index > 0;
         this.backBtn.style.display = showBack ? '' : 'none';
         this.nextBtn.style.marginLeft = showBack ? '' : 'auto';
