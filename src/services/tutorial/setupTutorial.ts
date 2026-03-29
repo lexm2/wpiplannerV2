@@ -442,28 +442,28 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 title: 'Export ICS',
                 description: "The Export ICS button will export this schedule to a format that you can drag into your calendar to import.",
                 waitFor: 'manual',
-                uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
+                uiState: { currentPage: 'planner', openModals: ['schedule-picker'], schedulePickerTab: 'settings' },
             },
             {
                 selector: '[data-tutorial-next]',
                 title: 'Export/Import',
                 description: "This will export the course to a JSON file which then can be imported on another device. Note that if you import into an existing schedule it will add all the courses from the exported schedule onto that schedule.",
                 waitFor: 'manual',
-                uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
+                uiState: { currentPage: 'planner', openModals: ['schedule-picker'], schedulePickerTab: 'settings' },
             },
             {
                 selector: '#new-schedule-btn-settings',
                 title: 'All done',
                 description: "Click New Schedule, type a name, and you're all set. The tutorial will end, and you'll be taken to your new schedule automatically. The modal will not automatically close.",
                 waitFor: 'click',
-                uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
+                uiState: { currentPage: 'planner', openModals: ['schedule-picker'], schedulePickerTab: 'settings' },
             },
             {
                 selector: '[data-tutorial-next]',
                 title: 'You messed up.',
                 description: "Make sure to give the new schedule a name and then hit ok on the prompt.",
                 waitFor: 'manual',
-                uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
+                uiState: { currentPage: 'planner', openModals: ['schedule-picker'], schedulePickerTab: 'settings' },
             },
         ],
     });
@@ -554,6 +554,9 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             for (const typeId of [...currentTypes]) {
                 services.uiStateManager.modalClosed(typeId);
             }
+        }
+        if (uiState.schedulePickerTab) {
+            mainController.navigateSchedulePickerToTab(uiState.schedulePickerTab);
         }
     });
 

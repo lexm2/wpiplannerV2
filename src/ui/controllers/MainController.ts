@@ -974,6 +974,10 @@ export class MainController {
         this.schedulePickerModal.show();
     }
 
+    navigateSchedulePickerToTab(tab: 'schedules' | 'settings'): void {
+        this.schedulePickerModal?.navigateToTab(tab);
+    }
+
     openFilterModal(): void {
         this.filterModalController.show();
     }

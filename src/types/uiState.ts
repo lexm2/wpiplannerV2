@@ -13,4 +13,5 @@ export interface UIState {
     currentView: ViewMode;
     openModals: string[];
     wizard: WizardState;
+    schedulePickerTab?: 'schedules' | 'settings';
 }

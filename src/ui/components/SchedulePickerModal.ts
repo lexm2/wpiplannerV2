@@ -570,6 +570,22 @@ export class SchedulePickerModal extends BaseModal {
         this.updateScheduleList();
     }
 
+    navigateToTab(tabName: 'schedules' | 'settings'): void {
+        // Double rAF to run after ModalService's own double-rAF show animation,
+        // ensuring the modal is fully laid out and offsetWidth is non-zero.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                if (!this.modalElement) return;
+                const container = this.modalElement.querySelector('.modal-pages-container') as HTMLElement;
+                if (!container) return;
+                container.scrollLeft = tabName === 'settings' ? container.offsetWidth : 0;
+                this.modalElement.querySelectorAll('.schedule-picker-footer .nav-tab').forEach(t => {
+                    t.classList.toggle('active', (t as HTMLElement).dataset.tab === tabName);
+                });
+            });
+        });
+    }
+
     private setupCourseSelectionListener(): void {
         this.scheduleManagementService.getCourseSelectionService().onSelectionChange(() => {
             if (this.modalElement) {
