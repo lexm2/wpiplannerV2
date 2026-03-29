@@ -163,7 +163,6 @@ export class TutorialService {
         const htmlEl = el as HTMLElement;
         const pad = 5;
 
-        // Void elements (input, img, etc.) cannot have children — append SVG to parent instead
         const voidEl = ['INPUT', 'IMG', 'TEXTAREA', 'HR', 'BR'].includes(htmlEl.tagName);
         const container: HTMLElement = voidEl ? htmlEl.parentElement! : htmlEl;
 

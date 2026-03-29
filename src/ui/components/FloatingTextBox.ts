@@ -217,7 +217,6 @@ export class FloatingTextBox {
             dot.remove();
         };
 
-        // Phase 1: Grow in + overlay fade in (300ms)
         const overlayFade = overlay.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards' });
         const growIn = dot.animate([
             { transform: 'translate(-50%, -50%) scale(0)' },
@@ -225,14 +224,12 @@ export class FloatingTextBox {
         ], { duration: 300, easing: 'ease-out', fill: 'forwards' });
 
         growIn.onfinish = () => {
-            // Phase 2: Travel to target (500ms)
             const travel = dot.animate([
                 { transform: 'translate(-50%, -50%) scale(1)' },
                 { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)` },
             ], { duration: 500, easing: 'cubic-bezier(0.76, 0, 0.24, 1)', fill: 'forwards' });
 
             travel.onfinish = () => {
-                // Phase 3: Hold for 500ms then animate out
                 setTimeout(() => {
                     overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
                     const fadeOut = dot.animate([

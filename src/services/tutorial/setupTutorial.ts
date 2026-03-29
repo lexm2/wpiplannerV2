@@ -33,7 +33,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
 
     async function sharedSetup() {
         await cleanupTutorial(false);
-        // Delete any stale Tutorial schedules left over from a previous session
         const stale = services.scheduleManagementService.getAllSchedules()
             .filter(s => s.name === 'Tutorial' || s.name.startsWith('Tutorial ('));
         for (const s of stale) {
@@ -492,7 +491,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         if (appState.filters) {
             for (const f of appState.filters) {
                 let criteria = f.criteria;
-                // Inject current selectedCourses into conflict filter at runtime
                 if (f.id === 'periodConflict') {
                     const conflictCriteria = criteria as { avoidConflicts: boolean; blockedSlots: unknown[] };
                     criteria = {
@@ -505,7 +503,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         }
     });
 
-    // Runs AFTER both appState and uiState transitions — safe to update modal internals
     tutorialService.onPostTransition((appState) => {
         if (appState?.autoScheduleTermPrefs) {
             mainController.updateAutoScheduleIntroTerms(appState.autoScheduleTermPrefs);
@@ -523,14 +520,10 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             services.uiStateManager.switchToPage(uiState.currentPage);
         }
         if (uiState.wizard?.isOpen && uiState.wizard.courseId) {
-            // Always reopen — the wizard reads selections from the service at construction,
-            // so reopening picks up any app state changes (e.g., a lecture was just selected).
             mainController.openWizardForCourse(uiState.wizard.courseId, uiState.wizard.step ?? undefined);
         } else if (uiState.wizard && !uiState.wizard.isOpen) {
             mainController.closeWizard();
         }
-        // Close modals, then reopen only the ones declared for this step.
-        // Skip close/reopen if the desired modals already match what's open (preserves modal internal state).
         const currentTypes = services.uiStateManager.getState().openModals;
         if (uiState.openModals !== undefined) {
             const desiredTypes = uiState.openModals;
@@ -538,7 +531,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 && desiredTypes.every(t => currentTypes.includes(t));
             if (!same) {
                 services.modalService.hideAllModals();
-                // Sync UIState — hideAllModals removes DOM but doesn't call modalClosed
                 for (const typeId of [...currentTypes]) {
                     services.uiStateManager.modalClosed(typeId);
                 }

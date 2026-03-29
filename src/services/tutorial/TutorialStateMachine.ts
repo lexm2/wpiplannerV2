@@ -28,27 +28,22 @@ export class TutorialStateMachine {
         const snapshot = this.snapshots.get(stepIndex);
         if (!snapshot) return;
 
-        // 1. Close everything
         this.services.modalService.hideAllModals();
         this.mainController.closeWizard();
 
-        // 2. Restore profile state
         this.services.profileStateManager.restoreTutorialState({
             activeScheduleId: snapshot.activeScheduleId,
             schedules: this.deepClone(snapshot.schedules),
             preferences: this.deepClone(snapshot.preferences),
         });
 
-        // 3. Restore filters
         this.services.filterService.clearFilters();
         for (const filter of snapshot.activeFilters) {
             this.services.filterService.addFilter(filter.id, filter.criteria);
         }
 
-        // 4. Restore page/view (restoreState clears modal/wizard tracking internally)
         this.services.uiStateManager.restoreState(snapshot.uiState);
 
-        // 5. Re-open wizard if it was open
         if (snapshot.uiState.wizard.isOpen && snapshot.uiState.wizard.courseId) {
             this.mainController.openWizardForCourse(
                 snapshot.uiState.wizard.courseId,
@@ -56,7 +51,6 @@ export class TutorialStateMachine {
             );
         }
 
-        // 6. Re-open modals that were open
         for (const typeId of snapshot.uiState.openModals) {
             this.reopenModal(typeId);
         }
