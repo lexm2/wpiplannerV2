@@ -982,6 +982,7 @@ export class MainController {
         this.scheduleController.openAutoSchedule();
     }
 
+
     private async updateSchedulePickerButton(): Promise<void> {
         const labelElement = document.getElementById('schedule-picker-label');
         if (labelElement) {

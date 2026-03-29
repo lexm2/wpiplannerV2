@@ -249,7 +249,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     description: 'Click the + button on Blinking LEDs 101 to add it.',
                     waitFor: 'click',
                     scrollArrow: true,
-                    uiState: { currentPage: 'planner', openModals: [] },
+                    uiState: { currentPage: 'planner' },
                     appState: { filters: [
                         { id: 'term', criteria: { terms: ['B'] } },
                         { id: 'periodConflict', criteria: { avoidConflicts: true, blockedSlots: [] } },
@@ -262,6 +262,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     description: 'Head to the Schedule tab to pick your sections.',
                     waitFor: 'click',
                     uiState: { currentPage: 'planner' },
+                    appState: { selectedCourses: [{ courseId: 'TUT-2005' }] },
                 },
                 {
                     selector: '.schedule-course-item[data-course-id="TUT-2005"]',
@@ -473,9 +474,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             for (const cs of appState.selectedCourses) {
                 const course = getTutorialCourse(cs.courseId);
                 if (!course) continue;
-                if (!services.courseSelectionService.isCourseSelected(course)) {
-                    await services.courseSelectionService.selectCourse(course);
-                }
+                await services.courseSelectionService.selectCourse(course);
                 if (cs.lecture || cs.discussion || cs.lab) {
                     const group = course.lectures?.find(g => g.section.number === cs.lecture) ?? null;
                     const disc = cs.discussion && group
@@ -517,10 +516,9 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         } else if (uiState.wizard && !uiState.wizard.isOpen) {
             mainController.closeWizard();
         }
+        // Always close modals, then reopen only the ones declared for this step
+        services.modalService.hideAllModals();
         if (uiState.openModals) {
-            // Always close and reopen modals so they pick up any app state changes
-            // (e.g., filters applied before the modal renders)
-            services.modalService.hideAllModals();
             for (const modalId of uiState.openModals) {
                 if (modalId === 'filter-modal') mainController.openFilterModal();
                 if (modalId === 'schedule-picker') mainController.openSchedulePicker();
