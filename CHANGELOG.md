@@ -1,5 +1,15 @@
 # Changelog
 
+## [2026-03-28]
+
+### Added
+- "Find Element" button in the tutorial floating text box — animates a dot from the center of the screen to the highlighted element with a dark overlay, helping you locate the target
+- First tutorial step now introduces the Find Element button by asking you to click it
+
+### Changed
+- Normalized z-indexes across the app to a clean tiered system (1–95 for UI, 100–300 for tutorial layers)
+- Tutorial step descriptions now support inline HTML, with a marching ants highlight on the welcome step
+
 ## [2026-03-25]
 
 ### Fixed

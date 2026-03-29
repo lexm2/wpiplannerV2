@@ -1,6 +1,6 @@
 ## TODO:
 
-
+- Add in new Planner page for planning out whole degree.
 
 - Import people own calendars as ICS, to custom calendar events.
 

@@ -76,8 +76,8 @@ export class FloatingTextBox {
         el.innerHTML = `
             <div class="${styles.header}">
                 <span class="${styles.title}">Tutorial</span>
+                <button class="${styles.findBtn}" data-tutorial-find>Find Element</button>
                 <button class="${styles.skipBtn}">Skip tutorial</button>
-                <button class="${styles.findBtn}">Find Element</button>
             </div>
             <div class="${styles.body}">
                 <div class="${styles.stepTitle}"></div>
@@ -166,6 +166,10 @@ export class FloatingTextBox {
         const targetRect = target.getBoundingClientRect();
         if (targetRect.width === 0 && targetRect.height === 0) return;
 
+        const overlay = document.createElement('div');
+        overlay.className = 'tutorial-find-overlay';
+        overlay.style.opacity = '0';
+
         const startX = window.innerWidth / 2;
         const startY = window.innerHeight / 2;
         const endX = targetRect.left + targetRect.width / 2;
@@ -177,19 +181,42 @@ export class FloatingTextBox {
         dot.className = 'tutorial-find-dot';
         dot.style.left = `${startX}px`;
         dot.style.top = `${startY}px`;
+        dot.style.transform = 'translate(-50%, -50%) scale(0)';
+
+        document.body.appendChild(overlay);
         document.body.appendChild(dot);
 
-        const animation = dot.animate([
-            { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
-            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)`, opacity: 1, offset: 0.8 },
-            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.5)`, opacity: 0 },
-        ], {
-            duration: 500,
-            easing: 'ease-in-out',
-            fill: 'forwards',
-        });
+        const cleanup = () => {
+            overlay.remove();
+            dot.remove();
+        };
 
-        animation.onfinish = () => dot.remove();
+        // Phase 1: Grow in + overlay fade in (300ms)
+        const overlayFade = overlay.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards' });
+        const growIn = dot.animate([
+            { transform: 'translate(-50%, -50%) scale(0)' },
+            { transform: 'translate(-50%, -50%) scale(1)' },
+        ], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+
+        growIn.onfinish = () => {
+            // Phase 2: Travel to target (500ms)
+            const travel = dot.animate([
+                { transform: 'translate(-50%, -50%) scale(1)' },
+                { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)` },
+            ], { duration: 500, easing: 'cubic-bezier(0.76, 0, 0.24, 1)', fill: 'forwards' });
+
+            travel.onfinish = () => {
+                // Phase 3: Hold for 500ms then animate out
+                setTimeout(() => {
+                    overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
+                    const fadeOut = dot.animate([
+                        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)` },
+                        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)` },
+                    ], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+                    fadeOut.onfinish = cleanup;
+                }, 500);
+            };
+        };
     }
 
     private repositionIfObstructed(selector: string): void {

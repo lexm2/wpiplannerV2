@@ -79,10 +79,11 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         },
         steps: [
             {
-                selector: '[data-tutorial-next]',
+                selector: '[data-tutorial-find]',
                 title: 'WPI Planner Tutorials',
-                description: 'Welcome to the WPI planner, I have set up 4 quick tutorials to bring you through most of the important aspects of the planner. Each step will have an element that will be highlighted like <span class="tutorial-inline-highlight">this</span>. Hit next button at the bottom right when you\'re ready to start.',
-                waitFor: 'manual',
+                description: 'Welcome to the WPI planner! Each step will highlight an element like <span class="tutorial-inline-highlight">this</span>. Try clicking the Find Element button to see where the highlighted element is.',
+                waitFor: 'click',
+                action: () => {},
             },
             {
                 selector: '[data-course-id="TUT-2001"] .course-select-btn',
