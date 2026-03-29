@@ -41,7 +41,27 @@ export class FloatingTextBox {
         this.currentStep = step;
         this.el.classList.remove(styles.hidden);
         this.stepTitleEl.textContent = step.title;
-        this.stepDescEl.textContent = step.description;
+        this.stepDescEl.innerHTML = step.description;
+        requestAnimationFrame(() => {
+            this.stepDescEl.querySelectorAll<HTMLElement>('.tutorial-inline-highlight').forEach(span => {
+                const w = span.offsetWidth + 4;
+                const h = span.offsetHeight + 4;
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('width', String(w));
+                svg.setAttribute('height', String(h));
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', '1');
+                rect.setAttribute('y', '1');
+                rect.setAttribute('rx', '4');
+                rect.setAttribute('width', String(w - 2));
+                rect.setAttribute('height', String(h - 2));
+                rect.setAttribute('fill', 'none');
+                rect.setAttribute('stroke-width', '2');
+                rect.setAttribute('stroke-dasharray', '8 6');
+                svg.appendChild(rect);
+                span.insertBefore(svg, span.firstChild);
+            });
+        });
         this.stepCounterEl.textContent = `Step ${index + 1} of ${total}`;
         this.nextBtnLabel.textContent = index + 1 === total ? 'Next Tutorial' : 'Next';
         requestAnimationFrame(() => {

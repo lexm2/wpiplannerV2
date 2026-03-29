@@ -81,7 +81,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             {
                 selector: '[data-tutorial-next]',
                 title: 'WPI Planner Tutorials',
-                description: "Welcome to the WPI planner, I have set up 4 quick tutorials to bring you through most of the important aspects of the planner. Hit next when you're ready to start.",
+                description: 'Welcome to the WPI planner, I have set up 4 quick tutorials to bring you through most of the important aspects of the planner. Each step will have an element that will be highlighted like <span class="tutorial-inline-highlight">this</span>. Hit next button at the bottom right when you\'re ready to start.',
                 waitFor: 'manual',
             },
             {
@@ -95,7 +95,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     if (c) services.courseSelectionService.selectCourse(c);
                 },
             },
-            {
+                {
                 selector: '#schedule-tab',
                 title: 'Go to the Schedule tab',
                 description: 'Head to the Schedule tab, this is where you will select your sections and see your schedule.',
@@ -115,7 +115,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             {
                 selector: '.wizard-section-card[data-crn="100105"]',
                 title: 'Pick a lecture',
-                description: 'Select the only lecture section.',
+                description: 'Select the second lecture section.',
                 waitFor: 'click',
                 action: () => document.querySelector<HTMLElement>('.wizard-section-card')?.click(),
             },

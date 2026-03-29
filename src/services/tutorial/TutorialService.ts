@@ -10,7 +10,6 @@ export class TutorialService {
     private stepChangeCallback: StepChangeCallback | null = null;
     private completionCallback: (() => void) | null = null;
     private currentSelector: string | null = null;
-    private highlightedElement: Element | null = null;
     private svgOverlay: SVGSVGElement | null = null;
     private arrowOverlay: HTMLElement | null = null;
     private intersectionObserver: IntersectionObserver | null = null;
@@ -91,7 +90,6 @@ export class TutorialService {
 
         const el = document.querySelector(selector);
         if (el) {
-            this.highlightedElement = el;
             this.attachSvgOverlay(el, scrollArrow);
             return;
         }
@@ -101,7 +99,6 @@ export class TutorialService {
             if (!found) return;
             this.highlightObserver!.disconnect();
             this.highlightObserver = null;
-            this.highlightedElement = found;
             this.attachSvgOverlay(found, scrollArrow);
         });
         this.highlightObserver.observe(document.body, { childList: true, subtree: true });
@@ -213,7 +210,6 @@ export class TutorialService {
             this.svgContainer.style.position = '';
             this.svgContainer = null;
         }
-        this.highlightedElement = null;
     }
 
     private getScrollParent(el: Element): Element {
