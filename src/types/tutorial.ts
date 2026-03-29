@@ -21,6 +21,7 @@ export interface TutorialAppState {
     filters?: TutorialFilterState[];
     autoScheduleTermPrefs?: Record<string, string[]>;
     refreshFilterUI?: boolean;
+    runAutoSchedule?: boolean;
 }
 
 export interface TutorialStep {

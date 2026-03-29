@@ -401,6 +401,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 title: 'Generate schedules',
                 description: 'Click Generate to run the scheduler. It will find all valid section combinations based on your filters and show you the results.',
                 waitFor: 'click',
+                stopPropagation: true,
                 uiState: { currentPage: 'schedule', openModals: ['auto-schedule-filter'] },
                 appState: { filters: [{ id: 'availability', criteria: { availableOnly: true } }], refreshFilterUI: true },
             },
@@ -410,6 +411,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 description: 'Click the next arrow to cycle through the generated schedules and pick the one that works best for you.',
                 waitFor: 'click',
                 uiState: { currentPage: 'schedule' },
+                appState: { runAutoSchedule: true },
             },
             {
                 selector: '[data-tutorial-next]',
@@ -516,6 +518,9 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         }
         if (appState?.refreshFilterUI) {
             mainController.refreshAutoScheduleFilterUI();
+        }
+        if (appState?.runAutoSchedule) {
+            mainController.runAutoSchedule();
         }
     });
 

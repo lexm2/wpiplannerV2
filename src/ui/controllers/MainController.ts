@@ -998,6 +998,10 @@ export class MainController {
         this.scheduleController.refreshAutoScheduleFilterUI();
     }
 
+    runAutoSchedule(): void {
+        this.scheduleController.runAutoSchedule();
+    }
+
     private async updateSchedulePickerButton(): Promise<void> {
         const labelElement = document.getElementById('schedule-picker-label');
         if (labelElement) {

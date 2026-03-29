@@ -1625,6 +1625,11 @@ export class ScheduleController implements CalendarEventProvider {
         this.currentAutoScheduleFilter?.refreshFilterUI();
     }
 
+    runAutoSchedule(): void {
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        this.doGenerateSchedules(selectedCourses);
+    }
+
     private async doGenerateSchedules(selectedCourses: SelectedCourse[], settings?: { blockedTimes: WeeklyTimeSlot[] }): Promise<void> {
         const termsGrid = document.querySelector('.terms-grid');
         const overlay = document.createElement('div');
