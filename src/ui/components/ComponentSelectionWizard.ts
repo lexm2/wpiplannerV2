@@ -12,9 +12,8 @@ import { getInlineSVG } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
 import { Validators } from '../../utils/validators';
 import { BaseSidebarPanel } from '../sidebar/BaseSidebarPanel';
+import type { WizardStep } from '../../types/uiState';
 import '../../styles/components/component-wizard.css';
-
-type WizardStep = 'lecture' | 'discussion' | 'lab';
 
 /**
  * Sidebar wizard for selecting course components.
@@ -32,6 +31,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     private onCancel: () => void;
     private onSelectionChange?: (selections: ComponentSelections) => void;
     private onHoverPreview?: (selections: ComponentSelections) => void;
+    private onStepChange?: (step: WizardStep) => void;
     private availableSteps: WizardStep[] = [];
     private filterChangeHandler: (() => void) | null = null;
     private allSelectedCourses: SelectedCourse[] = [];
@@ -45,7 +45,8 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         onSelectionChange?: (selections: ComponentSelections) => void,
         filterService?: FilterService,
         allSelectedCourses?: SelectedCourse[],
-        onHoverPreview?: (selections: ComponentSelections) => void
+        onHoverPreview?: (selections: ComponentSelections) => void,
+        onStepChange?: (step: WizardStep) => void
     ) {
         // Initialize base panel with animated list support
         super({
@@ -68,6 +69,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         this.onCancel = onCancel;
         this.onSelectionChange = onSelectionChange;
         this.onHoverPreview = onHoverPreview;
+        this.onStepChange = onStepChange;
         this.filterService = filterService || null;
         this.allSelectedCourses = allSelectedCourses || [];
 
@@ -499,6 +501,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
             // Move to next step
             const nextStep = this.availableSteps[currentIndex + 1];
             this.currentStep = nextStep;  // Update state BEFORE rendering
+            this.onStepChange?.(nextStep);
             this.transitionToStep(nextStep, 'forward');
         } else {
             // Completed all steps
@@ -515,6 +518,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         if (currentIndex > 0) {
             const prevStep = this.availableSteps[currentIndex - 1];
             this.currentStep = prevStep;  // Update state BEFORE rendering
+            this.onStepChange?.(prevStep);
             this.transitionToStep(prevStep, 'backward');
         }
     }
@@ -530,6 +534,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
 
         const direction = targetIndex > currentIndex ? 'forward' : 'backward';
         this.currentStep = step;  // Update state BEFORE rendering
+        this.onStepChange?.(step);
         this.transitionToStep(step, direction);
     }
 

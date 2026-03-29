@@ -16,6 +16,7 @@ import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { ModalService } from '../../services/ui/ModalService'
+import type { UIStateManager } from '../../services/ui/UIStateManager'
 import { ModalQueue } from '../../services/ui/ModalQueue'
 import { AutoScheduleIntroModal } from '../components/AutoScheduleIntroModal'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
@@ -40,6 +41,7 @@ export class ScheduleController implements CalendarEventProvider {
     private onScheduleUpdate: ((scheduleId: string, updates: Partial<Schedule>) => void) | null = null;
     private sidebarManager: SidebarManager;
     private modalService: ModalService | null = null;
+    private uiStateManager: UIStateManager | null = null;
 
     // Performance optimization: Caching infrastructure for grid rendering
     private cellContentCache: Map<string, CellContentResult> = new Map();
@@ -65,6 +67,10 @@ export class ScheduleController implements CalendarEventProvider {
      */
     setModalService(modalService: ModalService): void {
         this.modalService = modalService;
+    }
+
+    setUIStateManager(uiStateManager: UIStateManager): void {
+        this.uiStateManager = uiStateManager;
     }
 
     setCourseDataService(courseDataService: CourseDataService): void {
@@ -355,11 +361,13 @@ export class ScheduleController implements CalendarEventProvider {
             (selections) => this.onWizardSelectionChange(freshCourse, selections),
             this.filterService || undefined,
             otherSelectedCourses,
-            (selections) => this.onWizardHoverPreview(freshCourse, selections)
+            (selections) => this.onWizardHoverPreview(freshCourse, selections),
+            (step) => this.uiStateManager?.wizardStepChanged(step)
         );
 
         // Use SidebarManager to open the panel (handles closing existing panels)
         this.sidebarManager.openPanel(this.componentWizard);
+        this.uiStateManager?.wizardOpened(freshCourse.id, 'lecture');
     }
 
     /**
@@ -368,6 +376,7 @@ export class ScheduleController implements CalendarEventProvider {
     closeComponentWizard(): void {
         this.componentWizard = null;
         this.sidebarManager.closePanel();
+        this.uiStateManager?.wizardClosed();
 
         const hadPreview = this.wizardPreviewCourse !== null;
         this.wizardPreviewCourse = null;
@@ -1534,7 +1543,8 @@ export class ScheduleController implements CalendarEventProvider {
             const introModal = new AutoScheduleIntroModal(
                 this.modalService!,
                 selectedCourses,
-                (id) => this.colorService.getCourseColor(id)
+                (id) => this.colorService.getCourseColor(id),
+                this.uiStateManager || undefined
             );
             introModal.setOnNext((filtered) => {
                 coursesToSchedule = filtered;
@@ -1544,7 +1554,7 @@ export class ScheduleController implements CalendarEventProvider {
         });
 
         queue.add(() => {
-            const scheduleFilterModal = new FilterModalController(this.modalService!);
+            const scheduleFilterModal = new FilterModalController(this.modalService!, this.uiStateManager || undefined);
             scheduleFilterModal.setFilterService(this.filterService!);
             scheduleFilterModal.setCourseSelectionService(this.courseSelectionService);
             scheduleFilterModal.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);

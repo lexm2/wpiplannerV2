@@ -1,13 +1,15 @@
 import { BaseModal } from './BaseModal';
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { getInlineSVG } from '../../utils/iconPaths';
 import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
 
 export class TutorialsModal extends BaseModal {
+    get modalTypeId() { return 'tutorials'; }
     private tutorial: TutorialSetup;
 
-    constructor(modalService: ModalService, tutorial: TutorialSetup) {
-        super(modalService);
+    constructor(modalService: ModalService, tutorial: TutorialSetup, uiStateManager?: UIStateManager) {
+        super(modalService, uiStateManager);
         this.tutorial = tutorial;
     }
 

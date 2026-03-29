@@ -1,4 +1,5 @@
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { FilterService } from '../../services/filtering/FilterService';
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
@@ -12,6 +13,7 @@ import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterC
 import { DualRangeSlider } from '../components/DualRangeSlider';
 
 export class FilterModalController extends BaseModal {
+    get modalTypeId() { return 'filter-modal'; }
     private filterService: FilterService | null = null;
     private courseSelectionService: CourseSelectionService | null = null;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator | null = null;
@@ -22,8 +24,8 @@ export class FilterModalController extends BaseModal {
     private onGenerate: (() => void) | null = null;
     private coursesToSchedule: SelectedCourse[] | null = null;
 
-    constructor(modalService: ModalService) {
-        super(modalService);
+    constructor(modalService: ModalService, uiStateManager?: UIStateManager) {
+        super(modalService, uiStateManager);
     }
 
     setFilterService(filterService: FilterService): void {

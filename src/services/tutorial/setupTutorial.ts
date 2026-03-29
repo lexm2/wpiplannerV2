@@ -1,4 +1,5 @@
 import { TutorialService } from './TutorialService';
+import { TutorialStateMachine } from './TutorialStateMachine';
 import { FloatingTextBox } from '../../ui/components/FloatingTextBox';
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import type { MainController } from '../../ui/controllers/MainController';
@@ -16,6 +17,7 @@ export interface TutorialSetup {
 
 export function setupTutorial(services: ServiceContainer, mainController: MainController): TutorialSetup {
     const tutorialService = new TutorialService();
+    const stateMachine = new TutorialStateMachine(services, mainController);
     let filteringStarted = false;
     let autoScheduleStarted = false;
     let schedulesStarted = false;
@@ -46,6 +48,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     }
 
     async function cleanupTutorial(setVisited: boolean) {
+        stateMachine.clear();
         if (setVisited) {
             localStorage.setItem('wpi_visited', 'true');
         }
@@ -454,7 +457,14 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         ],
     });
 
+    tutorialService.onStepApply((index) => {
+        if (!stateMachine.hasSnapshot(index)) {
+            stateMachine.captureSnapshot(index);
+        }
+    });
+
     tutorialService.onComplete(() => {
+        stateMachine.clear();
         if (!filteringStarted) {
             filteringStarted = true;
             registerFilteringTutorial();
@@ -470,7 +480,11 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         }
     });
 
-    new FloatingTextBox(tutorialService).mount();
+    const floatingTextBox = new FloatingTextBox(tutorialService);
+    floatingTextBox.setGoBack(() =>
+        tutorialService.goBack((targetIndex) => stateMachine.restoreSnapshot(targetIndex))
+    );
+    floatingTextBox.mount();
 
     const tutorials: TutorialEntry[] = [
         { id: 'welcome', label: 'Getting Started' },

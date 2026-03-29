@@ -1,5 +1,6 @@
 import { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { BaseModal } from './BaseModal';
 import { ChangelogModal } from './ChangelogModal';
 import { TutorialsModal } from './TutorialsModal';
@@ -8,6 +9,7 @@ import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
 import styles from '../../styles/components/schedule-picker-modal.module.css';
 
 export class SchedulePickerModal extends BaseModal {
+    get modalTypeId() { return 'schedule-picker'; }
     private static readonly MENU_WIDTH = 120;
     private static readonly MENU_HEIGHT = 160;
     private static readonly MENU_OFFSET = 4;
@@ -22,13 +24,14 @@ export class SchedulePickerModal extends BaseModal {
     constructor(
         modalService: ModalService,
         scheduleManagementService: ScheduleManagementService,
-        tutorial?: TutorialSetup
+        tutorial?: TutorialSetup,
+        uiStateManager?: UIStateManager
     ) {
-        super(modalService);
+        super(modalService, uiStateManager);
         this.scheduleManagementService = scheduleManagementService;
         this.tutorial = tutorial;
-        this.changelogModal = new ChangelogModal(modalService);
-        if (tutorial) this.tutorialsModal = new TutorialsModal(modalService, tutorial);
+        this.changelogModal = new ChangelogModal(modalService, uiStateManager);
+        if (tutorial) this.tutorialsModal = new TutorialsModal(modalService, tutorial, uiStateManager);
 
         this.scheduleManagementService.onActiveScheduleChange(() => {
             if (this.modalElement) {

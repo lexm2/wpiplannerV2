@@ -1,16 +1,18 @@
 import { BaseModal } from './BaseModal';
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 import type { SelectedCourse } from '../../types/schedule';
 import { Validators } from '../../utils/validators';
 
 export class AutoScheduleIntroModal extends BaseModal {
+    get modalTypeId() { return 'auto-schedule-intro'; }
     private selectedCourses: SelectedCourse[];
     private getColor: (courseId: string) => string;
     private selectedTermsByCourseid: Map<string, Set<string>>;
     private onNext: ((filtered: SelectedCourse[]) => void) | null = null;
 
-    constructor(modalService: ModalService, selectedCourses: SelectedCourse[], getColor: (courseId: string) => string) {
-        super(modalService);
+    constructor(modalService: ModalService, selectedCourses: SelectedCourse[], getColor: (courseId: string) => string, uiStateManager?: UIStateManager) {
+        super(modalService, uiStateManager);
         this.selectedCourses = selectedCourses;
         this.getColor = getColor;
         this.selectedTermsByCourseid = new Map(

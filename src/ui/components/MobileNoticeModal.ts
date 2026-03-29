@@ -2,6 +2,7 @@ import { BaseModal } from './BaseModal';
 import { ModalService } from '../../services/ui/ModalService';
 
 export class MobileNoticeModal extends BaseModal {
+    get modalTypeId() { return 'mobile-notice'; }
     constructor(modalService: ModalService) {
         super(modalService);
     }

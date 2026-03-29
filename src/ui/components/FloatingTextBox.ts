@@ -9,10 +9,12 @@ export class FloatingTextBox {
     private stepCounterEl: HTMLElement;
     private nextBtn: HTMLButtonElement;
     private nextBtnLabel: HTMLSpanElement;
+    private backBtn: HTMLButtonElement;
     private dragOffsetX = 0;
     private dragOffsetY = 0;
     private isDragging = false;
     private currentStep: TutorialStep | null = null;
+    private goBackFn: (() => Promise<void>) | null = null;
 
     private boundMouseMove = this.onMouseMove.bind(this);
     private boundMouseUp = this.onMouseUp.bind(this);
@@ -24,8 +26,13 @@ export class FloatingTextBox {
         this.stepCounterEl = this.el.querySelector(`.${styles.stepCounter}`) as HTMLElement;
         this.nextBtn = this.el.querySelector(`.${styles.nextBtn}`) as HTMLButtonElement;
         this.nextBtnLabel = this.nextBtn.querySelector('span') as HTMLSpanElement;
+        this.backBtn = this.el.querySelector(`.${styles.backBtn}`) as HTMLButtonElement;
 
         this.tutorialService.onStepChange((step, index, total) => this.onStepChange(step, index, total));
+    }
+
+    setGoBack(fn: () => Promise<void>): void {
+        this.goBackFn = fn;
     }
 
     mount(): void {
@@ -64,6 +71,7 @@ export class FloatingTextBox {
         });
         this.stepCounterEl.textContent = `Step ${index + 1} of ${total}`;
         this.nextBtnLabel.textContent = index + 1 === total ? 'Next Tutorial' : 'Next';
+        this.backBtn.style.display = index === 0 ? 'none' : '';
         requestAnimationFrame(() => {
             this.repositionIfObstructed(step.selector);
             this.clampToViewport();
@@ -84,6 +92,7 @@ export class FloatingTextBox {
                 <div class="${styles.stepDescription}"></div>
             </div>
             <div class="${styles.footer}">
+                <button class="${styles.backBtn}" data-tutorial-back style="display:none"><span>Back</span></button>
                 <span class="${styles.stepCounter}"></span>
                 <button class="${styles.nextBtn}" data-tutorial-next><span>Next</span></button>
             </div>
@@ -106,6 +115,18 @@ export class FloatingTextBox {
             this.tutorialService.disarmCurrentListener();
             this.currentStep?.action?.();
             this.tutorialService.nextStep();
+        });
+
+        const backBtn = el.querySelector(`.${styles.backBtn}`) as HTMLButtonElement;
+        backBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+        backBtn.addEventListener('click', async () => {
+            if (!this.goBackFn) return;
+            backBtn.disabled = true;
+            try {
+                await this.goBackFn();
+            } finally {
+                backBtn.disabled = false;
+            }
         });
 
         return el;

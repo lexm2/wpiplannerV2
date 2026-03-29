@@ -2,12 +2,14 @@ import type { Tutorial, TutorialStep } from '../../types/tutorial';
 import { getInlineSVG } from '../../utils';
 
 type StepChangeCallback = (step: TutorialStep | null, index: number, total: number) => void;
+type StepApplyCallback = (index: number) => void;
 
 export class TutorialService {
     private tutorials: Map<string, Tutorial> = new Map();
     private activeTutorial: Tutorial | null = null;
     private currentStepIndex = 0;
     private stepChangeCallback: StepChangeCallback | null = null;
+    private stepApplyCallback: StepApplyCallback | null = null;
     private completionCallback: (() => void) | null = null;
     private currentSelector: string | null = null;
     private svgOverlay: SVGSVGElement | null = null;
@@ -19,6 +21,7 @@ export class TutorialService {
     private actionObserver: MutationObserver | null = null;
     private resizeObserver: ResizeObserver | null = null;
     private svgContainer: HTMLElement | null = null;
+    private suppressAutoAdvance = false;
 
     register(tutorial: Tutorial): void { this.tutorials.set(tutorial.id, tutorial); }
 
@@ -63,7 +66,21 @@ export class TutorialService {
         }
     }
 
+    async goBack(restoreFn: (targetIndex: number) => Promise<void>): Promise<void> {
+        if (!this.activeTutorial || this.currentStepIndex <= 0) return;
+        this.cleanup();
+        const targetIndex = this.currentStepIndex - 1;
+        await restoreFn(targetIndex);
+        this.currentStepIndex = targetIndex;
+        this.suppressAutoAdvance = true;
+        this.applyStep();
+    }
+
+    getCurrentStepIndex(): number { return this.currentStepIndex; }
+
     onStepChange(cb: StepChangeCallback): void { this.stepChangeCallback = cb; }
+
+    onStepApply(cb: StepApplyCallback): void { this.stepApplyCallback = cb; }
 
     onComplete(cb: () => void): void { this.completionCallback = cb; }
 
@@ -76,6 +93,7 @@ export class TutorialService {
 
     private applyStep(): void {
         if (!this.activeTutorial) return;
+        this.stepApplyCallback?.(this.currentStepIndex);
         const step = this.activeTutorial.steps[this.currentStepIndex];
         this.highlightElement(step.selector, step.scrollArrow ?? false);
         this.stepChangeCallback?.(step, this.currentStepIndex, this.activeTutorial.steps.length);
@@ -226,9 +244,14 @@ export class TutorialService {
         if (step.waitFor === 'appear') {
             const selector = step.waitForSelector ?? step.selector;
             if (document.querySelector(selector)) {
+                if (this.suppressAutoAdvance) {
+                    this.suppressAutoAdvance = false;
+                    return;
+                }
                 this.nextStep();
                 return;
             }
+            this.suppressAutoAdvance = false;
             this.actionObserver = new MutationObserver(() => {
                 if (!document.querySelector(selector)) return;
                 this.actionObserver!.disconnect();

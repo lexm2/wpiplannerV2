@@ -61,10 +61,10 @@ export class MainController {
         this.departmentController = new DepartmentController();
         this.courseController = new CourseController(courseSelectionService, courseDataService);
         this.scheduleController = new ScheduleController(courseSelectionService, this.colorService, this.autoScheduleOrchestrator);
-        this.sectionInfoModalController = new SectionInfoModalController(modalService);
-        new InfoModalController(modalService);
-        this.filterModalController = new FilterModalController(modalService);
-        this.scheduleFilterModalController = new FilterModalController(modalService);
+        this.sectionInfoModalController = new SectionInfoModalController(modalService, uiStateManager);
+        new InfoModalController(modalService, uiStateManager);
+        this.filterModalController = new FilterModalController(modalService, uiStateManager);
+        this.scheduleFilterModalController = new FilterModalController(modalService, uiStateManager);
 
         // Connect filter service to course controller
         this.courseController.setFilterService(filterService);
@@ -93,6 +93,7 @@ export class MainController {
         // Set modal controllers for ScheduleController
         this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
         this.scheduleController.setModalService(modalService);
+        this.scheduleController.setUIStateManager(uiStateManager);
 
         // Set up schedule update callback for calendar event exclusions
         this.scheduleController.setScheduleUpdateCallback((scheduleId, updates) => {
@@ -963,7 +964,7 @@ export class MainController {
 
     private openSchedulePicker(): void {
         if (!this.schedulePickerModal) {
-            this.schedulePickerModal = new SchedulePickerModal(this.services.modalService, this.services.scheduleManagementService, this.services.tutorial);
+            this.schedulePickerModal = new SchedulePickerModal(this.services.modalService, this.services.scheduleManagementService, this.services.tutorial, this.services.uiStateManager);
         }
         this.schedulePickerModal.show();
     }

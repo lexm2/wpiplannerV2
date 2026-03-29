@@ -591,6 +591,18 @@ export class ProfileStateManager {
         return JSON.parse(JSON.stringify(obj, setReplacer), setReviver);
     }
 
+    restoreTutorialState(data: { activeScheduleId: string | null; schedules: Schedule[]; preferences: SchedulePreferences }): void {
+        this.isRestoringState = true;
+        try {
+            const schedulesMap = new Map(data.schedules.map(s => [s.id, s]));
+            this.restoreFromSnapshot({ activeScheduleId: data.activeScheduleId, schedules: schedulesMap, preferences: data.preferences });
+            this.emitEvent('courses_changed', { action: 'tutorial-restore' }, 'system');
+            this.save(true);
+        } finally {
+            this.isRestoringState = false;
+        }
+    }
+
     canUndo(): boolean {
         return this.undoRedoManager.canUndo();
     }
