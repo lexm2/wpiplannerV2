@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 30, 2026, 1:10 PM",
+  "generated": "Mar 30, 2026, 2:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8235,7 +8235,7 @@
                 "crn": 348922,
                 "number": "A01",
                 "seats": 25,
-                "seatsAvailable": 24,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 12,
                 "note": null,
@@ -8252,7 +8252,7 @@
                     "building": "",
                     "room": "Riley Commons",
                     "seats": 25,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 12,
                     "specificSection": "A01",
@@ -8914,80 +8914,6 @@
                     "days": [
                       "M",
                       "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 351227,
-                "number": "C02",
-                "seats": 24,
-                "seatsAvailable": 24,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "C",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Matthew Steinke",
-                    "startTime": "12:00",
-                    "endTime": "13:50",
-                    "location": "Salisbury Labs 123 Computer Lab",
-                    "building": "",
-                    "room": "Salisbury Labs 123 Computer Lab",
-                    "seats": 24,
-                    "seatsAvailable": 24,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "C02",
-                    "days": [
-                      "M",
-                      "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 351388,
-                "number": "C03",
-                "seats": 24,
-                "seatsAvailable": 24,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "C",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Kimberly Aaronson",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Salisbury Labs 123 Computer Lab",
-                    "building": "",
-                    "room": "Salisbury Labs 123 Computer Lab",
-                    "seats": 24,
-                    "seatsAvailable": 24,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "C03",
-                    "days": [
-                      "T",
-                      "F"
                     ],
                     "isAsync": false
                   }
@@ -11148,43 +11074,6 @@
                     "specificSection": "B02 - Topics In Studio Art: Printmaking for Artists' Books",
                     "days": [
                       "W"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 351702,
-                "number": "C01 - Topics In Studio Art: Art in the Makerspace",
-                "seats": 24,
-                "seatsAvailable": 24,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "C",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Joshua Rosenstock",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Innovation Studio 203 Active Learning Classroom South",
-                    "building": "",
-                    "room": "Innovation Studio 203 Active Learning Classroom South",
-                    "seats": 24,
-                    "seatsAvailable": 24,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "C01 - Topics In Studio Art: Art in the Makerspace",
-                    "days": [
-                      "M",
-                      "R"
                     ],
                     "isAsync": false
                   }
@@ -40993,17 +40882,17 @@
                     "professor": "Not Assigned",
                     "startTime": "16:00",
                     "endTime": "17:50",
-                    "location": "Kaven Hall 116",
+                    "location": "Salisbury Labs 305",
                     "building": "",
-                    "room": "Kaven Hall 116",
+                    "room": "Salisbury Labs 305",
                     "seats": 40,
                     "seatsAvailable": 40,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
-                      "T",
-                      "F"
+                      "M",
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -78205,7 +78094,7 @@
                   "crn": 338914,
                   "number": "DD02",
                   "seats": 28,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -78222,7 +78111,7 @@
                       "building": "",
                       "room": "Fuller Labs 311",
                       "seats": 28,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -78661,7 +78550,7 @@
                   "crn": 338914,
                   "number": "DD02",
                   "seats": 28,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -78678,7 +78567,7 @@
                       "building": "",
                       "room": "Fuller Labs 311",
                       "seats": 28,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -79117,7 +79006,7 @@
                   "crn": 338914,
                   "number": "DD02",
                   "seats": 28,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -79134,7 +79023,7 @@
                       "building": "",
                       "room": "Fuller Labs 311",
                       "seats": 28,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -79185,7 +79074,7 @@
                 "crn": 338901,
                 "number": "DL01",
                 "seats": 84,
-                "seatsAvailable": 9,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -79202,7 +79091,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 84,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
@@ -79541,7 +79430,7 @@
                   "crn": 338914,
                   "number": "DD02",
                   "seats": 28,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -79558,7 +79447,7 @@
                       "building": "",
                       "room": "Fuller Labs 311",
                       "seats": 28,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -85932,7 +85821,7 @@
                 "crn": 349466,
                 "number": "B01",
                 "seats": 48,
-                "seatsAvailable": 47,
+                "seatsAvailable": 48,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -85949,7 +85838,7 @@
                     "building": "",
                     "room": "Unity Hall 405",
                     "seats": 48,
-                    "seatsAvailable": 47,
+                    "seatsAvailable": 48,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "B01",
@@ -86759,43 +86648,6 @@
                     "days": [
                       "T",
                       "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 352093,
-                "number": "D04",
-                "seats": 30,
-                "seatsAvailable": 30,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "10:00",
-                    "endTime": "11:50",
-                    "location": "Fuller Labs 311",
-                    "building": "",
-                    "room": "Fuller Labs 311",
-                    "seats": 30,
-                    "seatsAvailable": 30,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "D04",
-                    "days": [
-                      "M",
-                      "R"
                     ],
                     "isAsync": false
                   }
@@ -87737,7 +87589,7 @@
                 "crn": 351612,
                 "number": "C01",
                 "seats": 60,
-                "seatsAvailable": 59,
+                "seatsAvailable": 60,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -87754,7 +87606,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 60,
-                    "seatsAvailable": 59,
+                    "seatsAvailable": 60,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -88606,7 +88458,7 @@
                   "crn": 352011,
                   "number": "DX01",
                   "seats": 75,
-                  "seatsAvailable": 74,
+                  "seatsAvailable": 75,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5446",
@@ -88623,7 +88475,7 @@
                       "building": "",
                       "room": "Unity Hall 400",
                       "seats": 75,
-                      "seatsAvailable": 74,
+                      "seatsAvailable": 75,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
@@ -88673,7 +88525,7 @@
                 "crn": 352345,
                 "number": "DL01",
                 "seats": 75,
-                "seatsAvailable": 74,
+                "seatsAvailable": 75,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5446",
@@ -88690,7 +88542,7 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 75,
-                    "seatsAvailable": 74,
+                    "seatsAvailable": 75,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
@@ -88742,7 +88594,7 @@
                   "crn": 352011,
                   "number": "DX01",
                   "seats": 75,
-                  "seatsAvailable": 74,
+                  "seatsAvailable": 75,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5446",
@@ -88759,7 +88611,7 @@
                       "building": "",
                       "room": "Unity Hall 400",
                       "seats": 75,
-                      "seatsAvailable": 74,
+                      "seatsAvailable": 75,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
@@ -155655,7 +155507,7 @@
                 "crn": 355046,
                 "number": "B01",
                 "seats": 24,
-                "seatsAvailable": 24,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -155672,7 +155524,7 @@
                     "building": "",
                     "room": "Sports and Recreation Center 412 - '61 Meeting Room 1",
                     "seats": 24,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -155691,7 +155543,7 @@
                     "building": "",
                     "room": "Sports and Recreation Center - '61 Meeting Room 2",
                     "seats": 24,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -157704,7 +157556,7 @@
                 "crn": 348427,
                 "number": "A01",
                 "seats": 24,
-                "seatsAvailable": 24,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 25,
                 "note": null,
@@ -157721,7 +157573,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 24,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 25,
                     "specificSection": "A01",
@@ -300384,7 +300236,7 @@
                   "crn": 338914,
                   "number": "DD02",
                   "seats": 28,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -300401,7 +300253,7 @@
                       "building": "",
                       "room": "Fuller Labs 311",
                       "seats": 28,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -300840,7 +300692,7 @@
                   "crn": 338914,
                   "number": "DD02",
                   "seats": 28,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -300857,7 +300709,7 @@
                       "building": "",
                       "room": "Fuller Labs 311",
                       "seats": 28,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -301296,7 +301148,7 @@
                   "crn": 338914,
                   "number": "DD02",
                   "seats": 28,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -301313,7 +301165,7 @@
                       "building": "",
                       "room": "Fuller Labs 311",
                       "seats": 28,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -301364,7 +301216,7 @@
                 "crn": 338901,
                 "number": "DL01",
                 "seats": 84,
-                "seatsAvailable": 9,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -301381,7 +301233,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 84,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
@@ -301720,7 +301572,7 @@
                   "crn": 338914,
                   "number": "DD02",
                   "seats": 28,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -301737,7 +301589,7 @@
                       "building": "",
                       "room": "Fuller Labs 311",
                       "seats": 28,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
@@ -330080,7 +329932,7 @@
                 "crn": 337381,
                 "number": "D01",
                 "seats": 140,
-                "seatsAvailable": 39,
+                "seatsAvailable": 38,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -330097,7 +329949,7 @@
                     "building": "",
                     "room": "Olin Hall 107",
                     "seats": 140,
-                    "seatsAvailable": 39,
+                    "seatsAvailable": 38,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -330545,6 +330397,43 @@
                     "days": [
                       "T",
                       "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357845,
+                "number": "C02 - ST: Mechanics and Design of Soft Materials",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "C",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Jiawei Yang",
+                    "startTime": "16:00",
+                    "endTime": "17:50",
+                    "location": "Higgins Labs 114",
+                    "building": "",
+                    "room": "Higgins Labs 114",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "C02 - ST: Mechanics and Design of Soft Materials",
+                    "days": [
+                      "M",
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -378782,8 +378671,1295 @@
             },
             {
               "section": {
+                "crn": 351066,
+                "number": "CS02",
+                "seats": 80,
+                "seatsAvailable": 80,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5301",
+                "computedTerm": "C",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Hektor Kashuri",
+                    "startTime": "10:00",
+                    "endTime": "11:50",
+                    "location": "Unity Hall 520",
+                    "building": "",
+                    "room": "Unity Hall 520",
+                    "seats": 80,
+                    "seatsAvailable": 80,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "CS02",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [
+                {
+                  "crn": 351052,
+                  "number": "CS02-Multipurpose",
+                  "seats": 80,
+                  "seatsAvailable": 80,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5301",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Discussion",
+                      "professor": "Hektor Kashuri",
+                      "startTime": "10:00",
+                      "endTime": "10:50",
+                      "location": "Unity Hall 520",
+                      "building": "",
+                      "room": "Unity Hall 520",
+                      "seats": 80,
+                      "seatsAvailable": 80,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CS02-Multipurpose",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                }
+              ],
+              "compatibleLabs": [
+                {
+                  "crn": 349182,
+                  "number": "AX03",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 117 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 117 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX03",
+                      "days": [
+                        "T"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 349180,
+                  "number": "AX04",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 117 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 117 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX04",
+                      "days": [
+                        "T"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 349177,
+                  "number": "AX05",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "09:00",
+                      "endTime": "10:50",
+                      "location": "Olin Hall 117 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 117 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX05",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 349175,
+                  "number": "AX06",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "11:00",
+                      "endTime": "12:50",
+                      "location": "Olin Hall 117 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 117 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX06",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 349174,
+                  "number": "AX07",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 117 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 117 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX07",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 349173,
+                  "number": "AX08",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 117 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 117 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX08",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 349168,
+                  "number": "AX11",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX11",
+                      "days": [
+                        "T"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 349167,
+                  "number": "AX12",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX12",
+                      "days": [
+                        "T"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 349166,
+                  "number": "AX13",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "09:00",
+                      "endTime": "10:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX13",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 349165,
+                  "number": "AX14",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "11:00",
+                      "endTime": "12:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX14",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348462,
+                  "number": "AX15",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX15",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348461,
+                  "number": "AX16",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX16",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348459,
+                  "number": "AX17",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "09:00",
+                      "endTime": "10:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX17",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348458,
+                  "number": "AX18",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "11:00",
+                      "endTime": "12:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX18",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348457,
+                  "number": "AX19",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX19",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348455,
+                  "number": "AX20",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX20",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348451,
+                  "number": "AX23",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX23",
+                      "days": [
+                        "F"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348448,
+                  "number": "AX26",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX26",
+                      "days": [
+                        "T"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348446,
+                  "number": "AX27",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX27",
+                      "days": [
+                        "T"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348445,
+                  "number": "AX28",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "09:00",
+                      "endTime": "10:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX28",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348443,
+                  "number": "AX29",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "11:00",
+                      "endTime": "12:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX29",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348442,
+                  "number": "AX30",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX30",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348440,
+                  "number": "AX31",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX31",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348439,
+                  "number": "AX32",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "09:00",
+                      "endTime": "10:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX32",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348764,
+                  "number": "AX33",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "11:00",
+                      "endTime": "12:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX33",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348438,
+                  "number": "AX34",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX34",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348437,
+                  "number": "AX35",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX35",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 348432,
+                  "number": "AX38",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "AX38",
+                      "days": [
+                        "F"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351113,
+                  "number": "CX01",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX01",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351060,
+                  "number": "CX05",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "09:00",
+                      "endTime": "10:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX05",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351109,
+                  "number": "CX06",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "11:00",
+                      "endTime": "12:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX06",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351058,
+                  "number": "CX07",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX07",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351063,
+                  "number": "CX08",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "09:00",
+                      "endTime": "10:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX08",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351114,
+                  "number": "CX09",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "11:00",
+                      "endTime": "12:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX09",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351177,
+                  "number": "CX10",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "13:00",
+                      "endTime": "14:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX10",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351149,
+                  "number": "CX13",
+                  "seats": 25,
+                  "seatsAvailable": 25,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 208 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 208 Physics Lab",
+                      "seats": 25,
+                      "seatsAvailable": 25,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX13",
+                      "days": [
+                        "T"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351039,
+                  "number": "CX14",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "09:00",
+                      "endTime": "10:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX14",
+                      "days": [
+                        "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351067,
+                  "number": "CX18",
+                  "seats": 24,
+                  "seatsAvailable": 24,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": null,
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Not Assigned",
+                      "startTime": "15:00",
+                      "endTime": "16:50",
+                      "location": "Olin Hall 211 Physics Lab",
+                      "building": "",
+                      "room": "Olin Hall 211 Physics Lab",
+                      "seats": 24,
+                      "seatsAvailable": 24,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX18",
+                      "days": [
+                        "R"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "section": {
                 "crn": 351062,
-                "number": "CS01-Multipurpose",
+                "number": "CT01-Multipurpose",
                 "seats": 54,
                 "seatsAvailable": 54,
                 "actualWaitlist": 0,
@@ -378805,7 +379981,7 @@
                     "seatsAvailable": 54,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "CS01-Multipurpose",
+                    "specificSection": "CT01-Multipurpose",
                     "days": [],
                     "isAsync": true
                   }
@@ -378814,7 +379990,7 @@
               "compatibleDiscussions": [
                 {
                   "crn": 351053,
-                  "number": "CS01",
+                  "number": "CT01",
                   "seats": 54,
                   "seatsAvailable": 54,
                   "actualWaitlist": 0,
@@ -378836,7 +380012,7 @@
                       "seatsAvailable": 54,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "CS01",
+                      "specificSection": "CT01",
                       "days": [
                         "M",
                         "R"
@@ -380440,1293 +381616,6 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX16",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 351067,
-                  "number": "CX18",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX18",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "section": {
-                "crn": 351066,
-                "number": "CS02",
-                "seats": 80,
-                "seatsAvailable": 80,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5301",
-                "computedTerm": "C",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Hektor Kashuri",
-                    "startTime": "10:00",
-                    "endTime": "11:50",
-                    "location": "Unity Hall 520",
-                    "building": "",
-                    "room": "Unity Hall 520",
-                    "seats": 80,
-                    "seatsAvailable": 80,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "CS02",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [
-                {
-                  "crn": 351052,
-                  "number": "CS02-Multipurpose",
-                  "seats": 80,
-                  "seatsAvailable": 80,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5301",
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Hektor Kashuri",
-                      "startTime": "10:00",
-                      "endTime": "10:50",
-                      "location": "Unity Hall 520",
-                      "building": "",
-                      "room": "Unity Hall 520",
-                      "seats": 80,
-                      "seatsAvailable": 80,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CS02-Multipurpose",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                }
-              ],
-              "compatibleLabs": [
-                {
-                  "crn": 349182,
-                  "number": "AX03",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 117 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 117 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX03",
-                      "days": [
-                        "T"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349180,
-                  "number": "AX04",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 117 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 117 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX04",
-                      "days": [
-                        "T"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349177,
-                  "number": "AX05",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "09:00",
-                      "endTime": "10:50",
-                      "location": "Olin Hall 117 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 117 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX05",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349175,
-                  "number": "AX06",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "11:00",
-                      "endTime": "12:50",
-                      "location": "Olin Hall 117 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 117 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX06",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349174,
-                  "number": "AX07",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 117 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 117 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX07",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349173,
-                  "number": "AX08",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 117 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 117 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX08",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349168,
-                  "number": "AX11",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX11",
-                      "days": [
-                        "T"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349167,
-                  "number": "AX12",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX12",
-                      "days": [
-                        "T"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349166,
-                  "number": "AX13",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "09:00",
-                      "endTime": "10:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX13",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 349165,
-                  "number": "AX14",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "11:00",
-                      "endTime": "12:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX14",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348462,
-                  "number": "AX15",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX15",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348461,
-                  "number": "AX16",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX16",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348459,
-                  "number": "AX17",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "09:00",
-                      "endTime": "10:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX17",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348458,
-                  "number": "AX18",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "11:00",
-                      "endTime": "12:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX18",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348457,
-                  "number": "AX19",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX19",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348455,
-                  "number": "AX20",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX20",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348451,
-                  "number": "AX23",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX23",
-                      "days": [
-                        "F"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348448,
-                  "number": "AX26",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX26",
-                      "days": [
-                        "T"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348446,
-                  "number": "AX27",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX27",
-                      "days": [
-                        "T"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348445,
-                  "number": "AX28",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "09:00",
-                      "endTime": "10:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX28",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348443,
-                  "number": "AX29",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "11:00",
-                      "endTime": "12:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX29",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348442,
-                  "number": "AX30",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX30",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348440,
-                  "number": "AX31",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX31",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348439,
-                  "number": "AX32",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "09:00",
-                      "endTime": "10:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX32",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348764,
-                  "number": "AX33",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "11:00",
-                      "endTime": "12:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX33",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348438,
-                  "number": "AX34",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX34",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348437,
-                  "number": "AX35",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX35",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348432,
-                  "number": "AX38",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AX38",
-                      "days": [
-                        "F"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 351113,
-                  "number": "CX01",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX01",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 351060,
-                  "number": "CX05",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "09:00",
-                      "endTime": "10:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX05",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 351109,
-                  "number": "CX06",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "11:00",
-                      "endTime": "12:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX06",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 351058,
-                  "number": "CX07",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX07",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 351063,
-                  "number": "CX08",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "09:00",
-                      "endTime": "10:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX08",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 351114,
-                  "number": "CX09",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "11:00",
-                      "endTime": "12:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX09",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 351177,
-                  "number": "CX10",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "13:00",
-                      "endTime": "14:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX10",
-                      "days": [
-                        "R"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 351149,
-                  "number": "CX13",
-                  "seats": 25,
-                  "seatsAvailable": 25,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "15:00",
-                      "endTime": "16:50",
-                      "location": "Olin Hall 208 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 208 Physics Lab",
-                      "seats": 25,
-                      "seatsAvailable": 25,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX13",
-                      "days": [
-                        "T"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 351039,
-                  "number": "CX14",
-                  "seats": 24,
-                  "seatsAvailable": 24,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "09:00",
-                      "endTime": "10:50",
-                      "location": "Olin Hall 211 Physics Lab",
-                      "building": "",
-                      "room": "Olin Hall 211 Physics Lab",
-                      "seats": 24,
-                      "seatsAvailable": 24,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX14",
                       "days": [
                         "W"
                       ],
@@ -441834,43 +441723,6 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 352093,
-                "number": "D04",
-                "seats": 30,
-                "seatsAvailable": 30,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "10:00",
-                    "endTime": "11:50",
-                    "location": "Fuller Labs 311",
-                    "building": "",
-                    "room": "Fuller Labs 311",
-                    "seats": 30,
-                    "seatsAvailable": 30,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "D04",
-                    "days": [
-                      "M",
-                      "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
             }
           ]
         },
@@ -446222,43 +446074,6 @@
                     "days": [
                       "M",
                       "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 354800,
-                "number": "D01",
-                "seats": 20,
-                "seatsAvailable": 20,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Sarah Riddick",
-                    "startTime": "12:00",
-                    "endTime": "13:50",
-                    "location": "Kaven Hall 204",
-                    "building": "",
-                    "room": "Kaven Hall 204",
-                    "seats": 20,
-                    "seatsAvailable": 20,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "D01",
-                    "days": [
-                      "T",
-                      "F"
                     ],
                     "isAsync": false
                   }
