@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 30, 2026, 3:55 PM",
+  "generated": "Mar 30, 2026, 4:51 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -12097,6 +12097,55 @@
                     "room": "Kaven Hall 204",
                     "seats": 20,
                     "seatsAvailable": 17,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "S01",
+                    "days": [
+                      "M"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ARCH-500-2026",
+          "number": "500",
+          "name": "Thesis Research Seminar",
+          "description": "ARCH 500 - Thesis Research Seminar (3 credits) This seminar prepares students in the Master of Architecture program to conceive and develop a graduate thesis design project proposal that is rooted in the originality and innovation of research and design practice. The course is structured with seminars of invited speakers, discussions of readings, workshops, student presentations, and thesis proposal development. The seminar may include a travel component. The topics vary each year with the focus on research methodologies and broad issues relevant to the discipline of architecture. The course culminates in a written proposal that includes a description and justifion of the proposed thesis topic, main goals and objectives, methodologies, plan of study, expected products, and a proposal for the composition of a thesis committee. Prerequisites: Accepted as a student in the Master of Architecture program.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 357766,
+                "number": "S01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Seminar",
+                    "professor": "Shichao Liu; Nan Ma",
+                    "startTime": "18:00",
+                    "endTime": "20:50",
+                    "location": "Kaven Hall 204",
+                    "building": "",
+                    "room": "Kaven Hall 204",
+                    "seats": 20,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
@@ -117493,9 +117542,9 @@
                     "professor": "Esther Boucher-Yip",
                     "startTime": "14:00",
                     "endTime": "15:50",
-                    "location": "Unknown",
+                    "location": "Higgins Labs 114",
                     "building": "",
-                    "room": "Unknown",
+                    "room": "Higgins Labs 114",
                     "seats": 24,
                     "seatsAvailable": 24,
                     "actualWaitlist": 0,
@@ -146095,42 +146144,6 @@
             },
             {
               "section": {
-                "crn": 352176,
-                "number": "D01 - INQ SEM: Will AI Destroy the World? Critical Theories of Technology",
-                "seats": 12,
-                "seatsAvailable": 12,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "John Sanbonmatsu",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Salisbury Labs 124 Conference Room",
-                    "building": "",
-                    "room": "Salisbury Labs 124 Conference Room",
-                    "seats": 12,
-                    "seatsAvailable": 12,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "D01 - INQ SEM: Will AI Destroy the World? Critical Theories of Technology",
-                    "days": [
-                      "M"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
                 "crn": 352220,
                 "number": "D02 - INQ SEM: Artificial Composition",
                 "seats": 12,
@@ -146157,42 +146170,6 @@
                     "specificSection": "D02 - INQ SEM: Artificial Composition",
                     "days": [
                       "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 356585,
-                "number": "D02 - INQ SEM: Dam Infrastructure: Water Control from Hoover to Three Gorge",
-                "seats": 12,
-                "seatsAvailable": 12,
-                "actualWaitlist": 0,
-                "maxWaitlist": 0,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "Alexander Herbert",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Salisbury Labs 124 Conference Room",
-                    "building": "",
-                    "room": "Salisbury Labs 124 Conference Room",
-                    "seats": 12,
-                    "seatsAvailable": 12,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "D02 - INQ SEM: Dam Infrastructure: Water Control from Hoover to Three Gorge",
-                    "days": [
-                      "F"
                     ],
                     "isAsync": false
                   }
@@ -146239,6 +146216,42 @@
             },
             {
               "section": {
+                "crn": 352176,
+                "number": "D04 - INQ SEM: Will AI Destroy the World? Critical Theories of Technology",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Seminar",
+                    "professor": "John Sanbonmatsu",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Salisbury Labs 124 Conference Room",
+                    "building": "",
+                    "room": "Salisbury Labs 124 Conference Room",
+                    "seats": 12,
+                    "seatsAvailable": 12,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "D04 - INQ SEM: Will AI Destroy the World? Critical Theories of Technology",
+                    "days": [
+                      "M"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 352121,
                 "number": "D05 - INQ SEM: Frames of War",
                 "seats": 12,
@@ -146263,6 +146276,42 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D05 - INQ SEM: Frames of War",
+                    "days": [
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 356585,
+                "number": "D06 - INQ SEM: Dam Infrastructure: Water Control from Hoover to Three Gorge",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Seminar",
+                    "professor": "Alexander Herbert",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Salisbury Labs 124 Conference Room",
+                    "building": "",
+                    "room": "Salisbury Labs 124 Conference Room",
+                    "seats": 12,
+                    "seatsAvailable": 12,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "D06 - INQ SEM: Dam Infrastructure: Water Control from Hoover to Three Gorge",
                     "days": [
                       "F"
                     ],
@@ -146661,6 +146710,42 @@
                     "specificSection": "D17 - INQ SEM: Writing About Music",
                     "days": [
                       "M"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357866,
+                "number": "D18 - INQ SEM: Responsible AI",
+                "seats": 12,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Seminar",
+                    "professor": "Yunus Telliel",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Stratton Hall 202 (new)",
+                    "building": "",
+                    "room": "Stratton Hall 202 (new)",
+                    "seats": 12,
+                    "seatsAvailable": 12,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "D18 - INQ SEM: Responsible AI",
+                    "days": [
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -156768,30 +156853,30 @@
           "lectures": [
             {
               "section": {
-                "crn": 357675,
-                "number": "D01",
+                "crn": 357894,
+                "number": "C01",
                 "seats": 20,
                 "seatsAvailable": 20,
                 "actualWaitlist": 0,
-                "maxWaitlist": 0,
+                "maxWaitlist": 5,
                 "note": null,
-                "computedTerm": "D",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": false,
                 "periods": [
                   {
                     "type": "Lecture",
                     "professor": "Yunus Telliel",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Stratton Hall 202 (new)",
+                    "startTime": "08:00",
+                    "endTime": "09:50",
+                    "location": "Fuller Labs 311",
                     "building": "",
-                    "room": "Stratton Hall 202 (new)",
+                    "room": "Fuller Labs 311",
                     "seats": 20,
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "D01",
+                    "maxWaitlist": 5,
+                    "specificSection": "C01",
                     "days": [
                       "M",
                       "R"
@@ -425697,8 +425782,8 @@
               "section": {
                 "crn": 356354,
                 "number": "A01",
-                "seats": 65,
-                "seatsAvailable": 65,
+                "seats": 45,
+                "seatsAvailable": 45,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -425714,8 +425799,8 @@
                     "location": "Atwater Kent 233",
                     "building": "",
                     "room": "Atwater Kent 233",
-                    "seats": 65,
-                    "seatsAvailable": 65,
+                    "seats": 45,
+                    "seatsAvailable": 45,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "A01",
@@ -445622,6 +445707,43 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 352012,
+                "number": "D01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Esther Boucher-Yip",
+                    "startTime": "10:00",
+                    "endTime": "11:50",
+                    "location": "Olin Hall 218",
+                    "building": "",
+                    "room": "Olin Hall 218",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "D01",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -446408,30 +446530,30 @@
           "lectures": [
             {
               "section": {
-                "crn": 357675,
-                "number": "D01",
+                "crn": 357894,
+                "number": "C01",
                 "seats": 20,
                 "seatsAvailable": 20,
                 "actualWaitlist": 0,
-                "maxWaitlist": 0,
+                "maxWaitlist": 5,
                 "note": null,
-                "computedTerm": "D",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": false,
                 "periods": [
                   {
                     "type": "Lecture",
                     "professor": "Yunus Telliel",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Stratton Hall 202 (new)",
+                    "startTime": "08:00",
+                    "endTime": "09:50",
+                    "location": "Fuller Labs 311",
                     "building": "",
-                    "room": "Stratton Hall 202 (new)",
+                    "room": "Fuller Labs 311",
                     "seats": 20,
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
-                    "maxWaitlist": 0,
-                    "specificSection": "D01",
+                    "maxWaitlist": 5,
+                    "specificSection": "C01",
                     "days": [
                       "M",
                       "R"
