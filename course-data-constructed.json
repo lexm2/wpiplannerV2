@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 30, 2026, 7:53 PM",
+  "generated": "Mar 30, 2026, 8:40 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -97378,6 +97378,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357762,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Koksal Mus",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -109771,18 +109805,21 @@
                   {
                     "type": "Lecture",
                     "professor": "Ziming Zhang",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
+                    "startTime": "16:00",
+                    "endTime": "17:50",
+                    "location": "Salisbury Labs 407",
                     "building": "",
-                    "room": "Unknown",
+                    "room": "Salisbury Labs 407",
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
-                    "days": [],
-                    "isAsync": true
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
                   }
                 ]
               },
@@ -111707,18 +111744,21 @@
                   {
                     "type": "Lecture",
                     "professor": "Patrick Schaumont",
-                    "startTime": "12:00",
-                    "endTime": "12:00",
-                    "location": "Unknown",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Atwater Kent 232",
                     "building": "",
-                    "room": "Unknown",
+                    "room": "Atwater Kent 232",
                     "seats": 24,
                     "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "BL01",
-                    "days": [],
-                    "isAsync": true
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
                   }
                 ]
               },
@@ -113042,6 +113082,53 @@
           ]
         },
         {
+          "id": "ECE-5204-2026",
+          "number": "5204",
+          "name": "Analog Circuits And Intuition",
+          "description": "The ability to see the simplicity in a complex design problem is a skill that is not usually taught in engineering classes. Some engineers, when faced with design problems, immediately fill up pages and pages of calculations, or do complex circuit simulations or finite-element analyses. One problem with this approach is that if you get an answer, you do not know if it is correct unless you have an intuitive “feel” for what the answer should be. The applion of some simple rules of thumb and design techniques is a possible first step to developing intuition into the behavior of complex electrical systems. This course outlines some ways of thinking about analog circuits and systems that are intended will help to develop intuition and guide design. The lectures are a mixture of instructional sessions covering new background material, and design case studies. Prerequisites: Undergraduate background in device physics, microelectronics, control systems, electromagnetism.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350673,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Fred Floru",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "ECE-523-2025",
           "number": "523",
           "name": "Power Electronics",
@@ -113225,6 +113312,100 @@
                       "M"
                     ],
                     "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ECE-531-2026",
+          "number": "531",
+          "name": "Principles Of Detection And Estimation Theory",
+          "description": "Detection of signals in noise, optimum receiver principles, M-ary detection, matched filters, orthogonal signals and representations of random processes. MAP and maximum likelihood estimation. Wiener filtering and Kalman filtering. Channel considerations: prewhitening, fading and diversity combining. Prerequisites: ECE 502 and ECE 504 or equivalent.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 356441,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Donald Brown",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ECE-5311-2026",
+          "number": "5311",
+          "name": "Information Theory And Coding",
+          "description": "This course introduces the fundamentals of information theory and discusses applions in compression and transmission of data. Measures of information, including entropy, and their properties are derived. The limits of lossless data compression are derived and practical coding schemes approaching the theoretical limits are presented. Lossy data compression tradeoffs are discussed in terms of the rate-distortion framework. The concept of reliable communion through noisy channels (channel capacity) is developed. Techniques for practical channel coding, including block and convolutional codes, are also covered. Prerequisite: background in probability and random processes such as in ECE502 or equivalent.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 357868,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Gregary Prince",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
                   }
                 ]
               },
@@ -114514,6 +114695,53 @@
           ]
         },
         {
+          "id": "ECE-571-2026",
+          "number": "571",
+          "name": "Machine Learning for Engineering Applications",
+          "description": "ECE 571: Machine Learning for Engineering Applions (; 3 credits) This is an introductory course for engineering students to gain basic knowledge of machine learning and its applions. This course's objective is to learn machine learning theory and then apply it in engineering practice. A major emphasis of the course is to foster the capability of combining multiple machine learning techniques in complex problem solving, such as the detection of deepfake media. Topics include supervised learning, linear regression, kernel methods, support vector machine, neural networks, unsupervised learning, clustering, principal component analysis, deep learning with convolutional neural networks, and reinforcement learning. Students will develop software to implement machine learning and deep learning algorithms for practical engineering applions. Prerequisites: Basic knowledge of probability and computer programming.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350308,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Ziming Zhang",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "ECE-574-2025",
           "number": "574",
           "name": "Advanced Digital Systems Design",
@@ -114603,6 +114831,40 @@
                       "W"
                     ],
                     "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357779,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Patrick Schaumont",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
                   }
                 ]
               },
@@ -114965,6 +115227,40 @@
                       "M"
                     ],
                     "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357762,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Koksal Mus",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
                   }
                 ]
               },
@@ -132289,6 +132585,53 @@
           ]
         },
         {
+          "id": "FP-520-2026",
+          "number": "520",
+          "name": "Fire Modeling",
+          "description": "Modeling of compartment fire behavior is studied through the use and applion of two types of models: zone and field. The zone model studied is a student developed model. The field model studied is FDS. Focus on in-depth understanding of each of these models is the primary objective in terms of needed input, equations solved, interpretation of output and limitations. A working student model is required for successful completion of the course. Basic computational ability is assumed. Basic numerical methods are used and can be learned during the course via independent study. (Prerequisite: FP 521 or permission of the instructor.)",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 355393,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Not Assigned",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "FP-521-2025",
           "number": "521",
           "name": "Fire Dynamics I",
@@ -132382,6 +132725,40 @@
           "isGraduate": true,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 350516,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "James Urban",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 350411,
@@ -132517,6 +132894,40 @@
           "lectures": [
             {
               "section": {
+                "crn": 350699,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Milosh Puchovsky",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 350792,
                 "number": "S02",
                 "seats": 18,
@@ -132647,6 +133058,40 @@
           "isGraduate": true,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 350514,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Milosh Puchovsky",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 350410,
@@ -132913,6 +133358,40 @@
           "lectures": [
             {
               "section": {
+                "crn": 350513,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Milosh Puchovsky",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 350409,
                 "number": "F02",
                 "seats": 50,
@@ -132985,6 +133464,53 @@
                     "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "FP-571-2026",
+          "number": "571",
+          "name": "Performance-Based Design",
+          "description": "This course covers practical applions of fire protection engineering principles to the design of buildings. Both compartmented and non-compartmented buildings will be designed for criteria of life safety, property protection, continuity of operations, operational management and cost. Modern analytical tools as well as traditional codes and standards are utilized. Interaction with architects and code officials, and an awareness of other factors in the building design process are incorporated through design exercises and a design studio. (Prerequisites: FPE 553, FPE 521 and FPE 570 or special permission of the instructor.)",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350686,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Morgan Hurley",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -133164,6 +133690,53 @@
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "FP-575-2026",
+          "number": "575",
+          "name": "Explosion Protection",
+          "description": "Principles of combustion explosions are taught along with explosion hazard and protection applions. Topics include a review of flammability limit concentrations for flammable gases and dusts; thermochemical equilibrium calculations of adiabatic closed-vessel deflagration pressures, and detonation pressures and velocities; pressure development as a function of time for closed vessels and vented enclosures; the current status of explosion suppression technology; and vapor cloud explosion hazards.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350697,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Lorenz Boeck",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -133375,6 +133948,74 @@
           "lectures": [
             {
               "section": {
+                "crn": 350511,
+                "number": "F02 - SP: Complex Decision Making",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Kathy Notarianni",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F02 - SP: Complex Decision Making",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350753,
+                "number": "S01 - SP: Combustion",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Ali Rangwala",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01 - SP: Combustion",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 350790,
                 "number": "S02 - SP: Combustion",
                 "seats": 25,
@@ -133494,6 +134135,53 @@
                     "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "FP-585-2026",
+          "number": "585",
+          "name": "Explosion Dynamics",
+          "description": "FP 585: Explosion Dynamics (3 credits) This course will focus on fundamentals of explosions due to the combustion of flammable gas-air mixtures and combustible dust cloud Some generic questions that will be answered in an explosion dynamics context are: 1. How does a flammable mixture of gas or vapor or a suspension of powder or dust particles or droplets form in the industrial processing of these materials? 2. What are gas or dust cloud limits of ignitability, or in other words, what is the range of temperature, pressure, and concentration in which a flame can ignite and propagate? 3. What is the relationship between the flame propagation rate and the associated explosion pressure, and how is it influenced by the combustibility properties of the gas or dust cloud? 4. How does the “rate-of-pressure-rise” affect the overall explosion hazard and the viability of various explosion protection measures? 5. How does pressure development within the flammable gas or combustible dust cloud relate to the blast wave pressures propagating away from the cloud and away from the equipment in which the explosion originated? The course explains the physical and thermochemical phenomena pertinent to these questions and provides a mathematical framework for characterizing and applying the answers.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350462,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Ali Rangwala",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -155467,7 +156155,7 @@
                 "crn": 337049,
                 "number": "D03",
                 "seats": 24,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -155484,7 +156172,7 @@
                     "building": "",
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 24,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D03",
