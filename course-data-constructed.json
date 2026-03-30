@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 30, 2026, 4:51 PM",
+  "generated": "Mar 30, 2026, 5:51 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -34107,6 +34107,53 @@
                     "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "BME-520-2026",
+          "number": "520",
+          "name": "Biomechanics And Robotics",
+          "description": "This course introduces Biomechanics and Robotics as a unified subject addressing living and man-made \"organisms\". It draws deep connections between the natural and the synthetic, showing how the same principles apply to both, starting from sensing, through control, to actuation. Those principles are illustrated in several domains, including locomotion, prosthetics, and medicine. The following topics are addressed: Biological and Artificial sensors, actuators and control, Orthotics Biomechanics and Robotics, Prosthetic Biomechanics and Robotics: Artificial Organs and Limbs, Rehabilitation Robotics and Biomechanics: Therapy, Assistance and Clinical Evaluation, Human-Robot Interaction and Robot Aided Living for Healthier Tomorrow, Sports, Exercise and Games: Biomechanics and Robotics, Robot-aided Surgery, Biologically Inspired Robotics and Micro- (bio)robotics, New Technologies and Methodologies in Medical Robotics and Biomechanics, Neural Control of Movement and Robotics Applions, Applied Musculoskeletal Models and Human Movement Analysis. This course meshes physics, biology, medicine and engineering and introduce students to subject that holds a promise to be one of the most influential innovative research directions defining the 21st century. Recommended background: foundation of physics, linear algebra and differential equations; basic programming skills e.g. using MATLAB, undergraduate level biomechanics, robotics.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350571,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Melissa Sahl",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -95810,6 +95857,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350869,
+                "number": "S02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Alexandros Lioulemes",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -145247,7 +145328,7 @@
                 "crn": 350154,
                 "number": "B07 - INQ SEM: Power of Manifestos",
                 "seats": 12,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -145264,7 +145345,7 @@
                     "building": "",
                     "room": "Salisbury Labs 226 HUA Seminar Room",
                     "seats": 12,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "B07 - INQ SEM: Power of Manifestos",
@@ -326432,6 +326513,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350220,
+                "number": "F02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Ahmet Sabuncu",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -326766,6 +326881,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350240,
+                "number": "F02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mehdi Mortazavi",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -326895,6 +327044,40 @@
                       "W"
                     ],
                     "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350678,
+                "number": "S02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Jamal Yagoobi",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S02",
+                    "days": [],
+                    "isAsync": true
                   }
                 ]
               },
@@ -327400,6 +327583,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 356561,
+                "number": "B02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Yuxiang Liu",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "B02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -327566,6 +327783,195 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350235,
+                "number": "F03",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Alexandros Lioulemes",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F03",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350833,
+                "number": "S03",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mohammad Mahdi Agheli Hajiabadi",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S03",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ME-528-2026",
+          "number": "528",
+          "name": "Robot Dynamics",
+          "description": "ME 528/RBE 501 Robot Dynamics (3 Credits) Foundations and principles of robot dynamics. Topics include system modeling including dynamical modeling of serial arm robots using Newton and Lagrange’s techniques, dynamical modeling of mobile robots, introduction to dynamics-based robot control, as well as advanced techniques for serial arm forward kinematics, trajectory planning, singularity and manipulability, and vision-based control. In addition, dynamic simulation techniques will be covered to apply the concepts learned using realistic simulators. An end of term team project would allow students to apply mastery of the subject to real-world robotic platforms. Prerequisites: RBE 500 or equivalent",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 356523,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mohammad Mahdi Agheli Hajiabadi",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350163,
+                "number": "F02",
+                "seats": 40,
+                "seatsAvailable": 40,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Connor McCann",
+                    "startTime": "16:00",
+                    "endTime": "17:20",
+                    "location": "Atwater Kent 233",
+                    "building": "",
+                    "room": "Atwater Kent 233",
+                    "seats": 40,
+                    "seatsAvailable": 40,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F02",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350719,
+                "number": "S02",
+                "seats": 40,
+                "seatsAvailable": 40,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Gregory Fischer",
+                    "startTime": "16:00",
+                    "endTime": "17:20",
+                    "location": "Fuller Labs 311",
+                    "building": "",
+                    "room": "Fuller Labs 311",
+                    "seats": 40,
+                    "seatsAvailable": 40,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S02",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -327646,93 +328052,6 @@
                     "days": [
                       "M",
                       "W"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "ME-528-2026",
-          "number": "528",
-          "name": "Robot Dynamics",
-          "description": "ME 528/RBE 501 Robot Dynamics (3 Credits) Foundations and principles of robot dynamics. Topics include system modeling including dynamical modeling of serial arm robots using Newton and Lagrange’s techniques, dynamical modeling of mobile robots, introduction to dynamics-based robot control, as well as advanced techniques for serial arm forward kinematics, trajectory planning, singularity and manipulability, and vision-based control. In addition, dynamic simulation techniques will be covered to apply the concepts learned using realistic simulators. An end of term team project would allow students to apply mastery of the subject to real-world robotic platforms. Prerequisites: RBE 500 or equivalent",
-          "category": null,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": true,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 350163,
-                "number": "F02",
-                "seats": 40,
-                "seatsAvailable": 40,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "F",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Connor McCann",
-                    "startTime": "16:00",
-                    "endTime": "17:20",
-                    "location": "Atwater Kent 233",
-                    "building": "",
-                    "room": "Atwater Kent 233",
-                    "seats": 40,
-                    "seatsAvailable": 40,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "F02",
-                    "days": [
-                      "M",
-                      "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 350719,
-                "number": "S02",
-                "seats": 40,
-                "seatsAvailable": 40,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "S",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Gregory Fischer",
-                    "startTime": "16:00",
-                    "endTime": "17:20",
-                    "location": "Fuller Labs 311",
-                    "building": "",
-                    "room": "Fuller Labs 311",
-                    "seats": 40,
-                    "seatsAvailable": 40,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "S02",
-                    "days": [
-                      "M",
-                      "R"
                     ],
                     "isAsync": false
                   }
@@ -328257,6 +328576,40 @@
           "lectures": [
             {
               "section": {
+                "crn": 350053,
+                "number": "B01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Thomas Christiansen",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "B01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 349797,
                 "number": "B02",
                 "seats": 45,
@@ -328367,6 +328720,53 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
+                    "specificSection": "C01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ME-5358-2026",
+          "number": "5358",
+          "name": "Plastics",
+          "description": "(2 credits) This course will provide an integrated overview of the design, selection and use of synthetic plastics. The basic chemistry associated with polymerization and the structure of commercial plastics will be described. Various aspects of polymer crystallization and glass transition will be outlined. Salient aspects of fluid flow and heat transfer during the processing of plastics will be highlighted. Fundamentals of the diverse processing operations used to shape plastics and the resulting structures that develop after processing will be discussed. The mechanical behavior of plastics including elastic deformation, rubber elasticity, yielding, viscoelasticity, fracture and creep will be discussed. Plastic 164 Mechanical Engineering Return to Table of Contents Mechanical Engineering 165 degradation and environmental issues associated with recycling and disposal of plastics will be examined. Typical techniques used in the analysis and testing of plastics will be described and a working knowledge of various terminologies used in commercial practice will be provided. Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MTE 594A).",
+          "category": null,
+          "minCredits": 2,
+          "maxCredits": 2,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 351607,
+                "number": "C01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "C",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Michael Fritschy",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [],
                     "isAsync": true
@@ -328668,6 +329068,40 @@
           "isGraduate": true,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 349240,
+                "number": "A01",
+                "seats": 15,
+                "seatsAvailable": 15,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Christopher Brown",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 15,
+                    "seatsAvailable": 15,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "A01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 350137,
@@ -329228,6 +329662,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 352249,
+                "number": "D01",
+                "seats": 15,
+                "seatsAvailable": 15,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Christopher Brown",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 15,
+                    "seatsAvailable": 15,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "D01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -329460,6 +329928,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 348973,
+                "number": "A02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Jianyu Liang",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "A02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -329587,6 +330089,40 @@
                       "M"
                     ],
                     "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 351844,
+                "number": "D02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Paul Cotnoir",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "D02",
+                    "days": [],
+                    "isAsync": true
                   }
                 ]
               },
@@ -330455,6 +330991,40 @@
             },
             {
               "section": {
+                "crn": 349403,
+                "number": "B04 - ST: Design and Optimization of Thermal Systems",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Jamal Yagoobi",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "B04 - ST: Design and Optimization of Thermal Systems",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 354883,
                 "number": "C01 - ST: Modeling and Measurement in Thermofluid Energy Systems",
                 "seats": 20,
@@ -330836,6 +331406,53 @@
           ]
         },
         {
+          "id": "MFE-510-2026",
+          "number": "510",
+          "name": "Control And Monitoring Of Manufacturing Processes",
+          "description": "Covers a broad range of topics centered on control and monitoring functions for manufacturing, including process control, feedback systems, data collection and analysis, scheduling, machinecomputer interfacing and distributed control. Typical applions are considered with lab work.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350915,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Not Assigned",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "MFE-511-2025",
           "number": "511",
           "name": "Application Of Industrial Robotics",
@@ -330871,6 +331488,53 @@
                     "seatsAvailable": 21,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
+                    "specificSection": "D01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "MFE-511-2026",
+          "number": "511",
+          "name": "Application Of Industrial Robotics",
+          "description": "(Concurrent with ME 4815) This course introduces the student to the field of industrial automation. Topics covered include robot specifion and selection, control and drive methods, part presentation, economic justifion, safety, implementation, product design and programming languages. The course combines the use of lecture, project work and laboratories that utilize industrial robots. Theory and applion of robotic systems will be emphasized.",
+          "category": 1,
+          "minCredits": 2,
+          "maxCredits": 2,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 352160,
+                "number": "D01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Not Assigned",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [],
                     "isAsync": true
@@ -331111,6 +331775,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 348973,
+                "number": "A02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Jianyu Liang",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "A02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -331343,6 +332041,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 351844,
+                "number": "D02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Paul Cotnoir",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "D02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -331464,6 +332196,40 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 352249,
+                "number": "D01",
+                "seats": 15,
+                "seatsAvailable": 15,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Christopher Brown",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 15,
+                    "seatsAvailable": 15,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "D01",
                     "days": [],
                     "isAsync": true
                   }
@@ -331714,6 +332480,40 @@
           "isGraduate": true,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 349240,
+                "number": "A01",
+                "seats": 15,
+                "seatsAvailable": 15,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Christopher Brown",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 15,
+                    "seatsAvailable": 15,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "A01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 350137,
@@ -340372,6 +341172,40 @@
           "lectures": [
             {
               "section": {
+                "crn": 350053,
+                "number": "B01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Thomas Christiansen",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "B01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 349797,
                 "number": "B02",
                 "seats": 45,
@@ -340675,6 +341509,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 349452,
+                "number": "B02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Not Assigned",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "B02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -340773,6 +341641,40 @@
           "isGraduate": true,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 351448,
+                "number": "C01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "C",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Jianyu Liang",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "C01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 351623,
@@ -341084,6 +341986,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 352249,
+                "number": "D01",
+                "seats": 15,
+                "seatsAvailable": 15,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Christopher Brown",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 15,
+                    "seatsAvailable": 15,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "D01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -341268,6 +342204,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350690,
+                "number": "S02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Kyle Tsaknopoulos; Danielle Cote",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -341307,6 +342277,53 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
+                    "specificSection": "C01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "MTE-558-2026",
+          "number": "558",
+          "name": "Plastics",
+          "description": "(2 credits) This course will provide an integrated overview of the design, selection and use of synthetic plastics. The basic chemistry associated with polymerization and the structure of commercial plastics will be described. Various aspects of polymer crystallization and glass transition will be outlined. Salient aspects of fluid flow and heat transfer during the processing of plastics will be highlighted. Fundamentals of the diverse processing operations used to shape plastics and the resulting structures that develop after processing will be discussed. The mechanical behavior of plastics including elastic deformation, rubber elasticity, yielding, viscoelasticity, fracture and creep will be discussed. Plastic 164 Mechanical Engineering Return to Table of Contents Mechanical Engineering 165 degradation and environmental issues associated with recycling and disposal of plastics will be examined. Typical techniques used in the analysis and testing of plastics will be described and a working knowledge of various terminologies used in commercial practice will be provided. Note: Students cannot receive credit for this course if they have taken the Special Topics version of the same course (MTE 594A).",
+          "category": null,
+          "minCredits": 2,
+          "maxCredits": 2,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 351607,
+                "number": "C01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "C",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Michael Fritschy",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [],
                     "isAsync": true
@@ -341544,6 +342561,40 @@
                       "R"
                     ],
                     "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 352153,
+                "number": "D02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "D",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Pratap Rao",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "D02",
+                    "days": [],
+                    "isAsync": true
                   }
                 ]
               },
@@ -342012,6 +343063,40 @@
           "isGraduate": true,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 349240,
+                "number": "A01",
+                "seats": 15,
+                "seatsAvailable": 15,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Christopher Brown",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 15,
+                    "seatsAvailable": 15,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "A01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 350137,
@@ -434068,6 +435153,195 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350235,
+                "number": "F03",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Alexandros Lioulemes",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F03",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350833,
+                "number": "S03",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mohammad Mahdi Agheli Hajiabadi",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S03",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "RBE-501-2026",
+          "number": "501",
+          "name": "Robot Dynamics",
+          "description": "ME 528/RBE 501 Robot Dynamics (3 Credits) Foundations and principles of robot dynamics. Topics include system modeling including dynamical modeling of serial arm robots using Newton and Lagrange’s techniques, dynamical modeling of mobile robots, introduction to dynamics-based robot control, as well as advanced techniques for serial arm forward kinematics, trajectory planning, singularity and manipulability, and vision-based control. In addition, dynamic simulation techniques will be covered to apply the concepts learned using realistic simulators. An end of term team project would allow students to apply mastery of the subject to real-world robotic platforms. Prerequisites: RBE 500 or equivalent",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 356523,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mohammad Mahdi Agheli Hajiabadi",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350163,
+                "number": "F02",
+                "seats": 40,
+                "seatsAvailable": 40,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Connor McCann",
+                    "startTime": "16:00",
+                    "endTime": "17:20",
+                    "location": "Atwater Kent 233",
+                    "building": "",
+                    "room": "Atwater Kent 233",
+                    "seats": 40,
+                    "seatsAvailable": 40,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F02",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350719,
+                "number": "S02",
+                "seats": 40,
+                "seatsAvailable": 40,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Gregory Fischer",
+                    "startTime": "16:00",
+                    "endTime": "17:20",
+                    "location": "Fuller Labs 311",
+                    "building": "",
+                    "room": "Fuller Labs 311",
+                    "seats": 40,
+                    "seatsAvailable": 40,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "S02",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -434159,93 +435433,6 @@
           ]
         },
         {
-          "id": "RBE-501-2026",
-          "number": "501",
-          "name": "Robot Dynamics",
-          "description": "ME 528/RBE 501 Robot Dynamics (3 Credits) Foundations and principles of robot dynamics. Topics include system modeling including dynamical modeling of serial arm robots using Newton and Lagrange’s techniques, dynamical modeling of mobile robots, introduction to dynamics-based robot control, as well as advanced techniques for serial arm forward kinematics, trajectory planning, singularity and manipulability, and vision-based control. In addition, dynamic simulation techniques will be covered to apply the concepts learned using realistic simulators. An end of term team project would allow students to apply mastery of the subject to real-world robotic platforms. Prerequisites: RBE 500 or equivalent",
-          "category": null,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": true,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 350163,
-                "number": "F02",
-                "seats": 40,
-                "seatsAvailable": 40,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "F",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Connor McCann",
-                    "startTime": "16:00",
-                    "endTime": "17:20",
-                    "location": "Atwater Kent 233",
-                    "building": "",
-                    "room": "Atwater Kent 233",
-                    "seats": 40,
-                    "seatsAvailable": 40,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "F02",
-                    "days": [
-                      "M",
-                      "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 350719,
-                "number": "S02",
-                "seats": 40,
-                "seatsAvailable": 40,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "S",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Gregory Fischer",
-                    "startTime": "16:00",
-                    "endTime": "17:20",
-                    "location": "Fuller Labs 311",
-                    "building": "",
-                    "room": "Fuller Labs 311",
-                    "seats": 40,
-                    "seatsAvailable": 40,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "S02",
-                    "days": [
-                      "M",
-                      "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
           "id": "RBE-502-2026",
           "number": "502",
           "name": "Robot Control",
@@ -434287,6 +435474,40 @@
                       "F"
                     ],
                     "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350750,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Akin Tatoglu",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
                   }
                 ]
               },
@@ -434742,6 +435963,53 @@
                     "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "RBE-520-2026",
+          "number": "520",
+          "name": "Biomechanics And Robotics",
+          "description": "This course introduces Biomechanics and Robotics as a unified subject addressing living and man-made \"organisms\". It draws deep connections between the natural and the synthetic, showing how the same principles apply to both, starting from sensing, through control, to actuation. Those principles are illustrated in several domains, including locomotion, prosthetics, and medicine. The following topics are addressed: Biological and Artificial sensors, actuators and control, Orthotics Biomechanics and Robotics, Prosthetic Biomechanics and Robotics: Artificial Organs and Limbs, Rehabilitation Robotics and Biomechanics: Therapy, Assistance and Clinical Evaluation, Human-Robot Interaction and Robot Aided Living for Healthier Tomorrow, Sports, Exercise and Games: Biomechanics and Robotics, Robot-aided Surgery, Biologically Inspired Robotics and Micro- (bio)robotics, New Technologies and Methodologies in Medical Robotics and Biomechanics, Neural Control of Movement and Robotics Applions, Applied Musculoskeletal Models and Human Movement Analysis. This course meshes physics, biology, medicine and engineering and introduce students to subject that holds a promise to be one of the most influential innovative research directions defining the 21st century. Recommended background: foundation of physics, linear algebra and differential equations; basic programming skills e.g. using MATLAB, undergraduate level biomechanics, robotics.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350571,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Melissa Sahl",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
                     "isAsync": true
@@ -435351,6 +436619,40 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350869,
+                "number": "S02",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Alexandros Lioulemes",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -435483,6 +436785,40 @@
           "isGraduate": true,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 350476,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Daniel Montrallo Flickinger",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 355572,
@@ -435717,6 +437053,40 @@
           "isGraduate": true,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 350344,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Navid Dadkhah Tehrani",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 350706,
@@ -435982,6 +437352,74 @@
           "isGraduate": true,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 350495,
+                "number": "F02",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Vincent Aloi",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F02",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350759,
+                "number": "S01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Not Assigned",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 350819,
