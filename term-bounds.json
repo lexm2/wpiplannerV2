@@ -1,5 +1,5 @@
 {
-  "generated": "2026-03-30T10:58:05.044Z",
+  "generated": "2026-03-30T11:54:42.571Z",
   "years": {
     "2025": {
       "A": {
@@ -44,7 +44,7 @@
         "startDate": "2027-01-13",
         "endDate": "2027-03-05",
         "offeringPeriod": "2027 Spring C Term",
-        "sampleSize": 728
+        "sampleSize": 732
       },
       "D": {
         "startDate": "2027-03-15",
