@@ -421,6 +421,26 @@ export class CourseController {
         this.updateCourseUIById(course.id, isSelected);
     }
 
+    syncCourseSelectionState(): void {
+        const selectedIds = new Set(
+            this.courseSelectionService.getSelectedCourses().map(sc => sc.course.id)
+        );
+        const elements = document.querySelectorAll<HTMLElement>('#course-container .course-item[data-course-id], #course-container .course-card[data-course-id]');
+        for (const el of elements) {
+            const id = el.dataset.courseId;
+            if (!id) continue;
+            const isSelected = selectedIds.has(id);
+            const selectBtn = el.querySelector<HTMLButtonElement>('.course-select-btn');
+            if (!selectBtn) continue;
+
+            selectBtn.innerHTML = isSelected
+                ? getInlineSVG('CHECK', 'check-icon')
+                : getInlineSVG('PLUS', 'plus-icon');
+            el.classList.toggle('selected', isSelected);
+            selectBtn.classList.toggle('selected', isSelected);
+        }
+    }
+
     private displayCourseDescription(course: Course): void {
         const descriptionContainer = document.getElementById('course-description');
         if (!descriptionContainer) return;

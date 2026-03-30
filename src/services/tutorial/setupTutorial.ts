@@ -93,6 +93,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 description: 'Click the + button on the Tutorial course to add it to your planner.',
                 waitFor: 'click',
                 scrollArrow: true,
+                stopPropagation: true,
                 uiState: { currentPage: 'planner' },
             },
             {
@@ -216,7 +217,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     waitFor: 'click',
                     scrollArrow: true,
                     uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
-                    appState: { filters: [{ id: 'term', criteria: { terms: ['B'] } }] },
+                    appState: { filters: [{ id: 'term', criteria: { terms: ['B'] } }], refreshFilterUI: true },
                 },
                 {
                     selector: '#available-only-filter',
@@ -228,7 +229,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     appState: { filters: [
                         { id: 'term', criteria: { terms: ['B'] } },
                         { id: 'periodConflict', criteria: { avoidConflicts: true, blockedSlots: [] } },
-                    ] },
+                    ], refreshFilterUI: true },
                 },
                 {
                     selector: '#modal-primary-btn',
@@ -240,7 +241,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                         { id: 'term', criteria: { terms: ['B'] } },
                         { id: 'periodConflict', criteria: { avoidConflicts: true, blockedSlots: [] } },
                         { id: 'availability', criteria: { availableOnly: true } },
-                    ] },
+                    ], refreshFilterUI: true },
                 },
                 {
                     selector: '[data-course-id="TUT-2005"] .course-select-btn',
@@ -253,7 +254,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                         { id: 'term', criteria: { terms: ['B'] } },
                         { id: 'periodConflict', criteria: { avoidConflicts: true, blockedSlots: [] } },
                         { id: 'availability', criteria: { availableOnly: true } },
-                    ] },
+                    ], refreshFilterUI: true },
                 },
                 {
                     selector: '#schedule-tab',
@@ -509,6 +510,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         }
         if (appState?.refreshFilterUI) {
             mainController.refreshAutoScheduleFilterUI();
+            mainController.refreshPlannerFilterUI();
         }
         if (appState?.runAutoSchedule) {
             mainController.runAutoSchedule();
@@ -578,9 +580,10 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     });
 
     const floatingTextBox = new FloatingTextBox(tutorialService);
-    floatingTextBox.setGoBack(() =>
-        tutorialService.goBack((targetIndex) => stateMachine.restoreSnapshot(targetIndex))
-    );
+    floatingTextBox.setGoBack(async () => {
+        await tutorialService.goBack((targetIndex) => stateMachine.restoreSnapshot(targetIndex));
+        mainController.syncCourseSelectionUI();
+    });
     floatingTextBox.mount();
 
     const tutorials: TutorialEntry[] = [

@@ -184,6 +184,7 @@ export class MainController {
 
             this.setupEventListeners();
             this.setupCourseSelectionListener();
+            this.setupPageNavigationListener();
             this.setupScheduleChangeListener();
             this.initializeSwipeNavigation();
             AppBootstrap.setupWindowUnloadHandler();
@@ -1002,6 +1003,15 @@ export class MainController {
         this.scheduleController.refreshAutoScheduleFilterUI();
     }
 
+    refreshPlannerFilterUI(): void {
+        this.filterModalController.refreshFilterUI();
+    }
+
+    syncCourseSelectionUI(): void {
+        this.courseController.syncCourseSelectionState();
+        this.courseController.displaySelectedCourses();
+    }
+
     runAutoSchedule(): void {
         this.scheduleController.runAutoSchedule();
     }
@@ -1039,6 +1049,14 @@ export class MainController {
             }
         });
         this.updateSchedulePickerButton();
+    }
+
+    private setupPageNavigationListener(): void {
+        this.services.uiStateManager.subscribe((state, prevState) => {
+            if (state.currentPage === 'planner' && prevState.currentPage !== 'planner') {
+                this.courseController.syncCourseSelectionState();
+            }
+        });
     }
 
     private setupCourseSelectionListener(): void {

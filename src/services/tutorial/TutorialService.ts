@@ -84,7 +84,7 @@ export class TutorialService {
         await restoreFn(targetIndex);
         this.currentStepIndex = targetIndex;
         this.suppressAutoAdvance = true;
-        this.applyStep();
+        await this.applyStep();
     }
 
     getCurrentStepIndex(): number { return this.currentStepIndex; }
