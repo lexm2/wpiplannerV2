@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 30, 2026, 5:51 PM",
+  "generated": "Mar 30, 2026, 6:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -11897,56 +11897,6 @@
                     "days": [
                       "M",
                       "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "AR-3333-2026",
-          "number": "3333",
-          "name": "3d Animation II",
-          "description": "This course will build upon the techniques learned in IMGD/AR 2333. Students will learn to apply the animation principles with a focus on character acting and cinematic animation. Students are taught how to tell a compelling, character-driven story through a focus on acting techniques such as body language, lip syncing, facial animation, and micro expressions whilst incorporating digital cinematography techniques. Additional topics covered may include creating 3D simulations for hair and cloth, biped and quadruped animation, and 3D animation pipelines. Students will create animated sequences that are intended to serve a narrative structure for games and other media.Recommended background: Knowledge of digital 3D animation techniques and classical animation principles (IMGD/AR 2333).",
-          "category": 1,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 352241,
-                "number": "D01",
-                "seats": 24,
-                "seatsAvailable": 24,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Fuller Labs 222 IMGD Computer Lab",
-                    "building": "",
-                    "room": "Fuller Labs 222 IMGD Computer Lab",
-                    "seats": 24,
-                    "seatsAvailable": 24,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "D01",
-                    "days": [
-                      "T",
-                      "F"
                     ],
                     "isAsync": false
                   }
@@ -125148,7 +125098,7 @@
                 "crn": 349516,
                 "number": "BL01",
                 "seats": 90,
-                "seatsAvailable": 90,
+                "seatsAvailable": 89,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5264",
@@ -125165,7 +125115,7 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 90,
-                    "seatsAvailable": 90,
+                    "seatsAvailable": 89,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "BL01",
@@ -125184,7 +125134,7 @@
                   "crn": 349515,
                   "number": "BD01",
                   "seats": 90,
-                  "seatsAvailable": 90,
+                  "seatsAvailable": 89,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5264",
@@ -125201,7 +125151,7 @@
                       "building": "",
                       "room": "Unity Hall 400",
                       "seats": 90,
-                      "seatsAvailable": 90,
+                      "seatsAvailable": 89,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD01",
@@ -126388,7 +126338,7 @@
                 "crn": 348627,
                 "number": "A01",
                 "seats": 70,
-                "seatsAvailable": 69,
+                "seatsAvailable": 68,
                 "actualWaitlist": 0,
                 "maxWaitlist": 40,
                 "note": null,
@@ -126405,7 +126355,7 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 70,
-                    "seatsAvailable": 69,
+                    "seatsAvailable": 68,
                     "actualWaitlist": 0,
                     "maxWaitlist": 40,
                     "specificSection": "A01",
@@ -127515,7 +127465,7 @@
                 "crn": 351566,
                 "number": "CL01",
                 "seats": 90,
-                "seatsAvailable": 89,
+                "seatsAvailable": 88,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5358",
@@ -127532,7 +127482,7 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 90,
-                    "seatsAvailable": 89,
+                    "seatsAvailable": 88,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "CL01",
@@ -127551,7 +127501,7 @@
                   "crn": 351577,
                   "number": "CD01",
                   "seats": 90,
-                  "seatsAvailable": 89,
+                  "seatsAvailable": 88,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5358",
@@ -127568,7 +127518,7 @@
                       "building": "",
                       "room": "Higgins Labs 218 Discovery Classroom",
                       "seats": 90,
-                      "seatsAvailable": 89,
+                      "seatsAvailable": 88,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD01",
@@ -137001,7 +136951,7 @@
                 "crn": 348420,
                 "number": "A01 - Topics In International Politics",
                 "seats": 40,
-                "seatsAvailable": 40,
+                "seatsAvailable": 39,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -137018,7 +136968,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 40,
-                    "seatsAvailable": 40,
+                    "seatsAvailable": 39,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "A01 - Topics In International Politics",
@@ -158662,56 +158612,6 @@
                     "days": [
                       "M",
                       "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "IMGD-3333-2026",
-          "number": "3333",
-          "name": "3d Animation II",
-          "description": "This course will build upon the techniques learned in IMGD/AR 2333. Students will learn to apply the animation principles with a focus on character acting and cinematic animation. Students are taught how to tell a compelling, character-driven story through a focus on acting techniques such as body language, lip syncing, facial animation, and micro expressions whilst incorporating digital cinematography techniques. Additional topics covered may include creating 3D simulations for hair and cloth, biped and quadruped animation, and 3D animation pipelines. Students will create animated sequences that are intended to serve a narrative structure for games and other media.Recommended background: Knowledge of digital 3D animation techniques and classical animation principles (IMGD/AR 2333).",
-          "category": 1,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 352241,
-                "number": "D01",
-                "seats": 24,
-                "seatsAvailable": 24,
-                "actualWaitlist": 0,
-                "maxWaitlist": 10,
-                "note": null,
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "14:00",
-                    "endTime": "15:50",
-                    "location": "Fuller Labs 222 IMGD Computer Lab",
-                    "building": "",
-                    "room": "Fuller Labs 222 IMGD Computer Lab",
-                    "seats": 24,
-                    "seatsAvailable": 24,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 10,
-                    "specificSection": "D01",
-                    "days": [
-                      "T",
-                      "F"
                     ],
                     "isAsync": false
                   }
@@ -432659,7 +432559,7 @@
                 "crn": 348931,
                 "number": "AL01",
                 "seats": 72,
-                "seatsAvailable": 72,
+                "seatsAvailable": 71,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5064",
@@ -432676,7 +432576,7 @@
                     "building": "",
                     "room": "Atwater Kent 219",
                     "seats": 72,
-                    "seatsAvailable": 72,
+                    "seatsAvailable": 71,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "AL01",
@@ -432696,7 +432596,7 @@
                   "crn": 348930,
                   "number": "AX01",
                   "seats": 36,
-                  "seatsAvailable": 36,
+                  "seatsAvailable": 35,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5064",
@@ -432713,7 +432613,7 @@
                       "building": "",
                       "room": "Atwater Kent 120D Robotics Lab",
                       "seats": 36,
-                      "seatsAvailable": 36,
+                      "seatsAvailable": 35,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX01",
@@ -433101,7 +433001,7 @@
                 "crn": 349614,
                 "number": "BL01",
                 "seats": 72,
-                "seatsAvailable": 72,
+                "seatsAvailable": 71,
                 "actualWaitlist": 0,
                 "maxWaitlist": 30,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5237",
@@ -433118,7 +433018,7 @@
                     "building": "",
                     "room": "Atwater Kent 219",
                     "seats": 72,
-                    "seatsAvailable": 72,
+                    "seatsAvailable": 71,
                     "actualWaitlist": 0,
                     "maxWaitlist": 30,
                     "specificSection": "BL01",
@@ -433138,7 +433038,7 @@
                   "crn": 349692,
                   "number": "BX01",
                   "seats": 36,
-                  "seatsAvailable": 36,
+                  "seatsAvailable": 35,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5237",
@@ -433155,7 +433055,7 @@
                       "building": "",
                       "room": "Atwater Kent 120D Robotics Lab",
                       "seats": 36,
-                      "seatsAvailable": 36,
+                      "seatsAvailable": 35,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX01",
@@ -433680,7 +433580,7 @@
                 "crn": 351116,
                 "number": "C01",
                 "seats": 20,
-                "seatsAvailable": 20,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -433697,7 +433597,7 @@
                     "building": "",
                     "room": "Higgins Labs 114",
                     "seats": 20,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
