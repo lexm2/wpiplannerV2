@@ -102,6 +102,24 @@ export class FilterService {
         this.filterState.clearFilters();
     }
 
+    resetFilters(year?: number): void {
+        this.filterState.clearFilters();
+        if (year !== undefined) {
+            this.addFilter('academicYear', { year });
+        }
+    }
+
+    /** Check if filters are in "default" state (only the schedule's year filter, or empty) */
+    hasNonDefaultFilters(scheduleYear?: number): boolean {
+        const filters = this.getActiveFilters();
+        if (filters.length === 0) return false;
+        if (filters.length === 1 && filters[0].id === 'academicYear' && scheduleYear !== undefined) {
+            const criteria = filters[0].criteria as { year: number | 'all' };
+            return criteria.year !== scheduleYear;
+        }
+        return true;
+    }
+
     toggleFilter(filterId: string, criteria: unknown): boolean {
         if (this.hasFilter(filterId)) {
             return this.removeFilter(filterId);

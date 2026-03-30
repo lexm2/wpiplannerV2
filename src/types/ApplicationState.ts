@@ -43,10 +43,16 @@ export class ApplicationState {
         return {
             v: this.version,
             a: this.getActiveScheduleIndex(),
-            s: this.schedules.map(schedule => [
-                schedule.name,
-                schedule.selectedCourses.flatMap(course => encodeCourseSelection(course))
-            ]),
+            s: this.schedules.map(schedule => {
+                const tuple: [string, (string | null)[], number?] = [
+                    schedule.name,
+                    schedule.selectedCourses.flatMap(course => encodeCourseSelection(course))
+                ];
+                if (schedule.year !== undefined) {
+                    tuple.push(schedule.year);
+                }
+                return tuple;
+            }),
             p: this.preferences?.theme ? {
                 t: [0, 0] as [number, number],
                 d: [],
@@ -67,7 +73,7 @@ export class ApplicationState {
         data: MinimalSyncData,
         courseCatalog: Department[]
     ): ApplicationState {
-        const schedules = data.s.map(([name, coursesArray]) => {
+        const schedules = data.s.map(([name, coursesArray, year]) => {
             const selectedCourses: SelectedCourse[] = [];
 
             for (let i = 0; i < coursesArray.length; i += 4) {
@@ -98,7 +104,10 @@ export class ApplicationState {
                 `schedule_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
                 name,
                 selectedCourses,
-                []
+                [],
+                Date.now(),
+                [],
+                year
             );
         });
 

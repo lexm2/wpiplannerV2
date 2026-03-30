@@ -20,6 +20,8 @@ export interface Schedule {
     timestamp?: number;
     /** Locally-stored calendar events */
     localEvents?: LocalCalendarEvent[];
+    /** Academic year this schedule targets (e.g. 2026 for "2026–2027") */
+    year?: number;
 }
 
 export interface ScheduleCombination {

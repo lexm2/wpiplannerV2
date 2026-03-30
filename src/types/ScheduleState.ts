@@ -16,6 +16,7 @@ export class ScheduleState {
     readonly generatedSchedules: ScheduleCombination[];
     readonly timestamp: number;
     readonly localEvents: LocalCalendarEvent[];
+    readonly year?: number;
 
     constructor(
         id: string,
@@ -23,7 +24,8 @@ export class ScheduleState {
         selectedCourses: SelectedCourse[] = [],
         generatedSchedules: ScheduleCombination[] = [],
         timestamp: number = Date.now(),
-        localEvents: LocalCalendarEvent[] = []
+        localEvents: LocalCalendarEvent[] = [],
+        year?: number
     ) {
         this.id = id;
         this.name = name;
@@ -31,6 +33,7 @@ export class ScheduleState {
         this.generatedSchedules = generatedSchedules;
         this.timestamp = timestamp;
         this.localEvents = localEvents;
+        this.year = year;
     }
 
 
@@ -45,6 +48,7 @@ export class ScheduleState {
         selectedCourses: SelectedCourse[];
         generatedSchedules: ScheduleCombination[];
         localEvents: LocalCalendarEvent[];
+        year: number | undefined;
     }>): ScheduleState {
         return new ScheduleState(
             this.id,
@@ -52,7 +56,8 @@ export class ScheduleState {
             updates.selectedCourses ?? this.selectedCourses,
             updates.generatedSchedules ?? this.generatedSchedules,
             Date.now(), // Update timestamp on any change
-            updates.localEvents ?? this.localEvents
+            updates.localEvents ?? this.localEvents,
+            'year' in updates ? updates.year : this.year
         );
     }
 
@@ -244,7 +249,8 @@ export class ScheduleState {
             schedule.selectedCourses,
             schedule.generatedSchedules,
             schedule.timestamp || Date.now(),
-            schedule.localEvents || []
+            schedule.localEvents || [],
+            schedule.year
         );
     }
 
@@ -260,7 +266,8 @@ export class ScheduleState {
             selectedCourses: this.selectedCourses,
             generatedSchedules: this.generatedSchedules,
             timestamp: this.timestamp,
-            localEvents: this.localEvents
+            localEvents: this.localEvents,
+            year: this.year
         };
     }
 }

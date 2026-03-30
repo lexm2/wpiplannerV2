@@ -1025,7 +1025,9 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         const clearFiltersBtn = this.panel.querySelector('#wizard-clear-filters-btn');
         clearFiltersBtn?.addEventListener('click', () => {
             if (this.filterService) {
-                this.filterService.clearFilters();
+                const yearFilter = this.filterService.getActiveFilters().find(f => f.id === 'academicYear');
+                const activeYear = (yearFilter?.criteria as AcademicYearFilterCriteria | undefined)?.year;
+                this.filterService.resetFilters(typeof activeYear === 'number' ? activeYear : undefined);
             }
         });
 

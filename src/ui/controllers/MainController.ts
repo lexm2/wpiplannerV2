@@ -82,11 +82,13 @@ export class MainController {
         this.filterModalController.setFilterService(filterService);
         this.filterModalController.setCourseSelectionService(courseSelectionService);
         this.filterModalController.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
+        this.filterModalController.setProfileStateManager(services.profileStateManager);
 
         // Connect schedule filter service to controllers
         this.scheduleFilterModalController.setFilterService(filterService);
         this.scheduleFilterModalController.setCourseSelectionService(courseSelectionService);
         this.scheduleFilterModalController.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
+        this.scheduleFilterModalController.setProfileStateManager(services.profileStateManager);
         this.scheduleController.setCourseDataService(courseDataService);
         this.scheduleController.setConflictDetector(conflictDetector);
         this.scheduleController.setFilterService(filterService);
@@ -612,7 +614,8 @@ export class MainController {
             clearFiltersButton.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'eraser-icon'));
             clearFiltersButton.addEventListener('click', () => {
                 if (this.services.filterService) {
-                    this.services.filterService.clearFilters();
+                    const activeYear = this.services.profileStateManager.getActiveSchedule()?.year;
+                    this.services.filterService.resetFilters(activeYear);
                     this.updateFilterButtonState();
                     this.updateClearFiltersButtonState();
                     this.updateBookmarkFilterButtonState();
@@ -904,10 +907,11 @@ export class MainController {
     private updateFilterButtonState(): void {
         const filterButton = document.getElementById('filter-btn');
         if (filterButton && this.services.filterService) {
-            const hasActiveFilters = !this.services.filterService.isEmpty();
+            const activeYear = this.services.profileStateManager.getActiveSchedule()?.year;
+            const hasNonDefault = this.services.filterService.hasNonDefaultFilters(activeYear);
             const filterCount = this.services.filterService.getFilterCount();
 
-            if (hasActiveFilters) {
+            if (hasNonDefault) {
                 filterButton.classList.add('active');
                 filterButton.title = `${filterCount} filter${filterCount === 1 ? '' : 's'} active - Click to modify`;
             } else {
@@ -921,9 +925,10 @@ export class MainController {
     private updateClearFiltersButtonState(): void {
         const clearFiltersButton = document.getElementById('clear-filters-btn') as HTMLButtonElement | null;
         if (clearFiltersButton && this.services.filterService) {
-            const hasActiveFilters = !this.services.filterService.isEmpty();
+            const activeYear = this.services.profileStateManager.getActiveSchedule()?.year;
+            const hasNonDefault = this.services.filterService.hasNonDefaultFilters(activeYear);
 
-            if (hasActiveFilters) {
+            if (hasNonDefault) {
                 clearFiltersButton.style.display = '';
                 clearFiltersButton.disabled = false;
             } else {
@@ -955,10 +960,11 @@ export class MainController {
     private updateScheduleFilterButtonState(): void {
         const scheduleFilterButton = document.getElementById('schedule-filter-btn');
         if (scheduleFilterButton && this.services.filterService) {
-            const hasActiveFilters = !this.services.filterService.isEmpty();
+            const activeYear = this.services.profileStateManager.getActiveSchedule()?.year;
+            const hasNonDefault = this.services.filterService.hasNonDefaultFilters(activeYear);
             const filterCount = this.services.filterService.getFilterCount();
 
-            if (hasActiveFilters) {
+            if (hasNonDefault) {
                 scheduleFilterButton.classList.add('active');
                 scheduleFilterButton.title = `${filterCount} filter${filterCount === 1 ? '' : 's'} active - Click to modify`;
             } else {
@@ -1046,6 +1052,18 @@ export class MainController {
             const activeSchedule = this.services.scheduleManagementService.getActiveSchedule();
             if (activeSchedule) {
                 this.scheduleController.loadExternalEvents(activeSchedule);
+
+                // Sync year filter to match the newly activated schedule
+                if (activeSchedule.year !== undefined) {
+                    this.services.filterService.addFilter('academicYear', { year: activeSchedule.year });
+                } else {
+                    const newestYear = this.services.profileStateManager.getNewestAcademicYear();
+                    if (newestYear !== undefined) {
+                        this.services.filterService.addFilter('academicYear', { year: newestYear });
+                    }
+                }
+                this.updateFilterButtonState();
+                this.updateClearFiltersButtonState();
             }
         });
         this.updateSchedulePickerButton();

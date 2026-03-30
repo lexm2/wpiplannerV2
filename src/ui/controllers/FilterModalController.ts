@@ -3,6 +3,7 @@ import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { FilterService } from '../../services/filtering/FilterService';
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
+import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import { Course, Department } from '../../types/types';
 import { AcademicTerm, WeeklyTimeSlot, SelectedCourse } from '../../types/schedule';
 import { BaseModal } from '../components/BaseModal';
@@ -17,6 +18,7 @@ export class FilterModalController extends BaseModal {
     private filterService: FilterService | null = null;
     private courseSelectionService: CourseSelectionService | null = null;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator | null = null;
+    private profileStateManager: ProfileStateManager | null = null;
     private allCourses: Course[] = [];
     private isCategoryMode: boolean = false;
     private isUpdatingFilter: boolean = false;
@@ -38,6 +40,10 @@ export class FilterModalController extends BaseModal {
 
     setAutoScheduleOrchestrator(orchestrator: AutoScheduleOrchestrator): void {
         this.autoScheduleOrchestrator = orchestrator;
+    }
+
+    setProfileStateManager(psm: ProfileStateManager): void {
+        this.profileStateManager = psm;
     }
 
     setMode(mode: 'filter' | 'auto-schedule'): void {
@@ -172,7 +178,9 @@ export class FilterModalController extends BaseModal {
         const backdrop = document.createElement('div');
         backdrop.className = 'modal-backdrop filter-modal';
 
-        const activeFiltersCount = this.filterService?.getFilterCount() || 0;
+        const activeYear = this.profileStateManager?.getActiveSchedule()?.year;
+        const hasNonDefault = this.filterService?.hasNonDefaultFilters(activeYear) || false;
+        const activeFiltersCount = hasNonDefault ? (this.filterService?.getFilterCount() || 0) : 0;
         const isAutoSchedule = this.mode === 'auto-schedule';
         const title = isAutoSchedule ? 'Auto-Schedule Settings' : 'Filter Courses';
         const primaryBtnText = isAutoSchedule ? 'Generate Schedule' : 'Apply';
@@ -610,6 +618,14 @@ export class FilterModalController extends BaseModal {
                 } else {
                     this.filterService?.addFilter('academicYear', { year });
                 }
+                // Update active schedule's year to match
+                const psm = this.profileStateManager;
+                if (psm) {
+                    const active = psm.getActiveSchedule();
+                    if (active) {
+                        psm.updateSchedule(active.id, { year: year === 'all' ? undefined : year as number }, 'filter-sync');
+                    }
+                }
                 this.updatePreview(modalElement);
             });
         });
@@ -830,7 +846,8 @@ export class FilterModalController extends BaseModal {
         const clearButton = modalElement.querySelector('#clear-all-filters');
         clearButton?.addEventListener('click', () => {
             if (this.filterService) {
-                this.filterService.clearFilters();
+                const activeYear = this.profileStateManager?.getActiveSchedule()?.year;
+                this.filterService.resetFilters(activeYear);
                 this.updatePreview(modalElement);
                 // Sync main search input to clear it
                 this.syncMainSearchInput('');
@@ -1205,7 +1222,9 @@ export class FilterModalController extends BaseModal {
     private updatePreview(modalElement: HTMLElement): void {
         if (!this.filterService) return;
 
-        const filterCount = this.filterService.getFilterCount();
+        const activeYear = this.profileStateManager?.getActiveSchedule()?.year;
+        const hasNonDefault = this.filterService.hasNonDefaultFilters(activeYear);
+        const filterCount = hasNonDefault ? this.filterService.getFilterCount() : 0;
         const countElement = modalElement.querySelector('#course-count-preview');
         const filterCountElement = modalElement.querySelector('#filter-count');
 
