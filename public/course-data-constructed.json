@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 30, 2026, 2:44 PM",
+  "generated": "Mar 30, 2026, 3:55 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8383,7 +8383,7 @@
                 "crn": 351154,
                 "number": "C02",
                 "seats": 24,
-                "seatsAvailable": 24,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -8400,7 +8400,7 @@
                     "building": "",
                     "room": "Riley Commons",
                     "seats": 24,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
@@ -10540,7 +10540,7 @@
                 "crn": 352183,
                 "number": "D01",
                 "seats": 24,
-                "seatsAvailable": 24,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -10557,7 +10557,7 @@
                     "building": "",
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -42973,7 +42973,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Anita Mattson",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Atwater Kent 219",
@@ -49707,7 +49707,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Raul Orduna Picon",
                     "startTime": "08:00",
                     "endTime": "08:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -50474,7 +50474,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Shawn Burdette",
                     "startTime": "11:00",
                     "endTime": "11:50",
                     "location": "Salisbury Labs 115 Kinnicutt Hall",
@@ -51208,7 +51208,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Bruce Bursten",
                     "startTime": "15:00",
                     "endTime": "15:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -52042,7 +52042,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Uma Kumar",
                     "startTime": "08:00",
                     "endTime": "08:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -52809,7 +52809,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Raul Orduna Picon",
                     "startTime": "11:00",
                     "endTime": "11:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -53543,7 +53543,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Ronald Grimm",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Salisbury Labs 115 Kinnicutt Hall",
@@ -58074,7 +58074,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Raul Orduna Picon",
                     "startTime": "08:00",
                     "endTime": "08:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -58676,7 +58676,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Drew Brodeur",
                     "startTime": "11:00",
                     "endTime": "11:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -59179,7 +59179,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Bruce Bursten",
                     "startTime": "15:00",
                     "endTime": "15:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -59716,7 +59716,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "George Kaminski",
                     "startTime": "11:00",
                     "endTime": "11:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -61294,7 +61294,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Drew Brodeur",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Atwater Kent 219",
@@ -61500,7 +61500,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Destin Heilman",
                     "startTime": "11:00",
                     "endTime": "11:50",
                     "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -61906,7 +61906,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Christopher Lambert",
                     "startTime": "08:00",
                     "endTime": "08:50",
                     "location": "Salisbury Labs 115 Kinnicutt Hall",
@@ -62185,7 +62185,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "John MacDonald",
                     "startTime": "12:00",
                     "endTime": "12:50",
                     "location": "Salisbury Labs 115 Kinnicutt Hall",
@@ -62371,7 +62371,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "John MacDonald",
                     "startTime": "13:00",
                     "endTime": "13:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -62517,7 +62517,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Uma Kumar",
                     "startTime": "09:00",
                     "endTime": "09:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -62935,7 +62935,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "John MacDonald",
                     "startTime": "09:00",
                     "endTime": "09:50",
                     "location": "Stratton Hall 207 (new)",
@@ -62969,7 +62969,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "John MacDonald",
                       "startTime": "08:00",
                       "endTime": "10:50",
                       "location": "Goddard Hall 307 CH Lab",
@@ -63006,7 +63006,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Uma Kumar",
                     "startTime": "08:00",
                     "endTime": "08:50",
                     "location": "Goddard Hall 227 Classroom",
@@ -63040,7 +63040,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Uma Kumar",
                       "startTime": "08:00",
                       "endTime": "10:50",
                       "location": "Goddard Hall 307 CH Lab",
@@ -63111,7 +63111,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Uma Kumar",
                       "startTime": "11:00",
                       "endTime": "13:50",
                       "location": "Goddard Hall 307 CH Lab",
@@ -63145,7 +63145,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "John MacDonald",
                       "startTime": "08:00",
                       "endTime": "10:50",
                       "location": "Goddard Hall 307 CH Lab",
@@ -63313,7 +63313,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Drew Brodeur",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Salisbury Labs 402",
@@ -63347,7 +63347,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Drew Brodeur",
                       "startTime": "14:00",
                       "endTime": "16:50",
                       "location": "Goddard Hall 306 CH Lab",
@@ -63381,7 +63381,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Drew Brodeur",
                       "startTime": "11:00",
                       "endTime": "13:50",
                       "location": "Goddard Hall 306 CH Lab",
@@ -63515,7 +63515,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Ronald Grimm",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Goddard Hall 306 CH Lab",
@@ -63549,7 +63549,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Ronald Grimm",
                       "startTime": "14:00",
                       "endTime": "16:50",
                       "location": "Goddard Hall 306 CH Lab",
@@ -63683,7 +63683,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "John MacDonald",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Higgins Labs 154",
@@ -63717,7 +63717,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "John MacDonald",
                       "startTime": "14:00",
                       "endTime": "16:50",
                       "location": "Goddard Hall 307 CH Lab",
@@ -63885,7 +63885,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Drew Brodeur",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Salisbury Labs 104",
@@ -63919,7 +63919,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Drew Brodeur",
                       "startTime": "14:00",
                       "endTime": "16:50",
                       "location": "Goddard Hall 307 CH Lab",
@@ -64022,7 +64022,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Shawn Burdette",
                     "startTime": "09:00",
                     "endTime": "09:50",
                     "location": "Goddard Hall 227 Classroom",
@@ -64128,7 +64128,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Christopher Lambert",
                     "startTime": "10:00",
                     "endTime": "10:50",
                     "location": "Goddard Hall 227 Classroom",
@@ -64181,7 +64181,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "George Kaminski",
                     "startTime": "10:00",
                     "endTime": "10:50",
                     "location": "Salisbury Labs 011",
@@ -64286,7 +64286,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "George Kaminski",
                     "startTime": "10:00",
                     "endTime": "10:50",
                     "location": "Atwater Kent 232",
@@ -64422,7 +64422,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Christopher Lambert",
                     "startTime": "10:00",
                     "endTime": "11:50",
                     "location": "Higgins Labs 202",
@@ -64456,7 +64456,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Christopher Lambert",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Higgins Labs 202",
@@ -64558,7 +64558,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Destin Heilman",
                     "startTime": "11:00",
                     "endTime": "11:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -64664,7 +64664,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Aya Narunsky",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Goddard Hall 227 Classroom",
@@ -64770,7 +64770,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Robert Dempski",
                     "startTime": "13:00",
                     "endTime": "13:50",
                     "location": "Atwater Kent 219",
@@ -65881,7 +65881,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Bruce Bursten",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Kaven Hall 115",
@@ -66331,7 +66331,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Destin Heilman",
                     "startTime": "10:00",
                     "endTime": "11:50",
                     "location": "Salisbury Labs 402",
@@ -85858,7 +85858,7 @@
                 "crn": 350940,
                 "number": "C01",
                 "seats": 50,
-                "seatsAvailable": 50,
+                "seatsAvailable": 49,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -85875,7 +85875,7 @@
                     "building": "",
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 50,
-                    "seatsAvailable": 50,
+                    "seatsAvailable": 49,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
@@ -87626,7 +87626,7 @@
                 "crn": 352122,
                 "number": "D01",
                 "seats": 60,
-                "seatsAvailable": 60,
+                "seatsAvailable": 59,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -87643,7 +87643,7 @@
                     "building": "",
                     "room": "Salisbury Labs 411",
                     "seats": 60,
-                    "seatsAvailable": 60,
+                    "seatsAvailable": 59,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
@@ -290187,7 +290187,7 @@
                 "crn": 336998,
                 "number": "D01",
                 "seats": 30,
-                "seatsAvailable": 29,
+                "seatsAvailable": 30,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -290204,7 +290204,7 @@
                     "building": "",
                     "room": "Stratton Hall 201",
                     "seats": 30,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -419514,7 +419514,7 @@
                 "crn": 352424,
                 "number": "DL01",
                 "seats": 80,
-                "seatsAvailable": 80,
+                "seatsAvailable": 79,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5420",
@@ -419531,7 +419531,7 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 80,
-                    "seatsAvailable": 80,
+                    "seatsAvailable": 79,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "DL01",
@@ -419548,7 +419548,7 @@
                   "crn": 352423,
                   "number": "DD01",
                   "seats": 80,
-                  "seatsAvailable": 80,
+                  "seatsAvailable": 79,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5420",
@@ -419565,7 +419565,7 @@
                       "building": "",
                       "room": "Unity Hall 500",
                       "seats": 80,
-                      "seatsAvailable": 80,
+                      "seatsAvailable": 79,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
@@ -419646,7 +419646,7 @@
                   "crn": 352085,
                   "number": "DX03",
                   "seats": 20,
-                  "seatsAvailable": 20,
+                  "seatsAvailable": 19,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5420",
@@ -419663,7 +419663,7 @@
                       "building": "",
                       "room": "Olin Hall 117 Physics Lab",
                       "seats": 20,
-                      "seatsAvailable": 20,
+                      "seatsAvailable": 19,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX03",
