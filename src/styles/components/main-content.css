@@ -142,8 +142,8 @@
 .search-mode-btn .school-icon,
 .search-mode-btn .school-full-icon,
 .search-clear-btn .x-icon {
-  width: 14px;
-  height: 14px;
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .search-input:focus {
