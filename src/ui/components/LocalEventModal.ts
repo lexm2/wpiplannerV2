@@ -3,6 +3,7 @@
 // =============================================================================
 
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { BaseModal } from './BaseModal';
 import type { LocalCalendarEvent } from '../../types/schedule';
 import { AcademicTerm, EventType } from '../../types/schedule';
@@ -41,8 +42,10 @@ export class LocalEventModal extends BaseModal {
     private currentEventType: EventType = EventType.RECURRING;
     private selectedDays: Set<DayOfWeek> = new Set();
 
-    constructor(modalService: ModalService, options: LocalEventModalOptions) {
-        super(modalService);
+    get modalTypeId() { return 'local-event'; }
+
+    constructor(modalService: ModalService, options: LocalEventModalOptions, uiStateManager?: UIStateManager) {
+        super(modalService, uiStateManager);
         this.options = options;
         this.isEditMode = !!options.existingEvent;
 

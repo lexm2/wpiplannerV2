@@ -9,10 +9,12 @@ export class FloatingTextBox {
     private stepCounterEl: HTMLElement;
     private nextBtn: HTMLButtonElement;
     private nextBtnLabel: HTMLSpanElement;
+    private backBtn: HTMLButtonElement;
     private dragOffsetX = 0;
     private dragOffsetY = 0;
     private isDragging = false;
     private currentStep: TutorialStep | null = null;
+    private goBackFn: (() => Promise<void>) | null = null;
 
     private boundMouseMove = this.onMouseMove.bind(this);
     private boundMouseUp = this.onMouseUp.bind(this);
@@ -24,8 +26,13 @@ export class FloatingTextBox {
         this.stepCounterEl = this.el.querySelector(`.${styles.stepCounter}`) as HTMLElement;
         this.nextBtn = this.el.querySelector(`.${styles.nextBtn}`) as HTMLButtonElement;
         this.nextBtnLabel = this.nextBtn.querySelector('span') as HTMLSpanElement;
+        this.backBtn = this.el.querySelector(`.${styles.backBtn}`) as HTMLButtonElement;
 
         this.tutorialService.onStepChange((step, index, total) => this.onStepChange(step, index, total));
+    }
+
+    setGoBack(fn: () => Promise<void>): void {
+        this.goBackFn = fn;
     }
 
     mount(): void {
@@ -41,9 +48,36 @@ export class FloatingTextBox {
         this.currentStep = step;
         this.el.classList.remove(styles.hidden);
         this.stepTitleEl.textContent = step.title;
-        this.stepDescEl.textContent = step.description;
+        this.stepDescEl.innerHTML = step.description;
+        requestAnimationFrame(() => {
+            this.stepDescEl.querySelectorAll<HTMLElement>('.tutorial-inline-highlight').forEach(span => {
+                const w = span.offsetWidth + 4;
+                const h = span.offsetHeight + 4;
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('width', String(w));
+                svg.setAttribute('height', String(h));
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', '1');
+                rect.setAttribute('y', '1');
+                rect.setAttribute('rx', '4');
+                rect.setAttribute('width', String(w - 2));
+                rect.setAttribute('height', String(h - 2));
+                rect.setAttribute('fill', 'none');
+                rect.setAttribute('stroke-width', '2');
+                rect.setAttribute('stroke-dasharray', '8 6');
+                svg.appendChild(rect);
+                span.insertBefore(svg, span.firstChild);
+            });
+        });
         this.stepCounterEl.textContent = `Step ${index + 1} of ${total}`;
-        this.nextBtnLabel.textContent = index + 1 === total ? 'Next Tutorial' : 'Next';
+        const isLastStep = index + 1 === total;
+        const activeTutorial = this.tutorialService.getActiveTutorial();
+        this.nextBtnLabel.textContent = isLastStep
+            ? (activeTutorial?.lastStepLabel ?? 'Next Tutorial')
+            : 'Next';
+        const showBack = index > 0;
+        this.backBtn.style.display = showBack ? '' : 'none';
+        this.nextBtn.style.marginLeft = showBack ? '' : 'auto';
         requestAnimationFrame(() => {
             this.repositionIfObstructed(step.selector);
             this.clampToViewport();
@@ -56,6 +90,7 @@ export class FloatingTextBox {
         el.innerHTML = `
             <div class="${styles.header}">
                 <span class="${styles.title}">Tutorial</span>
+                <button class="${styles.findBtn}" data-tutorial-find>Find Element</button>
                 <button class="${styles.skipBtn}">Skip tutorial</button>
             </div>
             <div class="${styles.body}">
@@ -64,6 +99,7 @@ export class FloatingTextBox {
             </div>
             <div class="${styles.footer}">
                 <span class="${styles.stepCounter}"></span>
+                <button class="${styles.backBtn}" data-tutorial-back style="display:none"><span>Back</span></button>
                 <button class="${styles.nextBtn}" data-tutorial-next><span>Next</span></button>
             </div>
         `;
@@ -75,12 +111,27 @@ export class FloatingTextBox {
         skipBtn.addEventListener('mousedown', (e) => e.stopPropagation());
         skipBtn.addEventListener('click', () => this.tutorialService.skip());
 
+        const findBtn = el.querySelector(`.${styles.findBtn}`) as HTMLButtonElement;
+        findBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+        findBtn.addEventListener('click', () => this.animateFindDot());
+
         const nextBtn = el.querySelector(`.${styles.nextBtn}`) as HTMLButtonElement;
         nextBtn.addEventListener('mousedown', (e) => e.stopPropagation());
         nextBtn.addEventListener('click', () => {
             this.tutorialService.disarmCurrentListener();
-            this.currentStep?.action?.();
             this.tutorialService.nextStep();
+        });
+
+        const backBtn = el.querySelector(`.${styles.backBtn}`) as HTMLButtonElement;
+        backBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+        backBtn.addEventListener('click', async () => {
+            if (!this.goBackFn) return;
+            backBtn.disabled = true;
+            try {
+                await this.goBackFn();
+            } finally {
+                backBtn.disabled = false;
+            }
         });
 
         return el;
@@ -130,6 +181,65 @@ export class FloatingTextBox {
             this.el.style.top = `${top}px`;
             this.el.style.bottom = 'auto';
         }
+    }
+
+    private animateFindDot(): void {
+        if (!this.currentStep) return;
+
+        const target = document.querySelector(this.currentStep.selector) as HTMLElement | null;
+        if (!target) return;
+
+        const targetRect = target.getBoundingClientRect();
+        if (targetRect.width === 0 && targetRect.height === 0) return;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'tutorial-find-overlay';
+        overlay.style.opacity = '0';
+
+        const startX = window.innerWidth / 2;
+        const startY = window.innerHeight / 2;
+        const endX = targetRect.left + targetRect.width / 2;
+        const endY = targetRect.top + targetRect.height / 2;
+        const dx = endX - startX;
+        const dy = endY - startY;
+
+        const dot = document.createElement('div');
+        dot.className = 'tutorial-find-dot';
+        dot.style.left = `${startX}px`;
+        dot.style.top = `${startY}px`;
+        dot.style.transform = 'translate(-50%, -50%) scale(0)';
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(dot);
+
+        const cleanup = () => {
+            overlay.remove();
+            dot.remove();
+        };
+
+        const overlayFade = overlay.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards' });
+        const growIn = dot.animate([
+            { transform: 'translate(-50%, -50%) scale(0)' },
+            { transform: 'translate(-50%, -50%) scale(1)' },
+        ], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+
+        growIn.onfinish = () => {
+            const travel = dot.animate([
+                { transform: 'translate(-50%, -50%) scale(1)' },
+                { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)` },
+            ], { duration: 500, easing: 'cubic-bezier(0.76, 0, 0.24, 1)', fill: 'forwards' });
+
+            travel.onfinish = () => {
+                setTimeout(() => {
+                    overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
+                    const fadeOut = dot.animate([
+                        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)` },
+                        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)` },
+                    ], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+                    fadeOut.onfinish = cleanup;
+                }, 500);
+            };
+        };
     }
 
     private repositionIfObstructed(selector: string): void {

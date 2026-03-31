@@ -79,10 +79,20 @@ export class AppBootstrap {
             courseSelectionService.reconstructSectionObjects();
             timestampManager.updateClientTimestamp();
 
+            // Backfill year for existing schedules that lack one
+            const newestYear = profileStateManager.getNewestAcademicYear();
+            for (const schedule of profileStateManager.getAllSchedules()) {
+                if (schedule.year === undefined && newestYear !== undefined) {
+                    profileStateManager.updateSchedule(schedule.id, { year: newestYear }, 'system');
+                }
+            }
+
+            // Apply academic year filter based on active schedule's year
             if (!filterService.hasFilter('academicYear')) {
-                const years = [...new Set(allCourses.map(c => c.academicYear).filter(Boolean) as number[])].sort();
-                if (years.length > 1) {
-                    filterService.addFilter('academicYear', { year: years[years.length - 1] });
+                const activeSchedule = profileStateManager.getActiveSchedule();
+                const yearToFilter = activeSchedule?.year ?? newestYear;
+                if (yearToFilter !== undefined) {
+                    filterService.addFilter('academicYear', { year: yearToFilter });
                 }
             }
 

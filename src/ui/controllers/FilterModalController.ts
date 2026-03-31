@@ -1,7 +1,9 @@
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { FilterService } from '../../services/filtering/FilterService';
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
+import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import { Course, Department } from '../../types/types';
 import { AcademicTerm, WeeklyTimeSlot, SelectedCourse } from '../../types/schedule';
 import { BaseModal } from '../components/BaseModal';
@@ -12,9 +14,11 @@ import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterC
 import { DualRangeSlider } from '../components/DualRangeSlider';
 
 export class FilterModalController extends BaseModal {
+    get modalTypeId() { return 'filter-modal'; }
     private filterService: FilterService | null = null;
     private courseSelectionService: CourseSelectionService | null = null;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator | null = null;
+    private profileStateManager: ProfileStateManager | null = null;
     private allCourses: Course[] = [];
     private isCategoryMode: boolean = false;
     private isUpdatingFilter: boolean = false;
@@ -22,8 +26,8 @@ export class FilterModalController extends BaseModal {
     private onGenerate: (() => void) | null = null;
     private coursesToSchedule: SelectedCourse[] | null = null;
 
-    constructor(modalService: ModalService) {
-        super(modalService);
+    constructor(modalService: ModalService, uiStateManager?: UIStateManager) {
+        super(modalService, uiStateManager);
     }
 
     setFilterService(filterService: FilterService): void {
@@ -36,6 +40,10 @@ export class FilterModalController extends BaseModal {
 
     setAutoScheduleOrchestrator(orchestrator: AutoScheduleOrchestrator): void {
         this.autoScheduleOrchestrator = orchestrator;
+    }
+
+    setProfileStateManager(psm: ProfileStateManager): void {
+        this.profileStateManager = psm;
     }
 
     setMode(mode: 'filter' | 'auto-schedule'): void {
@@ -59,16 +67,46 @@ export class FilterModalController extends BaseModal {
 
     // Method to sync search input from main controller
     syncSearchInputFromMain(query: string): void {
-        if (this.modalId) {
-            const modalElement = document.getElementById(this.modalId);
-            if (modalElement) {
-                const searchInput = modalElement.querySelector('.search-text-input') as HTMLInputElement;
-                if (searchInput && searchInput.value !== query) {
-                    searchInput.value = query;
-                    this.updateClearSearchButton(modalElement, query);
-                }
+        if (this.modalElement) {
+            const searchInput = this.modalElement.querySelector('.search-text-input') as HTMLInputElement;
+            if (searchInput && searchInput.value !== query) {
+                searchInput.value = query;
+                this.updateClearSearchButton(this.modalElement, query);
             }
         }
+    }
+
+    // Refresh checkbox UI from current filterService state (used by tutorial back navigation)
+    refreshFilterUI(): void {
+        if (!this.filterService || !this.modalElement) return;
+        const modalElement = this.modalElement;
+
+        const activeFilters = this.filterService.getActiveFilters();
+
+        // Availability
+        const availFilter = activeFilters.find(f => f.id === 'availability');
+        const availCriteria = availFilter?.criteria as AvailabilityFilterCriteria | undefined;
+        const availCheckbox = modalElement.querySelector('#available-only-filter') as HTMLInputElement;
+        if (availCheckbox) availCheckbox.checked = availCriteria?.availableOnly || false;
+        const minSeatsInput = modalElement.querySelector('#min-seats-filter') as HTMLInputElement;
+        if (minSeatsInput) minSeatsInput.value = availCriteria?.minAvailable != null ? String(availCriteria.minAvailable) : '';
+
+        // Conflict
+        const conflictFilter = activeFilters.find(f => f.id === 'periodConflict');
+        const conflictCriteria = conflictFilter?.criteria as ConflictCriteria | undefined;
+        const conflictCheckbox = modalElement.querySelector('#avoid-conflicts-filter') as HTMLInputElement;
+        if (conflictCheckbox) conflictCheckbox.checked = conflictCriteria?.avoidConflicts || false;
+
+        // Term checkboxes
+        const termFilter = activeFilters.find(f => f.id === 'term');
+        const termCriteria = termFilter?.criteria as TermFilterCriteria | undefined;
+        const activeTerms = termCriteria?.terms || [];
+        modalElement.querySelectorAll<HTMLInputElement>('input[data-filter="term"]').forEach(cb => {
+            cb.checked = activeTerms.includes(cb.value as AcademicTerm);
+        });
+
+        this.updateDepartmentCheckboxes(modalElement);
+        this.updatePreview(modalElement);
     }
 
     // Method to refresh department selection from external changes
@@ -77,11 +115,8 @@ export class FilterModalController extends BaseModal {
             return;
         }
 
-        if (this.modalId) {
-            const modalElement = document.getElementById(this.modalId);
-            if (modalElement) {
-                this.updateDepartmentCheckboxes(modalElement);
-            }
+        if (this.modalElement) {
+            this.updateDepartmentCheckboxes(this.modalElement);
         }
     }
 
@@ -143,7 +178,9 @@ export class FilterModalController extends BaseModal {
         const backdrop = document.createElement('div');
         backdrop.className = 'modal-backdrop filter-modal';
 
-        const activeFiltersCount = this.filterService?.getFilterCount() || 0;
+        const activeYear = this.profileStateManager?.getActiveSchedule()?.year;
+        const hasNonDefault = this.filterService?.hasNonDefaultFilters(activeYear) || false;
+        const activeFiltersCount = hasNonDefault ? (this.filterService?.getFilterCount() || 0) : 0;
         const isAutoSchedule = this.mode === 'auto-schedule';
         const title = isAutoSchedule ? 'Auto-Schedule Settings' : 'Filter Courses';
         const primaryBtnText = isAutoSchedule ? 'Generate Schedule' : 'Apply';
@@ -581,6 +618,14 @@ export class FilterModalController extends BaseModal {
                 } else {
                     this.filterService?.addFilter('academicYear', { year });
                 }
+                // Update active schedule's year to match
+                const psm = this.profileStateManager;
+                if (psm) {
+                    const active = psm.getActiveSchedule();
+                    if (active) {
+                        psm.updateSchedule(active.id, { year: year === 'all' ? undefined : year as number }, 'filter-sync');
+                    }
+                }
                 this.updatePreview(modalElement);
             });
         });
@@ -801,7 +846,8 @@ export class FilterModalController extends BaseModal {
         const clearButton = modalElement.querySelector('#clear-all-filters');
         clearButton?.addEventListener('click', () => {
             if (this.filterService) {
-                this.filterService.clearFilters();
+                const activeYear = this.profileStateManager?.getActiveSchedule()?.year;
+                this.filterService.resetFilters(activeYear);
                 this.updatePreview(modalElement);
                 // Sync main search input to clear it
                 this.syncMainSearchInput('');
@@ -1176,7 +1222,9 @@ export class FilterModalController extends BaseModal {
     private updatePreview(modalElement: HTMLElement): void {
         if (!this.filterService) return;
 
-        const filterCount = this.filterService.getFilterCount();
+        const activeYear = this.profileStateManager?.getActiveSchedule()?.year;
+        const hasNonDefault = this.filterService.hasNonDefaultFilters(activeYear);
+        const filterCount = hasNonDefault ? this.filterService.getFilterCount() : 0;
         const countElement = modalElement.querySelector('#course-count-preview');
         const filterCountElement = modalElement.querySelector('#filter-count');
 

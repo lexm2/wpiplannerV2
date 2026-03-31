@@ -1,10 +1,12 @@
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { BaseModal } from '../components/BaseModal';
 import type { ModalType } from '../../types/modal';
 
 export class InfoModalController extends BaseModal {
-    constructor(modalService: ModalService) {
-        super(modalService);
+    get modalTypeId() { return 'info'; }
+    constructor(modalService: ModalService, uiStateManager?: UIStateManager) {
+        super(modalService, uiStateManager);
     }
 
     show(title: string, message: string, type: ModalType = 'info'): string {

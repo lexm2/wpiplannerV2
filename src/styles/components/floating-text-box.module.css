@@ -11,7 +11,7 @@
     border: 1px solid var(--color-border);
     border-radius: var(--effect-border-radius-large);
     box-shadow: var(--effect-shadow);
-    z-index: 9999;
+    z-index: 100;
     resize: both;
     overflow: auto;
     display: flex;
@@ -31,7 +31,7 @@
 }
 
 .skipBtn {
-    margin-left: auto;
+    margin-left: 6px;
     background: none;
     border: 1px solid var(--color-border-hover);
     color: var(--color-text);
@@ -43,6 +43,22 @@
 
 .skipBtn:hover {
     background: rgba(212, 66, 79, 0.6);
+    border-color: var(--color-primary);
+}
+
+.findBtn {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--color-border-hover);
+    color: var(--color-text);
+    font-size: 0.7rem;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: var(--effect-border-radius);
+}
+
+.findBtn:hover {
+    background: rgba(var(--color-primary-rgb, 100, 100, 255), 0.15);
     border-color: var(--color-primary);
 }
 
@@ -82,6 +98,7 @@
     border-top: 1px solid var(--color-border);
     display: flex;
     align-items: center;
+    gap: 6px;
     flex-shrink: 0;
 }
 
@@ -90,8 +107,28 @@
     color: var(--color-text-secondary);
 }
 
-.nextBtn {
+.backBtn {
     margin-left: auto;
+    background: none;
+    border: 1px solid var(--color-border-hover);
+    color: var(--color-text);
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 3px 10px;
+    border-radius: var(--effect-border-radius);
+}
+
+.backBtn:hover {
+    background: rgba(var(--color-primary-rgb, 100, 100, 255), 0.15);
+    border-color: var(--color-primary);
+}
+
+.backBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.nextBtn {
     background: var(--color-primary);
     border: none;
     color: #fff;

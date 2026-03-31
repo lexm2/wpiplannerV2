@@ -2,6 +2,7 @@ import { BaseModal } from './BaseModal';
 import { ModalService } from '../../services/ui/ModalService';
 
 export class DeleteLocalEventModal extends BaseModal {
+    get modalTypeId() { return 'delete-local-event'; }
     constructor(
         modalService: ModalService,
         private eventTitle: string,

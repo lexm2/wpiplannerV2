@@ -1,5 +1,6 @@
 import { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { BaseModal } from './BaseModal';
 import { ChangelogModal } from './ChangelogModal';
 import { TutorialsModal } from './TutorialsModal';
@@ -8,6 +9,7 @@ import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
 import styles from '../../styles/components/schedule-picker-modal.module.css';
 
 export class SchedulePickerModal extends BaseModal {
+    get modalTypeId() { return 'schedule-picker'; }
     private static readonly MENU_WIDTH = 120;
     private static readonly MENU_HEIGHT = 160;
     private static readonly MENU_OFFSET = 4;
@@ -22,13 +24,14 @@ export class SchedulePickerModal extends BaseModal {
     constructor(
         modalService: ModalService,
         scheduleManagementService: ScheduleManagementService,
-        tutorial?: TutorialSetup
+        tutorial?: TutorialSetup,
+        uiStateManager?: UIStateManager
     ) {
-        super(modalService);
+        super(modalService, uiStateManager);
         this.scheduleManagementService = scheduleManagementService;
         this.tutorial = tutorial;
-        this.changelogModal = new ChangelogModal(modalService);
-        if (tutorial) this.tutorialsModal = new TutorialsModal(modalService, tutorial);
+        this.changelogModal = new ChangelogModal(modalService, uiStateManager);
+        if (tutorial) this.tutorialsModal = new TutorialsModal(modalService, tutorial, uiStateManager);
 
         this.scheduleManagementService.onActiveScheduleChange(() => {
             if (this.modalElement) {
@@ -565,6 +568,22 @@ export class SchedulePickerModal extends BaseModal {
 
         await this.scheduleManagementService.clearAllSchedules();
         this.updateScheduleList();
+    }
+
+    navigateToTab(tabName: 'schedules' | 'settings'): void {
+        // Double rAF to run after ModalService's own double-rAF show animation,
+        // ensuring the modal is fully laid out and offsetWidth is non-zero.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                if (!this.modalElement) return;
+                const container = this.modalElement.querySelector('.modal-pages-container') as HTMLElement;
+                if (!container) return;
+                container.scrollLeft = tabName === 'settings' ? container.offsetWidth : 0;
+                this.modalElement.querySelectorAll('.schedule-picker-footer .nav-tab').forEach(t => {
+                    t.classList.toggle('active', (t as HTMLElement).dataset.tab === tabName);
+                });
+            });
+        });
     }
 
     private setupCourseSelectionListener(): void {

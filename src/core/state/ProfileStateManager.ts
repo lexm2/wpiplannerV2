@@ -359,13 +359,22 @@ export class ProfileStateManager {
     }
 
     // Schedule management methods
-    createSchedule(name: string, source: string = 'user', id?: string): Schedule {
+    getNewestAcademicYear(): number | undefined {
+        const years = this.allDepartments
+            .flatMap(d => d.courses)
+            .map(c => c.academicYear)
+            .filter(Boolean) as number[];
+        return years.length ? Math.max(...years) : undefined;
+    }
+
+    createSchedule(name: string, source: string = 'user', id?: string, year?: number): Schedule {
         return this.withStateUpdateSync(() => {
             const schedule: Schedule = {
                 id: id ?? this.generateScheduleId(),
                 name,
                 selectedCourses: [],
-                generatedSchedules: []
+                generatedSchedules: [],
+                year: year ?? this.getNewestAcademicYear()
             };
 
             this.state.schedules.push(schedule);
@@ -463,7 +472,8 @@ export class ProfileStateManager {
                 id: this.generateScheduleId(),
                 name: newName,
                 selectedCourses: [...originalSchedule.selectedCourses],
-                generatedSchedules: [...originalSchedule.generatedSchedules]
+                generatedSchedules: [...originalSchedule.generatedSchedules],
+                year: originalSchedule.year
             };
 
             this.state.schedules.push(duplicatedSchedule);
@@ -589,6 +599,18 @@ export class ProfileStateManager {
 
     private deepClone<T>(obj: T): T {
         return JSON.parse(JSON.stringify(obj, setReplacer), setReviver);
+    }
+
+    restoreTutorialState(data: { activeScheduleId: string | null; schedules: Schedule[]; preferences: SchedulePreferences }): void {
+        this.isRestoringState = true;
+        try {
+            const schedulesMap = new Map(data.schedules.map(s => [s.id, s]));
+            this.restoreFromSnapshot({ activeScheduleId: data.activeScheduleId, schedules: schedulesMap, preferences: data.preferences });
+            this.emitEvent('courses_changed', { action: 'tutorial-restore' }, 'system');
+            this.save(true);
+        } finally {
+            this.isRestoringState = false;
+        }
     }
 
     canUndo(): boolean {

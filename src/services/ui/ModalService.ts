@@ -3,15 +3,12 @@
  */
 export class ModalService {
     private modals: Map<string, HTMLElement> = new Map();
-    private currentZIndex: number = 1000;
-
     showModal(id: string, modalElement: HTMLElement): void {
         // Remove existing modal with same ID if it exists
         this.hideModal(id);
 
-        // Set z-index
-        modalElement.style.zIndex = this.currentZIndex.toString();
-        this.currentZIndex += 10;
+        // Ensure modal is above page content but below tutorial layers
+        modalElement.classList.add('modal-container');
 
         // Store modal reference
         this.modals.set(id, modalElement);

@@ -1,3 +1,4 @@
+import type { WizardStep } from '../../types/uiState'
 import { DayOfWeek, Course, Section, Period, LectureGroup } from '../../types/types'
 import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm, EventType } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
@@ -16,6 +17,7 @@ import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { ModalService } from '../../services/ui/ModalService'
+import type { UIStateManager } from '../../services/ui/UIStateManager'
 import { ModalQueue } from '../../services/ui/ModalQueue'
 import { AutoScheduleIntroModal } from '../components/AutoScheduleIntroModal'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
@@ -40,6 +42,7 @@ export class ScheduleController implements CalendarEventProvider {
     private onScheduleUpdate: ((scheduleId: string, updates: Partial<Schedule>) => void) | null = null;
     private sidebarManager: SidebarManager;
     private modalService: ModalService | null = null;
+    private uiStateManager: UIStateManager | null = null;
 
     // Performance optimization: Caching infrastructure for grid rendering
     private cellContentCache: Map<string, CellContentResult> = new Map();
@@ -65,6 +68,10 @@ export class ScheduleController implements CalendarEventProvider {
      */
     setModalService(modalService: ModalService): void {
         this.modalService = modalService;
+    }
+
+    setUIStateManager(uiStateManager: UIStateManager): void {
+        this.uiStateManager = uiStateManager;
     }
 
     setCourseDataService(courseDataService: CourseDataService): void {
@@ -321,7 +328,7 @@ export class ScheduleController implements CalendarEventProvider {
      * Open the component selection wizard for a course.
      * Uses SidebarManager for consistent panel management.
      */
-    openComponentWizard(course: Course, existingSelections?: SelectedCourse): void {
+    openComponentWizard(course: Course, existingSelections?: SelectedCourse, initialStep?: WizardStep): void {
         if (!this.courseDataService) {
             console.error('CourseDataService not available');
             return;
@@ -355,19 +362,29 @@ export class ScheduleController implements CalendarEventProvider {
             (selections) => this.onWizardSelectionChange(freshCourse, selections),
             this.filterService || undefined,
             otherSelectedCourses,
-            (selections) => this.onWizardHoverPreview(freshCourse, selections)
+            (selections) => this.onWizardHoverPreview(freshCourse, selections),
+            (step) => this.uiStateManager?.wizardStepChanged(step)
         );
 
         // Use SidebarManager to open the panel (handles closing existing panels)
         this.sidebarManager.openPanel(this.componentWizard);
+        if (initialStep && initialStep !== 'lecture') {
+            this.componentWizard.jumpToStep(initialStep);
+        }
+        this.uiStateManager?.wizardOpened(freshCourse.id, initialStep ?? 'lecture');
     }
 
     /**
      * Close the component selection wizard
      */
+    jumpWizardToStep(step: WizardStep): void {
+        this.componentWizard?.jumpToStep(step);
+    }
+
     closeComponentWizard(): void {
         this.componentWizard = null;
         this.sidebarManager.closePanel();
+        this.uiStateManager?.wizardClosed();
 
         const hadPreview = this.wizardPreviewCourse !== null;
         this.wizardPreviewCourse = null;
@@ -1407,7 +1424,7 @@ export class ScheduleController implements CalendarEventProvider {
         }
 
         autoScheduleBtn.insertAdjacentHTML('afterbegin', getInlineSVG('WAND', 'auto-schedule-icon'));
-        autoScheduleBtn.addEventListener('click', () => this.handleAutoSchedule());
+        autoScheduleBtn.addEventListener('click', () => this.openAutoSchedule());
 
         // Setup navigation buttons
         const prevBtn = document.getElementById('schedule-prev-btn');
@@ -1436,7 +1453,7 @@ export class ScheduleController implements CalendarEventProvider {
         const restartBtn = document.getElementById('schedule-restart-btn');
         if (restartBtn) {
             restartBtn.insertAdjacentHTML('afterbegin', getInlineSVG('REFRESH', 'schedule-nav-icon'));
-            restartBtn.addEventListener('click', () => this.handleAutoSchedule());
+            restartBtn.addEventListener('click', () => this.openAutoSchedule());
         }
     }
 
@@ -1504,7 +1521,7 @@ export class ScheduleController implements CalendarEventProvider {
         }
     }
 
-    private async handleAutoSchedule(): Promise<void> {
+    async openAutoSchedule(): Promise<void> {
         if (!this.filterService) {
             console.error('[Auto-Schedule] Filter service not available');
             alert('Filter service not available. Please try again.');
@@ -1534,7 +1551,8 @@ export class ScheduleController implements CalendarEventProvider {
             const introModal = new AutoScheduleIntroModal(
                 this.modalService!,
                 selectedCourses,
-                (id) => this.colorService.getCourseColor(id)
+                (id) => this.colorService.getCourseColor(id),
+                this.uiStateManager || undefined
             );
             introModal.setOnNext((filtered) => {
                 coursesToSchedule = filtered;
@@ -1544,7 +1562,7 @@ export class ScheduleController implements CalendarEventProvider {
         });
 
         queue.add(() => {
-            const scheduleFilterModal = new FilterModalController(this.modalService!);
+            const scheduleFilterModal = new FilterModalController(this.modalService!, this.uiStateManager || undefined);
             scheduleFilterModal.setFilterService(this.filterService!);
             scheduleFilterModal.setCourseSelectionService(this.courseSelectionService);
             scheduleFilterModal.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
@@ -1560,6 +1578,56 @@ export class ScheduleController implements CalendarEventProvider {
         });
 
         queue.start();
+    }
+
+    private currentAutoScheduleIntro: AutoScheduleIntroModal | null = null;
+
+    openAutoScheduleIntro(): void {
+        if (!this.modalService) return;
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        this.autoScheduleOrchestrator.prepareLockedSections(selectedCourses);
+        this.currentAutoScheduleIntro = new AutoScheduleIntroModal(
+            this.modalService,
+            selectedCourses,
+            (id) => this.colorService.getCourseColor(id),
+            this.uiStateManager || undefined
+        );
+        this.currentAutoScheduleIntro.show();
+    }
+
+    updateAutoScheduleIntroTerms(preferences: Record<string, string[]>): void {
+        this.currentAutoScheduleIntro?.setTermPreferences(preferences);
+    }
+
+    private currentAutoScheduleFilter: FilterModalController | null = null;
+
+    openAutoScheduleFilter(): void {
+        if (!this.modalService || !this.filterService) return;
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        this.currentAutoScheduleFilter = new FilterModalController(this.modalService, this.uiStateManager || undefined);
+        // Override modalTypeId so UIState tracks it distinctly from the regular filter modal
+        Object.defineProperty(this.currentAutoScheduleFilter, 'modalTypeId', { get: () => 'auto-schedule-filter' });
+        this.currentAutoScheduleFilter.setFilterService(this.filterService);
+        this.currentAutoScheduleFilter.setCourseSelectionService(this.courseSelectionService);
+        this.currentAutoScheduleFilter.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
+        this.currentAutoScheduleFilter.setMode('auto-schedule');
+        this.currentAutoScheduleFilter.setCoursesToSchedule(selectedCourses);
+        this.currentAutoScheduleFilter.setOnGenerate(() => {
+            this.doGenerateSchedules(selectedCourses);
+        });
+        if (this.courseDataService) {
+            this.currentAutoScheduleFilter.setCourseData(this.courseDataService.getAllDepartments());
+        }
+        this.currentAutoScheduleFilter.show();
+    }
+
+    refreshAutoScheduleFilterUI(): void {
+        this.currentAutoScheduleFilter?.refreshFilterUI();
+    }
+
+    runAutoSchedule(): void {
+        const selectedCourses = this.courseSelectionService.getSelectedCourses();
+        this.doGenerateSchedules(selectedCourses);
     }
 
     private async doGenerateSchedules(selectedCourses: SelectedCourse[], settings?: { blockedTimes: WeeklyTimeSlot[] }): Promise<void> {

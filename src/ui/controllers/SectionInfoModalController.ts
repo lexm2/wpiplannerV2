@@ -1,4 +1,5 @@
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
 import { PeriodType, Section, Course } from '../../types/types';
 import { BaseModal } from '../components/BaseModal';
@@ -15,8 +16,9 @@ export interface SectionData {
 }
 
 export class SectionInfoModalController extends BaseModal {
-    constructor(modalService: ModalService) {
-        super(modalService);
+    get modalTypeId() { return 'section-info'; }
+    constructor(modalService: ModalService, uiStateManager?: UIStateManager) {
+        super(modalService, uiStateManager);
     }
 
     show(data: SectionData): string {

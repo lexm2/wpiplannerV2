@@ -1,5 +1,6 @@
 import type { IModal, ModalOptions } from '../../types/modal';
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 
 /**
  * Unified abstract base class for all modal implementations.
@@ -8,12 +9,16 @@ import { ModalService } from '../../services/ui/ModalService';
  */
 export abstract class BaseModal implements IModal {
     protected modalService: ModalService;
+    protected uiStateManager: UIStateManager | null;
     protected modalId: string | null = null;
     protected modalElement: HTMLElement | null = null;
     protected closeCallbacks: Array<() => void> = [];
 
-    constructor(modalService: ModalService) {
+    abstract get modalTypeId(): string;
+
+    constructor(modalService: ModalService, uiStateManager?: UIStateManager) {
         this.modalService = modalService;
+        this.uiStateManager = uiStateManager ?? null;
     }
 
     /**
@@ -26,6 +31,7 @@ export abstract class BaseModal implements IModal {
      */
     hide(): void {
         if (this.modalId) {
+            this.uiStateManager?.modalClosed(this.modalTypeId);
             this.modalService.hideModal(this.modalId);
             this.triggerCloseCallbacks();
             this.modalId = null;
@@ -69,6 +75,7 @@ export abstract class BaseModal implements IModal {
             closeOnBackdrop: options.closeOnBackdrop ?? true,
             closeOnEscape: options.closeOnEscape ?? true
         });
+        this.uiStateManager?.modalOpened(this.modalTypeId);
         return this.modalId;
     }
 

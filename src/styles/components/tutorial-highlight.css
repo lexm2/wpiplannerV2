@@ -10,7 +10,7 @@
 .tutorial-highlight-svg {
     position: absolute;
     pointer-events: none;
-    z-index: 10000;
+    z-index: 200;
     overflow: visible;
 }
 
@@ -30,7 +30,7 @@
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    z-index: 10000;
+    z-index: 200;
     animation: tutorial-arrow-bob 0.8s ease-in-out infinite;
 }
 
@@ -38,6 +38,44 @@
     width: 20px;
     height: 20px;
     display: block;
+}
+
+.tutorial-inline-highlight {
+    position: relative;
+    display: inline-block;
+    padding: 1px 4px;
+}
+
+.tutorial-inline-highlight svg {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.tutorial-inline-highlight svg rect {
+    stroke: var(--color-primary);
+    animation: tutorial-march 0.6s linear infinite;
+}
+
+.tutorial-find-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    z-index: 299;
+}
+
+.tutorial-find-dot {
+    position: fixed;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+    z-index: 300;
 }
 
 .tutorial-scroll-arrow:not([data-direction]) { display: none; }

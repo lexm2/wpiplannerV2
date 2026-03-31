@@ -1,5 +1,6 @@
 import { BaseModal } from './BaseModal';
 import { ModalService } from '../../services/ui/ModalService';
+import type { UIStateManager } from '../../services/ui/UIStateManager';
 import changelogMarkdown from '../../../CHANGELOG.md?raw';
 
 interface ChangelogSection {
@@ -13,10 +14,11 @@ interface ChangelogEntry {
 }
 
 export class ChangelogModal extends BaseModal {
+    get modalTypeId() { return 'changelog'; }
     private changelogData: ChangelogEntry[] = [];
 
-    constructor(modalService: ModalService) {
-        super(modalService);
+    constructor(modalService: ModalService, uiStateManager?: UIStateManager) {
+        super(modalService, uiStateManager);
         this.changelogData = this.parseMarkdown(changelogMarkdown);
     }
 

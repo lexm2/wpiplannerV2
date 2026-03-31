@@ -11,7 +11,7 @@
 export interface MinimalSyncData {
     v: string;
     a: number | null;
-    s: [string, (string | null)[]][];
+    s: [string, (string | null)[], number?][];
     p?: {
         t: [number, number];
         d: number[];

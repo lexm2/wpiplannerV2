@@ -1,16 +1,22 @@
-import type { Tutorial, TutorialStep } from '../../types/tutorial';
+import type { Tutorial, TutorialStep, TutorialAppState } from '../../types/tutorial';
 import { getInlineSVG } from '../../utils';
 
+import type { UIState } from '../../types/uiState';
+
 type StepChangeCallback = (step: TutorialStep | null, index: number, total: number) => void;
+type StepApplyCallback = (index: number) => void;
+type UIStateTransitionCallback = (uiState: Partial<UIState>) => void;
+type AppStateTransitionCallback = (appState: TutorialAppState) => Promise<void>;
+type PostTransitionCallback = (appState: TutorialAppState | undefined) => void;
 
 export class TutorialService {
     private tutorials: Map<string, Tutorial> = new Map();
     private activeTutorial: Tutorial | null = null;
     private currentStepIndex = 0;
     private stepChangeCallback: StepChangeCallback | null = null;
+    private stepApplyCallback: StepApplyCallback | null = null;
     private completionCallback: (() => void) | null = null;
     private currentSelector: string | null = null;
-    private highlightedElement: Element | null = null;
     private svgOverlay: SVGSVGElement | null = null;
     private arrowOverlay: HTMLElement | null = null;
     private intersectionObserver: IntersectionObserver | null = null;
@@ -20,6 +26,13 @@ export class TutorialService {
     private actionObserver: MutationObserver | null = null;
     private resizeObserver: ResizeObserver | null = null;
     private svgContainer: HTMLElement | null = null;
+    private originalPosition: string | null = null;
+    private uiStateTransitionCallback: UIStateTransitionCallback | null = null;
+    private appStateTransitionCallback: AppStateTransitionCallback | null = null;
+    private postTransitionCallback: PostTransitionCallback | null = null;
+    private suppressAutoAdvance = false;
+    private highlightTimeout: ReturnType<typeof setTimeout> | null = null;
+    private actionTimeout: ReturnType<typeof setTimeout> | null = null;
 
     register(tutorial: Tutorial): void { this.tutorials.set(tutorial.id, tutorial); }
 
@@ -31,11 +44,11 @@ export class TutorialService {
         if (tutorial.onStart) {
             const result = tutorial.onStart();
             if (result instanceof Promise) {
-                result.then(() => requestAnimationFrame(() => this.applyStep()));
+                result.then(() => requestAnimationFrame(() => { void this.applyStep(); }));
                 return;
             }
         }
-        this.applyStep();
+        void this.applyStep();
     }
 
     skip(): void {
@@ -60,13 +73,35 @@ export class TutorialService {
             this.stepChangeCallback?.(null, 0, 0);
             this.completionCallback?.();
         } else {
-            this.applyStep();
+            void this.applyStep();
         }
     }
 
+    async goBack(restoreFn: (targetIndex: number) => Promise<void>): Promise<void> {
+        if (!this.activeTutorial || this.currentStepIndex <= 0) return;
+        this.cleanup();
+        const targetIndex = this.currentStepIndex - 1;
+        await restoreFn(targetIndex);
+        this.currentStepIndex = targetIndex;
+        this.suppressAutoAdvance = true;
+        await this.applyStep();
+    }
+
+    getCurrentStepIndex(): number { return this.currentStepIndex; }
+
+    getActiveTutorial(): Tutorial | null { return this.activeTutorial; }
+
     onStepChange(cb: StepChangeCallback): void { this.stepChangeCallback = cb; }
 
+    onStepApply(cb: StepApplyCallback): void { this.stepApplyCallback = cb; }
+
     onComplete(cb: () => void): void { this.completionCallback = cb; }
+
+    onUIStateTransition(cb: UIStateTransitionCallback): void { this.uiStateTransitionCallback = cb; }
+
+    onAppStateTransition(cb: AppStateTransitionCallback): void { this.appStateTransitionCallback = cb; }
+
+    onPostTransition(cb: PostTransitionCallback): void { this.postTransitionCallback = cb; }
 
     disarmCurrentListener(): void {
         this.actionCleanup?.();
@@ -75,9 +110,15 @@ export class TutorialService {
         this.actionObserver = null;
     }
 
-    private applyStep(): void {
+    private async applyStep(): Promise<void> {
         if (!this.activeTutorial) return;
+        this.stepApplyCallback?.(this.currentStepIndex);
         const step = this.activeTutorial.steps[this.currentStepIndex];
+        if (step.appState && this.appStateTransitionCallback) {
+            await this.appStateTransitionCallback(step.appState);
+        }
+        if (step.uiState) this.uiStateTransitionCallback?.(step.uiState);
+        this.postTransitionCallback?.(step.appState);
         this.highlightElement(step.selector, step.scrollArrow ?? false);
         this.stepChangeCallback?.(step, this.currentStepIndex, this.activeTutorial.steps.length);
         if (step.waitFor !== 'manual') this.listenForAction(step);
@@ -91,7 +132,6 @@ export class TutorialService {
 
         const el = document.querySelector(selector);
         if (el) {
-            this.highlightedElement = el;
             this.attachSvgOverlay(el, scrollArrow);
             return;
         }
@@ -101,10 +141,16 @@ export class TutorialService {
             if (!found) return;
             this.highlightObserver!.disconnect();
             this.highlightObserver = null;
-            this.highlightedElement = found;
+            if (this.highlightTimeout !== null) { clearTimeout(this.highlightTimeout); this.highlightTimeout = null; }
             this.attachSvgOverlay(found, scrollArrow);
         });
         this.highlightObserver.observe(document.body, { childList: true, subtree: true });
+        this.highlightTimeout = setTimeout(() => {
+            this.highlightObserver?.disconnect();
+            this.highlightObserver = null;
+            this.highlightTimeout = null;
+            console.warn(`[Tutorial] Element not found after 10s: ${selector}`);
+        }, 10_000);
     }
 
     private attachSvgOverlay(el: Element, scrollArrow: boolean): void {
@@ -117,10 +163,10 @@ export class TutorialService {
         const htmlEl = el as HTMLElement;
         const pad = 5;
 
-        // Void elements (input, img, etc.) cannot have children — append SVG to parent instead
         const voidEl = ['INPUT', 'IMG', 'TEXTAREA', 'HR', 'BR'].includes(htmlEl.tagName);
         const container: HTMLElement = voidEl ? htmlEl.parentElement! : htmlEl;
 
+        this.originalPosition = container.style.position;
         if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
         this.svgContainer = container;
 
@@ -210,10 +256,10 @@ export class TutorialService {
         this.resizeObserver = null;
         if (this.positionFrame !== null) { cancelAnimationFrame(this.positionFrame); this.positionFrame = null; }
         if (this.svgContainer) {
-            this.svgContainer.style.position = '';
+            this.svgContainer.style.position = this.originalPosition ?? '';
             this.svgContainer = null;
+            this.originalPosition = null;
         }
-        this.highlightedElement = null;
     }
 
     private getScrollParent(el: Element): Element {
@@ -230,23 +276,39 @@ export class TutorialService {
         if (step.waitFor === 'appear') {
             const selector = step.waitForSelector ?? step.selector;
             if (document.querySelector(selector)) {
+                if (this.suppressAutoAdvance) {
+                    this.suppressAutoAdvance = false;
+                    return;
+                }
                 this.nextStep();
                 return;
             }
+            this.suppressAutoAdvance = false;
             this.actionObserver = new MutationObserver(() => {
                 if (!document.querySelector(selector)) return;
                 this.actionObserver!.disconnect();
                 this.actionObserver = null;
+                if (this.actionTimeout !== null) { clearTimeout(this.actionTimeout); this.actionTimeout = null; }
                 this.nextStep();
             });
             this.actionObserver.observe(document.body, { childList: true, subtree: true });
+            this.actionTimeout = setTimeout(() => {
+                this.actionObserver?.disconnect();
+                this.actionObserver = null;
+                this.actionTimeout = null;
+                console.warn(`[Tutorial] Waited element not found after 10s: ${selector}`);
+            }, 10_000);
             return;
         }
 
         const selector = step.waitForSelector ?? step.selector;
         const eventType = step.waitFor === 'input' ? 'input' : 'click';
+        const stopProp = step.stopPropagation ?? false;
         const handler = (e: Event) => {
-            if ((e.target as Element).closest?.(selector)) this.nextStep();
+            if ((e.target as Element).closest?.(selector)) {
+                if (stopProp) e.stopPropagation();
+                this.nextStep();
+            }
         };
         document.body.addEventListener(eventType, handler, { capture: true });
         this.actionCleanup = () => document.body.removeEventListener(eventType, handler, { capture: true });
@@ -257,8 +319,10 @@ export class TutorialService {
         this.removeHighlight();
         this.highlightObserver?.disconnect();
         this.highlightObserver = null;
+        if (this.highlightTimeout !== null) { clearTimeout(this.highlightTimeout); this.highlightTimeout = null; }
         this.actionObserver?.disconnect();
         this.actionObserver = null;
+        if (this.actionTimeout !== null) { clearTimeout(this.actionTimeout); this.actionTimeout = null; }
         this.actionCleanup?.();
         this.actionCleanup = null;
     }
