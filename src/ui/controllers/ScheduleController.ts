@@ -1536,8 +1536,6 @@ export class ScheduleController implements CalendarEventProvider {
             return;
         }
 
-        this.autoScheduleOrchestrator.prepareLockedSections(selectedCourses);
-
         if (!this.modalService) {
             console.error('[Auto-Schedule] Modal service not available');
             await this.doGenerateSchedules(selectedCourses, { blockedTimes: [] });
@@ -1585,7 +1583,6 @@ export class ScheduleController implements CalendarEventProvider {
     openAutoScheduleIntro(): void {
         if (!this.modalService) return;
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
-        this.autoScheduleOrchestrator.prepareLockedSections(selectedCourses);
         this.currentAutoScheduleIntro = new AutoScheduleIntroModal(
             this.modalService,
             selectedCourses,

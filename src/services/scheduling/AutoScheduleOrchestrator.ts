@@ -79,22 +79,6 @@ export class AutoScheduleOrchestrator {
         await this.applyScheduleAtIndex(this.currentScheduleIndex);
     }
 
-    prepareLockedSections(selectedCourses: SelectedCourse[]): void {
-        for (const selectedCourse of selectedCourses) {
-            selectedCourse.lockedSections = new Set();
-
-            if (selectedCourse.selectedLecture && !this.autoAppliedCRNs.has(String(selectedCourse.selectedLecture.crn))) {
-                selectedCourse.lockedSections.add(String(selectedCourse.selectedLecture.crn));
-            }
-            if (selectedCourse.selectedDiscussion && !this.autoAppliedCRNs.has(String(selectedCourse.selectedDiscussion.crn))) {
-                selectedCourse.lockedSections.add(String(selectedCourse.selectedDiscussion.crn));
-            }
-            if (selectedCourse.selectedLab && !this.autoAppliedCRNs.has(String(selectedCourse.selectedLab.crn))) {
-                selectedCourse.lockedSections.add(String(selectedCourse.selectedLab.crn));
-            }
-        }
-    }
-
     async generateSchedules(selectedCourses: SelectedCourse[], settings?: AutoScheduleSettings): Promise<boolean> {
         try {
             if (settings) {
@@ -163,8 +147,6 @@ export class AutoScheduleOrchestrator {
             const selections: CourseComponentSelections[] = [];
 
             for (const result of schedule) {
-                if (result.isLocked) continue;
-
                 const { lecture, discussion, lab } = result.combination;
                 if (lecture) this.autoAppliedCRNs.add(String(lecture.crn));
                 if (discussion) this.autoAppliedCRNs.add(String(discussion.crn));

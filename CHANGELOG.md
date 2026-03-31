@@ -2,6 +2,11 @@
 
 ## [2026-03-31]
 
+### Changed
+- Courses with already-selected sections now appear as locked (excluded) by default in the auto-schedule modal, making it clear they won't be touched
+
+
+
 ### Added
 - X button on the right side of the course search bar to quickly clear the search
 - Professor search mode toggle in the search bar — click the school icon to search by professor name only, with a live suggestions dropdown as you type
