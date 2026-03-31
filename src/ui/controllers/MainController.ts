@@ -10,6 +10,7 @@ import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { getInlineSVG, type IconName } from '../../utils/iconPaths'
+import { getAvailableProfessors } from '../../utils/searchUtils'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
 import { DeviceDetection } from '../../utils/deviceDetection'
@@ -507,18 +508,90 @@ export class MainController {
 
         // Search functionality with debouncing and cancellation
         const searchInput = document.getElementById('search-input') as HTMLInputElement;
+        const searchClearBtn = document.getElementById('search-clear-btn') as HTMLButtonElement;
+        const searchModeBtn = document.getElementById('search-mode-btn') as HTMLButtonElement;
+        const professorDropdown = document.getElementById('search-professor-dropdown') as HTMLDivElement;
+        let professorMode = false;
+
+        if (professorDropdown) {
+            professorDropdown.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                if (target.classList.contains('professor-option') && searchInput) {
+                    searchInput.value = target.dataset.professor!;
+                    professorDropdown.style.display = 'none';
+                    searchInput.dispatchEvent(new Event('input'));
+                    searchInput.focus();
+                }
+            });
+        }
+
+        if (searchModeBtn) {
+            searchModeBtn.insertAdjacentHTML('beforeend', getInlineSVG('SCHOOL', 'school-icon'));
+            searchModeBtn.addEventListener('click', () => {
+                professorMode = !professorMode;
+                searchModeBtn.innerHTML = '';
+                searchModeBtn.insertAdjacentHTML('beforeend',
+                    professorMode ? getInlineSVG('SCHOOL_FULL', 'school-full-icon') : getInlineSVG('SCHOOL', 'school-icon')
+                );
+                searchModeBtn.classList.toggle('active', professorMode);
+                if (professorDropdown) professorDropdown.style.display = 'none';
+                if (searchInput) {
+                    searchInput.placeholder = professorMode ? 'Search professors...' : 'Search courses...';
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            });
+        }
+
+        if (searchClearBtn) {
+            searchClearBtn.insertAdjacentHTML('beforeend', getInlineSVG('X', 'x-icon'));
+            searchClearBtn.addEventListener('click', () => {
+                if (searchInput) {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                    searchInput.focus();
+                }
+                searchClearBtn.hidden = true;
+                professorMode = false;
+                if (professorDropdown) professorDropdown.style.display = 'none';
+                if (searchModeBtn) {
+                    searchModeBtn.innerHTML = '';
+                    searchModeBtn.insertAdjacentHTML('beforeend', getInlineSVG('SCHOOL', 'school-icon'));
+                    searchModeBtn.classList.remove('active');
+                }
+                if (searchInput) searchInput.placeholder = 'Search courses...';
+            });
+        }
+
         if (searchInput) {
+            searchInput.addEventListener('blur', () => {
+                setTimeout(() => { if (professorDropdown) professorDropdown.style.display = 'none'; }, 150);
+            });
+
             searchInput.addEventListener('input', () => {
                 const query = searchInput.value;
+                if (searchClearBtn) searchClearBtn.hidden = query === '';
+
+                if (professorMode && professorDropdown) {
+                    if (query.length > 0) {
+                        const matches = getAvailableProfessors(this.getAllCourses())
+                            .filter(p => p.toLowerCase().includes(query.toLowerCase()))
+                            .slice(0, 10);
+                        professorDropdown.innerHTML = matches
+                            .map(p => `<div class="professor-option" data-professor="${p}">${p}</div>`)
+                            .join('');
+                        professorDropdown.style.display = matches.length > 0 ? 'block' : 'none';
+                    } else {
+                        professorDropdown.style.display = 'none';
+                    }
+                }
 
                 // Use debounced operation for search to prevent excessive filtering
                 this.debouncedSearch.execute(async (cancellationToken) => {
                     cancellationToken.throwIfCancelled();
 
-                    // Update search text filter in FilterService
                     // Only trim for the check, but pass the original query with spaces
                     if (query.trim().length > 0) {
-                        this.services.filterService.addFilter('searchText', { query });
+                        this.services.filterService.addFilter('searchText', { query, professorOnly: professorMode });
                     } else {
                         this.services.filterService.removeFilter('searchText');
                     }
@@ -1437,6 +1510,17 @@ export class MainController {
             const currentQuery = searchCriteria?.query || '';
             if (searchInput.value !== currentQuery) {
                 searchInput.value = currentQuery;
+                const searchClearBtn = document.getElementById('search-clear-btn') as HTMLButtonElement;
+                if (searchClearBtn) searchClearBtn.hidden = currentQuery === '';
+                if (currentQuery === '') {
+                    const searchModeBtn = document.getElementById('search-mode-btn') as HTMLButtonElement;
+                    if (searchModeBtn && searchModeBtn.classList.contains('active')) {
+                        searchModeBtn.innerHTML = '';
+                        searchModeBtn.insertAdjacentHTML('beforeend', getInlineSVG('SCHOOL', 'school-icon'));
+                        searchModeBtn.classList.remove('active');
+                        searchInput.placeholder = 'Search courses...';
+                    }
+                }
             }
         }
     }

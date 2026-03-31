@@ -108,7 +108,12 @@
             <main class="main-content" role="main">
                 <div class="content-header">
                     <div class="content-controls">
-                        <input type="text" id="search-input" placeholder="Search courses..." class="search-input" aria-label="Search courses">
+                        <div class="search-input-wrapper">
+                            <input type="text" id="search-input" placeholder="Search courses..." class="search-input" aria-label="Search courses">
+                            <div id="search-professor-dropdown" class="professor-dropdown" style="display:none;"></div>
+                            <button id="search-mode-btn" class="search-mode-btn" title="Search professors" aria-label="Toggle professor search"></button>
+                            <button id="search-clear-btn" class="search-clear-btn" title="Clear search" aria-label="Clear search" hidden></button>
+                        </div>
                         <button id="clear-filters-btn" class="filter-btn" title="Clear all filters" aria-label="Clear all filters">
                         </button>
                         <div class="filter-buttons">

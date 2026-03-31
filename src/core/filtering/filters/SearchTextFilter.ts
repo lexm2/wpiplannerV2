@@ -15,6 +15,12 @@ export class SearchTextFilter implements SectionBasedFilter {
 
         const query = criteria.query.trim().toLowerCase();
 
+        if (criteria.professorOnly) {
+            return sections.filter(fs =>
+                fs.section.periods.some(p => p.professor.toLowerCase().includes(query))
+            );
+        }
+
         return sections.filter(fs => {
             const course = fs.course;
             const courseCode = `${course.departmentAbbr}${course.number}`;
