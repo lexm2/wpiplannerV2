@@ -31,6 +31,23 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             .find(c => c.id === id);
     }
 
+    async function selectTutorialCourse(cs: { courseId: string; lecture?: string; discussion?: string; lab?: string }): Promise<void> {
+        const course = getTutorialCourse(cs.courseId);
+        if (!course) return;
+        await services.courseSelectionService.selectCourse(course);
+        if (cs.lecture || cs.discussion || cs.lab) {
+            const group = course.lectures?.find(g => g.section.number === cs.lecture) ?? null;
+            const disc = cs.discussion && group
+                ? group.compatibleDiscussions.find(d => d.number === cs.discussion) ?? null
+                : null;
+            const lab = cs.lab && group
+                ? group.compatibleLabs.find(l => l.number === cs.lab) ?? null
+                : null;
+            await services.courseSelectionService.setSelectedComponents(course, group?.section ?? null, disc, lab);
+        }
+        mainController.syncCourseSelectionUI();
+    }
+
     async function sharedSetup() {
         await cleanupTutorial(false);
         const stale = services.scheduleManagementService.getAllSchedules()
@@ -472,21 +489,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     tutorialService.onAppStateTransition(async (appState) => {
         if (appState.selectedCourses) {
             for (const cs of appState.selectedCourses) {
-                const course = getTutorialCourse(cs.courseId);
-                if (!course) continue;
-                await services.courseSelectionService.selectCourse(course);
-                if (cs.lecture || cs.discussion || cs.lab) {
-                    const group = course.lectures?.find(g => g.section.number === cs.lecture) ?? null;
-                    const disc = cs.discussion && group
-                        ? group.compatibleDiscussions.find(d => d.number === cs.discussion) ?? null
-                        : null;
-                    const lab = cs.lab && group
-                        ? group.compatibleLabs.find(l => l.number === cs.lab) ?? null
-                        : null;
-                    await services.courseSelectionService.setSelectedComponents(
-                        course, group?.section ?? null, disc, lab
-                    );
-                }
+                await selectTutorialCourse(cs);
             }
         }
         if (appState.filters) {

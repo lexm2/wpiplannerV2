@@ -1,5 +1,10 @@
 # Changelog
 
+## [2026-03-31]
+
+### Fixed
+- Tutorial course selection UI now properly refreshes when advancing past a course-selection step using the Next button after going back
+
 ## [2026-03-28]
 
 ### Added
