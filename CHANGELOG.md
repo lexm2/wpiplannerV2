@@ -5,6 +5,7 @@
 ### Added
 - X button on the right side of the course search bar to quickly clear the search
 - Professor search mode toggle in the search bar — click the school icon to search by professor name only, with a live suggestions dropdown as you type
+- Removed course and professor search bars from the filter modal (search is now handled from the main search bar)
 
 ### Fixed
 - Tutorial course selection UI now properly refreshes when advancing past a course-selection step using the Next button after going back
