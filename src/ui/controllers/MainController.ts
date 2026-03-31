@@ -39,6 +39,7 @@ export class MainController {
     private colorService: CourseColorService;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator;
     private allDepartments: Department[] = [];
+    private professorSearchMode = false;
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
     private pendingExpansions: Array<{courseId: string, term: string}> = [];
 
@@ -511,7 +512,6 @@ export class MainController {
         const searchClearBtn = document.getElementById('search-clear-btn') as HTMLButtonElement;
         const searchModeBtn = document.getElementById('search-mode-btn') as HTMLButtonElement;
         const professorDropdown = document.getElementById('search-professor-dropdown') as HTMLDivElement;
-        let professorMode = false;
 
         if (professorDropdown) {
             professorDropdown.addEventListener('click', (e) => {
@@ -528,15 +528,16 @@ export class MainController {
         if (searchModeBtn) {
             searchModeBtn.insertAdjacentHTML('beforeend', getInlineSVG('SCHOOL', 'school-icon'));
             searchModeBtn.addEventListener('click', () => {
-                professorMode = !professorMode;
+                this.professorSearchMode = !this.professorSearchMode;
                 searchModeBtn.innerHTML = '';
                 searchModeBtn.insertAdjacentHTML('beforeend',
-                    professorMode ? getInlineSVG('SCHOOL_FULL', 'school-full-icon') : getInlineSVG('SCHOOL', 'school-icon')
+                    this.professorSearchMode ? getInlineSVG('SCHOOL_FULL', 'school-full-icon') : getInlineSVG('SCHOOL', 'school-icon')
                 );
-                searchModeBtn.classList.toggle('active', professorMode);
+                searchModeBtn.classList.toggle('active', this.professorSearchMode);
                 if (professorDropdown) professorDropdown.style.display = 'none';
                 if (searchInput) {
-                    searchInput.placeholder = professorMode ? 'Search professors...' : 'Search courses...';
+                    searchInput.value = '';
+                    searchInput.placeholder = this.professorSearchMode ? 'Search professors...' : 'Search courses...';
                     searchInput.dispatchEvent(new Event('input'));
                 }
             });
@@ -551,7 +552,7 @@ export class MainController {
                     searchInput.focus();
                 }
                 searchClearBtn.hidden = true;
-                professorMode = false;
+                this.professorSearchMode = false;
                 if (professorDropdown) professorDropdown.style.display = 'none';
                 if (searchModeBtn) {
                     searchModeBtn.innerHTML = '';
@@ -571,7 +572,7 @@ export class MainController {
                 const query = searchInput.value;
                 if (searchClearBtn) searchClearBtn.hidden = query === '';
 
-                if (professorMode && professorDropdown) {
+                if (this.professorSearchMode && professorDropdown) {
                     if (query.length > 0) {
                         const matches = getAvailableProfessors(this.getAllCourses())
                             .filter(p => p.toLowerCase().includes(query.toLowerCase()))
@@ -591,7 +592,7 @@ export class MainController {
 
                     // Only trim for the check, but pass the original query with spaces
                     if (query.trim().length > 0) {
-                        this.services.filterService.addFilter('searchText', { query, professorOnly: professorMode });
+                        this.services.filterService.addFilter('searchText', { query, professorOnly: this.professorSearchMode });
                     } else {
                         this.services.filterService.removeFilter('searchText');
                     }
@@ -1147,6 +1148,9 @@ export class MainController {
             if (state.currentPage === 'planner' && prevState.currentPage !== 'planner') {
                 this.courseController.syncCourseSelectionState();
             }
+            if (state.currentPage === 'schedule' && prevState.currentPage !== 'schedule') {
+                this.resetSearchAndDepartmentFilters();
+            }
         });
     }
 
@@ -1500,6 +1504,24 @@ export class MainController {
     private syncModalSearchInput(query: string): void {
         // Sync the modal search input if the modal is currently open
         this.filterModalController.syncSearchInputFromMain(query);
+    }
+
+    private resetSearchAndDepartmentFilters(): void {
+        this.services.filterService.removeFilter('searchText');
+        this.professorSearchMode = false;
+        const searchInput = document.getElementById('search-input') as HTMLInputElement;
+        const searchClearBtn = document.getElementById('search-clear-btn') as HTMLButtonElement;
+        const searchModeBtn = document.getElementById('search-mode-btn') as HTMLButtonElement;
+        const professorDropdown = document.getElementById('search-professor-dropdown') as HTMLDivElement;
+        if (searchInput) { searchInput.value = ''; searchInput.placeholder = 'Search courses...'; }
+        if (searchClearBtn) searchClearBtn.hidden = true;
+        if (professorDropdown) professorDropdown.style.display = 'none';
+        if (searchModeBtn) {
+            searchModeBtn.innerHTML = '';
+            searchModeBtn.insertAdjacentHTML('beforeend', getInlineSVG('SCHOOL', 'school-icon'));
+            searchModeBtn.classList.remove('active');
+        }
+        this.departmentController.handleDepartmentClick('all', false);
     }
 
     private syncSearchInputFromFilters(): void {
