@@ -1,5 +1,5 @@
 {
-  "generated": "Mar 31, 2026, 3:28 AM",
+  "generated": "Mar 31, 2026, 5:25 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -451189,7 +451189,7 @@
                 "number": "D03",
                 "seats": 35,
                 "seatsAvailable": -3,
-                "actualWaitlist": 8,
+                "actualWaitlist": 7,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "D",
@@ -451206,7 +451206,7 @@
                     "room": "Recreation Center Track",
                     "seats": 35,
                     "seatsAvailable": -3,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 15,
                     "specificSection": "D03",
                     "days": [
