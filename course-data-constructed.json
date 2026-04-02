@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 2, 2026, 9:13 AM",
+  "generated": "Apr 2, 2026, 10:11 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -434657,7 +434657,7 @@
                 "crn": 348535,
                 "number": "A01",
                 "seats": 60,
-                "seatsAvailable": 22,
+                "seatsAvailable": 21,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -434674,7 +434674,7 @@
                     "building": "",
                     "room": "Olin Hall 107",
                     "seats": 60,
-                    "seatsAvailable": 22,
+                    "seatsAvailable": 21,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "A01",
@@ -438150,7 +438150,7 @@
                 "crn": 354215,
                 "number": "F05 - ST: Artificial Intelligence for Robotics",
                 "seats": 60,
-                "seatsAvailable": 22,
+                "seatsAvailable": 21,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -438167,7 +438167,7 @@
                     "building": "",
                     "room": "Olin Hall 107",
                     "seats": 60,
-                    "seatsAvailable": 22,
+                    "seatsAvailable": 21,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F05 - ST: Artificial Intelligence for Robotics",
