@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 3, 2026, 7:37 PM",
+  "generated": "Apr 3, 2026, 8:04 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -319329,7 +319329,7 @@
                 "number": "BL01",
                 "seats": 72,
                 "seatsAvailable": 20,
-                "actualWaitlist": 15,
+                "actualWaitlist": 14,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5166",
                 "computedTerm": "B",
@@ -319346,7 +319346,7 @@
                     "room": "Unity Hall 420",
                     "seats": 72,
                     "seatsAvailable": 20,
-                    "actualWaitlist": 15,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 20,
                     "specificSection": "BL01",
                     "days": [
@@ -319362,7 +319362,7 @@
                   "crn": 349262,
                   "number": "BX01",
                   "seats": 18,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5166",
@@ -319379,7 +319379,7 @@
                       "building": "",
                       "room": "Washburn 107 Machine Shop",
                       "seats": 18,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX01",
