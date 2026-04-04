@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 4, 2026, 11:59 AM",
+  "generated": "Apr 4, 2026, 1:10 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -111516,7 +111516,7 @@
                 "number": "A01",
                 "seats": 48,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "A",
@@ -111533,7 +111533,7 @@
                     "room": "Olin Hall 223",
                     "seats": 48,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 15,
                     "specificSection": "A01",
                     "days": [
@@ -111615,7 +111615,7 @@
                 "crn": 349453,
                 "number": "B01",
                 "seats": 40,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -111632,7 +111632,7 @@
                     "building": "",
                     "room": "Atwater Kent 233",
                     "seats": 40,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
