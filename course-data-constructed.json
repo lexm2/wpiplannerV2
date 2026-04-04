@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 4, 2026, 7:52 PM",
+  "generated": "Apr 4, 2026, 8:25 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -120389,7 +120389,7 @@
                 "crn": 349371,
                 "number": "B01",
                 "seats": 60,
-                "seatsAvailable": 48,
+                "seatsAvailable": 49,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -120406,7 +120406,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 60,
-                    "seatsAvailable": 48,
+                    "seatsAvailable": 49,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -145690,7 +145690,7 @@
                 "crn": 349849,
                 "number": "B10 - INQ SEM: Philosophy of Film",
                 "seats": 12,
-                "seatsAvailable": 8,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -145707,7 +145707,7 @@
                     "building": "",
                     "room": "Stratton Hall 313",
                     "seats": 12,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "B10 - INQ SEM: Philosophy of Film",
