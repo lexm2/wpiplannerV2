@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 5, 2026, 8:59 PM",
+  "generated": "Apr 5, 2026, 9:39 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -320075,7 +320075,7 @@
                 "number": "AL01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 15,
+                "actualWaitlist": 14,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5057",
                 "computedTerm": "A",
@@ -320092,7 +320092,7 @@
                     "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 15,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 20,
                     "specificSection": "AL01",
                     "days": [
@@ -334976,7 +334976,7 @@
                 "crn": 350237,
                 "number": "F01",
                 "seats": 50,
-                "seatsAvailable": 42,
+                "seatsAvailable": 43,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -334993,7 +334993,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
-                    "seatsAvailable": 42,
+                    "seatsAvailable": 43,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "F01",
