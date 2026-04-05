@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 5, 2026, 10:00 PM",
+  "generated": "Apr 5, 2026, 10:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -24076,7 +24076,7 @@
                 "crn": 354281,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 30,
+                "seatsAvailable": 29,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -24093,7 +24093,7 @@
                     "building": "",
                     "room": "Atwater Kent 013 Computer Lab",
                     "seats": 30,
-                    "seatsAvailable": 30,
+                    "seatsAvailable": 29,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -24815,7 +24815,7 @@
                 "crn": 354281,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 30,
+                "seatsAvailable": 29,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -24832,7 +24832,7 @@
                     "building": "",
                     "room": "Atwater Kent 013 Computer Lab",
                     "seats": 30,
-                    "seatsAvailable": 30,
+                    "seatsAvailable": 29,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
