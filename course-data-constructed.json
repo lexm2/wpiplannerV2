@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 5, 2026, 5:29 AM",
+  "generated": "Apr 5, 2026, 6:44 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -353351,7 +353351,7 @@
                 "number": "B01",
                 "seats": 40,
                 "seatsAvailable": 25,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "B",
@@ -353368,7 +353368,7 @@
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 40,
                     "seatsAvailable": 25,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [
