@@ -564,19 +564,23 @@
   border-radius: var(--effect-border-radius);
 }
 
+.terms-grid.focused {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  gap: 0.5rem;
+  border-radius: 0;
+}
+
 .terms-grid.focused .term-graph {
   display: none;
 }
 
 .terms-grid.focused .term-graph.focused-term {
   display: flex;
-  grid-column: 1 / -1;
-  grid-row: 1 / -1;
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  right: 1rem;
-  bottom: 1rem;
+  flex: 1;
+  min-height: 0;
+  transition: none;
 }
 
 .term-graph {
@@ -638,37 +642,54 @@
   }
 }
 
-.term-back-btn {
+.focused-term-header {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-background-alt);
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0 0 var(--effect-border-radius) var(--effect-border-radius);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.terms-grid.focused .focused-term-header {
+  display: flex;
+}
+
+.focused-term-title {
   position: absolute;
-  left: 0.5rem;
-  top: 0.5rem;
-  background: var(--color-surface);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.term-back-btn {
+  background: none;
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
   padding: 0;
-  color: var(--color-text);
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: var(--effect-transition);
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  z-index: 30;
+  flex-shrink: 0;
 }
 
 .term-back-btn svg {
-  width: 1.25rem;
-  height: 1.25rem;
-  transform: scaleY(-1) rotate(180deg);
-}
-
-.term-graph.focused-term .term-back-btn {
-  display: flex;
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 .term-back-btn:hover {
-  background: var(--color-background-alt);
+  background: var(--color-background);
   border-color: var(--color-primary);
   color: var(--color-primary);
 }

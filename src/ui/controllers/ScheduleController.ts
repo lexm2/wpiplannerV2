@@ -1385,10 +1385,10 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     private setupTermFocusHandlers(): void {
-        const backButtons = document.querySelectorAll('.term-back-btn');
-        backButtons.forEach(btn => {
-            btn.innerHTML = getInlineSVG('ARROW_FORWARD_UP', 'term-back-icon');
-        });
+        const backBtn = document.querySelector('.term-back-btn');
+        if (backBtn) {
+            backBtn.innerHTML = getInlineSVG('ARROW_BACK_UP', 'term-back-icon');
+        }
 
         document.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
@@ -1435,6 +1435,9 @@ export class ScheduleController implements CalendarEventProvider {
         if (!termsGrid) return;
 
         termsGrid.classList.add('focused');
+
+        const titleEl = termsGrid.querySelector('.focused-term-title');
+        if (titleEl) titleEl.textContent = `${term} Term`;
 
         termGraphs.forEach(graph => {
             const graphElement = graph as HTMLElement;

@@ -5,6 +5,7 @@
 ### Added
 - Hovering a course block in the schedule grid now highlights the corresponding course in the sidebar
 - Schedule sidebar now groups courses by term (A, B, C, D) with labeled separators
+- Focused term view now has a header bar with a back button and term label instead of a floating undo button
 
 ## [2026-03-31]
 
