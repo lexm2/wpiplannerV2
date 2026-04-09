@@ -9,7 +9,6 @@ import type { ConflictCriteria } from '../../types/filters';
 export interface ScheduleResult {
   course: Course;
   combination: ComponentSelections;
-  isLocked?: boolean;
 }
 
 interface CourseTypeInfo {
@@ -41,42 +40,9 @@ export class AutoScheduler {
     }
 
     const blockedMasksByTerm = this.getBlockedMasksByTerm();
-
-    const lockedResults: ScheduleResult[] = [];
-    const incompleteCourses: SelectedCourse[] = [];
-    const lockedMaskByTerm = new Map<string, bigint>();
-
-    // Separate locked vs incomplete courses
-    for (const selectedCourse of selectedCourses) {
-      const lockedCombination = this.getLockedCombination(selectedCourse);
-      if (lockedCombination) {
-        lockedResults.push({
-          course: selectedCourse.course,
-          combination: lockedCombination,
-          isLocked: true
-        });
-
-        // Add locked sections to the combined mask
-        const mask = this.combinationToMask(lockedCombination);
-        const term = this.getCombinationTerm(lockedCombination);
-        if (term) {
-          const existing = lockedMaskByTerm.get(term) || 0n;
-          lockedMaskByTerm.set(term, existing | mask);
-        }
-      } else {
-        incompleteCourses.push(selectedCourse);
-      }
-    }
-
-    // If everything is locked, return single schedule
-    if (incompleteCourses.length === 0) {
-      return [lockedResults];
-    }
-
-    // Get masked candidates for each incomplete course
     const candidatesPerCourse: MaskedCandidate[][] = [];
 
-    for (const selectedCourse of incompleteCourses) {
+    for (const selectedCourse of selectedCourses) {
       const candidates = this.getMaskedCandidates(selectedCourse, blockedMasksByTerm);
 
       if (candidates.length === 0) {
@@ -87,16 +53,14 @@ export class AutoScheduler {
       candidatesPerCourse.push(candidates);
     }
 
-    // Generate valid schedules using recursive backtracking with bitmask pruning
     const validSchedules: ScheduleResult[][] = [];
 
     this.generateWithBacktracking(
-      incompleteCourses,
+      selectedCourses,
       candidatesPerCourse,
       0,
-      lockedMaskByTerm,
+      new Map(),
       [],
-      lockedResults,
       validSchedules,
       maxResults
     );
@@ -134,23 +98,16 @@ export class AutoScheduler {
     courseIndex: number,
     currentMaskByTerm: Map<string, bigint>,
     currentSelections: MaskedCandidate[],
-    lockedResults: ScheduleResult[],
     results: ScheduleResult[][],
     maxResults: number
   ): void {
-    // Check if we've found enough schedules
     if (results.length >= maxResults) return;
 
-    // Base case: all courses assigned
     if (courseIndex >= courses.length) {
-      const schedule = [
-        ...lockedResults,
-        ...currentSelections.map((candidate, i) => ({
-          course: courses[i].course,
-          combination: candidate.combination
-        }))
-      ];
-      results.push(schedule);
+      results.push(currentSelections.map((candidate, i) => ({
+        course: courses[i].course,
+        combination: candidate.combination
+      })));
       return;
     }
 
@@ -168,7 +125,7 @@ export class AutoScheduler {
 
       this.generateWithBacktracking(
         courses, candidatesPerCourse, courseIndex + 1, newMaskByTerm,
-        currentSelections, lockedResults, results, maxResults
+        currentSelections, results, maxResults
       );
 
       currentSelections.pop();
@@ -304,59 +261,6 @@ export class AutoScheduler {
 
     // Check schedule filters
     return this.sectionPassesFilters(section, selectedCourse);
-  }
-
-  /**
-   * Convert a section combination to a combined bitmask
-   */
-  private combinationToMask(combo: ComponentSelections): bigint {
-    let mask = 0n;
-    if (combo.lecture) mask |= sectionToMask(combo.lecture);
-    if (combo.discussion) mask |= sectionToMask(combo.discussion);
-    if (combo.lab) mask |= sectionToMask(combo.lab);
-    return mask;
-  }
-
-  /**
-   * Get the term of a section combination
-   */
-  private getCombinationTerm(combo: ComponentSelections): string | null {
-    return combo.lecture?.computedTerm ||
-           combo.discussion?.computedTerm ||
-           combo.lab?.computedTerm ||
-           null;
-  }
-
-  getLockedCombination(selectedCourse: SelectedCourse): ComponentSelections | null {
-    const lockedSections = selectedCourse.lockedSections || new Set();
-    const typeInfo = this.detectCourseTypes(selectedCourse.course);
-
-    let lockedLecture: Section | null = null;
-    let lockedDiscussion: Section | null = null;
-    let lockedLab: Section | null = null;
-
-    if (selectedCourse.selectedLecture && lockedSections.has(String(selectedCourse.selectedLecture.crn))) {
-      lockedLecture = selectedCourse.selectedLecture;
-    }
-
-    if (selectedCourse.selectedDiscussion && lockedSections.has(String(selectedCourse.selectedDiscussion.crn))) {
-      lockedDiscussion = selectedCourse.selectedDiscussion;
-    }
-
-    if (selectedCourse.selectedLab && lockedSections.has(String(selectedCourse.selectedLab.crn))) {
-      lockedLab = selectedCourse.selectedLab;
-    }
-
-    const hasAllRequired =
-      (!typeInfo.hasLectures || lockedLecture !== null) &&
-      (!typeInfo.hasDiscussions || lockedDiscussion !== null) &&
-      (!typeInfo.hasLabs || lockedLab !== null);
-
-    if (hasAllRequired) {
-      return { lecture: lockedLecture, discussion: lockedDiscussion, lab: lockedLab };
-    }
-
-    return null;
   }
 
   /**

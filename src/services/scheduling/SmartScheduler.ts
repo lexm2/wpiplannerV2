@@ -2,49 +2,26 @@ import type { SelectedCourse } from '../../types/schedule';
 import type { ComponentSelections } from '../../types/scheduling';
 import type { Course, Section } from '../../types/types';
 import { AutoScheduler, type ScheduleResult, type MaskedCandidate } from './AutoScheduler';
-import { sectionToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
+import { masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { FilterService } from '../filtering/FilterService';
 
 export interface SchedulerInput {
     candidatesPerCourse: MaskedCandidate[][];
     courses: Course[];
-    lockedResults: ScheduleResult[];
-    lockedMaskByTerm: Map<string, bigint>;
 }
 
 export class SmartScheduler {
     constructor(private filterService: FilterService) {}
 
     buildCandidateData(selectedCourses: SelectedCourse[]): SchedulerInput | null {
-        if (selectedCourses.length === 0) return { candidatesPerCourse: [], courses: [], lockedResults: [], lockedMaskByTerm: new Map() };
+        if (selectedCourses.length === 0) return { candidatesPerCourse: [], courses: [] };
 
         const autoScheduler = new AutoScheduler(this.filterService);
         const blockedMasks = autoScheduler.getBlockedMasksByTerm();
 
-        const lockedResults: ScheduleResult[] = [];
-        const unlocked: SelectedCourse[] = [];
-        const lockedMaskByTerm = new Map<string, bigint>();
-
-        for (const sc of selectedCourses) {
-            const lockedCombo = autoScheduler.getLockedCombination(sc);
-            if (lockedCombo) {
-                lockedResults.push({ course: sc.course, combination: lockedCombo, isLocked: true });
-                let mask = 0n;
-                if (lockedCombo.lecture) mask |= sectionToMask(lockedCombo.lecture);
-                if (lockedCombo.discussion) mask |= sectionToMask(lockedCombo.discussion);
-                if (lockedCombo.lab) mask |= sectionToMask(lockedCombo.lab);
-                const term = lockedCombo.lecture?.computedTerm
-                    ?? lockedCombo.discussion?.computedTerm
-                    ?? lockedCombo.lab?.computedTerm;
-                if (term) lockedMaskByTerm.set(term, (lockedMaskByTerm.get(term) ?? 0n) | mask);
-            } else {
-                unlocked.push(sc);
-            }
-        }
-
         const candidatesPerCourse: MaskedCandidate[][] = [];
         const scheduledCourses: Course[] = [];
-        for (const sc of unlocked) {
+        for (const sc of selectedCourses) {
             if (sc.allowedTerms?.length === 0) continue;
             const candidates = autoScheduler.getMaskedCandidates(sc, blockedMasks);
             if (candidates.length === 0) {
@@ -55,39 +32,26 @@ export class SmartScheduler {
             scheduledCourses.push(sc.course);
         }
 
-        return {
-            candidatesPerCourse,
-            courses: scheduledCourses,
-            lockedResults,
-            lockedMaskByTerm,
-        };
+        return { candidatesPerCourse, courses: scheduledCourses };
     }
 
     static findSchedules(input: SchedulerInput, maxResults: number): ScheduleResult[][] {
-        const { candidatesPerCourse, courses, lockedResults, lockedMaskByTerm } = input;
+        const { candidatesPerCourse, courses } = input;
 
-        if (candidatesPerCourse.length === 0) return lockedResults.length > 0 ? [lockedResults] : [];
+        if (candidatesPerCourse.length === 0) return [];
 
         const termOptionsPerCourse = candidatesPerCourse.map(candidates =>
             [...new Set(candidates.map(c => c.term))]
         );
 
-        const lockedCountByTerm = new Map<string, number>();
-        for (const result of lockedResults) {
-            const term = result.combination.lecture?.computedTerm
-                ?? result.combination.discussion?.computedTerm
-                ?? result.combination.lab?.computedTerm;
-            if (term) lockedCountByTerm.set(term, (lockedCountByTerm.get(term) ?? 0) + 1);
-        }
-
         const numDistinctTerms = new Set(termOptionsPerCourse.flat()).size;
-        let assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, 3, lockedCountByTerm);
+        let assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, 3);
         if (assignments.length === 0) {
             const relaxed = Math.ceil(courses.length / Math.max(numDistinctTerms, 1));
-            assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, relaxed, lockedCountByTerm);
+            assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, relaxed);
         }
         if (assignments.length === 0) {
-            assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, Infinity, lockedCountByTerm);
+            assignments = SmartScheduler.enumerateTermAssignments(termOptionsPerCourse, Infinity);
         }
 
         const results: ScheduleResult[][] = [];
@@ -109,8 +73,7 @@ export class SmartScheduler {
                 const groupCandidates = indices.map(i =>
                     candidatesPerCourse[i].filter(c => c.term === term)
                 );
-                const lockedMask = lockedMaskByTerm.get(term) ?? 0n;
-                const combos = SmartScheduler.bestForTermGroup(groupCandidates, lockedMask);
+                const combos = SmartScheduler.bestForTermGroup(groupCandidates, 0n);
                 if (!combos) { valid = false; break; }
                 indices.forEach((courseIdx, i) => {
                     allSelections.push({ courseIdx, combo: combos[i] });
@@ -119,13 +82,12 @@ export class SmartScheduler {
 
             if (!valid) continue;
 
-            results.push([
-                ...lockedResults,
-                ...allSelections.map(({ courseIdx, combo }) => ({
+            results.push(
+                allSelections.map(({ courseIdx, combo }) => ({
                     course: courses[courseIdx],
                     combination: combo,
-                })),
-            ]);
+                }))
+            );
         }
 
         return results;
@@ -137,9 +99,9 @@ export class SmartScheduler {
         return SmartScheduler.findSchedules(input, maxResults);
     }
 
-    private static enumerateTermAssignments(termOptions: string[][], maxPerTerm: number, initialCounts: Map<string, number> = new Map()): string[][] {
+    private static enumerateTermAssignments(termOptions: string[][], maxPerTerm: number): string[][] {
         const results: string[][] = [];
-        const counts = new Map<string, number>(initialCounts);
+        const counts = new Map<string, number>();
 
         const dfs = (i: number, current: string[]): void => {
             if (i === termOptions.length) {

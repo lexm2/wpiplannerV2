@@ -22,7 +22,6 @@ export class ScheduleScorer {
     private termScore(schedule: ScheduleResult[]): number {
         const counts = new Map<string, number>();
         for (const result of schedule) {
-            if (result.isLocked) continue;
             const section = result.combination.lecture
                 ?? result.combination.lab
                 ?? result.combination.discussion;

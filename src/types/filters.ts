@@ -79,6 +79,7 @@ export interface TermFilterCriteria {
 
 export interface SearchTextFilterCriteria {
     query: string;
+    professorOnly?: boolean;
 }
 
 export interface SectionStatusFilterCriteria {

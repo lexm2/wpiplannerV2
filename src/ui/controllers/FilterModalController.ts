@@ -10,7 +10,7 @@ import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup, FilterServiceLike } from '../components/SharedFilterSetup';
-import { DepartmentFilterCriteria, SearchTextFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, ProfessorFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria, WakeUpTimeFilterCriteria, ConflictCriteria } from '../../types/filters';
+import { DepartmentFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria, WakeUpTimeFilterCriteria, ConflictCriteria } from '../../types/filters';
 import { DualRangeSlider } from '../components/DualRangeSlider';
 
 export class FilterModalController extends BaseModal {
@@ -65,7 +65,6 @@ export class FilterModalController extends BaseModal {
         });
     }
 
-    // Method to sync search input from main controller
     syncSearchInputFromMain(query: string): void {
         if (this.modalElement) {
             const searchInput = this.modalElement.querySelector('.search-text-input') as HTMLInputElement;
@@ -247,7 +246,6 @@ export class FilterModalController extends BaseModal {
             <div class="filter-sections">
                 ${this.createGraduateLevelFilter()}
                 ${this.createAcademicYearFilter()}
-                ${this.createSearchTextFilter()}
                 ${this.createBookmarkFilter()}
                 ${this.createAvailabilityFilter()}
                 ${this.createDepartmentFilter()}
@@ -322,47 +320,6 @@ export class FilterModalController extends BaseModal {
                     <div class="filter-segmented-control" id="academic-year-filter">
                         <button class="segmented-btn ${currentYear === 'all' ? 'active' : ''}" data-year="all">All</button>
                         ${yearBtns}
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    private createSearchTextFilter(): string {
-        if (!this.filterService) return '';
-
-        const activeFilter = this.filterService.getActiveFilters().find(f => f.id === 'searchText');
-        const criteria = activeFilter?.criteria as SearchTextFilterCriteria | undefined;
-        const currentQuery = criteria?.query || '';
-
-        // Get active professors for chips
-        const profFilter = this.filterService.getActiveFilters().find(f => f.id === 'professor');
-        const profCriteria = profFilter?.criteria as ProfessorFilterCriteria | undefined;
-        const activeProfessors = profCriteria?.professors || [];
-
-        const professorChips = activeProfessors.map((prof: string) => `
-            <span class="filter-chip">
-                ${this.escapeHtml(prof)}
-                <button class="filter-chip-remove" data-professor="${this.escapeHtml(prof)}" data-filter="professor">×</button>
-            </span>
-        `).join('');
-
-        return `
-            <div class="filter-section search-text-section">
-                <div class="filter-section-content">
-                    <div class="filter-search-container">
-                        <input type="text" class="filter-search search-text-input"
-                               placeholder="Search courses..."
-                               value="${this.escapeHtml(currentQuery)}"
-                               data-filter="searchText">
-                    </div>
-                    <div class="filter-search-container">
-                        <input type="text" class="filter-search professor-search"
-                               placeholder="Search professors..." data-filter="professor">
-                        <div class="professor-dropdown" id="professor-dropdown" style="display: none;"></div>
-                    </div>
-                    <div class="filter-selected-chips" id="professor-chips" ${activeProfessors.length === 0 ? 'style="display: none;"' : ''}>
-                        ${professorChips}
                     </div>
                 </div>
             </div>
@@ -569,8 +526,6 @@ export class FilterModalController extends BaseModal {
     private initializeFilterUI(modalElement: HTMLElement): void {
         if (!this.filterService) return;
 
-        this.setupSearchTextFilter(modalElement);
-        this.setupProfessorFilter(modalElement);
         this.setupRMPRatingFilter(modalElement);
         this.setupDepartmentFilter(modalElement);
         this.setupAvailabilityFilter(modalElement);
@@ -640,28 +595,6 @@ export class FilterModalController extends BaseModal {
         this.updatePreview(modalElement);
     }
 
-    private setupSearchTextFilter(modalElement: HTMLElement): void {
-        const searchInput = modalElement.querySelector('.search-text-input') as HTMLInputElement;
-        const clearButton = modalElement.querySelector('.filter-clear-search');
-        
-        if (searchInput) {
-            searchInput.addEventListener('input', () => {
-                const query = searchInput.value.trim();
-                this.updateSearchTextFilter(query, modalElement);
-                this.syncMainSearchInput(query);
-            });
-        }
-
-        if (clearButton) {
-            clearButton.addEventListener('click', () => {
-                if (searchInput) {
-                    searchInput.value = '';
-                }
-                this.updateSearchTextFilter('', modalElement);
-                this.syncMainSearchInput('');
-            });
-        }
-    }
 
     private setupDepartmentFilter(modalElement: HTMLElement): void {
         // Setup toggle for category mode
@@ -755,28 +688,6 @@ export class FilterModalController extends BaseModal {
                 }
                 this.updateCreditRangeFilter(modalElement);
             });
-        });
-    }
-
-    private setupProfessorFilter(modalElement: HTMLElement): void {
-        if (!this.filterService) return;
-
-        const professors = this.filterService.getFilterOptions('professor', this.allCourses) as string[];
-
-        SharedFilterSetup.setupProfessorFilter({
-            modalElement,
-            filterService: this.filterService as FilterServiceLike,
-            idPrefix: '',
-            filterId: 'professor',
-            professors,
-            updateFilter: (updatedProfessors: string[]) => {
-                if (updatedProfessors.length > 0) {
-                    this.filterService?.addFilter('professor', { professors: updatedProfessors });
-                } else {
-                    this.filterService?.removeFilter('professor');
-                }
-                this.updatePreview(modalElement);
-            }
         });
     }
 
@@ -893,31 +804,6 @@ export class FilterModalController extends BaseModal {
                 }
             });
         });
-    }
-
-    // Filter update methods
-    private updateSearchTextFilter(query: string, modalElement: HTMLElement): void {
-        if (query.length > 0) {
-            this.filterService?.addFilter('searchText', { query });
-        } else {
-            this.filterService?.removeFilter('searchText');
-        }
-        this.updatePreview(modalElement);
-        this.updateClearSearchButton(modalElement, query);
-    }
-
-    private syncMainSearchInput(query: string): void {
-        const mainSearchInput = document.getElementById('search-input') as HTMLInputElement;
-        if (mainSearchInput) {
-            mainSearchInput.value = query;
-        }
-    }
-
-    private updateClearSearchButton(modalElement: HTMLElement, query: string): void {
-        const clearButton = modalElement.querySelector('.filter-clear-search') as HTMLElement;
-        if (clearButton) {
-            clearButton.style.display = query.length > 0 ? 'inline-block' : 'none';
-        }
     }
 
     private departmentMatchesSearch(departmentAbbreviation: string, query: string): boolean {

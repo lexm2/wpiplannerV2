@@ -16,7 +16,7 @@ export class AutoScheduleIntroModal extends BaseModal {
         this.selectedCourses = selectedCourses;
         this.getColor = getColor;
         this.selectedTermsByCourseid = new Map(
-            selectedCourses.map(sc => [sc.course.id, this.availableTerms(sc)])
+            selectedCourses.map(sc => [sc.course.id, this.hasPickedSections(sc) ? new Set<string>() : this.availableTerms(sc)])
         );
     }
 
@@ -35,7 +35,7 @@ export class AutoScheduleIntroModal extends BaseModal {
                         <button class="modal-close" aria-label="Close">&times;</button>
                     </div>
                     <div class="modal-body as-course-picker-body">
-                        <p class="as-picker-hint">Select which terms to include for each course.</p>
+                        <p class="as-picker-hint">Courses with selected sections are locked by default. Click a course to include it in auto-scheduling.</p>
                         <div class="as-course-grid">
                             ${this.renderCards()}
                         </div>
@@ -77,6 +77,10 @@ export class AutoScheduleIntroModal extends BaseModal {
         this.showModal(backdrop, { closeOnBackdrop: true, closeOnEscape: true });
     }
 
+    private hasPickedSections(sc: SelectedCourse): boolean {
+        return !!(sc.selectedLecture || sc.selectedDiscussion || sc.selectedLab);
+    }
+
     private availableTerms(sc: SelectedCourse): Set<string> {
         const terms = new Set<string>();
         sc.course.lectures?.forEach(lg => terms.add(lg.section.computedTerm));
@@ -102,8 +106,10 @@ export class AutoScheduleIntroModal extends BaseModal {
             const code = Validators.escapeHtml(`${sc.course.departmentAbbr}${sc.course.number}`);
             const name = Validators.escapeHtml(sc.course.name);
             const year = sc.course.academicYear ? Validators.escapeHtml(String(sc.course.academicYear)) : '—';
+            const termSet = this.selectedTermsByCourseid.get(sc.course.id);
+            const selectedClass = (termSet?.size ?? 0) > 0 ? ' selected' : '';
             return `
-                <div class="as-course-card selected" data-course-id="${Validators.escapeHtml(sc.course.id)}">
+                <div class="as-course-card${selectedClass}" data-course-id="${Validators.escapeHtml(sc.course.id)}">
                     <div class="as-course-card-accent" style="background:${Validators.escapeHtml(color)}"></div>
                     <div class="as-course-card-content">
                         <div class="as-course-code">${code}</div>

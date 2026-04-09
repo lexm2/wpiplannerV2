@@ -31,6 +31,7 @@ export class ScheduleController implements CalendarEventProvider {
     private sectionInfoModalController: SectionInfoModalController | null = null;
     private conflictDetector: BitMaskEngine | null = null;
     private containerEventListeners = new Map<HTMLElement, EventListener>();
+    private sidebarCourseItems = new Map<string, HTMLElement>();
     private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
@@ -500,6 +501,12 @@ export class ScheduleController implements CalendarEventProvider {
 
         selectedCoursesContainer.innerHTML = html;
 
+        this.sidebarCourseItems.clear();
+        selectedCoursesContainer.querySelectorAll<HTMLElement>('.schedule-course-item').forEach(el => {
+            const id = el.dataset.courseId;
+            if (id) this.sidebarCourseItems.set(id, el);
+        });
+
         if (wizardPanel) {
             selectedCoursesContainer.appendChild(wizardPanel);
         }
@@ -660,14 +667,42 @@ export class ScheduleController implements CalendarEventProvider {
     }
     
     private buildAllCoursesHTML(sortedCourses: SelectedCourse[]): string {
-        let html = '';
+        const TERM_ORDER: AcademicTerm[] = [AcademicTerm.A, AcademicTerm.B, AcademicTerm.C, AcademicTerm.D, AcademicTerm.F, AcademicTerm.S, AcademicTerm.ALL];
+        const TERM_LABELS: Record<AcademicTerm, string> = {
+            [AcademicTerm.A]: 'A Term',
+            [AcademicTerm.B]: 'B Term',
+            [AcademicTerm.C]: 'C Term',
+            [AcademicTerm.D]: 'D Term',
+            [AcademicTerm.F]: 'Fall',
+            [AcademicTerm.S]: 'Spring',
+            [AcademicTerm.ALL]: 'All Terms',
+        };
 
-        sortedCourses.forEach(selectedCourse => {
-            const course = selectedCourse.course;
+        const groups = new Map<AcademicTerm | 'UNSCHEDULED', SelectedCourse[]>();
+        for (const sc of sortedCourses) {
+            const term = (getComputedTerm(sc) as AcademicTerm | null) ?? 'UNSCHEDULED';
+            if (!groups.has(term)) groups.set(term, []);
+            groups.get(term)!.push(sc);
+        }
 
-            html += this.buildCourseHeaderHTML(course, selectedCourse);
-            html += '</div>'; // Close schedule-course-item
+        const sortedKeys = [...groups.keys()].sort((a, b) => {
+            const ai = a === 'UNSCHEDULED' ? -1 : TERM_ORDER.indexOf(a);
+            const bi = b === 'UNSCHEDULED' ? -1 : TERM_ORDER.indexOf(b);
+            if (ai === -1 && bi === -1) return 0;
+            if (ai === -1) return 1;
+            if (bi === -1) return -1;
+            return ai - bi;
         });
+
+        let html = '';
+        for (const termKey of sortedKeys) {
+            const label = termKey === 'UNSCHEDULED' ? 'Unscheduled' : TERM_LABELS[termKey];
+            html += `<div class="term-separator"><span class="term-separator-label">${label}</span><span class="term-separator-line"></span></div>`;
+            for (const sc of groups.get(termKey)!) {
+                html += this.buildCourseHeaderHTML(sc.course, sc);
+                html += '</div>';
+            }
+        }
 
         return html;
     }
@@ -1276,6 +1311,14 @@ export class ScheduleController implements CalendarEventProvider {
         // Add new listener and track it
         container.addEventListener('click', clickListener);
         this.containerEventListeners.set(container, clickListener);
+
+        // Highlight corresponding sidebar course item on hover
+        container.querySelectorAll<HTMLElement>('.section-block').forEach(block => {
+            const courseId = block.dataset.courseId;
+            if (!courseId) return;
+            block.addEventListener('mouseenter', () => this.sidebarCourseItems.get(courseId)?.classList.add('sidebar-course-highlighted'));
+            block.addEventListener('mouseleave', () => this.sidebarCourseItems.get(courseId)?.classList.remove('sidebar-course-highlighted'));
+        });
     }
 
     showSectionInfoModal(courseId: string, sectionNumber: string): void {
@@ -1342,10 +1385,10 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     private setupTermFocusHandlers(): void {
-        const backButtons = document.querySelectorAll('.term-back-btn');
-        backButtons.forEach(btn => {
-            btn.innerHTML = getInlineSVG('ARROW_FORWARD_UP', 'term-back-icon');
-        });
+        const backBtn = document.querySelector('.term-back-btn');
+        if (backBtn) {
+            backBtn.innerHTML = getInlineSVG('ARROW_BACK_UP', 'term-back-icon');
+        }
 
         document.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
@@ -1392,6 +1435,9 @@ export class ScheduleController implements CalendarEventProvider {
         if (!termsGrid) return;
 
         termsGrid.classList.add('focused');
+
+        const titleEl = termsGrid.querySelector('.focused-term-title');
+        if (titleEl) titleEl.textContent = `${term} Term`;
 
         termGraphs.forEach(graph => {
             const graphElement = graph as HTMLElement;
@@ -1536,8 +1582,6 @@ export class ScheduleController implements CalendarEventProvider {
             return;
         }
 
-        this.autoScheduleOrchestrator.prepareLockedSections(selectedCourses);
-
         if (!this.modalService) {
             console.error('[Auto-Schedule] Modal service not available');
             await this.doGenerateSchedules(selectedCourses, { blockedTimes: [] });
@@ -1585,7 +1629,6 @@ export class ScheduleController implements CalendarEventProvider {
     openAutoScheduleIntro(): void {
         if (!this.modalService) return;
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
-        this.autoScheduleOrchestrator.prepareLockedSections(selectedCourses);
         this.currentAutoScheduleIntro = new AutoScheduleIntroModal(
             this.modalService,
             selectedCourses,

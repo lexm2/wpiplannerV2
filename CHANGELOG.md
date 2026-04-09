@@ -1,6 +1,21 @@
 # Changelog
 
+## [2026-04-08]
+
+### Added
+- Hovering a course block in the schedule grid now highlights the corresponding course in the sidebar
+- Schedule sidebar now groups courses by term (A, B, C, D) with labeled separators
+- Focused term view now has a header bar with a back button and term label instead of a floating undo button
+
 ## [2026-03-31]
+
+### Changed
+- Courses with already-selected sections now appear as locked (excluded) by default in the auto-schedule modal, making it clear they won't be touched
+
+### Added
+- X button on the right side of the course search bar to quickly clear the search
+- Professor search mode toggle in the search bar — click the school icon to search by professor name only, with a live suggestions dropdown as you type
+- Removed course and professor search bars from the filter modal (search is now handled from the main search bar)
 
 ### Fixed
 - Tutorial course selection UI now properly refreshes when advancing past a course-selection step using the Next button after going back
