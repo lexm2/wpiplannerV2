@@ -221,6 +221,11 @@
   background: var(--color-background);
 }
 
+.schedule-course-item.sidebar-course-highlighted {
+  box-shadow: inset 3px 0 0 var(--color-primary);
+  background: var(--color-background-alt);
+}
+
 .schedule-course-header {
   display: flex;
   align-items: flex-start;

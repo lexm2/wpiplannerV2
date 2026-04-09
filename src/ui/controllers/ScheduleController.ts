@@ -31,6 +31,7 @@ export class ScheduleController implements CalendarEventProvider {
     private sectionInfoModalController: SectionInfoModalController | null = null;
     private conflictDetector: BitMaskEngine | null = null;
     private containerEventListeners = new Map<HTMLElement, EventListener>();
+    private sidebarCourseItems = new Map<string, HTMLElement>();
     private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
@@ -499,6 +500,12 @@ export class ScheduleController implements CalendarEventProvider {
         const sidebarPanel = selectedCoursesContainer.querySelector('.sidebar-panel');
 
         selectedCoursesContainer.innerHTML = html;
+
+        this.sidebarCourseItems.clear();
+        selectedCoursesContainer.querySelectorAll<HTMLElement>('.schedule-course-item').forEach(el => {
+            const id = el.dataset.courseId;
+            if (id) this.sidebarCourseItems.set(id, el);
+        });
 
         if (wizardPanel) {
             selectedCoursesContainer.appendChild(wizardPanel);
@@ -1276,6 +1283,14 @@ export class ScheduleController implements CalendarEventProvider {
         // Add new listener and track it
         container.addEventListener('click', clickListener);
         this.containerEventListeners.set(container, clickListener);
+
+        // Highlight corresponding sidebar course item on hover
+        container.querySelectorAll<HTMLElement>('.section-block').forEach(block => {
+            const courseId = block.dataset.courseId;
+            if (!courseId) return;
+            block.addEventListener('mouseenter', () => this.sidebarCourseItems.get(courseId)?.classList.add('sidebar-course-highlighted'));
+            block.addEventListener('mouseleave', () => this.sidebarCourseItems.get(courseId)?.classList.remove('sidebar-course-highlighted'));
+        });
     }
 
     showSectionInfoModal(courseId: string, sectionNumber: string): void {

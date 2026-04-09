@@ -1,5 +1,10 @@
 # Changelog
 
+## [2026-04-08]
+
+### Added
+- Hovering a course block in the schedule grid now highlights the corresponding course in the sidebar
+
 ## [2026-03-31]
 
 ### Changed
