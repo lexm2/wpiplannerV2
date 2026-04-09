@@ -667,14 +667,42 @@ export class ScheduleController implements CalendarEventProvider {
     }
     
     private buildAllCoursesHTML(sortedCourses: SelectedCourse[]): string {
-        let html = '';
+        const TERM_ORDER: AcademicTerm[] = [AcademicTerm.A, AcademicTerm.B, AcademicTerm.C, AcademicTerm.D, AcademicTerm.F, AcademicTerm.S, AcademicTerm.ALL];
+        const TERM_LABELS: Record<AcademicTerm, string> = {
+            [AcademicTerm.A]: 'A Term',
+            [AcademicTerm.B]: 'B Term',
+            [AcademicTerm.C]: 'C Term',
+            [AcademicTerm.D]: 'D Term',
+            [AcademicTerm.F]: 'Fall',
+            [AcademicTerm.S]: 'Spring',
+            [AcademicTerm.ALL]: 'All Terms',
+        };
 
-        sortedCourses.forEach(selectedCourse => {
-            const course = selectedCourse.course;
+        const groups = new Map<AcademicTerm | 'UNSCHEDULED', SelectedCourse[]>();
+        for (const sc of sortedCourses) {
+            const term = (getComputedTerm(sc) as AcademicTerm | null) ?? 'UNSCHEDULED';
+            if (!groups.has(term)) groups.set(term, []);
+            groups.get(term)!.push(sc);
+        }
 
-            html += this.buildCourseHeaderHTML(course, selectedCourse);
-            html += '</div>'; // Close schedule-course-item
+        const sortedKeys = [...groups.keys()].sort((a, b) => {
+            const ai = a === 'UNSCHEDULED' ? -1 : TERM_ORDER.indexOf(a);
+            const bi = b === 'UNSCHEDULED' ? -1 : TERM_ORDER.indexOf(b);
+            if (ai === -1 && bi === -1) return 0;
+            if (ai === -1) return 1;
+            if (bi === -1) return -1;
+            return ai - bi;
         });
+
+        let html = '';
+        for (const termKey of sortedKeys) {
+            const label = termKey === 'UNSCHEDULED' ? 'Unscheduled' : TERM_LABELS[termKey];
+            html += `<div class="term-separator"><span class="term-separator-label">${label}</span><span class="term-separator-line"></span></div>`;
+            for (const sc of groups.get(termKey)!) {
+                html += this.buildCourseHeaderHTML(sc.course, sc);
+                html += '</div>';
+            }
+        }
 
         return html;
     }
