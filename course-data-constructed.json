@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 10, 2026, 10:39 AM",
+  "generated": "Apr 10, 2026, 11:32 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -435939,7 +435939,7 @@
                 "number": "F01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "F",
@@ -435956,7 +435956,7 @@
                     "room": "Stratton Hall 311",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
                     "days": [
@@ -435975,7 +435975,7 @@
                     "room": "Kaven Hall 204",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
                     "days": [
