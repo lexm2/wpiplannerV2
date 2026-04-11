@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 11, 2026, 8:29 PM",
+  "generated": "Apr 11, 2026, 9:00 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -122001,7 +122001,7 @@
                   "crn": 348634,
                   "number": "AX02",
                   "seats": 35,
-                  "seatsAvailable": 20,
+                  "seatsAvailable": 21,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5142",
@@ -122018,7 +122018,7 @@
                       "building": "",
                       "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 20,
+                      "seatsAvailable": 21,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX02",
@@ -319300,7 +319300,7 @@
                   "crn": 349256,
                   "number": "BX02",
                   "seats": 18,
-                  "seatsAvailable": 6,
+                  "seatsAvailable": 7,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5166",
@@ -319317,7 +319317,7 @@
                       "building": "",
                       "room": "Washburn 107 Machine Shop",
                       "seats": 18,
-                      "seatsAvailable": 6,
+                      "seatsAvailable": 7,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX02",
