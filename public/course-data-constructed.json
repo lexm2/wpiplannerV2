@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 11, 2026, 5:10 AM",
+  "generated": "Apr 11, 2026, 6:12 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -320051,7 +320051,7 @@
                 "number": "BL01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 2,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5206",
                 "computedTerm": "B",
@@ -320068,7 +320068,7 @@
                     "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 20,
                     "specificSection": "BL01",
                     "days": [
