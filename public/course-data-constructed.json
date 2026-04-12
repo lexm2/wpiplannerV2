@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 12, 2026, 12:02 PM",
+  "generated": "Apr 12, 2026, 1:33 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -16948,7 +16948,7 @@
                 "number": "A01",
                 "seats": 85,
                 "seatsAvailable": 40,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 25,
                 "note": null,
                 "computedTerm": "A",
@@ -16965,7 +16965,7 @@
                     "room": "Unity Hall 500",
                     "seats": 85,
                     "seatsAvailable": 40,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 25,
                     "specificSection": "A01",
                     "days": [
@@ -355439,7 +355439,7 @@
                 "crn": 350499,
                 "number": "F01",
                 "seats": 50,
-                "seatsAvailable": 41,
+                "seatsAvailable": 40,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -355456,7 +355456,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seatsAvailable": 41,
+                    "seatsAvailable": 40,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "F01",
