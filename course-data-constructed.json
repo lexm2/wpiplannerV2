@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 12, 2026, 6:59 PM",
+  "generated": "Apr 12, 2026, 7:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -23866,7 +23866,7 @@
                 "crn": 350554,
                 "number": "F01 - ST: Biomanufacturing Process Control and Statistical Tools",
                 "seats": 30,
-                "seatsAvailable": 26,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -23883,7 +23883,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F01 - ST: Biomanufacturing Process Control and Statistical Tools",
@@ -443544,7 +443544,7 @@
                 "crn": 350930,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 28,
+                "seatsAvailable": 27,
                 "actualWaitlist": 6,
                 "maxWaitlist": 20,
                 "note": null,
@@ -443561,7 +443561,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 28,
+                    "seatsAvailable": 27,
                     "actualWaitlist": 6,
                     "maxWaitlist": 20,
                     "specificSection": "S01",
