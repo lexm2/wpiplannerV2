@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 12, 2026, 10:02 PM",
+  "generated": "Apr 12, 2026, 10:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -81907,7 +81907,7 @@
                   "crn": 349552,
                   "number": "BX12",
                   "seats": 25,
-                  "seatsAvailable": 22,
+                  "seatsAvailable": 23,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5186",
@@ -81924,7 +81924,7 @@
                       "building": "",
                       "room": "Kaven Hall 203 CARS Computer Lab",
                       "seats": 25,
-                      "seatsAvailable": 22,
+                      "seatsAvailable": 23,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX12",
@@ -81971,7 +81971,7 @@
                   "crn": 349328,
                   "number": "BX15",
                   "seats": 25,
-                  "seatsAvailable": 17,
+                  "seatsAvailable": 16,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5186",
@@ -81988,7 +81988,7 @@
                       "building": "",
                       "room": "Fuller Labs A21 Zoo Lab Restricted",
                       "seats": 25,
-                      "seatsAvailable": 17,
+                      "seatsAvailable": 16,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX15",
