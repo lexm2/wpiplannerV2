@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 12, 2026, 8:52 PM",
+  "generated": "Apr 12, 2026, 9:30 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -23352,7 +23352,7 @@
                 "crn": 350319,
                 "number": "FL01",
                 "seats": 30,
-                "seatsAvailable": 21,
+                "seatsAvailable": 22,
                 "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5280",
@@ -23369,7 +23369,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 21,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "FL01",
@@ -23384,7 +23384,7 @@
                   "crn": 350321,
                   "number": "FX01",
                   "seats": 30,
-                  "seatsAvailable": 21,
+                  "seatsAvailable": 22,
                   "actualWaitlist": 1,
                   "maxWaitlist": 20,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5280",
@@ -23401,7 +23401,7 @@
                       "building": "",
                       "room": "Unknown",
                       "seats": 30,
-                      "seatsAvailable": 21,
+                      "seatsAvailable": 22,
                       "actualWaitlist": 1,
                       "maxWaitlist": 20,
                       "specificSection": "FX01",
