@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 12, 2026, 7:42 PM",
+  "generated": "Apr 12, 2026, 8:04 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -1801,7 +1801,7 @@
                 "crn": 354935,
                 "number": "C01",
                 "seats": 50,
-                "seatsAvailable": 21,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -1818,7 +1818,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 50,
-                    "seatsAvailable": 21,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
@@ -2715,8 +2715,8 @@
                 "crn": 348978,
                 "number": "AL01",
                 "seats": 24,
-                "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "seatsAvailable": 1,
+                "actualWaitlist": 1,
                 "maxWaitlist": 4,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5074",
                 "computedTerm": "A",
@@ -2732,8 +2732,8 @@
                     "building": "",
                     "room": "Kaven Hall 202 Stats Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "seatsAvailable": 1,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 4,
                     "specificSection": "AL01",
                     "days": [
