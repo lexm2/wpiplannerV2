@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 17, 2026, 10:51 AM",
+  "generated": "Apr 17, 2026, 11:48 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -126887,7 +126887,7 @@
                 "crn": 348626,
                 "number": "AL01",
                 "seats": 120,
-                "seatsAvailable": 13,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5085",
@@ -126904,7 +126904,7 @@
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 120,
-                    "seatsAvailable": 13,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "AL01",
@@ -126923,7 +126923,7 @@
                   "crn": 348378,
                   "number": "AD01",
                   "seats": 120,
-                  "seatsAvailable": 13,
+                  "seatsAvailable": 12,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5085",
@@ -126940,7 +126940,7 @@
                       "building": "",
                       "room": "Salisbury Labs 115 Kinnicutt Hall",
                       "seats": 120,
-                      "seatsAvailable": 13,
+                      "seatsAvailable": 12,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD01",
