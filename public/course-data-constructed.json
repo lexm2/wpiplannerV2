@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 18, 2026, 4:34 PM",
+  "generated": "Apr 18, 2026, 5:21 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -145149,7 +145149,7 @@
                 "crn": 348509,
                 "number": "A08 - INQ SEM: Rhetoric and Popular Culture",
                 "seats": 12,
-                "seatsAvailable": 3,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -145166,7 +145166,7 @@
                     "building": "",
                     "room": "Salisbury Labs 226 HUA Seminar Room",
                     "seats": 12,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "A08 - INQ SEM: Rhetoric and Popular Culture",
