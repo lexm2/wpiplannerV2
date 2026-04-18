@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 18, 2026, 8:31 PM",
+  "generated": "Apr 18, 2026, 9:17 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -36102,7 +36102,7 @@
                 "crn": 352147,
                 "number": "D01",
                 "seats": 50,
-                "seatsAvailable": 20,
+                "seatsAvailable": 21,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -36119,7 +36119,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 21,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
@@ -89933,7 +89933,7 @@
                 "crn": 352161,
                 "number": "D01",
                 "seats": 60,
-                "seatsAvailable": 17,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -89950,7 +89950,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 60,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "D01",
