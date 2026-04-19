@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 19, 2026, 3:04 PM",
+  "generated": "Apr 19, 2026, 3:53 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -35225,7 +35225,7 @@
                 "crn": 350562,
                 "number": "F01 - ST: Wearable/Mobile Sensors and Systems",
                 "seats": 20,
-                "seatsAvailable": 12,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -35242,7 +35242,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 20,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01 - ST: Wearable/Mobile Sensors and Systems",
@@ -113015,7 +113015,7 @@
                 "crn": 350576,
                 "number": "F01 - ST: Wearable/Mobile Sensors and Systems",
                 "seats": 20,
-                "seatsAvailable": 12,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -113032,7 +113032,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 20,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01 - ST: Wearable/Mobile Sensors and Systems",
