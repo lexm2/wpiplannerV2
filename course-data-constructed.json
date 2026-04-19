@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 19, 2026, 2:24 PM",
+  "generated": "Apr 19, 2026, 3:04 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -97118,7 +97118,7 @@
                 "crn": 356563,
                 "number": "F02",
                 "seats": 30,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": null,
@@ -97135,7 +97135,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "F02",
@@ -100674,7 +100674,7 @@
                 "crn": 356563,
                 "number": "F02",
                 "seats": 30,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": null,
@@ -100691,7 +100691,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "F02",
