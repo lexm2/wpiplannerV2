@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 19, 2026, 10:00 AM",
+  "generated": "Apr 19, 2026, 10:58 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -160372,7 +160372,7 @@
                 "number": "D01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -160389,7 +160389,7 @@
                     "room": "Kaven Hall 203 CARS Computer Lab",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
