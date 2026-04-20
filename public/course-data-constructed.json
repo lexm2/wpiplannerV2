@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 20, 2026, 9:09 PM",
+  "generated": "Apr 20, 2026, 10:02 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -429416,7 +429416,7 @@
                 "number": "AL01",
                 "seats": 72,
                 "seatsAvailable": 1,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5094",
                 "computedTerm": "A",
@@ -429433,7 +429433,7 @@
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 72,
                     "seatsAvailable": 1,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "AL01",
                     "days": [
