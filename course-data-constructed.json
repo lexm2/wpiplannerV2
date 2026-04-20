@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 20, 2026, 10:14 AM",
+  "generated": "Apr 20, 2026, 11:43 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -429425,7 +429425,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Andre Rosendo",
                     "startTime": "12:00",
                     "endTime": "12:50",
                     "location": "Higgins Labs 218 Discovery Classroom",
@@ -429462,7 +429462,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Andre Rosendo",
                       "startTime": "08:00",
                       "endTime": "09:50",
                       "location": "Innovation Studio 103 Robotics Lab",
@@ -429494,7 +429494,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Andre Rosendo",
                       "startTime": "10:00",
                       "endTime": "11:50",
                       "location": "Innovation Studio 103 Robotics Lab",
@@ -429529,7 +429529,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Griffin Tabor",
+                    "professor": "Andre Rosendo",
                     "startTime": "15:00",
                     "endTime": "15:50",
                     "location": "Unity Hall 520",
@@ -429566,7 +429566,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Griffin Tabor",
+                      "professor": "Andre Rosendo",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Innovation Studio 103 Robotics Lab",
@@ -429598,7 +429598,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Griffin Tabor",
+                      "professor": "Andre Rosendo",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Innovation Studio 103 Robotics Lab",
@@ -429630,7 +429630,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Griffin Tabor",
+                      "professor": "Andre Rosendo",
                       "startTime": "18:00",
                       "endTime": "19:50",
                       "location": "Innovation Studio 103 Robotics Lab",
