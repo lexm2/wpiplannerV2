@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 21, 2026, 7:49 PM",
+  "generated": "Apr 21, 2026, 8:46 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -25864,7 +25864,7 @@
                   "crn": 351862,
                   "number": "DX01",
                   "seats": 25,
-                  "seatsAvailable": 15,
+                  "seatsAvailable": 14,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -25881,7 +25881,7 @@
                       "building": "",
                       "room": "Kaven Hall 203 CARS Computer Lab",
                       "seats": 25,
-                      "seatsAvailable": 15,
+                      "seatsAvailable": 14,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
@@ -25931,7 +25931,7 @@
                 "crn": 351855,
                 "number": "DL01",
                 "seats": 50,
-                "seatsAvailable": 22,
+                "seatsAvailable": 21,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -25948,7 +25948,7 @@
                     "building": "",
                     "room": "Salisbury Labs 104",
                     "seats": 50,
-                    "seatsAvailable": 22,
+                    "seatsAvailable": 21,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
@@ -26030,7 +26030,7 @@
                   "crn": 351862,
                   "number": "DX01",
                   "seats": 25,
-                  "seatsAvailable": 15,
+                  "seatsAvailable": 14,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -26047,7 +26047,7 @@
                       "building": "",
                       "room": "Kaven Hall 203 CARS Computer Lab",
                       "seats": 25,
-                      "seatsAvailable": 15,
+                      "seatsAvailable": 14,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
@@ -35992,7 +35992,7 @@
                 "number": "A01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "A",
@@ -36009,7 +36009,7 @@
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 15,
                     "specificSection": "A01",
                     "days": [
@@ -38906,6 +38906,56 @@
                     "days": [
                       "M",
                       "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "CE-303X-2026",
+          "number": "303X",
+          "name": "Virtual Design and Construction (VDC)",
+          "description": "This course is intended to give students experience in achieving goals using software. It introduces Civil Engineering students to the fundamental uses of AutoDesk software in the implementation of Virtual Design and Construction (VDC) planning. Concepts covered combine Computer Aided Drawing (CAD) and Building Information Modeling (BIM) techniques. Applion software such as AutoCAD Civil 3D, Autodesk Revit and Navisworks are used in this course. Students are required to become familiar with the software packages; specific skills taught are basic 2D drawing techniques, advanced 3D drawing and rendering techniques, basic 3D software environments, object creation and manipulation, assemblies of objects, surface and terrain modeling, building modeling, geographic and building information databases. Emphasis is given to the adaptability of this method to changes in design and to the generation of graphic design documentation. Lastly, software packages change over time, and different packages are used by different organizations. This course has an overall goal of training students in the thinking behind software, so as not to be tied to particular software but instead to be adaptable to changing circumstances. Knowledge of the subject matter in at least two Civil Engineering design courses is expected background for this course.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 351586,
+                "number": "C01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "C",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Jessica Rosewitz",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Kaven Hall 202 Stats Computer Lab",
+                    "building": "",
+                    "room": "Kaven Hall 202 Stats Computer Lab",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "C01",
+                    "days": [
+                      "T",
+                      "F"
                     ],
                     "isAsync": false
                   }
@@ -89014,7 +89064,7 @@
                 "number": "B01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "B",
@@ -89031,7 +89081,7 @@
                     "room": "Fuller Labs 320",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "B01",
                     "days": [
@@ -92475,7 +92525,7 @@
                 "crn": 350529,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 3,
                 "maxWaitlist": 20,
                 "note": null,
@@ -92492,7 +92542,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 3,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
@@ -97118,7 +97168,7 @@
                 "crn": 356563,
                 "number": "F02",
                 "seats": 30,
-                "seatsAvailable": 15,
+                "seatsAvailable": 16,
                 "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": null,
@@ -97135,7 +97185,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 15,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "F02",
@@ -98425,7 +98475,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Patricia Agupusi",
+                    "professor": "Robert Krueger",
                     "startTime": "12:00",
                     "endTime": "13:20",
                     "location": "Salisbury Labs 223A",
@@ -98547,6 +98597,56 @@
           ]
         },
         {
+          "id": "DEV-510-2026",
+          "number": "510",
+          "name": "Design Studio 1",
+          "description": "This studio course introduces students to a variety of design case studies from developing world infrastructure projects, to human computer interaction, autonomous vehicles, and others to give students an opportunity to explore and critique design processes and to develop a sense of their own approach with some depth.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 358539,
+                "number": "F01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Seminar",
+                    "professor": "Navneet Anand",
+                    "startTime": "12:00",
+                    "endTime": "13:20",
+                    "location": "Salisbury Labs 223A",
+                    "building": "",
+                    "room": "Salisbury Labs 223A",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "F01",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "DEV-510-2025",
           "number": "510",
           "name": "Design Studio 1",
@@ -98580,55 +98680,6 @@
                     "room": "Salisbury Labs 223A",
                     "seats": 20,
                     "seatsAvailable": 16,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 5,
-                    "specificSection": "S01",
-                    "days": [
-                      "T"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "DEV-510-2026",
-          "number": "510",
-          "name": "Design Studio 1",
-          "description": "This studio course introduces students to a variety of design case studies from developing world infrastructure projects, to human computer interaction, autonomous vehicles, and others to give students an opportunity to explore and critique design processes and to develop a sense of their own approach with some depth.",
-          "category": null,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": true,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 350754,
-                "number": "S01",
-                "seats": 20,
-                "seatsAvailable": 20,
-                "actualWaitlist": 0,
-                "maxWaitlist": 5,
-                "note": null,
-                "computedTerm": "S",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Seminar",
-                    "professor": "Not Assigned",
-                    "startTime": "18:00",
-                    "endTime": "20:20",
-                    "location": "Salisbury Labs 223A",
-                    "building": "",
-                    "room": "Salisbury Labs 223A",
-                    "seats": 20,
-                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
@@ -100674,7 +100725,7 @@
                 "crn": 356563,
                 "number": "F02",
                 "seats": 30,
-                "seatsAvailable": 15,
+                "seatsAvailable": 16,
                 "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": null,
@@ -100691,7 +100742,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 15,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "F02",
@@ -118303,7 +118354,7 @@
                 "crn": 358391,
                 "number": "B01",
                 "seats": 25,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -118320,7 +118371,7 @@
                     "building": "",
                     "room": "Atwater Kent 232",
                     "seats": 25,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "B01",
@@ -139994,7 +140045,7 @@
                 "crn": 351453,
                 "number": "C01 - Topics In The History Of American Science And Technology",
                 "seats": 35,
-                "seatsAvailable": 16,
+                "seatsAvailable": 17,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -140011,7 +140062,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 35,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 17,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01 - Topics In The History Of American Science And Technology",
@@ -145041,7 +145092,7 @@
                 "crn": 349157,
                 "number": "A04 - INQ SEM:  Latin America and the World",
                 "seats": 12,
-                "seatsAvailable": 6,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -145058,7 +145109,7 @@
                     "building": "",
                     "room": "Salisbury Labs 124 Conference Room",
                     "seats": 12,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "A04 - INQ SEM:  Latin America and the World",
@@ -145185,7 +145236,7 @@
                 "crn": 354594,
                 "number": "A09 - INQ SEM: Love and Dating in the Digital Age",
                 "seats": 12,
-                "seatsAvailable": 9,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -145202,7 +145253,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 12,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "A09 - INQ SEM: Love and Dating in the Digital Age",
@@ -145219,7 +145270,7 @@
             {
               "section": {
                 "crn": 354652,
-                "number": "A10 - INQ SEM: Yin Yang",
+                "number": "A10 - INQ SEM: Effortless Action",
                 "seats": 12,
                 "seatsAvailable": 11,
                 "actualWaitlist": 0,
@@ -145241,7 +145292,7 @@
                     "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "A10 - INQ SEM: Yin Yang",
+                    "specificSection": "A10 - INQ SEM: Effortless Action",
                     "days": [
                       "R"
                     ],
@@ -145689,7 +145740,7 @@
                 "crn": 349634,
                 "number": "B14 - INQ SEM HUA: Short Forms",
                 "seats": 12,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -145706,7 +145757,7 @@
                     "building": "",
                     "room": "Olin Hall 109",
                     "seats": 12,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "B14 - INQ SEM HUA: Short Forms",
@@ -453384,7 +453435,7 @@
                 "number": "D01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "D",
@@ -453401,7 +453452,7 @@
                     "room": "Recreation Center Fitness Area",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
@@ -453694,7 +453745,7 @@
                 "crn": 351353,
                 "number": "C02",
                 "seats": 20,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -453711,7 +453762,7 @@
                     "building": "",
                     "room": "Recreation Center Pool Lanes 1-3",
                     "seats": 20,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
@@ -466276,7 +466327,7 @@
                 "crn": 349955,
                 "number": "B03",
                 "seats": 25,
-                "seatsAvailable": 7,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -466293,7 +466344,7 @@
                     "building": "",
                     "room": "Recreation Center Dance",
                     "seats": 25,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B03",
