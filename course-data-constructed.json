@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 21, 2026, 10:43 AM",
+  "generated": "Apr 21, 2026, 11:45 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -431181,7 +431181,7 @@
                 "crn": 351125,
                 "number": "CL01",
                 "seats": 84,
-                "seatsAvailable": 28,
+                "seatsAvailable": 22,
                 "actualWaitlist": 6,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5384",
@@ -431198,7 +431198,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 84,
-                    "seatsAvailable": 28,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 6,
                     "maxWaitlist": 20,
                     "specificSection": "CL01",
@@ -431273,6 +431273,38 @@
                       "specificSection": "CX02",
                       "days": [
                         "W"
+                      ],
+                      "isAsync": false
+                    }
+                  ]
+                },
+                {
+                  "crn": 351010,
+                  "number": "CX03",
+                  "seats": 28,
+                  "seatsAvailable": 28,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5384",
+                  "computedTerm": "C",
+                  "isGps": false,
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lab",
+                      "professor": "Vincent Aloi",
+                      "startTime": "08:00",
+                      "endTime": "09:50",
+                      "location": "Atwater Kent 120D Robotics Lab",
+                      "building": "",
+                      "room": "Atwater Kent 120D Robotics Lab",
+                      "seats": 28,
+                      "seatsAvailable": 28,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 0,
+                      "specificSection": "CX03",
+                      "days": [
+                        "R"
                       ],
                       "isAsync": false
                     }
