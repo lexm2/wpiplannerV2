@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 22, 2026, 8:55 AM",
+  "generated": "Apr 22, 2026, 10:17 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -317436,7 +317436,7 @@
                 "number": "AL01",
                 "seats": 72,
                 "seatsAvailable": 20,
-                "actualWaitlist": 15,
+                "actualWaitlist": 14,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5047",
                 "computedTerm": "A",
@@ -317453,7 +317453,7 @@
                     "room": "Unity Hall 420",
                     "seats": 72,
                     "seatsAvailable": 20,
-                    "actualWaitlist": 15,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 15,
                     "specificSection": "AL01",
                     "days": [
