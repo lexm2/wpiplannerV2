@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 22, 2026, 11:35 AM",
+  "generated": "Apr 22, 2026, 12:43 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -38932,7 +38932,7 @@
                 "crn": 351586,
                 "number": "C01",
                 "seats": 20,
-                "seatsAvailable": 20,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -38949,7 +38949,7 @@
                     "building": "",
                     "room": "Kaven Hall 202 Stats Computer Lab",
                     "seats": 20,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "C01",
@@ -39320,7 +39320,7 @@
                 "crn": 351210,
                 "number": "C01",
                 "seats": 60,
-                "seatsAvailable": 31,
+                "seatsAvailable": 32,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -39337,7 +39337,7 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 60,
-                    "seatsAvailable": 31,
+                    "seatsAvailable": 32,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
@@ -40571,7 +40571,7 @@
                 "crn": 350988,
                 "number": "C01",
                 "seats": 40,
-                "seatsAvailable": 10,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -40588,7 +40588,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 40,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -98696,6 +98696,56 @@
           ]
         },
         {
+          "id": "DEV-520-2026",
+          "number": "520",
+          "name": "Design Studio 2",
+          "description": "This studio course is taken in E(1) term. Here students will begin to develop their own GQP or thesis projects. They will share their work with their peers in weekly feedback sessions. Faculty will act as mentors who push the students toward project and process clarity. For students traveling abroad the studio will provide an opportunity to raise and explore important cultural considerations.",
+          "category": null,
+          "minCredits": 2,
+          "maxCredits": 2,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 358540,
+                "number": "S01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Seminar",
+                    "professor": "Not Assigned",
+                    "startTime": "14:00",
+                    "endTime": "15:30",
+                    "location": "Salisbury Labs 223A",
+                    "building": "",
+                    "room": "Salisbury Labs 223A",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "S01",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "DEV-540-2025",
           "number": "540",
           "name": "Research Methods",
@@ -122251,7 +122301,7 @@
                   "crn": 351311,
                   "number": "CX03",
                   "seats": 35,
-                  "seatsAvailable": 13,
+                  "seatsAvailable": 14,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5599",
@@ -122268,7 +122318,7 @@
                       "building": "",
                       "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 13,
+                      "seatsAvailable": 14,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX03",
