@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 24, 2026, 3:49 AM",
+  "generated": "Apr 24, 2026, 6:05 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -41577,7 +41577,7 @@
                 "crn": 354249,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -41594,7 +41594,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
@@ -317971,7 +317971,7 @@
                 "number": "CL01",
                 "seats": 72,
                 "seatsAvailable": 20,
-                "actualWaitlist": 13,
+                "actualWaitlist": 14,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5377",
                 "computedTerm": "C",
@@ -317988,7 +317988,7 @@
                     "room": "Unity Hall 500",
                     "seats": 72,
                     "seatsAvailable": 20,
-                    "actualWaitlist": 13,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 15,
                     "specificSection": "CL01",
                     "days": [
