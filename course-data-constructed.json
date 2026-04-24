@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 24, 2026, 2:18 PM",
+  "generated": "Apr 24, 2026, 3:45 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -221396,7 +221396,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Burt Tilley",
+                    "professor": "Not Assigned",
                     "startTime": "11:00",
                     "endTime": "11:50",
                     "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -221432,7 +221432,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Burt Tilley",
+                      "professor": "Not Assigned",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Stratton Hall 205",
@@ -221464,7 +221464,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Burt Tilley",
+                      "professor": "Not Assigned",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 223",
@@ -266421,7 +266421,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Herman Servatius",
+                    "professor": "Ray Zirui Zhang",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Salisbury Labs 305",
@@ -305026,7 +305026,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Carly Thorp",
                       "startTime": "16:00",
                       "endTime": "16:50",
                       "location": "Kaven Hall 203 CARS Computer Lab",
