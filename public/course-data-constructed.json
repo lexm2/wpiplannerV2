@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 24, 2026, 6:05 AM",
+  "generated": "Apr 24, 2026, 8:21 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -160958,7 +160958,7 @@
                 "crn": 350322,
                 "number": "F01",
                 "seats": 20,
-                "seatsAvailable": 12,
+                "seatsAvailable": 11,
                 "actualWaitlist": 3,
                 "maxWaitlist": 20,
                 "note": null,
@@ -160975,7 +160975,7 @@
                     "building": "",
                     "room": "Kaven Hall 202 Stats Computer Lab",
                     "seats": 20,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 3,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
@@ -453978,7 +453978,7 @@
                 "crn": 351353,
                 "number": "C02",
                 "seats": 20,
-                "seatsAvailable": 4,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -453995,7 +453995,7 @@
                     "building": "",
                     "room": "Recreation Center Pool Lanes 1-3",
                     "seats": 20,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
