@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 24, 2026, 8:21 AM",
+  "generated": "Apr 24, 2026, 10:01 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8088,7 +8088,7 @@
                 "number": "B03",
                 "seats": 25,
                 "seatsAvailable": 12,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 5,
                 "note": null,
                 "computedTerm": "B",
@@ -8105,7 +8105,7 @@
                     "room": "Riley Commons",
                     "seats": 25,
                     "seatsAvailable": 12,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 5,
                     "specificSection": "B03",
                     "days": [
@@ -62770,7 +62770,7 @@
                 "number": "DL01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5408",
                 "computedTerm": "D",
@@ -62787,7 +62787,7 @@
                     "room": "Salisbury Labs 406",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
                     "days": [
@@ -86188,7 +86188,7 @@
                 "number": "D02",
                 "seats": 35,
                 "seatsAvailable": 5,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -86205,7 +86205,7 @@
                     "room": "Unity Hall 405",
                     "seats": 35,
                     "seatsAvailable": 5,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
@@ -442151,7 +442151,7 @@
                 "number": "D02",
                 "seats": 35,
                 "seatsAvailable": 5,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -442168,7 +442168,7 @@
                     "room": "Unity Hall 405",
                     "seats": 35,
                     "seatsAvailable": 5,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
