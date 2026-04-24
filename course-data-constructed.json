@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 24, 2026, 11:32 AM",
+  "generated": "Apr 24, 2026, 12:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -99188,7 +99188,7 @@
                 "crn": 352008,
                 "number": "D01",
                 "seats": 50,
-                "seatsAvailable": 38,
+                "seatsAvailable": 37,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -99205,7 +99205,7 @@
                     "building": "",
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 50,
-                    "seatsAvailable": 38,
+                    "seatsAvailable": 37,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
