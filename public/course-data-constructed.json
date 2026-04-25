@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 25, 2026, 8:33 PM",
+  "generated": "Apr 25, 2026, 9:20 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -113507,7 +113507,7 @@
                 "number": "S01",
                 "seats": 30,
                 "seatsAvailable": 26,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "S",
@@ -113524,7 +113524,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 26,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
