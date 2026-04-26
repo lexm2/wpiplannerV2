@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 26, 2026, 7:55 PM",
+  "generated": "Apr 26, 2026, 8:35 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -160755,7 +160755,7 @@
                 "crn": 357847,
                 "number": "F01",
                 "seats": 24,
-                "seatsAvailable": 14,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -160772,7 +160772,7 @@
                     "building": "",
                     "room": "Kaven Hall 203 CARS Computer Lab",
                     "seats": 24,
-                    "seatsAvailable": 14,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -452716,7 +452716,7 @@
                 "crn": 349391,
                 "number": "B01",
                 "seats": 24,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -452733,7 +452733,7 @@
                     "building": "",
                     "room": "Recreation Center All Courts 3-4",
                     "seats": 24,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
