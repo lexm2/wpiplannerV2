@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 26, 2026, 3:00 PM",
+  "generated": "Apr 26, 2026, 3:56 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -132105,7 +132105,7 @@
                 "crn": 350516,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 20,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -132122,7 +132122,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
