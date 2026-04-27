@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 27, 2026, 9:36 AM",
+  "generated": "Apr 27, 2026, 11:26 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -41932,6 +41932,53 @@
                       "W"
                     ],
                     "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "CE-580-2026",
+          "number": "580",
+          "name": "Advanced Project Management",
+          "description": "This course develops an understanding of the managerial principles and techniques used throughout a construction project as they are applied to its planning, preconstruction and construction phases. The course emphasizes the integrative challenges of the human, physical and capital resources as experienced from the owner’s point of view in the preconstruction phase of a project. Through assignments and case studies, the course reviews the complex environment of the construction industry and processes, project costing and economic evaluation, project organization, value engineering, time scheduling, contracting and risk alloon alternatives, contract administration, and cost and time control techniques. (Prerequisites: CE 3020, CE 3025, or equivalent.)",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 358821,
+                "number": "F01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Richard Gram",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "F01",
+                    "days": [],
+                    "isAsync": true
                   }
                 ]
               },
