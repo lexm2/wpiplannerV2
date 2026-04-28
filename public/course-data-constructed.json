@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 28, 2026, 10:29 AM",
+  "generated": "Apr 28, 2026, 12:11 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -3603,6 +3603,46 @@
                     "actualWaitlist": 30,
                     "maxWaitlist": 30,
                     "specificSection": "A01",
+                    "days": [
+                      "M",
+                      "T",
+                      "W",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 348963,
+                "number": "A02",
+                "seats": 60,
+                "seatsAvailable": 60,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Nikolaos Gatsonis",
+                    "startTime": "13:00",
+                    "endTime": "13:50",
+                    "location": "Atwater Kent 233",
+                    "building": "",
+                    "room": "Atwater Kent 233",
+                    "seats": 60,
+                    "seatsAvailable": 60,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
+                    "specificSection": "A02",
                     "days": [
                       "M",
                       "T",
@@ -72071,7 +72111,7 @@
                 "crn": 348968,
                 "number": "A02",
                 "seats": 18,
-                "seatsAvailable": 7,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -72088,7 +72128,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 18,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A02",
@@ -420971,8 +421011,8 @@
               "section": {
                 "crn": 356579,
                 "number": "B01",
-                "seats": 24,
-                "seatsAvailable": 1,
+                "seats": 35,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -420988,8 +421028,8 @@
                     "location": "Olin Hall 109",
                     "building": "",
                     "room": "Olin Hall 109",
-                    "seats": 24,
-                    "seatsAvailable": 1,
+                    "seats": 35,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
