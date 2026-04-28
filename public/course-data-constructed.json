@@ -1,5 +1,5 @@
 {
-  "generated": "Apr 28, 2026, 9:03 PM",
+  "generated": "Apr 28, 2026, 10:10 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -433840,7 +433840,7 @@
                 "number": "BL01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5194",
                 "computedTerm": "B",
@@ -433857,7 +433857,7 @@
                     "room": "Kaven Hall 115",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "BL01",
                     "days": [
