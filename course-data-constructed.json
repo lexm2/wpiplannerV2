@@ -1,5 +1,5 @@
 {
-  "generated": "May 1, 2026, 8:08 AM",
+  "generated": "May 1, 2026, 9:57 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -16302,7 +16302,7 @@
                 "number": "B01",
                 "seats": 140,
                 "seatsAvailable": 10,
-                "actualWaitlist": 18,
+                "actualWaitlist": 17,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "B",
@@ -16319,7 +16319,7 @@
                     "room": "Olin Hall 107",
                     "seats": 140,
                     "seatsAvailable": 10,
-                    "actualWaitlist": 18,
+                    "actualWaitlist": 17,
                     "maxWaitlist": 20,
                     "specificSection": "B01",
                     "days": [
@@ -424563,7 +424563,7 @@
                 "number": "B01",
                 "seats": 50,
                 "seatsAvailable": 20,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "B",
@@ -424580,7 +424580,7 @@
                     "room": "Salisbury Labs 305",
                     "seats": 50,
                     "seatsAvailable": 20,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [
@@ -432111,7 +432111,7 @@
                 "number": "BL01",
                 "seats": 72,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 30,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5237",
                 "computedTerm": "B",
@@ -432128,7 +432128,7 @@
                     "room": "Atwater Kent 219",
                     "seats": 72,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 30,
                     "specificSection": "BL01",
                     "days": [
