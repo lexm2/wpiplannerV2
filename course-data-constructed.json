@@ -1,5 +1,5 @@
 {
-  "generated": "May 1, 2026, 10:04 PM",
+  "generated": "May 1, 2026, 11:06 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -3583,7 +3583,7 @@
                 "number": "A01",
                 "seats": 90,
                 "seatsAvailable": 1,
-                "actualWaitlist": 11,
+                "actualWaitlist": 10,
                 "maxWaitlist": 30,
                 "note": null,
                 "computedTerm": "A",
@@ -3600,7 +3600,7 @@
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 90,
                     "seatsAvailable": 1,
-                    "actualWaitlist": 11,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 30,
                     "specificSection": "A01",
                     "days": [
@@ -454185,7 +454185,7 @@
                 "crn": 351353,
                 "number": "C02",
                 "seats": 20,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -454202,7 +454202,7 @@
                     "building": "",
                     "room": "Recreation Center Pool Lanes 1-3",
                     "seats": 20,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
