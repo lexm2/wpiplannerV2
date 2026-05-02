@@ -1,5 +1,5 @@
 {
-  "generated": "May 2, 2026, 10:10 AM",
+  "generated": "May 2, 2026, 11:05 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -161440,7 +161440,7 @@
                 "number": "F01",
                 "seats": 0,
                 "seatsAvailable": -2,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 25,
                 "note": null,
                 "computedTerm": "F",
@@ -161457,7 +161457,7 @@
                     "room": "Kaven Hall 202 Stats Computer Lab",
                     "seats": 0,
                     "seatsAvailable": -2,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 25,
                     "specificSection": "F01",
                     "days": [
@@ -315595,7 +315595,7 @@
                 "crn": 350764,
                 "number": "S01",
                 "seats": 25,
-                "seatsAvailable": 20,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -315612,7 +315612,7 @@
                     "building": "",
                     "room": "Stratton Hall 311",
                     "seats": 25,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
