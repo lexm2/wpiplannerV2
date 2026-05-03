@@ -1,5 +1,5 @@
 {
-  "generated": "May 3, 2026, 2:54 PM",
+  "generated": "May 3, 2026, 3:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -449856,7 +449856,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 15,
+                "actualWaitlist": 14,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "C",
@@ -449873,7 +449873,7 @@
                     "room": "Recreation Center Track",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 15,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
                     "days": [
@@ -453219,7 +453219,7 @@
                 "crn": 352151,
                 "number": "D03",
                 "seats": 25,
-                "seatsAvailable": 8,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -453236,7 +453236,7 @@
                     "building": "",
                     "room": "Recreation Center All Courts 3-4",
                     "seats": 25,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D03",
