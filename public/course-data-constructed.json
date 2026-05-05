@@ -1,5 +1,5 @@
 {
-  "generated": "May 5, 2026, 11:05 AM",
+  "generated": "May 5, 2026, 12:12 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4045,9 +4045,9 @@
               "section": {
                 "crn": 351266,
                 "number": "C01",
-                "seats": 80,
-                "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "seats": 90,
+                "seatsAvailable": 8,
+                "actualWaitlist": 3,
                 "maxWaitlist": 40,
                 "note": null,
                 "computedTerm": "C",
@@ -4062,9 +4062,9 @@
                     "location": "Higgins Labs 218 Discovery Classroom",
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
-                    "seats": 80,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "seats": 90,
+                    "seatsAvailable": 8,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 40,
                     "specificSection": "C01",
                     "days": [
@@ -7964,7 +7964,7 @@
                 "number": "D02",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -7981,7 +7981,7 @@
                     "room": "Riley Commons",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
@@ -343743,7 +343743,7 @@
                 "number": "D01",
                 "seats": 35,
                 "seatsAvailable": -1,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -343760,7 +343760,7 @@
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 35,
                     "seatsAvailable": -1,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
