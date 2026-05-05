@@ -1,5 +1,5 @@
 {
-  "generated": "May 5, 2026, 7:30 AM",
+  "generated": "May 5, 2026, 9:31 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -3582,8 +3582,8 @@
                 "crn": 348806,
                 "number": "A01",
                 "seats": 90,
-                "seatsAvailable": 1,
-                "actualWaitlist": 7,
+                "seatsAvailable": 8,
+                "actualWaitlist": 0,
                 "maxWaitlist": 30,
                 "note": null,
                 "computedTerm": "A",
@@ -3599,8 +3599,8 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 90,
-                    "seatsAvailable": 1,
-                    "actualWaitlist": 7,
+                    "seatsAvailable": 8,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 30,
                     "specificSection": "A01",
                     "days": [
@@ -435375,7 +435375,7 @@
                 "number": "BL01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5194",
                 "computedTerm": "B",
@@ -435392,7 +435392,7 @@
                     "room": "Kaven Hall 115",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "BL01",
                     "days": [
