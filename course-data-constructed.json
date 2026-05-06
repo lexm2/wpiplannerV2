@@ -1,5 +1,5 @@
 {
-  "generated": "May 6, 2026, 10:01 AM",
+  "generated": "May 6, 2026, 12:05 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -35318,42 +35318,6 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "F03 - ST: Medical Device Design for Global Health",
-                    "days": [
-                      "W"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 350730,
-                "number": "S01 - ST:  Lab Automation",
-                "seats": 15,
-                "seatsAvailable": 11,
-                "actualWaitlist": 0,
-                "maxWaitlist": 5,
-                "note": null,
-                "computedTerm": "S",
-                "isGps": true,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Ross Lagoy",
-                    "startTime": "18:00",
-                    "endTime": "20:50",
-                    "location": "Gateway Park 1 Room 4104",
-                    "building": "",
-                    "room": "Gateway Park 1 Room 4104",
-                    "seats": 15,
-                    "seatsAvailable": 11,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 5,
-                    "specificSection": "S01 - ST:  Lab Automation",
                     "days": [
                       "W"
                     ],
