@@ -1,5 +1,5 @@
 {
-  "generated": "May 6, 2026, 4:51 AM",
+  "generated": "May 6, 2026, 7:40 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -347193,7 +347193,7 @@
                 "crn": 350519,
                 "number": "F02",
                 "seats": 999,
-                "seatsAvailable": 996,
+                "seatsAvailable": 995,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -347210,7 +347210,7 @@
                     "building": "",
                     "room": "Alden Hall GH Great Hall",
                     "seats": 999,
-                    "seatsAvailable": 996,
+                    "seatsAvailable": 995,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "F02",
@@ -458781,7 +458781,7 @@
                 "crn": 350175,
                 "number": "F01",
                 "seats": 75,
-                "seatsAvailable": 73,
+                "seatsAvailable": 72,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -458798,7 +458798,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 75,
-                    "seatsAvailable": 73,
+                    "seatsAvailable": 72,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
