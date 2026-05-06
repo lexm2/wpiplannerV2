@@ -1,5 +1,5 @@
 {
-  "generated": "May 6, 2026, 4:24 PM",
+  "generated": "May 6, 2026, 5:58 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5142,7 +5142,7 @@
                 "crn": 348836,
                 "number": "A01",
                 "seats": 87,
-                "seatsAvailable": 59,
+                "seatsAvailable": 58,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -5159,7 +5159,7 @@
                     "building": "",
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 87,
-                    "seatsAvailable": 59,
+                    "seatsAvailable": 58,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
@@ -5214,7 +5214,7 @@
                 "crn": 349840,
                 "number": "B01",
                 "seats": 50,
-                "seatsAvailable": 21,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -5231,7 +5231,7 @@
                     "building": "",
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 50,
-                    "seatsAvailable": 21,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -5286,7 +5286,7 @@
                 "crn": 351101,
                 "number": "C01",
                 "seats": 50,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -5303,7 +5303,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 50,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -5358,7 +5358,7 @@
                 "crn": 351836,
                 "number": "D01",
                 "seats": 50,
-                "seatsAvailable": 28,
+                "seatsAvailable": 27,
                 "actualWaitlist": 0,
                 "maxWaitlist": 30,
                 "note": null,
@@ -5375,7 +5375,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 50,
-                    "seatsAvailable": 28,
+                    "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 30,
                     "specificSection": "D01",
@@ -26413,7 +26413,7 @@
                 "crn": 349483,
                 "number": "BL01",
                 "seats": 50,
-                "seatsAvailable": 10,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 50,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5230",
@@ -26430,7 +26430,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 50,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 50,
                     "specificSection": "BL01",
@@ -26450,7 +26450,7 @@
                   "crn": 349554,
                   "number": "BX01",
                   "seats": 50,
-                  "seatsAvailable": 10,
+                  "seatsAvailable": 11,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5230",
@@ -26467,7 +26467,7 @@
                       "building": "",
                       "room": "Salisbury Labs 305",
                       "seats": 50,
-                      "seatsAvailable": 10,
+                      "seatsAvailable": 11,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX01",
@@ -26485,7 +26485,7 @@
                 "crn": 351738,
                 "number": "CL01",
                 "seats": 50,
-                "seatsAvailable": 13,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 25,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5318",
@@ -26502,7 +26502,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 50,
-                    "seatsAvailable": 13,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 25,
                     "specificSection": "CL01",
@@ -26522,7 +26522,7 @@
                   "crn": 350995,
                   "number": "CX01",
                   "seats": 50,
-                  "seatsAvailable": 13,
+                  "seatsAvailable": 12,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5318",
@@ -26539,7 +26539,7 @@
                       "building": "",
                       "room": "Salisbury Labs 305",
                       "seats": 50,
-                      "seatsAvailable": 13,
+                      "seatsAvailable": 12,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX01",
@@ -37928,7 +37928,7 @@
                 "crn": 351342,
                 "number": "CL01",
                 "seats": 60,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5343",
@@ -37945,7 +37945,7 @@
                     "building": "",
                     "room": "Kaven Hall 116",
                     "seats": 60,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "CL01",
@@ -37965,7 +37965,7 @@
                   "crn": 351341,
                   "number": "CX01",
                   "seats": 60,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5343",
@@ -37982,7 +37982,7 @@
                       "building": "",
                       "room": "Kaven Hall 116",
                       "seats": 60,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX01",
@@ -38482,7 +38482,7 @@
                 "number": "B01",
                 "seats": 34,
                 "seatsAvailable": 0,
-                "actualWaitlist": 11,
+                "actualWaitlist": 12,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "B",
@@ -38499,7 +38499,7 @@
                     "room": "Olin Hall 218",
                     "seats": 34,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 11,
+                    "actualWaitlist": 12,
                     "maxWaitlist": 15,
                     "specificSection": "B01",
                     "days": [
@@ -139848,7 +139848,7 @@
                 "crn": 351529,
                 "number": "C01",
                 "seats": 35,
-                "seatsAvailable": 24,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -139865,7 +139865,7 @@
                     "building": "",
                     "room": "Stratton Hall 313",
                     "seats": 35,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -140209,7 +140209,7 @@
                 "crn": 351453,
                 "number": "C01 - Topics In The History Of American Science And Technology",
                 "seats": 35,
-                "seatsAvailable": 17,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -140226,7 +140226,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 35,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01 - Topics In The History Of American Science And Technology",
@@ -149318,7 +149318,7 @@
                 "crn": 352391,
                 "number": "D04 - PRAC IN HUA: Advanced Studies in Figure Drawing",
                 "seats": 12,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -149335,7 +149335,7 @@
                     "building": "",
                     "room": "Riley Commons",
                     "seats": 12,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D04 - PRAC IN HUA: Advanced Studies in Figure Drawing",
@@ -149353,7 +149353,7 @@
                     "building": "",
                     "room": "Riley Commons",
                     "seats": 12,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D04 - PRAC IN HUA: Advanced Studies in Figure Drawing",
@@ -149408,7 +149408,7 @@
                 "crn": 352387,
                 "number": "D06 - PRAC IN HUA: Light Art",
                 "seats": 12,
-                "seatsAvailable": 2,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -149425,7 +149425,7 @@
                     "building": "",
                     "room": "Salisbury Labs 124 Conference Room",
                     "seats": 12,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D06 - PRAC IN HUA: Light Art",
@@ -170340,8 +170340,8 @@
                     {
                       "type": "Lab",
                       "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
+                      "startTime": "11:00",
+                      "endTime": "11:50",
                       "location": "Unknown",
                       "building": "",
                       "room": "Unknown",
@@ -170350,8 +170350,10 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX12",
-                      "days": [],
-                      "isAsync": true
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
                     }
                   ]
                 },
@@ -170857,8 +170859,8 @@
                     {
                       "type": "Lab",
                       "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
+                      "startTime": "11:00",
+                      "endTime": "11:50",
                       "location": "Unknown",
                       "building": "",
                       "room": "Unknown",
@@ -170867,8 +170869,10 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX12",
-                      "days": [],
-                      "isAsync": true
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
                     }
                   ]
                 },
@@ -171342,8 +171346,8 @@
                     {
                       "type": "Lab",
                       "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
+                      "startTime": "11:00",
+                      "endTime": "11:50",
                       "location": "Unknown",
                       "building": "",
                       "room": "Unknown",
@@ -171352,8 +171356,10 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX12",
-                      "days": [],
-                      "isAsync": true
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
                     }
                   ]
                 },
@@ -171859,8 +171865,8 @@
                     {
                       "type": "Lab",
                       "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
+                      "startTime": "11:00",
+                      "endTime": "11:50",
                       "location": "Unknown",
                       "building": "",
                       "room": "Unknown",
@@ -171869,8 +171875,10 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX12",
-                      "days": [],
-                      "isAsync": true
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
                     }
                   ]
                 },
@@ -172376,8 +172384,8 @@
                     {
                       "type": "Lab",
                       "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
+                      "startTime": "11:00",
+                      "endTime": "11:50",
                       "location": "Unknown",
                       "building": "",
                       "room": "Unknown",
@@ -172386,8 +172394,10 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX12",
-                      "days": [],
-                      "isAsync": true
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
                     }
                   ]
                 },
@@ -172925,8 +172935,8 @@
                     {
                       "type": "Lab",
                       "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
+                      "startTime": "11:00",
+                      "endTime": "11:50",
                       "location": "Unknown",
                       "building": "",
                       "room": "Unknown",
@@ -172935,8 +172945,10 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX12",
-                      "days": [],
-                      "isAsync": true
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
                     }
                   ]
                 },
@@ -173444,8 +173456,8 @@
                     {
                       "type": "Lab",
                       "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
+                      "startTime": "11:00",
+                      "endTime": "11:50",
                       "location": "Unknown",
                       "building": "",
                       "room": "Unknown",
@@ -173454,8 +173466,10 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX12",
-                      "days": [],
-                      "isAsync": true
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
                     }
                   ]
                 },
@@ -173993,8 +174007,8 @@
                     {
                       "type": "Lab",
                       "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:00",
+                      "startTime": "11:00",
+                      "endTime": "11:50",
                       "location": "Unknown",
                       "building": "",
                       "room": "Unknown",
@@ -174003,8 +174017,10 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX12",
-                      "days": [],
-                      "isAsync": true
+                      "days": [
+                        "M"
+                      ],
+                      "isAsync": false
                     }
                   ]
                 },
@@ -352765,7 +352781,7 @@
                 "crn": 349474,
                 "number": "B01",
                 "seats": 50,
-                "seatsAvailable": 25,
+                "seatsAvailable": 26,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -352782,7 +352798,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 26,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -467213,7 +467229,7 @@
                 "crn": 355405,
                 "number": "B06",
                 "seats": 15,
-                "seatsAvailable": 8,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -467230,7 +467246,7 @@
                     "building": "",
                     "room": "Daniels Hall 102E",
                     "seats": 15,
-                    "seatsAvailable": 8,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B06",
