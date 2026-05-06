@@ -1,5 +1,5 @@
 {
-  "generated": "May 5, 2026, 11:32 PM",
+  "generated": "May 6, 2026, 1:16 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -25764,7 +25764,7 @@
                 "number": "BL01",
                 "seats": 50,
                 "seatsAvailable": 20,
-                "actualWaitlist": 19,
+                "actualWaitlist": 20,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5222",
                 "computedTerm": "B",
@@ -25781,7 +25781,7 @@
                     "room": "Kaven Hall 116",
                     "seats": 50,
                     "seatsAvailable": 20,
-                    "actualWaitlist": 19,
+                    "actualWaitlist": 20,
                     "maxWaitlist": 20,
                     "specificSection": "BL01",
                     "days": [
@@ -139835,7 +139835,7 @@
                 "crn": 351529,
                 "number": "C01",
                 "seats": 35,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -139852,7 +139852,7 @@
                     "building": "",
                     "room": "Stratton Hall 313",
                     "seats": 35,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
