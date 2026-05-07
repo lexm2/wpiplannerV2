@@ -1,5 +1,5 @@
 {
-  "generated": "May 7, 2026, 12:03 AM",
+  "generated": "May 7, 2026, 4:03 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -42160,7 +42160,7 @@
                 "number": "F01",
                 "seats": 30,
                 "seatsAvailable": 8,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
@@ -42177,7 +42177,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 8,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
                     "days": [],
@@ -108002,7 +108002,7 @@
                 "number": "C01",
                 "seats": 65,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "C",
@@ -108019,7 +108019,7 @@
                     "room": "Atwater Kent 233",
                     "seats": 65,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
