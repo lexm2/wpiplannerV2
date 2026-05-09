@@ -1,5 +1,5 @@
 {
-  "generated": "May 9, 2026, 9:55 AM",
+  "generated": "May 9, 2026, 10:54 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -124913,7 +124913,7 @@
                 "number": "BL01",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 15,
+                "actualWaitlist": 14,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5264",
                 "computedTerm": "B",
@@ -124930,7 +124930,7 @@
                     "room": "Unity Hall 400",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 15,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 20,
                     "specificSection": "BL01",
                     "days": [
@@ -124948,7 +124948,7 @@
                   "crn": 349515,
                   "number": "BD01",
                   "seats": 90,
-                  "seatsAvailable": 2,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5264",
@@ -124965,7 +124965,7 @@
                       "building": "",
                       "room": "Unity Hall 400",
                       "seats": 90,
-                      "seatsAvailable": 2,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD01",
