@@ -1,5 +1,5 @@
 {
-  "generated": "May 8, 2026, 11:37 PM",
+  "generated": "May 9, 2026, 1:21 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -131161,7 +131161,7 @@
                 "crn": 350569,
                 "number": "F01",
                 "seats": 50,
-                "seatsAvailable": 50,
+                "seatsAvailable": 49,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -131178,7 +131178,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seatsAvailable": 50,
+                    "seatsAvailable": 49,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -332677,7 +332677,7 @@
                 "crn": 350545,
                 "number": "F01",
                 "seats": 50,
-                "seatsAvailable": 38,
+                "seatsAvailable": 37,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -332694,7 +332694,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
-                    "seatsAvailable": 38,
+                    "seatsAvailable": 37,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "F01",
