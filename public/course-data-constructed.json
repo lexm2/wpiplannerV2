@@ -1,5 +1,5 @@
 {
-  "generated": "May 10, 2026, 9:42 PM",
+  "generated": "May 10, 2026, 10:29 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -84830,7 +84830,7 @@
                 "crn": 351375,
                 "number": "CL02",
                 "seats": 100,
-                "seatsAvailable": 86,
+                "seatsAvailable": 85,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5305",
@@ -84847,7 +84847,7 @@
                     "building": "",
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "seats": 100,
-                    "seatsAvailable": 86,
+                    "seatsAvailable": 85,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL02",
@@ -84867,7 +84867,7 @@
                   "crn": 351368,
                   "number": "CX13",
                   "seats": 25,
-                  "seatsAvailable": 21,
+                  "seatsAvailable": 20,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5305",
@@ -84884,7 +84884,7 @@
                       "building": "",
                       "room": "Atwater Kent 013 Computer Lab",
                       "seats": 25,
-                      "seatsAvailable": 21,
+                      "seatsAvailable": 20,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX13",
