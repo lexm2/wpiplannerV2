@@ -1,5 +1,5 @@
 {
-  "generated": "May 12, 2026, 10:43 PM",
+  "generated": "May 12, 2026, 11:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -95619,7 +95619,7 @@
                 "crn": 350249,
                 "number": "F01",
                 "seats": 50,
-                "seatsAvailable": 28,
+                "seatsAvailable": 27,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -95636,7 +95636,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 50,
-                    "seatsAvailable": 28,
+                    "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -101553,7 +101553,7 @@
                 "crn": 350249,
                 "number": "F01",
                 "seats": 50,
-                "seatsAvailable": 28,
+                "seatsAvailable": 27,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -101570,7 +101570,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 50,
-                    "seatsAvailable": 28,
+                    "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
