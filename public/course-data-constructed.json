@@ -1,5 +1,5 @@
 {
-  "generated": "May 13, 2026, 8:15 AM",
+  "generated": "May 13, 2026, 10:44 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -122402,7 +122402,7 @@
                 "number": "BL01",
                 "seats": 70,
                 "seatsAvailable": 29,
-                "actualWaitlist": 19,
+                "actualWaitlist": 18,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5268",
                 "computedTerm": "B",
@@ -122419,7 +122419,7 @@
                     "room": "Salisbury Labs 104",
                     "seats": 70,
                     "seatsAvailable": 29,
-                    "actualWaitlist": 19,
+                    "actualWaitlist": 18,
                     "maxWaitlist": 20,
                     "specificSection": "BL01",
                     "days": [
@@ -435646,7 +435646,7 @@
                 "number": "BL01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5194",
                 "computedTerm": "B",
@@ -435663,7 +435663,7 @@
                     "room": "Kaven Hall 115",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "BL01",
                     "days": [
