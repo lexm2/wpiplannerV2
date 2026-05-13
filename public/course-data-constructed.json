@@ -1,5 +1,5 @@
 {
-  "generated": "May 13, 2026, 10:44 AM",
+  "generated": "May 13, 2026, 12:33 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -107066,7 +107066,7 @@
                   "crn": 352001,
                   "number": "DX01",
                   "seats": 30,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5443",
@@ -107083,7 +107083,7 @@
                       "building": "",
                       "room": "Atwater Kent 113 Semi-Conductor Lab",
                       "seats": 30,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
@@ -160035,7 +160035,7 @@
                 "number": "BL01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 9,
+                "actualWaitlist": 10,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5163",
                 "computedTerm": "B",
@@ -160052,7 +160052,7 @@
                     "room": "Fuller Labs 222 IMGD Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 10,
                     "specificSection": "BL01",
                     "days": [
