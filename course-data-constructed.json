@@ -1,5 +1,5 @@
 {
-  "generated": "May 13, 2026, 10:43 PM",
+  "generated": "May 13, 2026, 11:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -103989,7 +103989,7 @@
                 "crn": 349102,
                 "number": "AL01",
                 "seats": 205,
-                "seatsAvailable": 18,
+                "seatsAvailable": 19,
                 "actualWaitlist": 6,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5101",
@@ -104006,7 +104006,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 205,
-                    "seatsAvailable": 18,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 6,
                     "maxWaitlist": 20,
                     "specificSection": "AL01",
@@ -104186,7 +104186,7 @@
                   "crn": 348665,
                   "number": "AX06",
                   "seats": 30,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5101",
@@ -104203,7 +104203,7 @@
                       "building": "",
                       "room": "Atwater Kent 113 Semi-Conductor Lab",
                       "seats": 30,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX06",
