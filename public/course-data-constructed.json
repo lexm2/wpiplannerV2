@@ -1,5 +1,5 @@
 {
-  "generated": "May 14, 2026, 1:32 AM",
+  "generated": "May 14, 2026, 5:33 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -4046,7 +4046,7 @@
                 "crn": 351266,
                 "number": "C01",
                 "seats": 90,
-                "seatsAvailable": 7,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 40,
                 "note": null,
@@ -4063,7 +4063,7 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 90,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 40,
                     "specificSection": "C01",
@@ -5780,7 +5780,7 @@
                 "number": "C01",
                 "seats": 42,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 7,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "C",
@@ -5797,7 +5797,7 @@
                     "room": "Salisbury Labs 406",
                     "seats": 42,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
