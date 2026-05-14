@@ -1,5 +1,5 @@
 {
-  "generated": "May 14, 2026, 7:05 PM",
+  "generated": "May 14, 2026, 8:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -67396,7 +67396,7 @@
                 "crn": 349543,
                 "number": "B01",
                 "seats": 30,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -67413,7 +67413,7 @@
                     "building": "",
                     "room": "Olin Hall 126",
                     "seats": 30,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -352389,7 +352389,7 @@
                 "crn": 350510,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 34,
+                "seatsAvailable": 33,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -352406,7 +352406,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seatsAvailable": 34,
+                    "seatsAvailable": 33,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
