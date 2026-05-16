@@ -1,5 +1,5 @@
 {
-  "generated": "May 16, 2026, 5:14 PM",
+  "generated": "May 16, 2026, 6:07 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -57910,7 +57910,7 @@
                 "crn": 349378,
                 "number": "BL01",
                 "seats": 120,
-                "seatsAvailable": 102,
+                "seatsAvailable": 101,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -57927,7 +57927,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 120,
-                    "seatsAvailable": 102,
+                    "seatsAvailable": 101,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "BL01",
@@ -59015,7 +59015,7 @@
                 "crn": 349345,
                 "number": "BL03",
                 "seats": 120,
-                "seatsAvailable": 106,
+                "seatsAvailable": 107,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -59032,7 +59032,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 120,
-                    "seatsAvailable": 106,
+                    "seatsAvailable": 107,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "BL03",
