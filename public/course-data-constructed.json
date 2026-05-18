@@ -1,5 +1,5 @@
 {
-  "generated": "May 18, 2026, 1:59 PM",
+  "generated": "May 18, 2026, 4:49 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8046,6 +8046,43 @@
           "lectures": [
             {
               "section": {
+                "crn": 348922,
+                "number": "A01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 12,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Robyn Thomas",
+                    "startTime": "10:00",
+                    "endTime": "11:50",
+                    "location": "Riley Commons",
+                    "building": "",
+                    "room": "Riley Commons",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 12,
+                    "specificSection": "A01",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 348919,
                 "number": "A02",
                 "seats": 25,
@@ -8070,6 +8107,43 @@
                     "actualWaitlist": 10,
                     "maxWaitlist": 12,
                     "specificSection": "A02",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 349834,
+                "number": "B01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 12,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Robyn Thomas",
+                    "startTime": "12:00",
+                    "endTime": "13:50",
+                    "location": "Riley Commons",
+                    "building": "",
+                    "room": "Riley Commons",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 12,
+                    "specificSection": "B01",
                     "days": [
                       "T",
                       "F"
@@ -8544,13 +8618,50 @@
           "id": "AR-1101-2026",
           "number": "1101",
           "name": "Digital Imaging And Computer Art",
-          "description": "This course focuses on the methods, procedures and techniques of creating and manipulating images through electronic and digital means. Students will develop an understanding of image alteration. Topics may include color theory, displays, modeling, shading, and visual perception. Recommended background: AR 1100.",
+          "description": "This course focuses on the methods, procedures and techniques of creating andmanipulating images through electronic and digital means. Students will developan understanding of image alteration. Topics may include color theory, displays,modeling, shading, and visual perception.Recommended background: AR 1100.",
           "category": 1,
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 348923,
+                "number": "A01",
+                "seats": 24,
+                "seatsAvailable": 24,
+                "actualWaitlist": 0,
+                "maxWaitlist": 12,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Roshanak Bigonah",
+                    "startTime": "08:00",
+                    "endTime": "09:50",
+                    "location": "Salisbury Labs 123 Computer Lab",
+                    "building": "",
+                    "room": "Salisbury Labs 123 Computer Lab",
+                    "seats": 24,
+                    "seatsAvailable": 24,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 12,
+                    "specificSection": "A01",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 349105,
@@ -8905,6 +9016,45 @@
                     "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357896,
+                "number": "B01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Michelle Borowski",
+                    "startTime": "14:00",
+                    "endTime": "14:50",
+                    "location": "Salisbury Labs 011",
+                    "building": "",
+                    "room": "Salisbury Labs 011",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "B01",
                     "days": [
                       "M",
                       "T",
@@ -34207,7 +34357,7 @@
                 "crn": 359412,
                 "number": "S01",
                 "seats": 25,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -34224,7 +34374,7 @@
                     "building": "",
                     "room": "Online-synchronous",
                     "seats": 25,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -36125,7 +36275,7 @@
                 "crn": 349477,
                 "number": "B01",
                 "seats": 50,
-                "seatsAvailable": 27,
+                "seatsAvailable": 26,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -36142,7 +36292,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
-                    "seatsAvailable": 27,
+                    "seatsAvailable": 26,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -38566,7 +38716,7 @@
                 "number": "B01",
                 "seats": 50,
                 "seatsAvailable": 4,
-                "actualWaitlist": 11,
+                "actualWaitlist": 9,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "B",
@@ -38583,7 +38733,7 @@
                     "room": "Salisbury Labs 411",
                     "seats": 50,
                     "seatsAvailable": 4,
-                    "actualWaitlist": 11,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 15,
                     "specificSection": "B01",
                     "days": [
@@ -67025,7 +67175,7 @@
                 "crn": 350572,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 25,
+                "seatsAvailable": 26,
                 "actualWaitlist": 3,
                 "maxWaitlist": 20,
                 "note": null,
@@ -67042,7 +67192,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 26,
                     "actualWaitlist": 3,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
@@ -86633,7 +86783,7 @@
                 "crn": 348951,
                 "number": "A01",
                 "seats": 80,
-                "seatsAvailable": 18,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -86650,7 +86800,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 80,
-                    "seatsAvailable": 18,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
@@ -89740,7 +89890,7 @@
                 "crn": 348948,
                 "number": "A01",
                 "seats": 70,
-                "seatsAvailable": 3,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -89757,7 +89907,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 70,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "A01",
@@ -90101,7 +90251,7 @@
                 "crn": 349264,
                 "number": "B01",
                 "seats": 70,
-                "seatsAvailable": 17,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -90118,7 +90268,7 @@
                     "building": "",
                     "room": "Unity Hall 420",
                     "seats": 70,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -122233,7 +122383,7 @@
                 "number": "AL01",
                 "seats": 70,
                 "seatsAvailable": 30,
-                "actualWaitlist": 14,
+                "actualWaitlist": 15,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5142",
                 "computedTerm": "A",
@@ -122250,7 +122400,7 @@
                     "room": "Washburn 229",
                     "seats": 70,
                     "seatsAvailable": 30,
-                    "actualWaitlist": 14,
+                    "actualWaitlist": 15,
                     "maxWaitlist": 15,
                     "specificSection": "AL01",
                     "days": [
@@ -135743,7 +135893,7 @@
                 "number": "A01",
                 "seats": 120,
                 "seatsAvailable": 0,
-                "actualWaitlist": 13,
+                "actualWaitlist": 12,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "A",
@@ -135760,7 +135910,7 @@
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "seats": 120,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 13,
+                    "actualWaitlist": 12,
                     "maxWaitlist": 20,
                     "specificSection": "A01",
                     "days": [
@@ -138194,6 +138344,45 @@
           "lectures": [
             {
               "section": {
+                "crn": 357703,
+                "number": "A01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Joseph Cullon",
+                    "startTime": "16:00",
+                    "endTime": "16:50",
+                    "location": "Salisbury Labs 407",
+                    "building": "",
+                    "room": "Salisbury Labs 407",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "A01",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 357723,
                 "number": "A02",
                 "seats": 25,
@@ -138233,11 +138422,89 @@
             },
             {
               "section": {
+                "crn": 357714,
+                "number": "A03",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Emily Gioielli",
+                    "startTime": "09:00",
+                    "endTime": "09:50",
+                    "location": "Washburn 323",
+                    "building": "",
+                    "room": "Washburn 323",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "A03",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357743,
+                "number": "A04",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "David Spanagel",
+                    "startTime": "10:00",
+                    "endTime": "10:50",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "A04",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 357658,
                 "number": "A05",
                 "seats": 25,
                 "seatsAvailable": 13,
-                "actualWaitlist": 9,
+                "actualWaitlist": 8,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -138254,9 +138521,48 @@
                     "room": "Higgins Labs 114",
                     "seats": 25,
                     "seatsAvailable": 13,
-                    "actualWaitlist": 9,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 10,
                     "specificSection": "A05",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357659,
+                "number": "A06",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Alexander Herbert",
+                    "startTime": "13:00",
+                    "endTime": "13:50",
+                    "location": "Stratton Hall 301",
+                    "building": "",
+                    "room": "Stratton Hall 301",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "A06",
                     "days": [
                       "M",
                       "T",
@@ -138296,6 +138602,45 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "B01",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 357764,
+                "number": "B02",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Whitney McIntosh",
+                    "startTime": "12:00",
+                    "endTime": "12:50",
+                    "location": "Washburn 323",
+                    "building": "",
+                    "room": "Washburn 323",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "B02",
                     "days": [
                       "M",
                       "T",
@@ -142297,6 +142642,45 @@
           "isGraduate": false,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 348807,
+                "number": "A01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Rebecca Moody",
+                    "startTime": "13:00",
+                    "endTime": "13:50",
+                    "location": "Washburn 323",
+                    "building": "",
+                    "room": "Washburn 323",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "A01",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 354625,
@@ -163080,6 +163464,58 @@
           ]
         },
         {
+          "id": "ISE-1800-2026",
+          "number": "1800",
+          "name": "Academic Skills for English Language Learners",
+          "description": "The goal of this course is to provide international students for whom English is not their native language the necessary skills for academic success through reading and writing assignments . Students will focus on developing vocabulary, critical reading, paragraph, and essay writing skills . Emphasis is also given to a review of English grammar through intensive written and oral practice to promote accurate and appropriate language use. Strongly recommended for first-year international non-native English speakers . Admission determined by Writing Placement or consent of the instructor.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 348905,
+                "number": "A01",
+                "seats": 15,
+                "seatsAvailable": 15,
+                "actualWaitlist": 0,
+                "maxWaitlist": 7,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Althea Danielski",
+                    "startTime": "09:00",
+                    "endTime": "09:50",
+                    "location": "Kaven Hall 115",
+                    "building": "",
+                    "room": "Kaven Hall 115",
+                    "seats": 15,
+                    "seatsAvailable": 15,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 7,
+                    "specificSection": "A01",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "ISE-1801-2025",
           "number": "1801",
           "name": "College Writing for English Language Learners",
@@ -163113,6 +163549,56 @@
                     "room": "Washburn 323",
                     "seats": 15,
                     "seatsAvailable": 2,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "B01",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "ISE-1801-2026",
+          "number": "1801",
+          "name": "College Writing for English Language Learners",
+          "description": "This course is for international students who want to develop their academic writing skills through a sequence of essay assignments, with emphasis on rhetorical and grammatical issues particular to second language learners (ESL) . Students will concentrate on producing coherent paragraphs, developing short essays in a variety of rhetorical modes, and improving mechanics (grammar and punctuation) and vocabulary usage. Both personal and academic writing assignments provide practice in the process of writing and revising work for content and form . Recommended Background: ISE 1800 or equivalent skills (determined by Writing Placement or consent of the instructor) .",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": false,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 349267,
+                "number": "B01",
+                "seats": 15,
+                "seatsAvailable": 15,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Althea Danielski",
+                    "startTime": "10:00",
+                    "endTime": "11:50",
+                    "location": "Kaven Hall 204",
+                    "building": "",
+                    "room": "Kaven Hall 204",
+                    "seats": 15,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -303263,7 +303749,7 @@
                 "crn": 352320,
                 "number": "DL01",
                 "seats": 25,
-                "seatsAvailable": 13,
+                "seatsAvailable": 14,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5415",
@@ -303280,7 +303766,7 @@
                     "building": "",
                     "room": "Stratton Hall 313",
                     "seats": 25,
-                    "seatsAvailable": 13,
+                    "seatsAvailable": 14,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
@@ -303299,7 +303785,7 @@
                   "crn": 352088,
                   "number": "DD01",
                   "seats": 25,
-                  "seatsAvailable": 13,
+                  "seatsAvailable": 14,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5415",
@@ -303316,7 +303802,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 25,
-                      "seatsAvailable": 13,
+                      "seatsAvailable": 14,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD01",
@@ -310059,7 +310545,7 @@
                 "crn": 349146,
                 "number": "AL01",
                 "seats": 35,
-                "seatsAvailable": 15,
+                "seatsAvailable": 14,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5067",
@@ -310076,7 +310562,7 @@
                     "building": "",
                     "room": "Salisbury Labs 402",
                     "seats": 35,
-                    "seatsAvailable": 15,
+                    "seatsAvailable": 14,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "AL01",
@@ -310095,7 +310581,7 @@
                   "crn": 349145,
                   "number": "AD01",
                   "seats": 35,
-                  "seatsAvailable": 15,
+                  "seatsAvailable": 14,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5067",
@@ -310112,7 +310598,7 @@
                       "building": "",
                       "room": "Salisbury Labs 402",
                       "seats": 35,
-                      "seatsAvailable": 15,
+                      "seatsAvailable": 14,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD01",
@@ -311289,7 +311775,7 @@
                 "crn": 350145,
                 "number": "BL01",
                 "seats": 25,
-                "seatsAvailable": 6,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5224",
@@ -311306,7 +311792,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 25,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "BL01",
@@ -311325,7 +311811,7 @@
                   "crn": 349835,
                   "number": "BD01",
                   "seats": 25,
-                  "seatsAvailable": 6,
+                  "seatsAvailable": 5,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5224",
@@ -311342,7 +311828,7 @@
                       "building": "",
                       "room": "Higgins Labs 154",
                       "seats": 25,
-                      "seatsAvailable": 6,
+                      "seatsAvailable": 5,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD01",
@@ -311459,7 +311945,7 @@
                 "crn": 349590,
                 "number": "BL01",
                 "seats": 35,
-                "seatsAvailable": 4,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5240",
@@ -311476,7 +311962,7 @@
                     "building": "",
                     "room": "Olin Hall 223",
                     "seats": 35,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "BL01",
@@ -311495,7 +311981,7 @@
                   "crn": 349588,
                   "number": "BD01",
                   "seats": 35,
-                  "seatsAvailable": 4,
+                  "seatsAvailable": 5,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5240",
@@ -311512,7 +311998,7 @@
                       "building": "",
                       "room": "Fuller Labs 311",
                       "seats": 35,
-                      "seatsAvailable": 4,
+                      "seatsAvailable": 5,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD01",
@@ -311782,7 +312268,7 @@
                 "crn": 349149,
                 "number": "AL01",
                 "seats": 30,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5068",
@@ -311799,7 +312285,7 @@
                     "building": "",
                     "room": "Stratton Hall 201",
                     "seats": 30,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "AL01",
@@ -311816,7 +312302,7 @@
                   "crn": 349148,
                   "number": "AD01",
                   "seats": 30,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5068",
@@ -311833,7 +312319,7 @@
                       "building": "",
                       "room": "Stratton Hall 311",
                       "seats": 30,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD01",
@@ -312090,7 +312576,7 @@
                 "crn": 349600,
                 "number": "BL01",
                 "seats": 30,
-                "seatsAvailable": 10,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5243",
@@ -312107,7 +312593,7 @@
                     "building": "",
                     "room": "Higgins Labs 114",
                     "seats": 30,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "BL01",
@@ -312124,7 +312610,7 @@
                   "crn": 349596,
                   "number": "BD01",
                   "seats": 30,
-                  "seatsAvailable": 10,
+                  "seatsAvailable": 11,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5243",
@@ -312141,7 +312627,7 @@
                       "building": "",
                       "room": "Stratton Hall 202 (new)",
                       "seats": 30,
-                      "seatsAvailable": 10,
+                      "seatsAvailable": 11,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD01",
@@ -312243,7 +312729,7 @@
                 "crn": 357885,
                 "number": "C01",
                 "seats": 25,
-                "seatsAvailable": 6,
+                "seatsAvailable": 7,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -312260,7 +312746,7 @@
                     "building": "",
                     "room": "Higgins Labs 114",
                     "seats": 25,
-                    "seatsAvailable": 6,
+                    "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -312795,7 +313281,7 @@
                 "crn": 351541,
                 "number": "C01",
                 "seats": 25,
-                "seatsAvailable": 11,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -312812,7 +313298,7 @@
                     "building": "",
                     "room": "Stratton Hall 301",
                     "seats": 25,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -313974,7 +314460,7 @@
                 "crn": 351828,
                 "number": "D01",
                 "seats": 25,
-                "seatsAvailable": 21,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -313991,7 +314477,7 @@
                     "building": "",
                     "room": "Stratton Hall 313",
                     "seats": 25,
-                    "seatsAvailable": 21,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -314578,7 +315064,7 @@
                 "crn": 355683,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 24,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -314595,7 +315081,7 @@
                     "building": "",
                     "room": "Stratton Hall 202 (new)",
                     "seats": 30,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -332196,7 +332682,7 @@
                 "crn": 350935,
                 "number": "C01",
                 "seats": 50,
-                "seatsAvailable": 28,
+                "seatsAvailable": 27,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -332213,7 +332699,7 @@
                     "building": "",
                     "room": "Innovation Studio 105 Active Learning Classroom",
                     "seats": 50,
-                    "seatsAvailable": 28,
+                    "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -342770,6 +343256,45 @@
           "lectures": [
             {
               "section": {
+                "crn": 349007,
+                "number": "A01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Lucy Caplan",
+                    "startTime": "09:00",
+                    "endTime": "09:50",
+                    "location": "Alden Hall B06 Janet Earle Room",
+                    "building": "",
+                    "room": "Alden Hall B06 Janet Earle Room",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "A01",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 349172,
                 "number": "A02",
                 "seats": 25,
@@ -343342,6 +343867,45 @@
             },
             {
               "section": {
+                "crn": 348422,
+                "number": "A02",
+                "seats": 0,
+                "seatsAvailable": 0,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mitchell Lutch",
+                    "startTime": "12:00",
+                    "endTime": "12:50",
+                    "location": "Alden Hall B06 Janet Earle Room",
+                    "building": "",
+                    "room": "Alden Hall B06 Janet Earle Room",
+                    "seats": 0,
+                    "seatsAvailable": 0,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "A02",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 348460,
                 "number": "A03",
                 "seats": 25,
@@ -343366,6 +343930,45 @@
                     "actualWaitlist": 7,
                     "maxWaitlist": 10,
                     "specificSection": "A03",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 350126,
+                "number": "B01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mitchell Lutch",
+                    "startTime": "13:00",
+                    "endTime": "13:50",
+                    "location": "Alden Hall B06 Janet Earle Room",
+                    "building": "",
+                    "room": "Alden Hall B06 Janet Earle Room",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "B01",
                     "days": [
                       "M",
                       "T",
@@ -426561,7 +427164,7 @@
                 "crn": 354466,
                 "number": "D01",
                 "seats": 45,
-                "seatsAvailable": 26,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -426578,7 +427181,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 45,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
@@ -428938,6 +429541,84 @@
             },
             {
               "section": {
+                "crn": 348889,
+                "number": "A02",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 12,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Rebecca Moody",
+                    "startTime": "09:00",
+                    "endTime": "09:50",
+                    "location": "Salisbury Labs 407",
+                    "building": "",
+                    "room": "Salisbury Labs 407",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 12,
+                    "specificSection": "A02",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 348888,
+                "number": "A03",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 12,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Esther (Stella) Rosario",
+                    "startTime": "11:00",
+                    "endTime": "11:50",
+                    "location": "Kaven Hall 115",
+                    "building": "",
+                    "room": "Kaven Hall 115",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 12,
+                    "specificSection": "A03",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 349210,
                 "number": "A04",
                 "seats": 25,
@@ -429003,6 +429684,45 @@
                     "specificSection": "A05",
                     "days": [
                       "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 349511,
+                "number": "B01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Roger Gottlieb",
+                    "startTime": "10:00",
+                    "endTime": "10:50",
+                    "location": "Washburn 323",
+                    "building": "",
+                    "room": "Washburn 323",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "B01",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
                       "F"
                     ],
                     "isAsync": false
@@ -439519,6 +440239,84 @@
             },
             {
               "section": {
+                "crn": 348889,
+                "number": "A02",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 12,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Rebecca Moody",
+                    "startTime": "09:00",
+                    "endTime": "09:50",
+                    "location": "Salisbury Labs 407",
+                    "building": "",
+                    "room": "Salisbury Labs 407",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 12,
+                    "specificSection": "A02",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 348888,
+                "number": "A03",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 12,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Esther (Stella) Rosario",
+                    "startTime": "11:00",
+                    "endTime": "11:50",
+                    "location": "Kaven Hall 115",
+                    "building": "",
+                    "room": "Kaven Hall 115",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 12,
+                    "specificSection": "A03",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 349210,
                 "number": "A04",
                 "seats": 25,
@@ -439584,6 +440382,45 @@
                     "specificSection": "A05",
                     "days": [
                       "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 349511,
+                "number": "B01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 0,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Roger Gottlieb",
+                    "startTime": "10:00",
+                    "endTime": "10:50",
+                    "location": "Washburn 323",
+                    "building": "",
+                    "room": "Washburn 323",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "specificSection": "B01",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
                       "F"
                     ],
                     "isAsync": false
@@ -444817,7 +445654,7 @@
                 "crn": 350386,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": null,
@@ -444834,7 +445671,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
@@ -445954,6 +446791,43 @@
           "isGraduate": false,
           "academicYear": 2026,
           "lectures": [
+            {
+              "section": {
+                "crn": 348751,
+                "number": "A01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 12,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Sarah Lucie",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Salisbury Labs 406",
+                    "building": "",
+                    "room": "Salisbury Labs 406",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 12,
+                    "specificSection": "A01",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
             {
               "section": {
                 "crn": 354367,
@@ -447900,6 +448774,80 @@
           "lectures": [
             {
               "section": {
+                "crn": 348423,
+                "number": "A01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Lerie M. Gabriel",
+                    "startTime": "16:00",
+                    "endTime": "17:50",
+                    "location": "Stratton Hall 202 (new)",
+                    "building": "",
+                    "room": "Stratton Hall 202 (new)",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "A01",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 354885,
+                "number": "A02",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "A",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Lerie M. Gabriel",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Washburn 323",
+                    "building": "",
+                    "room": "Washburn 323",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "A02",
+                    "days": [
+                      "M",
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
                 "crn": 349575,
                 "number": "B01",
                 "seats": 20,
@@ -447924,6 +448872,43 @@
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 349938,
+                "number": "B02",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Kevin Lewis",
+                    "startTime": "10:00",
+                    "endTime": "11:50",
+                    "location": "Kaven Hall 204",
+                    "building": "",
+                    "room": "Kaven Hall 204",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "B02",
                     "days": [
                       "T",
                       "F"
@@ -448283,6 +449268,43 @@
                     "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
+                    "days": [
+                      "T",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 349300,
+                "number": "B01",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Lerie M. Gabriel",
+                    "startTime": "14:00",
+                    "endTime": "15:50",
+                    "location": "Salisbury Labs 406",
+                    "building": "",
+                    "room": "Salisbury Labs 406",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "B01",
                     "days": [
                       "T",
                       "F"
