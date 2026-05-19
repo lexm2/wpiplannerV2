@@ -1,5 +1,5 @@
 {
-  "generated": "May 19, 2026, 6:03 AM",
+  "generated": "May 19, 2026, 10:05 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -104137,8 +104137,8 @@
                 "crn": 349102,
                 "number": "AL01",
                 "seats": 205,
-                "seatsAvailable": 23,
-                "actualWaitlist": 1,
+                "seatsAvailable": 24,
+                "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5101",
                 "computedTerm": "A",
@@ -104154,8 +104154,8 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 205,
-                    "seatsAvailable": 23,
-                    "actualWaitlist": 1,
+                    "seatsAvailable": 24,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "AL01",
                     "days": [
