@@ -1,5 +1,5 @@
 {
-  "generated": "May 20, 2026, 11:14 AM",
+  "generated": "May 20, 2026, 1:46 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -133401,7 +133401,7 @@
                 "crn": 350512,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 27,
+                "seatsAvailable": 26,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -133418,7 +133418,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 27,
+                    "seatsAvailable": 26,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -133936,6 +133936,53 @@
                     "seatsAvailable": 7,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
+                    "specificSection": "S01",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
+          "id": "FP-582-2026",
+          "number": "582",
+          "name": "Quantitative Risk Analysis",
+          "description": "FP 582: Quantitative Risk Analysis (3 credits) This course will cover fundamentals of facility siting studies (FSS), quantitative risk assessments (QRA) and mitigation techniques. The primary objectives are to provide a thorough foundation and knowledge of the inputs, methodologies and typical types of results for FSS and QRAs. It will also provide knowledge of how QRAs can be used to identify and prioritize risk mitigation strategies to make informed and effective risk mitigation decisions. This course is ideal for PSM managers, process safety engineers, facility siting coordinators / SMEs, and anyone involved in the facility siting decision making process.",
+          "category": null,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 360116,
+                "number": "S01",
+                "seats": 30,
+                "seatsAvailable": 30,
+                "actualWaitlist": 0,
+                "maxWaitlist": 20,
+                "note": null,
+                "computedTerm": "S",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Stephen Kmiotek",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 30,
+                    "seatsAvailable": 30,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 20,
                     "specificSection": "S01",
                     "days": [],
                     "isAsync": true
@@ -141126,7 +141173,7 @@
                 "crn": 357462,
                 "number": "A01 - Topics in American Political History: Parties, Polarization, and Partisanship",
                 "seats": 35,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -141143,7 +141190,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 35,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01 - Topics in American Political History: Parties, Polarization, and Partisanship",
@@ -154119,9 +154166,9 @@
                     "professor": "Not Assigned",
                     "startTime": "18:30",
                     "endTime": "20:20",
-                    "location": "Stratton Hall 313",
+                    "location": "Stratton Hall 311",
                     "building": "",
-                    "room": "Stratton Hall 313",
+                    "room": "Stratton Hall 311",
                     "seats": 30,
                     "seatsAvailable": 15,
                     "actualWaitlist": 0,
@@ -195710,17 +195757,17 @@
                     "professor": "Not Assigned",
                     "startTime": "18:00",
                     "endTime": "19:50",
-                    "location": "Atwater Kent 219",
+                    "location": "Higgins Labs 218 Discovery Classroom",
                     "building": "",
-                    "room": "Atwater Kent 219",
+                    "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 35,
                     "seatsAvailable": 35,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "BL11",
                     "days": [
-                      "T",
-                      "F"
+                      "M",
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -229858,17 +229905,17 @@
                     "professor": "Pei Ge",
                     "startTime": "18:00",
                     "endTime": "19:50",
-                    "location": "Stratton Hall 301",
+                    "location": "Stratton Hall 313",
                     "building": "",
-                    "room": "Stratton Hall 301",
+                    "room": "Stratton Hall 313",
                     "seats": 35,
                     "seatsAvailable": 35,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL01",
                     "days": [
-                      "T",
-                      "F"
+                      "M",
+                      "R"
                     ],
                     "isAsync": false
                   }
@@ -316869,6 +316916,55 @@
           ]
         },
         {
+          "id": "MA-557-2026",
+          "number": "557",
+          "name": "Graduate Seminar in Applied Mathematics",
+          "description": "This seminar introduces students to modern issues in Applied Mathematics. In the seminar, students and faculty will read and discuss survey and research papers, make and attend presentations, and participate in brainstorming sessions toward the solution of advanced mathematical problems.",
+          "category": null,
+          "minCredits": 0,
+          "maxCredits": 0,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 350444,
+                "number": "F01",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "F",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Seminar",
+                    "professor": "Not Assigned",
+                    "startTime": "11:00",
+                    "endTime": "11:50",
+                    "location": "Stratton Hall 202 (new)",
+                    "building": "",
+                    "room": "Stratton Hall 202 (new)",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "F01",
+                    "days": [
+                      "R"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "MA-559-2025",
           "number": "559",
           "name": "Statistics Graduate Seminar",
@@ -328181,7 +328277,7 @@
                 "crn": 354915,
                 "number": "C01",
                 "seats": 30,
-                "seatsAvailable": 10,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -328198,7 +328294,7 @@
                     "building": "",
                     "room": "Higgins Labs 202",
                     "seats": 30,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -328891,7 +328987,7 @@
                 "number": "C01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "C",
@@ -328908,7 +329004,7 @@
                     "room": "Higgins Labs 154",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -331266,7 +331362,7 @@
                 "number": "C01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "C",
@@ -331283,7 +331379,7 @@
                     "room": "Higgins Labs 154",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -341168,7 +341264,7 @@
                 "number": "C01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "C",
@@ -341185,7 +341281,7 @@
                     "room": "Higgins Labs 154",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -341738,7 +341834,7 @@
                 "crn": 354915,
                 "number": "C01",
                 "seats": 30,
-                "seatsAvailable": 10,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -341755,7 +341851,7 @@
                     "building": "",
                     "room": "Higgins Labs 202",
                     "seats": 30,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
