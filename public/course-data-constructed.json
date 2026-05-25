@@ -1,5 +1,5 @@
 {
-  "generated": "May 25, 2026, 7:57 PM",
+  "generated": "May 25, 2026, 9:11 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -126441,7 +126441,7 @@
                 "number": "C01",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "C",
@@ -126458,7 +126458,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
