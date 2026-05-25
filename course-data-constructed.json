@@ -1,5 +1,5 @@
 {
-  "generated": "May 25, 2026, 1:57 PM",
+  "generated": "May 25, 2026, 4:23 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -318641,7 +318641,7 @@
                 "number": "DL01",
                 "seats": 70,
                 "seatsAvailable": 20,
-                "actualWaitlist": 13,
+                "actualWaitlist": 12,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5425",
                 "computedTerm": "D",
@@ -318658,7 +318658,7 @@
                     "room": "Unity Hall 520",
                     "seats": 70,
                     "seatsAvailable": 20,
-                    "actualWaitlist": 13,
+                    "actualWaitlist": 12,
                     "maxWaitlist": 15,
                     "specificSection": "DL01",
                     "days": [
@@ -318773,7 +318773,7 @@
                   "crn": 351821,
                   "number": "DX04",
                   "seats": 18,
-                  "seatsAvailable": 5,
+                  "seatsAvailable": 4,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5425",
@@ -318790,7 +318790,7 @@
                       "building": "",
                       "room": "Washburn 107 Machine Shop",
                       "seats": 18,
-                      "seatsAvailable": 5,
+                      "seatsAvailable": 4,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX04",
