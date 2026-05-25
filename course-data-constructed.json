@@ -1,5 +1,5 @@
 {
-  "generated": "May 25, 2026, 4:23 PM",
+  "generated": "May 25, 2026, 6:07 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -3582,7 +3582,7 @@
                 "crn": 348806,
                 "number": "A01",
                 "seats": 90,
-                "seatsAvailable": 9,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 30,
                 "note": null,
@@ -3599,7 +3599,7 @@
                     "building": "",
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 90,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 30,
                     "specificSection": "A01",
@@ -315246,7 +315246,7 @@
                 "crn": 354717,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 24,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -315263,7 +315263,7 @@
                     "building": "",
                     "room": "Stratton Hall 201",
                     "seats": 30,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
