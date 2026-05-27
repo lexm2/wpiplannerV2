@@ -1,5 +1,5 @@
 {
-  "generated": "May 27, 2026, 10:35 AM",
+  "generated": "May 27, 2026, 2:01 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -96027,7 +96027,7 @@
                     "type": "Lecture",
                     "professor": "Randy Paffenroth",
                     "startTime": "14:00",
-                    "endTime": "15:50",
+                    "endTime": "15:20",
                     "location": "Olin Hall 107",
                     "building": "",
                     "room": "Olin Hall 107",
@@ -101961,7 +101961,7 @@
                     "type": "Lecture",
                     "professor": "Randy Paffenroth",
                     "startTime": "14:00",
-                    "endTime": "15:50",
+                    "endTime": "15:20",
                     "location": "Olin Hall 107",
                     "building": "",
                     "room": "Olin Hall 107",
@@ -355055,7 +355055,7 @@
                 "crn": 350775,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 26,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -355072,7 +355072,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -439273,7 +439273,7 @@
             {
               "section": {
                 "crn": 355554,
-                "number": "S01 - ST: Social AI and Social Robotics",
+                "number": "S01 - ST: LLMs for Human-Robot Interaction",
                 "seats": 20,
                 "seatsAvailable": 20,
                 "actualWaitlist": 0,
@@ -439286,19 +439286,19 @@
                   {
                     "type": "Lecture",
                     "professor": "Fiona Yuan",
-                    "startTime": "18:00",
-                    "endTime": "19:50",
-                    "location": "Higgins Labs 114",
+                    "startTime": "16:00",
+                    "endTime": "17:50",
+                    "location": "Higgins Labs 154",
                     "building": "",
-                    "room": "Higgins Labs 114",
+                    "room": "Higgins Labs 154",
                     "seats": 20,
                     "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "S01 - ST: Social AI and Social Robotics",
+                    "specificSection": "S01 - ST: LLMs for Human-Robot Interaction",
                     "days": [
-                      "T",
-                      "F"
+                      "M",
+                      "R"
                     ],
                     "isAsync": false
                   }
