@@ -1,5 +1,5 @@
 {
-  "generated": "May 28, 2026, 8:31 AM",
+  "generated": "May 28, 2026, 12:05 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -134233,7 +134233,7 @@
             {
               "section": {
                 "crn": 349110,
-                "number": "A04 - GPS: Extinctions",
+                "number": "A04 - GPS: Biodiversity, Conservation, and Human-Nature Interactions",
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
@@ -134255,7 +134255,7 @@
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "A04 - GPS: Extinctions",
+                    "specificSection": "A04 - GPS: Biodiversity, Conservation, and Human-Nature Interactions",
                     "days": [
                       "T",
                       "F"
@@ -134884,7 +134884,7 @@
             {
               "section": {
                 "crn": 350118,
-                "number": "B04 - GPS: Extinctions",
+                "number": "B04 - GPS: Biodiversity, Conservation, and Human-Nature Interactions",
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
@@ -134906,7 +134906,7 @@
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "B04 - GPS: Extinctions",
+                    "specificSection": "B04 - GPS: Biodiversity, Conservation, and Human-Nature Interactions",
                     "days": [
                       "T",
                       "F"
@@ -438694,7 +438694,7 @@
                 "crn": 350495,
                 "number": "F02",
                 "seats": 25,
-                "seatsAvailable": 20,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -438711,7 +438711,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 25,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F02",
