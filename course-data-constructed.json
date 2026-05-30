@@ -1,5 +1,5 @@
 {
-  "generated": "May 30, 2026, 8:51 PM",
+  "generated": "May 30, 2026, 9:57 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -297001,7 +297001,7 @@
                 "crn": 348740,
                 "number": "AL02",
                 "seats": 90,
-                "seatsAvailable": 34,
+                "seatsAvailable": 35,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5049",
@@ -297018,7 +297018,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 90,
-                    "seatsAvailable": 34,
+                    "seatsAvailable": 35,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "AL02",
@@ -297101,7 +297101,7 @@
                   "crn": 348397,
                   "number": "AD09",
                   "seats": 30,
-                  "seatsAvailable": 7,
+                  "seatsAvailable": 8,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5049",
@@ -297118,7 +297118,7 @@
                       "building": "",
                       "room": "Stratton Hall 202 (new)",
                       "seats": 30,
-                      "seatsAvailable": 7,
+                      "seatsAvailable": 8,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD09",
