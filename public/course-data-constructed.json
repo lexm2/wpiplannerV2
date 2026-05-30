@@ -1,5 +1,5 @@
 {
-  "generated": "May 30, 2026, 8:39 AM",
+  "generated": "May 30, 2026, 10:27 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -17268,7 +17268,7 @@
                 "crn": 348613,
                 "number": "A01",
                 "seats": 85,
-                "seatsAvailable": 31,
+                "seatsAvailable": 32,
                 "actualWaitlist": 0,
                 "maxWaitlist": 25,
                 "note": null,
@@ -17285,7 +17285,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 85,
-                    "seatsAvailable": 31,
+                    "seatsAvailable": 32,
                     "actualWaitlist": 0,
                     "maxWaitlist": 25,
                     "specificSection": "A01",
@@ -18235,7 +18235,7 @@
                 "number": "A01",
                 "seats": 60,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "A",
@@ -18252,7 +18252,7 @@
                     "room": "Salisbury Labs 411",
                     "seats": 60,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "A01",
                     "days": [
