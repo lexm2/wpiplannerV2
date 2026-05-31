@@ -1,5 +1,5 @@
 {
-  "generated": "May 31, 2026, 4:35 PM",
+  "generated": "May 31, 2026, 5:43 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -453376,7 +453376,7 @@
                 "crn": 349392,
                 "number": "B02",
                 "seats": 30,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -453393,7 +453393,7 @@
                     "building": "",
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B02",
@@ -460903,7 +460903,7 @@
                 "crn": 350191,
                 "number": "F01",
                 "seats": 40,
-                "seatsAvailable": 33,
+                "seatsAvailable": 32,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -460920,7 +460920,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 40,
-                    "seatsAvailable": 33,
+                    "seatsAvailable": 32,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
