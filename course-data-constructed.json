@@ -1,5 +1,5 @@
 {
-  "generated": "May 31, 2026, 10:15 PM",
+  "generated": "May 31, 2026, 11:31 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -316014,7 +316014,7 @@
                 "crn": 350764,
                 "number": "S01",
                 "seats": 25,
-                "seatsAvailable": 19,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -316031,7 +316031,7 @@
                     "building": "",
                     "room": "Stratton Hall 311",
                     "seats": 25,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -316534,7 +316534,7 @@
                 "crn": 355262,
                 "number": "S01",
                 "seats": 25,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -316551,7 +316551,7 @@
                     "building": "",
                     "room": "Stratton Hall 202 (new)",
                     "seats": 25,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
