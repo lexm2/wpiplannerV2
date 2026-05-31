@@ -1,5 +1,5 @@
 {
-  "generated": "May 31, 2026, 9:14 PM",
+  "generated": "May 31, 2026, 10:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -94197,7 +94197,7 @@
                 "crn": 350828,
                 "number": "S02",
                 "seats": 40,
-                "seatsAvailable": 29,
+                "seatsAvailable": 28,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -94214,7 +94214,7 @@
                     "building": "",
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 40,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 28,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S02",
