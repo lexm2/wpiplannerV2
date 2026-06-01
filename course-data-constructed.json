@@ -1,5 +1,5 @@
 {
-  "generated": "May 31, 2026, 11:31 PM",
+  "generated": "Jun 1, 2026, 1:59 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -104058,7 +104058,7 @@
                 "number": "AL01",
                 "seats": 205,
                 "seatsAvailable": 24,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5101",
                 "computedTerm": "A",
@@ -104075,7 +104075,7 @@
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 205,
                     "seatsAvailable": 24,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "AL01",
                     "days": [
@@ -125129,7 +125129,7 @@
                 "number": "BL01",
                 "seats": 90,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 11,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5264",
                 "computedTerm": "B",
@@ -125146,7 +125146,7 @@
                     "room": "Unity Hall 400",
                     "seats": 90,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 11,
                     "maxWaitlist": 20,
                     "specificSection": "BL01",
                     "days": [
@@ -135860,7 +135860,7 @@
                 "number": "A01",
                 "seats": 120,
                 "seatsAvailable": 0,
-                "actualWaitlist": 12,
+                "actualWaitlist": 11,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "A",
@@ -135877,7 +135877,7 @@
                     "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                     "seats": 120,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 12,
+                    "actualWaitlist": 11,
                     "maxWaitlist": 20,
                     "specificSection": "A01",
                     "days": [
