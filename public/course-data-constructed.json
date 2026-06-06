@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 6, 2026, 12:02 AM",
+  "generated": "Jun 6, 2026, 4:18 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -126369,7 +126369,7 @@
                 "number": "A01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 24,
+                "actualWaitlist": 23,
                 "maxWaitlist": 40,
                 "note": null,
                 "computedTerm": "A",
@@ -126386,7 +126386,7 @@
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 24,
+                    "actualWaitlist": 23,
                     "maxWaitlist": 40,
                     "specificSection": "A01",
                     "days": [
@@ -141193,7 +141193,7 @@
                 "crn": 349151,
                 "number": "A01 - Topics in Gender and History: Women & Communism",
                 "seats": 20,
-                "seatsAvailable": 7,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -141210,7 +141210,7 @@
                     "building": "",
                     "room": "Salisbury Labs 407",
                     "seats": 20,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01 - Topics in Gender and History: Women & Communism",
