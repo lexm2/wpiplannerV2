@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 6, 2026, 2:15 PM",
+  "generated": "Jun 6, 2026, 3:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -23044,7 +23044,7 @@
                 "crn": 350473,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 15,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -23061,7 +23061,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 15,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
@@ -24413,7 +24413,7 @@
                 "crn": 350244,
                 "number": "F01",
                 "seats": 15,
-                "seatsAvailable": 4,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 2,
                 "note": null,
@@ -24430,7 +24430,7 @@
                     "building": "",
                     "room": "Gateway Park 1 Room 4104",
                     "seats": 15,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 2,
                     "specificSection": "F01",
