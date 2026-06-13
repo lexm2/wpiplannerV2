@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 13, 2026, 4:03 PM",
+  "generated": "Jun 13, 2026, 5:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -155505,7 +155505,7 @@
                 "crn": 350388,
                 "number": "F01",
                 "seats": 28,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -155522,7 +155522,7 @@
                     "building": "",
                     "room": "Stratton Hall 311",
                     "seats": 28,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -453724,7 +453724,7 @@
                 "crn": 349398,
                 "number": "B04",
                 "seats": 25,
-                "seatsAvailable": 21,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -453741,7 +453741,7 @@
                     "building": "",
                     "room": "Recreation Center All Courts 3-4",
                     "seats": 25,
-                    "seatsAvailable": 21,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B04",
