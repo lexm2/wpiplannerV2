@@ -1,6 +1,8 @@
 import { TutorialService } from './TutorialService';
 import { TutorialStateMachine } from './TutorialStateMachine';
 import { FloatingTextBox } from '../../ui/components/FloatingTextBox';
+import { appState } from '../../core/state/appState.svelte';
+import { watch } from '../../svelte/reactivity.svelte';
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import type { MainController } from '../../ui/controllers/MainController';
 
@@ -81,9 +83,9 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         services.courseDataService.filterDepartments(d => d.abbreviation !== 'TUT');
     }
 
-    services.scheduleManagementService.onActiveScheduleChange((activeSchedule) => {
+    watch(() => appState.activeScheduleId, () => {
         if (cleaningUp || !tutorialScheduleId) return;
-        if (activeSchedule?.id !== tutorialScheduleId) {
+        if (appState.activeScheduleId !== tutorialScheduleId) {
             tutorialService.cancel();
             cleaningUp = true;
             cleanupTutorial(true).finally(() => { cleaningUp = false; });

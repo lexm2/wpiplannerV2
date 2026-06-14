@@ -5,6 +5,8 @@ import { BaseModal } from './BaseModal';
 import { ChangelogModal } from './ChangelogModal';
 import { TutorialsModal } from './TutorialsModal';
 import { getInlineSVG } from '../../utils/iconPaths';
+import { appState } from '../../core/state/appState.svelte';
+import { watch } from '../../svelte/reactivity.svelte';
 import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
 import styles from '../../styles/components/schedule-picker-modal.module.css';
 
@@ -33,11 +35,11 @@ export class SchedulePickerModal extends BaseModal {
         this.changelogModal = new ChangelogModal(modalService, uiStateManager);
         if (tutorial) this.tutorialsModal = new TutorialsModal(modalService, tutorial, uiStateManager);
 
-        this.scheduleManagementService.onActiveScheduleChange(() => {
-            if (this.modalElement) {
-                this.updateScheduleList();
-            }
-        });
+        // Re-render the schedule list (when open) on schedule (re)activation or
+        // any selection change — read straight from the runes.
+        const refreshIfOpen = () => { if (this.modalElement) this.updateScheduleList(); };
+        watch(() => appState.activationGeneration, refreshIfOpen);
+        watch(() => appState.selectedById, refreshIfOpen);
     }
 
     async show(): Promise<void> {
@@ -56,7 +58,6 @@ export class SchedulePickerModal extends BaseModal {
 
         setTimeout(() => {
             this.updateScheduleList();
-            this.setupCourseSelectionListener();
             const container = this.modalElement?.querySelector('.modal-pages-container') as HTMLElement;
             if (container) container.scrollLeft = 0;
         }, 0);
@@ -583,14 +584,6 @@ export class SchedulePickerModal extends BaseModal {
                     t.classList.toggle('active', (t as HTMLElement).dataset.tab === tabName);
                 });
             });
-        });
-    }
-
-    private setupCourseSelectionListener(): void {
-        this.scheduleManagementService.getCourseSelectionService().onSelectionChange(() => {
-            if (this.modalElement) {
-                this.updateScheduleList();
-            }
         });
     }
 

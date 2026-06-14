@@ -20,6 +20,7 @@ import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoSchedule
 import { AppBootstrap } from '../../bootstrap/AppBootstrap'
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer'
 import { watch } from '../../svelte/reactivity.svelte'
+import { appState } from '../../core/state/appState.svelte'
 import type { ModalService } from '../../services/ui/ModalService'
 import type { SelectionSnapshot } from '../../types/scheduling'
 
@@ -1118,12 +1119,13 @@ export class MainController {
     private previousSelectedCoursesMap = new Map<string, SelectionSnapshot>();
 
     private setupScheduleChangeListener(): void {
-        this.services.scheduleManagementService.onActiveScheduleChange((_activeSchedule, event) => {
+        // React to active-schedule (re)activation via runes.
+        watch(() => appState.activationGeneration, () => {
             this.updateSchedulePickerButton();
 
             // Skip reloading events if this was just an exclusion change
             // (the UI already updated optimistically, no need to refetch)
-            if (event?.source === 'calendar-event-exclusion') {
+            if (appState.activationSource === 'calendar-event-exclusion') {
                 return;
             }
 
@@ -1159,112 +1161,43 @@ export class MainController {
     }
 
     private setupCourseSelectionListener(): void {
-        this.services.courseSelectionService.onSelectionChangeWithType((event) => {
-            const selectedCourses = event.selectedCourses;
-            const currentCount = selectedCourses.length;
-            const isCoursesAddedOrRemoved = currentCount !== this.previousSelectedCoursesCount;
-            
-            // Handle schedule changes and data loads with full refresh
-            const requiresFullRefresh = event.type === 'data_loaded'
-                || event.type === 'selection_cleared'
-                || event.type === 'components_cleared';
+        // Refresh incrementally whenever the selected courses change (runes).
+        watch(() => appState.selectedById, () => this.refreshSelectionUI());
+    }
 
-            if (requiresFullRefresh) {
-                this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
-                this.courseController.displaySelectedCourses();
-                this.scheduleController.displayScheduleSelectedCourses();
-                if (this.services.uiStateManager.currentPage === 'schedule') {
-                    this.scheduleController.renderScheduleGrids();
-                }
-                this.updateSelectedCoursesState(selectedCourses);
-                return;
+    private refreshSelectionUI(): void {
+        const selectedCourses = this.services.profileStateManager.getSelectedCourses();
+        const currentIds = new Set(selectedCourses.map(sc => sc.course.id));
+        const previousIds = new Set(this.previousSelectedCoursesMap.keys());
+        const onSchedule = this.services.uiStateManager.currentPage === 'schedule';
+
+        // Added / removed courses → incremental sidebar + course-list updates
+        for (const sc of selectedCourses) {
+            if (!previousIds.has(sc.course.id)) {
+                this.courseController.addSelectedCourseToSidebar(sc.course);
+                this.courseController.updateCourseUIById(sc.course.id, true);
             }
-
-            if (event.type === 'components_changed' && event.affectedCourseIds) {
-                if (!event.skipCourseSidebarUpdate) {
-                    this.courseController.refreshCourseSelectionUI(selectedCourses, this.previousSelectedCoursesMap);
-                    this.courseController.displaySelectedCourses();
-                }
-                this.scheduleController.displayScheduleSelectedCourses();
-                if (this.services.uiStateManager.currentPage === 'schedule') {
-                    // If any affected course has no sections (cleared), we can't determine
-                    // which terms were affected — fall back to full grid re-render
-                    const needsFullRefresh = event.affectedCourseIds.some(id => {
-                        const sc = selectedCourses.find(c => c.course.id === id);
-                        return sc && !sc.selectedLecture && !sc.selectedDiscussion && !sc.selectedLab;
-                    });
-                    if (needsFullRefresh) {
-                        this.scheduleController.renderScheduleGrids();
-                    } else {
-                        this.scheduleController.renderAffectedTerms(event.affectedCourseIds);
-                    }
-                }
-                this.updateSelectedCoursesState(selectedCourses);
-                return;
+        }
+        for (const id of previousIds) {
+            if (!currentIds.has(id)) {
+                this.courseController.removeSelectedCourseFromSidebar(id);
+                this.courseController.updateCourseUIById(id, false);
             }
-            
-            // Create current state map for comparison
-            const currentCoursesMap = new Map<string, SelectionSnapshot>();
-            selectedCourses.forEach(sc => {
-                currentCoursesMap.set(sc.course.id, {
-                    lecture: sc.selectedLecture?.number || null,
-                    discussion: sc.selectedDiscussion?.number || null,
-                    lab: sc.selectedLab?.number || null
-                });
-            });
+        }
 
-            if (isCoursesAddedOrRemoved) {
-                const currentIds = new Set(selectedCourses.map(sc => sc.course.id));
-                const previousIds = new Set(this.previousSelectedCoursesMap.keys());
-
-                for (const sc of selectedCourses) {
-                    if (!previousIds.has(sc.course.id)) {
-                        this.courseController.addSelectedCourseToSidebar(sc.course);
-                        this.courseController.updateCourseUIById(sc.course.id, true);
-                    }
-                }
-                for (const id of previousIds) {
-                    if (!currentIds.has(id)) {
-                        this.courseController.removeSelectedCourseFromSidebar(id);
-                        this.courseController.updateCourseUIById(id, false);
-                    }
-                }
-
-                this.scheduleController.displayScheduleSelectedCourses();
-
-                if (this.services.uiStateManager.currentPage === 'schedule') {
-                    this.scheduleController.renderScheduleGrids();
-                }
-            } else {
-                // Check if only section selections changed
-                let sectionSelectionsChanged = false;
-                for (const [courseId, currentComponents] of currentCoursesMap) {
-                    const previousComponents = this.previousSelectedCoursesMap.get(courseId);
-                    const hasChanged = !previousComponents ||
-                        previousComponents.lecture !== currentComponents.lecture ||
-                        previousComponents.discussion !== currentComponents.discussion ||
-                        previousComponents.lab !== currentComponents.lab;
-
-                    if (hasChanged) {
-                        sectionSelectionsChanged = true;
-
-                        // Update visual state for this course
-                        const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
-                        if (selectedCourse && selectedCourse.selectedLecture) {
-                            this.scheduleController.updateSectionButtonStates(selectedCourse.course, selectedCourse.selectedLecture.number);
-                        }
-                    }
-                }
-                
-                // Update schedule grids if any sections changed
-                if (sectionSelectionsChanged && this.services.uiStateManager.currentPage === 'schedule') {
-                    this.scheduleController.renderScheduleGrids();
-                }
+        // Section changes on existing courses → reflect section-button state
+        for (const sc of selectedCourses) {
+            const prev = this.previousSelectedCoursesMap.get(sc.course.id);
+            if (prev && sc.selectedLecture && prev.lecture !== sc.selectedLecture.number) {
+                this.scheduleController.updateSectionButtonStates(sc.course, sc.selectedLecture.number);
             }
-            
-            // Update tracking state
-            this.updateSelectedCoursesState(selectedCourses);
-        });
+        }
+
+        this.scheduleController.displayScheduleSelectedCourses();
+        if (onSchedule) {
+            this.scheduleController.renderScheduleGrids();
+        }
+        this.updateSelectedCoursesState(selectedCourses);
     }
 
     private updateSelectedCoursesState(selectedCourses: SelectedCourse[]): void {

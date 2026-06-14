@@ -2,8 +2,6 @@ import { Course, Department, Section } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
 import type { ComponentSelections, CourseComponentSelections } from '../../types/scheduling'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
-import { appState } from '../../core/state/appState.svelte'
-import { watch } from '../../svelte/reactivity.svelte'
 import { DataValidator } from '../../core/validation/DataValidator'
 import { Validators } from '../../utils/validators'
 
@@ -20,25 +18,14 @@ export interface CourseSelectionResult {
     warnings?: string[];
 }
 
-export interface SelectionChangeEvent {
-    type: 'course_added' | 'course_removed' | 'section_changed' | 'selection_cleared' | 'data_loaded' | 'components_changed' | 'components_cleared';
-    course?: Course;
-    section?: string | null;
-    selectedCourses: SelectedCourse[];
-    timestamp: number;
-    affectedCourseIds?: string[];
-    skipCourseSidebarUpdate?: boolean;
-}
-
-export type SelectionChangeListener = (event: SelectionChangeEvent) => void;
-
 /**
- * Course selection API with synchronous persistence, validation, and event-driven UI synchronization
+ * Course selection API with synchronous persistence and validation.
+ * Mutations flow through ProfileStateManager → appState runes; consumers react
+ * to those runes directly (no event system here).
  */
 export class CourseSelectionService {
     private profileStateManager: ProfileStateManager;
     private dataValidator: DataValidator;
-    private selectionListeners = new Set<SelectionChangeListener>();
     private isInitialized = false;
     private initializationPromise: Promise<boolean> | null = null;
 
@@ -48,8 +35,6 @@ export class CourseSelectionService {
     ) {
         this.profileStateManager = profileStateManager || ProfileStateManager.getInstance();
         this.dataValidator = dataValidator || new DataValidator();
-
-        this.setupStateManagerListeners();
     }
 
     // Initialization
@@ -125,14 +110,6 @@ export class CourseSelectionService {
             // Get updated course
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
 
-            // Emit event for UI updates
-            this.notifySelectionListeners({
-                type: 'course_added',
-                course,
-                selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now()
-            });
-
             return {
                 success: true,
                 course: selectedCourse,
@@ -161,14 +138,6 @@ export class CourseSelectionService {
 
             // Call ProfileStateManager directly - synchronous persistence
             this.profileStateManager.unselectCourse(course, 'service');
-
-            // Emit event for UI updates
-            this.notifySelectionListeners({
-                type: 'course_removed',
-                course,
-                selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now()
-            });
 
             return {
                 success: true
@@ -218,15 +187,6 @@ export class CourseSelectionService {
             // Get updated course
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
 
-            // Emit event for UI updates
-            this.notifySelectionListeners({
-                type: 'section_changed',
-                course,
-                section: sectionNumber,
-                selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now()
-            });
-
             return {
                 success: true,
                 course: selectedCourse
@@ -247,13 +207,6 @@ export class CourseSelectionService {
         try {
             // Call ProfileStateManager directly - synchronous persistence
             this.profileStateManager.clearAllSelections('service');
-
-            // Emit event for UI updates
-            this.notifySelectionListeners({
-                type: 'selection_cleared',
-                selectedCourses: [],
-                timestamp: Date.now()
-            });
 
             return { success: true };
 
@@ -280,14 +233,6 @@ export class CourseSelectionService {
             this.profileStateManager.setSelectedComponents(course, null, null, null, 'service');
 
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
-
-            this.notifySelectionListeners({
-                type: 'components_changed',
-                course,
-                affectedCourseIds: [course.id],
-                selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now()
-            });
 
             return {
                 success: true,
@@ -319,13 +264,6 @@ export class CourseSelectionService {
                         'service'
                     );
                 }
-            });
-
-            // Single listener notification
-            this.notifySelectionListeners({
-                type: 'components_cleared',
-                selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now()
             });
 
             return { success: true };
@@ -366,14 +304,6 @@ export class CourseSelectionService {
             // Get updated course
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
 
-            // Emit event for UI updates
-            this.notifySelectionListeners({
-                type: 'components_changed',
-                course,
-                selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now()
-            });
-
             return {
                 success: true,
                 course: selectedCourse
@@ -408,25 +338,6 @@ export class CourseSelectionService {
                 }
             }
 
-            const previousSelections = new Map<string, {
-                lecture: Section | null;
-                discussion: Section | null;
-                lab: Section | null;
-            }>();
-
-            for (const selection of selections) {
-                const current = this.profileStateManager.getSelectedCourses().find(
-                    sc => sc.course.id === selection.course.id
-                );
-                if (current) {
-                    previousSelections.set(selection.course.id, {
-                        lecture: current.selectedLecture,
-                        discussion: current.selectedDiscussion,
-                        lab: current.selectedLab
-                    });
-                }
-            }
-
             await this.profileStateManager.withBatch(async () => {
                 for (const selection of selections) {
                     this.profileStateManager.setSelectedComponents(
@@ -438,23 +349,6 @@ export class CourseSelectionService {
                     );
                 }
             }, skipSnapshot);
-
-            const actuallyChangedCourseIds = selections.filter(selection => {
-                const previous = previousSelections.get(selection.course.id);
-                if (!previous) return true;
-
-                return previous.lecture?.crn !== selection.lecture?.crn ||
-                       previous.discussion?.crn !== selection.discussion?.crn ||
-                       previous.lab?.crn !== selection.lab?.crn;
-            }).map(s => s.course.id);
-
-            this.notifySelectionListeners({
-                type: 'components_changed',
-                selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now(),
-                affectedCourseIds: actuallyChangedCourseIds,
-                skipCourseSidebarUpdate: skipSnapshot
-            });
 
             return {
                 success: true
@@ -535,13 +429,6 @@ export class CourseSelectionService {
 
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
 
-            this.notifySelectionListeners({
-                type: 'components_changed',
-                course,
-                selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now()
-            });
-
             return {
                 success: true,
                 course: selectedCourse
@@ -570,13 +457,6 @@ export class CourseSelectionService {
             this.profileStateManager.unlockSection(course, sectionCrn, 'service');
 
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
-
-            this.notifySelectionListeners({
-                type: 'components_changed',
-                course,
-                selectedCourses: this.profileStateManager.getSelectedCourses(),
-                timestamp: Date.now()
-            });
 
             return {
                 success: true,
@@ -654,31 +534,6 @@ export class CourseSelectionService {
         return this.getSelectedCourses().map(sc => sc.course.id);
     }
 
-    // Event handling
-    addSelectionListener(listener: SelectionChangeListener): void {
-        this.selectionListeners.add(listener);
-    }
-
-    removeSelectionListener(listener: SelectionChangeListener): void {
-        this.selectionListeners.delete(listener);
-    }
-
-    removeAllSelectionListeners(): void {
-        this.selectionListeners.clear();
-    }
-
-    // Convenience method for backward compatibility
-    onSelectionChange(callback: (selectedCourses: SelectedCourse[]) => void): void {
-        const listener: SelectionChangeListener = (event) => {
-            callback(event.selectedCourses);
-        };
-        this.addSelectionListener(listener);
-    }
-
-    // Enhanced listener that provides event type for better UI handling
-    onSelectionChangeWithType(callback: (event: SelectionChangeEvent) => void): void {
-        this.addSelectionListener(callback);
-    }
 
     // Department and section management
     setAllDepartments(departments: Department[]): void {
@@ -743,15 +598,6 @@ export class CourseSelectionService {
             
             const result = await this.profileStateManager.importData(jsonData);
             
-            if (result.success) {
-                // Notify listeners about the data change
-                this.notifySelectionListeners({
-                    type: 'data_loaded',
-                    selectedCourses: this.profileStateManager.getSelectedCourses(),
-                    timestamp: Date.now()
-                });
-            }
-
             return {
                 success: result.success,
                 error: result.error?.message
@@ -856,36 +702,6 @@ export class CourseSelectionService {
         }
     }
 
-    private setupStateManagerListeners(): void {
-        // Emit a `data_loaded` (full UI refresh) whenever the active schedule is
-        // (re)activated or data is imported — the runes equivalent of the old
-        // active_schedule_changed / imported events. Incremental selection edits
-        // are emitted directly by our own mutation methods, not here.
-        watch(
-            () => (appState.activationGeneration, appState.importGeneration),
-            () => {
-                // Preserve the old skip: calendar-exclusion changes touch no courses.
-                if (appState.activationSource === 'calendar-event-exclusion') return;
-                this.notifySelectionListeners({
-                    type: 'data_loaded',
-                    selectedCourses: this.profileStateManager.getSelectedCourses(),
-                    timestamp: Date.now(),
-                });
-            },
-        );
-    }
-
-    private notifySelectionListeners(event: SelectionChangeEvent): void {
-        this.selectionListeners.forEach(listener => {
-            try {
-                listener(event);
-            } catch (error) {
-                console.error('Error in selection change listener:', error);
-            }
-        });
-    }
-
-
     private async attemptDataRepair(): Promise<boolean> {
         try {
             const selectedCourses = this.getSelectedCourses();
@@ -915,7 +731,6 @@ export class CourseSelectionService {
         console.log('=== COURSE SELECTION SERVICE DEBUG ===');
         console.log('Initialized:', this.isInitialized);
         console.log('Selected Courses:', this.getSelectedCoursesCount());
-        console.log('Listeners:', this.selectionListeners.size);
         console.log('Has Unsaved Changes:', this.hasUnsavedChanges());
         console.log('Storage: Synchronous (Firefox-safe)');
 

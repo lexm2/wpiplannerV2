@@ -1,7 +1,5 @@
 import { Schedule, SelectedCourse } from '../../types/schedule'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
-import { appState } from '../../core/state/appState.svelte'
-import { watch } from '../../svelte/reactivity.svelte'
 import { DataValidator } from '../../core/validation/DataValidator'
 import { CourseSelectionService } from './CourseSelectionService'
 import { ICSGenerator, ICSExportOptions, ICSExportResult } from '../../utils/icsGenerator'
@@ -13,17 +11,6 @@ export interface ScheduleOperationResult {
     warnings?: string[];
     message?: string;
 }
-
-export interface ScheduleChangeEvent {
-    type: 'schedule_created' | 'schedule_deleted' | 'schedule_updated' | 'schedule_activated' | 'schedules_loaded';
-    schedule?: Schedule;
-    schedules?: Schedule[];
-    timestamp: number;
-    /** Source of the event, used to identify what triggered the change */
-    source?: string;
-}
-
-export type ScheduleChangeListener = (event: ScheduleChangeEvent) => void;
 
 export interface ScheduleCreationOptions {
     id?: string;
@@ -46,7 +33,6 @@ export class ScheduleManagementService {
     private profileStateManager: ProfileStateManager;
     private courseSelectionService: CourseSelectionService;
     private dataValidator: DataValidator;
-    private scheduleListeners = new Set<ScheduleChangeListener>();
     private isInitialized = false;
     private initializationPromise: Promise<boolean> | null = null;
 
@@ -58,8 +44,6 @@ export class ScheduleManagementService {
         this.profileStateManager = profileStateManager || ProfileStateManager.getInstance();
         this.courseSelectionService = courseSelectionService || new CourseSelectionService(this.profileStateManager);
         this.dataValidator = dataValidator || new DataValidator();
-
-        this.setupStateManagerListeners();
     }
 
     // Initialization
@@ -166,13 +150,6 @@ export class ScheduleManagementService {
                 this.profileStateManager.save();
             }
 
-            // Notify listeners
-            this.notifyScheduleListeners({
-                type: 'schedule_created',
-                schedule,
-                timestamp: Date.now()
-            });
-
             return {
                 success: true,
                 schedule
@@ -227,13 +204,6 @@ export class ScheduleManagementService {
             // Activate
             this.profileStateManager.setActiveSchedule(scheduleId, 'api');
 
-            // Notify listeners
-            this.notifyScheduleListeners({
-                type: 'schedule_activated',
-                schedule,
-                timestamp: Date.now()
-            });
-
             return {
                 success: true,
                 schedule
@@ -285,13 +255,6 @@ export class ScheduleManagementService {
 
             // Get updated schedule
             const finalSchedule = this.profileStateManager.getAllSchedules().find(s => s.id === scheduleId);
-
-            // Notify listeners
-            this.notifyScheduleListeners({
-                type: 'schedule_updated',
-                schedule: finalSchedule,
-                timestamp: Date.now()
-            });
 
             return {
                 success: true,
@@ -349,13 +312,6 @@ export class ScheduleManagementService {
 
             this.profileStateManager.save();
 
-            // Notify listeners
-            this.notifyScheduleListeners({
-                type: 'schedule_created',
-                schedule: duplicatedSchedule,
-                timestamp: Date.now()
-            });
-
             return {
                 success: true,
                 schedule: duplicatedSchedule
@@ -397,13 +353,6 @@ export class ScheduleManagementService {
             this.profileStateManager.deleteSchedule(scheduleId, 'api');
 
             this.profileStateManager.save();
-
-            // Notify listeners
-            this.notifyScheduleListeners({
-                type: 'schedule_deleted',
-                schedule: scheduleToDelete,
-                timestamp: Date.now()
-            });
 
             return { success: true };
 
@@ -674,30 +623,6 @@ export class ScheduleManagementService {
         }
     }
 
-    // Event handling
-    addScheduleListener(listener: ScheduleChangeListener): void {
-        this.scheduleListeners.add(listener);
-    }
-
-    removeScheduleListener(listener: ScheduleChangeListener): void {
-        this.scheduleListeners.delete(listener);
-    }
-
-    removeAllScheduleListeners(): void {
-        this.scheduleListeners.clear();
-    }
-
-    // Convenience method for backward compatibility
-    onActiveScheduleChange(callback: (activeSchedule: Schedule | null, event?: ScheduleChangeEvent) => void): void {
-        const listener: ScheduleChangeListener = (event) => {
-            if (event.type === 'schedule_activated') {
-                callback(event.schedule || null, event);
-            }
-        };
-        this.addScheduleListener(listener);
-    }
-
-
     // Access to course selection service
     getCourseSelectionService(): CourseSelectionService {
         return this.courseSelectionService;
@@ -746,35 +671,6 @@ export class ScheduleManagementService {
         }
     }
 
-    private setupStateManagerListeners(): void {
-        // Emit `schedule_activated` whenever the active schedule is (re)activated
-        // or its metadata changes — the runes equivalent of the old
-        // active_schedule_changed event. The other schedule_* events had no
-        // consumers and were dropped. `activationSource` preserves the origin
-        // (e.g. 'calendar-event-exclusion') that consumers branch on.
-        watch(
-            () => appState.activationGeneration,
-            () => {
-                this.notifyScheduleListeners({
-                    type: 'schedule_activated',
-                    schedule: appState.activeSchedule ?? undefined,
-                    timestamp: Date.now(),
-                    source: appState.activationSource,
-                });
-            },
-        );
-    }
-
-    private notifyScheduleListeners(event: ScheduleChangeEvent): void {
-        this.scheduleListeners.forEach(listener => {
-            try {
-                listener(event);
-            } catch (error) {
-                console.error('Error in schedule change listener:', error);
-            }
-        });
-    }
-
     async initializeDefaultScheduleIfNeeded(): Promise<void> {
         const existingSchedules = this.profileStateManager.getAllSchedules();
         
@@ -819,7 +715,6 @@ export class ScheduleManagementService {
         console.log('Initialized:', this.isInitialized);
         console.log('Active Schedule ID:', this.getActiveScheduleId());
         console.log('Total Schedules:', this.getAllSchedules().length);
-        console.log('Listeners:', this.scheduleListeners.size);
         console.log('Has Unsaved Changes:', this.hasUnsavedChanges());
         
         this.profileStateManager.debugState();

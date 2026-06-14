@@ -1,5 +1,7 @@
 import { SelectedCourse } from '../../types/schedule'
 import { CourseSelectionService } from '../selection/CourseSelectionService'
+import { appState } from '../../core/state/appState.svelte'
+import { watch } from '../../svelte/reactivity.svelte'
 
 const DEFAULT_COLORS = [
     '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336',
@@ -17,12 +19,13 @@ export class CourseColorService {
     }
 
     private setupColorManagement(): void {
-        this.courseSelectionService.addSelectionListener((event) => {
-            if (event.type === 'course_removed' && event.course) {
-                this.releaseCourseColor(event.course.id);
-            } else if (event.type === 'selection_cleared' || event.type === 'data_loaded') {
-                this.courseColorMap.clear();
-                this.usedColors.clear();
+        // Release colors for courses that are no longer selected (runes).
+        watch(() => appState.selectedById, () => {
+            const selectedIds = new Set(appState.selectedCourses.map(sc => sc.course.id));
+            for (const courseId of [...this.courseColorMap.keys()]) {
+                if (!selectedIds.has(courseId)) {
+                    this.releaseCourseColor(courseId);
+                }
             }
         });
     }

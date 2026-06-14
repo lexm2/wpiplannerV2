@@ -3,6 +3,8 @@ import type { AutoScheduleSettings, WeeklyTimeSlot } from '../../types/schedule'
 import type { CourseComponentSelections } from '../../types/scheduling'
 import { CourseSelectionService } from '../selection/CourseSelectionService'
 import { FilterService } from '../filtering/FilterService'
+import { appState } from '../../core/state/appState.svelte'
+import { watch } from '../../svelte/reactivity.svelte'
 import type { ScheduleResult } from './AutoScheduler'
 import { SmartScheduler } from './SmartScheduler'
 import { ScheduleWorkerManager } from '../../workers/ScheduleWorkerManager'
@@ -43,7 +45,8 @@ export class AutoScheduleOrchestrator {
     }
 
     setupCourseSelectionChangeListener(): void {
-        this.courseSelectionService.onSelectionChange(() => {
+        // Invalidate generated schedules whenever the selection changes (runes).
+        watch(() => appState.selectedById, () => {
             if (this.isApplyingAutoSchedule) return;
             this.generatedSchedules = [];
             this.currentScheduleIndex = 0;
