@@ -22,6 +22,19 @@ class AppState {
     lastSaved = $state(0);
     hasUnsavedChanges = $state(false);
 
+    /**
+     * Bumped whenever the active schedule is (re)activated or its metadata
+     * changes — i.e. the old `active_schedule_changed` trigger. Vanilla
+     * consumers `watch` this to refresh. `activationSource` carries the
+     * originating source (e.g. 'calendar-event-exclusion') so consumers can
+     * preserve source-specific behavior.
+     */
+    activationGeneration = $state(0);
+    activationSource = $state('user');
+
+    /** Bumped after a successful data import (the old 'imported' trigger). */
+    importGeneration = $state(0);
+
     /** The active schedule object (new identity whenever it or its id changes). */
     activeSchedule = $derived(
         this.schedules.find(s => s.id === this.activeScheduleId) ?? null

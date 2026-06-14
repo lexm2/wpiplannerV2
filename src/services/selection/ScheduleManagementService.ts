@@ -1,5 +1,7 @@
 import { Schedule, SelectedCourse } from '../../types/schedule'
-import { ProfileStateManager, StateChangeEvent, StateChangeListener, ScheduleChangedData, ActiveScheduleChangedData, SaveStateChangedData } from '../../core/state/ProfileStateManager'
+import { ProfileStateManager } from '../../core/state/ProfileStateManager'
+import { appState } from '../../core/state/appState.svelte'
+import { watch } from '../../svelte/reactivity.svelte'
 import { DataValidator } from '../../core/validation/DataValidator'
 import { CourseSelectionService } from './CourseSelectionService'
 import { ICSGenerator, ICSExportOptions, ICSExportResult } from '../../utils/icsGenerator'
@@ -695,16 +697,6 @@ export class ScheduleManagementService {
         this.addScheduleListener(listener);
     }
 
-    // Convenience method for save state changes
-    onSaveStateChange(callback: (hasUnsavedChanges: boolean) => void): void {
-        const stateListener = (event: StateChangeEvent) => {
-            if (event.type === 'save_state_changed') {
-                const data = event.data as SaveStateChangedData;
-                callback(data.hasUnsavedChanges);
-            }
-        };
-        this.profileStateManager.addListener(stateListener);
-    }
 
     // Access to course selection service
     getCourseSelectionService(): CourseSelectionService {
@@ -755,46 +747,22 @@ export class ScheduleManagementService {
     }
 
     private setupStateManagerListeners(): void {
-        const stateListener: StateChangeListener = (event: StateChangeEvent) => {
-            // Convert state events to schedule events as needed
-            switch (event.type) {
-                case 'schedule_changed': {
-                    const data = event.data as ScheduleChangedData;
-                    if (data.action === 'created') {
-                        this.notifyScheduleListeners({
-                            type: 'schedule_created',
-                            schedule: data.schedule,
-                            timestamp: event.timestamp
-                        });
-                    } else if (data.action === 'deleted') {
-                        this.notifyScheduleListeners({
-                            type: 'schedule_deleted',
-                            schedule: data.schedule,
-                            timestamp: event.timestamp
-                        });
-                    } else if (data.action === 'updated') {
-                        this.notifyScheduleListeners({
-                            type: 'schedule_updated',
-                            schedule: data.schedule,
-                            timestamp: event.timestamp
-                        });
-                    }
-                    break;
-                }
-                case 'active_schedule_changed': {
-                    const data = event.data as ActiveScheduleChangedData;
-                    this.notifyScheduleListeners({
-                        type: 'schedule_activated',
-                        schedule: data.schedule,
-                        timestamp: event.timestamp,
-                        source: event.source
-                    });
-                    break;
-                }
-            }
-        };
-
-        this.profileStateManager.addListener(stateListener);
+        // Emit `schedule_activated` whenever the active schedule is (re)activated
+        // or its metadata changes — the runes equivalent of the old
+        // active_schedule_changed event. The other schedule_* events had no
+        // consumers and were dropped. `activationSource` preserves the origin
+        // (e.g. 'calendar-event-exclusion') that consumers branch on.
+        watch(
+            () => appState.activationGeneration,
+            () => {
+                this.notifyScheduleListeners({
+                    type: 'schedule_activated',
+                    schedule: appState.activeSchedule ?? undefined,
+                    timestamp: Date.now(),
+                    source: appState.activationSource,
+                });
+            },
+        );
     }
 
     private notifyScheduleListeners(event: ScheduleChangeEvent): void {

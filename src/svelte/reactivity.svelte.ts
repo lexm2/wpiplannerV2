@@ -1,3 +1,5 @@
+import { untrack } from 'svelte';
+
 /**
  * Migration bridge primitive — pure Svelte reactivity, not a custom event system.
  *
@@ -44,7 +46,10 @@ export function watch(deps: () => unknown, run: () => void): () => void {
                 first = false;
                 return;
             }
-            run();
+            // Run as a side-effect: untrack so reactive reads/writes inside
+            // `run` (e.g. mutating another store) don't become dependencies of
+            // this effect — otherwise a write in `run` could re-trigger it.
+            untrack(run);
         });
     });
 }

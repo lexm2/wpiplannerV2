@@ -9,56 +9,6 @@ import { appState } from './appState.svelte'
 import { TermBoundsService } from '../../utils/termBounds'
 import { ModalService } from '../../services/ui'
 
-export interface ScheduleChangedData {
-    schedule?: Schedule;
-    action: 'created' | 'updated' | 'deleted' | 'duplicated' | 'imported';
-}
-
-export interface ActiveScheduleChangedData {
-    schedule: Schedule;
-}
-
-export interface CoursesChangedData {
-    course?: Course;
-    action: string;
-    isRequired?: boolean;
-    sectionNumber?: string | null;
-    sectionCrn?: string;
-    schedule?: Schedule;
-    affectedCourseIds?: string[];
-    skipCourseSidebarUpdate?: boolean;
-    lecture?: string;
-    discussion?: string;
-    lab?: string;
-    courseId?: string;
-    color?: string;
-}
-
-export interface PreferencesChangedData {
-    preferences?: SchedulePreferences;
-    bookmarkedCourseIds?: string[];
-    courseId?: string;
-    bookmarked?: boolean;
-}
-
-export interface SaveStateChangedData {
-    hasUnsavedChanges: boolean;
-}
-
-export type StateChangeEventData =
-    | ScheduleChangedData
-    | ActiveScheduleChangedData
-    | CoursesChangedData
-    | PreferencesChangedData
-    | SaveStateChangedData;
-
-export interface StateChangeEvent {
-    type: 'schedule_changed' | 'courses_changed' | 'preferences_changed' | 'active_schedule_changed' | 'save_state_changed';
-    data: StateChangeEventData;
-    timestamp: number;
-    source: string;
-}
-
 export interface ProfileState {
     activeScheduleId: string | null;
     schedules: Schedule[];
@@ -69,18 +19,13 @@ export interface ProfileState {
     hasUnsavedChanges: boolean;
 }
 
-export type StateChangeListener = (event: StateChangeEvent, state: ProfileState) => void;
-
 /**
  * Single source of truth for application state with synchronous persistence and event-driven updates
  */
 export class ProfileStateManager {
     private static instance: ProfileStateManager | null = null;
-    private listeners = new Set<StateChangeListener>();
     private storageManager: TransactionalStorageManager;
     private isLoadingFlag = false;
-    private eventQueue: StateChangeEvent[] = [];
-    private processingQueue = false;
     private allDepartments: Department[] = [];
     private undoRedoManager: UndoRedoManager;
     private isRestoringState = false;
@@ -140,7 +85,6 @@ export class ProfileStateManager {
         if (this.beforeUnloadHandler && typeof window !== 'undefined') {
             window.removeEventListener('beforeunload', this.beforeUnloadHandler);
         }
-        this.removeAllListeners();
     }
 
     setCourseData(departments: Department[]): void {
@@ -235,7 +179,6 @@ export class ProfileStateManager {
             }
 
             this.updateActiveScheduleWithCurrentCourses();
-            this.emitEvent('courses_changed', { course, action: 'selected', isRequired }, source);
         });
     }
 
@@ -245,7 +188,6 @@ export class ProfileStateManager {
             if (index >= 0) {
                 this.state.selectedCourses = this.state.selectedCourses.filter(sc => sc.course.id !== course.id);
                 this.updateActiveScheduleWithCurrentCourses();
-                this.emitEvent('courses_changed', { course, action: 'unselected' }, source);
             }
         });
     }
@@ -297,7 +239,6 @@ export class ProfileStateManager {
             const appliedPatch = patch;
             this.patchSelectedCourse(course.id, sc => ({ ...sc, ...appliedPatch }));
             this.updateActiveScheduleWithCurrentCourses();
-            this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
         });
     }
 
@@ -317,13 +258,6 @@ export class ProfileStateManager {
             }));
             if (found) {
                 this.updateActiveScheduleWithCurrentCourses();
-                this.emitEvent('courses_changed', {
-                    course,
-                    lecture: lecture?.number,
-                    discussion: discussion?.number,
-                    lab: lab?.number,
-                    action: 'components_changed'
-                }, source);
             }
         });
     }
@@ -332,7 +266,6 @@ export class ProfileStateManager {
         this.withStateUpdate(() => {
             this.state.selectedCourses = [];
             this.updateActiveScheduleWithCurrentCourses();
-            this.emitEvent('courses_changed', { action: 'cleared' }, source);
         });
     }
 
@@ -345,7 +278,6 @@ export class ProfileStateManager {
             });
             if (found) {
                 this.updateActiveScheduleWithCurrentCourses();
-                this.emitEvent('courses_changed', { course, sectionCrn, action: 'section_locked' }, source);
             }
         });
     }
@@ -364,7 +296,6 @@ export class ProfileStateManager {
             });
             if (changed) {
                 this.updateActiveScheduleWithCurrentCourses();
-                this.emitEvent('courses_changed', { course, sectionCrn, action: 'section_unlocked' }, source);
             }
         });
     }
@@ -374,11 +305,6 @@ export class ProfileStateManager {
             const found = this.patchSelectedCourse(courseId, sc => ({ ...sc, customColor: color }));
             if (found) {
                 this.updateActiveScheduleWithCurrentCourses();
-                this.emitEvent('courses_changed', {
-                    action: 'color_changed',
-                    courseId,
-                    color
-                }, source);
             }
         });
     }
@@ -430,7 +356,6 @@ export class ProfileStateManager {
             };
 
             this.state.schedules = [...this.state.schedules, schedule];
-            this.emitEvent('schedule_changed', { schedule, action: 'created' }, source);
             return schedule;
         });
     }
@@ -451,8 +376,7 @@ export class ProfileStateManager {
             const loadedCourses = [...schedule.selectedCourses];
             this.state.selectedCourses = this.resolveCourseReferences(loadedCourses);
 
-            this.emitEvent('active_schedule_changed', { schedule }, source);
-            this.emitEvent('courses_changed', { action: 'loaded_from_schedule', schedule }, source);
+            this.signalActivation(source);
 
             this.isLoadingFlag = false;
             return true;
@@ -468,12 +392,10 @@ export class ProfileStateManager {
             const updated = { ...this.state.schedules[index], ...updates };
             this.state.schedules = this.state.schedules.map(s => s.id === scheduleId ? updated : s);
 
-            // If this is the active schedule, emit active schedule changed event
+            // If this is the active schedule, signal reactivation
             if (scheduleId === this.state.activeScheduleId) {
-                this.emitEvent('active_schedule_changed', { schedule: updated }, source);
+                this.signalActivation(source);
             }
-
-            this.emitEvent('schedule_changed', { schedule: updated, action: 'updated' }, source);
             return true;
         };
         return isAutomated ? this.withPersistSync(update) : this.withStateUpdateSync(update);
@@ -490,7 +412,6 @@ export class ProfileStateManager {
                 return false;
             }
 
-            const deletedSchedule = this.state.schedules[scheduleIndex];
             this.state.schedules = this.state.schedules.filter(s => s.id !== scheduleId);
 
             // Remove from storage
@@ -504,10 +425,8 @@ export class ProfileStateManager {
                 const nextSchedule = this.state.schedules[0];
                 this.state.activeScheduleId = nextSchedule.id;
                 this.state.selectedCourses = [...nextSchedule.selectedCourses];
-                this.emitEvent('active_schedule_changed', { schedule: nextSchedule }, source);
+                this.signalActivation(source);
             }
-
-            this.emitEvent('schedule_changed', { schedule: deletedSchedule, action: 'deleted' }, source);
             return true;
         });
     }
@@ -530,7 +449,6 @@ export class ProfileStateManager {
             };
 
             this.state.schedules = [...this.state.schedules, duplicatedSchedule];
-            this.emitEvent('schedule_changed', { schedule: duplicatedSchedule, action: 'duplicated' }, source);
             return duplicatedSchedule;
         });
     }
@@ -539,7 +457,6 @@ export class ProfileStateManager {
     updatePreferences(updates: Partial<SchedulePreferences>, source: string = 'user'): void {
         this.withPersist(() => {
             this.state.preferences = { ...this.state.preferences, ...updates };
-            this.emitEvent('preferences_changed', { preferences: this.state.preferences }, source);
         });
     }
 
@@ -552,11 +469,6 @@ export class ProfileStateManager {
                     ...this.state.preferences,
                     bookmarkedCourseIds: [...bookmarks, courseId]
                 };
-                this.emitEvent('preferences_changed', {
-                    preferences: this.state.preferences,
-                    action: 'bookmark_added',
-                    courseId
-                }, source);
             }
         });
     }
@@ -570,11 +482,6 @@ export class ProfileStateManager {
                     ...this.state.preferences,
                     bookmarkedCourseIds: bookmarks.filter(id => id !== courseId)
                 };
-                this.emitEvent('preferences_changed', {
-                    preferences: this.state.preferences,
-                    action: 'bookmark_removed',
-                    courseId
-                }, source);
             }
         });
     }
@@ -587,19 +494,6 @@ export class ProfileStateManager {
         return [...(this.state.preferences.bookmarkedCourseIds ?? [])];
     }
 
-    // Event handling
-    addListener(listener: StateChangeListener): void {
-        this.listeners.add(listener);
-    }
-
-    removeListener(listener: StateChangeListener): void {
-        this.listeners.delete(listener);
-    }
-
-    removeAllListeners(): void {
-        this.listeners.clear();
-    }
-
     // Undo/Redo methods
     async undo(): Promise<boolean> {
         const snapshot = this.undoRedoManager.undo();
@@ -608,7 +502,6 @@ export class ProfileStateManager {
         this.isRestoringState = true;
         try {
             this.restoreFromSnapshot(snapshot);
-            this.emitEvent('courses_changed', { action: 'undo' }, 'system');
             this.save();
             return true;
         } finally {
@@ -623,7 +516,6 @@ export class ProfileStateManager {
         this.isRestoringState = true;
         try {
             this.restoreFromSnapshot(snapshot);
-            this.emitEvent('courses_changed', { action: 'redo' }, 'system');
             this.save();
             return true;
         } finally {
@@ -659,7 +551,6 @@ export class ProfileStateManager {
         try {
             const schedulesMap = new Map(data.schedules.map(s => [s.id, s]));
             this.restoreFromSnapshot({ activeScheduleId: data.activeScheduleId, schedules: schedulesMap, preferences: data.preferences });
-            this.emitEvent('courses_changed', { action: 'tutorial-restore' }, 'system');
             this.save(true);
         } finally {
             this.isRestoringState = false;
@@ -711,13 +602,8 @@ export class ProfileStateManager {
 
             this.storageManager.savePreferences(this.state.preferences);
 
-            const previousUnsavedState = this.state.hasUnsavedChanges;
             this.state.hasUnsavedChanges = false;
             this.state.lastSaved = Date.now();
-
-            if (previousUnsavedState) {
-                this.emitEvent('save_state_changed', { hasUnsavedChanges: false }, 'system');
-            }
         } catch (error) {
             logger.error('Save failed:', error);
         }
@@ -833,8 +719,8 @@ export class ProfileStateManager {
     }
 
     async exportData(): Promise<string | null> {
-        const appState = this.createApplicationState();
-        const minimalData = appState.toMinimalFormat();
+        const applicationState = this.createApplicationState();
+        const minimalData = applicationState.toMinimalFormat();
         return JSON.stringify(minimalData);
     }
 
@@ -849,20 +735,20 @@ export class ProfileStateManager {
 
     parseImportCourses(data: string): SelectedCourse[] {
         const parsed = JSON.parse(data);
-        const appState = ApplicationState.fromMinimalFormat(parsed, this.allDepartments);
-        return appState.schedules[0]?.toSchedule().selectedCourses ?? [];
+        const applicationState = ApplicationState.fromMinimalFormat(parsed, this.allDepartments);
+        return applicationState.schedules[0]?.toSchedule().selectedCourses ?? [];
     }
 
     async importData(data: string): Promise<TransactionResult> {
         try {
             const parsed = JSON.parse(data);
-            const appState = ApplicationState.fromMinimalFormat(parsed, this.allDepartments);
-            const schedules = appState.schedules.map(s => s.toSchedule());
+            const applicationState = ApplicationState.fromMinimalFormat(parsed, this.allDepartments);
+            const schedules = applicationState.schedules.map(s => s.toSchedule());
 
             const result = await this.storageManager.importData(
                 schedules,
-                appState.activeScheduleId,
-                appState.preferences
+                applicationState.activeScheduleId,
+                applicationState.preferences
             );
 
             if (result.success) {
@@ -870,7 +756,8 @@ export class ProfileStateManager {
                 this.state.selectedCourses = [];
                 this.state.activeScheduleId = null;
                 await this.loadFromStorage();
-                this.emitEvent('schedule_changed', { action: 'imported' }, 'system');
+                appState.activationSource = 'import';
+                appState.importGeneration++;
             } else {
                 console.error('[ProfileStateManager] Import failed:', result.error);
             }
@@ -979,16 +866,20 @@ export class ProfileStateManager {
         appState.hasUnsavedChanges = false;
     }
 
+    /**
+     * Signal that the active schedule was (re)activated or its metadata changed
+     * (the old `active_schedule_changed` event). Consumers `watch` the
+     * generation; `activationSource` lets them branch on origin.
+     */
+    private signalActivation(source: string): void {
+        appState.activationSource = source;
+        appState.activationGeneration++;
+    }
+
 
     private withStateUpdate(updateFn: () => void): void {
-        const previousUnsavedState = this.state.hasUnsavedChanges;
         updateFn();
         this.state.hasUnsavedChanges = true;
-
-        // Emit save state change event if state actually changed
-        if (!previousUnsavedState) {
-            this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
-        }
 
         // Skip save if in batch mode - batch will handle save at the end
         if (!this.isBatchUpdate) {
@@ -997,14 +888,8 @@ export class ProfileStateManager {
     }
 
     private async withStateUpdateAsync<T>(updateFn: () => Promise<T>): Promise<T> {
-        const previousUnsavedState = this.state.hasUnsavedChanges;
         const result = await updateFn();
         this.state.hasUnsavedChanges = true;
-
-        // Emit save state change event if state actually changed
-        if (!previousUnsavedState) {
-            this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
-        }
 
         // Skip save if in batch mode - batch will handle save at the end
         if (!this.isBatchUpdate) {
@@ -1014,14 +899,8 @@ export class ProfileStateManager {
     }
 
     private withStateUpdateSync<T>(updateFn: () => T): T {
-        const previousUnsavedState = this.state.hasUnsavedChanges;
         const result = updateFn();
         this.state.hasUnsavedChanges = true;
-
-        // Emit save state change event if state actually changed
-        if (!previousUnsavedState) {
-            this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
-        }
 
         // Skip save if in batch mode - batch will handle save at the end
         if (!this.isBatchUpdate) {
@@ -1031,13 +910,8 @@ export class ProfileStateManager {
     }
 
     private withPersist(updateFn: () => void): void {
-        const previousUnsavedState = this.state.hasUnsavedChanges;
         updateFn();
         this.state.hasUnsavedChanges = true;
-
-        if (!previousUnsavedState) {
-            this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
-        }
 
         if (!this.isBatchUpdate) {
             this.save(true);
@@ -1045,13 +919,8 @@ export class ProfileStateManager {
     }
 
     private withPersistSync<T>(updateFn: () => T): T {
-        const previousUnsavedState = this.state.hasUnsavedChanges;
         const result = updateFn();
         this.state.hasUnsavedChanges = true;
-
-        if (!previousUnsavedState) {
-            this.emitEvent('save_state_changed', { hasUnsavedChanges: true }, 'system');
-        }
 
         if (!this.isBatchUpdate) {
             this.save(true);
@@ -1130,52 +999,6 @@ export class ProfileStateManager {
         );
     }
 
-    private emitEvent(type: StateChangeEvent['type'], data: StateChangeEventData, source: string): void {
-        // Skip event emission if we're in batch update mode
-        if (this.isBatchUpdate) {
-            return;
-        }
-
-        const event: StateChangeEvent = {
-            type,
-            data,
-            timestamp: Date.now(),
-            source
-        };
-
-        this.eventQueue.push(event);
-        this.processEventQueue();
-    }
-
-    private processEventQueue(): void {
-        if (this.processingQueue) return;
-        this.processingQueue = true;
-
-        // Process events in next tick to avoid recursion
-        setTimeout(() => {
-            const eventsToProcess = [...this.eventQueue];
-            this.eventQueue = [];
-
-            eventsToProcess.forEach(event => {
-                this.listeners.forEach(listener => {
-                    try {
-                        listener(event, this.getState());
-                    } catch (error) {
-                        logger.error('Error in state change listener:', error);
-                    }
-                });
-            });
-
-            this.processingQueue = false;
-
-            // If more events were queued while processing, process them
-            if (this.eventQueue.length > 0) {
-                this.processEventQueue();
-            }
-        }, 0);
-    }
-
-
     private generateScheduleId(): string {
         return `schedule_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     }
@@ -1199,7 +1022,6 @@ export class ProfileStateManager {
         logger.log('Selected Courses:', this.state.selectedCourses.length);
         logger.log('Has Unsaved Changes:', this.state.hasUnsavedChanges);
         logger.log('Last Saved:', new Date(this.state.lastSaved).toISOString());
-        logger.log('Listeners:', this.listeners.size);
         logger.log('Health Check:', this.isHealthy());
         logger.log('===============================');
     }

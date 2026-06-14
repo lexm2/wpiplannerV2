@@ -1,7 +1,9 @@
 import { Course, Department, Section } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
 import type { ComponentSelections, CourseComponentSelections } from '../../types/scheduling'
-import { ProfileStateManager, StateChangeEvent, StateChangeListener, ScheduleChangedData } from '../../core/state/ProfileStateManager'
+import { ProfileStateManager } from '../../core/state/ProfileStateManager'
+import { appState } from '../../core/state/appState.svelte'
+import { watch } from '../../svelte/reactivity.svelte'
 import { DataValidator } from '../../core/validation/DataValidator'
 import { Validators } from '../../utils/validators'
 
@@ -855,45 +857,22 @@ export class CourseSelectionService {
     }
 
     private setupStateManagerListeners(): void {
-        const stateListener: StateChangeListener = (event: StateChangeEvent) => {
-            // Convert state manager events to selection events
-            switch (event.type) {
-                case 'courses_changed':
-                    // Already handled in our methods where we emit events
-                    break;
-                case 'active_schedule_changed':
-                    // Skip UI refresh for calendar exclusion changes - no courses changed
-                    if (event.source === 'calendar-event-exclusion') {
-                        break;
-                    }
-
-                    // Force complete UI refresh for schedule changes
-                    const newSelectedCourses = this.profileStateManager.getSelectedCourses();
-
-                    this.notifySelectionListeners({
-                        type: 'data_loaded',
-                        selectedCourses: newSelectedCourses,
-                        timestamp: event.timestamp
-                    });
-                    break;
-                case 'schedule_changed': {
-                    // Handle imported data - trigger complete UI refresh
-                    const scheduleData = event.data as ScheduleChangedData;
-                    if (scheduleData?.action === 'imported') {
-                        const importedCourses = this.profileStateManager.getSelectedCourses();
-
-                        this.notifySelectionListeners({
-                            type: 'data_loaded',
-                            selectedCourses: importedCourses,
-                            timestamp: event.timestamp
-                        });
-                    }
-                    break;
-                }
-            }
-        };
-
-        this.profileStateManager.addListener(stateListener);
+        // Emit a `data_loaded` (full UI refresh) whenever the active schedule is
+        // (re)activated or data is imported — the runes equivalent of the old
+        // active_schedule_changed / imported events. Incremental selection edits
+        // are emitted directly by our own mutation methods, not here.
+        watch(
+            () => (appState.activationGeneration, appState.importGeneration),
+            () => {
+                // Preserve the old skip: calendar-exclusion changes touch no courses.
+                if (appState.activationSource === 'calendar-event-exclusion') return;
+                this.notifySelectionListeners({
+                    type: 'data_loaded',
+                    selectedCourses: this.profileStateManager.getSelectedCourses(),
+                    timestamp: Date.now(),
+                });
+            },
+        );
     }
 
     private notifySelectionListeners(event: SelectionChangeEvent): void {

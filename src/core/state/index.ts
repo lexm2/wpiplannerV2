@@ -1,3 +1,3 @@
-export type { StateChangeEvent, ProfileState, StateChangeListener } from './ProfileStateManager';
+export type { ProfileState } from './ProfileStateManager';
 export { ProfileStateManager } from './ProfileStateManager';
 export { UndoRedoManager } from './UndoRedoManager';
