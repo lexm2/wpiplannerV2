@@ -7,6 +7,7 @@
     "dev": "bun ./node_modules/vite/bin/vite.js --port 3000",
     "build": "bun run generate-icons && bun ./node_modules/vite/bin/vite.js build",
     "preview": "bun ./node_modules/vite/bin/vite.js preview",
+    "test": "bun ./node_modules/vitest/vitest.mjs run",
     "convert": "bun run scripts/convert-course-data.ts",
     "generate-icons": "bun run scripts/generate-icon-paths.ts",
     "fetch-data": "bun run scripts/fetch-course-data.ts",
@@ -16,9 +17,12 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@types/bun": "^1.2.10",
+    "happy-dom": "^20.10.3",
+    "jsdom": "^29.1.1",
     "svelte": "^5.56.3",
     "typescript": "^5.0.0",
-    "vite": "^7.2.7"
+    "vite": "^7.2.7",
+    "vitest": "^4.1.8"
   },
   "keywords": [
     "wpi",
