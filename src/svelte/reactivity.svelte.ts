@@ -19,3 +19,32 @@ export function subscribe(run: () => void): () => void {
         $effect(run);
     });
 }
+
+/**
+ * Like {@link subscribe}, but SKIPS the initial run — `run` fires only when a
+ * rune read by `deps` changes afterward. This mirrors the old listener
+ * semantics ("notify on change", not at registration) for vanilla consumers
+ * whose refresh callbacks aren't safe to run eagerly at wire-up time.
+ *
+ * `deps` must synchronously read the reactive state to track; its return value
+ * is ignored. Returns a dispose function.
+ *
+ * @example
+ *   this.dispose = watch(
+ *     () => filterService.getActiveFilters(), // tracked
+ *     () => this.refresh(),                    // runs on change only
+ *   );
+ */
+export function watch(deps: () => unknown, run: () => void): () => void {
+    let first = true;
+    return $effect.root(() => {
+        $effect(() => {
+            deps(); // establish/maintain dependencies every run
+            if (first) {
+                first = false;
+                return;
+            }
+            run();
+        });
+    });
+}

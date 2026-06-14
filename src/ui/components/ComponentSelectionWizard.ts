@@ -7,6 +7,7 @@ import { AcademicYearFilterCriteria } from '../../types/filters';
 import type { ComponentSelections } from '../../types/scheduling';
 import { CourseDataService } from '../../services/data/courseDataService';
 import { FilterService } from '../../services/filtering/FilterService';
+import { watch } from '../../svelte/reactivity.svelte';
 import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { logger } from '../../utils/logger';
@@ -33,7 +34,7 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     private onHoverPreview?: (selections: ComponentSelections) => void;
     private onStepChange?: (step: WizardStep) => void;
     private availableSteps: WizardStep[] = [];
-    private filterChangeHandler: (() => void) | null = null;
+    private filterDispose: (() => void) | null = null;
     private allSelectedCourses: SelectedCourse[] = [];
 
     constructor(
@@ -84,10 +85,13 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
         this.availableSteps = this.determineAvailableSteps();
         this.currentStep = this.determineStartStep();
 
-        // Set up filter change listener if filter service is available
+        // Refresh the current step whenever the active filters change.
         if (this.filterService) {
-            this.filterChangeHandler = () => this.onFilterChange();
-            this.filterService.addEventListener(this.filterChangeHandler);
+            const filterService = this.filterService;
+            this.filterDispose = watch(
+                () => filterService.getActiveFilters(),
+                () => this.onFilterChange(),
+            );
         }
 
         // RMP data is loaded centrally by MainController during app initialization
@@ -306,9 +310,9 @@ export class ComponentSelectionWizard extends BaseSidebarPanel {
     protected onClose(): void {
         document.removeEventListener('keydown', this.handleWizardEscapeKey);
 
-        if (this.filterService && this.filterChangeHandler) {
-            this.filterService.removeEventListener(this.filterChangeHandler);
-            this.filterChangeHandler = null;
+        if (this.filterDispose) {
+            this.filterDispose();
+            this.filterDispose = null;
         }
     }
 

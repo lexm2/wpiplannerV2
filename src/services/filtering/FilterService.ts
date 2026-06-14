@@ -1,5 +1,5 @@
 import { Course } from '../../types/types';
-import { FilterEventListener, ActiveFilter, BookmarkFilterCriteria, SearchTextFilterCriteria } from '../../types/filters';
+import { ActiveFilter, BookmarkFilterCriteria, SearchTextFilterCriteria } from '../../types/filters';
 import { FilterState } from '../../core/filtering/FilterState';
 import { rankCoursesByRelevance, getAvailableProfessors } from '../../utils/searchUtils';
 import { SectionFilterPipeline, SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
@@ -143,15 +143,6 @@ export class FilterService {
 
     isEmpty(): boolean {
         return this.filterState.isEmpty();
-    }
-
-    // Event Handling
-    addEventListener(listener: FilterEventListener): void {
-        this.filterState.addEventListener(listener);
-    }
-
-    removeEventListener(listener: FilterEventListener): void {
-        this.filterState.removeEventListener(listener);
     }
 
     getFilterSummary(): string {

@@ -15,8 +15,6 @@ export type {
   BaseFilter,
   FilterCriteria,
   ActiveFilter,
-  FilterChangeEvent,
-  FilterEventListener,
   DepartmentFilterCriteria,
   AvailabilityFilterCriteria,
   CreditRangeFilterCriteria,

@@ -1,12 +1,18 @@
-import { ActiveFilter, FilterChangeEvent, FilterEventListener, FilterCriteria } from '../../types/filters';
+import { SvelteMap } from 'svelte/reactivity';
+import { ActiveFilter, FilterCriteria } from '../../types/filters';
 
 /**
- * Manages active filters with event-driven state updates and selective serialization
+ * Manages active filters as reactive state.
+ *
+ * Backed by a `SvelteMap`, so every query method below (`getActiveFilters`,
+ * `hasFilter`, `getFilterCount`, …) is a reactive read: consumers wrap their
+ * refresh logic in `watch`/`subscribe` (src/svelte/reactivity.svelte) and
+ * re-run automatically when filters change. There is no separate listener
+ * system — runes are the reactivity mechanism.
  */
 export class FilterState {
-    private activeFilters: Map<string, ActiveFilter> = new Map();
-    private listeners: FilterEventListener[] = [];
-    
+    private activeFilters = new SvelteMap<string, ActiveFilter>();
+
     addFilter(id: string, name: string, criteria: unknown, displayValue: string): void {
         const filter: ActiveFilter = {
             id,
@@ -14,52 +20,29 @@ export class FilterState {
             criteria,
             displayValue
         };
-        
+
         this.activeFilters.set(id, filter);
-        this.notifyListeners({
-            type: 'add',
-            filterId: id,
-            criteria,
-            activeFilters: this.getActiveFilters()
-        });
     }
-    
+
     removeFilter(id: string): boolean {
-        const removed = this.activeFilters.delete(id);
-        if (removed) {
-            this.notifyListeners({
-                type: 'remove',
-                filterId: id,
-                activeFilters: this.getActiveFilters()
-            });
-        }
-        return removed;
+        return this.activeFilters.delete(id);
     }
-    
+
     updateFilter(id: string, criteria: unknown, displayValue: string): boolean {
         const existing = this.activeFilters.get(id);
         if (existing) {
-            existing.criteria = criteria;
-            existing.displayValue = displayValue;
-            this.notifyListeners({
-                type: 'update',
-                filterId: id,
-                criteria,
-                activeFilters: this.getActiveFilters()
-            });
+            // Re-set a new object so the SvelteMap registers the change
+            // (mutating the stored value in place would not be reactive).
+            this.activeFilters.set(id, { ...existing, criteria, displayValue });
             return true;
         }
         return false;
     }
-    
+
     clearFilters(): void {
         this.activeFilters.clear();
-        this.notifyListeners({
-            type: 'clear',
-            activeFilters: []
-        });
     }
-    
+
     hasFilter(id: string): boolean {
         return this.activeFilters.has(id);
     }
@@ -90,26 +73,5 @@ export class FilterState {
     
     isEmpty(): boolean {
         return this.activeFilters.size === 0;
-    }
-    
-    addEventListener(listener: FilterEventListener): void {
-        this.listeners.push(listener);
-    }
-    
-    removeEventListener(listener: FilterEventListener): void {
-        const index = this.listeners.indexOf(listener);
-        if (index > -1) {
-            this.listeners.splice(index, 1);
-        }
-    }
-    
-    private notifyListeners(event: FilterChangeEvent): void {
-        this.listeners.forEach(listener => {
-            try {
-                listener(event);
-            } catch (error) {
-                console.error('Error in filter event listener:', error);
-            }
-        });
     }
 }

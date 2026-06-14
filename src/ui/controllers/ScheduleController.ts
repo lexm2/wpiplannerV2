@@ -4,6 +4,7 @@ import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm, EventType }
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
 import { FilterService } from '../../services/filtering/FilterService'
+import { watch } from '../../svelte/reactivity.svelte'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
@@ -98,10 +99,11 @@ export class ScheduleController implements CalendarEventProvider {
             this.filterService.setConflictDetector();
         }
 
-        // Set up filter change listener to refresh display
-        this.filterService.addEventListener(() => {
-            this.applyFiltersAndRefresh();
-        });
+        // Refresh the schedule display whenever the active filters change.
+        watch(
+            () => filterService.getActiveFilters(),
+            () => this.applyFiltersAndRefresh(),
+        );
     }
 
     // =========================================================================

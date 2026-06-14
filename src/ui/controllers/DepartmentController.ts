@@ -1,6 +1,7 @@
 import { Department } from '../../types/types'
 import { FilterService } from '../../services/filtering/FilterService'
 import { groupDepartmentsByCategory } from '../../utils/departmentUtils'
+import { watch } from '../../svelte/reactivity.svelte'
 
 export class DepartmentController {
     private allDepartments: Department[] = [];
@@ -14,10 +15,11 @@ export class DepartmentController {
     setFilterService(filterService: FilterService): void {
         this.filterService = filterService;
 
-        // Listen for filter changes to sync sidebar visual state
-        this.filterService.addEventListener(() => {
-            this.syncVisualState();
-        });
+        // Re-sync sidebar visual state whenever the active filters change.
+        watch(
+            () => filterService.getActiveFilters(),
+            () => this.syncVisualState(),
+        );
     }
 
     /** Sync sidebar visual state with current filter state */

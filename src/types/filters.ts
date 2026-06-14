@@ -24,31 +24,6 @@ export interface ActiveFilter<TCriteria = unknown> {
     displayValue: string;
 }
 
-export type FilterChangeEvent<TCriteria = unknown> =
-    | {
-        type: 'add';
-        filterId: string;
-        criteria: TCriteria;
-        activeFilters: ActiveFilter<unknown>[];
-    }
-    | {
-        type: 'remove';
-        filterId: string;
-        activeFilters: ActiveFilter<unknown>[];
-    }
-    | {
-        type: 'clear';
-        activeFilters: ActiveFilter<unknown>[];
-    }
-    | {
-        type: 'update';
-        filterId: string;
-        criteria: TCriteria;
-        activeFilters: ActiveFilter<unknown>[];
-    };
-
-export type FilterEventListener = (event: FilterChangeEvent) => void;
-
 // Standard filter criteria types
 export interface DepartmentFilterCriteria {
     departments: string[];

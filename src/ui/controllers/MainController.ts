@@ -19,6 +19,7 @@ import { CourseColorService } from '../../services/scheduling/CourseColorService
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator'
 import { AppBootstrap } from '../../bootstrap/AppBootstrap'
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer'
+import { watch } from '../../svelte/reactivity.svelte'
 import type { ModalService } from '../../services/ui/ModalService'
 import type { SelectionSnapshot } from '../../types/scheduling'
 
@@ -144,10 +145,13 @@ export class MainController {
         // Initialize filters and wire up filter change listeners
         AppBootstrap.initializeFilters(services);
 
-        filterService.addEventListener((_event) => {
-            this.refreshCurrentView();
-            this.scheduleController.applyFiltersAndRefresh();
-        });
+        watch(
+            () => filterService.getActiveFilters(),
+            () => {
+                this.refreshCurrentView();
+                this.scheduleController.applyFiltersAndRefresh();
+            },
+        );
 
         // Initialize filter button states
         setTimeout(() => {
