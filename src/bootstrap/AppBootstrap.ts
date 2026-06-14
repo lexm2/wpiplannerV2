@@ -80,17 +80,17 @@ export class AppBootstrap {
             timestampManager.updateClientTimestamp();
 
             // Backfill year for existing schedules that lack one
-            const newestYear = profileStateManager.getNewestAcademicYear();
+            const defaultYear = profileStateManager.getDefaultAcademicYear();
             for (const schedule of profileStateManager.getAllSchedules()) {
-                if (schedule.year === undefined && newestYear !== undefined) {
-                    profileStateManager.updateSchedule(schedule.id, { year: newestYear }, 'system');
+                if (schedule.year === undefined && defaultYear !== undefined) {
+                    profileStateManager.updateSchedule(schedule.id, { year: defaultYear }, 'system');
                 }
             }
 
             // Apply academic year filter based on active schedule's year
             if (!filterService.hasFilter('academicYear')) {
                 const activeSchedule = profileStateManager.getActiveSchedule();
-                const yearToFilter = activeSchedule?.year ?? newestYear;
+                const yearToFilter = activeSchedule?.year ?? defaultYear;
                 if (yearToFilter !== undefined) {
                     filterService.addFilter('academicYear', { year: yearToFilter });
                 }

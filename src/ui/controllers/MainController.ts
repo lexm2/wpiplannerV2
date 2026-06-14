@@ -1131,9 +1131,9 @@ export class MainController {
                 if (activeSchedule.year !== undefined) {
                     this.services.filterService.addFilter('academicYear', { year: activeSchedule.year });
                 } else {
-                    const newestYear = this.services.profileStateManager.getNewestAcademicYear();
-                    if (newestYear !== undefined) {
-                        this.services.filterService.addFilter('academicYear', { year: newestYear });
+                    const defaultYear = this.services.profileStateManager.getDefaultAcademicYear();
+                    if (defaultYear !== undefined) {
+                        this.services.filterService.addFilter('academicYear', { year: defaultYear });
                     }
                 }
                 this.updateFilterButtonState();

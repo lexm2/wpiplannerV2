@@ -5,6 +5,7 @@ import type { TransactionResult } from '../storage'
 import { TransactionalStorageManager } from '../storage'
 import { getAllSections, setReplacer, setReviver, logger } from '../../utils'
 import { UndoRedoManager } from './UndoRedoManager'
+import { TermBoundsService } from '../../utils/termBounds'
 import { ModalService } from '../../services/ui'
 
 export interface ScheduleChangedData {
@@ -367,6 +368,23 @@ export class ProfileStateManager {
         return years.length ? Math.max(...years) : undefined;
     }
 
+    /**
+     * The academic year to select by default: the current academic year (date-driven,
+     * from term bounds) when course data exists for it, otherwise the newest year with data.
+     */
+    getDefaultAcademicYear(): number | undefined {
+        const available = new Set(
+            this.allDepartments
+                .flatMap(d => d.courses)
+                .map(c => c.academicYear)
+                .filter(Boolean) as number[]
+        );
+        if (!available.size) return undefined;
+        const current = TermBoundsService.getInstance().getCurrentAcademicYear();
+        if (current !== null && available.has(current)) return current;
+        return Math.max(...available); // fallback: newest year with data
+    }
+
     createSchedule(name: string, source: string = 'user', id?: string, year?: number): Schedule {
         return this.withStateUpdateSync(() => {
             const schedule: Schedule = {
@@ -374,7 +392,7 @@ export class ProfileStateManager {
                 name,
                 selectedCourses: [],
                 generatedSchedules: [],
-                year: year ?? this.getNewestAcademicYear()
+                year: year ?? this.getDefaultAcademicYear()
             };
 
             this.state.schedules.push(schedule);

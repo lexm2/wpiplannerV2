@@ -87,6 +87,25 @@ export class TermBoundsService {
         return Math.max(...Object.keys(this.termBoundsCache.years).map(Number));
     }
 
+    /**
+     * Returns the current academic year (the fall year, e.g. 2026 for "2026–2027").
+     * The year flips into `y` at the start of summer, i.e. right after the previous
+     * year's Spring D-term ends, so summer/fall/spring all map to the same academic year.
+     */
+    public getCurrentAcademicYear(now: Date = new Date()): number | null {
+        if (!this.termBoundsCache) return null;
+        const years = Object.keys(this.termBoundsCache.years).map(Number).sort((a, b) => a - b);
+        if (!years.length) return null;
+
+        let current = years[0];
+        for (const y of years) {
+            const prev = this.termBoundsCache.years[String(y - 1)];
+            const boundary = prev ? new Date(prev.D.endDate) : null; // null => earliest year, always passed
+            if (boundary === null || now >= boundary) current = y;
+        }
+        return current;
+    }
+
     public getTermBoundsData(): TermBoundsData | null {
         return this.termBoundsCache;
     }

@@ -114,16 +114,7 @@ export class ICSGenerator {
     static generateICS(schedule: Schedule, options: ICSExportOptions = {}): ICSExportResult {
         const timezone = options.timezone || this.DEFAULT_TIMEZONE;
         const service = TermBoundsService.getInstance();
-        const mostRecentYear = service.getMostRecentYear();
-        let academicYear: number;
-        if (mostRecentYear !== null) {
-            academicYear = mostRecentYear;
-        } else {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            academicYear = month >= 7 ? year : year - 1;
-        }
+        const academicYear = service.getCurrentAcademicYear() ?? new Date().getFullYear();
 
         const calendar = ical({
             name: schedule.name,
