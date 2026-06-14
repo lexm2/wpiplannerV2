@@ -5,6 +5,7 @@ import type { TransactionResult } from '../storage'
 import { TransactionalStorageManager } from '../storage'
 import { getAllSections, setReplacer, setReviver, logger } from '../../utils'
 import { UndoRedoManager } from './UndoRedoManager'
+import { appState } from './appState.svelte'
 import { TermBoundsService } from '../../utils/termBounds'
 import { ModalService } from '../../services/ui'
 
@@ -75,7 +76,6 @@ export type StateChangeListener = (event: StateChangeEvent, state: ProfileState)
  */
 export class ProfileStateManager {
     private static instance: ProfileStateManager | null = null;
-    private state: ProfileState;
     private listeners = new Set<StateChangeListener>();
     private storageManager: TransactionalStorageManager;
     private isLoadingFlag = false;
@@ -90,9 +90,18 @@ export class ProfileStateManager {
 
     private constructor(storageManager?: TransactionalStorageManager) {
         this.storageManager = storageManager || new TransactionalStorageManager();
-        this.state = this.createInitialState();
         this.undoRedoManager = new UndoRedoManager();
         this.setupBeforeUnloadHandler();
+    }
+
+    /**
+     * The reactive application state. Reads/writes go to the runes singleton;
+     * assigning a `$state.raw` field (e.g. `this.state.selectedCourses = [...]`)
+     * triggers reactivity, but in-place mutation does not — mutations below
+     * always reassign immutably.
+     */
+    private get state(): ProfileState {
+        return appState;
     }
 
     public static getInstance(): ProfileStateManager {
@@ -141,7 +150,17 @@ export class ProfileStateManager {
 
     // Public API for state access
     getState(): Readonly<ProfileState> {
-        return { ...this.state };
+        // Explicit copy (not `{...this.state}`): appState is a runes class whose
+        // fields are accessors, so spreading would not capture values reliably.
+        return {
+            activeScheduleId: appState.activeScheduleId,
+            schedules: appState.schedules,
+            selectedCourses: appState.selectedCourses,
+            preferences: appState.preferences,
+            isLoading: appState.isLoading,
+            lastSaved: appState.lastSaved,
+            hasUnsavedChanges: appState.hasUnsavedChanges,
+        };
     }
 
     getActiveSchedule(): Schedule | null {
@@ -177,17 +196,31 @@ export class ProfileStateManager {
         return this.state.isLoading || this.isLoadingFlag;
     }
 
+    /**
+     * Immutably patch the SelectedCourse for `courseId` by reassigning the
+     * selectedCourses array (required for `$state.raw` reactivity). Returns
+     * whether a matching course was found.
+     */
+    private patchSelectedCourse(courseId: string, patch: (sc: SelectedCourse) => SelectedCourse): boolean {
+        let found = false;
+        this.state.selectedCourses = this.state.selectedCourses.map(sc => {
+            if (sc.course.id === courseId) {
+                found = true;
+                return patch(sc);
+            }
+            return sc;
+        });
+        return found;
+    }
+
     // Course selection methods
     selectCourse(course: Course, isRequired: boolean = false, source: string = 'user'): void {
         this.withStateUpdate(() => {
-            const existingIndex = this.state.selectedCourses.findIndex(sc => sc.course.id === course.id);
-            
-            if (existingIndex >= 0) {
+            const existing = this.state.selectedCourses.find(sc => sc.course.id === course.id);
+
+            if (existing) {
                 // Update existing selection
-                this.state.selectedCourses[existingIndex] = {
-                    ...this.state.selectedCourses[existingIndex],
-                    isRequired
-                };
+                this.patchSelectedCourse(course.id, sc => ({ ...sc, isRequired }));
             } else {
                 // Add new selection
                 const selectedCourse: SelectedCourse = {
@@ -198,7 +231,7 @@ export class ProfileStateManager {
                     isRequired,
                     lockedSections: new Set()
                 };
-                this.state.selectedCourses.push(selectedCourse);
+                this.state.selectedCourses = [...this.state.selectedCourses, selectedCourse];
             }
 
             this.updateActiveScheduleWithCurrentCourses();
@@ -210,7 +243,7 @@ export class ProfileStateManager {
         this.withStateUpdate(() => {
             const index = this.state.selectedCourses.findIndex(sc => sc.course.id === course.id);
             if (index >= 0) {
-                this.state.selectedCourses.splice(index, 1);
+                this.state.selectedCourses = this.state.selectedCourses.filter(sc => sc.course.id !== course.id);
                 this.updateActiveScheduleWithCurrentCourses();
                 this.emitEvent('courses_changed', { course, action: 'unselected' }, source);
             }
@@ -222,56 +255,49 @@ export class ProfileStateManager {
             const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
             if (!selectedCourse) return;
 
-            // If clearing selection
+            // Compute the field patch for this section change.
+            let patch: Partial<SelectedCourse> | null = null;
+
             if (!sectionNumber) {
-                selectedCourse.selectedLecture = null;
-                selectedCourse.selectedDiscussion = null;
-                selectedCourse.selectedLab = null;
-                this.updateActiveScheduleWithCurrentCourses();
-                this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
+                // Clearing selection
+                patch = { selectedLecture: null, selectedDiscussion: null, selectedLab: null };
+            } else if (course.lectures) {
+                // Find the section - check lectures, then their discussions/labs
+                for (const lectureGroup of course.lectures) {
+                    if (lectureGroup.section.number === sectionNumber) {
+                        patch = { selectedLecture: lectureGroup.section };
+                        break;
+                    }
+                    const discussion = lectureGroup.compatibleDiscussions.find(d => d.number === sectionNumber);
+                    if (discussion) {
+                        patch = { selectedDiscussion: discussion };
+                        break;
+                    }
+                    const lab = lectureGroup.compatibleLabs.find(l => l.number === sectionNumber);
+                    if (lab) {
+                        patch = { selectedLab: lab };
+                        break;
+                    }
+                }
+            }
+
+            // Check standalone labs if not matched yet
+            if (!patch && sectionNumber && course.standaloneLabs) {
+                const lab = course.standaloneLabs.find(l => l.number === sectionNumber);
+                if (lab) {
+                    patch = { selectedLab: lab };
+                }
+            }
+
+            if (!patch) {
+                logger.warn(`Section ${sectionNumber} not found in course ${course.departmentAbbr}${course.number}`);
                 return;
             }
 
-            // Find the section - check lectures first
-            if (course.lectures) {
-                for (const lectureGroup of course.lectures) {
-                    if (lectureGroup.section.number === sectionNumber) {
-                        selectedCourse.selectedLecture = lectureGroup.section;
-                        this.updateActiveScheduleWithCurrentCourses();
-                        this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
-                        return;
-                    }
-                    // Check discussions
-                    const discussion = lectureGroup.compatibleDiscussions.find(d => d.number === sectionNumber);
-                    if (discussion) {
-                        selectedCourse.selectedDiscussion = discussion;
-                        this.updateActiveScheduleWithCurrentCourses();
-                        this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
-                        return;
-                    }
-                    // Check labs
-                    const lab = lectureGroup.compatibleLabs.find(l => l.number === sectionNumber);
-                    if (lab) {
-                        selectedCourse.selectedLab = lab;
-                        this.updateActiveScheduleWithCurrentCourses();
-                        this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
-                        return;
-                    }
-                }
-            }
-
-            // Check standalone labs
-            if (course.standaloneLabs) {
-                const lab = course.standaloneLabs.find(l => l.number === sectionNumber);
-                if (lab) {
-                    selectedCourse.selectedLab = lab;
-                    this.updateActiveScheduleWithCurrentCourses();
-                    this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
-                    return;
-                }
-            }
-
-            logger.warn(`Section ${sectionNumber} not found in course ${course.departmentAbbr}${course.number}`);
+            const appliedPatch = patch;
+            this.patchSelectedCourse(course.id, sc => ({ ...sc, ...appliedPatch }));
+            this.updateActiveScheduleWithCurrentCourses();
+            this.emitEvent('courses_changed', { course, sectionNumber, action: 'section_changed' }, source);
         });
     }
 
@@ -283,12 +309,13 @@ export class ProfileStateManager {
         source: string = 'user'
     ): void {
         this.withStateUpdate(() => {
-            const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
-            if (selectedCourse) {
-                selectedCourse.selectedLecture = lecture;
-                selectedCourse.selectedDiscussion = discussion;
-                selectedCourse.selectedLab = lab;
-
+            const found = this.patchSelectedCourse(course.id, sc => ({
+                ...sc,
+                selectedLecture: lecture,
+                selectedDiscussion: discussion,
+                selectedLab: lab,
+            }));
+            if (found) {
                 this.updateActiveScheduleWithCurrentCourses();
                 this.emitEvent('courses_changed', {
                     course,
@@ -311,12 +338,12 @@ export class ProfileStateManager {
 
     lockSection(course: Course, sectionCrn: string, source: string = 'user'): void {
         this.withStateUpdate(() => {
-            const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
-            if (selectedCourse) {
-                if (!selectedCourse.lockedSections) {
-                    selectedCourse.lockedSections = new Set();
-                }
-                selectedCourse.lockedSections.add(sectionCrn);
+            const found = this.patchSelectedCourse(course.id, sc => {
+                const lockedSections = new Set(sc.lockedSections ?? []);
+                lockedSections.add(sectionCrn);
+                return { ...sc, lockedSections };
+            });
+            if (found) {
                 this.updateActiveScheduleWithCurrentCourses();
                 this.emitEvent('courses_changed', { course, sectionCrn, action: 'section_locked' }, source);
             }
@@ -325,9 +352,17 @@ export class ProfileStateManager {
 
     unlockSection(course: Course, sectionCrn: string, source: string = 'user'): void {
         this.withStateUpdate(() => {
-            const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
-            if (selectedCourse && selectedCourse.lockedSections) {
-                selectedCourse.lockedSections.delete(sectionCrn);
+            let changed = false;
+            this.patchSelectedCourse(course.id, sc => {
+                if (sc.lockedSections?.has(sectionCrn)) {
+                    const lockedSections = new Set(sc.lockedSections);
+                    lockedSections.delete(sectionCrn);
+                    changed = true;
+                    return { ...sc, lockedSections };
+                }
+                return sc;
+            });
+            if (changed) {
                 this.updateActiveScheduleWithCurrentCourses();
                 this.emitEvent('courses_changed', { course, sectionCrn, action: 'section_unlocked' }, source);
             }
@@ -336,9 +371,8 @@ export class ProfileStateManager {
 
     setCourseColor(courseId: string, color: string, source: string = 'user'): void {
         this.withStateUpdate(() => {
-            const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === courseId);
-            if (selectedCourse) {
-                selectedCourse.customColor = color;
+            const found = this.patchSelectedCourse(courseId, sc => ({ ...sc, customColor: color }));
+            if (found) {
                 this.updateActiveScheduleWithCurrentCourses();
                 this.emitEvent('courses_changed', {
                     action: 'color_changed',
@@ -395,7 +429,7 @@ export class ProfileStateManager {
                 year: year ?? this.getDefaultAcademicYear()
             };
 
-            this.state.schedules.push(schedule);
+            this.state.schedules = [...this.state.schedules, schedule];
             this.emitEvent('schedule_changed', { schedule, action: 'created' }, source);
             return schedule;
         });
@@ -431,14 +465,15 @@ export class ProfileStateManager {
             const index = this.state.schedules.findIndex(s => s.id === scheduleId);
             if (index < 0) return false;
 
-            this.state.schedules[index] = { ...this.state.schedules[index], ...updates };
+            const updated = { ...this.state.schedules[index], ...updates };
+            this.state.schedules = this.state.schedules.map(s => s.id === scheduleId ? updated : s);
 
             // If this is the active schedule, emit active schedule changed event
             if (scheduleId === this.state.activeScheduleId) {
-                this.emitEvent('active_schedule_changed', { schedule: this.state.schedules[index] }, source);
+                this.emitEvent('active_schedule_changed', { schedule: updated }, source);
             }
 
-            this.emitEvent('schedule_changed', { schedule: this.state.schedules[index], action: 'updated' }, source);
+            this.emitEvent('schedule_changed', { schedule: updated, action: 'updated' }, source);
             return true;
         };
         return isAutomated ? this.withPersistSync(update) : this.withStateUpdateSync(update);
@@ -456,7 +491,7 @@ export class ProfileStateManager {
             }
 
             const deletedSchedule = this.state.schedules[scheduleIndex];
-            this.state.schedules.splice(scheduleIndex, 1);
+            this.state.schedules = this.state.schedules.filter(s => s.id !== scheduleId);
 
             // Remove from storage
             const deleteResult = await this.storageManager.deleteSchedule(scheduleId);
@@ -494,7 +529,7 @@ export class ProfileStateManager {
                 year: originalSchedule.year
             };
 
-            this.state.schedules.push(duplicatedSchedule);
+            this.state.schedules = [...this.state.schedules, duplicatedSchedule];
             this.emitEvent('schedule_changed', { schedule: duplicatedSchedule, action: 'duplicated' }, source);
             return duplicatedSchedule;
         });
@@ -713,12 +748,10 @@ export class ProfileStateManager {
             const schedulesResult = await this.storageManager.loadAllSchedules();
 
             if (schedulesResult.valid && schedulesResult.data) {
-                this.state.schedules = schedulesResult.data.filter(s => !s.id.startsWith('tutorial_'));
-
-                // Resolve course references for all schedules
-                for (const schedule of this.state.schedules) {
-                    schedule.selectedCourses = this.resolveCourseReferences(schedule.selectedCourses);
-                }
+                // Resolve course references for all schedules (immutable rebuild)
+                this.state.schedules = schedulesResult.data
+                    .filter(s => !s.id.startsWith('tutorial_'))
+                    .map(s => ({ ...s, selectedCourses: this.resolveCourseReferences(s.selectedCourses) }));
             }
 
             // Load active schedule ID
@@ -935,19 +968,15 @@ export class ProfileStateManager {
     }
 
     // Private helper methods
-    private createInitialState(): ProfileState {
-        return {
-            activeScheduleId: null,
-            schedules: [],
-            selectedCourses: [],
-            preferences: {
-                theme: 'wpi-dark',
-                bookmarkedCourseIds: []
-            },
-            isLoading: false,
-            lastSaved: 0,
-            hasUnsavedChanges: false
-        };
+    /** Reset reactive state back to defaults (immutable reassignment). */
+    private resetState(): void {
+        appState.activeScheduleId = null;
+        appState.schedules = [];
+        appState.selectedCourses = [];
+        appState.preferences = { theme: 'wpi-dark', bookmarkedCourseIds: [] };
+        appState.isLoading = false;
+        appState.lastSaved = 0;
+        appState.hasUnsavedChanges = false;
     }
 
 
@@ -1092,12 +1121,13 @@ export class ProfileStateManager {
     }
 
     private updateActiveScheduleWithCurrentCourses(): void {
-        if (this.state.activeScheduleId) {
-            const activeScheduleIndex = this.state.schedules.findIndex(s => s.id === this.state.activeScheduleId);
-            if (activeScheduleIndex >= 0) {
-                this.state.schedules[activeScheduleIndex].selectedCourses = [...this.state.selectedCourses];
-            }
-        }
+        const activeId = this.state.activeScheduleId;
+        if (!activeId) return;
+        if (!this.state.schedules.some(s => s.id === activeId)) return;
+        const currentCourses = [...this.state.selectedCourses];
+        this.state.schedules = this.state.schedules.map(s =>
+            s.id === activeId ? { ...s, selectedCourses: currentCourses } : s
+        );
     }
 
     private emitEvent(type: StateChangeEvent['type'], data: StateChangeEventData, source: string): void {
@@ -1188,7 +1218,7 @@ export class ProfileStateManager {
                 };
             }
 
-            this.state = this.createInitialState();
+            this.resetState();
             this.undoRedoManager.clear();
 
             const defaultSchedule = this.createSchedule('My Schedule', 'system');
