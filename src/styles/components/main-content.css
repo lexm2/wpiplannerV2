@@ -28,6 +28,13 @@
   width: 100%;
 }
 
+/* The FilterButtons Svelte component mounts here; `display: contents` lets its
+   children (clear-filters-btn + .filter-buttons) participate in the
+   .content-controls flex row exactly as the original inline DOM did. */
+.content-controls-filter-host {
+  display: contents;
+}
+
 .filter-buttons {
   display: flex;
   gap: 0.5rem;

@@ -9,6 +9,7 @@ import ThemeSelector from '../../svelte/ThemeSelector.svelte'
 import UndoRedoButtons from '../../svelte/UndoRedoButtons.svelte'
 import ViewToggle from '../../svelte/ViewToggle.svelte'
 import PageTabs from '../../svelte/PageTabs.svelte'
+import FilterButtons from '../../svelte/FilterButtons.svelte'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
@@ -151,6 +152,27 @@ export class MainController {
             });
         }
 
+        // Mount the planner filter controls (Svelte): clear-filters, filter, and
+        // bookmark-filter buttons. They read filterService.getActiveFilters()
+        // (a SvelteMap) + appState.activeSchedule (a rune) for their reactive
+        // active class, title text, icon swap, and clear-button show/hide+disabled
+        // — replacing updateFilterButtonState/updateBookmarkFilterButtonState/
+        // updateClearFiltersButtonState, the setTimeout(100) initializer, and the
+        // imperative click wiring below. Same ids/classes/titles are preserved so
+        // the tutorial's `#filter-btn` selector keeps working. onFilter opens the
+        // planner filter modal (the old #filter-btn handler body). The
+        // schedule-filter button is intentionally NOT migrated here.
+        const filterButtonsHost = document.getElementById('filter-buttons-host');
+        if (filterButtonsHost) {
+            mount(FilterButtons, {
+                target: filterButtonsHost,
+                props: {
+                    filterService,
+                    onFilter: () => this.openFilterModal()
+                }
+            });
+        }
+
         // Mount the planner/schedule page tabs (Svelte). It reads
         // uiState.currentPage (a rune) for its reactive `active` class —
         // replacing the tab `.active` toggle that used to live in
@@ -227,11 +249,11 @@ export class MainController {
             },
         );
 
-        // Initialize filter button states
+        // Initialize the schedule-filter button state. The planner filter trio
+        // (filter / bookmark / clear) is now the FilterButtons Svelte component,
+        // which primes itself from the reactive filter state.
         setTimeout(() => {
-            this.updateFilterButtonState();
             this.updateScheduleFilterButtonState();
-            this.updateBookmarkFilterButtonState();
         }, 100);
 
         this.init();
@@ -709,43 +731,9 @@ export class MainController {
         // View toggle buttons are rendered by the ViewToggle Svelte component
         // (mounted into #view-toggle); it calls setView + refreshCurrentView.
 
-        // Filter button
-        const filterButton = document.getElementById('filter-btn');
-        if (filterButton) {
-            filterButton.insertAdjacentHTML('afterbegin', getInlineSVG('FILTER_FILLED', 'filter-icon'));
-            filterButton.addEventListener('click', () => {
-                this.filterModalController.show();
-            });
-        }
-
-        // Bookmark filter toggle button
-        const bookmarkFilterButton = document.getElementById('bookmark-filter-btn');
-        if (bookmarkFilterButton) {
-            // Icon is set by updateBookmarkFilterButtonState during initialization
-            bookmarkFilterButton.addEventListener('click', () => {
-                if (this.services.filterService.hasFilter('bookmark')) {
-                    this.services.filterService.removeFilter('bookmark');
-                } else {
-                    this.services.filterService.addFilter('bookmark', { showBookmarkedOnly: true });
-                }
-                this.updateBookmarkFilterButtonState();
-            });
-        }
-
-        // Clear filters button
-        const clearFiltersButton = document.getElementById('clear-filters-btn');
-        if (clearFiltersButton) {
-            clearFiltersButton.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'eraser-icon'));
-            clearFiltersButton.addEventListener('click', () => {
-                if (this.services.filterService) {
-                    const activeYear = this.services.profileStateManager.getActiveSchedule()?.year;
-                    this.services.filterService.resetFilters(activeYear);
-                    this.updateFilterButtonState();
-                    this.updateClearFiltersButtonState();
-                    this.updateBookmarkFilterButtonState();
-                }
-            });
-        }
+        // The planner filter trio (filter / bookmark / clear) is rendered by the
+        // FilterButtons Svelte component (mounted into #filter-buttons-host). Icon
+        // injection, click handlers, and reactive state all live there.
 
         // Schedule filter button
         const scheduleFilterButton = document.getElementById('schedule-filter-btn');
@@ -981,8 +969,8 @@ export class MainController {
         // Display courses with cancellation support
         this.displayCoursesWithCancellation(coursesToDisplay, cancellationToken);
 
-        // Update filter button appearance and sync search input
-        this.updateFilterButtonState();
+        // The planner filter buttons (FilterButtons Svelte component) update
+        // themselves from the reactive filter state; just sync the search input.
         this.syncSearchInputFromFilters();
     }
     
@@ -1008,58 +996,11 @@ export class MainController {
         }
     }
 
-    private updateFilterButtonState(): void {
-        const filterButton = document.getElementById('filter-btn');
-        if (filterButton && this.services.filterService) {
-            const activeYear = this.services.profileStateManager.getActiveSchedule()?.year;
-            const hasNonDefault = this.services.filterService.hasNonDefaultFilters(activeYear);
-            const filterCount = this.services.filterService.getFilterCount();
-
-            if (hasNonDefault) {
-                filterButton.classList.add('active');
-                filterButton.title = `${filterCount} filter${filterCount === 1 ? '' : 's'} active - Click to modify`;
-            } else {
-                filterButton.classList.remove('active');
-                filterButton.title = 'Filter courses';
-            }
-        }
-        this.updateClearFiltersButtonState();
-    }
-
-    private updateClearFiltersButtonState(): void {
-        const clearFiltersButton = document.getElementById('clear-filters-btn') as HTMLButtonElement | null;
-        if (clearFiltersButton && this.services.filterService) {
-            const activeYear = this.services.profileStateManager.getActiveSchedule()?.year;
-            const hasNonDefault = this.services.filterService.hasNonDefaultFilters(activeYear);
-
-            if (hasNonDefault) {
-                clearFiltersButton.style.display = '';
-                clearFiltersButton.disabled = false;
-            } else {
-                clearFiltersButton.style.display = 'none';
-            }
-        }
-    }
-
-    private updateBookmarkFilterButtonState(): void {
-        const button = document.getElementById('bookmark-filter-btn');
-        if (button && this.services.filterService) {
-            const isActive = this.services.filterService.hasFilter('bookmark');
-            button.classList.toggle('active', isActive);
-
-            // Swap icon between outline and filled
-            const iconClass = 'bookmark-icon';
-            const existingIcon = button.querySelector(`.${iconClass}`);
-            if (existingIcon) {
-                existingIcon.remove();
-            }
-            const icon = isActive ? 'BOOKMARK_FILLED' : 'BOOKMARK';
-            button.insertAdjacentHTML('afterbegin', getInlineSVG(icon, iconClass));
-
-            // Update title
-            button.title = isActive ? 'Show all courses' : 'Show bookmarked only';
-        }
-    }
+    // updateFilterButtonState / updateClearFiltersButtonState /
+    // updateBookmarkFilterButtonState were deleted: the planner filter trio is
+    // now the FilterButtons Svelte component, which derives its state from the
+    // reactive filter store. updateScheduleFilterButtonState stays — the
+    // schedule-filter button is co-owned with ScheduleController.
 
     private updateScheduleFilterButtonState(): void {
         const scheduleFilterButton = document.getElementById('schedule-filter-btn');
@@ -1167,8 +1108,8 @@ export class MainController {
                         this.services.filterService.addFilter('academicYear', { year: defaultYear });
                     }
                 }
-                this.updateFilterButtonState();
-                this.updateClearFiltersButtonState();
+                // The planner filter buttons (FilterButtons Svelte component)
+                // react to the academicYear filter change above on their own.
             }
         });
         this.updateSchedulePickerButton();
