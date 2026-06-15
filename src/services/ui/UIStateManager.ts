@@ -5,23 +5,17 @@ export class UIStateManager {
     // Reactive state lives in the `uiState` rune store; this manager applies the
     // DOM side-effects and exposes imperative setters over it.
 
-    // Cached DOM elements for applying effects
-    private plannerTab: HTMLElement | null;
-    private scheduleTab: HTMLElement | null;
+    // Cached DOM elements for applying effects. The tab `.active` state is now
+    // owned by the PageTabs Svelte component (reading uiState.currentPage), so
+    // no tab elements are cached here — only the still-vanilla page regions.
     private plannerPage: HTMLElement | null;
     private schedulePage: HTMLElement | null;
-    private mobileMenuBtn: HTMLElement | null;
-    private scheduleMobileMenuBtn: HTMLElement | null;
     private departmentList: HTMLElement | null;
     private courseContainer: HTMLElement | null;
 
     constructor() {
-        this.plannerTab = document.getElementById('planner-tab');
-        this.scheduleTab = document.getElementById('schedule-tab');
         this.plannerPage = document.getElementById('planner-page');
         this.schedulePage = document.getElementById('schedule-page');
-        this.mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        this.scheduleMobileMenuBtn = document.getElementById('schedule-mobile-menu-btn');
         this.departmentList = document.getElementById('department-list');
         this.courseContainer = document.getElementById('course-container');
     }
@@ -119,26 +113,16 @@ export class UIStateManager {
     // --- DOM effects (private) ---
 
     private applyPageEffects(): void {
+        // The tab `.active` state is owned by the PageTabs Svelte component
+        // (reactive on uiState.currentPage). This only toggles the still-vanilla
+        // #planner-page / #schedule-page region display.
         const page = uiState.currentPage;
-        if (this.plannerTab && this.scheduleTab) {
-            if (page === 'schedule') {
-                this.plannerTab.classList.remove('active');
-                this.scheduleTab.classList.add('active');
-            } else {
-                this.plannerTab.classList.add('active');
-                this.scheduleTab.classList.remove('active');
-            }
-        }
         if (page === 'planner') {
             if (this.plannerPage) this.plannerPage.style.display = 'grid';
             if (this.schedulePage) this.schedulePage.style.display = 'none';
-            if (this.mobileMenuBtn) this.mobileMenuBtn.style.display = '';
-            if (this.scheduleMobileMenuBtn) this.scheduleMobileMenuBtn.style.display = 'none';
         } else {
             if (this.plannerPage) this.plannerPage.style.display = 'none';
             if (this.schedulePage) this.schedulePage.style.display = 'flex';
-            if (this.mobileMenuBtn) this.mobileMenuBtn.style.display = 'none';
-            if (this.scheduleMobileMenuBtn) this.scheduleMobileMenuBtn.style.display = '';
         }
     }
 

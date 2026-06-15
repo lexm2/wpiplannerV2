@@ -1,4 +1,4 @@
-import type { WizardStep } from '../../types/uiState'
+import type { PageId, WizardStep } from '../../types/uiState'
 import { uiState } from '../../services/ui/uiState.svelte'
 import { Course, Department } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
@@ -8,6 +8,7 @@ import { mount } from 'svelte'
 import DepartmentSidebar from '../../svelte/DepartmentSidebar.svelte'
 import UndoRedoButtons from '../../svelte/UndoRedoButtons.svelte'
 import ViewToggle from '../../svelte/ViewToggle.svelte'
+import PageTabs from '../../svelte/PageTabs.svelte'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
@@ -148,6 +149,26 @@ export class MainController {
                 props: {
                     uiStateManager: services.uiStateManager,
                     onSelect: () => this.refreshCurrentView()
+                }
+            });
+        }
+
+        // Mount the planner/schedule page tabs (Svelte). It reads
+        // uiState.currentPage (a rune) for its reactive `active` class —
+        // replacing the tab `.active` toggle that used to live in
+        // UIStateManager.applyPageEffects() and the imperative click wiring
+        // below. Same ids/base classes/labels are preserved so the tutorial's
+        // `#planner-tab`/`#schedule-tab` selectors keep working. onSwitch runs
+        // switchToPageView, which performs the same side-effects the old
+        // tab-click handlers did.
+        const navTabsPillEl = document.querySelector('.nav-tabs-pill');
+        if (navTabsPillEl) {
+            navTabsPillEl.innerHTML = '';
+            mount(PageTabs, {
+                target: navTabsPillEl,
+                props: {
+                    uiStateManager: services.uiStateManager,
+                    onSwitch: (page: PageId) => this.switchToPageView(page)
                 }
             });
         }
@@ -301,6 +322,20 @@ export class MainController {
         if (this.services.uiStateManager.getCurrentPage() === 'schedule') {
             this.scheduleController.closeComponentWizard();
             this.services.uiStateManager.switchToPage('planner');
+        }
+    }
+
+    // Performs the page switch + side-effects the old #planner-tab/#schedule-tab
+    // click handlers ran. Invoked by the PageTabs Svelte component's onSwitch.
+    private switchToPageView(page: PageId): void {
+        if (page === 'planner') {
+            // Close wizard when switching to planner/classes page
+            this.scheduleController.closeComponentWizard();
+            this.services.uiStateManager.switchToPage('planner');
+        } else {
+            this.services.uiStateManager.switchToPage('schedule');
+            this.scheduleController.displayScheduleSelectedCourses();
+            this.scheduleController.renderScheduleGrids();
         }
     }
 
@@ -649,26 +684,9 @@ export class MainController {
             });
         }
 
-        // Tab navigation
-        const plannerTab = document.getElementById('planner-tab');
-        const scheduleTab = document.getElementById('schedule-tab');
-
-        if (plannerTab) {
-            plannerTab.addEventListener('click', () => {
-                // Close wizard when switching to planner/classes page
-                this.scheduleController.closeComponentWizard();
-                this.services.uiStateManager.switchToPage('planner');
-            });
-        }
-
-        if (scheduleTab) {
-            scheduleTab.addEventListener('click', async () => {
-                this.services.uiStateManager.switchToPage('schedule');
-
-                this.scheduleController.displayScheduleSelectedCourses();
-                this.scheduleController.renderScheduleGrids();
-            });
-        }
+        // Tab navigation is rendered by the PageTabs Svelte component (mounted
+        // into .nav-tabs-pill); it calls switchToPageView, which runs the same
+        // side-effects (close wizard / switch page / render schedule grids).
 
         // View toggle buttons are rendered by the ViewToggle Svelte component
         // (mounted into #view-toggle); it calls setView + refreshCurrentView.
