@@ -6,6 +6,7 @@
   import SectionInfo from './SectionInfo.svelte';
   import DeleteLocalEvent from './DeleteLocalEvent.svelte';
   import LocalEvent from './LocalEvent.svelte';
+  import AutoScheduleIntro from './AutoScheduleIntro.svelte';
   import type { UIStateManager } from '../../services/ui/UIStateManager';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
 
@@ -48,5 +49,7 @@
     <DeleteLocalEvent onRequestClose={() => uiStateManager.modalClosed('delete-local-event')} />
   {:else if id === 'local-event'}
     <LocalEvent onRequestClose={() => uiStateManager.modalClosed('local-event')} />
+  {:else if id === 'auto-schedule-intro'}
+    <AutoScheduleIntro onRequestClose={() => uiStateManager.modalClosed('auto-schedule-intro')} />
   {/if}
 {/each}

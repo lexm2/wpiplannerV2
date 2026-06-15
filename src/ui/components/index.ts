@@ -18,6 +18,5 @@ export type {
   ConflictSetupOptions,
 } from './SharedFilterSetup';
 export { SharedFilterSetup } from './SharedFilterSetup';
-export { AutoScheduleIntroModal } from './AutoScheduleIntroModal';
 export { ComponentSelectionWizard } from './ComponentSelectionWizard';
 export { SchedulePickerModal } from './SchedulePickerModal';

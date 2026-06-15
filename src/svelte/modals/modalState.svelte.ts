@@ -1,5 +1,5 @@
 import type { SectionData } from '../../types/modal';
-import type { LocalCalendarEvent } from '../../types/schedule';
+import type { LocalCalendarEvent, SelectedCourse } from '../../types/schedule';
 
 export interface DeleteLocalEventPayload {
     title: string;
@@ -13,10 +13,22 @@ export interface LocalEventPayload {
     existingEvent?: LocalCalendarEvent;
 }
 
+export interface AutoScheduleIntroPayload {
+    selectedCourses: SelectedCourse[];
+    getColor: (courseId: string) => string;
+    /** Invoked with the term-filtered courses when the user clicks Next */
+    onNext: (filtered: SelectedCourse[]) => void;
+}
+
 class ModalState {
     sectionInfo = $state.raw<SectionData | null>(null);
     deleteLocalEvent = $state.raw<DeleteLocalEventPayload | null>(null);
     localEvent = $state.raw<LocalEventPayload | null>(null);
+    autoScheduleIntro = $state.raw<AutoScheduleIntroPayload | null>(null);
+    // Tutorial-driven term-preference overrides (replaces the imperative
+    // AutoScheduleIntroModal.setTermPreferences call). The component merges
+    // these into its per-course term selection whenever this changes.
+    autoScheduleIntroTermPrefs = $state.raw<Record<string, string[]> | null>(null);
 }
 
 export const modalState = new ModalState();

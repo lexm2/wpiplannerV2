@@ -7,6 +7,7 @@
     closeOnBackdrop = true,
     closeOnEscape = true,
     title,
+    extraClass,
     onRequestClose,
     children,
   }: {
@@ -14,6 +15,8 @@
     closeOnBackdrop?: boolean;
     closeOnEscape?: boolean;
     title?: string;
+    /** Extra class(es) on the backdrop, e.g. 'filter-modal' for width/scoping. */
+    extraClass?: string;
     onRequestClose: () => void;
     children: Snippet<[() => void]>;
   } = $props();
@@ -60,7 +63,7 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (backdrop is click-to-close; Escape is handled on svelte:window) -->
 <div
-  class="modal-backdrop modal-container"
+  class="modal-backdrop modal-container {extraClass ?? ''}"
   class:show={shown}
   class:hide={closing}
   data-modal-type={typeId}

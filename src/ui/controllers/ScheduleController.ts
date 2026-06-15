@@ -17,8 +17,6 @@ import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
 import { ModalService } from '../../services/ui/ModalService'
 import type { UIStateManager } from '../../services/ui/UIStateManager'
-import { ModalQueue } from '../../services/ui/ModalQueue'
-import { AutoScheduleIntroModal } from '../components/AutoScheduleIntroModal'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator, type CalendarEventProvider } from '../../services/scheduling/AutoScheduleOrchestrator'
 import type { ComponentSelections, SectionOccupant, CalendarOccupant, CellData, CellContentResult } from '../../types/scheduling'
@@ -1579,58 +1577,49 @@ export class ScheduleController implements CalendarEventProvider {
             return;
         }
 
-        const queue = new ModalQueue();
-        let coursesToSchedule = selectedCourses;
-
-        queue.add((q) => {
-            const introModal = new AutoScheduleIntroModal(
-                this.modalService!,
-                selectedCourses,
-                (id) => this.colorService.getCourseColor(id),
-                this.uiStateManager || undefined
-            );
-            introModal.setOnNext((filtered) => {
-                coursesToSchedule = filtered;
-                q.next();
-            });
-            introModal.show();
-        });
-
-        queue.add(() => {
-            const scheduleFilterModal = new FilterModalController(this.modalService!, this.uiStateManager || undefined);
-            scheduleFilterModal.setFilterService(this.filterService!);
-            scheduleFilterModal.setCourseSelectionService(this.courseSelectionService);
-            scheduleFilterModal.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
-            scheduleFilterModal.setMode('auto-schedule');
-            scheduleFilterModal.setCoursesToSchedule(coursesToSchedule);
-            scheduleFilterModal.setOnGenerate(() => {
-                this.doGenerateSchedules(coursesToSchedule);
-            });
-            if (this.courseDataService) {
-                scheduleFilterModal.setCourseData(this.courseDataService.getAllDepartments());
-            }
-            scheduleFilterModal.show();
-        });
-
-        queue.start();
+        // Declarative intro modal → its onNext opens the (still-vanilla) filter
+        // modal with the term-filtered courses. This replaces the old ModalQueue
+        // intro→filter sequencing with plain state + a continuation callback.
+        modalState.autoScheduleIntro = {
+            selectedCourses,
+            getColor: (id) => this.colorService.getCourseColor(id),
+            onNext: (filtered) => this.openScheduleFilterModal(filtered),
+        };
+        this.uiStateManager?.modalOpened('auto-schedule-intro');
     }
 
-    private currentAutoScheduleIntro: AutoScheduleIntroModal | null = null;
+    /** Open the (still-vanilla) filter modal for the given courses to schedule. */
+    private openScheduleFilterModal(coursesToSchedule: SelectedCourse[]): void {
+        if (!this.modalService || !this.filterService) return;
+        const scheduleFilterModal = new FilterModalController(this.modalService, this.uiStateManager || undefined);
+        scheduleFilterModal.setFilterService(this.filterService);
+        scheduleFilterModal.setCourseSelectionService(this.courseSelectionService);
+        scheduleFilterModal.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
+        scheduleFilterModal.setMode('auto-schedule');
+        scheduleFilterModal.setCoursesToSchedule(coursesToSchedule);
+        scheduleFilterModal.setOnGenerate(() => {
+            this.doGenerateSchedules(coursesToSchedule);
+        });
+        if (this.courseDataService) {
+            scheduleFilterModal.setCourseData(this.courseDataService.getAllDepartments());
+        }
+        scheduleFilterModal.show();
+    }
 
     openAutoScheduleIntro(): void {
-        if (!this.modalService) return;
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
-        this.currentAutoScheduleIntro = new AutoScheduleIntroModal(
-            this.modalService,
+        modalState.autoScheduleIntro = {
             selectedCourses,
-            (id) => this.colorService.getCourseColor(id),
-            this.uiStateManager || undefined
-        );
-        this.currentAutoScheduleIntro.show();
+            getColor: (id) => this.colorService.getCourseColor(id),
+            onNext: (filtered) => this.openScheduleFilterModal(filtered),
+        };
+        this.uiStateManager?.modalOpened('auto-schedule-intro');
     }
 
     updateAutoScheduleIntroTerms(preferences: Record<string, string[]>): void {
-        this.currentAutoScheduleIntro?.setTermPreferences(preferences);
+        // Pushed into the declarative intro modal via a reactive override channel
+        // (the component merges it into its per-course term selection).
+        modalState.autoScheduleIntroTermPrefs = preferences;
     }
 
     private currentAutoScheduleFilter: FilterModalController | null = null;
