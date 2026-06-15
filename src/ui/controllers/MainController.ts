@@ -10,13 +10,13 @@ import UndoRedoButtons from '../../svelte/UndoRedoButtons.svelte'
 import ViewToggle from '../../svelte/ViewToggle.svelte'
 import PageTabs from '../../svelte/PageTabs.svelte'
 import FilterButtons from '../../svelte/FilterButtons.svelte'
+import SearchBar from '../../svelte/SearchBar.svelte'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { getInlineSVG, type IconName } from '../../utils/iconPaths'
-import { getAvailableProfessors } from '../../utils/searchUtils'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
 import { DeviceDetection } from '../../utils/deviceDetection'
@@ -45,7 +45,6 @@ export class MainController {
     private colorService: CourseColorService;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator;
     private allDepartments: Department[] = [];
-    private professorSearchMode = false;
     private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
     private pendingExpansions: Array<{courseId: string, term: string}> = [];
 
@@ -169,6 +168,29 @@ export class MainController {
                 props: {
                     filterService,
                     onFilter: () => this.openFilterModal()
+                }
+            });
+        }
+
+        // Mount the course search bar (Svelte): search input + professor-mode
+        // toggle + clear button + professor autocomplete dropdown. The input's
+        // display value is local $state; the `searchText` filter only updates on
+        // the debounced write, and an internal $effect adopts EXTERNAL filter
+        // changes (page-switch reset / FilterModal edits) back into the input —
+        // replacing the imperative #search-input/#search-mode-btn/#search-clear-btn
+        // wiring and syncSearchInputFromFilters(). Same ids/classes are preserved.
+        // onModalSync forwards committed queries to the still-vanilla FilterModal
+        // (main->modal); the modal->main direction is handled by the shared
+        // `searchText` filter that the $effect watches.
+        const searchInputWrapper = document.querySelector('.search-input-wrapper');
+        if (searchInputWrapper) {
+            searchInputWrapper.innerHTML = '';
+            mount(SearchBar, {
+                target: searchInputWrapper,
+                props: {
+                    filterService,
+                    debouncedSearch: this.debouncedSearch,
+                    onModalSync: (q: string) => this.syncModalSearchInput(q)
                 }
             });
         }
@@ -611,110 +633,12 @@ export class MainController {
             }
         });
 
-        // Search functionality with debouncing and cancellation
-        const searchInput = document.getElementById('search-input') as HTMLInputElement;
-        const searchClearBtn = document.getElementById('search-clear-btn') as HTMLButtonElement;
-        const searchModeBtn = document.getElementById('search-mode-btn') as HTMLButtonElement;
-        const professorDropdown = document.getElementById('search-professor-dropdown') as HTMLDivElement;
-
-        if (professorDropdown) {
-            professorDropdown.addEventListener('click', (e) => {
-                const target = e.target as HTMLElement;
-                if (target.classList.contains('professor-option') && searchInput) {
-                    searchInput.value = target.dataset.professor!;
-                    professorDropdown.style.display = 'none';
-                    searchInput.dispatchEvent(new Event('input'));
-                    searchInput.focus();
-                }
-            });
-        }
-
-        if (searchModeBtn) {
-            searchModeBtn.insertAdjacentHTML('beforeend', getInlineSVG('SCHOOL', 'school-icon'));
-            searchModeBtn.addEventListener('click', () => {
-                this.professorSearchMode = !this.professorSearchMode;
-                searchModeBtn.innerHTML = '';
-                searchModeBtn.insertAdjacentHTML('beforeend',
-                    this.professorSearchMode ? getInlineSVG('SCHOOL_FULL', 'school-full-icon') : getInlineSVG('SCHOOL', 'school-icon')
-                );
-                searchModeBtn.classList.toggle('active', this.professorSearchMode);
-                if (professorDropdown) professorDropdown.style.display = 'none';
-                if (searchInput) {
-                    searchInput.value = '';
-                    searchInput.placeholder = this.professorSearchMode ? 'Search professors...' : 'Search courses...';
-                    searchInput.dispatchEvent(new Event('input'));
-                }
-            });
-        }
-
-        if (searchClearBtn) {
-            searchClearBtn.insertAdjacentHTML('beforeend', getInlineSVG('X', 'x-icon'));
-            searchClearBtn.addEventListener('click', () => {
-                if (searchInput) {
-                    searchInput.value = '';
-                    searchInput.dispatchEvent(new Event('input'));
-                    searchInput.focus();
-                }
-                searchClearBtn.hidden = true;
-                this.professorSearchMode = false;
-                if (professorDropdown) professorDropdown.style.display = 'none';
-                if (searchModeBtn) {
-                    searchModeBtn.innerHTML = '';
-                    searchModeBtn.insertAdjacentHTML('beforeend', getInlineSVG('SCHOOL', 'school-icon'));
-                    searchModeBtn.classList.remove('active');
-                }
-                if (searchInput) searchInput.placeholder = 'Search courses...';
-            });
-        }
-
-        if (searchInput) {
-            searchInput.addEventListener('blur', () => {
-                setTimeout(() => { if (professorDropdown) professorDropdown.style.display = 'none'; }, 150);
-            });
-
-            searchInput.addEventListener('input', () => {
-                const query = searchInput.value;
-                if (searchClearBtn) searchClearBtn.hidden = query === '';
-
-                if (this.professorSearchMode && professorDropdown) {
-                    if (query.length > 0) {
-                        const matches = getAvailableProfessors(this.getAllCourses())
-                            .filter(p => p.toLowerCase().includes(query.toLowerCase()))
-                            .slice(0, 10);
-                        professorDropdown.innerHTML = matches
-                            .map(p => `<div class="professor-option" data-professor="${p}">${p}</div>`)
-                            .join('');
-                        professorDropdown.style.display = matches.length > 0 ? 'block' : 'none';
-                    } else {
-                        professorDropdown.style.display = 'none';
-                    }
-                }
-
-                // Use debounced operation for search to prevent excessive filtering
-                this.debouncedSearch.execute(async (cancellationToken) => {
-                    cancellationToken.throwIfCancelled();
-
-                    // Only trim for the check, but pass the original query with spaces
-                    if (query.trim().length > 0) {
-                        this.services.filterService.addFilter('searchText', { query, professorOnly: this.professorSearchMode });
-                    } else {
-                        this.services.filterService.removeFilter('searchText');
-                    }
-
-                    cancellationToken.throwIfCancelled();
-
-                    // Sync modal search input
-                    this.syncModalSearchInput(query);
-
-                    return Promise.resolve();
-                }).catch(error => {
-                    // Ignore cancellation errors, log others
-                    if (error.name !== 'CancellationError') {
-                        console.error('Search error:', error);
-                    }
-                });
-            });
-        }
+        // The course search bar (input + professor-mode toggle + clear button +
+        // professor autocomplete dropdown) is now the SearchBar Svelte component,
+        // mounted into .search-input-wrapper. It owns its own input/blur/click
+        // wiring, the debounced filter write, and the professor autocomplete; an
+        // internal $effect adopts external `searchText` filter changes back into
+        // the input (replacing syncSearchInputFromFilters).
 
         // Schedule picker button
         const schedulePickerBtn = document.getElementById('schedule-picker-btn');
@@ -969,9 +893,9 @@ export class MainController {
         // Display courses with cancellation support
         this.displayCoursesWithCancellation(coursesToDisplay, cancellationToken);
 
-        // The planner filter buttons (FilterButtons Svelte component) update
-        // themselves from the reactive filter state; just sync the search input.
-        this.syncSearchInputFromFilters();
+        // The planner filter buttons (FilterButtons) and the search input
+        // (SearchBar) are Svelte components that derive their own state from the
+        // reactive filter store — no imperative sync needed here.
     }
     
     private async displayCoursesWithCancellation(coursesToDisplay: Course[], cancellationToken: CancellationToken): Promise<void> {
@@ -1400,45 +1324,12 @@ export class MainController {
     }
 
     private resetSearchAndDepartmentFilters(): void {
+        // Removing the searchText filter clears the SearchBar input reactively
+        // (its internal $effect adopts the now-empty filter query and resets
+        // professor mode); removing the department filter resets the sidebar to
+        // "All Departments". Both are Svelte components that react on their own.
         this.services.filterService.removeFilter('searchText');
-        this.professorSearchMode = false;
-        const searchInput = document.getElementById('search-input') as HTMLInputElement;
-        const searchClearBtn = document.getElementById('search-clear-btn') as HTMLButtonElement;
-        const searchModeBtn = document.getElementById('search-mode-btn') as HTMLButtonElement;
-        const professorDropdown = document.getElementById('search-professor-dropdown') as HTMLDivElement;
-        if (searchInput) { searchInput.value = ''; searchInput.placeholder = 'Search courses...'; }
-        if (searchClearBtn) searchClearBtn.hidden = true;
-        if (professorDropdown) professorDropdown.style.display = 'none';
-        if (searchModeBtn) {
-            searchModeBtn.innerHTML = '';
-            searchModeBtn.insertAdjacentHTML('beforeend', getInlineSVG('SCHOOL', 'school-icon'));
-            searchModeBtn.classList.remove('active');
-        }
-        // Reset department selection to "All"; the sidebar reflects this reactively.
         this.services.filterService.removeFilter('department');
-    }
-
-    private syncSearchInputFromFilters(): void {
-        const searchInput = document.getElementById('search-input') as HTMLInputElement;
-        if (searchInput) {
-            const searchTextFilter = this.services.filterService.getActiveFilters().find(f => f.id === 'searchText');
-            const searchCriteria = searchTextFilter?.criteria as { query?: string } | undefined;
-            const currentQuery = searchCriteria?.query || '';
-            if (searchInput.value !== currentQuery) {
-                searchInput.value = currentQuery;
-                const searchClearBtn = document.getElementById('search-clear-btn') as HTMLButtonElement;
-                if (searchClearBtn) searchClearBtn.hidden = currentQuery === '';
-                if (currentQuery === '') {
-                    const searchModeBtn = document.getElementById('search-mode-btn') as HTMLButtonElement;
-                    if (searchModeBtn && searchModeBtn.classList.contains('active')) {
-                        searchModeBtn.innerHTML = '';
-                        searchModeBtn.insertAdjacentHTML('beforeend', getInlineSVG('SCHOOL', 'school-icon'));
-                        searchModeBtn.classList.remove('active');
-                        searchInput.placeholder = 'Search courses...';
-                    }
-                }
-            }
-        }
     }
 
     private initializeDefaultDepartmentView(): void {
