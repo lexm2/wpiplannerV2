@@ -6,6 +6,7 @@ import { ThemeSelector } from '../components/ThemeSelector'
 import { SchedulePickerModal } from '../components/SchedulePickerModal'
 import { mount } from 'svelte'
 import DepartmentSidebar from '../../svelte/DepartmentSidebar.svelte'
+import UndoRedoButtons from '../../svelte/UndoRedoButtons.svelte'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
@@ -113,6 +114,25 @@ export class MainController {
         if (deptListEl) {
             deptListEl.innerHTML = '';
             mount(DepartmentSidebar, { target: deptListEl, props: { filterService } });
+        }
+
+        // Mount the undo/redo buttons (Svelte). The wrapper holds exactly these
+        // two buttons, so clearing + mounting is safe. The component reads
+        // appState.undoRedoGeneration to keep its disabled state in sync —
+        // replacing MainController's imperative updateUndoRedoButtons()/watch().
+        // Same ids/classes/titles are preserved so the tutorial and
+        // SchedulePickerModal getElementById(...).click() shims keep working.
+        const undoRedoEl = document.querySelector('.undo-redo-controls');
+        if (undoRedoEl) {
+            undoRedoEl.innerHTML = '';
+            mount(UndoRedoButtons, {
+                target: undoRedoEl,
+                props: {
+                    profileStateManager: services.profileStateManager,
+                    onUndo: () => this.handleUndo(),
+                    onRedo: () => this.handleRedo()
+                }
+            });
         }
 
         // Set up course data event subscriptions via AppBootstrap
@@ -698,23 +718,9 @@ export class MainController {
             });
         }
 
-        // Undo/Redo button event listeners
-        const undoBtn = document.getElementById('undo-btn');
-        const redoBtn = document.getElementById('redo-btn');
-
-        if (undoBtn) {
-            undoBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_BACK_UP'));
-            undoBtn.addEventListener('click', () => {
-                this.handleUndo();
-            });
-        }
-
-        if (redoBtn) {
-            redoBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_FORWARD_UP'));
-            redoBtn.addEventListener('click', () => {
-                this.handleRedo();
-            });
-        }
+        // Undo/Redo buttons are rendered by the UndoRedoButtons Svelte component
+        // (mounted in the constructor). Icon injection, click handlers, and
+        // disabled-state sync live there.
 
         // Settings menu for mobile
         this.setupSettingsMenu();
@@ -733,13 +739,6 @@ export class MainController {
             }
         });
 
-        // React to undo/redo history changes to update button states
-        watch(() => appState.undoRedoGeneration, () => {
-            this.updateUndoRedoButtons();
-        });
-
-        // Initial button state update
-        this.updateUndoRedoButtons();
     }
 
     /** Compute animation duration scaled by pixel distance (min 0.2s, max 0.5s) */
@@ -1229,19 +1228,6 @@ export class MainController {
             this.scheduleController.renderScheduleGrids();
         } else {
             this.refreshCurrentView();
-        }
-    }
-
-    private updateUndoRedoButtons(): void {
-        const undoBtn = document.getElementById('undo-btn') as HTMLButtonElement;
-        const redoBtn = document.getElementById('redo-btn') as HTMLButtonElement;
-
-        if (undoBtn) {
-            undoBtn.disabled = !this.services.profileStateManager.canUndo();
-        }
-
-        if (redoBtn) {
-            redoBtn.disabled = !this.services.profileStateManager.canRedo();
         }
     }
 
