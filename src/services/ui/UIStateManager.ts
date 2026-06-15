@@ -1,16 +1,9 @@
 import type { UIState, PageId, ViewMode, WizardStep } from '../../types/uiState';
-
-export type UIStateListener = (state: Readonly<UIState>, prevState: Readonly<UIState>) => void;
+import { uiState } from './uiState.svelte';
 
 export class UIStateManager {
-    private state: UIState = {
-        currentPage: 'planner',
-        currentView: 'list',
-        openModals: [],
-        wizard: { isOpen: false, courseId: null, step: null },
-    };
-
-    private listeners = new Set<UIStateListener>();
+    // Reactive state lives in the `uiState` rune store; this manager applies the
+    // DOM side-effects and exposes imperative setters over it.
 
     // Cached DOM elements for applying effects
     private viewListBtn: HTMLElement | null;
@@ -40,42 +33,32 @@ export class UIStateManager {
     // --- State access ---
 
     getState(): Readonly<UIState> {
-        return this.state;
+        return {
+            currentPage: uiState.currentPage,
+            currentView: uiState.currentView,
+            openModals: uiState.openModals,
+            wizard: uiState.wizard,
+        };
     }
 
     getSnapshot(): UIState {
-        return JSON.parse(JSON.stringify(this.state));
+        return JSON.parse(JSON.stringify(this.getState()));
     }
 
     // Backward-compat getters
-    get currentPage(): PageId { return this.state.currentPage; }
-    get currentView(): ViewMode { return this.state.currentView; }
+    get currentPage(): PageId { return uiState.currentPage; }
+    get currentView(): ViewMode { return uiState.currentView; }
 
     getCurrentPage(): PageId {
-        return this.state.currentPage;
-    }
-
-    // --- Subscriptions ---
-
-    subscribe(listener: UIStateListener): () => void {
-        this.listeners.add(listener);
-        return () => this.listeners.delete(listener);
-    }
-
-    private notify(prevState: UIState): void {
-        for (const listener of this.listeners) {
-            try { listener(this.state, prevState); } catch (e) { console.error('UIState listener error:', e); }
-        }
+        return uiState.currentPage;
     }
 
     // --- Page ---
 
     setPage(page: PageId): void {
-        if (page === this.state.currentPage) return;
-        const prev = this.getSnapshot();
-        this.state.currentPage = page;
+        if (page === uiState.currentPage) return;
+        uiState.currentPage = page;
         this.applyPageEffects();
-        this.notify(prev);
     }
 
     /** @deprecated Use setPage */
@@ -84,75 +67,62 @@ export class UIStateManager {
     }
 
     togglePage(): void {
-        this.setPage(this.state.currentPage === 'planner' ? 'schedule' : 'planner');
+        this.setPage(uiState.currentPage === 'planner' ? 'schedule' : 'planner');
     }
 
     // --- View mode ---
 
     setView(view: ViewMode): void {
-        if (view === this.state.currentView) return;
-        const prev = this.getSnapshot();
-        this.state.currentView = view;
+        if (view === uiState.currentView) return;
+        uiState.currentView = view;
         this.applyViewEffects();
-        this.notify(prev);
     }
 
     // --- Modal tracking ---
 
     modalOpened(typeId: string): void {
-        if (this.state.openModals.includes(typeId)) return;
-        const prev = this.getSnapshot();
-        this.state.openModals = [...this.state.openModals, typeId];
-        this.notify(prev);
+        if (uiState.openModals.includes(typeId)) return;
+        uiState.openModals = [...uiState.openModals, typeId];
     }
 
     modalClosed(typeId: string): void {
-        if (!this.state.openModals.includes(typeId)) return;
-        const prev = this.getSnapshot();
-        this.state.openModals = this.state.openModals.filter(id => id !== typeId);
-        this.notify(prev);
+        if (!uiState.openModals.includes(typeId)) return;
+        uiState.openModals = uiState.openModals.filter(id => id !== typeId);
     }
 
     // --- Wizard tracking ---
 
     wizardOpened(courseId: string, step: WizardStep): void {
-        const prev = this.getSnapshot();
-        this.state.wizard = { isOpen: true, courseId, step };
-        this.notify(prev);
+        uiState.wizard = { isOpen: true, courseId, step };
     }
 
     wizardStepChanged(step: WizardStep): void {
-        if (!this.state.wizard.isOpen) return;
-        const prev = this.getSnapshot();
-        this.state.wizard = { ...this.state.wizard, step };
-        this.notify(prev);
+        if (!uiState.wizard.isOpen) return;
+        uiState.wizard = { ...uiState.wizard, step };
     }
 
     wizardClosed(): void {
-        if (!this.state.wizard.isOpen) return;
-        const prev = this.getSnapshot();
-        this.state.wizard = { isOpen: false, courseId: null, step: null };
-        this.notify(prev);
+        if (!uiState.wizard.isOpen) return;
+        uiState.wizard = { isOpen: false, courseId: null, step: null };
     }
 
     // --- Bulk restore (for tutorial) ---
 
     restoreState(snapshot: UIState): void {
-        const prev = this.getSnapshot();
-        this.state = JSON.parse(JSON.stringify(snapshot));
-        // Only apply page/view DOM effects here.
-        // Modals and wizard are reopened explicitly by the caller.
-        this.state.openModals = [];
-        this.state.wizard = { isOpen: false, courseId: null, step: null };
+        uiState.currentPage = snapshot.currentPage;
+        uiState.currentView = snapshot.currentView;
+        // Only restore page/view here; modals and wizard are reopened
+        // explicitly by the caller.
+        uiState.openModals = [];
+        uiState.wizard = { isOpen: false, courseId: null, step: null };
         this.applyPageEffects();
         this.applyViewEffects();
-        this.notify(prev);
     }
 
     // --- DOM effects (private) ---
 
     private applyPageEffects(): void {
-        const page = this.state.currentPage;
+        const page = uiState.currentPage;
         if (this.plannerTab && this.scheduleTab) {
             if (page === 'schedule') {
                 this.plannerTab.classList.remove('active');
@@ -176,7 +146,7 @@ export class UIStateManager {
     }
 
     private applyViewEffects(): void {
-        const view = this.state.currentView;
+        const view = uiState.currentView;
         if (this.viewListBtn && this.viewGridBtn) {
             if (view === 'list') {
                 this.viewListBtn.classList.add('btn-primary', 'active');

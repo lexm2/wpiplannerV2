@@ -33,11 +33,9 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · ⏭️ deferred (becomes Sve
 - **Was:** `listeners: Set<()=>void>`, `onChange()`, `notifyListeners()`; re-exposed by `ProfileStateManager.onUndoRedoChange()`.
 - **Now:** `appState.undoRedoGeneration` rune, bumped by `UndoRedoManager.notifyListeners()` (kept the private method, replaced its body). `MainController` `watch(() => appState.undoRedoGeneration, ...)` re-reads `canUndo()`/`canRedo()`. Deleted `listeners`/`onChange` + `ProfileStateManager.onUndoRedoChange`.
 
-### 2. UIStateManager (NOT in original 5)
-- **System:** `src/services/ui/UIStateManager.ts` — `listeners: Set<UIStateListener>`, `subscribe()`, `notify()`, `UIStateListener` type. Plain `this.state` object (page/view/openModals/wizard).
-- **Consumer:** `MainController.ts:1153` — `uiStateManager.subscribe((state, prevState) => ...)`. (Also `ScheduleController.setUIStateManager`, and many modals hold a ref but only call setters.)
-- **Plan:** back `state` with `$state` (own `uiState.svelte.ts` or fields on `appState`). Setters mutate runes; DOM-effect methods (`applyPageEffects`/`applyViewEffects`) become an `$effect` or stay called inline. MainController `watch`es. Delete `subscribe`/`notify`/`listeners`/`UIStateListener`.
-- **Note:** `prevState` diffing in the consumer must be reproduced (runes give new+old via comparing, or keep a previous-value var in the watch).
+### 2. ✅ UIStateManager (NOT in original 5) — DONE
+- **Was:** `listeners: Set<UIStateListener>`, `subscribe()`, `notify()`, `UIStateListener` type; plain `this.state` object.
+- **Now:** reactive state moved to `src/services/ui/uiState.svelte.ts` (`$state` page/view, `$state.raw` openModals/wizard). UIStateManager keeps DOM-effect logic + imperative setters over the rune store; `getState`/`getSnapshot` build from it. `MainController.setupPageNavigationListener` uses `watch(() => uiState.currentPage, ...)` with a local `prevPage` to reproduce the old prevState diff. Deleted `subscribe`/`notify`/`listeners`/`UIStateListener`.
 
 ### 3. courseDataService (NOT in original 5)
 - **System:** `src/services/data/courseDataService.ts` — `listeners: Map<type, Set>`, `on()`/`off()`/`emit()`, `CourseDataEvent`/`CourseDataEventType`/`CourseDataEventListener` types.

@@ -1,4 +1,5 @@
 import type { WizardStep } from '../../types/uiState'
+import { uiState } from '../../services/ui/uiState.svelte'
 import { Course, Department } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
 import { ThemeSelector } from '../components/ThemeSelector'
@@ -1150,13 +1151,16 @@ export class MainController {
     }
 
     private setupPageNavigationListener(): void {
-        this.services.uiStateManager.subscribe((state, prevState) => {
-            if (state.currentPage === 'planner' && prevState.currentPage !== 'planner') {
+        let prevPage = uiState.currentPage;
+        watch(() => uiState.currentPage, () => {
+            const page = uiState.currentPage;
+            if (page === 'planner' && prevPage !== 'planner') {
                 this.courseController.syncCourseSelectionState();
             }
-            if (state.currentPage === 'schedule' && prevState.currentPage !== 'schedule') {
+            if (page === 'schedule' && prevPage !== 'schedule') {
                 this.resetSearchAndDepartmentFilters();
             }
+            prevPage = page;
         });
     }
 
