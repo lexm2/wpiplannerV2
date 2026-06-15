@@ -281,6 +281,17 @@ export class CourseController {
         return allCourses;
     }
 
+    /**
+     * Show the description panel for a Course object directly (no DOM element
+     * needed). Called from the Svelte CourseList when a course item is clicked,
+     * while the description panel is still vanilla. The list manages its own
+     * active-item highlight, so this no longer touches `.active` classes.
+     */
+    showCourseDescription(course: Course): void {
+        this.selectedCourse = course;
+        this.displayCourseDescription(course);
+    }
+
     selectCourse(element: HTMLElement): Course | null {
         const course = this.elementToCourseMap.get(element);
         if (!course) return null;

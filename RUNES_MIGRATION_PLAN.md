@@ -19,7 +19,10 @@ existing host element after clearing it).
 
 ---
 
-## PHASE 9 — App-shell controls (header) — lowest risk, many already rune-backed
+## PHASE 9 — App-shell controls (header) — ✅ DONE (all 6, each Playwright-verified + committed)
+9A UndoRedoButtons · 9B ViewToggle · 9C PageTabs · 9D ThemeSelector (+`uiState.currentThemeId` rune) · 9E FilterButtons · 9F SearchBar.
+LESSON (9F): a filter-sync `$effect` that reads the local input `$state` to compare MUST wrap the read/assign in `untrack(...)` — otherwise every keystroke re-runs the effect and resets the input to the not-yet-debounced filter value (Playwright caught this; same untrack lesson as the `watch` bridge). Settings mobile menu still vanilla → folds into App.svelte (Phase 13).
+Original per-unit notes:
 Each is tiny and independently committable. Mount into existing hosts.
 - **9A `UndoRedoButtons.svelte`** — host `.undo-redo-controls`. `$derived`(read `appState.undoRedoGeneration` then `psm.canUndo()/canRedo()`). Delete MainController 701-717, 736-742, `updateUndoRedoButtons` 1235-1246. Keep keydown or move to `<svelte:window>`.
 - **9B `ViewToggle.svelte`** — host `#view-list`/`#view-grid` (wrap). `$derived(uiState.currentView)`; `class:` bindings replace `UIStateManager.applyViewEffects` (delete it).

@@ -11,6 +11,7 @@ import ViewToggle from '../../svelte/ViewToggle.svelte'
 import PageTabs from '../../svelte/PageTabs.svelte'
 import FilterButtons from '../../svelte/FilterButtons.svelte'
 import SearchBar from '../../svelte/SearchBar.svelte'
+import CourseList from '../../svelte/CourseList.svelte'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
@@ -20,7 +21,7 @@ import { getInlineSVG, type IconName } from '../../utils/iconPaths'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
 import { DeviceDetection } from '../../utils/deviceDetection'
-import { DebouncedOperation, CancellationToken } from '../../utils/RequestCancellation'
+import { DebouncedOperation } from '../../utils/RequestCancellation'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator'
 import { AppBootstrap } from '../../bootstrap/AppBootstrap'
@@ -45,8 +46,6 @@ export class MainController {
     private colorService: CourseColorService;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator;
     private allDepartments: Department[] = [];
-    private expandedTerms: Map<string, string> = new Map(); // courseId -> expanded term letter
-    private pendingExpansions: Array<{courseId: string, term: string}> = [];
 
 
     constructor(services: ServiceContainer) {
@@ -74,14 +73,6 @@ export class MainController {
 
         // Connect filter service to course controller
         this.courseController.setFilterService(filterService);
-
-        // Register rendering callbacks for term expansion state management
-        this.courseController.setOnBatchCallback(() => {
-            this.restoreTermExpansionState();
-        });
-        this.courseController.setOnRenderCompleteCallback(() => {
-            this.processPendingExpansions();
-        });
 
         // Connect filter service and course data to filter modal
         this.filterModalController.setFilterService(filterService);
@@ -195,6 +186,31 @@ export class MainController {
             });
         }
 
+        // Mount the course list (Svelte) into #course-container. It derives the
+        // displayed courses from appState.loadedDepartments + the reactive filter
+        // store (replicating refreshCurrentView's single-department/all base +
+        // filterService.filterCourses), owns pagination (load-more), term-badge
+        // expansion (a slide transition replacing the old FLIP height animation),
+        // and the select/bookmark buttons (which reflect appState.selectedById /
+        // bookmarkedIds reactively). CourseController stays alive: it still owns
+        // the selected-courses panel and the course-description panel. Clicking a
+        // course item sets the shared courseListState.selectedCourseId AND calls
+        // onSelectCourse → courseController.showCourseDescription(course), which
+        // updates the still-vanilla description panel.
+        const courseContainerEl = document.getElementById('course-container');
+        if (courseContainerEl) {
+            courseContainerEl.innerHTML = '';
+            mount(CourseList, {
+                target: courseContainerEl,
+                props: {
+                    filterService,
+                    courseSelectionService,
+                    profileStateManager: services.profileStateManager,
+                    onSelectCourse: (course: Course) => this.courseController.showCourseDescription(course)
+                }
+            });
+        }
+
         // Mount the planner/schedule page tabs (Svelte). It reads
         // uiState.currentPage (a rune) for its reactive `active` class —
         // replacing the tab `.active` toggle that used to live in
@@ -263,10 +279,12 @@ export class MainController {
         // Initialize filters and wire up filter change listeners
         AppBootstrap.initializeFilters(services);
 
+        // The course list (CourseList Svelte component) reacts to the filter
+        // store on its own, so the watch only needs to drive the schedule-side
+        // refresh now.
         watch(
             () => filterService.getActiveFilters(),
             () => {
-                this.refreshCurrentView();
                 this.scheduleController.applyFiltersAndRefresh();
             },
         );
@@ -332,8 +350,8 @@ export class MainController {
             this.autoScheduleOrchestrator.setupCourseSelectionChangeListener();
             this.courseController.displaySelectedCourses();
 
-            // Initial UI sync for selected courses (use efficient targeted updates)
-            this.syncInitialCourseSelectionUI();
+            // The course list's select buttons are reactive (CourseList reads
+            // appState.selectedById), so no initial imperative selection sync.
 
             this.updateSelectedCoursesState(this.services.courseSelectionService.getSelectedCourses());
 
@@ -407,158 +425,9 @@ export class MainController {
         document.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
 
-            if (target.classList.contains('section-badge')) {
-                target.classList.toggle('selected');
-            }
-
-            if (target.classList.contains('term-badge') || target.closest('.term-badge')) {
-                e.stopPropagation();
-                const termBadge = target.classList.contains('term-badge') ? target : target.closest('.term-badge') as HTMLElement;
-                const clickedTerm = termBadge?.dataset.term;
-                const courseSections = termBadge?.closest('.course-sections') as HTMLElement;
-
-                if (!clickedTerm || !courseSections) return;
-
-                // Get courseId from the course-sections container
-                const courseId = courseSections.dataset.courseId;
-                if (!courseId) return;
-
-                // Check if rendering is in progress
-                if (this.courseController.isRendering()) {
-                    // Queue the expansion for later
-                    this.pendingExpansions.push({ courseId, term: clickedTerm });
-                    return;
-                }
-
-                const termBadgesContainer = courseSections.querySelector('.term-badges-container') as HTMLElement;
-                const termSectionsContainers = courseSections.querySelectorAll('.term-sections-container') as NodeListOf<HTMLElement>;
-                const clickedTermContainer = courseSections.querySelector(`.term-sections-container[data-term="${clickedTerm}"]`) as HTMLElement;
-
-                // Check if this term is already expanded
-                const isExpanded = clickedTermContainer && clickedTermContainer.style.display !== 'none';
-
-                if (isExpanded) {
-                    // Update state: term is being collapsed
-                    this.expandedTerms.delete(courseId);
-
-                    const courseItem = courseSections.closest('.course-item') as HTMLElement;
-
-                    // 1. Lock course-item at current height, promote to compositor layer
-                    const currentItemHeight = courseItem.getBoundingClientRect().height;
-                    courseItem.style.willChange = 'height';
-                    courseItem.style.height = `${currentItemHeight}px`;
-                    courseItem.style.overflow = 'hidden';
-
-                    // 2. Instantly do the full content swap
-                    termSectionsContainers.forEach(c => c.style.display = 'none');
-                    courseSections.classList.remove('expanded');
-                    courseSections.style.maxHeight = '';
-
-                    // Set initial state for term badges (hidden)
-                    const termBadges = termBadgesContainer.querySelectorAll('.term-badge') as NodeListOf<HTMLElement>;
-                    termBadges.forEach(badge => {
-                        badge.style.opacity = '0';
-                        badge.style.transform = 'translateX(-10px)';
-                        badge.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
-                    });
-
-                    termBadgesContainer.style.display = 'flex';
-                    termBadgesContainer.style.opacity = '1';
-
-                    // Reset container styles (badges are hidden via display:none, no need to touch individually)
-                    clickedTermContainer.style.cssText = '';
-                    clickedTermContainer.style.display = 'none';
-
-                    // Rotate icon back and clear inline styles from expansion
-                    const termIcon = clickedTermContainer.querySelector('.term-badge.active .term-icon') as HTMLElement;
-                    if (termIcon) {
-                        termIcon.style.transform = '';
-                        termIcon.style.transition = '';
-                    }
-
-                    // 3. Measure target height (temporarily unlock to get true content height)
-                    courseItem.style.height = 'auto';
-                    const targetItemHeight = courseItem.getBoundingClientRect().height;
-                    // Re-lock at starting height
-                    courseItem.style.height = `${currentItemHeight}px`;
-                    // Force browser to commit starting height before adding transition
-                    courseItem.offsetHeight;
-                    const collapseDuration = this.getHeightAnimDuration(currentItemHeight, targetItemHeight);
-                    courseItem.style.transition = `height ${collapseDuration}s ease`;
-
-                    // 4. Animate to target height
-                    requestAnimationFrame(() => {
-                        courseItem.style.height = `${targetItemHeight}px`;
-
-                        // Stagger animate term badges in
-                        termBadges.forEach((badge, i) => {
-                            setTimeout(() => {
-                                badge.style.opacity = '1';
-                                badge.style.transform = 'translateX(0)';
-                            }, i * 30);
-                        });
-
-                        // Clean up after transition
-                        const cleanup = () => {
-                            courseItem.style.height = '';
-                            courseItem.style.transition = '';
-                            courseItem.style.overflow = '';
-                            courseItem.style.willChange = '';
-                            // Clean up term badge inline styles
-                            termBadges.forEach(badge => {
-                                badge.style.cssText = '';
-                            });
-                        };
-                        const onEnd = (e: TransitionEvent) => {
-                            if (e.propertyName !== 'height') return;
-                            clearTimeout(fallbackTimer);
-                            courseItem.removeEventListener('transitionend', onEnd);
-                            cleanup();
-                        };
-                        courseItem.addEventListener('transitionend', onEnd);
-                        const fallbackTimer = setTimeout(() => {
-                            courseItem.removeEventListener('transitionend', onEnd);
-                            cleanup();
-                        }, collapseDuration * 1000 + 100);
-                    });
-                } else {
-                    // Update state: term is being expanded
-                    this.expandedTerms.set(courseId, clickedTerm);
-
-                    // Use extracted animation function
-                    this.animateTermExpansion(courseSections, termBadgesContainer, termSectionsContainers, clickedTermContainer);
-                }
-            }
-
-            const selectBtn = target.closest('.course-select-btn') as HTMLElement | null;
-            if (selectBtn) {
-                const courseElement = selectBtn.closest('.course-item, .course-card') as HTMLElement;
-                if (courseElement) {
-                    try {
-                        this.courseController.toggleCourseSelection(courseElement);
-                    } catch (error) {
-                        console.error('Failed to toggle course selection:', error);
-                        this.services.uiStateManager.showErrorMessage('Failed to update course selection. Please try again.');
-                    }
-                }
-            }
-
-            const bookmarkBtn = target.closest('.course-bookmark-btn') as HTMLElement | null;
-            if (bookmarkBtn) {
-                const courseElement = bookmarkBtn.closest('.course-item, .course-card') as HTMLElement;
-                if (courseElement) {
-                    this.courseController.toggleCourseBookmark(courseElement);
-                }
-            }
-
-            if (target.classList.contains('load-more-button')) {
-                // Handle Load More button click
-                this.handleLoadMoreClick().catch(error => {
-                    console.error('Failed to load more courses:', error);
-                    this.services.uiStateManager.showErrorMessage('Failed to load more courses. Please try again.');
-                });
-                return;
-            }
+            // The course LIST (term-badge expansion, select/bookmark buttons,
+            // load-more, and opening a course's description) is now owned by the
+            // CourseList Svelte component mounted into #course-container.
 
             if (target.classList.contains('course-remove-btn')) {
                 e.stopPropagation();
@@ -625,8 +494,11 @@ export class MainController {
             }
 
 
-            if (target.closest('.course-item, .course-card, .selected-course-item') && !target.closest('.course-select-btn') && !target.closest('.course-bookmark-btn') && !target.classList.contains('section-badge') && !target.closest('.course-remove-btn')) {
-                const courseElement = target.closest('.course-item, .course-card, .selected-course-item') as HTMLElement;
+            // Clicking a course in the LIST is handled by the CourseList Svelte
+            // component. The SELECTED-courses panel is still vanilla, so opening a
+            // course's description from there stays here.
+            if (target.closest('.selected-course-item') && !target.closest('.course-remove-btn')) {
+                const courseElement = target.closest('.selected-course-item') as HTMLElement;
                 if (courseElement) {
                     this.courseController.selectCourse(courseElement);
                 }
@@ -691,233 +563,19 @@ export class MainController {
 
     }
 
-    /** Compute animation duration scaled by pixel distance (min 0.2s, max 0.5s) */
-    private getHeightAnimDuration(fromHeight: number, toHeight: number): number {
-        const distance = Math.abs(toHeight - fromHeight);
-        // ~2ms per pixel, clamped to [200, 500]ms
-        return Math.min(500, Math.max(200, distance * 2)) / 1000;
-    }
+    // The course list (term-badge expansion, select/bookmark, load-more, opening
+    // a course's description) is now the CourseList Svelte component. Its term
+    // expansion uses a `slide` transition; the old imperative FLIP height
+    // animation (animateTermExpansion / getHeightAnimDuration /
+    // restoreTermExpansionState / processPendingExpansions) and the
+    // displayCoursesWithCancellation/handleLoadMoreClick rendering path are gone.
 
-
-    private animateTermExpansion(
-        courseSections: HTMLElement,
-        termBadgesContainer: HTMLElement,
-        termSectionsContainers: NodeListOf<HTMLElement>,
-        clickedTermContainer: HTMLElement,
-        onComplete?: () => void
-    ): void {
-        const courseItem = courseSections.closest('.course-item') as HTMLElement;
-
-        // 1. Lock course-item at current height, promote to compositor layer
-        const currentItemHeight = courseItem.getBoundingClientRect().height;
-        courseItem.style.willChange = 'height';
-        courseItem.style.height = `${currentItemHeight}px`;
-        courseItem.style.overflow = 'hidden';
-
-        // 2. Instantly do the full content swap
-        termBadgesContainer.style.display = 'none';
-        termSectionsContainers.forEach(c => c.style.display = 'none');
-
-        courseSections.classList.add('expanded');
-
-        // Show clicked container — reset any stale inline styles from prior collapse
-        clickedTermContainer.style.cssText = '';
-        clickedTermContainer.style.display = 'flex';
-        clickedTermContainer.style.maxHeight = 'none';
-        clickedTermContainer.style.paddingTop = '0.5rem';
-
-        const sectionBadges = clickedTermContainer.querySelectorAll('.section-badge') as NodeListOf<HTMLElement>;
-
-        sectionBadges.forEach(badge => {
-            badge.style.opacity = '0';
-            badge.style.transform = 'translateX(-10px)';
-            badge.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
-        });
-
-        // 3. Measure target height (temporarily unlock to get true content height)
-        courseItem.style.height = 'auto';
-        const targetItemHeight = courseItem.getBoundingClientRect().height;
-        // Re-lock at starting height and force reflow before adding transition
-        courseItem.style.height = `${currentItemHeight}px`;
-        courseItem.offsetHeight;
-        const expandDuration = this.getHeightAnimDuration(currentItemHeight, targetItemHeight);
-        courseItem.style.transition = `height ${expandDuration}s ease`;
-
-        // 4. Animate to target height
-        requestAnimationFrame(() => {
-            courseItem.style.height = `${targetItemHeight}px`;
-
-            // Stagger animate badges in
-            const staggerTimers: ReturnType<typeof setTimeout>[] = [];
-            sectionBadges.forEach((badge, i) => {
-                staggerTimers.push(setTimeout(() => {
-                    badge.style.opacity = '1';
-                    badge.style.transform = 'translateX(0)';
-                }, i * 15));
-            });
-
-            // Clean up after transition
-            const cleanup = () => {
-                // Cancel any pending stagger timeouts first
-                staggerTimers.forEach(t => clearTimeout(t));
-                courseItem.style.height = '';
-                courseItem.style.transition = '';
-                courseItem.style.overflow = '';
-                courseItem.style.willChange = '';
-                // Clean up inline styles so they don't slow down future interactions
-                clickedTermContainer.style.transition = '';
-                sectionBadges.forEach(badge => {
-                    badge.style.cssText = '';
-                });
-                if (onComplete) onComplete();
-            };
-            // Wait for both height transition AND all stagger animations to finish
-            const staggerEnd = sectionBadges.length * 15 + 200;
-            const cleanupDelay = Math.max(expandDuration * 1000, staggerEnd) + 100;
-            const onEnd = (e: TransitionEvent) => {
-                if (e.propertyName !== 'height') return;
-                clearTimeout(fallbackTimer);
-                courseItem.removeEventListener('transitionend', onEnd);
-                // Delay cleanup until stagger animations are done
-                const remaining = staggerEnd - (expandDuration * 1000);
-                if (remaining > 0) {
-                    setTimeout(cleanup, remaining + 50);
-                } else {
-                    cleanup();
-                }
-            };
-            courseItem.addEventListener('transitionend', onEnd);
-            const fallbackTimer = setTimeout(() => {
-                courseItem.removeEventListener('transitionend', onEnd);
-                cleanup();
-            }, cleanupDelay);
-        });
-
-        // Rotate icon
-        const termIcon = clickedTermContainer.querySelector('.term-badge.active .term-icon') as HTMLElement;
-        if (termIcon) {
-            termIcon.style.transition = `transform ${expandDuration}s ease`;
-            termIcon.style.transform = 'rotate(45deg)';
-        }
-    }
-
-    private restoreTermExpansionState(): void {
-        // Restore expansion state for all courses that have expanded terms
-        this.expandedTerms.forEach((expandedTerm, courseId) => {
-            const courseSections = document.querySelector(`.course-sections[data-course-id="${courseId}"]`) as HTMLElement;
-            if (!courseSections) return;
-
-            const termBadgesContainer = courseSections.querySelector('.term-badges-container') as HTMLElement;
-            const termSectionsContainers = courseSections.querySelectorAll('.term-sections-container') as NodeListOf<HTMLElement>;
-            const expandedTermContainer = courseSections.querySelector(`.term-sections-container[data-term="${expandedTerm}"]`) as HTMLElement;
-
-            if (!expandedTermContainer || !termBadgesContainer) return;
-
-            // Set display states without animation
-            courseSections.classList.add('expanded');
-            termBadgesContainer.style.display = 'none';
-            termSectionsContainers.forEach(container => {
-                container.style.display = 'none';
-            });
-            expandedTermContainer.style.display = 'flex';
-            expandedTermContainer.style.opacity = '1';
-            expandedTermContainer.style.maxHeight = 'none';
-            expandedTermContainer.style.paddingTop = '0.5rem';
-        });
-    }
-
-    private processPendingExpansions(): void {
-        // Process all queued term expansions with animations
-        this.pendingExpansions.forEach(({ courseId, term }) => {
-            const courseSections = document.querySelector(`.course-sections[data-course-id="${courseId}"]`) as HTMLElement;
-            if (!courseSections) {
-                console.warn(`Course sections not found for ${courseId}`);
-                return;
-            }
-
-            // Add to expanded state
-            this.expandedTerms.set(courseId, term);
-
-            const termBadgesContainer = courseSections.querySelector('.term-badges-container') as HTMLElement;
-            const termSectionsContainers = courseSections.querySelectorAll('.term-sections-container') as NodeListOf<HTMLElement>;
-            const clickedTermContainer = courseSections.querySelector(`.term-sections-container[data-term="${term}"]`) as HTMLElement;
-
-            if (!clickedTermContainer || !termBadgesContainer) {
-                console.warn(`Term container not found for ${courseId} term ${term}`);
-                return;
-            }
-
-            // Use extracted animation function
-            this.animateTermExpansion(courseSections, termBadgesContainer, termSectionsContainers, clickedTermContainer);
-
-        });
-
-        // Clear the queue
-        this.pendingExpansions = [];
-    }
-
+    // refreshCurrentView no longer renders the list (CourseList derives the
+    // displayed courses from the reactive filter store on its own). It is still
+    // called from undo/redo (refreshUI) and the data-refresh subscription; it
+    // keeps the schedule-side refresh those paths relied on.
     private refreshCurrentView(): void {
-        this.expandedTerms.clear();
-
-        const hasFilters = !this.services.filterService.isEmpty();
-
-        // Check if department filter is active
-        const departmentFilter = this.services.filterService.getActiveFilters()
-            .find(f => f.id === 'department');
-        const departmentCriteria = departmentFilter?.criteria as { departments?: string[] } | undefined;
-        const activeDepartmentIds = departmentCriteria?.departments || [];
-
-        // Start a new render operation with cancellation support
-        const cancellationToken = this.services.operationManager.startOperation('render', 'New render requested');
-
-        let coursesToDisplay: Course[] = [];
-
-        if (hasFilters) {
-            // Get base courses - if single department filter, use that department's courses
-            let baseCourses: Course[];
-            if (activeDepartmentIds.length === 1) {
-                const targetId = activeDepartmentIds[0].toLowerCase();
-                const dept = this.allDepartments.find(d => d.abbreviation.toLowerCase() === targetId);
-                baseCourses = dept ? dept.courses : this.getAllCourses();
-            } else {
-                baseCourses = this.getAllCourses();
-            }
-
-            coursesToDisplay = this.services.filterService.filterCourses(baseCourses);
-
-        } else {
-            // No filters - show all courses
-            coursesToDisplay = this.getAllCourses();
-        }
-
-        // Display courses with cancellation support
-        this.displayCoursesWithCancellation(coursesToDisplay, cancellationToken);
-
-        // The planner filter buttons (FilterButtons) and the search input
-        // (SearchBar) are Svelte components that derive their own state from the
-        // reactive filter store — no imperative sync needed here.
-    }
-    
-    private async displayCoursesWithCancellation(coursesToDisplay: Course[], cancellationToken: CancellationToken): Promise<void> {
-        try {
-            // Pass cancellation token to the progressive renderer
-            await this.courseController.displayCoursesWithCancellation(
-                coursesToDisplay, 
-                this.services.uiStateManager.currentView,
-                cancellationToken
-            );
-            
-            // Mark operation as complete
-            this.services.operationManager.completeOperation('render');
-            
-        } catch (error) {
-            if ((error as Error).name === 'CancellationError') {
-                // Render was cancelled, not an error
-                return;
-            }
-            console.error('Error displaying courses:', error);
-            this.services.operationManager.completeOperation('render');
-        }
+        this.scheduleController.applyFiltersAndRefresh();
     }
 
     // updateFilterButtonState / updateClearFiltersButtonState /
@@ -983,7 +641,9 @@ export class MainController {
     }
 
     syncCourseSelectionUI(): void {
-        this.courseController.syncCourseSelectionState();
+        // The course LIST's select buttons are reactive (CourseList reads
+        // appState.selectedById), so only the still-vanilla SELECTED panel needs
+        // an imperative refresh here.
         this.courseController.displaySelectedCourses();
     }
 
@@ -1043,9 +703,9 @@ export class MainController {
         let prevPage = uiState.currentPage;
         watch(() => uiState.currentPage, () => {
             const page = uiState.currentPage;
-            if (page === 'planner' && prevPage !== 'planner') {
-                this.courseController.syncCourseSelectionState();
-            }
+            // The course list's select buttons reflect appState.selectedById
+            // reactively (CourseList Svelte component), so returning to the
+            // planner no longer needs an imperative syncCourseSelectionState().
             if (page === 'schedule' && prevPage !== 'schedule') {
                 this.resetSearchAndDepartmentFilters();
             }
@@ -1064,17 +724,17 @@ export class MainController {
         const previousIds = new Set(this.previousSelectedCoursesMap.keys());
         const onSchedule = this.services.uiStateManager.currentPage === 'schedule';
 
-        // Added / removed courses → incremental sidebar + course-list updates
+        // Added / removed courses → incremental SELECTED-panel updates. The
+        // course LIST's select buttons are reactive (CourseList Svelte
+        // component reads appState.selectedById), so no updateCourseUIById here.
         for (const sc of selectedCourses) {
             if (!previousIds.has(sc.course.id)) {
                 this.courseController.addSelectedCourseToSidebar(sc.course);
-                this.courseController.updateCourseUIById(sc.course.id, true);
             }
         }
         for (const id of previousIds) {
             if (!currentIds.has(id)) {
                 this.courseController.removeSelectedCourseFromSidebar(id);
-                this.courseController.updateCourseUIById(id, false);
             }
         }
 
@@ -1134,18 +794,9 @@ export class MainController {
         }
     }
 
-    /**
-     * Efficiently sync UI for initially selected courses without global refresh
-     */
-    private syncInitialCourseSelectionUI(): void {
-        const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
-        
-        // Use targeted updates for each selected course
-        selectedCourses.forEach(selectedCourse => {
-            this.courseController.updateCourseUIById(selectedCourse.course.id, true);
-        });
-        
-    }
+    // syncInitialCourseSelectionUI was removed: the course list's select buttons
+    // are reactive now (CourseList reads appState.selectedById), so the initial
+    // selection state needs no imperative priming.
 
     private setupSettingsMenu(): void {
         const settingsBtn = document.getElementById('settings-menu-btn');
@@ -1336,28 +987,6 @@ export class MainController {
         // No department filter on startup → the sidebar shows "All Departments"
         // as active; trigger a refresh to show all courses.
         this.refreshCurrentView();
-    }
-
-    private async handleLoadMoreClick(): Promise<void> {
-        // Show loading state on the button
-        const loadMoreButton = document.querySelector('.load-more-button') as HTMLButtonElement;
-        if (!loadMoreButton) return;
-
-        const originalText = loadMoreButton.textContent;
-        loadMoreButton.textContent = 'Loading...';
-        loadMoreButton.disabled = true;
-
-        try {
-            // Load more courses using the current view
-            const currentView = this.services.uiStateManager.currentView;
-            await this.courseController.displayMoreCourses(currentView);
-        } catch (error) {
-            console.error('Error loading more courses:', error);
-            // Restore button state on error
-            loadMoreButton.textContent = originalText;
-            loadMoreButton.disabled = false;
-            throw error; // Re-throw so the caller can handle it
-        }
     }
 
 }
