@@ -1,4 +1,4 @@
-import { ThemeDefinition, ThemeId, ThemeChangeEvent, ThemeChangeListener } from './types'
+import { ThemeDefinition, ThemeId } from './types'
 import { ProfileStateManager } from '../core/state/ProfileStateManager'
 
 // Import theme definitions
@@ -55,7 +55,6 @@ export class ThemeManager {
     private static instance: ThemeManager;
     private currentTheme: ThemeId = 'wpi-dark';
     private themes: Map<ThemeId, ThemeDefinition> = new Map();
-    private listeners: Set<ThemeChangeListener> = new Set();
     private storage: ThemeStorage = new DefaultThemeStorage();
 
     private constructor() {
@@ -141,21 +140,9 @@ export class ThemeManager {
             return false;
         }
 
-        const oldTheme = this.currentTheme;
-        const newTheme = themeId;
-        const themeDefinition = this.themes.get(themeId)!;
-
         this.currentTheme = themeId;
         this.applyTheme(themeId);
         this.saveThemePreference(themeId);
-
-        // Notify listeners
-        const event: ThemeChangeEvent = {
-            oldTheme,
-            newTheme,
-            themeDefinition
-        };
-        this.notifyListeners(event);
 
         return true;
     }
@@ -223,25 +210,6 @@ export class ThemeManager {
     useSystemPreference(): boolean {
         const preferredTheme = this.detectSystemPreference();
         return this.setTheme(preferredTheme);
-    }
-
-    // Event listeners
-    onThemeChange(listener: ThemeChangeListener): void {
-        this.listeners.add(listener);
-    }
-
-    offThemeChange(listener: ThemeChangeListener): void {
-        this.listeners.delete(listener);
-    }
-
-    private notifyListeners(event: ThemeChangeEvent): void {
-        this.listeners.forEach(listener => {
-            try {
-                listener(event);
-            } catch (error) {
-                console.error('Error in theme change listener:', error);
-            }
-        });
     }
 
     // Theme preview (temporary application without saving)

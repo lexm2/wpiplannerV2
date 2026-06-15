@@ -44,10 +44,9 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · ⏭️ deferred (becomes Sve
 - **Consumers:** `AppBootstrap.ts:73` `on('data-loaded')`, `AppBootstrap.ts:103` `on('data-refreshed')`.
 - **Plan:** borderline — these are one-shot async load-completion signals, not continuous state. Convert to a rune signal (`loadGeneration`/`loadedDepartments` in appState) that AppBootstrap `watch`es, OR leave as direct async callbacks. **Decision needed** (see open questions).
 
-### 4. ThemeManager (NOT in original 5)
-- **System:** `src/themes/ThemeManager.ts` — `listeners: Set<ThemeChangeListener>`, `onThemeChange()`/`offThemeChange()`/`notifyListeners()`, `ThemeChangeEvent`/`ThemeChangeListener` types (`themes/types.ts`).
-- **Consumers:** NONE. `onThemeChange` has zero callers in the repo — this listener machinery is **dead code**.
-- **Plan:** delete the listener system outright (no rewiring). Optionally expose `currentThemeId` as a rune so `ThemeSelector` can react, but not required.
+### 4. ✅ ThemeManager (NOT in original 5) — DONE
+- **Was:** `listeners: Set<ThemeChangeListener>`, `onThemeChange`/`offThemeChange`/`notifyListeners`, `ThemeChangeEvent`/`ThemeChangeListener` types. Zero consumers — dead code.
+- **Now:** deleted outright (listener field, notify call in `setTheme`, the three methods, both types in `themes/types.ts`, and the `themes/index.ts` re-exports). No rune added — nothing reads it.
 
 ---
 

@@ -57,11 +57,3 @@ export interface ThemeManagerConfig {
 }
 
 export type ThemeId = string;
-
-export interface ThemeChangeEvent {
-    oldTheme: ThemeId;
-    newTheme: ThemeId;
-    themeDefinition: ThemeDefinition;
-}
-
-export type ThemeChangeListener = (event: ThemeChangeEvent) => void;

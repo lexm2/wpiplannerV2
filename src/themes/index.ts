@@ -8,6 +8,4 @@ export type {
   ThemeDefinition,
   ThemeManagerConfig,
   ThemeId,
-  ThemeChangeEvent,
-  ThemeChangeListener,
 } from './types';
