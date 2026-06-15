@@ -68,9 +68,19 @@ Resolved questions:
 - **courseDataService:** rune signal (user choice — consistency over one-shot-callback pragmatism).
 - **UIStateManager / ThemeManager:** in scope — same anti-pattern, both done.
 
-## NEXT (beyond this tracker's scope)
-- Convert vanilla controllers to `.svelte` components; each conversion deletes its
-  `watch(...)` bridge call. When the last bridge consumer is gone, delete
-  `src/svelte/reactivity.svelte.ts` and this file.
-- Deferred component callbacks (`DualRangeSlider.onChange`, `ComponentSelectionWizard.onSelectionChange`)
-  become Svelte component props/events at that point.
+## COMPONENT CONVERSION (in progress)
+
+Converting vanilla controllers to `.svelte` components. Each conversion deletes
+its `watch(...)` bridge call + imperative render code. When the last bridge
+consumer is gone, delete `src/svelte/reactivity.svelte.ts` and this file.
+
+### ✅ DepartmentController → `src/svelte/DepartmentSidebar.svelte` — DONE
+- First real Svelte component mounted in the production app (`mount()` in MainController ctor, target `#department-list`).
+- Component reads `appState.loadedDepartments` + reactive filter state (`filterService.getActiveFilters()` over a SvelteMap) directly — no props beyond `filterService`. List, active highlighting, and counts all `$derived`; category collapse is local `SvelteSet` state; clicks call `filterService` directly.
+- Deleted: `DepartmentController.ts`, its `index.ts` export, MainController's department-item click delegation + `displayDepartments`/`setAllDepartments`/`getDepartmentById`/`handleDepartmentClick('all')` wiring, and `UIStateManager.showLoadingState` (component shows its own empty-state loading).
+- Note: old `multi-select-active` class was applied to `#department-list` (class `department-categories`) but CSS only matches `.department-list.multi-select-active` → never had effect → omitted. `.sidebar-header h2` doesn't exist → that branch was dead → omitted.
+- Verified at runtime (Playwright): renders all categories/counts, click filters course list + toggles active, deselect→All, category collapse toggles `aria-expanded`/`expanded`; 0 console errors. `bun run build` clean (a11y warnings suppressed via comma-separated `svelte-ignore`).
+
+### ⬜ Remaining controllers (rough order, lowest-risk first)
+- CourseController, ScheduleController, the modal controllers, MainController shell.
+- Deferred component callbacks (`DualRangeSlider.onChange`, `ComponentSelectionWizard.onSelectionChange`) become Svelte props/events as their hosts convert.

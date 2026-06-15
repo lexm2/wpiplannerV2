@@ -164,12 +164,6 @@ export class UIStateManager {
 
     // --- Legacy methods ---
 
-    showLoadingState(): void {
-        if (this.departmentList) {
-            this.departmentList.innerHTML = '<div class="loading-message">Loading departments...</div>';
-        }
-    }
-
     showErrorMessage(message: string, onClearData?: () => Promise<void>): void {
         const content = onClearData
             ? `<div class="error-message">

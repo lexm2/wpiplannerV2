@@ -7,4 +7,3 @@ export { TimestampManager } from './TimestampManager';
 export { UIStateManager } from '../../services/ui/UIStateManager';
 export { FilterModalController } from './FilterModalController';
 export { CourseController } from './CourseController';
-export { DepartmentController } from './DepartmentController';

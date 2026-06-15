@@ -4,7 +4,8 @@ import { Course, Department } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { SchedulePickerModal } from '../components/SchedulePickerModal'
-import { DepartmentController } from './DepartmentController'
+import { mount } from 'svelte'
+import DepartmentSidebar from '../../svelte/DepartmentSidebar.svelte'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
@@ -32,7 +33,6 @@ export class MainController {
     private services: ServiceContainer;
     private schedulePickerModal: SchedulePickerModal | null = null;
     private themeSelector: ThemeSelector;
-    private departmentController: DepartmentController;
     private courseController: CourseController;
     private scheduleController: ScheduleController;
     private sectionInfoModalController: SectionInfoModalController;
@@ -64,7 +64,6 @@ export class MainController {
         this.autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, filterService);
 
         // Initialize controllers
-        this.departmentController = new DepartmentController();
         this.courseController = new CourseController(courseSelectionService, courseDataService);
         this.scheduleController = new ScheduleController(courseSelectionService, this.colorService, this.autoScheduleOrchestrator);
         this.sectionInfoModalController = new SectionInfoModalController(modalService, uiStateManager);
@@ -108,8 +107,13 @@ export class MainController {
             profileStateManager.updateSchedule(scheduleId, updates, 'calendar-event-exclusion');
         });
 
-        // Connect filter service to department controller
-        this.departmentController.setFilterService(filterService);
+        // Mount the department sidebar (Svelte). It reads appState.loadedDepartments
+        // and the reactive filter state directly, so it needs no imperative wiring.
+        const deptListEl = document.getElementById('department-list');
+        if (deptListEl) {
+            deptListEl.innerHTML = '';
+            mount(DepartmentSidebar, { target: deptListEl, props: { filterService } });
+        }
 
         // Set up course data event subscriptions via AppBootstrap
         AppBootstrap.setupCourseDataSubscriptions(services, {
@@ -119,15 +123,12 @@ export class MainController {
             onDataLoaded: (departments) => {
                 this.filterModalController.setCourseData(departments);
                 this.scheduleFilterModalController.setCourseData(departments);
-                this.departmentController.setAllDepartments(departments);
                 this.courseController.setAllDepartments(departments);
             },
             onDataRefreshed: (departments) => {
                 this.filterModalController.setCourseData(departments);
                 this.scheduleFilterModalController.setCourseData(departments);
-                this.departmentController.setAllDepartments(departments);
                 this.courseController.setAllDepartments(departments);
-                this.departmentController.displayDepartments();
                 this.refreshCurrentView();
             },
         });
@@ -181,13 +182,11 @@ export class MainController {
     }
 
     private async init(): Promise<void> {
-        this.services.uiStateManager.showLoadingState();
-
+        // The DepartmentSidebar component shows its own loading state until
+        // appState.loadedDepartments is populated.
         try {
             await AppBootstrap.initializeAsyncServices(this.services);
             this.themeSelector.initializeTheme();
-
-            this.departmentController.displayDepartments();
 
             // Set "All Departments" as the default selection on startup
             this.initializeDefaultDepartmentView();
@@ -270,23 +269,10 @@ export class MainController {
 
 
     private setupEventListeners(): void {
-        // Department selection
+        // Department selection is handled inside the DepartmentSidebar Svelte component.
         document.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
-            
-            
-            if (target.classList.contains('department-item')) {
-                const deptId = target.dataset.deptId;
-                if (deptId) {
-                    // Check if this is a multi-select click (Ctrl/Cmd key)
-                    const multiSelect = (e as MouseEvent).ctrlKey || (e as MouseEvent).metaKey;
-                    
-                    // Use the department controller which updates the filter service
-                    this.departmentController.handleDepartmentClick(deptId, multiSelect);
-                    // The filter service listener triggers refreshCurrentView automatically
-                }
-            }
-            
+
             if (target.classList.contains('section-badge')) {
                 target.classList.toggle('selected');
             }
@@ -941,7 +927,8 @@ export class MainController {
             // Get base courses - if single department filter, use that department's courses
             let baseCourses: Course[];
             if (activeDepartmentIds.length === 1) {
-                const dept = this.departmentController.getDepartmentById(activeDepartmentIds[0]);
+                const targetId = activeDepartmentIds[0].toLowerCase();
+                const dept = this.allDepartments.find(d => d.abbreviation.toLowerCase() === targetId);
                 baseCourses = dept ? dept.courses : this.getAllCourses();
             } else {
                 baseCourses = this.getAllCourses();
@@ -1462,7 +1449,8 @@ export class MainController {
             searchModeBtn.insertAdjacentHTML('beforeend', getInlineSVG('SCHOOL', 'school-icon'));
             searchModeBtn.classList.remove('active');
         }
-        this.departmentController.handleDepartmentClick('all', false);
+        // Reset department selection to "All"; the sidebar reflects this reactively.
+        this.services.filterService.removeFilter('department');
     }
 
     private syncSearchInputFromFilters(): void {
@@ -1489,8 +1477,8 @@ export class MainController {
     }
 
     private initializeDefaultDepartmentView(): void {
-        // Make sure "All Departments" is visually selected (it already has 'active' class from displayDepartments)
-        // and show all courses by triggering a refresh
+        // No department filter on startup → the sidebar shows "All Departments"
+        // as active; trigger a refresh to show all courses.
         this.refreshCurrentView();
     }
 
