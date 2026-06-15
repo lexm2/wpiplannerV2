@@ -6,8 +6,6 @@ export class UIStateManager {
     // DOM side-effects and exposes imperative setters over it.
 
     // Cached DOM elements for applying effects
-    private viewListBtn: HTMLElement | null;
-    private viewGridBtn: HTMLElement | null;
     private plannerTab: HTMLElement | null;
     private scheduleTab: HTMLElement | null;
     private plannerPage: HTMLElement | null;
@@ -18,8 +16,6 @@ export class UIStateManager {
     private courseContainer: HTMLElement | null;
 
     constructor() {
-        this.viewListBtn = document.getElementById('view-list');
-        this.viewGridBtn = document.getElementById('view-grid');
         this.plannerTab = document.getElementById('planner-tab');
         this.scheduleTab = document.getElementById('schedule-tab');
         this.plannerPage = document.getElementById('planner-page');
@@ -75,7 +71,8 @@ export class UIStateManager {
     setView(view: ViewMode): void {
         if (view === uiState.currentView) return;
         uiState.currentView = view;
-        this.applyViewEffects();
+        // The ViewToggle Svelte component reads uiState.currentView and updates
+        // its own classes reactively — no imperative DOM effect needed here.
     }
 
     // --- Modal tracking ---
@@ -116,7 +113,7 @@ export class UIStateManager {
         uiState.openModals = [];
         uiState.wizard = { isOpen: false, courseId: null, step: null };
         this.applyPageEffects();
-        this.applyViewEffects();
+        // currentView is reflected by the ViewToggle Svelte component reactively.
     }
 
     // --- DOM effects (private) ---
@@ -142,23 +139,6 @@ export class UIStateManager {
             if (this.schedulePage) this.schedulePage.style.display = 'flex';
             if (this.mobileMenuBtn) this.mobileMenuBtn.style.display = 'none';
             if (this.scheduleMobileMenuBtn) this.scheduleMobileMenuBtn.style.display = '';
-        }
-    }
-
-    private applyViewEffects(): void {
-        const view = uiState.currentView;
-        if (this.viewListBtn && this.viewGridBtn) {
-            if (view === 'list') {
-                this.viewListBtn.classList.add('btn-primary', 'active');
-                this.viewListBtn.classList.remove('btn-secondary');
-                this.viewGridBtn.classList.add('btn-secondary');
-                this.viewGridBtn.classList.remove('btn-primary', 'active');
-            } else {
-                this.viewGridBtn.classList.add('btn-primary', 'active');
-                this.viewGridBtn.classList.remove('btn-secondary');
-                this.viewListBtn.classList.add('btn-secondary');
-                this.viewListBtn.classList.remove('btn-primary', 'active');
-            }
         }
     }
 

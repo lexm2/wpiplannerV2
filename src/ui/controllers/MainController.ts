@@ -7,6 +7,7 @@ import { SchedulePickerModal } from '../components/SchedulePickerModal'
 import { mount } from 'svelte'
 import DepartmentSidebar from '../../svelte/DepartmentSidebar.svelte'
 import UndoRedoButtons from '../../svelte/UndoRedoButtons.svelte'
+import ViewToggle from '../../svelte/ViewToggle.svelte'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
@@ -131,6 +132,22 @@ export class MainController {
                     profileStateManager: services.profileStateManager,
                     onUndo: () => this.handleUndo(),
                     onRedo: () => this.handleRedo()
+                }
+            });
+        }
+
+        // Mount the list/grid view toggle (Svelte). It reads uiState.currentView
+        // (a rune) for its reactive active/btn-primary/btn-secondary classes —
+        // replacing UIStateManager.applyViewEffects() and the imperative click
+        // wiring below. Same ids/base classes are preserved. onSelect runs
+        // refreshCurrentView so the still-vanilla course list re-renders.
+        const viewToggleEl = document.getElementById('view-toggle');
+        if (viewToggleEl) {
+            mount(ViewToggle, {
+                target: viewToggleEl,
+                props: {
+                    uiStateManager: services.uiStateManager,
+                    onSelect: () => this.refreshCurrentView()
                 }
             });
         }
@@ -653,23 +670,8 @@ export class MainController {
             });
         }
 
-        // View toggle buttons
-        const viewListBtn = document.getElementById('view-list');
-        const viewGridBtn = document.getElementById('view-grid');
-        
-        if (viewListBtn) {
-            viewListBtn.addEventListener('click', () => {
-                this.services.uiStateManager.setView('list');
-                this.refreshCurrentView();
-            });
-        }
-        
-        if (viewGridBtn) {
-            viewGridBtn.addEventListener('click', () => {
-                this.services.uiStateManager.setView('grid');
-                this.refreshCurrentView();
-            });
-        }
+        // View toggle buttons are rendered by the ViewToggle Svelte component
+        // (mounted into #view-toggle); it calls setView + refreshCurrentView.
 
         // Filter button
         const filterButton = document.getElementById('filter-btn');
