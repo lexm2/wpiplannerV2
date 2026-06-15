@@ -2,18 +2,17 @@ import type { ScheduleDB, Department, Course, Section, Period, Time, LectureGrou
 import { DayOfWeek, PeriodType } from '../../types'
 import { AcademicTerm } from '../../types/schedule'
 import { getAllSections } from '../../utils'
-import type { CourseDataEventType, CourseDataEvent, CourseDataEventListener } from './types'
 import type { RawDepartment, RawCourse, RawSection, RawLectureGroup, RawPeriod } from '../../types/rawData'
+import { appState } from '../../core/state/appState.svelte'
 
 /**
  * Fetches and transforms WPI course catalog data with duplicate resolution and HTML sanitization.
- * Emits events when data is loaded or refreshed.
+ * Signals data load/refresh via `appState` rune generations.
  */
 export class CourseDataService {
     private static readonly WPI_COURSE_DATA_URL = './course-data-constructed.json';
     private scheduleDB: ScheduleDB | null = null;
     private latestAcademicYear: number | undefined;
-    private listeners = new Map<CourseDataEventType | '*', Set<CourseDataEventListener>>();
 
     constructor() {}
 
@@ -22,12 +21,8 @@ export class CourseDataService {
             const freshData = await this.fetchFreshData();
             this.scheduleDB = freshData;
 
-            this.emit({
-                type: 'data-loaded',
-                timestamp: Date.now(),
-                departments: freshData.departments,
-                scheduleDB: freshData
-            });
+            appState.loadedDepartments = freshData.departments;
+            appState.dataLoadGeneration++;
 
             return freshData;
         } catch (error) {
@@ -452,53 +447,6 @@ export class CourseDataService {
         return getAllSections(course);
     }
 
-    /**
-     * Subscribe to course data events
-     * @returns Unsubscribe function
-     */
-    on(eventType: CourseDataEventType | '*', listener: CourseDataEventListener): () => void {
-        if (!this.listeners.has(eventType)) {
-            this.listeners.set(eventType, new Set());
-        }
-        this.listeners.get(eventType)!.add(listener);
-
-        return () => this.off(eventType, listener);
-    }
-
-    /**
-     * Unsubscribe from course data events
-     */
-    off(eventType: CourseDataEventType | '*', listener: CourseDataEventListener): void {
-        const listeners = this.listeners.get(eventType);
-        if (listeners) {
-            listeners.delete(listener);
-        }
-    }
-
-    /**
-     * Emit a course data event to all listeners
-     */
-    private emit(event: CourseDataEvent): void {
-        const specificListeners = this.listeners.get(event.type);
-        const wildcardListeners = this.listeners.get('*');
-
-        specificListeners?.forEach(listener => {
-            try {
-                listener(event);
-            } catch (error) {
-                console.error(`[CourseDataService] Error in listener for ${event.type}:`, error);
-            }
-        });
-
-        wildcardListeners?.forEach(listener => {
-            try {
-                listener(event);
-            } catch (error) {
-                console.error('[CourseDataService] Error in wildcard listener:', error);
-            }
-        });
-    }
-
     getLatestAcademicYear(): number | undefined {
         return this.latestAcademicYear;
     }
@@ -550,7 +498,7 @@ export class CourseDataService {
     }
 
     /**
-     * Notify listeners that data should be refreshed (e.g., after cloud sync)
+     * Signal that data should be refreshed (e.g., after cloud sync)
      */
     notifyDataRefreshed(): void {
         if (!this.scheduleDB) {
@@ -558,11 +506,7 @@ export class CourseDataService {
             return;
         }
 
-        this.emit({
-            type: 'data-refreshed',
-            timestamp: Date.now(),
-            departments: this.scheduleDB.departments,
-            scheduleDB: this.scheduleDB
-        });
+        appState.loadedDepartments = this.scheduleDB.departments;
+        appState.dataRefreshGeneration++;
     }
 }

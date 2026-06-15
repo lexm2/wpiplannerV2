@@ -1,4 +1,4 @@
-import type { Schedule, SelectedCourse, SchedulePreferences } from '../../types';
+import type { Schedule, SelectedCourse, SchedulePreferences, Department } from '../../types';
 
 /**
  * Reactive application state (Svelte 5 runes) — the single source of truth that
@@ -41,6 +41,17 @@ class AppState {
      * `watch` this and re-read `canUndo()`/`canRedo()` to refresh button state.
      */
     undoRedoGeneration = $state(0);
+
+    /**
+     * Course catalog payload + load signals (the old CourseDataService event
+     * system). `loadedDepartments` holds the latest departments; consumers
+     * `watch` `dataLoadGeneration` (initial fetch) / `dataRefreshGeneration`
+     * (post-sync refresh) and read `loadedDepartments`. Separate generations
+     * because load vs refresh have distinct consumer logic.
+     */
+    loadedDepartments = $state.raw<Department[]>([]);
+    dataLoadGeneration = $state(0);
+    dataRefreshGeneration = $state(0);
 
     /** The active schedule object (new identity whenever it or its id changes). */
     activeSchedule = $derived(

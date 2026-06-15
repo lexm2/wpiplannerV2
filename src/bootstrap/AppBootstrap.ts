@@ -16,6 +16,8 @@ import { TermBoundsService } from '../utils/termBounds'
 import { createDefaultFilters, SearchTextFilter } from '../core/filtering/filters'
 import type { ServiceContainer } from './ServiceContainer'
 import type { Department } from '../types/types'
+import { appState } from '../core/state/appState.svelte'
+import { watch } from '../svelte/reactivity.svelte'
 
 export class AppBootstrap {
     static createServices(): ServiceContainer {
@@ -66,16 +68,15 @@ export class AppBootstrap {
         }
     ): void {
         const {
-            courseDataService, profileStateManager, filterService,
-            courseSelectionService, scheduleManagementService, timestampManager
+            profileStateManager, filterService,
+            courseSelectionService, timestampManager
         } = services;
 
-        courseDataService.on('data-loaded', (event) => {
-            profileStateManager.setCourseData(event.departments);
+        watch(() => appState.dataLoadGeneration, () => {
+            const departments = appState.loadedDepartments;
+            profileStateManager.setCourseData(departments);
 
-            const allCourses = event.departments.flatMap(d => d.courses);
-
-            courseSelectionService.setAllDepartments(event.departments);
+            courseSelectionService.setAllDepartments(departments);
             courseSelectionService.reconstructSectionObjects();
             timestampManager.updateClientTimestamp();
 
@@ -96,17 +97,18 @@ export class AppBootstrap {
                 }
             }
 
-            callbacks.setAllDepartments(event.departments);
-            callbacks.onDataLoaded(event.departments);
+            callbacks.setAllDepartments(departments);
+            callbacks.onDataLoaded(departments);
         });
 
-        courseDataService.on('data-refreshed', (event) => {
-            profileStateManager.setCourseData(event.departments);
+        watch(() => appState.dataRefreshGeneration, () => {
+            const departments = appState.loadedDepartments;
+            profileStateManager.setCourseData(departments);
 
-            courseSelectionService.setAllDepartments(event.departments);
-            callbacks.setAllDepartments(event.departments);
+            courseSelectionService.setAllDepartments(departments);
+            callbacks.setAllDepartments(departments);
 
-            callbacks.onDataRefreshed(event.departments);
+            callbacks.onDataRefreshed(departments);
         });
     }
 
