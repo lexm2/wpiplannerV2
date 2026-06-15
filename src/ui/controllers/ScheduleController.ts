@@ -7,7 +7,6 @@ import { FilterService } from '../../services/filtering/FilterService'
 import { watch } from '../../svelte/reactivity.svelte'
 import { FilterModalController } from './FilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
-import { LocalEventModal } from '../components/LocalEventModal'
 import { modalState } from '../../svelte/modals/modalState.svelte'
 import { SidebarManager } from '../sidebar/SidebarManager'
 import { TimeUtils } from '../utils/timeUtils'
@@ -262,15 +261,15 @@ export class ScheduleController implements CalendarEventProvider {
      * Open modal to add a new local event.
      */
     private openAddLocalEventModal(): void {
-        if (!this.modalService || !this.currentSchedule) {
-            console.warn('[ScheduleController] Cannot open add event modal - missing service or schedule');
+        if (!this.currentSchedule) {
+            console.warn('[ScheduleController] Cannot open add event modal - missing schedule');
             return;
         }
 
-        const modal = new LocalEventModal(this.modalService, {
+        modalState.localEvent = {
             onSave: (eventData) => this.addLocalEvent(eventData),
-        });
-        modal.show();
+        };
+        this.uiStateManager?.modalOpened('local-event');
     }
 
     private deleteLocalEvent(eventId: string): void {

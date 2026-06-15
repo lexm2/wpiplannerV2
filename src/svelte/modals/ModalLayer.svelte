@@ -5,6 +5,7 @@
   import Tutorials from './Tutorials.svelte';
   import SectionInfo from './SectionInfo.svelte';
   import DeleteLocalEvent from './DeleteLocalEvent.svelte';
+  import LocalEvent from './LocalEvent.svelte';
   import type { UIStateManager } from '../../services/ui/UIStateManager';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
 
@@ -45,5 +46,7 @@
     <SectionInfo onRequestClose={() => uiStateManager.modalClosed('section-info')} />
   {:else if id === 'delete-local-event'}
     <DeleteLocalEvent onRequestClose={() => uiStateManager.modalClosed('delete-local-event')} />
+  {:else if id === 'local-event'}
+    <LocalEvent onRequestClose={() => uiStateManager.modalClosed('local-event')} />
   {/if}
 {/each}
