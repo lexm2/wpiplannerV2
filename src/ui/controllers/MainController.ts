@@ -14,6 +14,7 @@ import SearchBar from '../../svelte/SearchBar.svelte'
 import CourseList from '../../svelte/CourseList.svelte'
 import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
 import CourseDescription from '../../svelte/CourseDescription.svelte'
+import ModalLayer from '../../svelte/modals/ModalLayer.svelte'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
@@ -271,6 +272,21 @@ export class MainController {
             mount(ThemeSelector, {
                 target: themeSelectorEl,
                 props: { profileStateManager }
+            });
+        }
+
+        // Mount the declarative Svelte modal layer (ModalLayer) into #modal-root,
+        // once. It reads uiState.openModals (a rune) and renders a Svelte
+        // component for each open id it knows about (currently just
+        // 'mobile-notice'), ignoring ids owned by the still-vanilla modals
+        // (BaseModal/ModalService append to document.body, not #modal-root, so
+        // there's no double render). Closing routes through
+        // uiStateManager.modalClosed so the rune stays the single source of truth.
+        const modalRootEl = document.getElementById('modal-root');
+        if (modalRootEl) {
+            mount(ModalLayer, {
+                target: modalRootEl,
+                props: { uiStateManager: services.uiStateManager }
             });
         }
 
