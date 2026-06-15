@@ -1,3 +1,5 @@
+import type { Section, Course } from './types';
+
 /**
  * Core modal interface that all modals must implement
  */
@@ -39,4 +41,14 @@ export interface ModalEvent {
     type: ModalEventType;
     modalId: string;
     timestamp: number;
+}
+
+export interface SectionData {
+    courseCode: string;
+    courseName: string;
+    section: Section;
+    course: Course;
+    courseId: string;
+    currentColor: string;
+    onColorChange?: (color: string) => void;
 }

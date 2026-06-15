@@ -5,11 +5,10 @@ import { CourseSelectionService } from '../../services/selection/CourseSelection
 import { CourseDataService } from '../../services/data/courseDataService'
 import { FilterService } from '../../services/filtering/FilterService'
 import { watch } from '../../svelte/reactivity.svelte'
-import { SectionInfoModalController } from './SectionInfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
 import { LocalEventModal } from '../components/LocalEventModal'
-import { DeleteLocalEventModal } from '../components/DeleteLocalEventModal'
+import { modalState } from '../../svelte/modals/modalState.svelte'
 import { SidebarManager } from '../sidebar/SidebarManager'
 import { TimeUtils } from '../utils/timeUtils'
 import { BitMaskEngine, buildConflictMatrix } from '../../core/scheduling/BitMaskEngine'
@@ -29,7 +28,6 @@ export class ScheduleController implements CalendarEventProvider {
     private courseSelectionService: CourseSelectionService;
     private courseDataService: CourseDataService | null = null;
     private filterService: FilterService | null = null;
-    private sectionInfoModalController: SectionInfoModalController | null = null;
     private conflictDetector: BitMaskEngine | null = null;
     private containerEventListeners = new Map<HTMLElement, EventListener>();
     private sidebarCourseItems = new Map<string, HTMLElement>();
@@ -78,10 +76,6 @@ export class ScheduleController implements CalendarEventProvider {
 
     setCourseDataService(courseDataService: CourseDataService): void {
         this.courseDataService = courseDataService;
-    }
-
-    setSectionInfoModalController(sectionInfoModalController: SectionInfoModalController): void {
-        this.sectionInfoModalController = sectionInfoModalController;
     }
 
     setConflictDetector(engine: BitMaskEngine): void {
@@ -1290,8 +1284,8 @@ export class ScheduleController implements CalendarEventProvider {
                     event.stopPropagation();
                     const localEvent = (this.currentSchedule.localEvents || []).find(e => e.id === eventId);
                     const title = localEvent?.title || 'Untitled Event';
-                    const modal = new DeleteLocalEventModal(this.modalService, title, () => this.deleteLocalEvent(eventId));
-                    modal.show();
+                    modalState.deleteLocalEvent = { title, onConfirm: () => this.deleteLocalEvent(eventId) };
+                    this.uiStateManager?.modalOpened('delete-local-event');
                 }
                 return;
             }
@@ -1324,11 +1318,6 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     showSectionInfoModal(courseId: string, sectionNumber: string): void {
-        if (!this.sectionInfoModalController) {
-            console.warn('Section info modal controller not available');
-            return;
-        }
-
         let course: Course | undefined;
         let section: Section | null = null;
 
@@ -1382,8 +1371,9 @@ export class ScheduleController implements CalendarEventProvider {
             onColorChange: (color: string) => this.setCourseColor(courseId, color)
         };
 
-        // Show modal using the dedicated controller
-        this.sectionInfoModalController.show(sectionData);
+        // Show modal via the declarative modal layer
+        modalState.sectionInfo = sectionData;
+        this.uiStateManager?.modalOpened('section-info');
     }
 
     private setupTermFocusHandlers(): void {

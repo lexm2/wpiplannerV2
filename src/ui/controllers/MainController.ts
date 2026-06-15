@@ -16,8 +16,6 @@ import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
 import CourseDescription from '../../svelte/CourseDescription.svelte'
 import ModalLayer from '../../svelte/modals/ModalLayer.svelte'
 import { ScheduleController } from './ScheduleController'
-import { SectionInfoModalController } from './SectionInfoModalController'
-import { InfoModalController } from './InfoModalController'
 import { FilterModalController } from './FilterModalController'
 import { getInlineSVG, type IconName } from '../../utils/iconPaths'
 import { ResizablePanel } from '../components/ResizablePanel'
@@ -40,7 +38,6 @@ export class MainController {
     private services: ServiceContainer;
     private schedulePickerModal: SchedulePickerModal | null = null;
     private scheduleController: ScheduleController;
-    private sectionInfoModalController: SectionInfoModalController;
     private filterModalController: FilterModalController;
     private scheduleFilterModalController: FilterModalController;
     private debouncedSearch: DebouncedOperation;
@@ -66,8 +63,6 @@ export class MainController {
 
         // Initialize controllers
         this.scheduleController = new ScheduleController(courseSelectionService, this.colorService, this.autoScheduleOrchestrator);
-        this.sectionInfoModalController = new SectionInfoModalController(modalService, uiStateManager);
-        new InfoModalController(modalService, uiStateManager);
         this.filterModalController = new FilterModalController(modalService, uiStateManager);
         this.scheduleFilterModalController = new FilterModalController(modalService, uiStateManager);
 
@@ -87,7 +82,6 @@ export class MainController {
         this.scheduleController.setFilterService(filterService);
 
         // Set modal controllers for ScheduleController
-        this.scheduleController.setSectionInfoModalController(this.sectionInfoModalController);
         this.scheduleController.setModalService(modalService);
         this.scheduleController.setUIStateManager(uiStateManager);
 
@@ -282,11 +276,16 @@ export class MainController {
         // (BaseModal/ModalService append to document.body, not #modal-root, so
         // there's no double render). Closing routes through
         // uiStateManager.modalClosed so the rune stays the single source of truth.
+        // `tutorial` is passed as a THUNK, not a value: services.tutorial is
+        // assigned in main.ts AFTER this constructor runs (setupTutorial needs
+        // the constructed MainController), so a static prop would capture
+        // undefined. The thunk is read lazily inside ModalLayer when the
+        // tutorials modal opens (long after init), by which point it's set.
         const modalRootEl = document.getElementById('modal-root');
         if (modalRootEl) {
             mount(ModalLayer, {
                 target: modalRootEl,
-                props: { uiStateManager: services.uiStateManager }
+                props: { uiStateManager: services.uiStateManager, getTutorial: () => services.tutorial }
             });
         }
 

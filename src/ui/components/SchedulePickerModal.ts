@@ -2,8 +2,6 @@ import { ScheduleManagementService } from '../../services/selection/ScheduleMana
 import { ModalService } from '../../services/ui/ModalService';
 import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { BaseModal } from './BaseModal';
-import { ChangelogModal } from './ChangelogModal';
-import { TutorialsModal } from './TutorialsModal';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { appState } from '../../core/state/appState.svelte';
 import { watch } from '../../svelte/reactivity.svelte';
@@ -17,8 +15,6 @@ export class SchedulePickerModal extends BaseModal {
     private static readonly MENU_OFFSET = 4;
     private static readonly VIEWPORT_PADDING = 8;
     private scheduleManagementService: ScheduleManagementService;
-    private changelogModal: ChangelogModal;
-    private tutorialsModal: TutorialsModal | null = null;
     private tutorial: TutorialSetup | undefined;
     private scheduleListClickHandler: ((e: Event) => void) | null = null;
     private scheduleListDblClickHandler: ((e: Event) => void) | null = null;
@@ -32,8 +28,6 @@ export class SchedulePickerModal extends BaseModal {
         super(modalService, uiStateManager);
         this.scheduleManagementService = scheduleManagementService;
         this.tutorial = tutorial;
-        this.changelogModal = new ChangelogModal(modalService, uiStateManager);
-        if (tutorial) this.tutorialsModal = new TutorialsModal(modalService, tutorial, uiStateManager);
 
         // Re-render the schedule list (when open) on schedule (re)activation or
         // any selection change — read straight from the runes.
@@ -214,10 +208,10 @@ export class SchedulePickerModal extends BaseModal {
             if (activeId) this.exportScheduleICS(activeId);
         });
         exportBtn?.addEventListener('click', () => this.exportAllSchedules());
-        changelogBtn?.addEventListener('click', () => this.changelogModal.show());
+        changelogBtn?.addEventListener('click', () => this.uiStateManager?.modalOpened('changelog'));
         tutorialsBtn?.addEventListener('click', () => {
             this.hide();
-            this.tutorialsModal?.show();
+            if (this.tutorial) this.uiStateManager?.modalOpened('tutorials');
         });
         clearAllBtn?.addEventListener('click', () => this.clearAllData());
         toggleThemeBtn?.addEventListener('click', () => document.getElementById('settings-theme-btn')?.click());

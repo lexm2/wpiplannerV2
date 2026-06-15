@@ -1,6 +1,4 @@
-export { InfoModalController } from './InfoModalController';
-export type { SectionData } from './SectionInfoModalController';
-export { SectionInfoModalController } from './SectionInfoModalController';
+export type { SectionData } from '../../types/modal';
 export { MainController } from './MainController';
 export { ScheduleController } from './ScheduleController';
 export { TimestampManager } from './TimestampManager';
