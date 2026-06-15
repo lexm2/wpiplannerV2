@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 15, 2026, 3:45 AM",
+  "generated": "Jun 15, 2026, 9:58 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -19504,7 +19504,7 @@
               "number": "AX01",
               "seats": 20,
               "seatsAvailable": 0,
-              "actualWaitlist": 4,
+              "actualWaitlist": 3,
               "maxWaitlist": 10,
               "note": null,
               "computedTerm": "A",
@@ -19521,7 +19521,7 @@
                   "room": "Goddard Hall 206 BB Lab",
                   "seats": 20,
                   "seatsAvailable": 0,
-                  "actualWaitlist": 4,
+                  "actualWaitlist": 3,
                   "maxWaitlist": 10,
                   "specificSection": "AX01",
                   "days": [
@@ -91170,7 +91170,7 @@
                 "number": "D01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 5,
                 "note": null,
                 "computedTerm": "D",
@@ -91187,7 +91187,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 5,
                     "specificSection": "D01",
                     "days": [
@@ -427753,7 +427753,7 @@
                 "number": "D02",
                 "seats": 25,
                 "seatsAvailable": 13,
-                "actualWaitlist": 8,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -427770,7 +427770,7 @@
                     "room": "Stratton Hall 202 (new)",
                     "seats": 25,
                     "seatsAvailable": 13,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
@@ -438414,7 +438414,7 @@
                 "number": "D02",
                 "seats": 25,
                 "seatsAvailable": 13,
-                "actualWaitlist": 8,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -438431,7 +438431,7 @@
                     "room": "Stratton Hall 202 (new)",
                     "seats": 25,
                     "seatsAvailable": 13,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
@@ -450472,7 +450472,7 @@
                 "number": "B03",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "B",
@@ -450489,7 +450489,7 @@
                     "room": "Recreation Center Track",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "B03",
                     "days": [
