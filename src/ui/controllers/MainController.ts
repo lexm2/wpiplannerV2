@@ -746,8 +746,8 @@ export class MainController {
             }
         });
 
-        // Listen to undo/redo state changes to update button states
-        this.services.profileStateManager.onUndoRedoChange(() => {
+        // React to undo/redo history changes to update button states
+        watch(() => appState.undoRedoGeneration, () => {
             this.updateUndoRedoButtons();
         });
 

@@ -1,5 +1,6 @@
 import { setReplacer, setReviver } from '../../utils/jsonSerializer';
 import type { Schedule, SchedulePreferences } from '../../types/schedule';
+import { appState } from './appState.svelte';
 
 export interface StateSnapshot {
   timestamp: number;
@@ -12,7 +13,6 @@ export class UndoRedoManager {
   private maxHistorySize = 100;
   private history: StateSnapshot[] = [];
   private currentIndex = -1;
-  private listeners: Set<() => void> = new Set();
 
   captureSnapshot(
     activeScheduleId: string | null,
@@ -75,13 +75,9 @@ export class UndoRedoManager {
     this.notifyListeners();
   }
 
-  onChange(listener: () => void): () => void {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
-  }
-
+  /** Signal a history change to reactive consumers (replaces the old listener set). */
   private notifyListeners(): void {
-    this.listeners.forEach(listener => listener());
+    appState.undoRedoGeneration++;
   }
 
   private deepClone<T>(obj: T): T {

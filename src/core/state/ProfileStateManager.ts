@@ -565,10 +565,6 @@ export class ProfileStateManager {
         return this.undoRedoManager.canRedo();
     }
 
-    onUndoRedoChange(listener: () => void): () => void {
-        return this.undoRedoManager.onChange(listener);
-    }
-
     save(skipSnapshot = false): void {
         const savePromise = this.executeSave(skipSnapshot);
         this.pendingSavePromises.add(savePromise);

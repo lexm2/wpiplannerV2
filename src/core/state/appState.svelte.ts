@@ -35,6 +35,13 @@ class AppState {
     /** Bumped after a successful data import (the old 'imported' trigger). */
     importGeneration = $state(0);
 
+    /**
+     * Bumped whenever the undo/redo history changes (snapshot captured, undo,
+     * redo, or clear) — the old `UndoRedoManager.onChange` trigger. Consumers
+     * `watch` this and re-read `canUndo()`/`canRedo()` to refresh button state.
+     */
+    undoRedoGeneration = $state(0);
+
     /** The active schedule object (new identity whenever it or its id changes). */
     activeSchedule = $derived(
         this.schedules.find(s => s.id === this.activeScheduleId) ?? null
