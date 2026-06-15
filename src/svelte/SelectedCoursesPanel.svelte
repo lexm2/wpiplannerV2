@@ -5,9 +5,8 @@
   import type { Course } from '../types/types';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
 
-  let { courseSelectionService, onSelectCourse }: {
+  let { courseSelectionService }: {
     courseSelectionService: CourseSelectionService;
-    onSelectCourse: (course: Course) => void;
   } = $props();
 
   // `appState.selectedCourses` is a $state.raw array — copy before sorting,
@@ -43,10 +42,9 @@
       : `${course.minCredits}-${course.maxCredits} credits`;
   }
 
-  // Bridge to the still-vanilla course-description panel — identical to CourseList.
+  // Set the shared rune; CourseDescription.svelte reads it to render the panel.
   function handleSelect(course: Course): void {
-    courseListState.selectedCourseId = course.id;
-    onSelectCourse(course);
+    courseListState.selectedCourse = course;
   }
 
   function onItemKeydown(e: KeyboardEvent, course: Course): void {

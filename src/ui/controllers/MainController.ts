@@ -13,7 +13,7 @@ import FilterButtons from '../../svelte/FilterButtons.svelte'
 import SearchBar from '../../svelte/SearchBar.svelte'
 import CourseList from '../../svelte/CourseList.svelte'
 import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
-import { CourseController } from './CourseController'
+import CourseDescription from '../../svelte/CourseDescription.svelte'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
 import { InfoModalController } from './InfoModalController'
@@ -38,7 +38,6 @@ import type { SelectionSnapshot } from '../../types/scheduling'
 export class MainController {
     private services: ServiceContainer;
     private schedulePickerModal: SchedulePickerModal | null = null;
-    private courseController: CourseController;
     private scheduleController: ScheduleController;
     private sectionInfoModalController: SectionInfoModalController;
     private filterModalController: FilterModalController;
@@ -65,15 +64,11 @@ export class MainController {
         this.autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, filterService);
 
         // Initialize controllers
-        this.courseController = new CourseController(courseSelectionService, courseDataService);
         this.scheduleController = new ScheduleController(courseSelectionService, this.colorService, this.autoScheduleOrchestrator);
         this.sectionInfoModalController = new SectionInfoModalController(modalService, uiStateManager);
         new InfoModalController(modalService, uiStateManager);
         this.filterModalController = new FilterModalController(modalService, uiStateManager);
         this.scheduleFilterModalController = new FilterModalController(modalService, uiStateManager);
-
-        // Connect filter service to course controller
-        this.courseController.setFilterService(filterService);
 
         // Connect filter service and course data to filter modal
         this.filterModalController.setFilterService(filterService);
@@ -193,11 +188,9 @@ export class MainController {
         // filterService.filterCourses), owns pagination (load-more), term-badge
         // expansion (a slide transition replacing the old FLIP height animation),
         // and the select/bookmark buttons (which reflect appState.selectedById /
-        // bookmarkedIds reactively). CourseController stays alive: it still owns
-        // the selected-courses panel and the course-description panel. Clicking a
-        // course item sets the shared courseListState.selectedCourseId AND calls
-        // onSelectCourse → courseController.showCourseDescription(course), which
-        // updates the still-vanilla description panel.
+        // bookmarkedIds reactively). Clicking a course item sets the shared
+        // courseListState.selectedCourse rune, which CourseDescription.svelte
+        // (mounted below) reads to render the description panel.
         const courseContainerEl = document.getElementById('course-container');
         if (courseContainerEl) {
             courseContainerEl.innerHTML = '';
@@ -206,9 +199,22 @@ export class MainController {
                 props: {
                     filterService,
                     courseSelectionService,
-                    profileStateManager: services.profileStateManager,
-                    onSelectCourse: (course: Course) => this.courseController.showCourseDescription(course)
+                    profileStateManager: services.profileStateManager
                 }
+            });
+        }
+
+        // Mount the course-description panel (Svelte) into #course-description. It
+        // reads courseListState.selectedCourse (a rune set by CourseList /
+        // SelectedCoursesPanel item clicks) and renders the description, category
+        // tooltip, and component tabs (lectures/discussions/labs/interest lists) —
+        // replacing CourseController.showCourseDescription / displayCourseDescription.
+        const courseDescriptionEl = document.getElementById('course-description');
+        if (courseDescriptionEl) {
+            courseDescriptionEl.innerHTML = '';
+            mount(CourseDescription, {
+                target: courseDescriptionEl,
+                props: { courseDataService }
             });
         }
 
@@ -220,16 +226,15 @@ export class MainController {
         // and the initializeSelectedCoursesExpander wiring. Its remove button
         // calls stopPropagation so the still-global `.course-remove-btn` handler
         // (which serves the vanilla SCHEDULE sidebar) does not double-fire.
-        // Clicking an item bridges to the still-vanilla description panel via
-        // onSelectCourse → courseController.showCourseDescription.
+        // Clicking an item sets the shared courseListState.selectedCourse rune,
+        // which CourseDescription.svelte reads to render the description panel.
         const selectedSectionEl = document.querySelector('.selected-courses-section');
         if (selectedSectionEl) {
             selectedSectionEl.innerHTML = '';
             mount(SelectedCoursesPanel, {
                 target: selectedSectionEl,
                 props: {
-                    courseSelectionService,
-                    onSelectCourse: (course: Course) => this.courseController.showCourseDescription(course)
+                    courseSelectionService
                 }
             });
         }
@@ -277,12 +282,10 @@ export class MainController {
             onDataLoaded: (departments) => {
                 this.filterModalController.setCourseData(departments);
                 this.scheduleFilterModalController.setCourseData(departments);
-                this.courseController.setAllDepartments(departments);
             },
             onDataRefreshed: (departments) => {
                 this.filterModalController.setCourseData(departments);
                 this.scheduleFilterModalController.setCourseData(departments);
-                this.courseController.setAllDepartments(departments);
                 this.refreshCurrentView();
             },
         });
@@ -522,8 +525,9 @@ export class MainController {
             // Clicking a course in the LIST is handled by the CourseList Svelte
             // component, and the SELECTED-courses panel is now the
             // SelectedCoursesPanel Svelte component (which handles its own item
-            // clicks → showCourseDescription). The global `.course-remove-btn`
-            // handler above stays for the still-vanilla SCHEDULE sidebar.
+            // clicks → courseListState.selectedCourse). The global
+            // `.course-remove-btn` handler above stays for the still-vanilla
+            // SCHEDULE sidebar.
         });
 
         // The course search bar (input + professor-mode toggle + clear button +

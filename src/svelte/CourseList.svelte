@@ -11,11 +11,10 @@
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
   import type { ProfileStateManager } from '../core/state/ProfileStateManager';
 
-  let { filterService, courseSelectionService, profileStateManager, onSelectCourse }: {
+  let { filterService, courseSelectionService, profileStateManager }: {
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
     profileStateManager: ProfileStateManager;
-    onSelectCourse: (course: Course) => void;
   } = $props();
 
   const INITIAL_PAGE_SIZE = 100;
@@ -182,8 +181,7 @@
   }
 
   function selectCourse(course: Course): void {
-    courseListState.selectedCourseId = course.id;
-    onSelectCourse(course);
+    courseListState.selectedCourse = course;
   }
 
   function toggleSelect(course: Course): void {
