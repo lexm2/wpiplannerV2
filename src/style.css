@@ -8,7 +8,7 @@
 @import url('./styles/components/reset.css');
 @import url('./styles/components/header.css');
 @import url('./styles/components/theme-selector-base.css'); /* Base styles for index.html */
-/* theme-selector.module.css - dynamic classes imported in ThemeSelector.ts */
+/* theme-selector.module.css - dynamic classes imported in src/svelte/ThemeSelector.svelte */
 @import url('./styles/components/layout.css');
 /* resize-handle.css migrated to CSS Module - imported directly in ResizablePanel.ts */
 @import url('./styles/components/sidebar.css');

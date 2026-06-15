@@ -1,5 +1,6 @@
 import { ThemeDefinition, ThemeId } from './types'
 import { ProfileStateManager } from '../core/state/ProfileStateManager'
+import { uiState } from '../services/ui/uiState.svelte'
 
 // Import theme definitions
 import wpiClassic from './definitions/wpi-classic.json'
@@ -99,6 +100,7 @@ export class ThemeManager {
         
         // Apply the current theme
         this.applyTheme(this.currentTheme);
+        uiState.currentThemeId = this.currentTheme;
     }
 
     registerTheme(theme: ThemeDefinition): void {
@@ -143,6 +145,9 @@ export class ThemeManager {
         this.currentTheme = themeId;
         this.applyTheme(themeId);
         this.saveThemePreference(themeId);
+        // Notify reactive consumers (e.g. the Svelte ThemeSelector) of the new
+        // visible theme — ThemeManager has no listener system of its own.
+        uiState.currentThemeId = themeId;
 
         return true;
     }
@@ -216,12 +221,17 @@ export class ThemeManager {
     previewTheme(themeId: ThemeId): boolean {
         if (!this.themes.has(themeId)) return false;
         this.applyTheme(themeId);
+        // Reflect the previewed (visible) theme so the UI matches what's shown,
+        // even though this.currentTheme / storage are intentionally left unchanged.
+        // resetToCurrentTheme() below restores the rune on cancel.
+        uiState.currentThemeId = themeId;
         return true;
     }
 
     // Reset to current theme (cancel preview)
     resetToCurrentTheme(): void {
         this.applyTheme(this.currentTheme);
+        uiState.currentThemeId = this.currentTheme;
     }
 
     // Export/Import functionality

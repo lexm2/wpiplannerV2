@@ -2,10 +2,10 @@ import type { PageId, WizardStep } from '../../types/uiState'
 import { uiState } from '../../services/ui/uiState.svelte'
 import { Course, Department } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
-import { ThemeSelector } from '../components/ThemeSelector'
 import { SchedulePickerModal } from '../components/SchedulePickerModal'
 import { mount } from 'svelte'
 import DepartmentSidebar from '../../svelte/DepartmentSidebar.svelte'
+import ThemeSelector from '../../svelte/ThemeSelector.svelte'
 import UndoRedoButtons from '../../svelte/UndoRedoButtons.svelte'
 import ViewToggle from '../../svelte/ViewToggle.svelte'
 import PageTabs from '../../svelte/PageTabs.svelte'
@@ -35,7 +35,6 @@ import type { SelectionSnapshot } from '../../types/scheduling'
 export class MainController {
     private services: ServiceContainer;
     private schedulePickerModal: SchedulePickerModal | null = null;
-    private themeSelector: ThemeSelector;
     private courseController: CourseController;
     private scheduleController: ScheduleController;
     private sectionInfoModalController: SectionInfoModalController;
@@ -59,7 +58,6 @@ export class MainController {
             scheduleManagementService, operationManager, uiStateManager
         } = services;
 
-        this.themeSelector = new ThemeSelector(profileStateManager);
         this.debouncedSearch = new DebouncedOperation(operationManager, 'search', 300);
 
         // Initialize extracted services
@@ -173,6 +171,21 @@ export class MainController {
             });
         }
 
+        // Mount the theme dropdown (Svelte). It reads uiState.currentThemeId
+        // (a rune bumped by ThemeManager.setTheme) for its reactive current-name
+        // text + active-option highlight — so the settings-menu "Toggle Theme"
+        // (which calls themeManager.setTheme directly) keeps it in sync without
+        // any imperative wiring. The saved-theme application that the old
+        // ThemeSelector.initializeTheme() performed now lives in init() below.
+        const themeSelectorEl = document.querySelector('.theme-selector');
+        if (themeSelectorEl) {
+            themeSelectorEl.innerHTML = '';
+            mount(ThemeSelector, {
+                target: themeSelectorEl,
+                props: { profileStateManager }
+            });
+        }
+
         // Set up course data event subscriptions via AppBootstrap
         AppBootstrap.setupCourseDataSubscriptions(services, {
             setAllDepartments: (departments) => {
@@ -244,7 +257,12 @@ export class MainController {
         // appState.loadedDepartments is populated.
         try {
             await AppBootstrap.initializeAsyncServices(this.services);
-            this.themeSelector.initializeTheme();
+            // Apply the saved theme now that storage has loaded — this replicates
+            // the old ThemeSelector.initializeTheme()/loadSavedTheme() behavior.
+            // setTheme also bumps uiState.currentThemeId, so the mounted Svelte
+            // ThemeSelector reflects the saved theme as its active/current option.
+            const savedTheme = this.services.profileStateManager.getPreferences()?.theme ?? 'wpi-dark';
+            this.services.themeManager.setTheme(savedTheme);
 
             // Set "All Departments" as the default selection on startup
             this.initializeDefaultDepartmentView();

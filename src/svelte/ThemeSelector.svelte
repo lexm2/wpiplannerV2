@@ -1,0 +1,74 @@
+<script lang="ts">
+  import styles from '../styles/components/theme-selector.module.css';
+  import { ThemeManager } from '../themes/ThemeManager';
+  import { uiState } from '../services/ui/uiState.svelte';
+  import { getInlineSVG } from '../utils/iconPaths';
+  import type { ProfileStateManager } from '../core/state/ProfileStateManager';
+
+  // `profileStateManager` matches the old ctor signature; the saved-theme load is
+  // now performed by MainController (see initializeTheme parity there), so this
+  // component only renders + drives selection. The prop is accepted for signature
+  // parity and future use.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let { profileStateManager }: { profileStateManager?: ProfileStateManager } = $props();
+
+  const tm = ThemeManager.getInstance();
+  const themes = tm.getAvailableThemes();
+
+  let open = $state(false);
+  // `uiState.currentThemeId` is a rune bumped by ThemeManager.setTheme — so the
+  // active option + current-name text recompute on any theme change, including
+  // the settings-menu "Toggle Theme" which calls themeManager.setTheme directly.
+  const currentId = $derived(uiState.currentThemeId);
+  const currentName = $derived(
+    themes.find(t => t.id === currentId)?.name ?? ''
+  );
+
+  function toggle(e: MouseEvent): void {
+    e.stopPropagation();
+    open = !open;
+  }
+
+  function selectTheme(id: string): void {
+    tm.setTheme(id); // bumps the rune → display updates reactively
+    open = false;
+  }
+</script>
+
+<svelte:window onclick={() => (open = false)} />
+
+<!--
+  Global classes (.theme-dropdown/.theme-options/.dropdown-arrow) live in
+  theme-selector-base.css and are written as plain strings. The dynamic state
+  classes (.open/.show/.theme-option/.active/...) come from the CSS *module*, so
+  they're hashed and must be pulled from the imported `styles` object — meaning
+  the `class:` directive (which needs a literal key) can't express them. We use
+  the object form of the `class` attribute instead.
+-->
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (dropdown is click-driven; keyboard nav is a separate follow-up) -->
+<div
+  class={["theme-dropdown", { [styles.open]: open }]}
+  id="theme-dropdown"
+  onclick={toggle}
+>
+  <span id="current-theme-name">{currentName}</span>
+  <span class="dropdown-arrow" id="theme-dropdown-arrow">{@html getInlineSVG('CHEVRON_DOWN', 'dropdown-arrow-icon')}</span>
+</div>
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (options container only stops propagation; keyboard nav is a separate follow-up) -->
+<div
+  class={["theme-options", { [styles.show]: open }]}
+  id="theme-options"
+  onclick={(e) => e.stopPropagation()}
+>
+  {#each themes as t (t.id)}
+    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (theme options are click-driven; keyboard nav is a separate follow-up) -->
+    <div
+      class={[styles['theme-option'], { [styles.active]: t.id === currentId }]}
+      data-theme-id={t.id}
+      onclick={() => selectTheme(t.id)}
+    >
+      <div class={styles['theme-option-name']}>{t.name}</div>
+      <div class={styles['theme-option-description']}>{t.description}</div>
+    </div>
+  {/each}
+</div>

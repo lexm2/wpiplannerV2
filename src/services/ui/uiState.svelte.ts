@@ -12,6 +12,10 @@ import type { PageId, ViewMode, WizardState } from '../../types/uiState';
 class UiState {
     currentPage = $state<PageId>('planner');
     currentView = $state<ViewMode>('list');
+    // Reflects the *visible* theme. Written by ThemeManager.setTheme/previewTheme/
+    // resetToCurrentTheme (ThemeManager has no listener system, so this rune is how
+    // the Svelte ThemeSelector stays in sync). Default matches ThemeManager's default.
+    currentThemeId = $state<string>('wpi-dark');
     openModals = $state.raw<string[]>([]);
     wizard = $state.raw<WizardState>({ isOpen: false, courseId: null, step: null });
 }

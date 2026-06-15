@@ -1,5 +1,4 @@
 export { BaseModal } from './BaseModal';
-export { ThemeSelector } from './ThemeSelector';
 export type { DualRangeSliderOptions } from './DualRangeSlider';
 export { DualRangeSlider } from './DualRangeSlider';
 export type {
