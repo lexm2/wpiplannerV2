@@ -12,6 +12,7 @@ import PageTabs from '../../svelte/PageTabs.svelte'
 import FilterButtons from '../../svelte/FilterButtons.svelte'
 import SearchBar from '../../svelte/SearchBar.svelte'
 import CourseList from '../../svelte/CourseList.svelte'
+import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
 import { CourseController } from './CourseController'
 import { ScheduleController } from './ScheduleController'
 import { SectionInfoModalController } from './SectionInfoModalController'
@@ -211,6 +212,28 @@ export class MainController {
             });
         }
 
+        // Mount the planner SELECTED-courses panel (Svelte) into
+        // .selected-courses-section. It renders the whole section (header
+        // expander + list), deriving its list from appState.selectedCourses (a
+        // rune) so it reacts to selection changes on its own — replacing
+        // CourseController.displaySelectedCourses / add/removeSelectedCourseToSidebar
+        // and the initializeSelectedCoursesExpander wiring. Its remove button
+        // calls stopPropagation so the still-global `.course-remove-btn` handler
+        // (which serves the vanilla SCHEDULE sidebar) does not double-fire.
+        // Clicking an item bridges to the still-vanilla description panel via
+        // onSelectCourse → courseController.showCourseDescription.
+        const selectedSectionEl = document.querySelector('.selected-courses-section');
+        if (selectedSectionEl) {
+            selectedSectionEl.innerHTML = '';
+            mount(SelectedCoursesPanel, {
+                target: selectedSectionEl,
+                props: {
+                    courseSelectionService,
+                    onSelectCourse: (course: Course) => this.courseController.showCourseDescription(course)
+                }
+            });
+        }
+
         // Mount the planner/schedule page tabs (Svelte). It reads
         // uiState.currentPage (a rune) for its reactive `active` class —
         // replacing the tab `.active` toggle that used to live in
@@ -348,7 +371,10 @@ export class MainController {
             this.scheduleController.setupAutoScheduleButton();
             this.scheduleController.setupClearAllSectionsButton();
             this.autoScheduleOrchestrator.setupCourseSelectionChangeListener();
-            this.courseController.displaySelectedCourses();
+
+            // The SELECTED-courses panel is the SelectedCoursesPanel Svelte
+            // component now (reactive on appState.selectedCourses), so no initial
+            // imperative render here.
 
             // The course list's select buttons are reactive (CourseList reads
             // appState.selectedById), so no initial imperative selection sync.
@@ -493,16 +519,11 @@ export class MainController {
                 return;
             }
 
-
             // Clicking a course in the LIST is handled by the CourseList Svelte
-            // component. The SELECTED-courses panel is still vanilla, so opening a
-            // course's description from there stays here.
-            if (target.closest('.selected-course-item') && !target.closest('.course-remove-btn')) {
-                const courseElement = target.closest('.selected-course-item') as HTMLElement;
-                if (courseElement) {
-                    this.courseController.selectCourse(courseElement);
-                }
-            }
+            // component, and the SELECTED-courses panel is now the
+            // SelectedCoursesPanel Svelte component (which handles its own item
+            // clicks → showCourseDescription). The global `.course-remove-btn`
+            // handler above stays for the still-vanilla SCHEDULE sidebar.
         });
 
         // The course search bar (input + professor-mode toggle + clear button +
@@ -641,10 +662,10 @@ export class MainController {
     }
 
     syncCourseSelectionUI(): void {
-        // The course LIST's select buttons are reactive (CourseList reads
-        // appState.selectedById), so only the still-vanilla SELECTED panel needs
-        // an imperative refresh here.
-        this.courseController.displaySelectedCourses();
+        // No-op: both the course LIST (CourseList) and the SELECTED-courses panel
+        // (SelectedCoursesPanel) are reactive Svelte components reading
+        // appState, so there is nothing to imperatively refresh. Kept as a
+        // stable entry point because setupTutorial.ts still calls it.
     }
 
     runAutoSchedule(): void {
@@ -720,23 +741,11 @@ export class MainController {
 
     private refreshSelectionUI(): void {
         const selectedCourses = this.services.profileStateManager.getSelectedCourses();
-        const currentIds = new Set(selectedCourses.map(sc => sc.course.id));
-        const previousIds = new Set(this.previousSelectedCoursesMap.keys());
         const onSchedule = this.services.uiStateManager.currentPage === 'schedule';
 
-        // Added / removed courses → incremental SELECTED-panel updates. The
-        // course LIST's select buttons are reactive (CourseList Svelte
-        // component reads appState.selectedById), so no updateCourseUIById here.
-        for (const sc of selectedCourses) {
-            if (!previousIds.has(sc.course.id)) {
-                this.courseController.addSelectedCourseToSidebar(sc.course);
-            }
-        }
-        for (const id of previousIds) {
-            if (!currentIds.has(id)) {
-                this.courseController.removeSelectedCourseFromSidebar(id);
-            }
-        }
+        // The course LIST's select buttons (CourseList) and the SELECTED-courses
+        // panel (SelectedCoursesPanel) are reactive Svelte components reading
+        // appState, so added/removed courses need no imperative panel updates here.
 
         // Section changes on existing courses → reflect section-button state
         for (const sc of selectedCourses) {
@@ -784,7 +793,9 @@ export class MainController {
     }
 
     private refreshUI(): void {
-        this.courseController.displaySelectedCourses();
+        // The SELECTED-courses panel is reactive (SelectedCoursesPanel reads
+        // appState.selectedCourses), so only the schedule-page selection needs
+        // an imperative refresh here.
         this.scheduleController.displayScheduleSelectedCourses();
 
         if (this.services.uiStateManager.currentPage === 'schedule') {
