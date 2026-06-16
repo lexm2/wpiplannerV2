@@ -14,6 +14,7 @@ import ScheduleFilterButton from '../../svelte/ScheduleFilterButton.svelte'
 import { localEventService } from '../../services/scheduling/localEventService'
 import { sectionInfoService } from '../../services/scheduling/sectionInfoService'
 import { autoScheduleService } from '../../services/scheduling/autoScheduleService'
+import { componentWizardService } from '../../services/scheduling/componentWizardService'
 import SearchBar from '../../svelte/SearchBar.svelte'
 import CourseList from '../../svelte/CourseList.svelte'
 import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
@@ -25,7 +26,6 @@ import WizardHost from '../../svelte/WizardHost.svelte'
 import ScheduleGrids from '../../svelte/schedule/ScheduleGrids.svelte'
 import ModalLayer from '../../svelte/modals/ModalLayer.svelte'
 import { modalState } from '../../svelte/modals/modalState.svelte'
-import { ScheduleController } from './ScheduleController'
 import { getInlineSVG, type IconName } from '../../utils/iconPaths'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
@@ -45,7 +45,6 @@ import type { SelectionSnapshot } from '../../types/scheduling'
  */
 export class MainController {
     private services: ServiceContainer;
-    private scheduleController: ScheduleController;
     private debouncedSearch: DebouncedOperation;
     private colorService: CourseColorService;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator;
@@ -67,18 +66,14 @@ export class MainController {
         this.colorService = new CourseColorService(courseSelectionService);
         this.autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, filterService);
 
-        // Initialize controllers
-        this.scheduleController = new ScheduleController(courseSelectionService);
-
-        // The planner/schedule filter modal is now the FilterModal Svelte component
-        // in ModalLayer (mounted below) — opened via uiState.openModals, services
-        // passed as ModalLayer props. No imperative controller instances here.
-        this.scheduleController.setCourseDataService(courseDataService);
-        this.scheduleController.setConflictDetector(conflictDetector);
-        this.scheduleController.setFilterService(filterService);
-
-        // Set modal controllers for ScheduleController
-        this.scheduleController.setUIStateManager(uiStateManager);
+        // Component-selection wizard launching lives in the standalone
+        // componentWizardService, which drives the reactive wizardState store
+        // (WizardHost renders the panel) + the schedulePreviewState rune and
+        // persists committed selections via CourseSelectionService — the last
+        // responsibility lifted off the now-deleted ScheduleController.
+        // The ConflictFilter is registered by AppBootstrap.initializeServices
+        // (filterService.setConflictDetector()), so no controller wiring is needed.
+        componentWizardService.init(courseSelectionService, courseDataService, filterService, uiStateManager);
 
         // Local calendar-event CRUD lives in the standalone localEventService,
         // which reads appState.activeSchedule directly and persists via
@@ -340,8 +335,8 @@ export class MainController {
                 target: scheduleCoursesEl,
                 props: {
                     courseSelectionService: services.courseSelectionService,
-                    getIncompleteInfo: (sc: SelectedCourse) => this.scheduleController.getIncompleteSelectionInfo(sc),
-                    onOpenWizard: (course: Course, existing: SelectedCourse | undefined) => this.scheduleController.openComponentWizard(course, existing),
+                    getIncompleteInfo: (sc: SelectedCourse) => componentWizardService.getIncompleteSelectionInfo(sc),
+                    onOpenWizard: (course: Course, existing: SelectedCourse | undefined) => componentWizardService.openComponentWizard(course, existing),
                 }
             });
         }
@@ -427,18 +422,18 @@ export class MainController {
     }
 
     closeWizard(): void {
-        this.scheduleController.closeComponentWizard();
+        componentWizardService.closeComponentWizard();
     }
 
     openWizardForCourse(courseId: string, initialStep?: WizardStep): void {
         const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
         const selected = selectedCourses.find(sc => sc.course.id === courseId);
         if (!selected) return;
-        this.scheduleController.openComponentWizard(selected.course, selected, initialStep);
+        componentWizardService.openComponentWizard(selected.course, selected, initialStep);
     }
 
     jumpWizardToStep(step: WizardStep): void {
-        this.scheduleController.jumpWizardToStep(step);
+        componentWizardService.jumpWizardToStep(step);
     }
 
     private async init(): Promise<void> {
@@ -532,7 +527,7 @@ export class MainController {
 
     private handleSwipeRight(): void {
         if (this.services.uiStateManager.getCurrentPage() === 'schedule') {
-            this.scheduleController.closeComponentWizard();
+            componentWizardService.closeComponentWizard();
             this.services.uiStateManager.setPage('planner');
         }
     }
@@ -542,7 +537,7 @@ export class MainController {
     private switchToPageView(page: PageId): void {
         if (page === 'planner') {
             // Close wizard when switching to planner/classes page
-            this.scheduleController.closeComponentWizard();
+            componentWizardService.closeComponentWizard();
             this.services.uiStateManager.setPage('planner');
         } else {
             this.services.uiStateManager.setPage('schedule');
