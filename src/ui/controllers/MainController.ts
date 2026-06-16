@@ -13,6 +13,7 @@ import ClearAllSectionsButton from '../../svelte/ClearAllSectionsButton.svelte'
 import ScheduleFilterButton from '../../svelte/ScheduleFilterButton.svelte'
 import { localEventService } from '../../services/scheduling/localEventService'
 import { sectionInfoService } from '../../services/scheduling/sectionInfoService'
+import { autoScheduleService } from '../../services/scheduling/autoScheduleService'
 import SearchBar from '../../svelte/SearchBar.svelte'
 import CourseList from '../../svelte/CourseList.svelte'
 import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
@@ -67,7 +68,7 @@ export class MainController {
         this.autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, filterService);
 
         // Initialize controllers
-        this.scheduleController = new ScheduleController(courseSelectionService, this.colorService, this.autoScheduleOrchestrator);
+        this.scheduleController = new ScheduleController(courseSelectionService);
 
         // The planner/schedule filter modal is now the FilterModal Svelte component
         // in ModalLayer (mounted below) — opened via uiState.openModals, services
@@ -91,6 +92,13 @@ export class MainController {
         // CourseColorService (replacing ScheduleController's showSectionInfoModal
         // + its getCourseColor/setCourseColor delegators).
         sectionInfoService.init(courseSelectionService, this.colorService, uiStateManager);
+
+        // Auto-schedule modal orchestration (intro → filter → generate) lives in
+        // the standalone autoScheduleService, which drives the declarative modals
+        // via modalState and surfaces the generating overlay through the
+        // appState.scheduleGenerating rune (replacing ScheduleController's
+        // openAutoSchedule/openAutoScheduleIntro/.../doGenerateSchedules).
+        autoScheduleService.init(courseSelectionService, filterService, this.colorService, this.autoScheduleOrchestrator, uiStateManager);
 
         // Mount the department sidebar (Svelte). It reads appState.loadedDepartments
         // and the reactive filter state directly, so it needs no imperative wiring.
@@ -314,7 +322,7 @@ export class MainController {
                 target: autoScheduleFooterEl,
                 props: {
                     autoScheduleOrchestrator: this.autoScheduleOrchestrator,
-                    onOpenAutoSchedule: () => this.scheduleController.openAutoSchedule(),
+                    onOpenAutoSchedule: () => autoScheduleService.openAutoSchedule(),
                 }
             });
         }
@@ -659,23 +667,23 @@ export class MainController {
     }
 
     openAutoSchedule(): void {
-        this.scheduleController.openAutoSchedule();
+        autoScheduleService.openAutoSchedule();
     }
 
     openAutoScheduleIntro(): void {
-        this.scheduleController.openAutoScheduleIntro();
+        autoScheduleService.openAutoScheduleIntro();
     }
 
     openAutoScheduleFilter(): void {
-        this.scheduleController.openAutoScheduleFilter();
+        autoScheduleService.openAutoScheduleFilter();
     }
 
     updateAutoScheduleIntroTerms(preferences: Record<string, string[]>): void {
-        this.scheduleController.updateAutoScheduleIntroTerms(preferences);
+        autoScheduleService.updateAutoScheduleIntroTerms(preferences);
     }
 
     refreshAutoScheduleFilterUI(): void {
-        this.scheduleController.refreshAutoScheduleFilterUI();
+        autoScheduleService.refreshAutoScheduleFilterUI();
     }
 
     refreshPlannerFilterUI(): void {
@@ -692,7 +700,7 @@ export class MainController {
     }
 
     runAutoSchedule(): void {
-        this.scheduleController.runAutoSchedule();
+        autoScheduleService.runAutoSchedule();
     }
 
     private async updateSchedulePickerButton(): Promise<void> {
