@@ -1,6 +1,6 @@
 import type { WizardStep } from '../../types/uiState'
 import { Course, Section, Period, LectureGroup } from '../../types/types'
-import { SelectedCourse, Schedule, LocalCalendarEvent, AcademicTerm, EventType } from '../../types/schedule'
+import { SelectedCourse, Schedule, LocalCalendarEvent } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
 import { FilterService } from '../../services/filtering/FilterService'
@@ -14,10 +14,10 @@ import type { WeeklyTimeSlot } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import type { UIStateManager } from '../../services/ui/UIStateManager'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
-import { AutoScheduleOrchestrator, type CalendarEventProvider } from '../../services/scheduling/AutoScheduleOrchestrator'
+import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator'
 import type { ComponentSelections } from '../../types/scheduling'
 
-export class ScheduleController implements CalendarEventProvider {
+export class ScheduleController {
     private courseSelectionService: CourseSelectionService;
     private courseDataService: CourseDataService | null = null;
     private filterService: FilterService | null = null;
@@ -89,47 +89,6 @@ export class ScheduleController implements CalendarEventProvider {
     // =========================================================================
     // Local Event Helper Methods
     // =========================================================================
-
-    /**
-     * Get all blocked times from local events for auto-scheduler.
-     */
-    getAllLocalEventBlockedTimes(): WeeklyTimeSlot[] {
-        if (!this.currentSchedule?.localEvents) return [];
-
-        const blockedTimes: WeeklyTimeSlot[] = [];
-        const visibleEvents = this.currentSchedule.localEvents.filter(e => e.visible);
-
-        for (const event of visibleEvents) {
-            if (event.eventType === EventType.ONE_TIME) continue;
-
-            const days = event.days || [];
-            const terms = event.terms || [AcademicTerm.ALL];
-
-            for (const term of terms) {
-                const academicTerm = term as AcademicTerm;
-                for (const day of days) {
-                    blockedTimes.push({
-                        id: `${event.id}-${term}-${day}`,
-                        day,
-                        startTime: event.startTime,
-                        endTime: event.endTime,
-                        term: academicTerm,
-                    });
-                }
-            }
-        }
-
-        return blockedTimes;
-    }
-
-    getLocalEventCount(): number {
-        const localEvents = this.currentSchedule?.localEvents || [];
-        return localEvents.filter(e => e.visible).length;
-    }
-
-    getAllCalendarBlockedTimes(): WeeklyTimeSlot[] {
-        return this.getAllLocalEventBlockedTimes();
-    }
 
     openCalendarEventsPanel(): void {
         this.openAddLocalEventModal();
@@ -406,59 +365,6 @@ export class ScheduleController implements CalendarEventProvider {
 
         const message = `Incomplete: Missing ${missingComponents.join(', ')} selection`;
         return { isIncomplete: true, message };
-    }
-    
-    async handleSectionSelection(course: Course, sectionNumber: string): Promise<void> {
-        const currentSelectedSection = this.courseSelectionService.getSelectedSection(course);
-        
-        try {
-            if (currentSelectedSection === sectionNumber) {
-                // Deselect current section
-                await this.courseSelectionService.setSelectedSection(course, null);
-            } else {
-                // Select new section (automatically deselects any previous section)
-                await this.courseSelectionService.setSelectedSection(course, sectionNumber);
-            }
-        } catch (error) {
-            console.error('Failed to update section selection:', error);
-            // TODO: Show error message to user
-        }
-        
-        // Note: UI refresh is handled automatically by the selection change listener
-        // No need to call displayScheduleSelectedCourses() here as it would cause duplicate refreshes
-    }
-
-    updateSectionButtonStates(course: Course, selectedSection: string | null): void {
-        const validCourseItem = document.querySelector<HTMLElement>(`.schedule-course-item[data-course-id="${course.id}"]`);
-        if (!validCourseItem) return;
-        const sectionButtons = validCourseItem.querySelectorAll('.section-select-btn');
-        const sectionOptions = validCourseItem.querySelectorAll('.section-option');
-
-        sectionButtons.forEach(button => {
-            const buttonSection = (button as HTMLElement).dataset.section;
-            const isSelected = buttonSection === selectedSection;
-            
-            // Update button appearance
-            if (isSelected) {
-                button.classList.add('selected');
-                button.innerHTML = getInlineSVG('CHECK', 'check-icon');
-            } else {
-                button.classList.remove('selected');
-                button.innerHTML = getInlineSVG('PLUS', 'plus-icon');
-            }
-        });
-
-        sectionOptions.forEach(option => {
-            const optionSection = (option as HTMLElement).dataset.section;
-            const isSelected = optionSection === selectedSection;
-            
-            // Update option appearance
-            if (isSelected) {
-                option.classList.add('selected');
-            } else {
-                option.classList.remove('selected');
-            }
-        });
     }
 
     private getCourseColor(courseId: string): string {

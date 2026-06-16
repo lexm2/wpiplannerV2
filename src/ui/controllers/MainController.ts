@@ -28,6 +28,7 @@ import { DeviceDetection } from '../../utils/deviceDetection'
 import { DebouncedOperation } from '../../utils/RequestCancellation'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator'
+import { calendarEventProvider } from '../../services/scheduling/calendarEventProvider'
 import { AppBootstrap } from '../../bootstrap/AppBootstrap'
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer'
 import { watch } from '../../svelte/reactivity.svelte'
@@ -455,7 +456,7 @@ export class MainController {
             AppBootstrap.setupWindowUnloadHandler();
 
             // Wire up calendar event provider for auto-scheduler
-            this.autoScheduleOrchestrator.setCalendarEventProvider(this.scheduleController);
+            this.autoScheduleOrchestrator.setCalendarEventProvider(calendarEventProvider);
 
             // Load active schedule into ScheduleController (for local events, etc.)
             const activeSchedule = this.services.scheduleManagementService.getActiveSchedule();
