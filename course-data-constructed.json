@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 16, 2026, 3:29 PM",
+  "generated": "Jun 16, 2026, 7:02 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -9809,7 +9809,7 @@
                 "number": "B01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "B",
@@ -9826,7 +9826,7 @@
                     "room": "Fuller Labs 320",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [
@@ -108986,7 +108986,7 @@
                 "crn": 349290,
                 "number": "BL01",
                 "seats": 60,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5180",
@@ -109003,7 +109003,7 @@
                     "building": "",
                     "room": "Atwater Kent 219",
                     "seats": 60,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "BL01",
@@ -109055,7 +109055,7 @@
                   "crn": 349288,
                   "number": "BX02",
                   "seats": 40,
-                  "seatsAvailable": 10,
+                  "seatsAvailable": 9,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5180",
@@ -109072,7 +109072,7 @@
                       "building": "",
                       "room": "Atwater Kent 227 Lab Restricted Access",
                       "seats": 40,
-                      "seatsAvailable": 10,
+                      "seatsAvailable": 9,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX02",
@@ -109657,7 +109657,7 @@
                 "crn": 350132,
                 "number": "B01",
                 "seats": 30,
-                "seatsAvailable": 19,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -109674,7 +109674,7 @@
                     "building": "",
                     "room": "Salisbury Labs 407",
                     "seats": 30,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -121277,7 +121277,7 @@
                 "crn": 354449,
                 "number": "C01",
                 "seats": 50,
-                "seatsAvailable": 31,
+                "seatsAvailable": 30,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -121294,7 +121294,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 50,
-                    "seatsAvailable": 31,
+                    "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "C01",
@@ -153017,7 +153017,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Grant Burrier",
+                    "professor": "Sumalee Passaretti",
                     "startTime": "18:30",
                     "endTime": "20:20",
                     "location": "Salisbury Labs 411",
@@ -297277,7 +297277,7 @@
                 "crn": 351499,
                 "number": "CL02",
                 "seats": 105,
-                "seatsAvailable": 57,
+                "seatsAvailable": 56,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5367",
@@ -297294,7 +297294,7 @@
                     "building": "",
                     "room": "Olin Hall 107",
                     "seats": 105,
-                    "seatsAvailable": 57,
+                    "seatsAvailable": 56,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL02",
@@ -297377,7 +297377,7 @@
                   "crn": 351478,
                   "number": "CD08",
                   "seats": 35,
-                  "seatsAvailable": 27,
+                  "seatsAvailable": 26,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5367",
@@ -297394,7 +297394,7 @@
                       "building": "",
                       "room": "Stratton Hall 205",
                       "seats": 35,
-                      "seatsAvailable": 27,
+                      "seatsAvailable": 26,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD08",
@@ -369695,7 +369695,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Snehalata Kadam",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Olin Hall 126",
@@ -369728,7 +369728,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Snehalata Kadam",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 126",
@@ -369761,7 +369761,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Snehalata Kadam",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 218",
@@ -370116,7 +370116,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370148,7 +370148,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370180,7 +370180,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370212,7 +370212,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370244,7 +370244,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370276,7 +370276,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370308,7 +370308,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370340,7 +370340,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370372,7 +370372,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370404,7 +370404,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370436,7 +370436,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370468,7 +370468,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370500,7 +370500,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370532,7 +370532,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370564,7 +370564,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370596,7 +370596,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370628,7 +370628,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370660,7 +370660,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370692,7 +370692,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370724,7 +370724,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370756,7 +370756,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370788,7 +370788,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -370820,7 +370820,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370852,7 +370852,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370884,7 +370884,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370916,7 +370916,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370948,7 +370948,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -370980,7 +370980,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371012,7 +371012,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371044,7 +371044,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371076,7 +371076,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371108,7 +371108,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -371140,7 +371140,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -371210,7 +371210,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Qi Wen",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 107",
@@ -371243,7 +371243,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Qi Wen",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Olin Hall 218",
@@ -371276,7 +371276,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Qi Wen",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Olin Hall 218",
@@ -371309,7 +371309,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Qi Wen",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 126",
@@ -371664,7 +371664,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371696,7 +371696,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371728,7 +371728,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371760,7 +371760,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371792,7 +371792,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371824,7 +371824,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371856,7 +371856,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371888,7 +371888,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371920,7 +371920,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371952,7 +371952,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -371984,7 +371984,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372016,7 +372016,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372048,7 +372048,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372080,7 +372080,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372112,7 +372112,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372144,7 +372144,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372176,7 +372176,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372208,7 +372208,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372240,7 +372240,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372272,7 +372272,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372304,7 +372304,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372336,7 +372336,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -372368,7 +372368,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -372400,7 +372400,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -372432,7 +372432,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -372464,7 +372464,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -372496,7 +372496,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -372528,7 +372528,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -372560,7 +372560,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -372592,7 +372592,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -372624,7 +372624,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -372656,7 +372656,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373081,7 +373081,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373113,7 +373113,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373145,7 +373145,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373177,7 +373177,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373209,7 +373209,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373241,7 +373241,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373273,7 +373273,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373305,7 +373305,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373337,7 +373337,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373369,7 +373369,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373401,7 +373401,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373433,7 +373433,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373465,7 +373465,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373497,7 +373497,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373529,7 +373529,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373561,7 +373561,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373593,7 +373593,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373625,7 +373625,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373657,7 +373657,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373689,7 +373689,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373721,7 +373721,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -373753,7 +373753,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373785,7 +373785,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373817,7 +373817,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373849,7 +373849,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373881,7 +373881,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373913,7 +373913,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373945,7 +373945,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -373977,7 +373977,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374009,7 +374009,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374041,7 +374041,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374073,7 +374073,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -374105,7 +374105,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -374560,7 +374560,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374592,7 +374592,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374624,7 +374624,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374656,7 +374656,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374688,7 +374688,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374720,7 +374720,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374752,7 +374752,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374784,7 +374784,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374816,7 +374816,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374848,7 +374848,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -374880,7 +374880,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -374912,7 +374912,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -374944,7 +374944,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -374976,7 +374976,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -375008,7 +375008,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -375040,7 +375040,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -375072,7 +375072,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -375104,7 +375104,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -375136,7 +375136,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -375168,7 +375168,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -375200,7 +375200,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -375232,7 +375232,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -375264,7 +375264,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -375296,7 +375296,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -375328,7 +375328,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -375360,7 +375360,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -375392,7 +375392,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -375424,7 +375424,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -375456,7 +375456,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -375488,7 +375488,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -375520,7 +375520,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -375913,7 +375913,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -375945,7 +375945,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -375977,7 +375977,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376009,7 +376009,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376041,7 +376041,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376073,7 +376073,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376105,7 +376105,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376137,7 +376137,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376169,7 +376169,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376201,7 +376201,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376233,7 +376233,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376265,7 +376265,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376297,7 +376297,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376329,7 +376329,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376361,7 +376361,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376393,7 +376393,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376425,7 +376425,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376457,7 +376457,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376489,7 +376489,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376521,7 +376521,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376553,7 +376553,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -376585,7 +376585,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "10:00",
                       "endTime": "11:50",
                       "location": "Olin Hall 114",
@@ -376617,7 +376617,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 114",
@@ -376649,7 +376649,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 114",
@@ -376681,7 +376681,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 114",
@@ -376713,7 +376713,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376745,7 +376745,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376777,7 +376777,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376809,7 +376809,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376841,7 +376841,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376873,7 +376873,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376905,7 +376905,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376937,7 +376937,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -376969,7 +376969,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -377001,7 +377001,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -377592,7 +377592,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -377624,7 +377624,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -377656,7 +377656,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -377688,7 +377688,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -377720,7 +377720,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -377752,7 +377752,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -377784,7 +377784,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -377816,7 +377816,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -377848,7 +377848,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -377880,7 +377880,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -377912,7 +377912,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -377944,7 +377944,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -377976,7 +377976,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378008,7 +378008,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378040,7 +378040,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378072,7 +378072,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378104,7 +378104,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378136,7 +378136,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378168,7 +378168,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378200,7 +378200,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378232,7 +378232,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378264,7 +378264,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378296,7 +378296,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -378328,7 +378328,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -378360,7 +378360,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -378392,7 +378392,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -378424,7 +378424,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -378456,7 +378456,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -378488,7 +378488,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -378520,7 +378520,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -378552,7 +378552,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -378584,7 +378584,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378616,7 +378616,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -378943,7 +378943,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -378975,7 +378975,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379007,7 +379007,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379039,7 +379039,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379071,7 +379071,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379103,7 +379103,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379135,7 +379135,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379167,7 +379167,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379199,7 +379199,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379231,7 +379231,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379263,7 +379263,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379295,7 +379295,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379327,7 +379327,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379359,7 +379359,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379391,7 +379391,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379423,7 +379423,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379455,7 +379455,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379487,7 +379487,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379519,7 +379519,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379551,7 +379551,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379583,7 +379583,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379615,7 +379615,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379647,7 +379647,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379679,7 +379679,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379711,7 +379711,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379743,7 +379743,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379775,7 +379775,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379807,7 +379807,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379839,7 +379839,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -379871,7 +379871,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -379903,7 +379903,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -380356,7 +380356,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380388,7 +380388,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380420,7 +380420,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380452,7 +380452,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380484,7 +380484,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380516,7 +380516,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380548,7 +380548,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380580,7 +380580,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380612,7 +380612,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380644,7 +380644,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380676,7 +380676,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380708,7 +380708,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -380740,7 +380740,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -380772,7 +380772,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -380804,7 +380804,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -380836,7 +380836,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -380868,7 +380868,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -380900,7 +380900,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -380932,7 +380932,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -380964,7 +380964,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -380996,7 +380996,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -381028,7 +381028,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -381060,7 +381060,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -381092,7 +381092,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -381124,7 +381124,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -381156,7 +381156,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -381188,7 +381188,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -381220,7 +381220,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 114",
@@ -381252,7 +381252,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -381284,7 +381284,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -381316,7 +381316,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -381348,7 +381348,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -381380,7 +381380,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -381412,7 +381412,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -381444,7 +381444,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -381476,7 +381476,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -381508,7 +381508,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -381540,7 +381540,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 114",
@@ -381572,7 +381572,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 114",
@@ -381604,7 +381604,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -436572,7 +436572,7 @@
                 "crn": 355570,
                 "number": "B01",
                 "seats": 45,
-                "seatsAvailable": 34,
+                "seatsAvailable": 35,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -436589,7 +436589,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 45,
-                    "seatsAvailable": 34,
+                    "seatsAvailable": 35,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -468373,7 +468373,7 @@
                 "crn": 355410,
                 "number": "A05 - ST in Holistic Well-Being: Strategies for College Learning and Productivity",
                 "seats": 30,
-                "seatsAvailable": 17,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -468390,7 +468390,7 @@
                     "building": "",
                     "room": "Stratton Hall 205",
                     "seats": 30,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A05 - ST in Holistic Well-Being: Strategies for College Learning and Productivity",
