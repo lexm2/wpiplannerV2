@@ -311,6 +311,10 @@
   align-items: center;
   flex-wrap: wrap;
   padding-top: 0.5rem;
+  /* Fill the expanded (full-width) row. Without this the container shrinks to its
+     content width inside the align-items:flex-start column, so flex-wrap never
+     triggers and a course with many sections renders one giant overflowing row. */
+  width: 100%;
 }
 
 /* Section badges start hidden — declared in CSS (not JS) so the very first

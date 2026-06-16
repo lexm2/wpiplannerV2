@@ -199,26 +199,67 @@
 
   const courseViews = $derived(displayed.map(buildCourseView));
 
-  function toggleTerm(e: MouseEvent, courseId: string, term: string, available: boolean): void {
-    if (!available) return;
-    // Lock the row at its current height + clip overflow NOW — synchronously,
-    // before the rune mutation triggers the {#if} swap — exactly like the old
-    // imperative handler. This is what stops the new content from painting at
-    // full size for one frame (the flash): the swapped-in content renders inside
-    // the locked height and is clipped until termFlip animates the height open.
-    const item = (e.currentTarget as HTMLElement | null)?.closest('.course-item') as HTMLElement | null;
-    if (item) {
-      const h = item.getBoundingClientRect().height;
-      item.style.height = `${h}px`;
-      item.style.overflow = 'hidden';
-      item.style.willChange = 'height';
-      pendingStartHeight.set(courseId, h);
+  const BADGE_STEP_MS = 30; // per-step delay of the diagonal crumb cascade
+
+  // Group badges into their wrapped visual rows by offsetTop (flex-wrap lays them
+  // out in rows); within a row they keep DOM order. Used for the diagonal cascade.
+  function groupBadgeRows(badges: HTMLElement[]): HTMLElement[][] {
+    const rowMap = new Map<number, HTMLElement[]>();
+    for (const b of badges) {
+      const top = b.offsetTop;
+      if (!rowMap.has(top)) rowMap.set(top, []);
+      rowMap.get(top)!.push(b);
     }
-    if (expandedTerm.get(courseId) === term) expandedTerm.delete(courseId);
-    else expandedTerm.set(courseId, term);
+    return Array.from(rowMap.keys()).sort((a, b) => a - b).map(k => rowMap.get(k)!);
   }
 
-  const BADGE_STEP_MS = 15; // per-step delay of the diagonal crumb cascade
+  // Lock a row at its current height + clip overflow synchronously, before the
+  // rune mutation triggers the {#if} swap. This stops the new content from
+  // painting at full size for one frame (the flash) — it renders clipped inside
+  // the locked height until termFlip animates the height to its new value.
+  function lockForFlip(item: HTMLElement, courseId: string): void {
+    const h = item.getBoundingClientRect().height;
+    item.style.height = `${h}px`;
+    item.style.overflow = 'hidden';
+    item.style.willChange = 'height';
+    pendingStartHeight.set(courseId, h);
+  }
+
+  function toggleTerm(e: MouseEvent, courseId: string, term: string, available: boolean): void {
+    if (!available) return;
+    const item = (e.currentTarget as HTMLElement | null)?.closest('.course-item') as HTMLElement | null;
+    const container = item?.querySelector('.term-sections-container') as HTMLElement | null;
+    const collapsing = expandedTerm.get(courseId) === term;
+
+    // Collapsing with motion: play the open animation in reverse — fade the
+    // section badges out diagonally from the bottom-right up to the top-left,
+    // THEN collapse the row. The {#if} swap removes the badges from the DOM the
+    // instant the rune flips, so the fade must run here, before that mutation.
+    if (collapsing && item && container && !reduceMotion) {
+      const rows = groupBadgeRows(
+        Array.from(container.querySelectorAll('.section-badge')) as HTMLElement[]
+      );
+      let maxStep = 0;
+      rows.forEach((row, ri) => row.forEach((_, ci) => { maxStep = Math.max(maxStep, ri + ci); }));
+      rows.forEach((row, ri) => {
+        row.forEach((b, ci) => {
+          b.style.transition = 'opacity 0.15s ease';
+          // Reverse the diagonal: highest (rowIndex + colIndex) fades first.
+          window.setTimeout(() => { b.style.opacity = '0'; }, (maxStep - (ri + ci)) * BADGE_STEP_MS);
+        });
+      });
+      // Once the crumbs have faded out, lock the height and flip to collapsed.
+      window.setTimeout(() => {
+        lockForFlip(item, courseId);
+        expandedTerm.delete(courseId);
+      }, maxStep * BADGE_STEP_MS + 150);
+      return;
+    }
+
+    if (item) lockForFlip(item, courseId);
+    if (collapsing) expandedTerm.delete(courseId);
+    else expandedTerm.set(courseId, term);
+  }
 
   // Port of the old MainController FLIP height animation. Driven by the
   // `expandedTerm` rune: when a course's expanded term changes, Svelte swaps the
@@ -242,21 +283,13 @@
       item.style.height = 'auto';
       const targetH = item.getBoundingClientRect().height;
 
-      // Group section badges into visual rows by offsetTop (flex-wrap lays them
-      // out in rows). Within each row badges keep their order. The stagger delay
-      // is diagonal — (rowIndex + colIndex) * step — so each row starts one step
-      // after the previous instead of waiting for it to finish. A single row is
-      // just 0,1,2,…; three rows cascade as a wavefront without taking years.
-      const sectionBadges = Array.from(
-        item.querySelectorAll('.term-sections-container .section-badge')
-      ) as HTMLElement[];
-      const rowMap = new Map<number, HTMLElement[]>();
-      for (const b of sectionBadges) {
-        const top = b.offsetTop;
-        if (!rowMap.has(top)) rowMap.set(top, []);
-        rowMap.get(top)!.push(b);
-      }
-      const rows = Array.from(rowMap.keys()).sort((a, b) => a - b).map(k => rowMap.get(k)!);
+      // Group section badges into visual rows. The stagger delay is diagonal —
+      // (rowIndex + colIndex) * step — so each row starts one step after the
+      // previous instead of waiting for it to finish. A single row is just
+      // 0,1,2,…; many rows cascade as a wavefront without taking years.
+      const rows = groupBadgeRows(
+        Array.from(item.querySelectorAll('.term-sections-container .section-badge')) as HTMLElement[]
+      );
 
       item.style.height = `${startH}px`;
       void item.offsetHeight; // commit start height before adding the transition
