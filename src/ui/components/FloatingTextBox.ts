@@ -174,6 +174,7 @@ export class FloatingTextBox {
 
         if (rect.bottom > vh) top = vh - rect.height - 8;
         if (top < 0) top = 8;
+        if (rect.right > vw) left = vw - rect.width - 8;
         if (rect.left < 0) left = 8;
 
         if (left !== rect.left || top !== rect.top) {
@@ -217,7 +218,7 @@ export class FloatingTextBox {
             dot.remove();
         };
 
-        const overlayFade = overlay.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards' });
+        overlay.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards' });
         const growIn = dot.animate([
             { transform: 'translate(-50%, -50%) scale(0)' },
             { transform: 'translate(-50%, -50%) scale(1)' },

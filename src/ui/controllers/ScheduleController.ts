@@ -154,7 +154,7 @@ export class ScheduleController {
         const now = Date.now();
         const newEvent: LocalCalendarEvent = {
             ...eventData,
-            id: `local-${now}-${Math.random().toString(36).substr(2, 9)}`,
+            id: `local-${now}-${Math.random().toString(36).substring(2, 11)}`,
             createdAt: now,
             updatedAt: now,
         };

@@ -96,7 +96,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         id: 'welcome',
         onStart: () => {
             mainController.closeWizard();
-            services.uiStateManager.switchToPage('planner');
+            services.uiStateManager.setPage('planner');
         },
         steps: [
             {
@@ -179,7 +179,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             id: 'filtering',
             onStart: async () => {
                 mainController.closeWizard();
-                services.uiStateManager.switchToPage('schedule');
+                services.uiStateManager.setPage('schedule');
                 const selections: Array<[string, string, string | null, string | null]> = [
                     ['TUT-2001', 'TAL01', null, 'TAX01'],
                     ['TUT-2002', 'TDL01', null, 'TDX02'],
@@ -349,7 +349,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 }
             });
             services.filterService.clearFilters();
-            services.uiStateManager.switchToPage('schedule');
+            services.uiStateManager.setPage('schedule');
         },
         steps: [
             {
@@ -440,7 +440,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         lastStepLabel: 'Finish',
         onStart: () => {
             mainController.closeWizard();
-            services.uiStateManager.switchToPage('planner');
+            services.uiStateManager.setPage('planner');
         },
         steps: [
             {
@@ -524,7 +524,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
 
     tutorialService.onUIStateTransition((uiState) => {
         if (uiState.currentPage) {
-            services.uiStateManager.switchToPage(uiState.currentPage);
+            services.uiStateManager.setPage(uiState.currentPage);
         }
         if (uiState.wizard?.isOpen && uiState.wizard.courseId) {
             mainController.openWizardForCourse(uiState.wizard.courseId, uiState.wizard.step ?? undefined);

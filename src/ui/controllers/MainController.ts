@@ -54,7 +54,7 @@ export class MainController {
         const {
             profileStateManager, courseDataService, courseSelectionService,
             conflictDetector, filterService,
-            scheduleManagementService, operationManager, uiStateManager
+            operationManager, uiStateManager
         } = services;
 
         this.debouncedSearch = new DebouncedOperation(operationManager, 'search', 300);
@@ -386,7 +386,6 @@ export class MainController {
 
         // Initialize tracking for course changes
         const initialSelectedCourses = courseSelectionService.getSelectedCourses();
-        this.previousSelectedCoursesCount = initialSelectedCourses.length;
         this.previousSelectedCoursesMap = new Map();
         initialSelectedCourses.forEach(sc => {
             this.previousSelectedCoursesMap.set(sc.course.id, {
@@ -525,14 +524,14 @@ export class MainController {
 
     private handleSwipeLeft(): void {
         if (this.services.uiStateManager.getCurrentPage() === 'planner') {
-            this.services.uiStateManager.switchToPage('schedule');
+            this.services.uiStateManager.setPage('schedule');
         }
     }
 
     private handleSwipeRight(): void {
         if (this.services.uiStateManager.getCurrentPage() === 'schedule') {
             this.scheduleController.closeComponentWizard();
-            this.services.uiStateManager.switchToPage('planner');
+            this.services.uiStateManager.setPage('planner');
         }
     }
 
@@ -542,9 +541,9 @@ export class MainController {
         if (page === 'planner') {
             // Close wizard when switching to planner/classes page
             this.scheduleController.closeComponentWizard();
-            this.services.uiStateManager.switchToPage('planner');
+            this.services.uiStateManager.setPage('planner');
         } else {
-            this.services.uiStateManager.switchToPage('schedule');
+            this.services.uiStateManager.setPage('schedule');
         }
     }
 
@@ -723,7 +722,6 @@ export class MainController {
     }
 
 
-    private previousSelectedCoursesCount = 0;
     private previousSelectedCoursesMap = new Map<string, SelectionSnapshot>();
 
     private setupScheduleChangeListener(): void {
@@ -788,7 +786,6 @@ export class MainController {
     }
 
     private updateSelectedCoursesState(selectedCourses: SelectedCourse[]): void {
-        this.previousSelectedCoursesCount = selectedCourses.length;
         this.previousSelectedCoursesMap = new Map();
         selectedCourses.forEach(sc => {
             this.previousSelectedCoursesMap.set(sc.course.id, {
@@ -987,14 +984,6 @@ export class MainController {
         } else {
             this.services.themeManager.setTheme('wpi-dark');
         }
-    }
-
-    private getAllCourses(): Course[] {
-        const allCourses: Course[] = [];
-        this.allDepartments.forEach(dept => {
-            allCourses.push(...dept.courses);
-        });
-        return allCourses;
     }
 
     private syncModalSearchInput(_query: string): void {

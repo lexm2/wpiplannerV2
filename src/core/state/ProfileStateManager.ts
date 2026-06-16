@@ -67,9 +67,9 @@ export class ProfileStateManager {
 
         this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
             if (this.pendingSavePromises.size > 0) {
+                // Calling preventDefault() triggers the browser's "leave site?" prompt;
+                // the legacy returnValue mechanism is deprecated and no longer needed.
                 e.preventDefault();
-                e.returnValue = '';
-                return '';
             }
         };
 
@@ -153,7 +153,7 @@ export class ProfileStateManager {
     }
 
     // Course selection methods
-    selectCourse(course: Course, isRequired: boolean = false, source: string = 'user'): void {
+    selectCourse(course: Course, isRequired: boolean = false, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             const existing = this.state.selectedCourses.find(sc => sc.course.id === course.id);
 
@@ -177,7 +177,7 @@ export class ProfileStateManager {
         });
     }
 
-    unselectCourse(course: Course, source: string = 'user'): void {
+    unselectCourse(course: Course, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             const index = this.state.selectedCourses.findIndex(sc => sc.course.id === course.id);
             if (index >= 0) {
@@ -187,7 +187,7 @@ export class ProfileStateManager {
         });
     }
 
-    setSelectedSection(course: Course, sectionNumber: string | null, source: string = 'user'): void {
+    setSelectedSection(course: Course, sectionNumber: string | null, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
             if (!selectedCourse) return;
@@ -242,7 +242,7 @@ export class ProfileStateManager {
         lecture: Section | null,
         discussion: Section | null,
         lab: Section | null,
-        source: string = 'user'
+        _source: string = 'user'
     ): void {
         this.withStateUpdate(() => {
             const found = this.patchSelectedCourse(course.id, sc => ({
@@ -257,14 +257,14 @@ export class ProfileStateManager {
         });
     }
 
-    clearAllSelections(source: string = 'user'): void {
+    clearAllSelections(_source: string = 'user'): void {
         this.withStateUpdate(() => {
             this.state.selectedCourses = [];
             this.updateActiveScheduleWithCurrentCourses();
         });
     }
 
-    lockSection(course: Course, sectionCrn: string, source: string = 'user'): void {
+    lockSection(course: Course, sectionCrn: string, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             const found = this.patchSelectedCourse(course.id, sc => {
                 const lockedSections = new Set(sc.lockedSections ?? []);
@@ -277,7 +277,7 @@ export class ProfileStateManager {
         });
     }
 
-    unlockSection(course: Course, sectionCrn: string, source: string = 'user'): void {
+    unlockSection(course: Course, sectionCrn: string, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             let changed = false;
             this.patchSelectedCourse(course.id, sc => {
@@ -295,7 +295,7 @@ export class ProfileStateManager {
         });
     }
 
-    setCourseColor(courseId: string, color: string, source: string = 'user'): void {
+    setCourseColor(courseId: string, color: string, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             const found = this.patchSelectedCourse(courseId, sc => ({ ...sc, customColor: color }));
             if (found) {
@@ -340,7 +340,7 @@ export class ProfileStateManager {
         return Math.max(...available); // fallback: newest year with data
     }
 
-    createSchedule(name: string, source: string = 'user', id?: string, year?: number): Schedule {
+    createSchedule(name: string, _source: string = 'user', id?: string, year?: number): Schedule {
         return this.withStateUpdateSync(() => {
             const schedule: Schedule = {
                 id: id ?? this.generateScheduleId(),
@@ -430,7 +430,7 @@ export class ProfileStateManager {
         return this.updateSchedule(scheduleId, { name: newName }, source);
     }
 
-    duplicateSchedule(scheduleId: string, newName: string, source: string = 'user'): Schedule | null {
+    duplicateSchedule(scheduleId: string, newName: string, _source: string = 'user'): Schedule | null {
         const originalSchedule = this.state.schedules.find(s => s.id === scheduleId);
         if (!originalSchedule) return null;
 
@@ -449,14 +449,14 @@ export class ProfileStateManager {
     }
 
     // Preferences management
-    updatePreferences(updates: Partial<SchedulePreferences>, source: string = 'user'): void {
+    updatePreferences(updates: Partial<SchedulePreferences>, _source: string = 'user'): void {
         this.withPersist(() => {
             this.state.preferences = { ...this.state.preferences, ...updates };
         });
     }
 
     // Bookmark management
-    bookmarkCourse(courseId: string, source: string = 'user'): void {
+    bookmarkCourse(courseId: string, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             const bookmarks = this.state.preferences.bookmarkedCourseIds ?? [];
             if (!bookmarks.includes(courseId)) {
@@ -468,7 +468,7 @@ export class ProfileStateManager {
         });
     }
 
-    unbookmarkCourse(courseId: string, source: string = 'user'): void {
+    unbookmarkCourse(courseId: string, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             const bookmarks = this.state.preferences.bookmarkedCourseIds ?? [];
             const index = bookmarks.indexOf(courseId);

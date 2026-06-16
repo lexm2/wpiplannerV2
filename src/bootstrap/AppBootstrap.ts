@@ -147,9 +147,10 @@ export class AppBootstrap {
             const profileStateManager = ProfileStateManager.getInstance();
 
             if (profileStateManager.hasPendingSaves()) {
+                // preventDefault() triggers the browser's unload confirmation; the
+                // legacy returnValue mechanism is deprecated and no longer required.
                 e.preventDefault();
-                e.returnValue = '';
-                return '';
+                return;
             }
 
             StorageWorkerManager.getInstance().terminate();
