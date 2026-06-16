@@ -5,10 +5,9 @@ import { ActiveFilter, FilterCriteria } from '../../types/filters';
  * Manages active filters as reactive state.
  *
  * Backed by a `SvelteMap`, so every query method below (`getActiveFilters`,
- * `hasFilter`, `getFilterCount`, …) is a reactive read: consumers wrap their
- * refresh logic in `watch`/`subscribe` (src/svelte/reactivity.svelte) and
- * re-run automatically when filters change. There is no separate listener
- * system — runes are the reactivity mechanism.
+ * `hasFilter`, `getFilterCount`, …) is a reactive read: consumers read them in a
+ * component or an `$effect` and re-run automatically when filters change. There
+ * is no separate listener system — runes are the reactivity mechanism.
  */
 export class FilterState {
     private activeFilters = new SvelteMap<string, ActiveFilter>();

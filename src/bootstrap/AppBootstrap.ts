@@ -21,8 +21,6 @@ import { localEventService } from '../services/scheduling/localEventService'
 import { sectionInfoService } from '../services/scheduling/sectionInfoService'
 import { autoScheduleService } from '../services/scheduling/autoScheduleService'
 import type { ServiceContainer } from './ServiceContainer'
-import { appState } from '../core/state/appState.svelte'
-import { watch } from '../svelte/reactivity.svelte'
 
 export class AppBootstrap {
     static createServices(): ServiceContainer {
@@ -86,55 +84,6 @@ export class AppBootstrap {
         autoScheduleService.init(courseSelectionService, filterService, colorService, autoScheduleOrchestrator, uiStateManager);
     }
 
-    static setupCourseDataSubscriptions(services: ServiceContainer): void {
-        const {
-            profileStateManager, filterService,
-            courseSelectionService, timestampManager
-        } = services;
-
-        // CourseDataService reassigns appState.loadedDepartments (a $state.raw,
-        // always a freshly-built array) on both the initial fetch and every
-        // post-sync refresh, so one watcher keyed on that data covers both —
-        // replacing the old dataLoad/dataRefresh generation counters. `watch`
-        // skips its initial run and subscriptions are wired before loadCourseData,
-        // so the first fire is the initial load; a local flag then routes the
-        // one-time setup vs. the lighter refresh path.
-        // The FilterModal reads departments straight off appState.loadedDepartments
-        // (the same array this watcher syncs), so no separate "allDepartments"
-        // cache/callback is needed — both the one-time setup and the refresh path
-        // only sync the non-reactive services here; every Svelte view re-derives
-        // from appState.loadedDepartments on its own.
-        let initialLoadDone = false;
-        watch(() => appState.loadedDepartments, () => {
-            const departments = appState.loadedDepartments;
-            profileStateManager.setCourseData(departments);
-            courseSelectionService.setAllDepartments(departments);
-
-            if (!initialLoadDone) {
-                initialLoadDone = true;
-                courseSelectionService.reconstructSectionObjects();
-                timestampManager.updateClientTimestamp();
-
-                // Backfill year for existing schedules that lack one
-                const defaultYear = profileStateManager.getDefaultAcademicYear();
-                for (const schedule of profileStateManager.getAllSchedules()) {
-                    if (schedule.year === undefined && defaultYear !== undefined) {
-                        profileStateManager.updateSchedule(schedule.id, { year: defaultYear }, 'system');
-                    }
-                }
-
-                // Apply academic year filter based on active schedule's year
-                if (!filterService.hasFilter('academicYear')) {
-                    const activeSchedule = profileStateManager.getActiveSchedule();
-                    const yearToFilter = activeSchedule?.year ?? defaultYear;
-                    if (yearToFilter !== undefined) {
-                        filterService.addFilter('academicYear', { year: yearToFilter });
-                    }
-                }
-            }
-        });
-    }
-
     static initializeFilters(services: ServiceContainer): void {
         const { filterService } = services;
 
@@ -182,10 +131,10 @@ export class AppBootstrap {
 
     // Async app startup, run after the component shell is mounted (the previous
     // MainController.init()). Loads data + storage, applies the saved theme, wires
-    // the auto-scheduler's calendar provider + selection-invalidation listener,
-    // registers the unload handler, and auto-starts the welcome tutorial on first
-    // visit. The mounted Svelte views show their own loading states until
-    // appState.loadedDepartments populates (via setupCourseDataSubscriptions).
+    // the auto-scheduler's calendar provider, registers the unload handler, and
+    // auto-starts the welcome tutorial on first visit. The mounted Svelte views
+    // show their own loading states until appState.loadedDepartments populates;
+    // App.svelte's $effect on that rune drives the one-time course-data sync.
     static async startApp(services: ServiceContainer): Promise<void> {
         try {
             await AppBootstrap.initializeAsyncServices(services);
@@ -196,7 +145,6 @@ export class AppBootstrap {
             services.themeManager.setTheme(savedTheme);
 
             services.autoScheduleOrchestrator.setCalendarEventProvider(calendarEventProvider);
-            services.autoScheduleOrchestrator.setupCourseSelectionChangeListener();
             AppBootstrap.setupWindowUnloadHandler();
 
             if (!localStorage.getItem('wpi_visited')) {

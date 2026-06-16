@@ -10,8 +10,8 @@ import type { Schedule, SelectedCourse, SchedulePreferences, Department } from '
  * IndexedDB and preserve `===` identity with catalog Course/Section objects
  * (a deep `$state` proxy would break both).
  *
- * Consumers that need to react read these fields (directly in a component, or
- * via `watch`/`subscribe` from src/svelte/reactivity.svelte in vanilla code).
+ * Consumers that need to react read these fields directly in a component or in
+ * an App.svelte `$effect` — runes are the only reactivity mechanism.
  */
 class AppState {
     activeScheduleId = $state<string | null>(null);
@@ -45,8 +45,9 @@ class AppState {
 
     /**
      * Course catalog. CourseDataService reassigns this (a freshly-built array)
-     * on the initial fetch and every post-sync refresh; consumers `watch` it and
-     * distinguish load vs refresh locally (see AppBootstrap.setupCourseDataSubscriptions).
+     * on the initial fetch and every post-sync refresh; consumers read it in an
+     * `$effect` and distinguish load vs refresh locally (see App.svelte's
+     * loadedDepartments effect).
      */
     loadedDepartments = $state.raw<Department[]>([]);
 

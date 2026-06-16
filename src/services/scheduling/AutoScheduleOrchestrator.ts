@@ -4,7 +4,6 @@ import type { CourseComponentSelections } from '../../types/scheduling'
 import { CourseSelectionService } from '../selection/CourseSelectionService'
 import { FilterService } from '../filtering/FilterService'
 import { appState } from '../../core/state/appState.svelte'
-import { watch } from '../../svelte/reactivity.svelte'
 import type { ScheduleResult } from './AutoScheduler'
 import { SmartScheduler } from './SmartScheduler'
 import { ScheduleWorkerManager } from '../../workers/ScheduleWorkerManager'
@@ -43,14 +42,16 @@ export class AutoScheduleOrchestrator {
         appState.autoScheduleIndex = this.currentScheduleIndex;
     }
 
-    setupCourseSelectionChangeListener(): void {
-        // Invalidate generated schedules whenever the selection changes (runes).
-        watch(() => appState.selectedById, () => {
-            if (this.isApplyingAutoSchedule) return;
-            this.generatedSchedules = [];
-            this.currentScheduleIndex = 0;
-            this.notifyStateChange();
-        });
+    // Invalidate generated schedules whenever the selection changes. Driven by an
+    // App.svelte $effect keyed on appState.selectedById (was the
+    // setupCourseSelectionChangeListener watcher before the bridge was removed).
+    // The isApplyingAutoSchedule guard suppresses the self-trigger while a
+    // generated schedule is being applied.
+    invalidateOnSelectionChange(): void {
+        if (this.isApplyingAutoSchedule) return;
+        this.generatedSchedules = [];
+        this.currentScheduleIndex = 0;
+        this.notifyStateChange();
     }
 
     getGeneratedSchedules(): ScheduleResult[][] {

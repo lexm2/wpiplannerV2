@@ -1,7 +1,6 @@
 import { SelectedCourse } from '../../types/schedule'
 import { CourseSelectionService } from '../selection/CourseSelectionService'
 import { appState } from '../../core/state/appState.svelte'
-import { watch } from '../../svelte/reactivity.svelte'
 
 const DEFAULT_COLORS = [
     '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336',
@@ -15,19 +14,18 @@ export class CourseColorService {
 
     constructor(courseSelectionService: CourseSelectionService) {
         this.courseSelectionService = courseSelectionService;
-        this.setupColorManagement();
     }
 
-    private setupColorManagement(): void {
-        // Release colors for courses that are no longer selected (runes).
-        watch(() => appState.selectedById, () => {
-            const selectedIds = new Set(appState.selectedCourses.map(sc => sc.course.id));
-            for (const courseId of [...this.courseColorMap.keys()]) {
-                if (!selectedIds.has(courseId)) {
-                    this.releaseCourseColor(courseId);
-                }
+    // Release colors for courses that are no longer selected. Driven by an
+    // App.svelte $effect keyed on appState.selectedById (was the
+    // setupColorManagement watcher before the reactivity bridge was removed).
+    releaseUnselectedColors(): void {
+        const selectedIds = new Set(appState.selectedCourses.map(sc => sc.course.id));
+        for (const courseId of [...this.courseColorMap.keys()]) {
+            if (!selectedIds.has(courseId)) {
+                this.releaseCourseColor(courseId);
             }
-        });
+        }
     }
 
     precomputeCourseColors(selectedCourses: SelectedCourse[]): void {

@@ -12,11 +12,11 @@ DeviceDetection.initialize();
 
 const services = AppBootstrap.createServices();
 
-// Non-UI bootstrap (sync): inject the standalone scheduling services, register
-// the course-data subscription + default filters — all before the component
-// shell mounts and before the async data load below catches the subscription.
+// Non-UI bootstrap (sync): inject the standalone scheduling services and
+// register the default filters before the component shell mounts. The
+// course-data sync is now an App.svelte $effect on appState.loadedDepartments,
+// established at mount — before the async data load in startApp() fires it.
 AppBootstrap.initStandaloneServices(services);
-AppBootstrap.setupCourseDataSubscriptions(services);
 AppBootstrap.initializeFilters(services);
 
 // Mount the declarative root shell (App.svelte) into #app — replaces

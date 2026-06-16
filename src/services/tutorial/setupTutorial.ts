@@ -2,7 +2,6 @@ import { TutorialService } from './TutorialService';
 import { TutorialStateMachine } from './TutorialStateMachine';
 import { FloatingTextBox } from '../../ui/components/FloatingTextBox';
 import { appState } from '../../core/state/appState.svelte';
-import { watch } from '../../svelte/reactivity.svelte';
 import { componentWizardService } from '../../services/scheduling/componentWizardService';
 import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
 import { modalState } from '../../svelte/modals/modalState.svelte';
@@ -17,6 +16,7 @@ export interface TutorialSetup {
     service: TutorialService;
     tutorials: TutorialEntry[];
     start: (id: string) => Promise<void>;
+    onActiveScheduleChange: () => void;
 }
 
 export function setupTutorial(services: ServiceContainer): TutorialSetup {
@@ -84,14 +84,18 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         services.courseDataService.filterDepartments(d => d.abbreviation !== 'TUT');
     }
 
-    watch(() => appState.activeScheduleId, () => {
+    // Auto-cancel the running tutorial when the active schedule changes away from
+    // the tutorial's own schedule. Called by an App.svelte $effect keyed on
+    // appState.activeScheduleId (was a bridge watch here before the bridge was
+    // removed). The tutorialScheduleId guard makes this a no-op outside a tutorial.
+    function onActiveScheduleChange(): void {
         if (cleaningUp || !tutorialScheduleId) return;
         if (appState.activeScheduleId !== tutorialScheduleId) {
             tutorialService.cancel();
             cleaningUp = true;
             cleanupTutorial(true).finally(() => { cleaningUp = false; });
         }
-    });
+    }
 
     tutorialService.register({
         id: 'welcome',
@@ -614,5 +618,5 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         tutorialService.start(id);
     }
 
-    return { service: tutorialService, tutorials, start };
+    return { service: tutorialService, tutorials, start, onActiveScheduleChange };
 }

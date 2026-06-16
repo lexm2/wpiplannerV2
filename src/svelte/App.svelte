@@ -125,10 +125,10 @@
 
   // Active-schedule (re)activation → sync the academicYear filter to the newly
   // activated schedule's year. Mirrors MainController.setupScheduleChangeListener:
-  // the first run is skipped (the initial year filter is set by
-  // AppBootstrap.setupCourseDataSubscriptions on data load), exclusion-only
-  // changes are ignored, and the body runs untracked so its filter writes don't
-  // re-trigger the effect.
+  // the first run is skipped (the initial year filter is set by the
+  // loadedDepartments effect below on data load), exclusion-only changes are
+  // ignored, and the body runs untracked so its filter writes don't re-trigger
+  // the effect.
   let activationInit = false;
   $effect(() => {
     appState.activation; // track activation events only
@@ -164,6 +164,82 @@
         resetSearchAndDepartmentFilters();
       }
       prevPage = page;
+    });
+  });
+
+  // Selection change → release colors for deselected courses + invalidate any
+  // generated auto-schedules. Replaces CourseColorService.setupColorManagement
+  // and AutoScheduleOrchestrator.setupCourseSelectionChangeListener (both were
+  // bridge watches on appState.selectedById). The initial run (mount, empty
+  // selection) is skipped to match the old watch's skip-initial semantics.
+  let selectionInit = false;
+  $effect(() => {
+    appState.selectedById; // track selection identity changes
+    untrack(() => {
+      if (!selectionInit) {
+        selectionInit = true;
+        return;
+      }
+      services.colorService.releaseUnselectedColors();
+      services.autoScheduleOrchestrator.invalidateOnSelectionChange();
+    });
+  });
+
+  // Course-data load/refresh → sync the non-reactive services off
+  // appState.loadedDepartments. Replaces AppBootstrap.setupCourseDataSubscriptions
+  // (a bridge watch). CourseDataService reassigns loadedDepartments (a
+  // $state.raw freshly-built array) on the initial fetch and every post-sync
+  // refresh; one effect covers both. The mount run sees the empty array and is
+  // skipped (dataSubsInit) — startApp triggers loadCourseData after mount, so the
+  // first real fire is the initial load; initialLoadDone then routes one-time
+  // setup vs. the lighter refresh path. Svelte views re-derive from the rune.
+  let dataSubsInit = false;
+  let initialLoadDone = false;
+  $effect(() => {
+    appState.loadedDepartments; // track data load/refresh
+    untrack(() => {
+      if (!dataSubsInit) {
+        dataSubsInit = true;
+        return;
+      }
+      const departments = appState.loadedDepartments;
+      services.profileStateManager.setCourseData(departments);
+      services.courseSelectionService.setAllDepartments(departments);
+
+      if (!initialLoadDone) {
+        initialLoadDone = true;
+        services.courseSelectionService.reconstructSectionObjects();
+        services.timestampManager.updateClientTimestamp();
+
+        // Backfill year for existing schedules that lack one.
+        const defaultYear = services.profileStateManager.getDefaultAcademicYear();
+        for (const schedule of services.profileStateManager.getAllSchedules()) {
+          if (schedule.year === undefined && defaultYear !== undefined) {
+            services.profileStateManager.updateSchedule(schedule.id, { year: defaultYear }, 'system');
+          }
+        }
+
+        // Apply academic year filter based on the active schedule's year.
+        if (!services.filterService.hasFilter('academicYear')) {
+          const activeSchedule = services.profileStateManager.getActiveSchedule();
+          const yearToFilter = activeSchedule?.year ?? defaultYear;
+          if (yearToFilter !== undefined) {
+            services.filterService.addFilter('academicYear', { year: yearToFilter });
+          }
+        }
+      }
+    });
+  });
+
+  // Active-schedule change → let the tutorial auto-cancel if the user navigated
+  // away from its schedule. Replaces the setupTutorial bridge watch on
+  // appState.activeScheduleId. services.tutorial is assigned in main.ts after
+  // mount, so it may be undefined on the initial run (guarded by ?.); the
+  // tutorialScheduleId guard inside makes it a no-op outside a tutorial.
+  $effect(() => {
+    appState.activeScheduleId; // track active-schedule changes
+    untrack(() => {
+      services.tutorial?.onActiveScheduleChange();
     });
   });
 
