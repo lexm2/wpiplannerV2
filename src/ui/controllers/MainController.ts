@@ -2,7 +2,6 @@ import type { PageId, WizardStep } from '../../types/uiState'
 import { uiState } from '../../services/ui/uiState.svelte'
 import { Course, Department } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
-import { SchedulePickerModal } from '../components/SchedulePickerModal'
 import { mount } from 'svelte'
 import DepartmentSidebar from '../../svelte/DepartmentSidebar.svelte'
 import ThemeSelector from '../../svelte/ThemeSelector.svelte'
@@ -15,6 +14,7 @@ import CourseList from '../../svelte/CourseList.svelte'
 import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
 import CourseDescription from '../../svelte/CourseDescription.svelte'
 import ModalLayer from '../../svelte/modals/ModalLayer.svelte'
+import { modalState } from '../../svelte/modals/modalState.svelte'
 import { ScheduleController } from './ScheduleController'
 import { FilterModalController } from './FilterModalController'
 import { getInlineSVG, type IconName } from '../../utils/iconPaths'
@@ -36,7 +36,6 @@ import type { SelectionSnapshot } from '../../types/scheduling'
  */
 export class MainController {
     private services: ServiceContainer;
-    private schedulePickerModal: SchedulePickerModal | null = null;
     private scheduleController: ScheduleController;
     private filterModalController: FilterModalController;
     private scheduleFilterModalController: FilterModalController;
@@ -103,7 +102,7 @@ export class MainController {
         // appState.undoRedoGeneration to keep its disabled state in sync —
         // replacing MainController's imperative updateUndoRedoButtons()/watch().
         // Same ids/classes/titles are preserved so the tutorial and
-        // SchedulePickerModal getElementById(...).click() shims keep working.
+        // SchedulePicker settings getElementById(...).click() shims keep working.
         const undoRedoEl = document.querySelector('.undo-redo-controls');
         if (undoRedoEl) {
             undoRedoEl.innerHTML = '';
@@ -285,7 +284,11 @@ export class MainController {
         if (modalRootEl) {
             mount(ModalLayer, {
                 target: modalRootEl,
-                props: { uiStateManager: services.uiStateManager, getTutorial: () => services.tutorial }
+                props: {
+                    uiStateManager: services.uiStateManager,
+                    getTutorial: () => services.tutorial,
+                    scheduleManagementService: services.scheduleManagementService,
+                }
             });
         }
 
@@ -642,14 +645,15 @@ export class MainController {
     }
 
     openSchedulePicker(): void {
-        if (!this.schedulePickerModal) {
-            this.schedulePickerModal = new SchedulePickerModal(this.services.modalService, this.services.scheduleManagementService, this.services.tutorial, this.services.uiStateManager);
-        }
-        this.schedulePickerModal.show();
+        // The schedule picker is now the SchedulePicker Svelte component in the
+        // declarative ModalLayer; opening it = pushing its id onto the rune.
+        this.services.uiStateManager.modalOpened('schedule-picker');
     }
 
     navigateSchedulePickerToTab(tab: 'schedules' | 'settings'): void {
-        this.schedulePickerModal?.navigateToTab(tab);
+        // Tutorial tab-navigation channel — SchedulePicker reads this and applies
+        // it to its local active tab, then clears it.
+        modalState.schedulePickerTab = tab;
     }
 
     openFilterModal(): void {

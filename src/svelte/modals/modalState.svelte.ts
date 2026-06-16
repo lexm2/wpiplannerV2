@@ -29,6 +29,10 @@ class ModalState {
     // AutoScheduleIntroModal.setTermPreferences call). The component merges
     // these into its per-course term selection whenever this changes.
     autoScheduleIntroTermPrefs = $state.raw<Record<string, string[]> | null>(null);
+    // Tutorial-driven schedule-picker tab navigation (replaces the imperative
+    // SchedulePickerModal.navigateToTab call). The component applies it to its
+    // local active-tab then nulls this channel.
+    schedulePickerTab = $state.raw<'schedules' | 'settings' | null>(null);
 }
 
 export const modalState = new ModalState();

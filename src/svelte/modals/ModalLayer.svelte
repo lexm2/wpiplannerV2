@@ -7,16 +7,19 @@
   import DeleteLocalEvent from './DeleteLocalEvent.svelte';
   import LocalEvent from './LocalEvent.svelte';
   import AutoScheduleIntro from './AutoScheduleIntro.svelte';
+  import SchedulePicker from './SchedulePicker.svelte';
   import type { UIStateManager } from '../../services/ui/UIStateManager';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
+  import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
 
-  let { uiStateManager, getTutorial }: {
+  let { uiStateManager, getTutorial, scheduleManagementService }: {
     uiStateManager: UIStateManager;
     // Thunk, not a value: services.tutorial is assigned after MainController is
     // constructed (and after this layer mounts), so it must be read lazily at
     // render time. The {#each} re-runs on every uiState.openModals change, so
     // reading it when 'tutorials' opens returns the (by-then-set) instance.
     getTutorial: () => TutorialSetup | undefined;
+    scheduleManagementService: ScheduleManagementService;
   } = $props();
 
   // Single declarative modal layer. Renders a Svelte component for each open
@@ -51,5 +54,12 @@
     <LocalEvent onRequestClose={() => uiStateManager.modalClosed('local-event')} />
   {:else if id === 'auto-schedule-intro'}
     <AutoScheduleIntro onRequestClose={() => uiStateManager.modalClosed('auto-schedule-intro')} />
+  {:else if id === 'schedule-picker'}
+    <SchedulePicker
+      {scheduleManagementService}
+      {uiStateManager}
+      {getTutorial}
+      onRequestClose={() => uiStateManager.modalClosed('schedule-picker')}
+    />
   {/if}
 {/each}

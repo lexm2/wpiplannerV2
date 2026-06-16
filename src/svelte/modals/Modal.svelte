@@ -8,6 +8,7 @@
     closeOnEscape = true,
     title,
     extraClass,
+    dialogClass,
     onRequestClose,
     children,
   }: {
@@ -17,6 +18,8 @@
     title?: string;
     /** Extra class(es) on the backdrop, e.g. 'filter-modal' for width/scoping. */
     extraClass?: string;
+    /** Extra class(es) on the dialog, e.g. 'schedule-picker-modal-dialog no-transform'. */
+    dialogClass?: string;
     onRequestClose: () => void;
     children: Snippet<[() => void]>;
   } = $props();
@@ -71,7 +74,7 @@
 >
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_interactive_supports_focus (dialog onclick only stops backdrop propagation) -->
   <div
-    class="modal-dialog"
+    class="modal-dialog {dialogClass ?? ''}"
     class:show={shown}
     class:hide={closing}
     role="dialog"
