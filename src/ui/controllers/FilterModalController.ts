@@ -1,20 +1,25 @@
-import { ModalService } from '../../services/ui/ModalService';
-import type { UIStateManager } from '../../services/ui/UIStateManager';
 import { FilterService } from '../../services/filtering/FilterService';
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService';
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
 import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import { Course, Department } from '../../types/types';
 import { AcademicTerm, WeeklyTimeSlot, SelectedCourse } from '../../types/schedule';
-import { BaseModal } from '../components/BaseModal';
 import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
 import { SharedFilterComponents } from '../components/SharedFilterComponents';
 import { SharedFilterSetup, FilterServiceLike } from '../components/SharedFilterSetup';
 import { DepartmentFilterCriteria, AvailabilityFilterCriteria, CreditRangeFilterCriteria, TermFilterCriteria, GraduateLevelFilterCriteria, AcademicYearFilterCriteria, WakeUpTimeFilterCriteria, ConflictCriteria } from '../../types/filters';
 import { DualRangeSlider } from '../components/DualRangeSlider';
 
-export class FilterModalController extends BaseModal {
-    get modalTypeId() { return 'filter-modal'; }
+/**
+ * Builds + wires the filter UI (8 sections, both 'filter' and 'auto-schedule'
+ * modes) into a host element. No longer a BaseModal: the declarative
+ * `FilterModal.svelte` (in ModalLayer) owns the backdrop/dialog/animation and
+ * calls {@link renderInto}; the close/primary buttons call the `requestClose`
+ * thunk (the Svelte Modal's animated close). All section/setup/update logic is
+ * unchanged from the old controller — it operates on `this.modalElement`, which
+ * is now the Svelte-provided host.
+ */
+export class FilterModalController {
     private filterService: FilterService | null = null;
     private courseSelectionService: CourseSelectionService | null = null;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator | null = null;
@@ -25,10 +30,11 @@ export class FilterModalController extends BaseModal {
     private mode: 'filter' | 'auto-schedule' = 'filter';
     private onGenerate: (() => void) | null = null;
     private coursesToSchedule: SelectedCourse[] | null = null;
-
-    constructor(modalService: ModalService, uiStateManager?: UIStateManager) {
-        super(modalService, uiStateManager);
-    }
+    private modalElement: HTMLElement | null = null;
+    private requestClose: (() => void) | null = null;
+    // RMP dual-range sliders — kept so destroy() can remove their document-level
+    // listeners (the old BaseModal version leaked these on every open).
+    private sliders: { rating?: DualRangeSlider; difficulty?: DualRangeSlider; retake?: DualRangeSlider } = {};
 
     setFilterService(filterService: FilterService): void {
         this.filterService = filterService;
@@ -63,16 +69,6 @@ export class FilterModalController extends BaseModal {
         departments.forEach(dept => {
             this.allCourses.push(...dept.courses);
         });
-    }
-
-    syncSearchInputFromMain(query: string): void {
-        if (this.modalElement) {
-            const searchInput = this.modalElement.querySelector('.search-text-input') as HTMLInputElement;
-            if (searchInput && searchInput.value !== query) {
-                searchInput.value = query;
-                this.updateClearSearchButton(this.modalElement, query);
-            }
-        }
     }
 
     // Refresh checkbox UI from current filterService state (used by tutorial back navigation)
@@ -158,28 +154,24 @@ export class FilterModalController extends BaseModal {
         this.updatePreview(modalElement);
     }
 
-    show(): string {
+    /**
+     * Build the modal inner content (header + body + footer) into the host the
+     * Svelte Modal provides, wire the close/primary buttons to `requestClose`,
+     * then initialize the filter UI. Replaces the old show()/createModalElement
+     * (the backdrop/dialog/.modal-content wrapper + animation now live in
+     * Modal.svelte; closeOnBackdrop/closeOnEscape are handled there too).
+     */
+    renderInto(container: HTMLElement, requestClose: () => void): void {
         if (!this.filterService) {
             console.error('FilterService not set on FilterModalController');
-            return '';
+            return;
         }
-
-        const modalElement = this.createModalElement();
-        const id = this.showModal(modalElement, { closeOnBackdrop: true, closeOnEscape: true });
-
-        // Set up filter UI after modal is shown
-        setTimeout(() => this.initializeFilterUI(modalElement), 50);
-
-        return id;
-    }
-
-    private createModalElement(): HTMLElement {
-        const backdrop = document.createElement('div');
-        backdrop.className = 'modal-backdrop filter-modal';
+        this.modalElement = container;
+        this.requestClose = requestClose;
 
         const activeYear = this.profileStateManager?.getActiveSchedule()?.year;
-        const hasNonDefault = this.filterService?.hasNonDefaultFilters(activeYear) || false;
-        const activeFiltersCount = hasNonDefault ? (this.filterService?.getFilterCount() || 0) : 0;
+        const hasNonDefault = this.filterService.hasNonDefaultFilters(activeYear) || false;
+        const activeFiltersCount = hasNonDefault ? (this.filterService.getFilterCount() || 0) : 0;
         const isAutoSchedule = this.mode === 'auto-schedule';
         const title = isAutoSchedule ? 'Auto-Schedule Settings' : 'Filter Courses';
         const primaryBtnText = isAutoSchedule ? 'Generate Schedule' : 'Apply';
@@ -187,58 +179,56 @@ export class FilterModalController extends BaseModal {
             ? this.getAutoSchedulePreviewText()
             : this.getFilterPreviewText();
 
-        backdrop.innerHTML = `
-            <div class="modal-dialog filter-modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title">
-                            ${title}
-                            <span id="filter-count" class="filter-count">${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}</span>
-                        </h3>
-                        <button class="modal-close" data-modal-close>×</button>
-                    </div>
-                    <div class="modal-body filter-modal-body">
-                        ${this.createFilterSections()}
-                    </div>
-                    <div class="modal-footer">
-                        <div class="filter-preview">
-                            <span id="course-count-preview">${previewText}</span>
-                        </div>
-                        <div class="filter-actions">
-                            <button class="modal-btn btn-secondary" id="clear-all-filters">Clear All</button>
-                            <button class="modal-btn btn-primary" id="modal-primary-btn">${primaryBtnText}</button>
-                        </div>
-                    </div>
+        container.innerHTML = `
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    ${title}
+                    <span id="filter-count" class="filter-count">${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}</span>
+                </h3>
+                <button class="modal-close" data-modal-close>×</button>
+            </div>
+            <div class="modal-body filter-modal-body">
+                ${this.createFilterSections()}
+            </div>
+            <div class="modal-footer">
+                <div class="filter-preview">
+                    <span id="course-count-preview">${previewText}</span>
+                </div>
+                <div class="filter-actions">
+                    <button class="modal-btn btn-secondary" id="clear-all-filters">Clear All</button>
+                    <button class="modal-btn btn-primary" id="modal-primary-btn">${primaryBtnText}</button>
                 </div>
             </div>
         `;
 
-        const dialog = backdrop.querySelector('.modal-dialog');
-        if (dialog instanceof HTMLElement) {
-            dialog.addEventListener('click', (event) => {
-                event.stopPropagation();
-            });
-        }
-
-        // Setup close button handlers
-        backdrop.querySelectorAll('[data-modal-close]').forEach(btn => {
-            btn.addEventListener('click', () => this.hide());
+        container.querySelectorAll('[data-modal-close]').forEach(btn => {
+            btn.addEventListener('click', () => this.requestClose?.());
         });
 
-        // Setup primary button
-        const primaryBtn = backdrop.querySelector('#modal-primary-btn');
+        const primaryBtn = container.querySelector('#modal-primary-btn');
         if (primaryBtn) {
             primaryBtn.addEventListener('click', () => {
                 if (this.mode === 'auto-schedule' && this.onGenerate) {
-                    this.hide();
+                    this.requestClose?.();
                     this.onGenerate();
                 } else {
-                    this.hide();
+                    this.requestClose?.();
                 }
             });
         }
 
-        return backdrop;
+        // Set up filter UI after the host is in the DOM (matches old 50ms defer).
+        setTimeout(() => this.initializeFilterUI(container), 50);
+    }
+
+    /** Remove the RMP sliders' document-level listeners on unmount. */
+    destroy(): void {
+        this.sliders.rating?.destroy();
+        this.sliders.difficulty?.destroy();
+        this.sliders.retake?.destroy();
+        this.sliders = {};
+        this.modalElement = null;
+        this.requestClose = null;
     }
 
     private createFilterSections(): string {
@@ -694,7 +684,12 @@ export class FilterModalController extends BaseModal {
     private setupRMPRatingFilter(modalElement: HTMLElement): void {
         if (!this.filterService) return;
 
-        const sliderRefs: { rating?: DualRangeSlider, difficulty?: DualRangeSlider, retake?: DualRangeSlider } = {};
+        // Destroy any sliders from a prior render before re-creating (clear-all
+        // re-runs initializeFilterUI), then store the new ones for destroy().
+        this.sliders.rating?.destroy();
+        this.sliders.difficulty?.destroy();
+        this.sliders.retake?.destroy();
+        this.sliders = {};
 
         SharedFilterSetup.setupRMPRatingFilter(
             {
@@ -704,7 +699,7 @@ export class FilterModalController extends BaseModal {
                 filterId: 'rmpRating',
                 updatePreview: (element: HTMLElement) => this.updatePreview(element)
             },
-            sliderRefs
+            this.sliders
         );
     }
 
@@ -760,8 +755,6 @@ export class FilterModalController extends BaseModal {
                 const activeYear = this.profileStateManager?.getActiveSchedule()?.year;
                 this.filterService.resetFilters(activeYear);
                 this.updatePreview(modalElement);
-                // Sync main search input to clear it
-                this.syncMainSearchInput('');
                 // Refresh the modal content
                 const modalBody = modalElement.querySelector('.filter-modal-body');
                 if (modalBody) {

@@ -8,11 +8,26 @@
   import LocalEvent from './LocalEvent.svelte';
   import AutoScheduleIntro from './AutoScheduleIntro.svelte';
   import SchedulePicker from './SchedulePicker.svelte';
+  import FilterModal from './FilterModal.svelte';
   import type { UIStateManager } from '../../services/ui/UIStateManager';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
+  import type { FilterService } from '../../services/filtering/FilterService';
+  import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
+  import type { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
+  import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
+  import type { Department } from '../../types/types';
 
-  let { uiStateManager, getTutorial, scheduleManagementService }: {
+  let {
+    uiStateManager,
+    getTutorial,
+    scheduleManagementService,
+    filterService,
+    courseSelectionService,
+    autoScheduleOrchestrator,
+    profileStateManager,
+    getDepartments,
+  }: {
     uiStateManager: UIStateManager;
     // Thunk, not a value: services.tutorial is assigned after MainController is
     // constructed (and after this layer mounts), so it must be read lazily at
@@ -20,6 +35,11 @@
     // reading it when 'tutorials' opens returns the (by-then-set) instance.
     getTutorial: () => TutorialSetup | undefined;
     scheduleManagementService: ScheduleManagementService;
+    filterService: FilterService;
+    courseSelectionService: CourseSelectionService;
+    autoScheduleOrchestrator: AutoScheduleOrchestrator;
+    profileStateManager: ProfileStateManager;
+    getDepartments: () => Department[];
   } = $props();
 
   // Single declarative modal layer. Renders a Svelte component for each open
@@ -60,6 +80,26 @@
       {uiStateManager}
       {getTutorial}
       onRequestClose={() => uiStateManager.modalClosed('schedule-picker')}
+    />
+  {:else if id === 'filter-modal'}
+    <FilterModal
+      typeId="filter-modal"
+      {filterService}
+      {courseSelectionService}
+      {autoScheduleOrchestrator}
+      {profileStateManager}
+      {getDepartments}
+      onRequestClose={() => uiStateManager.modalClosed('filter-modal')}
+    />
+  {:else if id === 'auto-schedule-filter'}
+    <FilterModal
+      typeId="auto-schedule-filter"
+      {filterService}
+      {courseSelectionService}
+      {autoScheduleOrchestrator}
+      {profileStateManager}
+      {getDepartments}
+      onRequestClose={() => uiStateManager.modalClosed('auto-schedule-filter')}
     />
   {/if}
 {/each}

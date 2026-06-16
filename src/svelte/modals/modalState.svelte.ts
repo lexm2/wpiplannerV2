@@ -13,6 +13,15 @@ export interface LocalEventPayload {
     existingEvent?: LocalCalendarEvent;
 }
 
+export interface FilterModalPayload {
+    /** 'filter' = planner/schedule filter; 'auto-schedule' = generate settings. */
+    mode: 'filter' | 'auto-schedule';
+    /** auto-schedule only: invoked (after close) when "Generate Schedule" clicked. */
+    onGenerate?: () => void;
+    /** auto-schedule only: the courses being scheduled (drives the preview). */
+    coursesToSchedule?: SelectedCourse[];
+}
+
 export interface AutoScheduleIntroPayload {
     selectedCourses: SelectedCourse[];
     getColor: (courseId: string) => string;
@@ -33,6 +42,12 @@ class ModalState {
     // SchedulePickerModal.navigateToTab call). The component applies it to its
     // local active-tab then nulls this channel.
     schedulePickerTab = $state.raw<'schedules' | 'settings' | null>(null);
+    // Filter modal payload (mode + auto-schedule continuation). Set by the
+    // trigger site before modalOpened('filter-modal' | 'auto-schedule-filter').
+    filter = $state.raw<FilterModalPayload | null>(null);
+    // Bumped to re-sync the open filter modal's checkboxes from filterService
+    // (tutorial back-navigation) — replaces refreshFilterUI()/refreshAutoScheduleFilterUI().
+    filterRefreshTick = $state(0);
 }
 
 export const modalState = new ModalState();

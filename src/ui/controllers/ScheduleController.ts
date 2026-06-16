@@ -5,7 +5,6 @@ import { CourseSelectionService } from '../../services/selection/CourseSelection
 import { CourseDataService } from '../../services/data/courseDataService'
 import { FilterService } from '../../services/filtering/FilterService'
 import { watch } from '../../svelte/reactivity.svelte'
-import { FilterModalController } from './FilterModalController'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
 import { modalState } from '../../svelte/modals/modalState.svelte'
 import { SidebarManager } from '../sidebar/SidebarManager'
@@ -1588,22 +1587,15 @@ export class ScheduleController implements CalendarEventProvider {
         this.uiStateManager?.modalOpened('auto-schedule-intro');
     }
 
-    /** Open the (still-vanilla) filter modal for the given courses to schedule. */
+    /** Open the declarative FilterModal (auto-schedule mode) for the given courses. */
     private openScheduleFilterModal(coursesToSchedule: SelectedCourse[]): void {
-        if (!this.modalService || !this.filterService) return;
-        const scheduleFilterModal = new FilterModalController(this.modalService, this.uiStateManager || undefined);
-        scheduleFilterModal.setFilterService(this.filterService);
-        scheduleFilterModal.setCourseSelectionService(this.courseSelectionService);
-        scheduleFilterModal.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
-        scheduleFilterModal.setMode('auto-schedule');
-        scheduleFilterModal.setCoursesToSchedule(coursesToSchedule);
-        scheduleFilterModal.setOnGenerate(() => {
-            this.doGenerateSchedules(coursesToSchedule);
-        });
-        if (this.courseDataService) {
-            scheduleFilterModal.setCourseData(this.courseDataService.getAllDepartments());
-        }
-        scheduleFilterModal.show();
+        if (!this.filterService) return;
+        modalState.filter = {
+            mode: 'auto-schedule',
+            coursesToSchedule,
+            onGenerate: () => this.doGenerateSchedules(coursesToSchedule),
+        };
+        this.uiStateManager?.modalOpened('auto-schedule-filter');
     }
 
     openAutoScheduleIntro(): void {
@@ -1622,30 +1614,17 @@ export class ScheduleController implements CalendarEventProvider {
         modalState.autoScheduleIntroTermPrefs = preferences;
     }
 
-    private currentAutoScheduleFilter: FilterModalController | null = null;
-
     openAutoScheduleFilter(): void {
-        if (!this.modalService || !this.filterService) return;
+        if (!this.filterService) return;
         const selectedCourses = this.courseSelectionService.getSelectedCourses();
-        this.currentAutoScheduleFilter = new FilterModalController(this.modalService, this.uiStateManager || undefined);
-        // Override modalTypeId so UIState tracks it distinctly from the regular filter modal
-        Object.defineProperty(this.currentAutoScheduleFilter, 'modalTypeId', { get: () => 'auto-schedule-filter' });
-        this.currentAutoScheduleFilter.setFilterService(this.filterService);
-        this.currentAutoScheduleFilter.setCourseSelectionService(this.courseSelectionService);
-        this.currentAutoScheduleFilter.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
-        this.currentAutoScheduleFilter.setMode('auto-schedule');
-        this.currentAutoScheduleFilter.setCoursesToSchedule(selectedCourses);
-        this.currentAutoScheduleFilter.setOnGenerate(() => {
-            this.doGenerateSchedules(selectedCourses);
-        });
-        if (this.courseDataService) {
-            this.currentAutoScheduleFilter.setCourseData(this.courseDataService.getAllDepartments());
-        }
-        this.currentAutoScheduleFilter.show();
+        // Same declarative FilterModal as openScheduleFilterModal, but for the
+        // current selection (direct button / tutorial reopen path).
+        this.openScheduleFilterModal(selectedCourses);
     }
 
     refreshAutoScheduleFilterUI(): void {
-        this.currentAutoScheduleFilter?.refreshFilterUI();
+        // Re-sync the open FilterModal's checkboxes from filterService.
+        modalState.filterRefreshTick++;
     }
 
     runAutoSchedule(): void {

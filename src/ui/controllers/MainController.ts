@@ -16,7 +16,6 @@ import CourseDescription from '../../svelte/CourseDescription.svelte'
 import ModalLayer from '../../svelte/modals/ModalLayer.svelte'
 import { modalState } from '../../svelte/modals/modalState.svelte'
 import { ScheduleController } from './ScheduleController'
-import { FilterModalController } from './FilterModalController'
 import { getInlineSVG, type IconName } from '../../utils/iconPaths'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
@@ -37,8 +36,6 @@ import type { SelectionSnapshot } from '../../types/scheduling'
 export class MainController {
     private services: ServiceContainer;
     private scheduleController: ScheduleController;
-    private filterModalController: FilterModalController;
-    private scheduleFilterModalController: FilterModalController;
     private debouncedSearch: DebouncedOperation;
     private colorService: CourseColorService;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator;
@@ -62,20 +59,10 @@ export class MainController {
 
         // Initialize controllers
         this.scheduleController = new ScheduleController(courseSelectionService, this.colorService, this.autoScheduleOrchestrator);
-        this.filterModalController = new FilterModalController(modalService, uiStateManager);
-        this.scheduleFilterModalController = new FilterModalController(modalService, uiStateManager);
 
-        // Connect filter service and course data to filter modal
-        this.filterModalController.setFilterService(filterService);
-        this.filterModalController.setCourseSelectionService(courseSelectionService);
-        this.filterModalController.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
-        this.filterModalController.setProfileStateManager(services.profileStateManager);
-
-        // Connect schedule filter service to controllers
-        this.scheduleFilterModalController.setFilterService(filterService);
-        this.scheduleFilterModalController.setCourseSelectionService(courseSelectionService);
-        this.scheduleFilterModalController.setAutoScheduleOrchestrator(this.autoScheduleOrchestrator);
-        this.scheduleFilterModalController.setProfileStateManager(services.profileStateManager);
+        // The planner/schedule filter modal is now the FilterModal Svelte component
+        // in ModalLayer (mounted below) — opened via uiState.openModals, services
+        // passed as ModalLayer props. No imperative controller instances here.
         this.scheduleController.setCourseDataService(courseDataService);
         this.scheduleController.setConflictDetector(conflictDetector);
         this.scheduleController.setFilterService(filterService);
@@ -288,6 +275,11 @@ export class MainController {
                     uiStateManager: services.uiStateManager,
                     getTutorial: () => services.tutorial,
                     scheduleManagementService: services.scheduleManagementService,
+                    filterService: services.filterService,
+                    courseSelectionService: services.courseSelectionService,
+                    autoScheduleOrchestrator: this.autoScheduleOrchestrator,
+                    profileStateManager: services.profileStateManager,
+                    getDepartments: () => this.allDepartments,
                 }
             });
         }
@@ -297,13 +289,11 @@ export class MainController {
             setAllDepartments: (departments) => {
                 this.allDepartments = departments;
             },
-            onDataLoaded: (departments) => {
-                this.filterModalController.setCourseData(departments);
-                this.scheduleFilterModalController.setCourseData(departments);
+            onDataLoaded: () => {
+                // FilterModal reads departments via its getDepartments thunk at
+                // open time (this.allDepartments, just updated above).
             },
-            onDataRefreshed: (departments) => {
-                this.filterModalController.setCourseData(departments);
-                this.scheduleFilterModalController.setCourseData(departments);
+            onDataRefreshed: () => {
                 this.refreshCurrentView();
             },
         });
@@ -579,7 +569,7 @@ export class MainController {
         if (scheduleFilterButton) {
             scheduleFilterButton.insertAdjacentHTML('afterbegin', getInlineSVG('FILTER_FILLED', 'filter-icon'));
             scheduleFilterButton.addEventListener('click', () => {
-                this.scheduleFilterModalController.show();
+                this.openFilterModal();
             });
         }
 
@@ -657,7 +647,10 @@ export class MainController {
     }
 
     openFilterModal(): void {
-        this.filterModalController.show();
+        // Planner + schedule filter both open the declarative FilterModal in
+        // 'filter' mode (id 'filter-modal'); ModalLayer renders it.
+        modalState.filter = { mode: 'filter' };
+        this.services.uiStateManager.modalOpened('filter-modal');
     }
 
     openAutoSchedule(): void {
@@ -681,7 +674,9 @@ export class MainController {
     }
 
     refreshPlannerFilterUI(): void {
-        this.filterModalController.refreshFilterUI();
+        // Re-sync the open FilterModal's checkboxes from filterService (tutorial
+        // back-navigation). The component responds to this tick.
+        modalState.filterRefreshTick++;
     }
 
     syncCourseSelectionUI(): void {
@@ -1003,9 +998,9 @@ export class MainController {
         return allCourses;
     }
 
-    private syncModalSearchInput(query: string): void {
-        // Sync the modal search input if the modal is currently open
-        this.filterModalController.syncSearchInputFromMain(query);
+    private syncModalSearchInput(_query: string): void {
+        // No-op: the filter modal has no search-text input (the planner search bar
+        // is the SearchBar Svelte component). Kept as a stable SearchBar callback.
     }
 
     private resetSearchAndDepartmentFilters(): void {
