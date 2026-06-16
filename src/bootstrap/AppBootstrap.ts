@@ -13,8 +13,14 @@ import { rateMyProfessorService } from '../services/external/RateMyProfessorServ
 import { StorageWorkerManager } from '../workers/StorageWorkerManager'
 import { TermBoundsService } from '../utils/termBounds'
 import { createDefaultFilters, SearchTextFilter } from '../core/filtering/filters'
+import { CourseColorService } from '../services/scheduling/CourseColorService'
+import { AutoScheduleOrchestrator } from '../services/scheduling/AutoScheduleOrchestrator'
+import { calendarEventProvider } from '../services/scheduling/calendarEventProvider'
+import { componentWizardService } from '../services/scheduling/componentWizardService'
+import { localEventService } from '../services/scheduling/localEventService'
+import { sectionInfoService } from '../services/scheduling/sectionInfoService'
+import { autoScheduleService } from '../services/scheduling/autoScheduleService'
 import type { ServiceContainer } from './ServiceContainer'
-import type { Department } from '../types/types'
 import { appState } from '../core/state/appState.svelte'
 import { watch } from '../svelte/reactivity.svelte'
 
@@ -40,6 +46,13 @@ export class AppBootstrap {
         const timestampManager = new TimestampManager();
         const operationManager = new OperationManager();
 
+        // Derived UI services (previously constructed in the MainController ctor).
+        // They depend only on courseSelectionService/filterService, so they belong
+        // in the container alongside everything else — App.svelte (Phase 13C) reads
+        // them for the grid/footer/modal-layer props.
+        const colorService = new CourseColorService(courseSelectionService);
+        const autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, filterService);
+
         return {
             profileStateManager,
             storageService,
@@ -52,16 +65,28 @@ export class AppBootstrap {
             operationManager,
             uiStateManager,
             timestampManager,
+            colorService,
+            autoScheduleOrchestrator,
         };
     }
 
-    static setupCourseDataSubscriptions(
-        services: ServiceContainer,
-        callbacks: {
-            setAllDepartments: (departments: Department[]) => void;
-            onDataLoaded: (departments: Department[]) => void;
-        }
-    ): void {
+    // Inject the non-singleton services into the standalone scheduling-service
+    // singletons (componentWizard / localEvent / sectionInfo / autoSchedule).
+    // Previously done in the MainController constructor; now part of bootstrap so
+    // it runs before the tutorial and the component mounts.
+    static initStandaloneServices(services: ServiceContainer): void {
+        const {
+            courseSelectionService, courseDataService, filterService,
+            profileStateManager, uiStateManager, colorService, autoScheduleOrchestrator,
+        } = services;
+
+        componentWizardService.init(courseSelectionService, courseDataService, filterService, uiStateManager);
+        localEventService.init(profileStateManager, uiStateManager);
+        sectionInfoService.init(courseSelectionService, colorService, uiStateManager);
+        autoScheduleService.init(courseSelectionService, filterService, colorService, autoScheduleOrchestrator, uiStateManager);
+    }
+
+    static setupCourseDataSubscriptions(services: ServiceContainer): void {
         const {
             profileStateManager, filterService,
             courseSelectionService, timestampManager
@@ -74,6 +99,11 @@ export class AppBootstrap {
         // skips its initial run and subscriptions are wired before loadCourseData,
         // so the first fire is the initial load; a local flag then routes the
         // one-time setup vs. the lighter refresh path.
+        // The FilterModal reads departments straight off appState.loadedDepartments
+        // (the same array this watcher syncs), so no separate "allDepartments"
+        // cache/callback is needed — both the one-time setup and the refresh path
+        // only sync the non-reactive services here; every Svelte view re-derives
+        // from appState.loadedDepartments on its own.
         let initialLoadDone = false;
         watch(() => appState.loadedDepartments, () => {
             const departments = appState.loadedDepartments;
@@ -101,15 +131,6 @@ export class AppBootstrap {
                         filterService.addFilter('academicYear', { year: yearToFilter });
                     }
                 }
-
-                callbacks.setAllDepartments(departments);
-                callbacks.onDataLoaded(departments);
-            } else {
-                // Post-sync refresh: CourseDataService has reassigned
-                // appState.loadedDepartments (a fresh array), so every reactive
-                // view re-derives on its own — only the cached department list
-                // needs updating here.
-                callbacks.setAllDepartments(departments);
             }
         });
     }
@@ -157,5 +178,36 @@ export class AppBootstrap {
 
             StorageWorkerManager.getInstance().terminate();
         });
+    }
+
+    // Async app startup, run after the component shell is mounted (the previous
+    // MainController.init()). Loads data + storage, applies the saved theme, wires
+    // the auto-scheduler's calendar provider + selection-invalidation listener,
+    // registers the unload handler, and auto-starts the welcome tutorial on first
+    // visit. The mounted Svelte views show their own loading states until
+    // appState.loadedDepartments populates (via setupCourseDataSubscriptions).
+    static async startApp(services: ServiceContainer): Promise<void> {
+        try {
+            await AppBootstrap.initializeAsyncServices(services);
+
+            // Apply the saved theme now that storage has loaded — setTheme bumps
+            // uiState.currentThemeId so the mounted ThemeSelector reflects it.
+            const savedTheme = services.profileStateManager.getPreferences()?.theme ?? 'wpi-dark';
+            services.themeManager.setTheme(savedTheme);
+
+            services.autoScheduleOrchestrator.setCalendarEventProvider(calendarEventProvider);
+            services.autoScheduleOrchestrator.setupCourseSelectionChangeListener();
+            AppBootstrap.setupWindowUnloadHandler();
+
+            if (!localStorage.getItem('wpi_visited')) {
+                await services.tutorial?.start('welcome');
+            }
+        } catch (error) {
+            console.error('Failed to initialize application:', error);
+            services.uiStateManager.showErrorMessage(
+                'Failed to initialize application. Some features may not work properly.',
+                () => services.scheduleManagementService.clearAllSchedules()
+            );
+        }
     }
 }

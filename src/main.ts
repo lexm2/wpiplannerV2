@@ -7,6 +7,14 @@ import { setupTutorial } from './services/tutorial/setupTutorial'
 DeviceDetection.initialize();
 
 const services = AppBootstrap.createServices();
+
+// Non-UI bootstrap (sync): inject the standalone scheduling services, register
+// the course-data subscription + default filters — all before the component
+// shell mounts and before the async data load below catches the subscription.
+AppBootstrap.initStandaloneServices(services);
+AppBootstrap.setupCourseDataSubscriptions(services);
+AppBootstrap.initializeFilters(services);
+
 const mainController = new MainController(services);
 
 if (DeviceDetection.isMobilePhone()) {
@@ -26,3 +34,8 @@ declare global {
     }
 }
 window.mainController = mainController;
+
+// Async startup (data load, theme, auto-scheduler wiring, welcome tutorial).
+// Runs after the shell is mounted + the tutorial is wired, so the welcome
+// auto-start sees services.tutorial set. Fire-and-forget (errors handled inside).
+AppBootstrap.startApp(services);

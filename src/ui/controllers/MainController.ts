@@ -1,6 +1,6 @@
 import type { PageId } from '../../types/uiState'
 import { uiState } from '../../services/ui/uiState.svelte'
-import { Course, Department } from '../../types/types'
+import { Course } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
 import { mount } from 'svelte'
 import DepartmentSidebar from '../../svelte/DepartmentSidebar.svelte'
@@ -31,14 +31,9 @@ import { ResizablePanel } from '../components/ResizablePanel'
 import { SwipeGestureHandler } from '../utils/SwipeGestureHandler'
 import { DeviceDetection } from '../../utils/deviceDetection'
 import { DebouncedOperation } from '../../utils/RequestCancellation'
-import { CourseColorService } from '../../services/scheduling/CourseColorService'
-import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator'
-import { calendarEventProvider } from '../../services/scheduling/calendarEventProvider'
-import { AppBootstrap } from '../../bootstrap/AppBootstrap'
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer'
 import { watch } from '../../svelte/reactivity.svelte'
 import { appState } from '../../core/state/appState.svelte'
-import type { SelectionSnapshot } from '../../types/scheduling'
 
 /**
  * UI controller managing DOM event binding, view refreshing, and sub-controller coordination
@@ -46,10 +41,6 @@ import type { SelectionSnapshot } from '../../types/scheduling'
 export class MainController {
     private services: ServiceContainer;
     private debouncedSearch: DebouncedOperation;
-    private colorService: CourseColorService;
-    private autoScheduleOrchestrator: AutoScheduleOrchestrator;
-    private allDepartments: Department[] = [];
-
 
     constructor(services: ServiceContainer) {
         this.services = services;
@@ -57,43 +48,16 @@ export class MainController {
         const {
             profileStateManager, courseDataService, courseSelectionService,
             conflictDetector, filterService,
-            operationManager, uiStateManager
+            operationManager,
         } = services;
 
         this.debouncedSearch = new DebouncedOperation(operationManager, 'search', 300);
 
-        // Initialize extracted services
-        this.colorService = new CourseColorService(courseSelectionService);
-        this.autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, filterService);
-
-        // Component-selection wizard launching lives in the standalone
-        // componentWizardService, which drives the reactive wizardState store
-        // (WizardHost renders the panel) + the schedulePreviewState rune and
-        // persists committed selections via CourseSelectionService — the last
-        // responsibility lifted off the now-deleted ScheduleController.
-        // The ConflictFilter is registered by AppBootstrap.initializeServices
-        // (filterService.setConflictDetector()), so no controller wiring is needed.
-        componentWizardService.init(courseSelectionService, courseDataService, filterService, uiStateManager);
-
-        // Local calendar-event CRUD lives in the standalone localEventService,
-        // which reads appState.activeSchedule directly and persists via
-        // profileStateManager.updateSchedule (replacing ScheduleController's
-        // currentSchedule + setScheduleUpdateCallback wiring).
-        localEventService.init(profileStateManager, uiStateManager);
-
-        // Section-info modal (grid section click) lives in the standalone
-        // sectionInfoService, which resolves the section from the wizard preview
-        // rune or the saved selection and routes color get/set through
-        // CourseColorService (replacing ScheduleController's showSectionInfoModal
-        // + its getCourseColor/setCourseColor delegators).
-        sectionInfoService.init(courseSelectionService, this.colorService, uiStateManager);
-
-        // Auto-schedule modal orchestration (intro → filter → generate) lives in
-        // the standalone autoScheduleService, which drives the declarative modals
-        // via modalState and surfaces the generating overlay through the
-        // appState.scheduleGenerating rune (replacing ScheduleController's
-        // openAutoSchedule/openAutoScheduleIntro/.../doGenerateSchedules).
-        autoScheduleService.init(courseSelectionService, filterService, this.colorService, this.autoScheduleOrchestrator, uiStateManager);
+        // Service construction + injection (colorService/autoScheduleOrchestrator,
+        // and the componentWizard/localEvent/sectionInfo/autoSchedule .init calls)
+        // now live in AppBootstrap (createServices + initStandaloneServices), run
+        // before this constructor — so MainController only mounts components and
+        // wires DOM glue.
 
         // Mount the department sidebar (Svelte). It reads appState.loadedDepartments
         // and the reactive filter state directly, so it needs no imperative wiring.
@@ -293,9 +257,9 @@ export class MainController {
                     scheduleManagementService: services.scheduleManagementService,
                     filterService: services.filterService,
                     courseSelectionService: services.courseSelectionService,
-                    autoScheduleOrchestrator: this.autoScheduleOrchestrator,
+                    autoScheduleOrchestrator: services.autoScheduleOrchestrator,
                     profileStateManager: services.profileStateManager,
-                    getDepartments: () => this.allDepartments,
+                    getDepartments: () => appState.loadedDepartments,
                 }
             });
         }
@@ -315,7 +279,7 @@ export class MainController {
             mount(AutoScheduleControls, {
                 target: autoScheduleFooterEl,
                 props: {
-                    autoScheduleOrchestrator: this.autoScheduleOrchestrator,
+                    autoScheduleOrchestrator: services.autoScheduleOrchestrator,
                     onOpenAutoSchedule: () => autoScheduleService.openAutoSchedule(),
                 }
             });
@@ -373,7 +337,7 @@ export class MainController {
             mount(ScheduleGrids, {
                 target: gridsRootEl,
                 props: {
-                    colorService: this.colorService,
+                    colorService: services.colorService,
                     conflictEngine: conflictDetector,
                     onOpenSectionInfo: (courseId: string, sectionNumber: string) =>
                         sectionInfoService.show(courseId, sectionNumber),
@@ -383,99 +347,27 @@ export class MainController {
             });
         }
 
-        // Set up course data event subscriptions via AppBootstrap
-        AppBootstrap.setupCourseDataSubscriptions(services, {
-            setAllDepartments: (departments) => {
-                this.allDepartments = departments;
-            },
-            onDataLoaded: () => {
-                // FilterModal reads departments via its getDepartments thunk at
-                // open time (this.allDepartments, just updated above).
-            },
-        });
-
-        // Initialize tracking for course changes
-        const initialSelectedCourses = courseSelectionService.getSelectedCourses();
-        this.previousSelectedCoursesMap = new Map();
-        initialSelectedCourses.forEach(sc => {
-            this.previousSelectedCoursesMap.set(sc.course.id, {
-                lecture: sc.selectedLecture?.number || null,
-                discussion: sc.selectedDiscussion?.number || null,
-                lab: sc.selectedLab?.number || null
+        // Mount the declarative clear-all-sections button into its sidebar slot
+        // — replaces ScheduleController.setupClearAllSectionsButton().
+        const clearAllSlotEl = document.getElementById('clear-all-sections-slot');
+        if (clearAllSlotEl) {
+            mount(ClearAllSectionsButton, {
+                target: clearAllSlotEl,
+                props: {
+                    courseSelectionService: services.courseSelectionService,
+                }
             });
-        });
-
-        // Initialize filters and wire up filter change listeners
-        AppBootstrap.initializeFilters(services);
-
-        // No imperative filter watch needed here: the course list, search bar,
-        // planner filter trio, and the schedule filter button are all Svelte
-        // components that derive their state from the reactive filter store on
-        // their own (the schedule button via ScheduleFilterButton, mounted in
-        // bindEvents).
-
-        this.init();
-    }
-
-    private async init(): Promise<void> {
-        // The DepartmentSidebar component shows its own loading state until
-        // appState.loadedDepartments is populated.
-        try {
-            await AppBootstrap.initializeAsyncServices(this.services);
-            // Apply the saved theme now that storage has loaded — this replicates
-            // the old ThemeSelector.initializeTheme()/loadSavedTheme() behavior.
-            // setTheme also bumps uiState.currentThemeId, so the mounted Svelte
-            // ThemeSelector reflects the saved theme as its active/current option.
-            const savedTheme = this.services.profileStateManager.getPreferences()?.theme ?? 'wpi-dark';
-            this.services.themeManager.setTheme(savedTheme);
-
-            // No startup department-view refresh needed: with no department filter
-            // the sidebar shows "All Departments" active and CourseList renders all
-            // courses, both reacting to appState/the filter store on their own.
-
-            this.setupEventListeners();
-            this.setupCourseSelectionListener();
-            this.setupPageNavigationListener();
-            this.setupScheduleChangeListener();
-            this.initializeSwipeNavigation();
-            AppBootstrap.setupWindowUnloadHandler();
-
-            // Wire up calendar event provider for auto-scheduler
-            this.autoScheduleOrchestrator.setCalendarEventProvider(calendarEventProvider);
-
-            // Mount the declarative clear-all-sections button into its sidebar
-            // slot — replaces ScheduleController.setupClearAllSectionsButton().
-            const clearAllSlotEl = document.getElementById('clear-all-sections-slot');
-            if (clearAllSlotEl) {
-                mount(ClearAllSectionsButton, {
-                    target: clearAllSlotEl,
-                    props: {
-                        courseSelectionService: this.services.courseSelectionService,
-                    }
-                });
-            }
-
-            this.autoScheduleOrchestrator.setupCourseSelectionChangeListener();
-
-            // The SELECTED-courses panel is the SelectedCoursesPanel Svelte
-            // component now (reactive on appState.selectedCourses), so no initial
-            // imperative render here.
-
-            // The course list's select buttons are reactive (CourseList reads
-            // appState.selectedById), so no initial imperative selection sync.
-
-            this.updateSelectedCoursesState(this.services.courseSelectionService.getSelectedCourses());
-
-            if (!localStorage.getItem('wpi_visited')) {
-                await this.services.tutorial?.start('welcome');
-            }
-        } catch (error) {
-            console.error('Failed to initialize application:', error);
-            this.services.uiStateManager.showErrorMessage(
-                'Failed to initialize application. Some features may not work properly.',
-                () => this.services.scheduleManagementService.clearAllSchedules()
-            );
         }
+
+        // DOM glue (event listeners, page/schedule watchers, swipe nav). None of
+        // this needs the async data load — the views are reactive — so it runs
+        // synchronously here. The async startup (data load, theme, auto-scheduler
+        // wiring, welcome tutorial) lives in AppBootstrap.startApp, kicked off
+        // from main.ts after the shell is mounted + the tutorial wired.
+        this.setupEventListeners();
+        this.setupPageNavigationListener();
+        this.setupScheduleChangeListener();
+        this.initializeSwipeNavigation();
     }
 
     private initializeSwipeNavigation(): void {
@@ -646,8 +538,6 @@ export class MainController {
     }
 
 
-    private previousSelectedCoursesMap = new Map<string, SelectionSnapshot>();
-
     private setupScheduleChangeListener(): void {
         // React to active-schedule (re)activation via runes.
         watch(() => appState.activation, () => {
@@ -688,33 +578,6 @@ export class MainController {
                 this.resetSearchAndDepartmentFilters();
             }
             prevPage = page;
-        });
-    }
-
-    private setupCourseSelectionListener(): void {
-        // Refresh incrementally whenever the selected courses change (runes).
-        watch(() => appState.selectedById, () => this.refreshSelectionUI());
-    }
-
-    private refreshSelectionUI(): void {
-        const selectedCourses = this.services.profileStateManager.getSelectedCourses();
-
-        // The course LIST's select buttons (CourseList), the planner
-        // SELECTED-courses panel (SelectedCoursesPanel), the SCHEDULE sidebar
-        // (ScheduleSidebar), and the schedule GRID (ScheduleGrids) are reactive
-        // Svelte components reading appState, so added/removed courses and section
-        // changes need no imperative refresh here.
-        this.updateSelectedCoursesState(selectedCourses);
-    }
-
-    private updateSelectedCoursesState(selectedCourses: SelectedCourse[]): void {
-        this.previousSelectedCoursesMap = new Map();
-        selectedCourses.forEach(sc => {
-            this.previousSelectedCoursesMap.set(sc.course.id, {
-                lecture: sc.selectedLecture?.number || null,
-                discussion: sc.selectedDiscussion?.number || null,
-                lab: sc.selectedLab?.number || null
-            });
         });
     }
 

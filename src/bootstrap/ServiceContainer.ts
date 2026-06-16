@@ -9,6 +9,8 @@ import { ThemeManager } from '../themes/ThemeManager'
 import { OperationManager } from '../utils/RequestCancellation'
 import { UIStateManager } from '../services/ui/UIStateManager'
 import { TimestampManager } from '../ui/controllers/TimestampManager'
+import { CourseColorService } from '../services/scheduling/CourseColorService'
+import { AutoScheduleOrchestrator } from '../services/scheduling/AutoScheduleOrchestrator'
 import type { TutorialSetup } from '../services/tutorial/setupTutorial'
 
 export interface ServiceContainer {
@@ -24,4 +26,6 @@ export interface ServiceContainer {
     operationManager: OperationManager;
     uiStateManager: UIStateManager;
     timestampManager: TimestampManager;
+    colorService: CourseColorService;
+    autoScheduleOrchestrator: AutoScheduleOrchestrator;
 }
