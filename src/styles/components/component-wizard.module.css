@@ -136,7 +136,9 @@
     align-items: center;
 }
 
-.breadcrumb-arrow-icon {
+/* Injected via {@html getInlineSVG(...)} with a literal class name, so it can't be
+   module-hashed — keep it global. */
+:global(.breadcrumb-arrow-icon) {
     width: 16px;
     height: 16px;
     stroke: currentColor;
@@ -425,10 +427,8 @@
     border-color: var(--color-primary);
 }
 
-/* Ensure sidebar container can hold wizard */
-.schedule-sidebar-content {
-    position: relative;
-}
+/* (The sidebar container's `position: relative` lives in schedule-page.css —
+   it's a global element outside this module's scope.) */
 
 /* Rate My Professor Badge */
 .rmp-badge {
@@ -480,19 +480,20 @@
     }
 }
 
-html.is-mobile .wizard-header h2 {
+/* `html.is-mobile` is a global class set on <html>, so it can't be module-scoped. */
+:global(html.is-mobile) .wizard-header h2 {
     font-size: 1.1rem;
 }
 
-html.is-mobile .wizard-step-title {
+:global(html.is-mobile) .wizard-step-title {
     font-size: 1rem;
 }
 
-html.is-mobile .wizard-content {
+:global(html.is-mobile) .wizard-content {
     padding: 1rem;
 }
 
-html.is-mobile .wizard-sections-grid {
+:global(html.is-mobile) .wizard-sections-grid {
     gap: 0.75rem;
 }
 
@@ -576,5 +577,27 @@ html.is-mobile .wizard-sections-grid {
     background: var(--color-primary);
     color: var(--color-on-primary, #fff);
     border-color: var(--color-primary);
+}
+
+/* Step slide keyframes, defined locally so the `animation:` references above bind
+   to this module (the base .sidebar-panel uses its own global copies). */
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutLeft {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(-100%); opacity: 0; }
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
 }
 

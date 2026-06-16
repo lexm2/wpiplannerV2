@@ -170,24 +170,9 @@
                 <div class="resize-handle resize-handle-schedule" data-resize="schedule-sidebar" role="separator" aria-orientation="vertical" aria-label="Resize schedule sidebar"></div>
 
                 <main class="schedule-main">
-                    <div class="terms-grid">
-                        <div class="focused-term-header">
-                            <button class="term-back-btn"></button>
-                            <span class="focused-term-title"></span>
-                        </div>
-                        <div class="term-graph" data-term="A">
-                            <div class="schedule-grid" id="schedule-grid-A"></div>
-                        </div>
-                        <div class="term-graph" data-term="B">
-                            <div class="schedule-grid" id="schedule-grid-B"></div>
-                        </div>
-                        <div class="term-graph" data-term="C">
-                            <div class="schedule-grid" id="schedule-grid-C"></div>
-                        </div>
-                        <div class="term-graph" data-term="D">
-                            <div class="schedule-grid" id="schedule-grid-D"></div>
-                        </div>
-                    </div>
+                    <!-- ScheduleGrids.svelte renders the .terms-grid + 4 term grids
+                         into this display:contents host (declarative grid). -->
+                    <div id="schedule-grids-root" style="display: contents"></div>
                 </main>
             </div>
         </div>

@@ -17,4 +17,3 @@ export type {
   ConflictSetupOptions,
 } from './SharedFilterSetup';
 export { SharedFilterSetup } from './SharedFilterSetup';
-export { ComponentSelectionWizard } from './ComponentSelectionWizard';

@@ -6,11 +6,9 @@
   let {
     autoScheduleOrchestrator,
     onOpenAutoSchedule,
-    onAfterNavigate,
   }: {
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
     onOpenAutoSchedule: () => void;
-    onAfterNavigate: () => void;
   } = $props();
 
   // The orchestrator's generated-schedule state lives in plain fields; it bumps
@@ -28,16 +26,15 @@
   const hasSchedules = $derived(generatedCount > 0);
   const progressPct = $derived(hasSchedules ? ((currentIndex + 1) / generatedCount) * 100 : 0);
 
-  // Nav re-applies the schedule at the new index (orchestrator bumps the rune so
-  // this footer's progress updates reactively); the grid is still vanilla until
-  // Phase 12C/D, so onAfterNavigate() drives ScheduleController.renderScheduleGrids().
+  // Nav re-applies the schedule at the new index via batchSetSelectedComponents,
+  // which updates appState.selectedCourses — the declarative grid reacts on its
+  // own, and the orchestrator bumps autoScheduleGeneration so this footer's
+  // progress updates too. No after-navigate callback needed.
   async function prev(): Promise<void> {
     await autoScheduleOrchestrator.navigateSchedule(-1);
-    onAfterNavigate();
   }
   async function next(): Promise<void> {
     await autoScheduleOrchestrator.navigateSchedule(1);
-    onAfterNavigate();
   }
 </script>
 

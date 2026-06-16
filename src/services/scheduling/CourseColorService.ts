@@ -69,5 +69,8 @@ export class CourseColorService {
         this.courseColorMap.set(courseId, color);
         this.usedColors.add(color);
         this.courseSelectionService.setCourseColor(courseId, color);
+        // Signal the declarative schedule grid to re-derive block colors (the
+        // course list is unchanged on a recolor, so this is the trigger).
+        appState.colorGeneration++;
     }
 }

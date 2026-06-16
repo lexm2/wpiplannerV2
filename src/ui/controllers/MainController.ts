@@ -16,6 +16,8 @@ import CourseDescription from '../../svelte/CourseDescription.svelte'
 import AutoScheduleControls from '../../svelte/AutoScheduleControls.svelte'
 import ScheduleSidebar from '../../svelte/ScheduleSidebar.svelte'
 import CalendarEventsButton from '../../svelte/CalendarEventsButton.svelte'
+import WizardHost from '../../svelte/WizardHost.svelte'
+import ScheduleGrids from '../../svelte/schedule/ScheduleGrids.svelte'
 import ModalLayer from '../../svelte/modals/ModalLayer.svelte'
 import { modalState } from '../../svelte/modals/modalState.svelte'
 import { ScheduleController } from './ScheduleController'
@@ -290,7 +292,9 @@ export class MainController {
         // progress bar — replacing ScheduleController.setupAutoScheduleButton()
         // and the imperative updateAutoScheduleButtonUI() DOM updates. The
         // `#auto-schedule-btn` id is preserved so the tutorial selector keeps
-        // working. onAfterNavigate drives the still-vanilla grid re-render.
+        // working. Navigation re-applies the schedule via batchSetSelectedComponents,
+        // which updates appState.selectedCourses — the declarative grid reacts on
+        // its own, so no after-navigate callback is needed.
         const autoScheduleFooterEl = document.querySelector('.schedule-sidebar-content-footer');
         if (autoScheduleFooterEl) {
             autoScheduleFooterEl.innerHTML = '';
@@ -299,7 +303,6 @@ export class MainController {
                 props: {
                     autoScheduleOrchestrator: this.autoScheduleOrchestrator,
                     onOpenAutoSchedule: () => this.scheduleController.openAutoSchedule(),
-                    onAfterNavigate: () => this.scheduleController.renderScheduleGrids(),
                 }
             });
         }
@@ -323,6 +326,16 @@ export class MainController {
             });
         }
 
+        // Mount the component-selection wizard host as a sibling of the courses
+        // wrapper inside #schedule-sidebar-content. It's driven by the wizardState
+        // store (ScheduleController.openComponentWizard) and renders the wizard panel
+        // as an absolute overlay over the sidebar content — replacing the old vanilla
+        // ComponentSelectionWizard + SidebarManager.openPanel plumbing.
+        const scheduleSidebarContentEl = document.getElementById('schedule-sidebar-content');
+        if (scheduleSidebarContentEl) {
+            mount(WizardHost, { target: scheduleSidebarContentEl });
+        }
+
         // Mount the always-present Calendar Events button into the sidebar header
         // slot — replaces ScheduleController.renderCalendarEventsHeader().
         const calendarSlotEl = document.getElementById('calendar-events-header-slot');
@@ -331,6 +344,27 @@ export class MainController {
                 target: calendarSlotEl,
                 props: {
                     onClick: () => this.scheduleController.openCalendarEventsPanel(),
+                }
+            });
+        }
+
+        // Mount the declarative schedule grids (Svelte). They render the
+        // .terms-grid + 4 term grids and are reactive on appState.selectedCourses,
+        // the wizard preview rune, colorGeneration, and activeSchedule.localEvents —
+        // replacing ScheduleController.renderScheduleGrids() and all its imperative
+        // call sites. Section click → section-info modal; event click → delete
+        // confirm; recolor + auto-schedule generate/navigate flow through runes.
+        const gridsRootEl = document.getElementById('schedule-grids-root');
+        if (gridsRootEl) {
+            mount(ScheduleGrids, {
+                target: gridsRootEl,
+                props: {
+                    colorService: this.colorService,
+                    conflictEngine: conflictDetector,
+                    onOpenSectionInfo: (courseId: string, sectionNumber: string) =>
+                        this.scheduleController.showSectionInfoModal(courseId, sectionNumber),
+                    onOpenDeleteEvent: (eventId: string) =>
+                        this.scheduleController.openDeleteLocalEventModal(eventId),
                 }
             });
         }
@@ -480,7 +514,6 @@ export class MainController {
     private handleSwipeLeft(): void {
         if (this.services.uiStateManager.getCurrentPage() === 'planner') {
             this.services.uiStateManager.switchToPage('schedule');
-            this.scheduleController.renderScheduleGrids();
         }
     }
 
@@ -500,7 +533,6 @@ export class MainController {
             this.services.uiStateManager.switchToPage('planner');
         } else {
             this.services.uiStateManager.switchToPage('schedule');
-            this.scheduleController.renderScheduleGrids();
         }
     }
 
@@ -734,16 +766,12 @@ export class MainController {
 
     private refreshSelectionUI(): void {
         const selectedCourses = this.services.profileStateManager.getSelectedCourses();
-        const onSchedule = this.services.uiStateManager.currentPage === 'schedule';
 
         // The course LIST's select buttons (CourseList), the planner
-        // SELECTED-courses panel (SelectedCoursesPanel), and the SCHEDULE sidebar
-        // (ScheduleSidebar) are reactive Svelte components reading appState, so
-        // added/removed courses and section changes need no imperative panel
-        // updates here — only the schedule GRID is still vanilla.
-        if (onSchedule) {
-            this.scheduleController.renderScheduleGrids();
-        }
+        // SELECTED-courses panel (SelectedCoursesPanel), the SCHEDULE sidebar
+        // (ScheduleSidebar), and the schedule GRID (ScheduleGrids) are reactive
+        // Svelte components reading appState, so added/removed courses and section
+        // changes need no imperative refresh here.
         this.updateSelectedCoursesState(selectedCourses);
     }
 
@@ -778,12 +806,10 @@ export class MainController {
     }
 
     private refreshUI(): void {
-        // The planner SELECTED-courses panel and the SCHEDULE sidebar are
-        // reactive Svelte components reading appState.selectedCourses, so only
-        // the still-vanilla schedule GRID needs an imperative refresh here.
-        if (this.services.uiStateManager.currentPage === 'schedule') {
-            this.scheduleController.renderScheduleGrids();
-        } else {
+        // The planner SELECTED-courses panel, the SCHEDULE sidebar, and the
+        // schedule GRID are all reactive Svelte components reading appState, so
+        // nothing on the schedule page needs an imperative refresh here.
+        if (this.services.uiStateManager.currentPage !== 'schedule') {
             this.refreshCurrentView();
         }
     }

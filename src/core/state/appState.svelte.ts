@@ -62,6 +62,21 @@ class AppState {
      */
     autoScheduleGeneration = $state(0);
 
+    /**
+     * Bumped whenever a course's display color changes (recolor via the
+     * section-info modal). The declarative schedule grid reads this so a recolor
+     * re-derives its block colors without the course list itself changing. New
+     * courses get colors via the `selectedCourses` change (no bump needed).
+     */
+    colorGeneration = $state(0);
+
+    /**
+     * True while the auto-scheduler is generating. Drives the declarative
+     * schedule grid's generating overlay (replaces ScheduleController's imperative
+     * `.schedule-generating-overlay` create/append in `doGenerateSchedules`).
+     */
+    scheduleGenerating = $state(false);
+
     /** The active schedule object (new identity whenever it or its id changes). */
     activeSchedule = $derived(
         this.schedules.find(s => s.id === this.activeScheduleId) ?? null

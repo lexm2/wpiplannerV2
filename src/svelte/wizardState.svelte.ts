@@ -1,0 +1,80 @@
+/**
+ * Reactive home of the component-selection wizard — the Svelte replacement for the
+ * old vanilla `ComponentSelectionWizard` + `SidebarManager.openPanel` plumbing.
+ *
+ * `ScheduleController` owns the services and opens the wizard by calling `open()`
+ * with a per-launch config (course, services, callbacks). The config carries the
+ * services so the app's "services are injected, never imported" rule still holds —
+ * this store just holds whatever the controller hands it.
+ *
+ * `ComponentSelectionWizard.svelte` reads this store and derives everything else;
+ * `currentStep`/`selections` live here (not in the component) so external callers
+ * like `ScheduleController.jumpWizardToStep` can drive navigation without a ref.
+ */
+import type { Course } from '../types/types';
+import type { SelectedCourse } from '../types/schedule';
+import type { ComponentSelections } from '../types/scheduling';
+import type { WizardStep } from '../types/uiState';
+import type { CourseDataService } from '../services/data/courseDataService';
+import type { FilterService } from '../services/filtering/FilterService';
+import { determineAvailableSteps } from './wizardLogic';
+
+export interface WizardConfig {
+    course: Course;
+    courseDataService: CourseDataService;
+    filterService: FilterService | null;
+    allSelectedCourses: SelectedCourse[];
+    existingSelections?: SelectedCourse;
+    onComplete: (selections: ComponentSelections) => void;
+    onCancel: () => void;
+    onSelectionChange?: (selections: ComponentSelections) => void;
+    onHoverPreview?: (selections: ComponentSelections) => void;
+    onStepChange?: (step: WizardStep) => void;
+}
+
+// Fixed step order — used to derive slide direction for any navigation, including
+// external jumps that don't know the course's available-steps list.
+const STEP_ORDER: WizardStep[] = ['lecture', 'discussion', 'lab'];
+
+class WizardState {
+    config = $state.raw<WizardConfig | null>(null);
+    currentStep = $state.raw<WizardStep>('lecture');
+    selections = $state<ComponentSelections>({ lecture: null, discussion: null, lab: null });
+    /** Last navigation direction, drives the step slide-in animation. */
+    direction = $state.raw<'forward' | 'backward'>('forward');
+
+    get isOpen(): boolean {
+        return this.config !== null;
+    }
+
+    open(config: WizardConfig, initialStep?: WizardStep): void {
+        this.config = config;
+        this.selections = {
+            lecture: config.existingSelections?.selectedLecture ?? null,
+            discussion: config.existingSelections?.selectedDiscussion ?? null,
+            lab: config.existingSelections?.selectedLab ?? null,
+        };
+
+        const steps = determineAvailableSteps(config.course, config.courseDataService, this.selections.lecture);
+        const start = (initialStep && steps.includes(initialStep)) ? initialStep : (steps[0] ?? 'lecture');
+        this.currentStep = start;
+        this.direction = 'forward';
+        config.onStepChange?.(start);
+    }
+
+    close(): void {
+        this.config = null;
+        this.selections = { lecture: null, discussion: null, lab: null };
+    }
+
+    /** Navigate to a step, computing direction from the fixed step order. */
+    jumpToStep(step: WizardStep): void {
+        if (step === this.currentStep) return;
+        this.direction = STEP_ORDER.indexOf(step) > STEP_ORDER.indexOf(this.currentStep)
+            ? 'forward' : 'backward';
+        this.currentStep = step;
+        this.config?.onStepChange?.(step);
+    }
+}
+
+export const wizardState = new WizardState();
