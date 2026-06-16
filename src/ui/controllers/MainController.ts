@@ -11,6 +11,7 @@ import PageTabs from '../../svelte/PageTabs.svelte'
 import FilterButtons from '../../svelte/FilterButtons.svelte'
 import ClearAllSectionsButton from '../../svelte/ClearAllSectionsButton.svelte'
 import { localEventService } from '../../services/scheduling/localEventService'
+import { sectionInfoService } from '../../services/scheduling/sectionInfoService'
 import SearchBar from '../../svelte/SearchBar.svelte'
 import CourseList from '../../svelte/CourseList.svelte'
 import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
@@ -82,6 +83,13 @@ export class MainController {
         // profileStateManager.updateSchedule (replacing ScheduleController's
         // currentSchedule + setScheduleUpdateCallback wiring).
         localEventService.init(profileStateManager, uiStateManager);
+
+        // Section-info modal (grid section click) lives in the standalone
+        // sectionInfoService, which resolves the section from the wizard preview
+        // rune or the saved selection and routes color get/set through
+        // CourseColorService (replacing ScheduleController's showSectionInfoModal
+        // + its getCourseColor/setCourseColor delegators).
+        sectionInfoService.init(courseSelectionService, this.colorService, uiStateManager);
 
         // Mount the department sidebar (Svelte). It reads appState.loadedDepartments
         // and the reactive filter state directly, so it needs no imperative wiring.
@@ -365,7 +373,7 @@ export class MainController {
                     colorService: this.colorService,
                     conflictEngine: conflictDetector,
                     onOpenSectionInfo: (courseId: string, sectionNumber: string) =>
-                        this.scheduleController.showSectionInfoModal(courseId, sectionNumber),
+                        sectionInfoService.show(courseId, sectionNumber),
                     onOpenDeleteEvent: (eventId: string) =>
                         localEventService.openDeleteModal(eventId),
                 }

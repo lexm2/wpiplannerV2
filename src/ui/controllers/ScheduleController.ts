@@ -255,17 +255,6 @@ export class ScheduleController {
         return { isIncomplete: true, message };
     }
 
-    private getCourseColor(courseId: string): string {
-        return this.colorService.getCourseColor(courseId);
-    }
-
-    setCourseColor(courseId: string, color: string): void {
-        // The recolor patches the course's customColor onto appState.selectedCourses,
-        // which the declarative grid derives off — re-colors on its own, no
-        // imperative re-render needed.
-        this.colorService.setCourseColor(courseId, color);
-    }
-
     applyFiltersAndRefresh(): void {
         // The schedule sidebar list shows every selected course (filters only
         // apply inside the wizard), so the reactive ScheduleSidebar needs no
@@ -287,67 +276,6 @@ export class ScheduleController {
                 scheduleFilterButton.title = 'Filter selected courses';
             }
         }
-    }
-
-    showSectionInfoModal(courseId: string, sectionNumber: string): void {
-        let course: Course | undefined;
-        let section: Section | null = null;
-
-        // Check if this is the course being edited in wizard mode (preview rune)
-        const previewCourse = schedulePreviewState.previewCourse;
-        const previewSelections = schedulePreviewState.selections;
-        if (previewCourse?.id === courseId && previewSelections) {
-            course = previewCourse;
-
-            // Find section from wizard selections
-            if (previewSelections.lecture?.number === sectionNumber) {
-                section = previewSelections.lecture;
-            } else if (previewSelections.discussion?.number === sectionNumber) {
-                section = previewSelections.discussion;
-            } else if (previewSelections.lab?.number === sectionNumber) {
-                section = previewSelections.lab;
-            }
-        } else {
-            // Use existing logic for saved courses
-            const selectedCourses = this.courseSelectionService.getSelectedCourses();
-            const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId);
-
-            if (!selectedCourse) {
-                console.warn('Course not found:', courseId);
-                return;
-            }
-
-            course = selectedCourse.course;
-
-            // Find the section from component selections
-            if (selectedCourse.selectedLecture?.number === sectionNumber) {
-                section = selectedCourse.selectedLecture;
-            } else if (selectedCourse.selectedDiscussion?.number === sectionNumber) {
-                section = selectedCourse.selectedDiscussion;
-            } else if (selectedCourse.selectedLab?.number === sectionNumber) {
-                section = selectedCourse.selectedLab;
-            }
-        }
-
-        if (!section || !course) {
-            console.warn('Section not found:', sectionNumber);
-            return;
-        }
-
-        // Create section data for modal controller
-        const sectionData = {
-            courseCode: `${course.departmentAbbr}${course.number}`,
-            courseName: course.name,
-            section: section,
-            course: course,
-            courseId: courseId,
-            currentColor: this.getCourseColor(courseId),
-            onColorChange: (color: string) => this.setCourseColor(courseId, color)
-        };
-
-        // Show modal via the declarative modal layer
-        modalState.sectionInfo = sectionData;
-        this.uiStateManager?.modalOpened('section-info');
     }
 
     async openAutoSchedule(): Promise<void> {
