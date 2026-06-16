@@ -10,6 +10,7 @@ import ViewToggle from '../../svelte/ViewToggle.svelte'
 import PageTabs from '../../svelte/PageTabs.svelte'
 import FilterButtons from '../../svelte/FilterButtons.svelte'
 import ClearAllSectionsButton from '../../svelte/ClearAllSectionsButton.svelte'
+import { localEventService } from '../../services/scheduling/localEventService'
 import SearchBar from '../../svelte/SearchBar.svelte'
 import CourseList from '../../svelte/CourseList.svelte'
 import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
@@ -76,10 +77,11 @@ export class MainController {
         // Set modal controllers for ScheduleController
         this.scheduleController.setUIStateManager(uiStateManager);
 
-        // Set up schedule update callback for calendar event exclusions
-        this.scheduleController.setScheduleUpdateCallback((scheduleId, updates) => {
-            profileStateManager.updateSchedule(scheduleId, updates, 'calendar-event-exclusion');
-        });
+        // Local calendar-event CRUD lives in the standalone localEventService,
+        // which reads appState.activeSchedule directly and persists via
+        // profileStateManager.updateSchedule (replacing ScheduleController's
+        // currentSchedule + setScheduleUpdateCallback wiring).
+        localEventService.init(profileStateManager, uiStateManager);
 
         // Mount the department sidebar (Svelte). It reads appState.loadedDepartments
         // and the reactive filter state directly, so it needs no imperative wiring.
@@ -344,7 +346,7 @@ export class MainController {
             mount(CalendarEventsButton, {
                 target: calendarSlotEl,
                 props: {
-                    onClick: () => this.scheduleController.openCalendarEventsPanel(),
+                    onClick: () => localEventService.openAddModal(),
                 }
             });
         }
@@ -365,7 +367,7 @@ export class MainController {
                     onOpenSectionInfo: (courseId: string, sectionNumber: string) =>
                         this.scheduleController.showSectionInfoModal(courseId, sectionNumber),
                     onOpenDeleteEvent: (eventId: string) =>
-                        this.scheduleController.openDeleteLocalEventModal(eventId),
+                        localEventService.openDeleteModal(eventId),
                 }
             });
         }
@@ -457,12 +459,6 @@ export class MainController {
 
             // Wire up calendar event provider for auto-scheduler
             this.autoScheduleOrchestrator.setCalendarEventProvider(calendarEventProvider);
-
-            // Load active schedule into ScheduleController (for local events, etc.)
-            const activeSchedule = this.services.scheduleManagementService.getActiveSchedule();
-            if (activeSchedule) {
-                this.scheduleController.loadExternalEvents(activeSchedule);
-            }
 
             // Mount the declarative clear-all-sections button into its sidebar
             // slot — replaces ScheduleController.setupClearAllSectionsButton().
@@ -737,8 +733,6 @@ export class MainController {
 
             const activeSchedule = this.services.scheduleManagementService.getActiveSchedule();
             if (activeSchedule) {
-                this.scheduleController.loadExternalEvents(activeSchedule);
-
                 // Sync year filter to match the newly activated schedule
                 if (activeSchedule.year !== undefined) {
                     this.services.filterService.addFilter('academicYear', { year: activeSchedule.year });

@@ -1,6 +1,6 @@
 import type { WizardStep } from '../../types/uiState'
 import { Course, Section, Period, LectureGroup } from '../../types/types'
-import { SelectedCourse, Schedule, LocalCalendarEvent } from '../../types/schedule'
+import { SelectedCourse } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
 import { FilterService } from '../../services/filtering/FilterService'
@@ -23,8 +23,6 @@ export class ScheduleController {
     private conflictDetector: BitMaskEngine | null = null;
     private colorService: CourseColorService;
     private autoScheduleOrchestrator: AutoScheduleOrchestrator;
-    private currentSchedule: Schedule | null = null;
-    private onScheduleUpdate: ((scheduleId: string, updates: Partial<Schedule>) => void) | null = null;
     private uiStateManager: UIStateManager | null = null;
 
     constructor(courseSelectionService: CourseSelectionService, colorService: CourseColorService, autoScheduleOrchestrator: AutoScheduleOrchestrator) {
@@ -61,115 +59,6 @@ export class ScheduleController {
             () => filterService.getActiveFilters(),
             () => this.applyFiltersAndRefresh(),
         );
-    }
-
-    // =========================================================================
-    // Schedule Loading
-    // =========================================================================
-
-    /**
-     * Load a schedule for display.
-     * Should be called when the active schedule changes.
-     */
-    async loadExternalEvents(schedule: Schedule): Promise<void> {
-        // The declarative grid reads appState.activeSchedule.localEvents directly,
-        // so it updates on its own. We still track currentSchedule here for the
-        // auto-scheduler's blocked-times getters and local-event CRUD.
-        this.currentSchedule = schedule;
-    }
-
-    /**
-     * Set the callback for updating schedules (used for saving exclusion changes).
-     */
-    setScheduleUpdateCallback(callback: (scheduleId: string, updates: Partial<Schedule>) => void): void {
-        this.onScheduleUpdate = callback;
-    }
-
-    // =========================================================================
-    // Local Event Helper Methods
-    // =========================================================================
-
-    openCalendarEventsPanel(): void {
-        this.openAddLocalEventModal();
-    }
-
-    /**
-     * Open the calendar events panel to manage local and external events.
-     */
-
-    // =========================================================================
-    // Local Event CRUD Methods
-    // =========================================================================
-
-    /**
-     * Open modal to add a new local event.
-     */
-    private openAddLocalEventModal(): void {
-        if (!this.currentSchedule) {
-            console.warn('[ScheduleController] Cannot open add event modal - missing schedule');
-            return;
-        }
-
-        modalState.localEvent = {
-            onSave: (eventData) => this.addLocalEvent(eventData),
-        };
-        this.uiStateManager?.modalOpened('local-event');
-    }
-
-    /**
-     * Open the delete-confirmation modal for a local event (the grid's
-     * external-event-block click target). Confirming calls deleteLocalEvent.
-     */
-    openDeleteLocalEventModal(eventId: string): void {
-        if (!this.currentSchedule || !this.uiStateManager) return;
-        const localEvent = (this.currentSchedule.localEvents || []).find(e => e.id === eventId);
-        const title = localEvent?.title || 'Untitled Event';
-        modalState.deleteLocalEvent = { title, onConfirm: () => this.deleteLocalEvent(eventId) };
-        this.uiStateManager.modalOpened('delete-local-event');
-    }
-
-    private deleteLocalEvent(eventId: string): void {
-        if (!this.currentSchedule || !this.onScheduleUpdate) return;
-
-        const updatedLocalEvents = (this.currentSchedule.localEvents || []).filter(e => e.id !== eventId);
-
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            localEvents: updatedLocalEvents,
-        };
-
-        // The grid is reactive on appState.activeSchedule.localEvents; this
-        // persist replaces the schedule immutably so activeSchedule re-derives.
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            localEvents: updatedLocalEvents,
-        });
-    }
-
-    /**
-     * Add a new local event.
-     */
-    private addLocalEvent(eventData: Omit<LocalCalendarEvent, 'id' | 'createdAt' | 'updatedAt'>): void {
-        if (!this.currentSchedule || !this.onScheduleUpdate) return;
-
-        const now = Date.now();
-        const newEvent: LocalCalendarEvent = {
-            ...eventData,
-            id: `local-${now}-${Math.random().toString(36).substring(2, 11)}`,
-            createdAt: now,
-            updatedAt: now,
-        };
-
-        const currentEvents = this.currentSchedule.localEvents || [];
-        const updatedLocalEvents = [...currentEvents, newEvent];
-
-        this.currentSchedule = {
-            ...this.currentSchedule,
-            localEvents: updatedLocalEvents,
-        };
-
-        this.onScheduleUpdate(this.currentSchedule.id, {
-            localEvents: updatedLocalEvents,
-        });
     }
 
     /**
