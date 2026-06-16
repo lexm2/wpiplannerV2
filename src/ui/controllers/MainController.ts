@@ -124,15 +124,14 @@ export class MainController {
         // Mount the list/grid view toggle (Svelte). It reads uiState.currentView
         // (a rune) for its reactive active/btn-primary/btn-secondary classes —
         // replacing UIStateManager.applyViewEffects() and the imperative click
-        // wiring below. Same ids/base classes are preserved. onSelect runs
-        // refreshCurrentView so the still-vanilla course list re-renders.
+        // wiring below. Same ids/base classes are preserved. Selecting a view
+        // updates the rune; CourseList derives its layout from it and re-renders.
         const viewToggleEl = document.getElementById('view-toggle');
         if (viewToggleEl) {
             mount(ViewToggle, {
                 target: viewToggleEl,
                 props: {
-                    uiStateManager: services.uiStateManager,
-                    onSelect: () => this.refreshCurrentView()
+                    uiStateManager: services.uiStateManager
                 }
             });
         }
@@ -393,9 +392,6 @@ export class MainController {
                 // FilterModal reads departments via its getDepartments thunk at
                 // open time (this.allDepartments, just updated above).
             },
-            onDataRefreshed: () => {
-                this.refreshCurrentView();
-            },
         });
 
         // Initialize tracking for course changes
@@ -448,8 +444,9 @@ export class MainController {
             const savedTheme = this.services.profileStateManager.getPreferences()?.theme ?? 'wpi-dark';
             this.services.themeManager.setTheme(savedTheme);
 
-            // Set "All Departments" as the default selection on startup
-            this.initializeDefaultDepartmentView();
+            // No startup department-view refresh needed: with no department filter
+            // the sidebar shows "All Departments" active and CourseList renders all
+            // courses, both reacting to appState/the filter store on their own.
 
             this.setupEventListeners();
             this.setupCourseSelectionListener();
@@ -625,16 +622,11 @@ export class MainController {
     // restoreTermExpansionState / processPendingExpansions) and the
     // displayCoursesWithCancellation/handleLoadMoreClick rendering path are gone.
 
-    // refreshCurrentView is now a no-op: the course list, selected-courses panel,
-    // schedule sidebar, schedule grid, and the schedule filter button are all
-    // reactive Svelte components that derive from appState / the filter store, so
-    // its old job (the imperative schedule-filter-button refresh via
-    // ScheduleController.applyFiltersAndRefresh) is gone. Kept as a no-op so its
-    // remaining callers (ViewToggle.onSelect, onDataRefreshed, refreshUI,
-    // initializeDefaultDepartmentView) stay intact; the call sites + this stub
-    // are slated for the later imperative view-refresh teardown.
-    private refreshCurrentView(): void {
-    }
+    // refreshCurrentView and its callers (ViewToggle.onSelect, onDataRefreshed,
+    // refreshUI, initializeDefaultDepartmentView) were removed: the course list,
+    // selected-courses panel, schedule sidebar, schedule grid, and filter buttons
+    // are all reactive Svelte components deriving from appState / the filter
+    // store, so there is no imperative view refresh left to perform.
 
     // updateFilterButtonState / updateClearFiltersButtonState /
     // updateBookmarkFilterButtonState / updateScheduleFilterButtonState were all
@@ -785,30 +777,19 @@ export class MainController {
     }
 
     private handleUndo(): void {
-        this.services.profileStateManager.undo().then(() => {
-            this.refreshUI();
-        }).catch(error => {
+        // No imperative UI refresh: undo replaces appState (selected courses,
+        // schedules, filters) and every view is a reactive Svelte component.
+        this.services.profileStateManager.undo().catch(error => {
             console.error('Undo failed:', error);
             this.services.uiStateManager.showErrorMessage('Failed to undo. Please try again.');
         });
     }
 
     private handleRedo(): void {
-        this.services.profileStateManager.redo().then(() => {
-            this.refreshUI();
-        }).catch(error => {
+        this.services.profileStateManager.redo().catch(error => {
             console.error('Redo failed:', error);
             this.services.uiStateManager.showErrorMessage('Failed to redo. Please try again.');
         });
-    }
-
-    private refreshUI(): void {
-        // The planner SELECTED-courses panel, the SCHEDULE sidebar, and the
-        // schedule GRID are all reactive Svelte components reading appState, so
-        // nothing on the schedule page needs an imperative refresh here.
-        if (this.services.uiStateManager.currentPage !== 'schedule') {
-            this.refreshCurrentView();
-        }
     }
 
     // syncInitialCourseSelectionUI was removed: the course list's select buttons
@@ -986,12 +967,6 @@ export class MainController {
         // "All Departments". Both are Svelte components that react on their own.
         this.services.filterService.removeFilter('searchText');
         this.services.filterService.removeFilter('department');
-    }
-
-    private initializeDefaultDepartmentView(): void {
-        // No department filter on startup → the sidebar shows "All Departments"
-        // as active; trigger a refresh to show all courses.
-        this.refreshCurrentView();
     }
 
 }

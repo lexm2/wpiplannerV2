@@ -3,22 +3,19 @@
   import type { ViewMode } from '../types/uiState';
   import type { UIStateManager } from '../services/ui/UIStateManager';
 
-  let { uiStateManager, onSelect }: {
+  let { uiStateManager }: {
     uiStateManager: UIStateManager;
-    onSelect: () => void;
   } = $props();
 
   // `uiState.currentView` is a rune, so the reactive `class:` bindings below
   // replace UIStateManager.applyViewEffects()'s imperative class toggling.
   const view = $derived(uiState.currentView);
 
-  // Match the old MainController handler: call setView, then onSelect
-  // (= refreshCurrentView) regardless of whether the view changed. setView
-  // early-returns when unchanged, so onSelect is what re-renders the (still
-  // vanilla) course list either way.
+  // setView updates the uiState.currentView rune; CourseList derives its
+  // list/grid layout from that rune, so the course list re-renders on its own
+  // (no imperative refresh callback needed).
   function select(v: ViewMode): void {
     uiStateManager.setView(v);
-    onSelect();
   }
 </script>
 

@@ -60,7 +60,6 @@ export class AppBootstrap {
         callbacks: {
             setAllDepartments: (departments: Department[]) => void;
             onDataLoaded: (departments: Department[]) => void;
-            onDataRefreshed: (departments: Department[]) => void;
         }
     ): void {
         const {
@@ -106,8 +105,11 @@ export class AppBootstrap {
                 callbacks.setAllDepartments(departments);
                 callbacks.onDataLoaded(departments);
             } else {
+                // Post-sync refresh: CourseDataService has reassigned
+                // appState.loadedDepartments (a fresh array), so every reactive
+                // view re-derives on its own — only the cached department list
+                // needs updating here.
                 callbacks.setAllDepartments(departments);
-                callbacks.onDataRefreshed(departments);
             }
         });
     }
