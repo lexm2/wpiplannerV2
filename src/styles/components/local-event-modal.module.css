@@ -22,13 +22,15 @@
     gap: 0.35rem;
 }
 
-.local-event-form :global(.form-group) :global(label) {
+.local-event-form :global(.form-group) :global(label),
+.local-event-form :global(.form-group) :global(.form-label) {
     font-size: 0.85rem;
     font-weight: var(--font-weight-medium);
     color: var(--color-text);
 }
 
-.local-event-form :global(.form-group) :global(label) :global(.required) {
+.local-event-form :global(.form-group) :global(label) :global(.required),
+.local-event-form :global(.form-group) :global(.form-label) :global(.required) {
     color: var(--color-danger, #ef4444);
 }
 

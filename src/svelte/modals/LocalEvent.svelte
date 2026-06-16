@@ -177,8 +177,12 @@
 
         <!-- Event Type Selector -->
         <div class="form-group">
-          <label>Event Type</label>
-          <div class={styles['event-type-selector']}>
+          <span class="form-label" id="event-type-label">Event Type</span>
+          <div
+            class={styles['event-type-selector']}
+            role="group"
+            aria-labelledby="event-type-label"
+          >
             <button
               type="button"
               class={styles['event-type-option']}
@@ -219,8 +223,13 @@
           <!-- Recurring: Day + term selectors -->
           <div class={styles['recurring-fields']}>
             <div class="form-group">
-              <label>Days <span class="required">*</span></label>
-              <div class={styles['day-selector']} class:form-error={dayError}>
+              <span class="form-label" id="event-days-label">Days <span class="required">*</span></span>
+              <div
+                class={styles['day-selector']}
+                class:form-error={dayError}
+                role="group"
+                aria-labelledby="event-days-label"
+              >
                 {#each WEEKDAYS as day}
                   <button
                     type="button"
@@ -236,8 +245,13 @@
             </div>
 
             <div class="form-group">
-              <label>Terms</label>
-              <div class={styles['event-term-checkboxes']} class:form-error={termError}>
+              <span class="form-label" id="event-terms-label">Terms</span>
+              <div
+                class={styles['event-term-checkboxes']}
+                class:form-error={termError}
+                role="group"
+                aria-labelledby="event-terms-label"
+              >
                 {#each TERMS as term}
                   <label class={styles['event-term-label']}>
                     <span class={styles['event-term-text']}>Term {term}</span>
@@ -258,8 +272,8 @@
 
         <!-- Time (shared) -->
         <div class="form-group">
-          <label>Time</label>
-          <div class={styles['time-row']}>
+          <span class="form-label" id="event-time-label">Time</span>
+          <div class={styles['time-row']} role="group" aria-labelledby="event-time-label">
             <div class={styles['form-group-time']}>
               <input type="time" id="event-start" class="form-input" bind:value={startTime} />
             </div>
