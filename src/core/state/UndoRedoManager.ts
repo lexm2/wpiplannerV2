@@ -75,9 +75,10 @@ export class UndoRedoManager {
     this.notifyListeners();
   }
 
-  /** Signal a history change to reactive consumers (replaces the old listener set). */
+  /** Publish current undo/redo availability for reactive consumers. */
   private notifyListeners(): void {
-    appState.undoRedoGeneration++;
+    appState.canUndo = this.canUndo();
+    appState.canRedo = this.canRedo();
   }
 
   private deepClone<T>(obj: T): T {

@@ -51,10 +51,10 @@
 
   const localEvents = $derived(appState.activeSchedule?.localEvents ?? []);
 
-  // Per-term block lists. Reading appState.colorGeneration makes a recolor (which
-  // doesn't change the course list) re-derive block colors.
+  // Per-term block lists. A recolor patches the course's customColor onto
+  // appState.selectedCourses, so `selected` (a dependency here) changes identity
+  // and this re-derives the block colors — no separate signal needed.
   const blocksByTerm = $derived.by<Record<string, TermBlocks>>(() => {
-    void appState.colorGeneration;
     colorService.precomputeCourseColors(selected);
     const colorOf = (id: string) => colorService.getCourseColor(id);
 

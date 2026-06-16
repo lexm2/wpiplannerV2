@@ -747,8 +747,6 @@ export class ProfileStateManager {
                 this.state.selectedCourses = [];
                 this.state.activeScheduleId = null;
                 await this.loadFromStorage();
-                appState.activationSource = 'import';
-                appState.importGeneration++;
             } else {
                 console.error('[ProfileStateManager] Import failed:', result.error);
             }
@@ -859,12 +857,11 @@ export class ProfileStateManager {
 
     /**
      * Signal that the active schedule was (re)activated or its metadata changed
-     * (the old `active_schedule_changed` event). Consumers `watch` the
-     * generation; `activationSource` lets them branch on origin.
+     * (the old `active_schedule_changed` event). Publishes a fresh activation
+     * event object; consumers `watch` it and read `.source` to branch on origin.
      */
     private signalActivation(source: string): void {
-        appState.activationSource = source;
-        appState.activationGeneration++;
+        appState.activation = { source };
     }
 
 

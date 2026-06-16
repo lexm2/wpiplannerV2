@@ -7,7 +7,7 @@ import { appState } from '../../core/state/appState.svelte'
 
 /**
  * Fetches and transforms WPI course catalog data with duplicate resolution and HTML sanitization.
- * Signals data load/refresh via `appState` rune generations.
+ * Publishes the catalog by reassigning `appState.loadedDepartments`; consumers react to that.
  */
 export class CourseDataService {
     private static readonly WPI_COURSE_DATA_URL = './course-data-constructed.json';
@@ -22,7 +22,6 @@ export class CourseDataService {
             this.scheduleDB = freshData;
 
             appState.loadedDepartments = freshData.departments;
-            appState.dataLoadGeneration++;
 
             return freshData;
         } catch (error) {
@@ -507,6 +506,5 @@ export class CourseDataService {
         }
 
         appState.loadedDepartments = this.scheduleDB.departments;
-        appState.dataRefreshGeneration++;
     }
 }

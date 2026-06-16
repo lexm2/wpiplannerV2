@@ -68,43 +68,47 @@ export class AppBootstrap {
             courseSelectionService, timestampManager
         } = services;
 
-        watch(() => appState.dataLoadGeneration, () => {
+        // CourseDataService reassigns appState.loadedDepartments (a $state.raw,
+        // always a freshly-built array) on both the initial fetch and every
+        // post-sync refresh, so one watcher keyed on that data covers both —
+        // replacing the old dataLoad/dataRefresh generation counters. `watch`
+        // skips its initial run and subscriptions are wired before loadCourseData,
+        // so the first fire is the initial load; a local flag then routes the
+        // one-time setup vs. the lighter refresh path.
+        let initialLoadDone = false;
+        watch(() => appState.loadedDepartments, () => {
             const departments = appState.loadedDepartments;
             profileStateManager.setCourseData(departments);
-
             courseSelectionService.setAllDepartments(departments);
-            courseSelectionService.reconstructSectionObjects();
-            timestampManager.updateClientTimestamp();
 
-            // Backfill year for existing schedules that lack one
-            const defaultYear = profileStateManager.getDefaultAcademicYear();
-            for (const schedule of profileStateManager.getAllSchedules()) {
-                if (schedule.year === undefined && defaultYear !== undefined) {
-                    profileStateManager.updateSchedule(schedule.id, { year: defaultYear }, 'system');
+            if (!initialLoadDone) {
+                initialLoadDone = true;
+                courseSelectionService.reconstructSectionObjects();
+                timestampManager.updateClientTimestamp();
+
+                // Backfill year for existing schedules that lack one
+                const defaultYear = profileStateManager.getDefaultAcademicYear();
+                for (const schedule of profileStateManager.getAllSchedules()) {
+                    if (schedule.year === undefined && defaultYear !== undefined) {
+                        profileStateManager.updateSchedule(schedule.id, { year: defaultYear }, 'system');
+                    }
                 }
-            }
 
-            // Apply academic year filter based on active schedule's year
-            if (!filterService.hasFilter('academicYear')) {
-                const activeSchedule = profileStateManager.getActiveSchedule();
-                const yearToFilter = activeSchedule?.year ?? defaultYear;
-                if (yearToFilter !== undefined) {
-                    filterService.addFilter('academicYear', { year: yearToFilter });
+                // Apply academic year filter based on active schedule's year
+                if (!filterService.hasFilter('academicYear')) {
+                    const activeSchedule = profileStateManager.getActiveSchedule();
+                    const yearToFilter = activeSchedule?.year ?? defaultYear;
+                    if (yearToFilter !== undefined) {
+                        filterService.addFilter('academicYear', { year: yearToFilter });
+                    }
                 }
+
+                callbacks.setAllDepartments(departments);
+                callbacks.onDataLoaded(departments);
+            } else {
+                callbacks.setAllDepartments(departments);
+                callbacks.onDataRefreshed(departments);
             }
-
-            callbacks.setAllDepartments(departments);
-            callbacks.onDataLoaded(departments);
-        });
-
-        watch(() => appState.dataRefreshGeneration, () => {
-            const departments = appState.loadedDepartments;
-            profileStateManager.setCourseData(departments);
-
-            courseSelectionService.setAllDepartments(departments);
-            callbacks.setAllDepartments(departments);
-
-            callbacks.onDataRefreshed(departments);
         });
     }
 

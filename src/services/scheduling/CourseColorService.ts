@@ -68,9 +68,9 @@ export class CourseColorService {
     setCourseColor(courseId: string, color: string): void {
         this.courseColorMap.set(courseId, color);
         this.usedColors.add(color);
+        // Persists customColor onto the SelectedCourse, which reassigns
+        // appState.selectedCourses — the declarative grid derives off that and
+        // re-colors on its own (no separate signal needed).
         this.courseSelectionService.setCourseColor(courseId, color);
-        // Signal the declarative schedule grid to re-derive block colors (the
-        // course list is unchanged on a recolor, so this is the trigger).
-        appState.colorGeneration++;
     }
 }

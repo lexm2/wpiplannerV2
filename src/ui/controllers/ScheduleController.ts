@@ -466,8 +466,9 @@ export class ScheduleController implements CalendarEventProvider {
     }
 
     setCourseColor(courseId: string, color: string): void {
-        // The color service bumps appState.colorGeneration, which the declarative
-        // grid reads to re-derive block colors — no imperative re-render needed.
+        // The recolor patches the course's customColor onto appState.selectedCourses,
+        // which the declarative grid derives off — re-colors on its own, no
+        // imperative re-render needed.
         this.colorService.setCourseColor(courseId, color);
     }
 
@@ -684,7 +685,7 @@ export class ScheduleController implements CalendarEventProvider {
             }
             // On success the grid re-renders on its own: the orchestrator applied
             // the schedule via batchSetSelectedComponents (appState.selectedCourses).
-            // The footer (AutoScheduleControls) reacts via appState.autoScheduleGeneration.
+            // The footer (AutoScheduleControls) reacts via appState.autoScheduleCount/Index.
         } catch (error) {
             console.error('[Auto-Schedule] Error generating schedules:', error);
             alert('An error occurred while generating the schedule. Please try again.');

@@ -30,13 +30,13 @@
   let refreshTick = $state(0);
 
   const schedules = $derived.by<Schedule[]>(() => {
-    appState.activationGeneration; // dep: re-read on schedule switch
-    appState.selectedById;         // dep: re-read on selection change
-    refreshTick;                   // dep: manual mutations
+    appState.activeScheduleId; // dep: re-read on schedule switch
+    appState.selectedById;     // dep: re-read on selection change
+    refreshTick;               // dep: manual mutations
     return scheduleManagementService.getAllSchedules();
   });
   const activeScheduleId = $derived.by<string | null>(() => {
-    appState.activationGeneration;
+    appState.activeScheduleId;
     refreshTick;
     return scheduleManagementService.getActiveScheduleId();
   });

@@ -35,10 +35,12 @@ export class AutoScheduleOrchestrator {
         this.calendarEventProvider = provider;
     }
 
-    // Bump the rune the declarative AutoScheduleControls footer reads. Replaces
-    // the old onStateChange single-callback into ScheduleController.
+    // Publish the result count + applied index the declarative AutoScheduleControls
+    // footer reads. Replaces the old onStateChange single-callback into
+    // ScheduleController.
     private notifyStateChange(): void {
-        appState.autoScheduleGeneration++;
+        appState.autoScheduleCount = this.generatedSchedules.length;
+        appState.autoScheduleIndex = this.currentScheduleIndex;
     }
 
     setupCourseSelectionChangeListener(): void {

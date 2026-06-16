@@ -220,6 +220,14 @@ function sanitizeClassName(className: string): string {
   return className.replace(/[^a-zA-Z0-9_\-\s]/g, '');
 }
 
+// Output is fully determined by (iconName, className), so memoize it: callers
+// render the same icons via {@html} on every component re-render (e.g. CourseList
+// runs this ~6x per row x 100 rows), and each call otherwise re-does a string
+// .replace(). The set of (icon, class) pairs is small and fixed, so the cache is
+// bounded. Only successful resolutions are cached - the missing-icon path stays
+// uncached so its console.warn keeps surfacing the bug.
+const inlineSVGCache = new Map<string, string>();
+
 /**
  * Helper function to create an inline SVG with custom classes.
  * @param iconName The icon to render
@@ -227,6 +235,10 @@ function sanitizeClassName(className: string): string {
  * @returns HTML string with inline SVG
  */
 export function getInlineSVG(iconName: IconName, className?: string): string {
+  const cacheKey = `${iconName}|${className ?? ''}`;
+  const cached = inlineSVGCache.get(cacheKey);
+  if (cached !== undefined) return cached;
+
   const svg = INLINE_SVGS[iconName];
 
   if (!svg) {
@@ -235,8 +247,9 @@ export function getInlineSVG(iconName: IconName, className?: string): string {
     return className ? fallback.replace('<svg', `<svg class="${sanitizeClassName(className)}"`) : fallback;
   }
 
-  if (!className) return svg;
-
-  const safeClassName = sanitizeClassName(className);
-  return svg.replace('<svg', `<svg class="${safeClassName}"`);
+  const result = className
+    ? svg.replace('<svg', `<svg class="${sanitizeClassName(className)}"`)
+    : svg;
+  inlineSVGCache.set(cacheKey, result);
+  return result;
 }

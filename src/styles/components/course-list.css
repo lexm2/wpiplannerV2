@@ -233,7 +233,6 @@
   gap: 0.25rem;
   align-items: center;
   flex-shrink: 0;
-  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .term-badge {
@@ -311,9 +310,21 @@
   gap: 0.5rem;
   align-items: center;
   flex-wrap: wrap;
-  padding-top: 0;
-  max-height: 0;
-  overflow: visible;
+  padding-top: 0.5rem;
+}
+
+/* Section badges start hidden — declared in CSS (not JS) so the very first
+   painted frame after the {#if} swap is already invisible and they can never
+   flash their finished state. termFlip fades them in one-by-one, cascading
+   diagonally across wrapped rows. */
+.term-sections-container .section-badge {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .term-sections-container .section-badge {
+    opacity: 1;
+  }
 }
 
 .term-badge.active {

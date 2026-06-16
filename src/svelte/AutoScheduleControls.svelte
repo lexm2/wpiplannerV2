@@ -11,25 +11,20 @@
     onOpenAutoSchedule: () => void;
   } = $props();
 
-  // The orchestrator's generated-schedule state lives in plain fields; it bumps
-  // appState.autoScheduleGeneration on every transition (generate / navigate /
-  // reset / selection-invalidation). Reading that rune inside these $derived
-  // makes the footer recompute on its own — replacing ScheduleController's
-  // imperative updateAutoScheduleButtonUI() DOM updates and the orchestrator's
-  // onStateChange callback.
-  const generatedCount = $derived(
-    (appState.autoScheduleGeneration, autoScheduleOrchestrator.getGeneratedSchedules().length)
-  );
-  const currentIndex = $derived(
-    (appState.autoScheduleGeneration, autoScheduleOrchestrator.getCurrentScheduleIndex())
-  );
+  // The orchestrator publishes its result count + applied index to these runes
+  // on every transition (generate / navigate / reset / selection-invalidation),
+  // so the footer's nav + progress bar stay in sync on their own — replacing
+  // ScheduleController's imperative updateAutoScheduleButtonUI() DOM updates and
+  // the orchestrator's onStateChange callback.
+  const generatedCount = $derived(appState.autoScheduleCount);
+  const currentIndex = $derived(appState.autoScheduleIndex);
   const hasSchedules = $derived(generatedCount > 0);
   const progressPct = $derived(hasSchedules ? ((currentIndex + 1) / generatedCount) * 100 : 0);
 
   // Nav re-applies the schedule at the new index via batchSetSelectedComponents,
   // which updates appState.selectedCourses — the declarative grid reacts on its
-  // own, and the orchestrator bumps autoScheduleGeneration so this footer's
-  // progress updates too. No after-navigate callback needed.
+  // own, and the orchestrator publishes appState.autoScheduleIndex so this
+  // footer's progress updates too. No after-navigate callback needed.
   async function prev(): Promise<void> {
     await autoScheduleOrchestrator.navigateSchedule(-1);
   }

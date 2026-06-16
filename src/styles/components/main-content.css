@@ -35,6 +35,12 @@
   display: contents;
 }
 
+/* ViewToggle.svelte mounts here; display:contents lets its two buttons join the
+   .content-controls flex row, matching the filter host above. */
+.view-toggle {
+  display: contents;
+}
+
 .filter-buttons {
   display: flex;
   gap: 0.5rem;

@@ -89,7 +89,7 @@ export class MainController {
 
         // Mount the undo/redo buttons (Svelte). The wrapper holds exactly these
         // two buttons, so clearing + mounting is safe. The component reads
-        // appState.undoRedoGeneration to keep its disabled state in sync —
+        // appState.canUndo/canRedo to keep its disabled state in sync —
         // replacing MainController's imperative updateUndoRedoButtons()/watch().
         // Same ids/classes/titles are preserved so the tutorial and
         // SchedulePicker settings getElementById(...).click() shims keep working.
@@ -99,7 +99,6 @@ export class MainController {
             mount(UndoRedoButtons, {
                 target: undoRedoEl,
                 props: {
-                    profileStateManager: services.profileStateManager,
                     onUndo: () => this.handleUndo(),
                     onRedo: () => this.handleRedo()
                 }
@@ -287,7 +286,7 @@ export class MainController {
         }
 
         // Mount the auto-schedule footer controls (Svelte). It reads
-        // appState.autoScheduleGeneration (a rune the orchestrator bumps) to
+        // appState.autoScheduleCount/Index (runes the orchestrator publishes) to
         // toggle between the Auto-Schedule button and the prev/restart/next nav +
         // progress bar — replacing ScheduleController.setupAutoScheduleButton()
         // and the imperative updateAutoScheduleButtonUI() DOM updates. The
@@ -350,8 +349,8 @@ export class MainController {
 
         // Mount the declarative schedule grids (Svelte). They render the
         // .terms-grid + 4 term grids and are reactive on appState.selectedCourses,
-        // the wizard preview rune, colorGeneration, and activeSchedule.localEvents —
-        // replacing ScheduleController.renderScheduleGrids() and all its imperative
+        // the wizard preview rune, and activeSchedule.localEvents — replacing
+        // ScheduleController.renderScheduleGrids() and all its imperative
         // call sites. Section click → section-info modal; event click → delete
         // confirm; recolor + auto-schedule generate/navigate flow through runes.
         const gridsRootEl = document.getElementById('schedule-grids-root');
@@ -716,12 +715,12 @@ export class MainController {
 
     private setupScheduleChangeListener(): void {
         // React to active-schedule (re)activation via runes.
-        watch(() => appState.activationGeneration, () => {
+        watch(() => appState.activation, () => {
             this.updateSchedulePickerButton();
 
             // Skip reloading events if this was just an exclusion change
             // (the UI already updated optimistically, no need to refetch)
-            if (appState.activationSource === 'calendar-event-exclusion') {
+            if (appState.activation.source === 'calendar-event-exclusion') {
                 return;
             }
 

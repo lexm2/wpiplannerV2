@@ -23,52 +23,43 @@ class AppState {
     hasUnsavedChanges = $state(false);
 
     /**
-     * Bumped whenever the active schedule is (re)activated or its metadata
-     * changes — i.e. the old `active_schedule_changed` trigger. Vanilla
-     * consumers `watch` this to refresh. `activationSource` carries the
-     * originating source (e.g. 'calendar-event-exclusion') so consumers can
-     * preserve source-specific behavior.
+     * The most recent active-schedule (re)activation event — i.e. the old
+     * `active_schedule_changed` trigger. {@link ProfileStateManager} reassigns
+     * this (a fresh object) whenever the active schedule is switched, deleted, or
+     * has its metadata updated; consumers `watch` it to refresh and read `.source`
+     * to branch on origin (e.g. 'calendar-event-exclusion'). A reassigned object
+     * — rather than a counter — fires on exactly these events without the spurious
+     * fires that watching `activeSchedule` identity would bring (it changes on
+     * every course add).
      */
-    activationGeneration = $state(0);
-    activationSource = $state('user');
-
-    /** Bumped after a successful data import (the old 'imported' trigger). */
-    importGeneration = $state(0);
+    activation = $state.raw<{ source: string }>({ source: 'user' });
 
     /**
-     * Bumped whenever the undo/redo history changes (snapshot captured, undo,
-     * redo, or clear) — the old `UndoRedoManager.onChange` trigger. Consumers
-     * `watch` this and re-read `canUndo()`/`canRedo()` to refresh button state.
+     * Whether undo/redo are currently available. {@link UndoRedoManager} writes
+     * these after every history change (capture, undo, redo, clear); the
+     * UndoRedoButtons component reads them directly for its disabled state —
+     * replacing the old generation counter + `canUndo()`/`canRedo()` re-read.
      */
-    undoRedoGeneration = $state(0);
+    canUndo = $state(false);
+    canRedo = $state(false);
 
     /**
-     * Course catalog payload + load signals (the old CourseDataService event
-     * system). `loadedDepartments` holds the latest departments; consumers
-     * `watch` `dataLoadGeneration` (initial fetch) / `dataRefreshGeneration`
-     * (post-sync refresh) and read `loadedDepartments`. Separate generations
-     * because load vs refresh have distinct consumer logic.
+     * Course catalog. CourseDataService reassigns this (a freshly-built array)
+     * on the initial fetch and every post-sync refresh; consumers `watch` it and
+     * distinguish load vs refresh locally (see AppBootstrap.setupCourseDataSubscriptions).
      */
     loadedDepartments = $state.raw<Department[]>([]);
-    dataLoadGeneration = $state(0);
-    dataRefreshGeneration = $state(0);
 
     /**
-     * Bumped whenever the auto-schedule result set changes (generated, navigated,
-     * reset, or invalidated by a selection change) — the old
-     * `AutoScheduleOrchestrator.onStateChange` single-callback into
-     * `ScheduleController.updateAutoScheduleButtonUI`. `AutoScheduleControls`
-     * reads this then re-reads `getGeneratedSchedules()`/`getCurrentScheduleIndex()`.
+     * Generated auto-schedule result count + the currently-applied index.
+     * {@link AutoScheduleOrchestrator} writes these on every transition
+     * (generated, navigated, reset, or invalidated by a selection change); the
+     * AutoScheduleControls footer reads them directly for its nav + progress bar
+     * — replacing the old generation counter and `getGeneratedSchedules()`/
+     * `getCurrentScheduleIndex()` re-reads.
      */
-    autoScheduleGeneration = $state(0);
-
-    /**
-     * Bumped whenever a course's display color changes (recolor via the
-     * section-info modal). The declarative schedule grid reads this so a recolor
-     * re-derives its block colors without the course list itself changing. New
-     * courses get colors via the `selectedCourses` change (no bump needed).
-     */
-    colorGeneration = $state(0);
+    autoScheduleCount = $state(0);
+    autoScheduleIndex = $state(0);
 
     /**
      * True while the auto-scheduler is generating. Drives the declarative
