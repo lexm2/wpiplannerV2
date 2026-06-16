@@ -4,7 +4,6 @@ import { SelectedCourse } from '../../types/schedule'
 import { CourseSelectionService } from '../../services/selection/CourseSelectionService'
 import { CourseDataService } from '../../services/data/courseDataService'
 import { FilterService } from '../../services/filtering/FilterService'
-import { watch } from '../../svelte/reactivity.svelte'
 import { appState } from '../../core/state/appState.svelte'
 import { wizardState } from '../../svelte/wizardState.svelte'
 import { modalState } from '../../svelte/modals/modalState.svelte'
@@ -53,12 +52,6 @@ export class ScheduleController {
         if (this.conflictDetector) {
             this.filterService.setConflictDetector();
         }
-
-        // Refresh the schedule display whenever the active filters change.
-        watch(
-            () => filterService.getActiveFilters(),
-            () => this.applyFiltersAndRefresh(),
-        );
     }
 
     /**
@@ -253,29 +246,6 @@ export class ScheduleController {
 
         const message = `Incomplete: Missing ${missingComponents.join(', ')} selection`;
         return { isIncomplete: true, message };
-    }
-
-    applyFiltersAndRefresh(): void {
-        // The schedule sidebar list shows every selected course (filters only
-        // apply inside the wizard), so the reactive ScheduleSidebar needs no
-        // refresh here — just sync the filter button.
-        this.updateScheduleFilterButtonState();
-    }
-
-    private updateScheduleFilterButtonState(): void {
-        const scheduleFilterButton = document.getElementById('schedule-filter-btn');
-        if (scheduleFilterButton && this.filterService) {
-            const hasActiveFilters = !this.filterService.isEmpty();
-            const filterCount = this.filterService.getFilterCount();
-            
-            if (hasActiveFilters) {
-                scheduleFilterButton.classList.add('active');
-                scheduleFilterButton.title = `${filterCount} filter${filterCount === 1 ? '' : 's'} active - Click to modify`;
-            } else {
-                scheduleFilterButton.classList.remove('active');
-                scheduleFilterButton.title = 'Filter selected courses';
-            }
-        }
     }
 
     async openAutoSchedule(): Promise<void> {

@@ -10,6 +10,7 @@ import ViewToggle from '../../svelte/ViewToggle.svelte'
 import PageTabs from '../../svelte/PageTabs.svelte'
 import FilterButtons from '../../svelte/FilterButtons.svelte'
 import ClearAllSectionsButton from '../../svelte/ClearAllSectionsButton.svelte'
+import ScheduleFilterButton from '../../svelte/ScheduleFilterButton.svelte'
 import { localEventService } from '../../services/scheduling/localEventService'
 import { sectionInfoService } from '../../services/scheduling/sectionInfoService'
 import SearchBar from '../../svelte/SearchBar.svelte'
@@ -408,22 +409,11 @@ export class MainController {
         // Initialize filters and wire up filter change listeners
         AppBootstrap.initializeFilters(services);
 
-        // The course list (CourseList Svelte component) reacts to the filter
-        // store on its own, so the watch only needs to drive the schedule-side
-        // refresh now.
-        watch(
-            () => filterService.getActiveFilters(),
-            () => {
-                this.scheduleController.applyFiltersAndRefresh();
-            },
-        );
-
-        // Initialize the schedule-filter button state. The planner filter trio
-        // (filter / bookmark / clear) is now the FilterButtons Svelte component,
-        // which primes itself from the reactive filter state.
-        setTimeout(() => {
-            this.updateScheduleFilterButtonState();
-        }, 100);
+        // No imperative filter watch needed here: the course list, search bar,
+        // planner filter trio, and the schedule filter button are all Svelte
+        // components that derive their state from the reactive filter store on
+        // their own (the schedule button via ScheduleFilterButton, mounted in
+        // bindEvents).
 
         this.init();
     }
@@ -586,12 +576,19 @@ export class MainController {
         // FilterButtons Svelte component (mounted into #filter-buttons-host). Icon
         // injection, click handlers, and reactive state all live there.
 
-        // Schedule filter button
-        const scheduleFilterButton = document.getElementById('schedule-filter-btn');
-        if (scheduleFilterButton) {
-            scheduleFilterButton.insertAdjacentHTML('afterbegin', getInlineSVG('FILTER_FILLED', 'filter-icon'));
-            scheduleFilterButton.addEventListener('click', () => {
-                this.openFilterModal();
+        // The schedule filter button is the ScheduleFilterButton Svelte component
+        // (mounted into #schedule-filter-slot). Icon injection, click handler, and
+        // reactive active/title state (from the filter store) all live there —
+        // replacing the imperative icon insert + click wiring + the two
+        // updateScheduleFilterButtonState copies and their filter watches.
+        const scheduleFilterSlot = document.getElementById('schedule-filter-slot');
+        if (scheduleFilterSlot) {
+            mount(ScheduleFilterButton, {
+                target: scheduleFilterSlot,
+                props: {
+                    filterService: this.services.filterService,
+                    onFilter: () => this.openFilterModal(),
+                }
             });
         }
 
@@ -625,36 +622,22 @@ export class MainController {
     // restoreTermExpansionState / processPendingExpansions) and the
     // displayCoursesWithCancellation/handleLoadMoreClick rendering path are gone.
 
-    // refreshCurrentView no longer renders the list (CourseList derives the
-    // displayed courses from the reactive filter store on its own). It is still
-    // called from undo/redo (refreshUI) and the data-refresh subscription; it
-    // keeps the schedule-side refresh those paths relied on.
+    // refreshCurrentView is now a no-op: the course list, selected-courses panel,
+    // schedule sidebar, schedule grid, and the schedule filter button are all
+    // reactive Svelte components that derive from appState / the filter store, so
+    // its old job (the imperative schedule-filter-button refresh via
+    // ScheduleController.applyFiltersAndRefresh) is gone. Kept as a no-op so its
+    // remaining callers (ViewToggle.onSelect, onDataRefreshed, refreshUI,
+    // initializeDefaultDepartmentView) stay intact; the call sites + this stub
+    // are slated for the later imperative view-refresh teardown.
     private refreshCurrentView(): void {
-        this.scheduleController.applyFiltersAndRefresh();
     }
 
     // updateFilterButtonState / updateClearFiltersButtonState /
-    // updateBookmarkFilterButtonState were deleted: the planner filter trio is
-    // now the FilterButtons Svelte component, which derives its state from the
-    // reactive filter store. updateScheduleFilterButtonState stays — the
-    // schedule-filter button is co-owned with ScheduleController.
-
-    private updateScheduleFilterButtonState(): void {
-        const scheduleFilterButton = document.getElementById('schedule-filter-btn');
-        if (scheduleFilterButton && this.services.filterService) {
-            const activeYear = this.services.profileStateManager.getActiveSchedule()?.year;
-            const hasNonDefault = this.services.filterService.hasNonDefaultFilters(activeYear);
-            const filterCount = this.services.filterService.getFilterCount();
-
-            if (hasNonDefault) {
-                scheduleFilterButton.classList.add('active');
-                scheduleFilterButton.title = `${filterCount} filter${filterCount === 1 ? '' : 's'} active - Click to modify`;
-            } else {
-                scheduleFilterButton.classList.remove('active');
-                scheduleFilterButton.title = 'Filter selected courses';
-            }
-        }
-    }
+    // updateBookmarkFilterButtonState / updateScheduleFilterButtonState were all
+    // deleted: the planner filter trio is the FilterButtons Svelte component and
+    // the schedule filter button is the ScheduleFilterButton component, both
+    // deriving their state from the reactive filter store.
 
     openSchedulePicker(): void {
         // The schedule picker is now the SchedulePicker Svelte component in the
