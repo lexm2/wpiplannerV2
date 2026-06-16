@@ -2,23 +2,13 @@ import type { UIState, PageId, ViewMode, WizardStep } from '../../types/uiState'
 import { uiState } from './uiState.svelte';
 
 export class UIStateManager {
-    // Reactive state lives in the `uiState` rune store; this manager applies the
-    // DOM side-effects and exposes imperative setters over it.
-
-    // Cached DOM elements for applying effects. The tab `.active` state is now
-    // owned by the PageTabs Svelte component (reading uiState.currentPage), so
-    // no tab elements are cached here — only the still-vanilla page regions.
-    private plannerPage: HTMLElement | null;
-    private schedulePage: HTMLElement | null;
-    private departmentList: HTMLElement | null;
-    private courseContainer: HTMLElement | null;
-
-    constructor() {
-        this.plannerPage = document.getElementById('planner-page');
-        this.schedulePage = document.getElementById('schedule-page');
-        this.departmentList = document.getElementById('department-list');
-        this.courseContainer = document.getElementById('course-container');
-    }
+    // Reactive state lives in the `uiState` rune store; this manager exposes
+    // imperative setters over it. The page-region display toggle is now reactive
+    // (App.svelte binds #planner-page/#schedule-page display to
+    // uiState.currentPage), so this manager no longer applies any DOM effect —
+    // the only remaining DOM touch is the fatal-error fallback (showErrorMessage),
+    // which queries its targets lazily (they're rendered by App.svelte, which
+    // mounts after this manager is constructed).
 
     // --- State access ---
 
@@ -48,7 +38,8 @@ export class UIStateManager {
     setPage(page: PageId): void {
         if (page === uiState.currentPage) return;
         uiState.currentPage = page;
-        this.applyPageEffects();
+        // App.svelte toggles the #planner-page/#schedule-page display reactively
+        // off this rune — no imperative DOM effect needed.
     }
 
     /** @deprecated Use setPage */
@@ -114,24 +105,8 @@ export class UIStateManager {
         // explicitly by the caller.
         uiState.openModals = [];
         uiState.wizard = { isOpen: false, courseId: null, step: null };
-        this.applyPageEffects();
-        // currentView is reflected by the ViewToggle Svelte component reactively.
-    }
-
-    // --- DOM effects (private) ---
-
-    private applyPageEffects(): void {
-        // The tab `.active` state is owned by the PageTabs Svelte component
-        // (reactive on uiState.currentPage). This only toggles the still-vanilla
-        // #planner-page / #schedule-page region display.
-        const page = uiState.currentPage;
-        if (page === 'planner') {
-            if (this.plannerPage) this.plannerPage.style.display = 'grid';
-            if (this.schedulePage) this.schedulePage.style.display = 'none';
-        } else {
-            if (this.plannerPage) this.plannerPage.style.display = 'none';
-            if (this.schedulePage) this.schedulePage.style.display = 'flex';
-        }
+        // Page display + currentView are reflected by App.svelte / the ViewToggle
+        // Svelte component reactively off the runes set above.
     }
 
     // --- Legacy methods ---
@@ -145,12 +120,17 @@ export class UIStateManager {
                </div>`
             : `<div class="error-message">${message}</div>`;
 
-        if (this.departmentList) {
-            this.departmentList.innerHTML = content;
+        // Queried lazily: App.svelte renders these regions and mounts after this
+        // manager is constructed, so caching them in the ctor would capture null.
+        const departmentList = document.getElementById('department-list');
+        const courseContainer = document.getElementById('course-container');
+
+        if (departmentList) {
+            departmentList.innerHTML = content;
         }
 
-        if (this.courseContainer) {
-            this.courseContainer.innerHTML = content;
+        if (courseContainer) {
+            courseContainer.innerHTML = content;
         }
 
         if (onClearData) {
