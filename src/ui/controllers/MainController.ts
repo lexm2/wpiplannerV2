@@ -13,6 +13,7 @@ import SearchBar from '../../svelte/SearchBar.svelte'
 import CourseList from '../../svelte/CourseList.svelte'
 import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
 import CourseDescription from '../../svelte/CourseDescription.svelte'
+import AutoScheduleControls from '../../svelte/AutoScheduleControls.svelte'
 import ModalLayer from '../../svelte/modals/ModalLayer.svelte'
 import { modalState } from '../../svelte/modals/modalState.svelte'
 import { ScheduleController } from './ScheduleController'
@@ -281,6 +282,26 @@ export class MainController {
             });
         }
 
+        // Mount the auto-schedule footer controls (Svelte). It reads
+        // appState.autoScheduleGeneration (a rune the orchestrator bumps) to
+        // toggle between the Auto-Schedule button and the prev/restart/next nav +
+        // progress bar — replacing ScheduleController.setupAutoScheduleButton()
+        // and the imperative updateAutoScheduleButtonUI() DOM updates. The
+        // `#auto-schedule-btn` id is preserved so the tutorial selector keeps
+        // working. onAfterNavigate drives the still-vanilla grid re-render.
+        const autoScheduleFooterEl = document.querySelector('.schedule-sidebar-content-footer');
+        if (autoScheduleFooterEl) {
+            autoScheduleFooterEl.innerHTML = '';
+            mount(AutoScheduleControls, {
+                target: autoScheduleFooterEl,
+                props: {
+                    autoScheduleOrchestrator: this.autoScheduleOrchestrator,
+                    onOpenAutoSchedule: () => this.scheduleController.openAutoSchedule(),
+                    onAfterNavigate: () => this.scheduleController.renderScheduleGrids(),
+                }
+            });
+        }
+
         // Set up course data event subscriptions via AppBootstrap
         AppBootstrap.setupCourseDataSubscriptions(services, {
             setAllDepartments: (departments) => {
@@ -376,7 +397,6 @@ export class MainController {
                 this.scheduleController.loadExternalEvents(activeSchedule);
             }
 
-            this.scheduleController.setupAutoScheduleButton();
             this.scheduleController.setupClearAllSectionsButton();
             this.autoScheduleOrchestrator.setupCourseSelectionChangeListener();
 

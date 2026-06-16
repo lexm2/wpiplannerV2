@@ -51,10 +51,6 @@ export class ScheduleController implements CalendarEventProvider {
         this.autoScheduleOrchestrator = autoScheduleOrchestrator;
         this.sidebarManager = new SidebarManager('schedule-sidebar-content');
         this.setupTermFocusHandlers();
-
-        this.autoScheduleOrchestrator.onStateChange(() => {
-            this.updateAutoScheduleButtonUI();
-        });
     }
 
     setUIStateManager(uiStateManager: UIStateManager): void {
@@ -1441,47 +1437,6 @@ export class ScheduleController implements CalendarEventProvider {
         });
     }
 
-    setupAutoScheduleButton(): void {
-        const autoScheduleBtn = document.getElementById('auto-schedule-btn');
-        if (!autoScheduleBtn) {
-            console.warn('Auto-schedule button not found');
-            return;
-        }
-
-        autoScheduleBtn.insertAdjacentHTML('afterbegin', getInlineSVG('WAND', 'auto-schedule-icon'));
-        autoScheduleBtn.addEventListener('click', () => this.openAutoSchedule());
-
-        // Setup navigation buttons
-        const prevBtn = document.getElementById('schedule-prev-btn');
-        const nextBtn = document.getElementById('schedule-next-btn');
-
-        if (prevBtn) {
-            prevBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_BAR_LEFT', 'schedule-nav-icon'));
-            prevBtn.addEventListener('click', async () => {
-
-                await this.autoScheduleOrchestrator.navigateSchedule(-1);
-                this.renderScheduleGrids();
-                this.updateAutoScheduleButtonUI();
-            });
-        }
-
-        if (nextBtn) {
-            nextBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ARROW_BAR_RIGHT', 'schedule-nav-icon'));
-            nextBtn.addEventListener('click', async () => {
-
-                await this.autoScheduleOrchestrator.navigateSchedule(1);
-                this.renderScheduleGrids();
-                this.updateAutoScheduleButtonUI();
-            });
-        }
-
-        const restartBtn = document.getElementById('schedule-restart-btn');
-        if (restartBtn) {
-            restartBtn.insertAdjacentHTML('afterbegin', getInlineSVG('REFRESH', 'schedule-nav-icon'));
-            restartBtn.addEventListener('click', () => this.openAutoSchedule());
-        }
-    }
-
     setupClearAllSectionsButton(): void {
         const clearAllBtn = document.getElementById('clear-all-sections-btn');
         if (!clearAllBtn) {
@@ -1517,32 +1472,6 @@ export class ScheduleController implements CalendarEventProvider {
                 console.error('Failed to clear all components:', error);
                 alert('Failed to clear sections. Please try again.');
             }
-        }
-    }
-
-    private updateAutoScheduleButtonUI(): void {
-        const btn = document.getElementById('auto-schedule-btn') as HTMLButtonElement;
-        const navButtons = document.getElementById('schedule-nav-buttons');
-        const progressTrack = document.getElementById('schedule-progress-track');
-        const progressBar = document.getElementById('schedule-progress-bar') as HTMLElement | null;
-        if (!btn) return;
-
-        const generatedSchedules = this.autoScheduleOrchestrator.getGeneratedSchedules();
-
-        if (generatedSchedules.length === 0) {
-            btn.style.display = '';
-            btn.innerHTML = `${getInlineSVG('WAND', 'auto-schedule-icon')}<span>Auto-Schedule</span>`;
-            btn.disabled = false;
-            btn.title = 'Automatically generate a schedule';
-            if (navButtons) navButtons.style.display = 'none';
-            if (progressTrack) progressTrack.style.display = 'none';
-            if (progressBar) progressBar.style.width = '0%';
-        } else {
-            btn.style.display = 'none';
-            if (navButtons) navButtons.style.display = 'flex';
-            if (progressTrack) progressTrack.style.display = '';
-            const pct = ((this.autoScheduleOrchestrator.getCurrentScheduleIndex() + 1) / generatedSchedules.length) * 100;
-            if (progressBar) progressBar.style.width = `${pct}%`;
         }
     }
 
@@ -1641,11 +1570,11 @@ export class ScheduleController implements CalendarEventProvider {
             } else {
                 this.renderScheduleGrids();
             }
-            this.updateAutoScheduleButtonUI();
+            // Footer (AutoScheduleControls) reacts via appState.autoScheduleGeneration,
+            // which the orchestrator bumps inside generateSchedules.
         } catch (error) {
             console.error('[Auto-Schedule] Error generating schedules:', error);
             alert('An error occurred while generating the schedule. Please try again.');
-            this.updateAutoScheduleButtonUI();
         } finally {
             overlay.classList.remove('visible');
             overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });

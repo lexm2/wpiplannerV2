@@ -85,6 +85,9 @@ consumer is gone, delete `src/svelte/reactivity.svelte.ts` and this file.
 - Every modal is now a `.svelte` component rendered by the single `src/svelte/modals/ModalLayer.svelte`, gated by `uiState.openModals` (the rune is the sole modal registry). Shell = `Modal.svelte`; payloads = `modalState.svelte.ts`.
 - **11G teardown:** deleted the entire vanilla modal framework — `BaseModal.ts`, `ModalService.ts`, `ModalQueue.ts`, `services.modalService` (field + construction + `ProfileStateManager`/`ScheduleController`/`MainController` wiring). `UIStateManager.closeAllModals()` replaces `ModalService.hideAllModals()` in the tutorial dispatch. Trimmed `types/modal.ts` to just `SectionData`. The full tutorial (all 4 sub-tutorials, all modal types, Back/Next snapshot restore) re-ran clean under Playwright with 0 console errors.
 
+### ✅ Auto-schedule footer → `src/svelte/AutoScheduleControls.svelte` (Phase 12A) — DONE
+- Footer Auto-Schedule button + prev/restart/next nav + progress bar, mounted into `.schedule-sidebar-content-footer`. Reactive on `appState.autoScheduleGeneration` (new rune the `AutoScheduleOrchestrator` bumps on every result-set transition) — replaces `ScheduleController.setupAutoScheduleButton()`/`updateAutoScheduleButtonUI()` and the orchestrator's `onStateChange` single-callback. `#auto-schedule-btn` id preserved for the tutorial. Nav re-applies via the orchestrator then re-renders the (still-vanilla) grid through an `onAfterNavigate` prop.
+
 ### ⬜ Remaining controllers (rough order, lowest-risk first)
-- ScheduleController (calendar/sidebar — Phase 12 decomposition), MainController shell (Phase 13: App.svelte root, LAST).
+- ScheduleController: 12B sidebar (SelectedCourseItem), 12C+D grids (TermGrid), 12E CalendarEventProvider + delete controller. MainController shell (Phase 13: App.svelte root, LAST).
 - Deferred component callbacks (`DualRangeSlider.onChange`, `ComponentSelectionWizard.onSelectionChange`) become Svelte props/events as their hosts convert.

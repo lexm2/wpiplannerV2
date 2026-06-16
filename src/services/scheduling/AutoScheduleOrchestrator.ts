@@ -22,7 +22,6 @@ export class AutoScheduleOrchestrator {
     private courseSelectionService: CourseSelectionService;
     private filterService: FilterService;
     private calendarEventProvider: CalendarEventProvider | null = null;
-    private onStateChangeCallback: (() => void) | null = null;
 
     constructor(
         courseSelectionService: CourseSelectionService,
@@ -36,12 +35,10 @@ export class AutoScheduleOrchestrator {
         this.calendarEventProvider = provider;
     }
 
-    onStateChange(callback: () => void): void {
-        this.onStateChangeCallback = callback;
-    }
-
+    // Bump the rune the declarative AutoScheduleControls footer reads. Replaces
+    // the old onStateChange single-callback into ScheduleController.
     private notifyStateChange(): void {
-        this.onStateChangeCallback?.();
+        appState.autoScheduleGeneration++;
     }
 
     setupCourseSelectionChangeListener(): void {
@@ -80,6 +77,7 @@ export class AutoScheduleOrchestrator {
         this.currentScheduleIndex = (this.currentScheduleIndex + direction + this.generatedSchedules.length) % this.generatedSchedules.length;
 
         await this.applyScheduleAtIndex(this.currentScheduleIndex);
+        this.notifyStateChange();
     }
 
     async generateSchedules(selectedCourses: SelectedCourse[], settings?: AutoScheduleSettings): Promise<boolean> {
@@ -111,6 +109,7 @@ export class AutoScheduleOrchestrator {
             if (!input) {
                 this.generatedSchedules = [];
                 this.currentScheduleIndex = 0;
+                this.notifyStateChange();
                 return false;
             }
 
@@ -120,6 +119,7 @@ export class AutoScheduleOrchestrator {
             if (allSchedules.length === 0) {
                 this.generatedSchedules = [];
                 this.currentScheduleIndex = 0;
+                this.notifyStateChange();
                 return false;
             }
 
@@ -127,12 +127,14 @@ export class AutoScheduleOrchestrator {
             this.currentScheduleIndex = 0;
 
             await this.applyScheduleAtIndex(0);
+            this.notifyStateChange();
             return true;
 
         } catch (error) {
             console.error('[Auto-Schedule] Error generating schedules:', error);
             this.generatedSchedules = [];
             this.currentScheduleIndex = 0;
+            this.notifyStateChange();
             throw error;
         }
     }
@@ -174,5 +176,6 @@ export class AutoScheduleOrchestrator {
     resetSchedules(): void {
         this.generatedSchedules = [];
         this.currentScheduleIndex = 0;
+        this.notifyStateChange();
     }
 }

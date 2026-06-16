@@ -53,6 +53,15 @@ class AppState {
     dataLoadGeneration = $state(0);
     dataRefreshGeneration = $state(0);
 
+    /**
+     * Bumped whenever the auto-schedule result set changes (generated, navigated,
+     * reset, or invalidated by a selection change) — the old
+     * `AutoScheduleOrchestrator.onStateChange` single-callback into
+     * `ScheduleController.updateAutoScheduleButtonUI`. `AutoScheduleControls`
+     * reads this then re-reads `getGeneratedSchedules()`/`getCurrentScheduleIndex()`.
+     */
+    autoScheduleGeneration = $state(0);
+
     /** The active schedule object (new identity whenever it or its id changes). */
     activeSchedule = $derived(
         this.schedules.find(s => s.id === this.activeScheduleId) ?? null
