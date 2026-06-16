@@ -537,7 +537,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             const same = currentTypes.length === desiredTypes.length
                 && desiredTypes.every(t => currentTypes.includes(t));
             if (!same) {
-                services.modalService.hideAllModals();
+                services.uiStateManager.closeAllModals();
                 for (const typeId of [...currentTypes]) {
                     services.uiStateManager.modalClosed(typeId);
                 }
@@ -550,7 +550,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 }
             }
         } else {
-            services.modalService.hideAllModals();
+            services.uiStateManager.closeAllModals();
             for (const typeId of [...currentTypes]) {
                 services.uiStateManager.modalClosed(typeId);
             }

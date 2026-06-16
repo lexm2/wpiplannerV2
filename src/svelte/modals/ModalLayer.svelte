@@ -42,18 +42,16 @@
     getDepartments: () => Department[];
   } = $props();
 
-  // Single declarative modal layer. Renders a Svelte component for each open
-  // modal type-id it KNOWS about (the registry below) and ignores the rest —
-  // vanilla modals (BaseModal/ModalService) push their ids into
-  // uiState.openModals too, but render themselves via ModalService, so the
-  // layer skipping unknown ids avoids any double render.
+  // Single declarative modal layer — the ONLY modal renderer in the app now
+  // that BaseModal/ModalService are gone. Renders a Svelte component for each
+  // open modal type-id in the registry below; uiState.openModals is the sole
+  // modal source of truth.
   //
   // Closing goes through uiStateManager.modalClosed(id) so uiState.openModals
   // stays the single source of truth (keeping tutorial snapshots correct);
   // that removal unmounts the component, after its 200ms hide animation has
   // already played. Payload modals (section-info, delete-local-event) read
-  // their data from modalState (set by the vanilla trigger sites before
-  // modalOpened).
+  // their data from modalState (set by the trigger sites before modalOpened).
 </script>
 
 {#each uiState.openModals as id (id)}

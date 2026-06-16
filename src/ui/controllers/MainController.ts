@@ -27,7 +27,6 @@ import { AppBootstrap } from '../../bootstrap/AppBootstrap'
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer'
 import { watch } from '../../svelte/reactivity.svelte'
 import { appState } from '../../core/state/appState.svelte'
-import type { ModalService } from '../../services/ui/ModalService'
 import type { SelectionSnapshot } from '../../types/scheduling'
 
 /**
@@ -47,7 +46,7 @@ export class MainController {
 
         const {
             profileStateManager, courseDataService, courseSelectionService,
-            conflictDetector, modalService, filterService,
+            conflictDetector, filterService,
             scheduleManagementService, operationManager, uiStateManager
         } = services;
 
@@ -68,7 +67,6 @@ export class MainController {
         this.scheduleController.setFilterService(filterService);
 
         // Set modal controllers for ScheduleController
-        this.scheduleController.setModalService(modalService);
         this.scheduleController.setUIStateManager(uiStateManager);
 
         // Set up schedule update callback for calendar event exclusions
@@ -257,11 +255,10 @@ export class MainController {
 
         // Mount the declarative Svelte modal layer (ModalLayer) into #modal-root,
         // once. It reads uiState.openModals (a rune) and renders a Svelte
-        // component for each open id it knows about (currently just
-        // 'mobile-notice'), ignoring ids owned by the still-vanilla modals
-        // (BaseModal/ModalService append to document.body, not #modal-root, so
-        // there's no double render). Closing routes through
-        // uiStateManager.modalClosed so the rune stays the single source of truth.
+        // component for each open id. Every modal is now declarative — there is
+        // no vanilla ModalService/BaseModal layer left, so openModals is the
+        // sole modal registry. Closing routes through uiStateManager.modalClosed
+        // so the rune stays the single source of truth.
         // `tutorial` is passed as a THUNK, not a value: services.tutorial is
         // assigned in main.ts AFTER this constructor runs (setupTutorial needs
         // the constructed MainController), so a static prop would capture
@@ -984,10 +981,6 @@ export class MainController {
         } else {
             this.services.themeManager.setTheme('wpi-dark');
         }
-    }
-
-    public getModalService(): ModalService {
-        return this.services.modalService;
     }
 
     private getAllCourses(): Course[] {

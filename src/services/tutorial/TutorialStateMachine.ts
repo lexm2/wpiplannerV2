@@ -28,7 +28,7 @@ export class TutorialStateMachine {
         const snapshot = this.snapshots.get(stepIndex);
         if (!snapshot) return;
 
-        this.services.modalService.hideAllModals();
+        this.services.uiStateManager.closeAllModals();
         this.mainController.closeWizard();
 
         this.services.profileStateManager.restoreTutorialState({

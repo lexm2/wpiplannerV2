@@ -81,6 +81,10 @@ consumer is gone, delete `src/svelte/reactivity.svelte.ts` and this file.
 - Note: old `multi-select-active` class was applied to `#department-list` (class `department-categories`) but CSS only matches `.department-list.multi-select-active` → never had effect → omitted. `.sidebar-header h2` doesn't exist → that branch was dead → omitted.
 - Verified at runtime (Playwright): renders all categories/counts, click filters course list + toggles active, deselect→All, category collapse toggles `aria-expanded`/`expanded`; 0 console errors. `bun run build` clean (a11y warnings suppressed via comma-separated `svelte-ignore`).
 
+### ✅ Modal layer → declarative ModalLayer (Phase 11, all sub-units A–G) — DONE
+- Every modal is now a `.svelte` component rendered by the single `src/svelte/modals/ModalLayer.svelte`, gated by `uiState.openModals` (the rune is the sole modal registry). Shell = `Modal.svelte`; payloads = `modalState.svelte.ts`.
+- **11G teardown:** deleted the entire vanilla modal framework — `BaseModal.ts`, `ModalService.ts`, `ModalQueue.ts`, `services.modalService` (field + construction + `ProfileStateManager`/`ScheduleController`/`MainController` wiring). `UIStateManager.closeAllModals()` replaces `ModalService.hideAllModals()` in the tutorial dispatch. Trimmed `types/modal.ts` to just `SectionData`. The full tutorial (all 4 sub-tutorials, all modal types, Back/Next snapshot restore) re-ran clean under Playwright with 0 console errors.
+
 ### ⬜ Remaining controllers (rough order, lowest-risk first)
-- CourseController, ScheduleController, the modal controllers, MainController shell.
+- ScheduleController (calendar/sidebar — Phase 12 decomposition), MainController shell (Phase 13: App.svelte root, LAST).
 - Deferred component callbacks (`DualRangeSlider.onChange`, `ComponentSelectionWizard.onSelectionChange`) become Svelte props/events as their hosts convert.

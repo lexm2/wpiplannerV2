@@ -14,7 +14,6 @@ import { getComputedTerm, validateSelectedCourses, getDisplayTerms } from '../..
 import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../../types/schedule'
 import { getInlineSVG } from '../../utils/iconPaths'
 import { Validators } from '../../utils/validators'
-import { ModalService } from '../../services/ui/ModalService'
 import type { UIStateManager } from '../../services/ui/UIStateManager'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator, type CalendarEventProvider } from '../../services/scheduling/AutoScheduleOrchestrator'
@@ -37,7 +36,6 @@ export class ScheduleController implements CalendarEventProvider {
     private currentSchedule: Schedule | null = null;
     private onScheduleUpdate: ((scheduleId: string, updates: Partial<Schedule>) => void) | null = null;
     private sidebarManager: SidebarManager;
-    private modalService: ModalService | null = null;
     private uiStateManager: UIStateManager | null = null;
 
     // Performance optimization: Caching infrastructure for grid rendering
@@ -57,13 +55,6 @@ export class ScheduleController implements CalendarEventProvider {
         this.autoScheduleOrchestrator.onStateChange(() => {
             this.updateAutoScheduleButtonUI();
         });
-    }
-
-    /**
-     * Set the ModalService for opening modals from this controller.
-     */
-    setModalService(modalService: ModalService): void {
-        this.modalService = modalService;
     }
 
     setUIStateManager(uiStateManager: UIStateManager): void {
@@ -1276,7 +1267,7 @@ export class ScheduleController implements CalendarEventProvider {
             const externalBlock = target.closest('.external-event-block') as HTMLElement | null;
             if (externalBlock) {
                 const eventId = externalBlock.dataset.eventId;
-                if (eventId && this.currentSchedule && this.modalService) {
+                if (eventId && this.currentSchedule && this.uiStateManager) {
                     event.stopPropagation();
                     const localEvent = (this.currentSchedule.localEvents || []).find(e => e.id === eventId);
                     const title = localEvent?.title || 'Untitled Event';
@@ -1570,13 +1561,13 @@ export class ScheduleController implements CalendarEventProvider {
             return;
         }
 
-        if (!this.modalService) {
-            console.error('[Auto-Schedule] Modal service not available');
+        if (!this.uiStateManager) {
+            console.error('[Auto-Schedule] UI state manager not available');
             await this.doGenerateSchedules(selectedCourses, { blockedTimes: [] });
             return;
         }
 
-        // Declarative intro modal → its onNext opens the (still-vanilla) filter
+        // Declarative intro modal → its onNext opens the declarative filter
         // modal with the term-filtered courses. This replaces the old ModalQueue
         // intro→filter sequencing with plain state + a continuation callback.
         modalState.autoScheduleIntro = {

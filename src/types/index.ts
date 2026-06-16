@@ -46,13 +46,6 @@ export type {
 export { PeriodType, DayOfWeek, Semester, SectionType } from './types';
 export { ApplicationState } from './ApplicationState';
 export type {
-  IModal,
-  ModalOptions,
-  ModalType as BaseModalType,
-  ModalEventType,
-  ModalEvent,
-} from './modal';
-export type {
   ComponentSelections,
   CourseComponentSelections,
   SelectionSnapshot,

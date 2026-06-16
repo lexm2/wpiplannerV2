@@ -81,6 +81,14 @@ export class UIStateManager {
         uiState.openModals = uiState.openModals.filter(id => id !== typeId);
     }
 
+    // Close every open modal at once. The declarative ModalLayer unmounts each
+    // component when its id leaves uiState.openModals (after its hide animation).
+    // Replaces the old ModalService.hideAllModals() the tutorial used to call.
+    closeAllModals(): void {
+        if (uiState.openModals.length === 0) return;
+        uiState.openModals = [];
+    }
+
     // --- Wizard tracking ---
 
     wizardOpened(courseId: string, step: WizardStep): void {

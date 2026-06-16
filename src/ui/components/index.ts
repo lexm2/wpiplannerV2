@@ -1,4 +1,3 @@
-export { BaseModal } from './BaseModal';
 export type { DualRangeSliderOptions } from './DualRangeSlider';
 export { DualRangeSlider } from './DualRangeSlider';
 export type {

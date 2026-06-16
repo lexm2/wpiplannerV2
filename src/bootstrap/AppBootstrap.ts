@@ -1,7 +1,6 @@
 import { CourseDataService } from '../services/data/courseDataService'
 import { CourseSelectionService } from '../services/selection/CourseSelectionService'
 import { BitMaskEngine } from '../core/scheduling/BitMaskEngine'
-import { ModalService } from '../services/ui/ModalService'
 import { FilterService } from '../services/filtering/FilterService'
 import { ScheduleManagementService } from '../services/selection/ScheduleManagementService'
 import { ProfileStateManager } from '../core/state/ProfileStateManager'
@@ -30,8 +29,6 @@ export class AppBootstrap {
         const courseDataService = new CourseDataService();
         const courseSelectionService = new CourseSelectionService(profileStateManager);
         const conflictDetector = new BitMaskEngine();
-        const modalService = new ModalService();
-        profileStateManager.setModalService(modalService);
 
         const filterService = new FilterService({
             getBookmarkedCourseIds: () => profileStateManager.getBookmarkedCourseIds()
@@ -49,7 +46,6 @@ export class AppBootstrap {
             courseDataService,
             courseSelectionService,
             conflictDetector,
-            modalService,
             filterService,
             scheduleManagementService,
             themeManager,

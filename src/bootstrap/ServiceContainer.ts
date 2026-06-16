@@ -3,7 +3,6 @@ import { StorageService } from '../services/selection/StorageService'
 import { CourseDataService } from '../services/data/courseDataService'
 import { CourseSelectionService } from '../services/selection/CourseSelectionService'
 import { BitMaskEngine } from '../core/scheduling/BitMaskEngine'
-import { ModalService } from '../services/ui/ModalService'
 import { FilterService } from '../services/filtering/FilterService'
 import { ScheduleManagementService } from '../services/selection/ScheduleManagementService'
 import { ThemeManager } from '../themes/ThemeManager'
@@ -19,7 +18,6 @@ export interface ServiceContainer {
     courseDataService: CourseDataService;
     courseSelectionService: CourseSelectionService;
     conflictDetector: BitMaskEngine;
-    modalService: ModalService;
     filterService: FilterService;
     scheduleManagementService: ScheduleManagementService;
     themeManager: ThemeManager;

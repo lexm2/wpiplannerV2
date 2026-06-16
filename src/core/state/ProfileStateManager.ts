@@ -7,7 +7,6 @@ import { getAllSections, setReplacer, setReviver, logger } from '../../utils'
 import { UndoRedoManager } from './UndoRedoManager'
 import { appState } from './appState.svelte'
 import { TermBoundsService } from '../../utils/termBounds'
-import { ModalService } from '../../services/ui'
 
 export interface ProfileState {
     activeScheduleId: string | null;
@@ -61,10 +60,6 @@ export class ProfileStateManager {
             ProfileStateManager.instance.destroy();
             ProfileStateManager.instance = null;
         }
-    }
-
-    setModalService(_modalService: ModalService): void {
-        // Reserved for future use
     }
 
     private setupBeforeUnloadHandler(): void {
