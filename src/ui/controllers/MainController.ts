@@ -9,6 +9,7 @@ import UndoRedoButtons from '../../svelte/UndoRedoButtons.svelte'
 import ViewToggle from '../../svelte/ViewToggle.svelte'
 import PageTabs from '../../svelte/PageTabs.svelte'
 import FilterButtons from '../../svelte/FilterButtons.svelte'
+import ClearAllSectionsButton from '../../svelte/ClearAllSectionsButton.svelte'
 import SearchBar from '../../svelte/SearchBar.svelte'
 import CourseList from '../../svelte/CourseList.svelte'
 import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
@@ -464,7 +465,18 @@ export class MainController {
                 this.scheduleController.loadExternalEvents(activeSchedule);
             }
 
-            this.scheduleController.setupClearAllSectionsButton();
+            // Mount the declarative clear-all-sections button into its sidebar
+            // slot — replaces ScheduleController.setupClearAllSectionsButton().
+            const clearAllSlotEl = document.getElementById('clear-all-sections-slot');
+            if (clearAllSlotEl) {
+                mount(ClearAllSectionsButton, {
+                    target: clearAllSlotEl,
+                    props: {
+                        courseSelectionService: this.services.courseSelectionService,
+                    }
+                });
+            }
+
             this.autoScheduleOrchestrator.setupCourseSelectionChangeListener();
 
             // The SELECTED-courses panel is the SelectedCoursesPanel Svelte

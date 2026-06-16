@@ -11,7 +11,6 @@ import { modalState } from '../../svelte/modals/modalState.svelte'
 import { schedulePreviewState } from '../../svelte/schedule/schedulePreviewState.svelte'
 import { BitMaskEngine } from '../../core/scheduling/BitMaskEngine'
 import type { WeeklyTimeSlot } from '../../types/schedule'
-import { getInlineSVG } from '../../utils/iconPaths'
 import type { UIStateManager } from '../../services/ui/UIStateManager'
 import { CourseColorService } from '../../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator'
@@ -460,44 +459,6 @@ export class ScheduleController {
         // Show modal via the declarative modal layer
         modalState.sectionInfo = sectionData;
         this.uiStateManager?.modalOpened('section-info');
-    }
-
-    setupClearAllSectionsButton(): void {
-        const clearAllBtn = document.getElementById('clear-all-sections-btn');
-        if (!clearAllBtn) {
-            console.warn('Clear all sections button not found');
-            return;
-        }
-
-        clearAllBtn.insertAdjacentHTML('afterbegin', getInlineSVG('ERASER', 'clear-all-eraser-icon'));
-        clearAllBtn.addEventListener('click', () => this.handleClearAllSections());
-    }
-
-    private async handleClearAllSections(): Promise<void> {
-        const selectedCourses = this.courseSelectionService.getSelectedCourses();
-
-        if (selectedCourses.length === 0) {
-            alert('No courses selected.');
-            return;
-        }
-
-        const hasAnySections = selectedCourses.some(sc =>
-            sc.selectedLecture || sc.selectedDiscussion || sc.selectedLab
-        );
-
-        if (!hasAnySections) {
-            alert('No sections selected to clear.');
-            return;
-        }
-
-        if (confirm('Clear all selected sections for all courses?')) {
-            try {
-                await this.courseSelectionService.clearAllComponents();
-            } catch (error) {
-                console.error('Failed to clear all components:', error);
-                alert('Failed to clear sections. Please try again.');
-            }
-        }
     }
 
     async openAutoSchedule(): Promise<void> {
