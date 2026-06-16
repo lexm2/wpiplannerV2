@@ -17,7 +17,7 @@ if (DeviceDetection.isMobilePhone()) {
     services.uiStateManager.modalOpened('mobile-notice');
 }
 
-services.tutorial = setupTutorial(services, mainController);
+services.tutorial = setupTutorial(services);
 
 // Expose main controller globally for development/testing
 declare global {

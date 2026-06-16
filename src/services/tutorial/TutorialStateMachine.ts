@@ -1,6 +1,8 @@
 import type { TutorialSnapshot } from '../../types/tutorial';
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
-import type { MainController } from '../../ui/controllers/MainController';
+import { componentWizardService } from '../../services/scheduling/componentWizardService';
+import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
+import { modalState } from '../../svelte/modals/modalState.svelte';
 import { setReplacer, setReviver } from '../../utils';
 
 export class TutorialStateMachine {
@@ -8,7 +10,6 @@ export class TutorialStateMachine {
 
     constructor(
         private services: ServiceContainer,
-        private mainController: MainController,
     ) {}
 
     captureSnapshot(stepIndex: number): void {
@@ -29,7 +30,7 @@ export class TutorialStateMachine {
         if (!snapshot) return;
 
         this.services.uiStateManager.closeAllModals();
-        this.mainController.closeWizard();
+        componentWizardService.closeComponentWizard();
 
         this.services.profileStateManager.restoreTutorialState({
             activeScheduleId: snapshot.activeScheduleId,
@@ -45,10 +46,12 @@ export class TutorialStateMachine {
         this.services.uiStateManager.restoreState(snapshot.uiState);
 
         if (snapshot.uiState.wizard.isOpen && snapshot.uiState.wizard.courseId) {
-            this.mainController.openWizardForCourse(
-                snapshot.uiState.wizard.courseId,
-                snapshot.uiState.wizard.step ?? undefined
-            );
+            const { courseId, step } = snapshot.uiState.wizard;
+            const selected = this.services.courseSelectionService.getSelectedCourses()
+                .find(sc => sc.course.id === courseId);
+            if (selected) {
+                componentWizardService.openComponentWizard(selected.course, selected, step ?? undefined);
+            }
         }
 
         for (const typeId of snapshot.uiState.openModals) {
@@ -67,19 +70,20 @@ export class TutorialStateMachine {
     private reopenModal(typeId: string): void {
         switch (typeId) {
             case 'filter-modal':
-                this.mainController.openFilterModal();
+                modalState.filter = { mode: 'filter' };
+                this.services.uiStateManager.modalOpened('filter-modal');
                 break;
             case 'schedule-picker':
-                this.mainController.openSchedulePicker();
+                this.services.uiStateManager.modalOpened('schedule-picker');
                 break;
             case 'auto-schedule':
-                this.mainController.openAutoSchedule();
+                autoScheduleService.openAutoSchedule();
                 break;
             case 'auto-schedule-intro':
-                this.mainController.openAutoScheduleIntro();
+                autoScheduleService.openAutoScheduleIntro();
                 break;
             case 'auto-schedule-filter':
-                this.mainController.openAutoScheduleFilter();
+                autoScheduleService.openAutoScheduleFilter();
                 break;
         }
     }

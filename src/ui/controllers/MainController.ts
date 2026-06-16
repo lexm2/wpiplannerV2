@@ -1,4 +1,4 @@
-import type { PageId, WizardStep } from '../../types/uiState'
+import type { PageId } from '../../types/uiState'
 import { uiState } from '../../services/ui/uiState.svelte'
 import { Course, Department } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
@@ -417,21 +417,6 @@ export class MainController {
         this.init();
     }
 
-    closeWizard(): void {
-        componentWizardService.closeComponentWizard();
-    }
-
-    openWizardForCourse(courseId: string, initialStep?: WizardStep): void {
-        const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
-        const selected = selectedCourses.find(sc => sc.course.id === courseId);
-        if (!selected) return;
-        componentWizardService.openComponentWizard(selected.course, selected, initialStep);
-    }
-
-    jumpWizardToStep(step: WizardStep): void {
-        componentWizardService.jumpWizardToStep(step);
-    }
-
     private async init(): Promise<void> {
         // The DepartmentSidebar component shows its own loading state until
         // appState.loadedDepartments is populated.
@@ -640,54 +625,11 @@ export class MainController {
         this.services.uiStateManager.modalOpened('schedule-picker');
     }
 
-    navigateSchedulePickerToTab(tab: 'schedules' | 'settings'): void {
-        // Tutorial tab-navigation channel — SchedulePicker reads this and applies
-        // it to its local active tab, then clears it.
-        modalState.schedulePickerTab = tab;
-    }
-
     openFilterModal(): void {
         // Planner + schedule filter both open the declarative FilterModal in
         // 'filter' mode (id 'filter-modal'); ModalLayer renders it.
         modalState.filter = { mode: 'filter' };
         this.services.uiStateManager.modalOpened('filter-modal');
-    }
-
-    openAutoSchedule(): void {
-        autoScheduleService.openAutoSchedule();
-    }
-
-    openAutoScheduleIntro(): void {
-        autoScheduleService.openAutoScheduleIntro();
-    }
-
-    openAutoScheduleFilter(): void {
-        autoScheduleService.openAutoScheduleFilter();
-    }
-
-    updateAutoScheduleIntroTerms(preferences: Record<string, string[]>): void {
-        autoScheduleService.updateAutoScheduleIntroTerms(preferences);
-    }
-
-    refreshAutoScheduleFilterUI(): void {
-        autoScheduleService.refreshAutoScheduleFilterUI();
-    }
-
-    refreshPlannerFilterUI(): void {
-        // Re-sync the open FilterModal's checkboxes from filterService (tutorial
-        // back-navigation). The component responds to this tick.
-        modalState.filterRefreshTick++;
-    }
-
-    syncCourseSelectionUI(): void {
-        // No-op: both the course LIST (CourseList) and the SELECTED-courses panel
-        // (SelectedCoursesPanel) are reactive Svelte components reading
-        // appState, so there is nothing to imperatively refresh. Kept as a
-        // stable entry point because setupTutorial.ts still calls it.
-    }
-
-    runAutoSchedule(): void {
-        autoScheduleService.runAutoSchedule();
     }
 
     private async updateSchedulePickerButton(): Promise<void> {

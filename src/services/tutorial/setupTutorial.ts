@@ -3,8 +3,10 @@ import { TutorialStateMachine } from './TutorialStateMachine';
 import { FloatingTextBox } from '../../ui/components/FloatingTextBox';
 import { appState } from '../../core/state/appState.svelte';
 import { watch } from '../../svelte/reactivity.svelte';
+import { componentWizardService } from '../../services/scheduling/componentWizardService';
+import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
+import { modalState } from '../../svelte/modals/modalState.svelte';
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
-import type { MainController } from '../../ui/controllers/MainController';
 
 export interface TutorialEntry {
     id: string;
@@ -17,9 +19,9 @@ export interface TutorialSetup {
     start: (id: string) => Promise<void>;
 }
 
-export function setupTutorial(services: ServiceContainer, mainController: MainController): TutorialSetup {
+export function setupTutorial(services: ServiceContainer): TutorialSetup {
     const tutorialService = new TutorialService();
-    const stateMachine = new TutorialStateMachine(services, mainController);
+    const stateMachine = new TutorialStateMachine(services);
     let filteringStarted = false;
     let autoScheduleStarted = false;
     let schedulesStarted = false;
@@ -47,7 +49,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                 : null;
             await services.courseSelectionService.setSelectedComponents(course, group?.section ?? null, disc, lab);
         }
-        mainController.syncCourseSelectionUI();
     }
 
     async function sharedSetup() {
@@ -70,7 +71,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         if (setVisited) {
             localStorage.setItem('wpi_visited', 'true');
         }
-        mainController.closeWizard();
+        componentWizardService.closeComponentWizard();
         services.filterService.clearFilters();
         if (previousScheduleId) {
             await services.scheduleManagementService.setActiveSchedule(previousScheduleId);
@@ -95,7 +96,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     tutorialService.register({
         id: 'welcome',
         onStart: () => {
-            mainController.closeWizard();
+            componentWizardService.closeComponentWizard();
             services.uiStateManager.setPage('planner');
         },
         steps: [
@@ -178,7 +179,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         tutorialService.register({
             id: 'filtering',
             onStart: async () => {
-                mainController.closeWizard();
+                componentWizardService.closeComponentWizard();
                 services.uiStateManager.setPage('schedule');
                 const selections: Array<[string, string, string | null, string | null]> = [
                     ['TUT-2001', 'TAL01', null, 'TAX01'],
@@ -338,7 +339,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     tutorialService.register({
         id: 'autoSchedule',
         onStart: async () => {
-            mainController.closeWizard();
+            componentWizardService.closeComponentWizard();
             await services.profileStateManager.withBatch(async () => {
                 for (const id of ['TUT-2001', 'TUT-2002', 'TUT-2003', 'TUT-2004', 'TUT-2005', 'TUT-2006', 'TUT-2007', 'TUT-2008', 'TUT-2009', 'TUT-2010', 'TUT-2011', 'TUT-2012']) {
                     const c = getTutorialCourse(id);
@@ -439,7 +440,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
         id: 'schedules',
         lastStepLabel: 'Finish',
         onStart: () => {
-            mainController.closeWizard();
+            componentWizardService.closeComponentWizard();
             services.uiStateManager.setPage('planner');
         },
         steps: [
@@ -511,14 +512,14 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
 
     tutorialService.onPostTransition((appState) => {
         if (appState?.autoScheduleTermPrefs) {
-            mainController.updateAutoScheduleIntroTerms(appState.autoScheduleTermPrefs);
+            autoScheduleService.updateAutoScheduleIntroTerms(appState.autoScheduleTermPrefs);
         }
         if (appState?.refreshFilterUI) {
-            mainController.refreshAutoScheduleFilterUI();
-            mainController.refreshPlannerFilterUI();
+            autoScheduleService.refreshAutoScheduleFilterUI();
+            modalState.filterRefreshTick++;
         }
         if (appState?.runAutoSchedule) {
-            mainController.runAutoSchedule();
+            autoScheduleService.runAutoSchedule();
         }
     });
 
@@ -527,9 +528,14 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             services.uiStateManager.setPage(uiState.currentPage);
         }
         if (uiState.wizard?.isOpen && uiState.wizard.courseId) {
-            mainController.openWizardForCourse(uiState.wizard.courseId, uiState.wizard.step ?? undefined);
+            const { courseId, step } = uiState.wizard;
+            const selected = services.courseSelectionService.getSelectedCourses()
+                .find(sc => sc.course.id === courseId);
+            if (selected) {
+                componentWizardService.openComponentWizard(selected.course, selected, step ?? undefined);
+            }
         } else if (uiState.wizard && !uiState.wizard.isOpen) {
-            mainController.closeWizard();
+            componentWizardService.closeComponentWizard();
         }
         const currentTypes = services.uiStateManager.getState().openModals;
         if (uiState.openModals !== undefined) {
@@ -542,11 +548,14 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
                     services.uiStateManager.modalClosed(typeId);
                 }
                 for (const modalId of desiredTypes) {
-                    if (modalId === 'filter-modal') mainController.openFilterModal();
-                    if (modalId === 'schedule-picker') mainController.openSchedulePicker();
-                    if (modalId === 'auto-schedule') mainController.openAutoSchedule();
-                    if (modalId === 'auto-schedule-intro') mainController.openAutoScheduleIntro();
-                    if (modalId === 'auto-schedule-filter') mainController.openAutoScheduleFilter();
+                    if (modalId === 'filter-modal') {
+                        modalState.filter = { mode: 'filter' };
+                        services.uiStateManager.modalOpened('filter-modal');
+                    }
+                    if (modalId === 'schedule-picker') services.uiStateManager.modalOpened('schedule-picker');
+                    if (modalId === 'auto-schedule') autoScheduleService.openAutoSchedule();
+                    if (modalId === 'auto-schedule-intro') autoScheduleService.openAutoScheduleIntro();
+                    if (modalId === 'auto-schedule-filter') autoScheduleService.openAutoScheduleFilter();
                 }
             }
         } else {
@@ -556,7 +565,7 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
             }
         }
         if (uiState.schedulePickerTab) {
-            mainController.navigateSchedulePickerToTab(uiState.schedulePickerTab);
+            modalState.schedulePickerTab = uiState.schedulePickerTab;
         }
     });
 
@@ -587,7 +596,6 @@ export function setupTutorial(services: ServiceContainer, mainController: MainCo
     const floatingTextBox = new FloatingTextBox(tutorialService);
     floatingTextBox.setGoBack(async () => {
         await tutorialService.goBack((targetIndex) => stateMachine.restoreSnapshot(targetIndex));
-        mainController.syncCourseSelectionUI();
     });
     floatingTextBox.mount();
 
