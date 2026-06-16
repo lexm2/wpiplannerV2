@@ -14,6 +14,8 @@ import CourseList from '../../svelte/CourseList.svelte'
 import SelectedCoursesPanel from '../../svelte/SelectedCoursesPanel.svelte'
 import CourseDescription from '../../svelte/CourseDescription.svelte'
 import AutoScheduleControls from '../../svelte/AutoScheduleControls.svelte'
+import ScheduleSidebar from '../../svelte/ScheduleSidebar.svelte'
+import CalendarEventsButton from '../../svelte/CalendarEventsButton.svelte'
 import ModalLayer from '../../svelte/modals/ModalLayer.svelte'
 import { modalState } from '../../svelte/modals/modalState.svelte'
 import { ScheduleController } from './ScheduleController'
@@ -302,6 +304,37 @@ export class MainController {
             });
         }
 
+        // Mount the schedule sidebar's selected-courses list (Svelte). It reads
+        // appState.selectedCourses (a rune) and re-renders on add/remove/section
+        // change — replacing ScheduleController.displayScheduleSelectedCourses()
+        // and the global .course-remove-btn/.course-clear-sections-btn/
+        // .schedule-course-header click delegation. It mounts into a
+        // display:contents child wrapper so the vanilla ComponentSelectionWizard
+        // panel (appendChild'd to #schedule-sidebar-content) survives as a sibling.
+        const scheduleCoursesEl = document.getElementById('schedule-sidebar-courses');
+        if (scheduleCoursesEl) {
+            mount(ScheduleSidebar, {
+                target: scheduleCoursesEl,
+                props: {
+                    courseSelectionService: services.courseSelectionService,
+                    getIncompleteInfo: (sc: SelectedCourse) => this.scheduleController.getIncompleteSelectionInfo(sc),
+                    onOpenWizard: (course: Course, existing: SelectedCourse | undefined) => this.scheduleController.openComponentWizard(course, existing),
+                }
+            });
+        }
+
+        // Mount the always-present Calendar Events button into the sidebar header
+        // slot — replaces ScheduleController.renderCalendarEventsHeader().
+        const calendarSlotEl = document.getElementById('calendar-events-header-slot');
+        if (calendarSlotEl) {
+            mount(CalendarEventsButton, {
+                target: calendarSlotEl,
+                props: {
+                    onClick: () => this.scheduleController.openCalendarEventsPanel(),
+                }
+            });
+        }
+
         // Set up course data event subscriptions via AppBootstrap
         AppBootstrap.setupCourseDataSubscriptions(services, {
             setAllDepartments: (departments) => {
@@ -447,7 +480,6 @@ export class MainController {
     private handleSwipeLeft(): void {
         if (this.services.uiStateManager.getCurrentPage() === 'planner') {
             this.services.uiStateManager.switchToPage('schedule');
-            this.scheduleController.displayScheduleSelectedCourses();
             this.scheduleController.renderScheduleGrids();
         }
     }
@@ -468,92 +500,18 @@ export class MainController {
             this.services.uiStateManager.switchToPage('planner');
         } else {
             this.services.uiStateManager.switchToPage('schedule');
-            this.scheduleController.displayScheduleSelectedCourses();
             this.scheduleController.renderScheduleGrids();
         }
     }
 
 
     private setupEventListeners(): void {
-        // Department selection is handled inside the DepartmentSidebar Svelte component.
-        document.addEventListener('click', (e) => {
-            const target = e.target as HTMLElement;
-
-            // The course LIST (term-badge expansion, select/bookmark buttons,
-            // load-more, and opening a course's description) is now owned by the
-            // CourseList Svelte component mounted into #course-container.
-
-            if (target.classList.contains('course-remove-btn')) {
-                e.stopPropagation();
-                const courseId = (target as HTMLElement).dataset.courseId;
-
-                if (courseId) {
-                    const selectedCourse = this.services.profileStateManager.getSelectedCourses().find(sc => sc.course.id === courseId);
-                    if (selectedCourse) {
-                        this.services.courseSelectionService.unselectCourse(selectedCourse.course).catch(error => {
-                            console.error('Failed to unselect course:', error);
-                            this.services.uiStateManager.showErrorMessage('Failed to remove course. Please try again.');
-                        });
-                    }
-                }
-                return;
-            }
-
-            if (target.classList.contains('course-clear-sections-btn')) {
-                e.stopPropagation();
-                const courseId = (target as HTMLElement).dataset.courseId;
-
-                if (courseId) {
-                    const selectedCourse = this.services.profileStateManager.getSelectedCourses().find(sc => sc.course.id === courseId);
-                    if (selectedCourse) {
-                        this.services.courseSelectionService.clearCourseComponents(selectedCourse.course).catch(error => {
-                            console.error('Failed to clear course components:', error);
-                            this.services.uiStateManager.showErrorMessage('Failed to clear sections. Please try again.');
-                        });
-                    }
-                }
-                return;
-            }
-
-            // Handle clicking on schedule course header to open wizard
-            if (target.classList.contains('schedule-course-header') || target.closest('.schedule-course-header')) {
-                e.stopPropagation();
-
-                if (this.services.uiStateManager.currentPage === 'schedule') {
-                    // Don't trigger if clicking remove button
-                    if (target.classList.contains('course-remove-btn')) {
-                        return;
-                    }
-
-                    const headerElement = target.classList.contains('schedule-course-header')
-                        ? target
-                        : target.closest('.schedule-course-header') as HTMLElement;
-
-                    if (headerElement) {
-                        const courseElement = headerElement.closest('.schedule-course-item') as HTMLElement;
-                        if (courseElement) {
-                            const course = this.scheduleController.getCourseFromElement(courseElement);
-                            if (course) {
-                                // Get existing selections for this course
-                                const selectedCourses = this.services.courseSelectionService.getSelectedCourses();
-                                const existingSelections = selectedCourses.find(sc => sc.course.id === course.id);
-
-                                // Open wizard with existing selections if any
-                                this.scheduleController.openComponentWizard(course, existingSelections);
-                            }
-                        }
-                    }
-                }
-                return;
-            }
-
-            // Clicking a course in the LIST is handled by the CourseList Svelte
-            // component, and the SELECTED-courses panel is now the
-            // SelectedCoursesPanel Svelte component (which handles its own item
-            // clicks → courseListState.selectedCourse). The global
-            // `.course-remove-btn` handler above stays for the still-vanilla
-            // SCHEDULE sidebar.
-        });
+        // The course LIST, the planner SELECTED-courses panel, and the SCHEDULE
+        // sidebar (ScheduleSidebar/SelectedCourseItem) are all Svelte components
+        // that own their own click handling now — remove/clear-sections and
+        // open-wizard for the schedule sidebar route through component props, so
+        // the old global `.course-remove-btn`/`.course-clear-sections-btn`/
+        // `.schedule-course-header` click delegation is gone.
 
         // The course search bar (input + professor-mode toggle + clear button +
         // professor autocomplete dropdown) is now the SearchBar Svelte component,
@@ -778,19 +736,11 @@ export class MainController {
         const selectedCourses = this.services.profileStateManager.getSelectedCourses();
         const onSchedule = this.services.uiStateManager.currentPage === 'schedule';
 
-        // The course LIST's select buttons (CourseList) and the SELECTED-courses
-        // panel (SelectedCoursesPanel) are reactive Svelte components reading
-        // appState, so added/removed courses need no imperative panel updates here.
-
-        // Section changes on existing courses → reflect section-button state
-        for (const sc of selectedCourses) {
-            const prev = this.previousSelectedCoursesMap.get(sc.course.id);
-            if (prev && sc.selectedLecture && prev.lecture !== sc.selectedLecture.number) {
-                this.scheduleController.updateSectionButtonStates(sc.course, sc.selectedLecture.number);
-            }
-        }
-
-        this.scheduleController.displayScheduleSelectedCourses();
+        // The course LIST's select buttons (CourseList), the planner
+        // SELECTED-courses panel (SelectedCoursesPanel), and the SCHEDULE sidebar
+        // (ScheduleSidebar) are reactive Svelte components reading appState, so
+        // added/removed courses and section changes need no imperative panel
+        // updates here — only the schedule GRID is still vanilla.
         if (onSchedule) {
             this.scheduleController.renderScheduleGrids();
         }
@@ -828,11 +778,9 @@ export class MainController {
     }
 
     private refreshUI(): void {
-        // The SELECTED-courses panel is reactive (SelectedCoursesPanel reads
-        // appState.selectedCourses), so only the schedule-page selection needs
-        // an imperative refresh here.
-        this.scheduleController.displayScheduleSelectedCourses();
-
+        // The planner SELECTED-courses panel and the SCHEDULE sidebar are
+        // reactive Svelte components reading appState.selectedCourses, so only
+        // the still-vanilla schedule GRID needs an imperative refresh here.
         if (this.services.uiStateManager.currentPage === 'schedule') {
             this.scheduleController.renderScheduleGrids();
         } else {

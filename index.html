@@ -159,7 +159,9 @@
                         </div>
                     </div>
                     <div class="schedule-sidebar-content" id="schedule-sidebar-content">
-                        <div class="empty-state">No courses selected yet</div>
+                        <!-- ScheduleSidebar.svelte mounts into this display:contents wrapper;
+                             the vanilla wizard panel is appendChild'd to the parent as a sibling. -->
+                        <div id="schedule-sidebar-courses" style="display: contents"></div>
                     </div>
                     <!-- AutoScheduleControls.svelte mounts here (footer button + nav + progress). -->
                     <div class="schedule-sidebar-content-footer"></div>

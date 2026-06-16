@@ -7,6 +7,7 @@ import { FilterService } from '../../services/filtering/FilterService'
 import { watch } from '../../svelte/reactivity.svelte'
 import { ComponentSelectionWizard } from '../components/ComponentSelectionWizard'
 import { modalState } from '../../svelte/modals/modalState.svelte'
+import { scheduleSidebarState } from '../../svelte/scheduleSidebarState.svelte'
 import { SidebarManager } from '../sidebar/SidebarManager'
 import { TimeUtils } from '../utils/timeUtils'
 import { BitMaskEngine, buildConflictMatrix } from '../../core/scheduling/BitMaskEngine'
@@ -25,7 +26,6 @@ export class ScheduleController implements CalendarEventProvider {
     private filterService: FilterService | null = null;
     private conflictDetector: BitMaskEngine | null = null;
     private containerEventListeners = new Map<HTMLElement, EventListener>();
-    private sidebarCourseItems = new Map<string, HTMLElement>();
     private escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
     private componentWizard: ComponentSelectionWizard | null = null;
     private wizardPreviewCourse: Course | null = null;
@@ -96,7 +96,6 @@ export class ScheduleController implements CalendarEventProvider {
         if (this.isSchedulePageVisible()) {
             this.renderScheduleGrids();
         }
-        this.displayScheduleSelectedCourses();
     }
 
     private isSchedulePageVisible(): boolean {
@@ -267,7 +266,6 @@ export class ScheduleController implements CalendarEventProvider {
         };
 
         this.renderScheduleGrids();
-        this.displayScheduleSelectedCourses();
 
         this.onScheduleUpdate(this.currentSchedule.id, {
             localEvents: updatedLocalEvents,
@@ -297,7 +295,6 @@ export class ScheduleController implements CalendarEventProvider {
         };
 
         this.renderScheduleGrids();
-        this.displayScheduleSelectedCourses();
 
         this.onScheduleUpdate(this.currentSchedule.id, {
             localEvents: updatedLocalEvents,
@@ -393,8 +390,9 @@ export class ScheduleController implements CalendarEventProvider {
             );
 
             if (result.success) {
-                // Refresh the display to show updated selections
-                this.displayScheduleSelectedCourses();
+                // The schedule sidebar (ScheduleSidebar) is reactive on
+                // appState.selectedCourses, so the updated selection re-renders
+                // on its own — no imperative sidebar refresh needed here.
             } else {
                 console.error('Failed to save component selections:', result.error);
                 alert('Failed to save selections. Please try again.');
@@ -425,144 +423,6 @@ export class ScheduleController implements CalendarEventProvider {
         this.renderScheduleGrids();
     }
 
-    displayScheduleSelectedCourses(): void {
-        const selectedCoursesContainer = document.getElementById('schedule-sidebar-content');
-        const countElement = document.getElementById('schedule-selected-count');
-
-        if (!selectedCoursesContainer) {
-            console.error('Missing DOM element - selectedCoursesContainer not found');
-            return;
-        }
-
-        let selectedCourses = this.courseSelectionService.getSelectedCourses();
-
-        // Always show calendar button - users can add local events even without courses
-        if (selectedCourses.length === 0) {
-            if (countElement) {
-                countElement.textContent = '(0)';
-            }
-
-            // Preserve panels if open
-            const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
-            const sidebarPanel = selectedCoursesContainer.querySelector('.sidebar-panel');
-
-            this.renderCalendarEventsHeader();
-
-            const html = `<div class="empty-state">No courses selected yet</div>`;
-            selectedCoursesContainer.innerHTML = html;
-
-            if (wizardPanel) {
-                selectedCoursesContainer.appendChild(wizardPanel);
-            }
-            if (sidebarPanel) {
-                selectedCoursesContainer.appendChild(sidebarPanel);
-            }
-
-            return;
-        }
-
-        // Always show all selected courses - filters only apply inside the component wizard
-        const sortedCourses = selectedCourses.sort((a, b) => {
-            const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
-            if (deptCompare !== 0) return deptCompare;
-            return a.course.number.localeCompare(b.course.number);
-        });
-
-        this.renderCalendarEventsHeader();
-
-        const html = this.buildAllCoursesHTML(sortedCourses);
-        if (countElement) {
-            countElement.textContent = `(${selectedCourses.length})`;
-        }
-
-        const wizardPanel = selectedCoursesContainer.querySelector('.sidebar-panel--component-wizard');
-        const sidebarPanel = selectedCoursesContainer.querySelector('.sidebar-panel');
-
-        selectedCoursesContainer.innerHTML = html;
-
-        this.sidebarCourseItems.clear();
-        selectedCoursesContainer.querySelectorAll<HTMLElement>('.schedule-course-item').forEach(el => {
-            const id = el.dataset.courseId;
-            if (id) this.sidebarCourseItems.set(id, el);
-        });
-
-        if (wizardPanel) {
-            selectedCoursesContainer.appendChild(wizardPanel);
-        }
-
-        if (sidebarPanel) {
-            selectedCoursesContainer.appendChild(sidebarPanel);
-        }
-    }
-
-    private renderCalendarEventsHeader(): void {
-        const slot = document.getElementById('calendar-events-header-slot');
-        if (!slot) return;
-        slot.innerHTML = this.buildCalendarEventsButtonHTML();
-        const calendarBtn = slot.querySelector('#calendar-events-btn');
-        if (calendarBtn) {
-            calendarBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.openAddLocalEventModal();
-            });
-        }
-    }
-    
-    
-    private buildCourseHeaderHTML(course: Course, selectedCourse: SelectedCourse | undefined, isExpanded: boolean = false): string {
-        const credits = course.minCredits === course.maxCredits
-            ? `${course.minCredits} credits`
-            : `${course.minCredits}-${course.maxCredits} credits`;
-
-        // Build selected components display
-        let selectedComponentsHTML = '';
-        let warningIconHTML = '';
-
-        if (selectedCourse) {
-            const components: string[] = [];
-            if (selectedCourse.selectedLecture) {
-                components.push(`<span class="selected-component lec">Lec ${selectedCourse.selectedLecture.number}</span>`);
-            }
-            if (selectedCourse.selectedDiscussion) {
-                components.push(`<span class="selected-component dis">Dis ${selectedCourse.selectedDiscussion.number}</span>`);
-            }
-            if (selectedCourse.selectedLab) {
-                components.push(`<span class="selected-component lab">Lab ${selectedCourse.selectedLab.number}</span>`);
-            }
-
-            // Check for incomplete selections
-            const incompleteInfo = this.getIncompleteSelectionInfo(selectedCourse);
-            if (incompleteInfo.isIncomplete) {
-                warningIconHTML = `<span class="incomplete-warning" title="${incompleteInfo.message}"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="warning-icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" /></svg></span>`;
-                components.push(warningIconHTML);
-            }
-
-            if (components.length > 0) {
-                selectedComponentsHTML = `<div class="schedule-course-components">${components.join('')}</div>`;
-            }
-        }
-
-        return `
-            <div class="sidebar-content-item schedule-course-item ${isExpanded ? 'expanded' : 'collapsed'}" data-course-id="${course.id}">
-                <div class="schedule-course-header">
-                    <div class="schedule-course-info">
-                        <div class="schedule-course-code">${Validators.escapeHtml(course.departmentAbbr)}${Validators.escapeHtml(course.number)}</div>
-                        <div class="schedule-course-name">${Validators.escapeHtml(course.name)}</div>
-                        ${selectedComponentsHTML}
-                        <div class="schedule-course-credits">${credits}</div>
-                    </div>
-                    <div class="course-item-controls">
-                        <button class="course-clear-sections-btn" data-course-id="${course.id}" title="Clear selected sections">
-                            ${getInlineSVG('ERASER', 'eraser-icon')}
-                        </button>
-                        <button class="course-remove-btn" data-course-id="${course.id}" title="Remove from selection">
-                            ${getInlineSVG('TRASH', 'trash-icon')}
-                        </button>
-                    </div>
-                </div>
-        `;
-    }
-
     /**
      * Check if a section has at least one period with a valid time slot
      * Async sections are valid even with 12:00-12:00 times
@@ -585,7 +445,7 @@ export class ScheduleController implements CalendarEventProvider {
      * Returns information about what's missing
      * This logic matches the wizard's determineAvailableSteps() to ensure consistency
      */
-    private getIncompleteSelectionInfo(selectedCourse: SelectedCourse): { isIncomplete: boolean; message: string } {
+    getIncompleteSelectionInfo(selectedCourse: SelectedCourse): { isIncomplete: boolean; message: string } {
         const course = selectedCourse.course;
 
         // Skip check for lab-only courses
@@ -645,60 +505,6 @@ export class ScheduleController implements CalendarEventProvider {
         return { isIncomplete: true, message };
     }
     
-    private buildAllCoursesHTML(sortedCourses: SelectedCourse[]): string {
-        const TERM_ORDER: AcademicTerm[] = [AcademicTerm.A, AcademicTerm.B, AcademicTerm.C, AcademicTerm.D, AcademicTerm.F, AcademicTerm.S, AcademicTerm.ALL];
-        const TERM_LABELS: Record<AcademicTerm, string> = {
-            [AcademicTerm.A]: 'A Term',
-            [AcademicTerm.B]: 'B Term',
-            [AcademicTerm.C]: 'C Term',
-            [AcademicTerm.D]: 'D Term',
-            [AcademicTerm.F]: 'Fall',
-            [AcademicTerm.S]: 'Spring',
-            [AcademicTerm.ALL]: 'All Terms',
-        };
-
-        const groups = new Map<AcademicTerm | 'UNSCHEDULED', SelectedCourse[]>();
-        for (const sc of sortedCourses) {
-            const term = (getComputedTerm(sc) as AcademicTerm | null) ?? 'UNSCHEDULED';
-            if (!groups.has(term)) groups.set(term, []);
-            groups.get(term)!.push(sc);
-        }
-
-        const sortedKeys = [...groups.keys()].sort((a, b) => {
-            const ai = a === 'UNSCHEDULED' ? -1 : TERM_ORDER.indexOf(a);
-            const bi = b === 'UNSCHEDULED' ? -1 : TERM_ORDER.indexOf(b);
-            if (ai === -1 && bi === -1) return 0;
-            if (ai === -1) return 1;
-            if (bi === -1) return -1;
-            return ai - bi;
-        });
-
-        let html = '';
-        for (const termKey of sortedKeys) {
-            const label = termKey === 'UNSCHEDULED' ? 'Unscheduled' : TERM_LABELS[termKey];
-            html += `<div class="term-separator"><span class="term-separator-label">${label}</span><span class="term-separator-line"></span></div>`;
-            for (const sc of groups.get(termKey)!) {
-                html += this.buildCourseHeaderHTML(sc.course, sc);
-                html += '</div>';
-            }
-        }
-
-        return html;
-    }
-
-    /**
-     * Build HTML for the calendar events button (always shown for local events).
-     */
-    private buildCalendarEventsButtonHTML(): string {
-        return `
-            <button class="calendar-events-btn" id="calendar-events-btn">
-                <span class="calendar-events-btn-icon">${getInlineSVG('CALENDAR_DOWN', 'calendar-btn-icon')}</span>
-                <span class="calendar-events-btn-name">Calendar Events</span>
-            </button>
-        `;
-    }
-
-
     async handleSectionSelection(course: Course, sectionNumber: string): Promise<void> {
         const currentSelectedSection = this.courseSelectionService.getSelectedSection(course);
         
@@ -1222,14 +1028,10 @@ export class ScheduleController implements CalendarEventProvider {
         this.renderScheduleGrids();
     }
 
-    getCourseFromElement(element: HTMLElement): Course | undefined {
-        const courseId = element.dataset.courseId;
-        if (!courseId) return undefined;
-        return this.courseSelectionService.getSelectedCourses().find(sc => sc.course.id === courseId)?.course;
-    }
-
     applyFiltersAndRefresh(): void {
-        this.displayScheduleSelectedCourses();
+        // The schedule sidebar list shows every selected course (filters only
+        // apply inside the wizard), so the reactive ScheduleSidebar needs no
+        // refresh here — just sync the filter button.
         this.updateScheduleFilterButtonState();
     }
 
@@ -1291,12 +1093,14 @@ export class ScheduleController implements CalendarEventProvider {
         container.addEventListener('click', clickListener);
         this.containerEventListeners.set(container, clickListener);
 
-        // Highlight corresponding sidebar course item on hover
+        // Highlight the corresponding sidebar course item on hover via a rune
+        // the reactive SelectedCourseItem reads (replaces the sidebarCourseItems
+        // map + classList toggles).
         container.querySelectorAll<HTMLElement>('.section-block').forEach(block => {
             const courseId = block.dataset.courseId;
             if (!courseId) return;
-            block.addEventListener('mouseenter', () => this.sidebarCourseItems.get(courseId)?.classList.add('sidebar-course-highlighted'));
-            block.addEventListener('mouseleave', () => this.sidebarCourseItems.get(courseId)?.classList.remove('sidebar-course-highlighted'));
+            block.addEventListener('mouseenter', () => scheduleSidebarState.hoveredCourseId = courseId);
+            block.addEventListener('mouseleave', () => scheduleSidebarState.hoveredCourseId = null);
         });
     }
 
