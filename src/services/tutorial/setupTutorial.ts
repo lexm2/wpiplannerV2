@@ -1,6 +1,7 @@
+import { mount } from 'svelte';
 import { TutorialService } from './TutorialService';
 import { TutorialStateMachine } from './TutorialStateMachine';
-import { FloatingTextBox } from '../../ui/components/FloatingTextBox';
+import FloatingTextBox from '../../svelte/tutorial/FloatingTextBox.svelte';
 import { appState } from '../../core/state/appState.svelte';
 import { componentWizardService } from '../../services/scheduling/componentWizardService';
 import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
@@ -596,11 +597,15 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         }
     });
 
-    const floatingTextBox = new FloatingTextBox(tutorialService);
-    floatingTextBox.setGoBack(async () => {
-        await tutorialService.goBack((targetIndex) => stateMachine.restoreSnapshot(targetIndex));
+    mount(FloatingTextBox, {
+        target: document.body,
+        props: {
+            tutorialService,
+            onGoBack: async () => {
+                await tutorialService.goBack((targetIndex) => stateMachine.restoreSnapshot(targetIndex));
+            },
+        },
     });
-    floatingTextBox.mount();
 
     const tutorials: TutorialEntry[] = [
         { id: 'welcome', label: 'Getting Started' },
