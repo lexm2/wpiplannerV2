@@ -2,6 +2,6 @@
 .app-body {
   flex: 1;
   display: grid;
-  grid-template-columns: var(--panel-sidebar-width, var(--spacing-sidebar-width)) auto 1fr auto var(--panel-right-width, var(--spacing-right-panel-width));
+  grid-template-columns: var(--panel-sidebar-width, var(--spacing-sidebar-width)) 1fr var(--panel-right-width, var(--spacing-right-panel-width));
   overflow: hidden;
 }

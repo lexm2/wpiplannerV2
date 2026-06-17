@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, untrack } from 'svelte';
+  import { untrack } from 'svelte';
   import type { PageId } from '../types/uiState';
   import type { Course } from '../types/types';
   import type { SelectedCourse } from '../types/schedule';
@@ -11,9 +11,6 @@
   import { localEventService } from '../services/scheduling/localEventService';
   import { sectionInfoService } from '../services/scheduling/sectionInfoService';
   import { autoScheduleService } from '../services/scheduling/autoScheduleService';
-  import { ResizablePanel } from '../ui/components/ResizablePanel';
-  import { SwipeGestureHandler } from '../ui/utils/SwipeGestureHandler';
-  import { DeviceDetection } from '../utils/deviceDetection';
   import { DebouncedOperation } from '../utils/RequestCancellation';
 
   import DepartmentSidebar from './DepartmentSidebar.svelte';
@@ -107,19 +104,6 @@
     } else if (e.ctrlKey && e.key === 'y') {
       e.preventDefault();
       handleRedo();
-    }
-  }
-
-  function handleSwipeLeft(): void {
-    if (services.uiStateManager.getCurrentPage() === 'planner') {
-      services.uiStateManager.setPage('schedule');
-    }
-  }
-
-  function handleSwipeRight(): void {
-    if (services.uiStateManager.getCurrentPage() === 'schedule') {
-      componentWizardService.closeComponentWizard();
-      services.uiStateManager.setPage('planner');
     }
   }
 
@@ -242,26 +226,6 @@
       services.tutorial?.onActiveScheduleChange();
     });
   });
-
-  onMount(() => {
-    // Resizable panels (left sidebar / right panel / schedule sidebar). Same
-    // selectors + bounds MainController.setupResizablePanels used.
-    new ResizablePanel({
-      panels: [
-        { handleSelector: '.resize-handle-left', targetProperty: '--panel-sidebar-width', minWidth: 200, maxWidth: 400, defaultWidth: 280, direction: 'left' },
-        { handleSelector: '.resize-handle-right', targetProperty: '--panel-right-width', minWidth: 250, maxWidth: 1000, defaultWidth: 700, direction: 'right' },
-        { handleSelector: '.resize-handle-schedule', targetProperty: '--panel-schedule-sidebar-width', minWidth: 200, maxWidth: 500, defaultWidth: 400, direction: 'left' },
-      ]
-    });
-
-    // Mobile swipe navigation between the two pages.
-    if (DeviceDetection.isMobilePhone()) {
-      const plannerPage = document.getElementById('planner-page');
-      const schedulePage = document.getElementById('schedule-page');
-      if (plannerPage) new SwipeGestureHandler(plannerPage, handleSwipeLeft, handleSwipeRight);
-      if (schedulePage) new SwipeGestureHandler(schedulePage, handleSwipeLeft, handleSwipeRight);
-    }
-  });
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -315,8 +279,6 @@
     </div>
   </aside>
 
-  <div class="resize-handle resize-handle-left" data-resize="sidebar" role="separator" aria-orientation="vertical" aria-label="Resize left sidebar"></div>
-
   <main class="main-content">
     <div class="content-header">
       <div class="content-controls">
@@ -339,8 +301,6 @@
       />
     </div>
   </main>
-
-  <div class="resize-handle resize-handle-right" data-resize="right-panel" role="separator" aria-orientation="vertical" aria-label="Resize right panel"></div>
 
   <aside class="right-panel" aria-label="Course details and selection">
     <section class="selected-courses-section">
@@ -387,8 +347,6 @@
         />
       </div>
     </aside>
-
-    <div class="resize-handle resize-handle-schedule" data-resize="schedule-sidebar" role="separator" aria-orientation="vertical" aria-label="Resize schedule sidebar"></div>
 
     <main class="schedule-main">
       <div id="schedule-grids-root" style="display: contents">

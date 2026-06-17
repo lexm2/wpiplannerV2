@@ -10,7 +10,6 @@
 @import url('./styles/components/theme-selector-base.css'); /* Base styles for index.html */
 /* theme-selector.module.css - dynamic classes imported in src/svelte/ThemeSelector.svelte */
 @import url('./styles/components/layout.css');
-/* resize-handle.css migrated to CSS Module - imported directly in ResizablePanel.ts */
 @import url('./styles/components/sidebar.css');
 @import url('./styles/components/main-content.css');
 @import url('./styles/components/course-list.css');
