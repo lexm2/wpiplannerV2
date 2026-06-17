@@ -17,7 +17,7 @@ import type { UIStateManager } from '../ui/UIStateManager'
  * overlay through the `appState.scheduleGenerating` rune (the grid reacts).
  * Replaces ScheduleController's openAutoSchedule / openScheduleFilterModal /
  * openAutoScheduleIntro / updateAutoScheduleIntroTerms / openAutoScheduleFilter /
- * refreshAutoScheduleFilterUI / runAutoSchedule / doGenerateSchedules.
+ * runAutoSchedule / doGenerateSchedules.
  *
  * Needs the non-singleton services (CourseSelectionService, FilterService,
  * CourseColorService, AutoScheduleOrchestrator, UIStateManager), injected once
@@ -110,11 +110,6 @@ class AutoScheduleService {
         // Same declarative FilterModal as openScheduleFilterModal, but for the
         // current selection (direct button / tutorial reopen path).
         this.openScheduleFilterModal(selectedCourses)
-    }
-
-    refreshAutoScheduleFilterUI(): void {
-        // Re-sync the open FilterModal's checkboxes from filterService.
-        modalState.filterRefreshTick++
     }
 
     runAutoSchedule(): void {

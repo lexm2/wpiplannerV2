@@ -18,7 +18,7 @@
 @import url('./styles/components/schedule-page.css');
 @import url('./styles/components/schedule-picker-modal.css');
 @import url('./styles/components/modal.css'); /* BaseModal framework - LocalEventModal migrated to local-event-modal.module.css */
-/* dual-range-slider.css migrated to CSS Module - imported directly in DualRangeSlider.ts */
+/* dual-range-slider.module.css - imported directly in svelte/filters/DualRangeSlider.svelte */
 /* component-wizard.module.css - imported directly in ComponentSelectionWizard.svelte */
 @import url('./styles/components/sidebar-panel.css'); /* Base sidebar panel styles */
 /* calendar-events-panel.css migrated to CSS Module - imported directly in CalendarEventsPanel.ts */

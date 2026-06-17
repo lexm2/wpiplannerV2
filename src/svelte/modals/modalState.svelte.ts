@@ -45,9 +45,6 @@ class ModalState {
     // Filter modal payload (mode + auto-schedule continuation). Set by the
     // trigger site before modalOpened('filter-modal' | 'auto-schedule-filter').
     filter = $state.raw<FilterModalPayload | null>(null);
-    // Bumped to re-sync the open filter modal's checkboxes from filterService
-    // (tutorial back-navigation) — replaces refreshFilterUI()/refreshAutoScheduleFilterUI().
-    filterRefreshTick = $state(0);
 }
 
 export const modalState = new ModalState();

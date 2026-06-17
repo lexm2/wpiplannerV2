@@ -518,10 +518,9 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         if (appState?.autoScheduleTermPrefs) {
             autoScheduleService.updateAutoScheduleIntroTerms(appState.autoScheduleTermPrefs);
         }
-        if (appState?.refreshFilterUI) {
-            autoScheduleService.refreshAutoScheduleFilterUI();
-            modalState.filterRefreshTick++;
-        }
+        // appState.refreshFilterUI used to imperatively re-sync the open filter
+        // modal; the filter sections are reactive now, so applying filters to
+        // filterService (in onAppStateTransition) updates the modal directly.
         if (appState?.runAutoSchedule) {
             autoScheduleService.runAutoSchedule();
         }
