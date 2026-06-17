@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-17T16:01:49.667Z",
+  "generated": "2026-06-17T18:32:21.357Z",
   "years": {
     "2025": {
       "A": {
@@ -38,7 +38,7 @@
         "startDate": "2026-10-19",
         "endDate": "2026-12-11",
         "offeringPeriod": "2026 Fall B Term",
-        "sampleSize": 815
+        "sampleSize": 816
       },
       "C": {
         "startDate": "2027-01-13",

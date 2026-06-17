@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 17, 2026, 4:01 PM",
+  "generated": "Jun 17, 2026, 6:32 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -35868,7 +35868,7 @@
                 "crn": 355817,
                 "number": "DL01",
                 "seats": 30,
-                "seatsAvailable": 24,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -35885,7 +35885,7 @@
                     "building": "",
                     "room": "Higgins Labs 114",
                     "seats": 30,
-                    "seatsAvailable": 24,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
@@ -35903,7 +35903,7 @@
                   "crn": 352233,
                   "number": "DX01",
                   "seats": 30,
-                  "seatsAvailable": 24,
+                  "seatsAvailable": 25,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -35920,7 +35920,7 @@
                       "building": "",
                       "room": "Innovation Studio 105 Active Learning Classroom",
                       "seats": 30,
-                      "seatsAvailable": 24,
+                      "seatsAvailable": 25,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
@@ -92120,7 +92120,7 @@
                 "crn": 350390,
                 "number": "F02",
                 "seats": 30,
-                "seatsAvailable": 22,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -92137,7 +92137,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 22,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F02",
@@ -92621,7 +92621,7 @@
                 "crn": 350747,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 3,
                 "maxWaitlist": 20,
                 "note": null,
@@ -92638,7 +92638,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 3,
                     "maxWaitlist": 20,
                     "specificSection": "S01",
@@ -97162,7 +97162,7 @@
                 "crn": 357762,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 2,
                 "maxWaitlist": 20,
                 "note": null,
@@ -97179,7 +97179,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 2,
                     "maxWaitlist": 20,
                     "specificSection": "S01",
@@ -113747,7 +113747,7 @@
                 "crn": 350756,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 26,
+                "seatsAvailable": 25,
                 "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": null,
@@ -113764,7 +113764,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "S01",
@@ -114950,7 +114950,7 @@
                 "crn": 357762,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 2,
                 "maxWaitlist": 20,
                 "note": null,
@@ -114967,7 +114967,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 2,
                     "maxWaitlist": 20,
                     "specificSection": "S01",
@@ -117784,7 +117784,7 @@
                 "crn": 357459,
                 "number": "B01",
                 "seats": 24,
-                "seatsAvailable": 17,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -117801,7 +117801,7 @@
                     "building": "",
                     "room": "Online-synchronous",
                     "seats": 24,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "B01",
@@ -138620,6 +138620,45 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
+            },
+            {
+              "section": {
+                "crn": 360554,
+                "number": "B03",
+                "seats": 25,
+                "seatsAvailable": 25,
+                "actualWaitlist": 0,
+                "maxWaitlist": 10,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": false,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Brittany Frederick",
+                    "startTime": "11:00",
+                    "endTime": "11:50",
+                    "location": "Fuller Labs 311",
+                    "building": "",
+                    "room": "Fuller Labs 311",
+                    "seats": 25,
+                    "seatsAvailable": 25,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 10,
+                    "specificSection": "B03",
+                    "days": [
+                      "M",
+                      "T",
+                      "R",
+                      "F"
+                    ],
+                    "isAsync": false
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
             }
           ]
         },
@@ -147084,8 +147123,8 @@
               "section": {
                 "crn": 351811,
                 "number": "D01 - INQ SEM: Collections of W A M",
-                "seats": 12,
-                "seatsAvailable": 0,
+                "seats": 18,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -147098,11 +147137,11 @@
                     "professor": "David Samson",
                     "startTime": "10:00",
                     "endTime": "11:50",
-                    "location": "Salisbury Labs 226 HUA Seminar Room",
+                    "location": "Higgins Labs 154",
                     "building": "",
-                    "room": "Salisbury Labs 226 HUA Seminar Room",
-                    "seats": 12,
-                    "seatsAvailable": 0,
+                    "room": "Higgins Labs 154",
+                    "seats": 18,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "D01 - INQ SEM: Collections of W A M",
@@ -162405,7 +162444,7 @@
                 "crn": 348891,
                 "number": "A01",
                 "seats": 35,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 25,
                 "note": null,
@@ -162422,7 +162461,7 @@
                     "building": "",
                     "room": "Innovation Studio 205 Active Learning Classroom North",
                     "seats": 35,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 25,
                     "specificSection": "A01",
@@ -265048,7 +265087,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -265065,7 +265104,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -266241,7 +266280,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -266258,7 +266297,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -267434,7 +267473,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -267451,7 +267490,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -268531,7 +268570,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -268548,7 +268587,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -269726,7 +269765,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -269743,7 +269782,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -270951,7 +270990,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -270968,7 +271007,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -272144,7 +272183,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -272161,7 +272200,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -274466,7 +274505,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -274483,7 +274522,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -275627,7 +275666,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -275644,7 +275683,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -276850,7 +276889,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -276867,7 +276906,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -278043,7 +278082,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -278060,7 +278099,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -279270,7 +279309,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -279287,7 +279326,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -279689,7 +279728,7 @@
                 "crn": 351513,
                 "number": "CL02",
                 "seats": 96,
-                "seatsAvailable": 92,
+                "seatsAvailable": 91,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5327",
@@ -279706,7 +279745,7 @@
                     "building": "",
                     "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 96,
-                    "seatsAvailable": 92,
+                    "seatsAvailable": 91,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL02",
@@ -279789,7 +279828,7 @@
                   "crn": 351773,
                   "number": "CD03",
                   "seats": 32,
-                  "seatsAvailable": 29,
+                  "seatsAvailable": 28,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5327",
@@ -279806,7 +279845,7 @@
                       "building": "",
                       "room": "Stratton Hall 205",
                       "seats": 32,
-                      "seatsAvailable": 29,
+                      "seatsAvailable": 28,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD03",
@@ -280495,7 +280534,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -280512,7 +280551,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -281592,7 +281631,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -281609,7 +281648,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -282753,7 +282792,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -282770,7 +282809,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -283948,7 +283987,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -283965,7 +284004,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -285109,7 +285148,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -285126,7 +285165,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -287495,7 +287534,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -287512,7 +287551,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -288720,7 +288759,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -288737,7 +288776,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -289975,7 +290014,7 @@
                   "crn": 351516,
                   "number": "CX05",
                   "seats": 35,
-                  "seatsAvailable": 31,
+                  "seatsAvailable": 30,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -289992,7 +290031,7 @@
                       "building": "",
                       "room": "Stratton Hall 116 Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 31,
+                      "seatsAvailable": 30,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX05",
@@ -293827,7 +293866,7 @@
                 "crn": 351496,
                 "number": "CL01",
                 "seats": 90,
-                "seatsAvailable": 68,
+                "seatsAvailable": 69,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5344",
@@ -293844,7 +293883,7 @@
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 90,
-                    "seatsAvailable": 68,
+                    "seatsAvailable": 69,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CL01",
@@ -293895,7 +293934,7 @@
                   "crn": 351350,
                   "number": "CD02",
                   "seats": 30,
-                  "seatsAvailable": 23,
+                  "seatsAvailable": 24,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5344",
@@ -293912,7 +293951,7 @@
                       "building": "",
                       "room": "Stratton Hall 205",
                       "seats": 30,
-                      "seatsAvailable": 23,
+                      "seatsAvailable": 24,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CD02",
@@ -296537,7 +296576,7 @@
                 "crn": 348740,
                 "number": "AL02",
                 "seats": 90,
-                "seatsAvailable": 35,
+                "seatsAvailable": 34,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5049",
@@ -296554,7 +296593,7 @@
                     "building": "",
                     "room": "Unity Hall 500",
                     "seats": 90,
-                    "seatsAvailable": 35,
+                    "seatsAvailable": 34,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "AL02",
@@ -296605,7 +296644,7 @@
                   "crn": 349187,
                   "number": "AD07",
                   "seats": 30,
-                  "seatsAvailable": 18,
+                  "seatsAvailable": 17,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5049",
@@ -296622,7 +296661,7 @@
                       "building": "",
                       "room": "Stratton Hall 311",
                       "seats": 30,
-                      "seatsAvailable": 18,
+                      "seatsAvailable": 17,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD07",
@@ -314188,7 +314227,7 @@
                 "crn": 350201,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 22,
+                "seatsAvailable": 21,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -314205,7 +314244,7 @@
                     "building": "",
                     "room": "Atwater Kent 232",
                     "seats": 30,
-                    "seatsAvailable": 22,
+                    "seatsAvailable": 21,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -314238,7 +314277,7 @@
                 "crn": 350773,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -314255,7 +314294,7 @@
                     "building": "",
                     "room": "Stratton Hall 311",
                     "seats": 30,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "S01",
@@ -315121,7 +315160,7 @@
                 "crn": 355263,
                 "number": "F01",
                 "seats": 20,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -315138,7 +315177,7 @@
                     "building": "",
                     "room": "Olin Hall 126",
                     "seats": 20,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "F01",
@@ -315170,7 +315209,7 @@
                 "crn": 350710,
                 "number": "S01",
                 "seats": 25,
-                "seatsAvailable": 23,
+                "seatsAvailable": 22,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -315187,7 +315226,7 @@
                     "building": "",
                     "room": "Stratton Hall 311",
                     "seats": 25,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 22,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
@@ -384741,7 +384780,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -384773,7 +384812,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -384805,7 +384844,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -384837,7 +384876,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -384869,7 +384908,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -384901,7 +384940,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -384933,7 +384972,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -384965,7 +385004,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -384997,7 +385036,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385029,7 +385068,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385061,7 +385100,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385093,7 +385132,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385125,7 +385164,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385157,7 +385196,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385189,7 +385228,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385221,7 +385260,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385253,7 +385292,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385285,7 +385324,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385317,7 +385356,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385349,7 +385388,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385381,7 +385420,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385413,7 +385452,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385445,7 +385484,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385477,7 +385516,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385509,7 +385548,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385541,7 +385580,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "15:00",
                       "endTime": "16:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385573,7 +385612,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385605,7 +385644,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -385678,7 +385717,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -385710,7 +385749,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -385742,7 +385781,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -385774,7 +385813,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -385806,7 +385845,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -385838,7 +385877,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -385870,7 +385909,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385902,7 +385941,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385934,7 +385973,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385966,7 +386005,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -385998,7 +386037,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -386030,7 +386069,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -386062,7 +386101,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -386094,7 +386133,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -386126,7 +386165,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -386158,7 +386197,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -386190,7 +386229,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -386222,7 +386261,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 208 Physics Lab",
@@ -386254,7 +386293,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386286,7 +386325,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386318,7 +386357,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386350,7 +386389,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386382,7 +386421,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386414,7 +386453,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386446,7 +386485,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386478,7 +386517,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386510,7 +386549,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386542,7 +386581,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386574,7 +386613,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -386606,7 +386645,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 211 Physics Lab",
@@ -401057,7 +401096,7 @@
                 "crn": 349459,
                 "number": "BL01",
                 "seats": 162,
-                "seatsAvailable": 106,
+                "seatsAvailable": 105,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5161",
@@ -401074,7 +401113,7 @@
                     "building": "",
                     "room": "Olin Hall 107",
                     "seats": 162,
-                    "seatsAvailable": 106,
+                    "seatsAvailable": 105,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "BL01",
@@ -401191,7 +401230,7 @@
                   "crn": 349257,
                   "number": "BD04",
                   "seats": 34,
-                  "seatsAvailable": 23,
+                  "seatsAvailable": 22,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5161",
@@ -401208,7 +401247,7 @@
                       "building": "",
                       "room": "Olin Hall 126",
                       "seats": 34,
-                      "seatsAvailable": 23,
+                      "seatsAvailable": 22,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD04",
@@ -401322,7 +401361,7 @@
                   "crn": 349429,
                   "number": "BX04",
                   "seats": 24,
-                  "seatsAvailable": 19,
+                  "seatsAvailable": 18,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -401339,7 +401378,7 @@
                       "building": "",
                       "room": "Olin Hall 117 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 19,
+                      "seatsAvailable": 18,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -402902,7 +402941,7 @@
                   "crn": 349429,
                   "number": "BX04",
                   "seats": 24,
-                  "seatsAvailable": 19,
+                  "seatsAvailable": 18,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -402919,7 +402958,7 @@
                       "building": "",
                       "room": "Olin Hall 117 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 19,
+                      "seatsAvailable": 18,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -404383,7 +404422,7 @@
                   "crn": 349429,
                   "number": "BX04",
                   "seats": 24,
-                  "seatsAvailable": 19,
+                  "seatsAvailable": 18,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -404400,7 +404439,7 @@
                       "building": "",
                       "room": "Olin Hall 117 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 19,
+                      "seatsAvailable": 18,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -405945,7 +405984,7 @@
                   "crn": 349429,
                   "number": "BX04",
                   "seats": 24,
-                  "seatsAvailable": 19,
+                  "seatsAvailable": 18,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -405962,7 +406001,7 @@
                       "building": "",
                       "room": "Olin Hall 117 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 19,
+                      "seatsAvailable": 18,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -407443,7 +407482,7 @@
                   "crn": 349429,
                   "number": "BX04",
                   "seats": 24,
-                  "seatsAvailable": 19,
+                  "seatsAvailable": 18,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -407460,7 +407499,7 @@
                       "building": "",
                       "room": "Olin Hall 117 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 19,
+                      "seatsAvailable": 18,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -409026,7 +409065,7 @@
                   "crn": 349429,
                   "number": "BX04",
                   "seats": 24,
-                  "seatsAvailable": 19,
+                  "seatsAvailable": 18,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -409043,7 +409082,7 @@
                       "building": "",
                       "room": "Olin Hall 117 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 19,
+                      "seatsAvailable": 18,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -410569,7 +410608,7 @@
                   "crn": 349429,
                   "number": "BX04",
                   "seats": 24,
-                  "seatsAvailable": 19,
+                  "seatsAvailable": 18,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -410586,7 +410625,7 @@
                       "building": "",
                       "room": "Olin Hall 117 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 19,
+                      "seatsAvailable": 18,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -412176,7 +412215,7 @@
                   "crn": 349429,
                   "number": "BX04",
                   "seats": 24,
-                  "seatsAvailable": 19,
+                  "seatsAvailable": 18,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -412193,7 +412232,7 @@
                       "building": "",
                       "room": "Olin Hall 117 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 19,
+                      "seatsAvailable": 18,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -417016,7 +417055,7 @@
                   "crn": 349605,
                   "number": "BX04",
                   "seats": 24,
-                  "seatsAvailable": 19,
+                  "seatsAvailable": 18,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -417033,7 +417072,7 @@
                       "building": "",
                       "room": "Olin Hall 117 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 19,
+                      "seatsAvailable": 18,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -419358,7 +419397,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "10:00",
                       "endTime": "11:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -419390,7 +419429,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "12:00",
                       "endTime": "13:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -419422,7 +419461,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "10:00",
                       "endTime": "11:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -419454,7 +419493,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "12:00",
                       "endTime": "13:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -419591,7 +419630,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -419623,7 +419662,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -419655,7 +419694,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -419687,7 +419726,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -420182,7 +420221,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "12:00",
                       "endTime": "13:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -420214,7 +420253,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "10:00",
                       "endTime": "11:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -420246,7 +420285,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "08:00",
                       "endTime": "09:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -420349,7 +420388,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "09:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -420381,7 +420420,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -420413,7 +420452,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "13:00",
                       "endTime": "14:50",
                       "location": "Olin Hall 117 Physics Lab",
@@ -420445,7 +420484,7 @@
                   "periods": [
                     {
                       "type": "Lab",
-                      "professor": "Not Assigned",
+                      "professor": "Veneta Tountcheva",
                       "startTime": "11:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 117 Physics Lab",
