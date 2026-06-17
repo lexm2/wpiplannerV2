@@ -164,11 +164,18 @@
   let active = $state(false);
   $effect(() => {
     const el = document.getElementById('schedule-sidebar-content');
+    // The panel is absolutely positioned at top:0 inside this scroll container,
+    // so reset the scroll to the top before locking overflow — otherwise, if the
+    // sidebar was scrolled down, the panel renders above the visible area and the
+    // overflow lock leaves no way to scroll up to it. Restore on close.
+    const prevScrollTop = el?.scrollTop ?? 0;
+    if (el) el.scrollTop = 0;
     el?.classList.add('wizard-active');
     const raf = requestAnimationFrame(() => (active = true));
     return () => {
       cancelAnimationFrame(raf);
       el?.classList.remove('wizard-active');
+      if (el) el.scrollTop = prevScrollTop;
     };
   });
 </script>
