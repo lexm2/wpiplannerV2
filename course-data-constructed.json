@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 17, 2026, 10:43 PM",
+  "generated": "Jun 18, 2026, 12:03 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -125164,7 +125164,7 @@
                   "crn": 349515,
                   "number": "BD01",
                   "seats": 90,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5264",
@@ -125181,7 +125181,7 @@
                       "building": "",
                       "room": "Unity Hall 400",
                       "seats": 90,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD01",
