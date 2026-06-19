@@ -78,7 +78,7 @@ export class AppBootstrap {
             profileStateManager, uiStateManager, colorService, autoScheduleOrchestrator,
         } = services;
 
-        componentWizardService.init(courseSelectionService, courseDataService, filterService, uiStateManager);
+        componentWizardService.init(courseSelectionService, courseDataService, filterService);
         localEventService.init(profileStateManager, uiStateManager);
         sectionInfoService.init(courseSelectionService, colorService, uiStateManager);
         autoScheduleService.init(courseSelectionService, filterService, colorService, autoScheduleOrchestrator, uiStateManager);

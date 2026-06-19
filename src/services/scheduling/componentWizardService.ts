@@ -7,7 +7,6 @@ import { schedulePreviewState } from '../../svelte/schedule/schedulePreviewState
 import type { CourseSelectionService } from '../selection/CourseSelectionService'
 import type { CourseDataService } from '../data/courseDataService'
 import type { FilterService } from '../filtering/FilterService'
-import type { UIStateManager } from '../ui/UIStateManager'
 
 /**
  * Standalone component-selection wizard launcher for the schedule page.
@@ -22,24 +21,21 @@ import type { UIStateManager } from '../ui/UIStateManager'
  * the last responsibility lifted off the now-deleted ScheduleController.
  *
  * Needs the non-singleton services (CourseSelectionService, CourseDataService,
- * FilterService, UIStateManager), injected once via init() from MainController.
+ * FilterService), injected once via init() during bootstrap.
  */
 class ComponentWizardService {
     private courseSelectionService: CourseSelectionService | null = null
     private courseDataService: CourseDataService | null = null
     private filterService: FilterService | null = null
-    private uiStateManager: UIStateManager | null = null
 
     init(
         courseSelectionService: CourseSelectionService,
         courseDataService: CourseDataService,
         filterService: FilterService,
-        uiStateManager: UIStateManager,
     ): void {
         this.courseSelectionService = courseSelectionService
         this.courseDataService = courseDataService
         this.filterService = filterService
-        this.uiStateManager = uiStateManager
     }
 
     /**
@@ -84,11 +80,9 @@ class ComponentWizardService {
                 onCancel: () => this.closeComponentWizard(),
                 onSelectionChange: (selections) => this.onWizardSelectionChange(freshCourse, selections),
                 onHoverPreview: (selections) => this.onWizardHoverPreview(freshCourse, selections),
-                onStepChange: (step) => this.uiStateManager?.wizardStepChanged(step),
             },
             initialStep,
         )
-        this.uiStateManager?.wizardOpened(freshCourse.id, initialStep ?? 'lecture')
     }
 
     jumpWizardToStep(step: WizardStep): void {
@@ -97,7 +91,6 @@ class ComponentWizardService {
 
     closeComponentWizard(): void {
         wizardState.close()
-        this.uiStateManager?.wizardClosed()
 
         // Clear the preview rune unconditionally — the grid reacts and drops any
         // preview blocks on its own.

@@ -1,15 +1,16 @@
 /**
- * Reactive home of the component-selection wizard — the Svelte replacement for the
- * old vanilla `ComponentSelectionWizard` + `SidebarManager.openPanel` plumbing.
+ * Reactive home of the component-selection wizard — the single source of truth
+ * for the wizard's open/step/selection state.
  *
- * `ScheduleController` owns the services and opens the wizard by calling `open()`
- * with a per-launch config (course, services, callbacks). The config carries the
- * services so the app's "services are injected, never imported" rule still holds —
- * this store just holds whatever the controller hands it.
+ * `componentWizardService` owns the services and opens the wizard by calling
+ * `open()` with a per-launch config (course, services, callbacks). The config
+ * carries the services so the app's "services are injected, never imported" rule
+ * still holds — this store just holds whatever the service hands it.
  *
  * `ComponentSelectionWizard.svelte` reads this store and derives everything else;
  * `currentStep`/`selections` live here (not in the component) so external callers
- * like `ScheduleController.jumpWizardToStep` can drive navigation without a ref.
+ * (e.g. `componentWizardService.jumpWizardToStep`) can drive navigation without a
+ * component ref.
  */
 import type { Course } from '../types/types';
 import type { SelectedCourse } from '../types/schedule';
@@ -29,7 +30,6 @@ export interface WizardConfig {
     onCancel: () => void;
     onSelectionChange?: (selections: ComponentSelections) => void;
     onHoverPreview?: (selections: ComponentSelections) => void;
-    onStepChange?: (step: WizardStep) => void;
 }
 
 // Fixed step order — used to derive slide direction for any navigation, including
@@ -59,7 +59,6 @@ class WizardState {
         const start = (initialStep && steps.includes(initialStep)) ? initialStep : (steps[0] ?? 'lecture');
         this.currentStep = start;
         this.direction = 'forward';
-        config.onStepChange?.(start);
     }
 
     close(): void {
@@ -73,7 +72,6 @@ class WizardState {
         this.direction = STEP_ORDER.indexOf(step) > STEP_ORDER.indexOf(this.currentStep)
             ? 'forward' : 'backward';
         this.currentStep = step;
-        this.config?.onStepChange?.(step);
     }
 }
 

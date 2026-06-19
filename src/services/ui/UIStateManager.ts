@@ -1,5 +1,6 @@
-import type { UIState, PageId, ViewMode, WizardStep } from '../../types/uiState';
+import type { UIState, PageId, ViewMode } from '../../types/uiState';
 import { uiState } from './uiState.svelte';
+import { wizardState } from '../../svelte/wizardState.svelte';
 
 export class UIStateManager {
     // Reactive state lives in the `uiState` rune store; this manager exposes
@@ -17,7 +18,13 @@ export class UIStateManager {
             currentPage: uiState.currentPage,
             currentView: uiState.currentView,
             openModals: uiState.openModals,
-            wizard: uiState.wizard,
+            // Derived from the live wizard store (single source of truth) so the
+            // tutorial snapshot reflects whether the wizard is open at capture time.
+            wizard: {
+                isOpen: wizardState.isOpen,
+                courseId: wizardState.config?.course.id ?? null,
+                step: wizardState.isOpen ? wizardState.currentStep : null,
+            },
         };
     }
 
@@ -80,31 +87,14 @@ export class UIStateManager {
         uiState.openModals = [];
     }
 
-    // --- Wizard tracking ---
-
-    wizardOpened(courseId: string, step: WizardStep): void {
-        uiState.wizard = { isOpen: true, courseId, step };
-    }
-
-    wizardStepChanged(step: WizardStep): void {
-        if (!uiState.wizard.isOpen) return;
-        uiState.wizard = { ...uiState.wizard, step };
-    }
-
-    wizardClosed(): void {
-        if (!uiState.wizard.isOpen) return;
-        uiState.wizard = { isOpen: false, courseId: null, step: null };
-    }
-
     // --- Bulk restore (for tutorial) ---
 
     restoreState(snapshot: UIState): void {
         uiState.currentPage = snapshot.currentPage;
         uiState.currentView = snapshot.currentView;
-        // Only restore page/view here; modals and wizard are reopened
-        // explicitly by the caller.
+        // Only restore page/view here; modals and the wizard are reopened
+        // explicitly by the caller (the wizard via componentWizardService).
         uiState.openModals = [];
-        uiState.wizard = { isOpen: false, courseId: null, step: null };
         // Page display + currentView are reflected by App.svelte / the ViewToggle
         // Svelte component reactively off the runes set above.
     }
