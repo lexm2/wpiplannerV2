@@ -7,10 +7,9 @@
   import type { DebouncedOperation } from '../utils/RequestCancellation';
   import type { SearchTextFilterCriteria } from '../types/filters';
 
-  let { filterService, debouncedSearch, onModalSync }: {
+  let { filterService, debouncedSearch }: {
     filterService: FilterService;
     debouncedSearch: DebouncedOperation;
-    onModalSync?: (query: string) => void;
   } = $props();
 
   // `query` is the LOCAL display value, updated on every keystroke via bind:value.
@@ -61,17 +60,17 @@
       .slice(0, 10);
   });
 
-  // Commit the current query to the shared `searchText` filter + sync the modal.
-  // Same semantics as the old debounced operation body: addFilter when the
-  // trimmed query is non-empty, removeFilter otherwise; pass the ORIGINAL query
-  // (with spaces) and the current professorMode as professorOnly.
+  // Commit the current query to the shared `searchText` filter. Same semantics as
+  // the old debounced operation body: addFilter when the trimmed query is
+  // non-empty, removeFilter otherwise; pass the ORIGINAL query (with spaces) and
+  // the current professorMode as professorOnly. The filter modal reads the same
+  // filter reactively, so no manual modal sync is needed.
   function applySearch(): void {
     if (query.trim().length > 0) {
       filterService.addFilter('searchText', { query, professorOnly: professorMode });
     } else {
       filterService.removeFilter('searchText');
     }
-    onModalSync?.(query);
   }
 
   function onInput(): void {
@@ -103,7 +102,6 @@
     query = '';
     dropdownOpen = false;
     filterService.removeFilter('searchText');
-    onModalSync?.('');
   }
 
   // Clear button: empty the query + filter, reset professor mode, hide dropdown.
@@ -112,7 +110,6 @@
     professorMode = false;
     dropdownOpen = false;
     filterService.removeFilter('searchText');
-    onModalSync?.('');
   }
 
   // Selecting a professor fills the input and searches immediately (no debounce),

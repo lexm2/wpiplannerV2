@@ -32,21 +32,15 @@
   const isHierarchical = $derived(course ? courseDataService.isHierarchicalCourse(course) : false);
   const isLabOnly = $derived(course ? courseDataService.isLabOnlyCourse(course) : false);
 
-  function hasAnyDiscussions(c: Course): boolean {
-    return courseDataService.getLecturesForCourse(c).some(lg => lg.compatibleDiscussions.length > 0);
-  }
-  function hasAnyLabs(c: Course): boolean {
-    return courseDataService.getLecturesForCourse(c).some(lg => lg.compatibleLabs.length > 0);
-  }
-  function hasAnyInterestLists(c: Course): boolean {
-    return courseDataService.getLecturesForCourse(c).some(lg => lg.section.isInterestList);
-  }
+  // The course's lecture groups, computed once per course change and reused by
+  // every tab-visibility derived + sectionsForTab below.
+  const lectures = $derived(course ? courseDataService.getLecturesForCourse(course) : []);
 
   // Tab visibility — mirrors CourseController.renderComponentTabs lines 465-468.
   const showLectures = $derived(isHierarchical);
-  const showDiscussions = $derived(isHierarchical && !!course && hasAnyDiscussions(course));
-  const showLabs = $derived(course ? (isHierarchical ? hasAnyLabs(course) : isLabOnly) : false);
-  const showInterestLists = $derived(isHierarchical && !!course && hasAnyInterestLists(course));
+  const showDiscussions = $derived(isHierarchical && lectures.some(lg => lg.compatibleDiscussions.length > 0));
+  const showLabs = $derived(course ? (isHierarchical ? lectures.some(lg => lg.compatibleLabs.length > 0) : isLabOnly) : false);
+  const showInterestLists = $derived(isHierarchical && lectures.some(lg => lg.section.isInterestList));
 
   const showTabs = $derived(isHierarchical || isLabOnly);
 
@@ -74,15 +68,15 @@
 
   function sectionsForTab(c: Course, tabId: string): SectionGroup {
     if (tabId === 'lectures') {
-      const lectures = courseDataService.getLecturesForCourse(c).filter(lg => !lg.section.isInterestList);
+      const lectureGroups = lectures.filter(lg => !lg.section.isInterestList);
       return {
-        heading: `Available Lectures (${lectures.length})`,
+        heading: `Available Lectures (${lectureGroups.length})`,
         type: 'Lecture',
-        sections: lectures.map(lg => lg.section),
+        sections: lectureGroups.map(lg => lg.section),
       };
     }
     if (tabId === 'discussions') {
-      const discussions = courseDataService.getLecturesForCourse(c).flatMap(lg => lg.compatibleDiscussions);
+      const discussions = lectures.flatMap(lg => lg.compatibleDiscussions);
       return {
         heading: `Available Discussions (${discussions.length})`,
         type: 'Discussion',
@@ -94,11 +88,11 @@
         const labs = courseDataService.getStandaloneLabs(c);
         return { heading: `Available Lab Sections (${labs.length})`, type: 'Lab', sections: labs };
       }
-      const labs = courseDataService.getLecturesForCourse(c).flatMap(lg => lg.compatibleLabs);
+      const labs = lectures.flatMap(lg => lg.compatibleLabs);
       return { heading: `Available Labs (${labs.length})`, type: 'Lab', sections: labs };
     }
     if (tabId === 'interest-lists') {
-      const interestLists = courseDataService.getLecturesForCourse(c).filter(lg => lg.section.isInterestList);
+      const interestLists = lectures.filter(lg => lg.section.isInterestList);
       return {
         heading: `Interest Lists (${interestLists.length})`,
         type: 'Interest List',
