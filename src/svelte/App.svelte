@@ -11,6 +11,8 @@
   import { localEventService } from '../services/scheduling/localEventService';
   import { sectionInfoService } from '../services/scheduling/sectionInfoService';
   import { autoScheduleService } from '../services/scheduling/autoScheduleService';
+  import { timestampState } from './timestampState.svelte';
+  import { installAppEffects } from './appEffects.svelte';
   import { DebouncedOperation } from '../utils/RequestCancellation';
 
   import DepartmentSidebar from './DepartmentSidebar.svelte';
@@ -89,14 +91,6 @@
     services.themeManager.setTheme(currentThemeId === 'wpi-dark' ? 'wpi-light' : 'wpi-dark');
   }
 
-  function resetSearchAndDepartmentFilters(): void {
-    // Both SearchBar and DepartmentSidebar react to these filter removals on
-    // their own (SearchBar's $effect clears the input; the sidebar returns to
-    // "All Departments").
-    services.filterService.removeFilter('searchText');
-    services.filterService.removeFilter('department');
-  }
-
   function handleKeydown(e: KeyboardEvent): void {
     if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
       e.preventDefault();
@@ -107,125 +101,11 @@
     }
   }
 
-  // Active-schedule (re)activation → sync the academicYear filter to the newly
-  // activated schedule's year. Mirrors MainController.setupScheduleChangeListener:
-  // the first run is skipped (the initial year filter is set by the
-  // loadedDepartments effect below on data load), exclusion-only changes are
-  // ignored, and the body runs untracked so its filter writes don't re-trigger
-  // the effect.
-  let activationInit = false;
-  $effect(() => {
-    appState.activation; // track activation events only
-    untrack(() => {
-      if (!activationInit) {
-        activationInit = true;
-        return;
-      }
-      if (appState.activation.source === 'calendar-event-exclusion') return;
-
-      const activeSchedule = services.scheduleManagementService.getActiveSchedule();
-      if (activeSchedule) {
-        if (activeSchedule.year !== undefined) {
-          services.filterService.addFilter('academicYear', { year: activeSchedule.year });
-        } else {
-          const defaultYear = services.profileStateManager.getDefaultAcademicYear();
-          if (defaultYear !== undefined) {
-            services.filterService.addFilter('academicYear', { year: defaultYear });
-          }
-        }
-      }
-    });
-  });
-
-  // Page navigation → reset search + department filters on entering the schedule
-  // page. Mirrors MainController.setupPageNavigationListener (the prevPage guard;
-  // the initial run is a no-op since the start page is 'planner').
-  let prevPage: PageId = uiState.currentPage;
-  $effect(() => {
-    const page = uiState.currentPage;
-    untrack(() => {
-      if (page === 'schedule' && prevPage !== 'schedule') {
-        resetSearchAndDepartmentFilters();
-      }
-      prevPage = page;
-    });
-  });
-
-  // Selection change → release colors for deselected courses + invalidate any
-  // generated auto-schedules. Replaces CourseColorService.setupColorManagement
-  // and AutoScheduleOrchestrator.setupCourseSelectionChangeListener (both were
-  // bridge watches on appState.selectedById). The initial run (mount, empty
-  // selection) is skipped to match the old watch's skip-initial semantics.
-  let selectionInit = false;
-  $effect(() => {
-    appState.selectedById; // track selection identity changes
-    untrack(() => {
-      if (!selectionInit) {
-        selectionInit = true;
-        return;
-      }
-      services.colorService.releaseUnselectedColors();
-      services.autoScheduleOrchestrator.invalidateOnSelectionChange();
-    });
-  });
-
-  // Course-data load/refresh → sync the non-reactive services off
-  // appState.loadedDepartments. Replaces AppBootstrap.setupCourseDataSubscriptions
-  // (a bridge watch). CourseDataService reassigns loadedDepartments (a
-  // $state.raw freshly-built array) on the initial fetch and every post-sync
-  // refresh; one effect covers both. The mount run sees the empty array and is
-  // skipped (dataSubsInit) — startApp triggers loadCourseData after mount, so the
-  // first real fire is the initial load; initialLoadDone then routes one-time
-  // setup vs. the lighter refresh path. Svelte views re-derive from the rune.
-  let dataSubsInit = false;
-  let initialLoadDone = false;
-  $effect(() => {
-    appState.loadedDepartments; // track data load/refresh
-    untrack(() => {
-      if (!dataSubsInit) {
-        dataSubsInit = true;
-        return;
-      }
-      const departments = appState.loadedDepartments;
-      services.profileStateManager.setCourseData(departments);
-      services.courseSelectionService.setAllDepartments(departments);
-
-      if (!initialLoadDone) {
-        initialLoadDone = true;
-        services.courseSelectionService.reconstructSectionObjects();
-        services.timestampManager.updateClientTimestamp();
-
-        // Backfill year for existing schedules that lack one.
-        const defaultYear = services.profileStateManager.getDefaultAcademicYear();
-        for (const schedule of services.profileStateManager.getAllSchedules()) {
-          if (schedule.year === undefined && defaultYear !== undefined) {
-            services.profileStateManager.updateSchedule(schedule.id, { year: defaultYear }, 'system');
-          }
-        }
-
-        // Apply academic year filter based on the active schedule's year.
-        if (!services.filterService.hasFilter('academicYear')) {
-          const activeSchedule = services.profileStateManager.getActiveSchedule();
-          const yearToFilter = activeSchedule?.year ?? defaultYear;
-          if (yearToFilter !== undefined) {
-            services.filterService.addFilter('academicYear', { year: yearToFilter });
-          }
-        }
-      }
-    });
-  });
-
-  // Active-schedule change → let the tutorial auto-cancel if the user navigated
-  // away from its schedule. Replaces the setupTutorial bridge watch on
-  // appState.activeScheduleId. services.tutorial is assigned in main.ts after
-  // mount, so it may be undefined on the initial run (guarded by ?.); the
-  // tutorialScheduleId guard inside makes it a no-op outside a tutorial.
-  $effect(() => {
-    appState.activeScheduleId; // track active-schedule changes
-    untrack(() => {
-      services.tutorial?.onActiveScheduleChange();
-    });
-  });
+  // Global side-effect bridges (activation→year filter, page-nav→filter reset,
+  // selection→color/auto-schedule, data-load→service sync, active-schedule→
+  // tutorial). Extracted to keep this root as pure composition; runs once here so
+  // the effects register in this component's scope.
+  installAppEffects(services);
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -236,14 +116,14 @@
       <h1>WPI Course Planner</h1>
       <div class="header-subtitle">
         <div class="timestamps-container">
-          <span id="client-timestamp">Loading client data...</span>
-          <span id="server-timestamp">Loading server data...</span>
+          <span id="client-timestamp">{timestampState.clientLabel}</span>
+          <span id="server-timestamp">{timestampState.serverLabel}</span>
         </div>
       </div>
     </div>
     <nav class="header-navigation" aria-label="Main navigation">
       <div class="nav-tabs-pill">
-        <PageTabs uiStateManager={services.uiStateManager} onSwitch={switchToPageView} />
+        <PageTabs onSwitch={switchToPageView} />
       </div>
     </nav>
     <div class="header-controls">
@@ -266,7 +146,7 @@
         <span id="schedule-picker-label">{scheduleName}</span>
       </button>
       <div class="theme-selector">
-        <ThemeSelector profileStateManager={services.profileStateManager} />
+        <ThemeSelector />
       </div>
     </div>
   </div>
@@ -283,7 +163,7 @@
     <div class="content-header">
       <div class="content-controls">
         <div class="search-input-wrapper">
-          <SearchBar filterService={services.filterService} {debouncedSearch} onModalSync={() => {}} />
+          <SearchBar filterService={services.filterService} {debouncedSearch} />
         </div>
         <div id="filter-buttons-host" class="content-controls-filter-host">
           <FilterButtons filterService={services.filterService} onFilter={openFilterModal} />
@@ -322,22 +202,16 @@
           <div id="calendar-events-header-slot" class="calendar-events-header-slot">
             <CalendarEventsButton onClick={() => localEventService.openAddModal()} />
           </div>
-          <div id="schedule-filter-slot" style="display: contents">
-            <ScheduleFilterButton filterService={services.filterService} onFilter={openFilterModal} />
-          </div>
-          <div id="clear-all-sections-slot" style="display: contents">
-            <ClearAllSectionsButton courseSelectionService={services.courseSelectionService} />
-          </div>
+          <ScheduleFilterButton filterService={services.filterService} onFilter={openFilterModal} />
+          <ClearAllSectionsButton courseSelectionService={services.courseSelectionService} />
         </div>
       </div>
       <div class="schedule-sidebar-content" id="schedule-sidebar-content">
-        <div id="schedule-sidebar-courses" style="display: contents">
-          <ScheduleSidebar
-            courseSelectionService={services.courseSelectionService}
-            getIncompleteInfo={(sc: SelectedCourse) => componentWizardService.getIncompleteSelectionInfo(sc)}
-            onOpenWizard={(course: Course, existing: SelectedCourse | undefined) => componentWizardService.openComponentWizard(course, existing)}
-          />
-        </div>
+        <ScheduleSidebar
+          courseSelectionService={services.courseSelectionService}
+          getIncompleteInfo={(sc: SelectedCourse) => componentWizardService.getIncompleteSelectionInfo(sc)}
+          onOpenWizard={(course: Course, existing: SelectedCourse | undefined) => componentWizardService.openComponentWizard(course, existing)}
+        />
         <WizardHost />
       </div>
       <div class="schedule-sidebar-content-footer">
@@ -349,14 +223,12 @@
     </aside>
 
     <main class="schedule-main">
-      <div id="schedule-grids-root" style="display: contents">
-        <ScheduleGrids
-          colorService={services.colorService}
-          conflictEngine={services.conflictDetector}
-          onOpenSectionInfo={(courseId: string, sectionNumber: string) => sectionInfoService.show(courseId, sectionNumber)}
-          onOpenDeleteEvent={(eventId: string) => localEventService.openDeleteModal(eventId)}
-        />
-      </div>
+      <ScheduleGrids
+        colorService={services.colorService}
+        conflictEngine={services.conflictDetector}
+        onOpenSectionInfo={(courseId: string, sectionNumber: string) => sectionInfoService.show(courseId, sectionNumber)}
+        onOpenDeleteEvent={(eventId: string) => localEventService.openDeleteModal(eventId)}
+      />
     </main>
   </div>
 </div>

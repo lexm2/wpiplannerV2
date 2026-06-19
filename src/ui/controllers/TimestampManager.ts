@@ -1,57 +1,38 @@
-export class TimestampManager {
-    constructor() {
-    }
+import { timestampState } from '../../svelte/timestampState.svelte';
 
+const TIMESTAMP_FORMAT: Intl.DateTimeFormatOptions = {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+};
+
+function formatTimestamp(date: Date): string {
+    return date.toLocaleDateString('en-US', TIMESTAMP_FORMAT).replace(',', ' at');
+}
+
+export class TimestampManager {
     updateClientTimestamp(): void {
-        const clientTimestampElement = document.getElementById('client-timestamp');
-        if (clientTimestampElement) {
-            const now = new Date();
-            const options: Intl.DateTimeFormatOptions = {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true
-            };
-            const formattedTime = now.toLocaleDateString('en-US', options).replace(',', ' at');
-            clientTimestampElement.textContent = `Client loaded: ${formattedTime}`;
-        }
+        timestampState.clientLabel = `Client loaded: ${formatTimestamp(new Date())}`;
     }
 
     async loadServerTimestamp(): Promise<string | null> {
-        const serverTimestampElement = document.getElementById('server-timestamp');
-        if (!serverTimestampElement) return null;
-
         try {
-            const response = await fetch('./last-updated.json', {
-                cache: 'no-cache'
-            });
+            const response = await fetch('./last-updated.json', { cache: 'no-cache' });
 
             if (response.ok) {
                 const timestampData = await response.json();
-                const serverDate = new Date(timestampData.timestamp);
-                const options: Intl.DateTimeFormatOptions = {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: true
-                };
-                const formattedTime = serverDate.toLocaleDateString('en-US', options).replace(',', ' at');
-                serverTimestampElement.textContent = `Server updated: ${formattedTime}`;
+                timestampState.serverLabel = `Server updated: ${formatTimestamp(new Date(timestampData.timestamp))}`;
                 return timestampData.timestamp;
-            } else {
-                throw new Error(`Failed to fetch server timestamp: ${response.status}`);
             }
+            throw new Error(`Failed to fetch server timestamp: ${response.status}`);
         } catch (error) {
             console.warn('Failed to load server timestamp:', error);
-            serverTimestampElement.textContent = 'Server timestamp unavailable';
+            timestampState.serverLabel = 'Server timestamp unavailable';
             return null;
         }
     }
-
 }

@@ -3,15 +3,9 @@
   import { ThemeManager } from '../themes/ThemeManager';
   import { uiState } from '../services/ui/uiState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
-  import type { ProfileStateManager } from '../core/state/ProfileStateManager';
 
-  // `profileStateManager` matches the old ctor signature; the saved-theme load is
-  // now performed by MainController (see initializeTheme parity there), so this
-  // component only renders + drives selection. The prop is accepted for signature
-  // parity and future use.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let { profileStateManager }: { profileStateManager?: ProfileStateManager } = $props();
-
+  // The saved-theme load happens during bootstrap; this component only renders +
+  // drives selection off the ThemeManager singleton and the currentThemeId rune.
   const tm = ThemeManager.getInstance();
   const themes = tm.getAvailableThemes();
 
