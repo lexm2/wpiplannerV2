@@ -51,13 +51,18 @@
 
   const localEvents = $derived(appState.activeSchedule?.localEvents ?? []);
 
-  // Per-term block lists. A recolor patches the course's customColor onto
-  // appState.selectedCourses, so `selected` (a dependency here) changes identity
-  // and this re-derives the block colors — no separate signal needed.
-  const blocksByTerm = $derived.by<Record<string, TermBlocks>>(() => {
+  // Course-color lookup. Precomputing assigns/persists colors (a side-effect), so
+  // it lives in its own derived keyed on `selected` rather than inside the block
+  // builder — that keeps blocksByTerm a pure transform. A recolor patches the
+  // course's customColor onto appState.selectedCourses, so `selected` changes
+  // identity and the colors re-derive without a separate signal.
+  const colorOf = $derived.by<(id: string) => string>(() => {
     colorService.precomputeCourseColors(selected);
-    const colorOf = (id: string) => colorService.getCourseColor(id);
+    return (id: string) => colorService.getCourseColor(id);
+  });
 
+  // Per-term block lists, consuming the color lookup read-only.
+  const blocksByTerm = $derived.by<Record<string, TermBlocks>>(() => {
     const result: Record<string, TermBlocks> = {};
     for (const term of TERMS) {
       const termCourses = selected.filter(sc => courseShowsInTerm(sc, term));
@@ -78,17 +83,17 @@
     focusedTerm = null;
   }
 
-  $effect(() => {
-    function onKey(e: KeyboardEvent): void {
-      if (e.key === 'Escape' && focusedTerm !== null) {
-        e.preventDefault();
-        unfocus();
-      }
+  // Escape exits term focus (declarative window listener; no-op when nothing is
+  // focused).
+  function onKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Escape' && focusedTerm !== null) {
+      e.preventDefault();
+      unfocus();
     }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  });
+  }
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 <div class="terms-grid" class:focused={focusedTerm !== null}>
   <div class="focused-term-header">

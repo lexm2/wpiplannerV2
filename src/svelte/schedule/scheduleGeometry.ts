@@ -7,6 +7,7 @@ import {
 } from '../../types/schedule';
 import type { ComponentSelections } from '../../types/scheduling';
 import { getComputedTerm, getDisplayTerms } from '../../utils/typeGuards';
+import { TimeUtils } from '../../ui/utils/timeUtils';
 
 /**
  * Pure geometry/data helpers for the declarative schedule grid (no Svelte/DOM).
@@ -18,8 +19,10 @@ import { getComputedTerm, getDisplayTerms } from '../../utils/typeGuards';
  * occupancy map and no `isFirstSlot` gating.
  */
 
-const START_MIN = 8 * 60;   // 8:00 AM — top of the grid body
-const SPAN_MIN = 12 * 60;   // 8 AM–8 PM = 12 hours
+// Single source of truth for the grid's time bounds — shared with TermGrid's
+// hour labels so the block math and the grid scaffold can never drift.
+const START_MIN = TimeUtils.START_HOUR * 60;   // top of the grid body (8:00 AM)
+const SPAN_MIN = TimeUtils.TOTAL_HOURS * 60;   // 8 AM–8 PM = 12 hours
 
 /** Monday–Friday, in grid-column order. */
 export const WEEKDAYS: DayOfWeek[] = [
@@ -116,19 +119,6 @@ function packColumns(items: { startMin: number; endMin: number }[]): { col: numb
     }
     flush();
     return result;
-}
-
-/**
- * A section has a renderable time slot when at least one period has a real
- * (non-zero) duration. Async periods (12:00–12:00) collapse to zero and never
- * render — matching the old occupancy map's behavior.
- */
-export function hasValidTimeSlot(section: Section): boolean {
-    return section.periods.some(period => {
-        if (period.isAsync) return true;
-        return period.startTime.hours !== period.endTime.hours ||
-            period.startTime.minutes !== period.endTime.minutes;
-    });
 }
 
 function selectedSections(sc: SelectedCourse): Section[] {
