@@ -1,4 +1,5 @@
 <script lang="ts">
+  import FilterSection from './FilterSection.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
   import type { Course } from '../../types/types';
@@ -20,10 +21,9 @@
     )
   );
 
-  const currentYear = $derived.by<number | 'all'>(() => {
-    const f = filterService.getActiveFilters().find((f) => f.id === 'academicYear');
-    return (f?.criteria as AcademicYearFilterCriteria | undefined)?.year ?? 'all';
-  });
+  const currentYear = $derived<number | 'all'>(
+    filterService.getCriteria<AcademicYearFilterCriteria>('academicYear')?.year ?? 'all'
+  );
 
   function setYear(year: number | 'all'): void {
     if (year === 'all') filterService.removeFilter('academicYear');
@@ -41,17 +41,12 @@
 </script>
 
 {#if years.length > 1}
-  <div class="filter-section">
-    <div class="filter-section-header">
-      <h4 class="filter-section-title">Academic Year</h4>
+  <FilterSection title="Academic Year">
+    <div class="filter-segmented-control">
+      <button class="segmented-btn" class:active={currentYear === 'all'} onclick={() => setYear('all')}>All</button>
+      {#each years as y (y)}
+        <button class="segmented-btn" class:active={currentYear === y} onclick={() => setYear(y)}>{y}–{y + 1}</button>
+      {/each}
     </div>
-    <div class="filter-section-content">
-      <div class="filter-segmented-control">
-        <button class="segmented-btn" class:active={currentYear === 'all'} onclick={() => setYear('all')}>All</button>
-        {#each years as y (y)}
-          <button class="segmented-btn" class:active={currentYear === y} onclick={() => setYear(y)}>{y}–{y + 1}</button>
-        {/each}
-      </div>
-    </div>
-  </div>
+  </FilterSection>
 {/if}

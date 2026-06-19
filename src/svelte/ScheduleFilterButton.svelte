@@ -15,9 +15,11 @@
   // Replaces the two imperative updateScheduleFilterButtonState copies
   // (MainController + ScheduleController), the filter `watch`/applyFiltersAndRefresh
   // plumbing that drove them, and the setTimeout(100) initializer.
+  // hasNonDefaultFilters / getFilterCount read the SvelteMap-backed FilterState
+  // internally, so these stay reactive without any dependency trick.
   const year = $derived(appState.activeSchedule?.year);
-  const hasNonDefault = $derived((filterService.getActiveFilters(), filterService.hasNonDefaultFilters(year)));
-  const filterCount = $derived((filterService.getActiveFilters(), filterService.getFilterCount()));
+  const hasNonDefault = $derived(filterService.hasNonDefaultFilters(year));
+  const filterCount = $derived(filterService.getFilterCount());
 </script>
 
 <button

@@ -137,6 +137,16 @@ export class FilterService {
         return this.filterState.getActiveFilters();
     }
 
+    /**
+     * Reactive, typed accessor for a single filter's criteria — replaces the
+     * `getActiveFilters().find(f => f.id === '...')?.criteria as T` pattern in
+     * the filter components. Reads the SvelteMap-backed FilterState, so it stays
+     * reactive inside `$derived`/templates.
+     */
+    getCriteria<T>(filterId: string): T | undefined {
+        return this.filterState.getFilter(filterId)?.criteria as T | undefined;
+    }
+
     getFilterCount(): number {
         return this.filterState.getFilterCount();
     }

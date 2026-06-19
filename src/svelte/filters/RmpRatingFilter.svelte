@@ -1,5 +1,6 @@
 <script lang="ts">
   import DualRangeSlider from './DualRangeSlider.svelte';
+  import FilterSection from './FilterSection.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { RMPRatingFilterCriteria } from '../../types/filters';
 
@@ -9,8 +10,7 @@
   // that and write back to the service (debounced). Matches the controller,
   // which seeded the sliders from criteria and never re-synced them while open.
   // svelte-ignore state_referenced_locally — intentional one-time seed read.
-  const initial = (filterService.getActiveFilters().find((f) => f.id === 'rmpRating')?.criteria ??
-    {}) as RMPRatingFilterCriteria;
+  const initial = filterService.getCriteria<RMPRatingFilterCriteria>('rmpRating') ?? {} as RMPRatingFilterCriteria;
 
   let ratingMin = $state(initial.minRating ?? 0);
   let ratingMax = $state(initial.maxRating ?? 5);
@@ -61,12 +61,8 @@
   });
 </script>
 
-<div class="filter-section">
-  <div class="filter-section-header">
-    <h4 class="filter-section-title">Rate My Professor</h4>
-  </div>
-  <div class="filter-section-content">
-    <div class="filter-slider-container">
+<FilterSection title="Rate My Professor">
+  <div class="filter-slider-container">
       <div class="filter-slider-group">
         <!-- svelte-ignore a11y_label_has_associated_control -->
         <label>Rating</label>
@@ -129,8 +125,7 @@
       <input type="checkbox" class="filter-toggle" bind:checked={includeWithoutData} />
       <span class="filter-toggle-text">Include professors without RMP data</span>
     </label>
-    <div class="filter-hint">
-      <small>Note: Filters are off when at default ranges.</small>
-    </div>
+  <div class="filter-hint">
+    <small>Note: Filters are off when at default ranges.</small>
   </div>
-</div>
+</FilterSection>

@@ -14,10 +14,12 @@
   // updateFilterButtonState/updateBookmarkFilterButtonState/
   // updateClearFiltersButtonState imperative DOM updates and the setTimeout(100)
   // initializer that primed them.
+  // hasNonDefaultFilters / getFilterCount / hasFilter all read the SvelteMap-backed
+  // FilterState internally, so these stay reactive without any dependency trick.
   const year = $derived(appState.activeSchedule?.year);
-  const hasNonDefault = $derived((filterService.getActiveFilters(), filterService.hasNonDefaultFilters(year)));
-  const filterCount = $derived((filterService.getActiveFilters(), filterService.getFilterCount()));
-  const bookmarkOn = $derived((filterService.getActiveFilters(), filterService.hasFilter('bookmark')));
+  const hasNonDefault = $derived(filterService.hasNonDefaultFilters(year));
+  const filterCount = $derived(filterService.getFilterCount());
+  const bookmarkOn = $derived(filterService.hasFilter('bookmark'));
 
   // Mirrors the old #bookmark-filter-btn click handler.
   function toggleBookmark(): void {
