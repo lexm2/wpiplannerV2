@@ -9,8 +9,8 @@
  *
  * `ComponentSelectionWizard.svelte` reads this store and derives everything else;
  * `currentStep`/`selections` live here (not in the component) so external callers
- * (e.g. `componentWizardService.jumpWizardToStep`) can drive navigation without a
- * component ref.
+ * (e.g. via `wizardState.jumpToStep`) can drive navigation without a component
+ * ref.
  */
 import type { Course } from '../types/types';
 import type { SelectedCourse } from '../types/schedule';
@@ -24,7 +24,6 @@ export interface WizardConfig {
     course: Course;
     courseDataService: CourseDataService;
     filterService: FilterService | null;
-    allSelectedCourses: SelectedCourse[];
     existingSelections?: SelectedCourse;
     onComplete: (selections: ComponentSelections) => void;
     onCancel: () => void;

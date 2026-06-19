@@ -130,8 +130,7 @@
 
   function clearFilters(): void {
     if (!filterService) return;
-    const yearFilter = filterService.getActiveFilters().find((f) => f.id === 'academicYear');
-    const activeYear = (yearFilter?.criteria as { year?: number } | undefined)?.year;
+    const activeYear = filterService.getCriteria<{ year?: number }>('academicYear')?.year;
     filterService.resetFilters(typeof activeYear === 'number' ? activeYear : undefined);
   }
 

@@ -59,13 +59,6 @@ class ComponentWizardService {
             return
         }
 
-        // Get all currently selected courses for conflict detection context
-        const allSelectedCourses = this.courseSelectionService.getSelectedCourses()
-
-        // Filter out the current course being edited from the context
-        // This prevents the wizard from checking conflicts against itself
-        const otherSelectedCourses = allSelectedCourses.filter(sc => sc.course.id !== freshCourse.id)
-
         // Open the wizard via the reactive store; WizardHost renders the Svelte
         // ComponentSelectionWizard panel. The callbacks below are framework-agnostic
         // and unchanged from the old vanilla wizard's contract.
@@ -74,7 +67,6 @@ class ComponentWizardService {
                 course: freshCourse,
                 courseDataService: this.courseDataService,
                 filterService: this.filterService,
-                allSelectedCourses: otherSelectedCourses,
                 existingSelections,
                 onComplete: (selections) => this.onWizardComplete(freshCourse, selections),
                 onCancel: () => this.closeComponentWizard(),
@@ -83,10 +75,6 @@ class ComponentWizardService {
             },
             initialStep,
         )
-    }
-
-    jumpWizardToStep(step: WizardStep): void {
-        wizardState.jumpToStep(step)
     }
 
     closeComponentWizard(): void {
