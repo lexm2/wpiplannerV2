@@ -7,6 +7,9 @@
     closeOnBackdrop = true,
     closeOnEscape = true,
     title,
+    header,
+    showHeader = false,
+    hideClose = false,
     extraClass,
     dialogClass,
     onRequestClose,
@@ -16,6 +19,15 @@
     closeOnBackdrop?: boolean;
     closeOnEscape?: boolean;
     title?: string;
+    /**
+     * Custom header content (receives `close`). Overrides the default
+     * title+close header. For modals with tabs/extra controls in the header.
+     */
+    header?: Snippet<[() => void]>;
+    /** Render the built-in `title` + close-button header inside the content. */
+    showHeader?: boolean;
+    /** Hide the close button in the built-in header (e.g. forced-acknowledge modals). */
+    hideClose?: boolean;
     /** Extra class(es) on the backdrop, e.g. 'filter-modal' for width/scoping. */
     extraClass?: string;
     /** Extra class(es) on the dialog, e.g. 'schedule-picker-modal-dialog no-transform'. */
@@ -83,6 +95,16 @@
     onclick={stop}
   >
     <div class="modal-content">
+      {#if header}
+        {@render header(close)}
+      {:else if showHeader}
+        <div class="modal-header">
+          <h2 class="modal-title">{title}</h2>
+          {#if !hideClose}
+            <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
+          {/if}
+        </div>
+      {/if}
       {@render children(close)}
     </div>
   </div>

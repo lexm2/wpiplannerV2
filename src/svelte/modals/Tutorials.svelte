@@ -9,12 +9,8 @@
   } = $props();
 </script>
 
-<Modal typeId="tutorials" title="Tutorials" {onRequestClose}>
+<Modal typeId="tutorials" title="Tutorials" showHeader {onRequestClose}>
   {#snippet children(close)}
-    <div class="modal-header">
-      <h2 class="modal-title">Tutorials</h2>
-      <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
-    </div>
     <div class="modal-body tutorials-modal-body">
       {#each tutorial.tutorials as t (t.id)}
         <button

@@ -9,12 +9,11 @@
   closeOnBackdrop={false}
   closeOnEscape={false}
   title="Mobile Not Supported"
+  showHeader
+  hideClose
   {onRequestClose}
 >
   {#snippet children(close)}
-    <div class="modal-header">
-      <h2 class="modal-title">Mobile Not Supported</h2>
-    </div>
     <div class="modal-body">
       <p>Mobile support was temporarily removed to make it easier to ship new features. Please use a desktop browser for the best experience.</p>
     </div>

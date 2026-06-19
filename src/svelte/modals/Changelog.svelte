@@ -69,12 +69,8 @@
   const changelogData = parseMarkdown(changelogMarkdown);
 </script>
 
-<Modal typeId="changelog" title="What's New" {onRequestClose}>
+<Modal typeId="changelog" title="What's New" showHeader {onRequestClose}>
   {#snippet children(close)}
-    <div class="modal-header">
-      <h2 class="modal-title">What's New</h2>
-      <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
-    </div>
     <div class="modal-body changelog-modal-body">
       {#if changelogData.length === 0}
         <p class="changelog-empty">No changes to display</p>
