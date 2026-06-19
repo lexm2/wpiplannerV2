@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getInlineSVG } from '../utils/iconPaths';
   import { scheduleSidebarState } from './scheduleSidebarState.svelte';
+  import { formatCredits } from './selectedCourseUtils';
   import type { SelectedCourse } from '../types/schedule';
 
   let { selectedCourse, incompleteInfo, onOpenWizard, onRemove, onClearSections }: {
@@ -12,20 +13,15 @@
   } = $props();
 
   const course = $derived(selectedCourse.course);
-  const credits = $derived(
-    course.minCredits === course.maxCredits
-      ? `${course.minCredits} credits`
-      : `${course.minCredits}-${course.maxCredits} credits`
-  );
+  const credits = $derived(formatCredits(course));
   const hasComponents = $derived(
     !!(selectedCourse.selectedLecture || selectedCourse.selectedDiscussion || selectedCourse.selectedLab)
   );
-  // The grid sets the hovered course id; this item highlights when it matches —
-  // replacing ScheduleController's sidebarCourseItems map + classList toggles.
+  // The grid sets the hovered course id; this item highlights when it matches.
   const highlighted = $derived(scheduleSidebarState.hoveredCourseId === course.id);
 
-  // The whole header opens the wizard (old MainController .schedule-course-header
-  // delegation). The control buttons stopPropagation so they don't also open it.
+  // The whole header opens the wizard; the control buttons stopPropagation so a
+  // click on them doesn't also open the wizard.
   function handleHeaderKeydown(e: KeyboardEvent): void {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();

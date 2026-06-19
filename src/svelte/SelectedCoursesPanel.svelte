@@ -2,6 +2,7 @@
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
   import { courseListState } from './courseListState.svelte';
+  import { formatCredits, compareSelectedCourses } from './selectedCourseUtils';
   import type { Course } from '../types/types';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
 
@@ -10,14 +11,8 @@
   } = $props();
 
   // `appState.selectedCourses` is a $state.raw array — copy before sorting,
-  // never mutate in place. Sort by department then number (mirrors the old
-  // CourseController.displaySelectedCourses).
-  const sorted = $derived(
-    [...appState.selectedCourses].sort((a, b) => {
-      const d = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
-      return d !== 0 ? d : a.course.number.localeCompare(b.course.number);
-    })
-  );
+  // never mutate in place. Sort by department then number.
+  const sorted = $derived([...appState.selectedCourses].sort(compareSelectedCourses));
   const count = $derived(appState.selectedCourses.length);
 
   // Expander state persists in localStorage (default collapsed), matching the
@@ -36,12 +31,6 @@
     }
   }
 
-  function creditsLabel(course: Course): string {
-    return course.minCredits === course.maxCredits
-      ? `${course.minCredits} credits`
-      : `${course.minCredits}-${course.maxCredits} credits`;
-  }
-
   // Set the shared rune; CourseDescription.svelte reads it to render the panel.
   function handleSelect(course: Course): void {
     courseListState.selectedCourse = course;
@@ -54,9 +43,8 @@
     }
   }
 
-  // stopPropagation so the global delegated `.course-remove-btn` handler in
-  // MainController (which serves the still-vanilla SCHEDULE sidebar) does NOT
-  // also fire on this button.
+  // stopPropagation so the row's own click handler (handleSelect) doesn't also
+  // fire when the remove button is clicked.
   function handleRemove(e: MouseEvent, course: Course): void {
     e.stopPropagation();
     courseSelectionService.unselectCourse(course).catch(err => console.error('Failed to unselect course:', err));
@@ -87,7 +75,6 @@
       <div
         class="selected-course-item"
         data-course-id={course.id}
-        data-sort-key={course.departmentAbbr + course.number}
         role="button"
         tabindex="0"
         onclick={() => handleSelect(course)}
@@ -96,7 +83,7 @@
         <div class="selected-course-info">
           <div class="selected-course-code">{course.departmentAbbr}{course.number}</div>
           <div class="selected-course-name">{course.name}</div>
-          <div class="selected-course-credits">{creditsLabel(course)}</div>
+          <div class="selected-course-credits">{formatCredits(course)}</div>
         </div>
         <button
           class="course-remove-btn"

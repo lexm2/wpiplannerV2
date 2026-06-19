@@ -3,6 +3,7 @@
   import { getComputedTerm } from '../utils/typeGuards';
   import { AcademicTerm } from '../types/schedule';
   import SelectedCourseItem from './SelectedCourseItem.svelte';
+  import { compareSelectedCourses, TERM_ORDER, TERM_LABELS } from './selectedCourseUtils';
   import type { SelectedCourse } from '../types/schedule';
   import type { Course } from '../types/types';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
@@ -13,30 +14,11 @@
     onOpenWizard: (course: Course, existing: SelectedCourse | undefined) => void;
   } = $props();
 
-  const TERM_ORDER: AcademicTerm[] = [
-    AcademicTerm.A, AcademicTerm.B, AcademicTerm.C, AcademicTerm.D,
-    AcademicTerm.F, AcademicTerm.S, AcademicTerm.ALL,
-  ];
-  const TERM_LABELS: Record<AcademicTerm, string> = {
-    [AcademicTerm.A]: 'A Term',
-    [AcademicTerm.B]: 'B Term',
-    [AcademicTerm.C]: 'C Term',
-    [AcademicTerm.D]: 'D Term',
-    [AcademicTerm.F]: 'Fall',
-    [AcademicTerm.S]: 'Spring',
-    [AcademicTerm.ALL]: 'All Terms',
-  };
-
   // Group selected courses by computed term, sorted dept->number within each
-  // group; unscheduled (and unknown terms) sort last. Mirrors the old
-  // ScheduleController.buildAllCoursesHTML — the list is reactive on
+  // group; unscheduled (and unknown terms) sort last. The list is reactive on
   // appState.selectedCourses, so add/remove/section changes re-render on their own.
   const groups = $derived.by(() => {
-    const sorted = [...appState.selectedCourses].sort((a, b) => {
-      const deptCompare = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
-      if (deptCompare !== 0) return deptCompare;
-      return a.course.number.localeCompare(b.course.number);
-    });
+    const sorted = [...appState.selectedCourses].sort(compareSelectedCourses);
 
     const byTerm = new Map<AcademicTerm | 'UNSCHEDULED', SelectedCourse[]>();
     for (const sc of sorted) {
