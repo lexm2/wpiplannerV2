@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import type { TutorialService } from '../../services/tutorial/TutorialService';
   import type { TutorialStep } from '../../types/tutorial';
+  import { animateFindDot } from './findDot';
   import styles from '../../styles/components/floating-text-box.module.css';
 
   let {
@@ -27,7 +29,9 @@
   const showBack = $derived(index > 0);
 
   // The service notifies the box on every step change (single callback slot).
-  $effect(() => {
+  // This is one-time setup (the registration reads no reactive state), so it
+  // belongs in onMount rather than an $effect that could re-register the slot.
+  onMount(() => {
     tutorialService.onStepChange((s, i, t) => {
       step = s;
       index = i;
@@ -181,72 +185,9 @@
     }
   }
 
-  // --- "Find element" dot animation ------------------------------------------
-  function animateFindDot(): void {
-    if (!step) return;
-    const target = document.querySelector(step.selector) as HTMLElement | null;
-    if (!target) return;
-
-    const targetRect = target.getBoundingClientRect();
-    if (targetRect.width === 0 && targetRect.height === 0) return;
-
-    const overlay = document.createElement('div');
-    overlay.className = 'tutorial-find-overlay';
-    overlay.style.opacity = '0';
-
-    const startX = window.innerWidth / 2;
-    const startY = window.innerHeight / 2;
-    const endX = targetRect.left + targetRect.width / 2;
-    const endY = targetRect.top + targetRect.height / 2;
-    const dx = endX - startX;
-    const dy = endY - startY;
-
-    const dot = document.createElement('div');
-    dot.className = 'tutorial-find-dot';
-    dot.style.left = `${startX}px`;
-    dot.style.top = `${startY}px`;
-    dot.style.transform = 'translate(-50%, -50%) scale(0)';
-
-    document.body.appendChild(overlay);
-    document.body.appendChild(dot);
-
-    const cleanup = () => {
-      overlay.remove();
-      dot.remove();
-    };
-
-    overlay.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards' });
-    const growIn = dot.animate(
-      [
-        { transform: 'translate(-50%, -50%) scale(0)' },
-        { transform: 'translate(-50%, -50%) scale(1)' },
-      ],
-      { duration: 300, easing: 'ease-out', fill: 'forwards' }
-    );
-
-    growIn.onfinish = () => {
-      const travel = dot.animate(
-        [
-          { transform: 'translate(-50%, -50%) scale(1)' },
-          { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)` },
-        ],
-        { duration: 500, easing: 'cubic-bezier(0.76, 0, 0.24, 1)', fill: 'forwards' }
-      );
-
-      travel.onfinish = () => {
-        setTimeout(() => {
-          overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
-          const fadeOut = dot.animate(
-            [
-              { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)` },
-              { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)` },
-            ],
-            { duration: 300, easing: 'ease-in', fill: 'forwards' }
-          );
-          fadeOut.onfinish = cleanup;
-        }, 500);
-      };
-    };
+  // "Find element" dot animation — flies a dot to the current step's target.
+  function onFindElement(): void {
+    if (step) animateFindDot(step.selector);
   }
 
   function onNext(): void {
@@ -271,7 +212,7 @@
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class={styles.header} onmousedown={onDragStart}>
     <span class={styles.title}>Tutorial</span>
-    <button class={styles.findBtn} data-tutorial-find onmousedown={stopMousedown} onclick={animateFindDot}>
+    <button class={styles.findBtn} data-tutorial-find onmousedown={stopMousedown} onclick={onFindElement}>
       Find Element
     </button>
     <button class={styles.skipBtn} onmousedown={stopMousedown} onclick={() => tutorialService.skip()}>
