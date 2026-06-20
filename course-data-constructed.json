@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 20, 2026, 3:05 PM",
+  "generated": "Jun 20, 2026, 4:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -444020,7 +444020,7 @@
                 "crn": 354603,
                 "number": "F01 - ST: Reliability Engineering",
                 "seats": 30,
-                "seatsAvailable": 26,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -444037,7 +444037,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F01 - ST: Reliability Engineering",
