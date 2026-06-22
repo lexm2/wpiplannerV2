@@ -97,6 +97,7 @@
 
 <FilterSection title="Availability">
   <FilterToggle
+    id="avoid-conflicts-filter"
     label="Hide periods that conflict with selected sections"
     checked={avoidConflicts}
     onchange={onAvoidConflicts}
@@ -111,6 +112,7 @@
   {/if}
 
   <FilterToggle
+    id="available-only-filter"
     label="Show only sections with available seats"
     checked={availableOnly}
     onchange={onAvailableOnly}

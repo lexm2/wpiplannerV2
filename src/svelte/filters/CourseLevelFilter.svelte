@@ -44,6 +44,8 @@
         <input
           type="checkbox"
           class="filter-toggle"
+          data-filter="term"
+          value={term}
           checked={activeTerms.includes(term)}
           onchange={(e) => toggleTerm(term, e.currentTarget.checked)}
         />

@@ -116,6 +116,6 @@
   </div>
   <div class="filter-actions">
     <button class="modal-btn btn-secondary" onclick={onClearAll}>Clear All</button>
-    <button class="modal-btn btn-primary" onclick={onPrimary}>{primaryLabel}</button>
+    <button id="modal-primary-btn" class="modal-btn btn-primary" onclick={onPrimary}>{primaryLabel}</button>
   </div>
 </div>

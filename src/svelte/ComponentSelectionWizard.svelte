@@ -315,6 +315,7 @@
     <button class={[styles['wizard-btn'], styles['wizard-btn-text']]} onclick={cancel}>Cancel</button>
     {#if hasSelection || isLastStep}
       <button
+        id="wizard-next-btn"
         class={[styles['wizard-btn'], styles['wizard-btn-primary']]}
         onclick={() => (isLastStep ? tryComplete() : next())}
       >

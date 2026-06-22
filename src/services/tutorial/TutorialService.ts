@@ -32,6 +32,7 @@ export class TutorialService {
     private suppressAutoAdvance = false;
     private highlightTimeout: ReturnType<typeof setTimeout> | null = null;
     private actionTimeout: ReturnType<typeof setTimeout> | null = null;
+    private revealTimer: ReturnType<typeof setTimeout> | null = null;
 
     register(tutorial: Tutorial): void { this.tutorials.set(tutorial.id, tutorial); }
 
@@ -126,28 +127,73 @@ export class TutorialService {
         this.removeHighlight();
         this.highlightObserver?.disconnect();
         this.highlightObserver = null;
+        this.stopReveal();
 
         const el = document.querySelector(selector);
         if (el) {
+            this.revealInView(el);
             this.attachSvgOverlay(el, scrollArrow);
             return;
         }
 
+        // Target isn't in the DOM yet — observe for it to mount while actively
+        // revealing it (paginated "Load more" lists, off-screen rows).
         this.highlightObserver = new MutationObserver(() => {
             const found = document.querySelector(selector);
             if (!found) return;
             this.highlightObserver!.disconnect();
             this.highlightObserver = null;
+            this.stopReveal();
             if (this.highlightTimeout !== null) { clearTimeout(this.highlightTimeout); this.highlightTimeout = null; }
+            this.revealInView(found);
             this.attachSvgOverlay(found, scrollArrow);
         });
         this.highlightObserver.observe(document.body, { childList: true, subtree: true });
+        this.startReveal(selector);
         this.highlightTimeout = setTimeout(() => {
             this.highlightObserver?.disconnect();
             this.highlightObserver = null;
+            this.stopReveal();
             this.highlightTimeout = null;
             console.warn(`[Tutorial] Element not found after 10s: ${selector}`);
         }, 10_000);
+    }
+
+    // Scroll a found target into view if it's outside the viewport, so the
+    // highlight (and the user) land on it. The SVG overlay is a child of the
+    // target's container, so it follows this scroll automatically.
+    private revealInView(el: Element): void {
+        const r = el.getBoundingClientRect();
+        const outOfView =
+            r.bottom <= 0 || r.top >= window.innerHeight ||
+            r.right <= 0 || r.left >= window.innerWidth ||
+            r.top < 0 || r.bottom > window.innerHeight;
+        if (outOfView) el.scrollIntoView({ block: 'center', inline: 'center' });
+    }
+
+    // While a step's target is missing, mount it by clicking a visible "Load
+    // more" (the paginated course list pages in 100 at a time). Stops as soon as
+    // the target appears (the highlight MutationObserver then attaches and
+    // revealInView scrolls to it) or the step changes. Deliberately does NOT
+    // scroll arbitrary containers — that races with wizard/modal render.
+    private startReveal(selector: string): void {
+        let attempts = 0;
+        const tick = () => {
+            this.revealTimer = null;
+            if (this.currentSelector !== selector) return;
+            if (document.querySelector(selector)) return;
+            if (attempts++ >= 40) return;
+            const loadMore = Array.from(
+                document.querySelectorAll<HTMLElement>('.load-more-button, [data-load-more]')
+            ).find(b => b.offsetParent !== null);
+            if (loadMore) loadMore.click();
+            this.revealTimer = setTimeout(tick, 200);
+        };
+        tick();
+    }
+
+    private stopReveal(): void {
+        if (this.revealTimer !== null) { clearTimeout(this.revealTimer); this.revealTimer = null; }
     }
 
     private attachSvgOverlay(el: Element, scrollArrow: boolean): void {
@@ -210,27 +256,32 @@ export class TutorialService {
         this.resizeObserver.observe(el);
         updateSize();
 
+        let arrow: HTMLElement | null = null;
         if (scrollArrow) {
-            const arrow = document.createElement('div');
+            arrow = document.createElement('div');
             arrow.classList.add('tutorial-scroll-arrow');
             arrow.innerHTML = getInlineSVG('CHEVRON_DOWN', 'tutorial-scroll-arrow-icon');
             document.body.appendChild(arrow);
             this.arrowOverlay = arrow;
-
-            this.intersectionObserver = new IntersectionObserver(([entry]) => {
-                if (entry.isIntersecting) {
-                    svg.style.visibility = '';
-                    arrow.removeAttribute('data-direction');
-                } else {
-                    svg.style.visibility = 'hidden';
-                    const r = entry.boundingClientRect;
-                    const cr = this.getScrollParent(el).getBoundingClientRect();
-                    const elCY = r.top + r.height / 2;
-                    arrow.dataset.direction = elCY < cr.top + cr.height / 2 ? 'up' : 'down';
-                }
-            }, { threshold: 0 });
-            this.intersectionObserver.observe(el);
         }
+
+        // Track the target's viewport intersection: re-sync the box on re-entry
+        // (layout can shift while it's off-screen) and, when a scroll arrow is
+        // shown, point it toward the off-screen target.
+        this.intersectionObserver = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+                updateSize();
+                svg.style.visibility = '';
+                arrow?.removeAttribute('data-direction');
+            } else if (arrow) {
+                svg.style.visibility = 'hidden';
+                const r = entry.boundingClientRect;
+                const cr = this.getScrollParent(el).getBoundingClientRect();
+                const elCY = r.top + r.height / 2;
+                arrow.dataset.direction = elCY < cr.top + cr.height / 2 ? 'up' : 'down';
+            }
+        }, { threshold: 0 });
+        this.intersectionObserver.observe(el);
 
         this.highlightObserver = new MutationObserver(() => {
             if (el.isConnected && this.svgOverlay?.isConnected) return;
@@ -314,6 +365,7 @@ export class TutorialService {
     private cleanup(): void {
         this.currentSelector = null;
         this.removeHighlight();
+        this.stopReveal();
         this.highlightObserver?.disconnect();
         this.highlightObserver = null;
         if (this.highlightTimeout !== null) { clearTimeout(this.highlightTimeout); this.highlightTimeout = null; }

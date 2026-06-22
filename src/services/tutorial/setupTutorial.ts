@@ -138,7 +138,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                 appState: { selectedCourses: [{ courseId: 'TUT-2001' }] },
             },
             {
-                selector: '.wizard-section-card[data-crn="100105"]',
+                selector: '[data-crn="100108"]',
                 title: 'Pick a lecture',
                 description: 'Select the second lecture section.',
                 waitFor: 'click',
@@ -146,20 +146,20 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                 appState: { selectedCourses: [{ courseId: 'TUT-2001' }] },
             },
             {
-                selector: '.wizard-btn.wizard-btn-primary',
+                selector: '#wizard-next-btn',
                 title: 'Continue to labs',
                 description: 'Click Next to move on to selecting a lab.',
                 waitFor: 'click',
                 uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lecture' } },
-                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TAL01' }] },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TCL01' }] },
             },
             {
-                selector: '.wizard-section-card[data-crn="100107"]',
+                selector: '[data-crn="100111"]',
                 title: 'Pick a lab',
                 description: 'Select the bottom lab section. Notice how you can hover the different sections to see how they fit into your schedule.',
                 waitFor: 'click',
                 uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lab' } },
-                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TAL01' }] },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TCL01' }] },
             },
             {
                 selector: '#wizard-next-btn',
@@ -167,7 +167,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                 description: 'Click Finish to confirm your selections, if you hit cancel the selections will be lost.',
                 waitFor: 'click',
                 uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lab' } },
-                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TAL01', lab: 'TAX02' }] },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TCL01', lab: 'TCX03' }] },
             },
             {
                 selector: '[data-tutorial-next]',
@@ -175,7 +175,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                 description: 'You now know the basic functionality of the planner. The next tutorial will go over how to quickly find courses that work for you. If you want to skip over a tutorial for any reason just hit skip tutorial and it will move onto the next one. If you want to restart a tutorial, go to the schedules button at the top right then settings then click on tutorials.',
                 waitFor: 'manual',
                 uiState: { currentPage: 'schedule', wizard: { isOpen: false, courseId: null, step: null } },
-                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TAL01', lab: 'TAX02' }] },
+                appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TCL01', lab: 'TCX03' }] },
             },
         ],
     });
@@ -298,7 +298,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                     appState: { selectedCourses: [{ courseId: 'TUT-2005' }] },
                 },
                 {
-                    selector: '.wizard-section-card[data-crn="100122"]',
+                    selector: '[data-crn="100122"]',
                     title: 'Pick a lecture',
                     description: 'Select the B term lecture section.',
                     waitFor: 'click',
@@ -306,7 +306,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                     appState: { selectedCourses: [{ courseId: 'TUT-2005' }] },
                 },
                 {
-                    selector: '.wizard-btn.wizard-btn-primary',
+                    selector: '#wizard-next-btn',
                     title: 'Continue to labs',
                     description: 'Click Next to move on to selecting a lab.',
                     waitFor: 'click',
@@ -314,7 +314,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                     appState: { selectedCourses: [{ courseId: 'TUT-2005', lecture: 'TBL01' }] },
                 },
                 {
-                    selector: '.wizard-section-card[data-crn="100124"]',
+                    selector: '[data-crn="100124"]',
                     title: 'Pick a lab',
                     description: 'Select the first lab section. Notice how you can hover sections to preview them on the schedule.',
                     waitFor: 'click',
@@ -367,7 +367,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                 uiState: { currentPage: 'schedule' },
             },
             {
-                selector: '.wizard-section-card[data-crn="100041"]',
+                selector: '[data-crn="100041"]',
                 title: 'Pick a lecture',
                 description: 'We are going to use this lecture.',
                 waitFor: 'click',
