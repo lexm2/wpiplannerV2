@@ -156,6 +156,14 @@
   flex-shrink: 0;
 }
 
+/* The code is all-caps + digits (no descenders), so its glyphs ride high in
+   the line box and look raised next to the mixed-case course name. Nudge the
+   text down so the two share an optical center. */
+.course-item .course-code {
+  position: relative;
+  top: 2px;
+}
+
 .course-name {
   font-weight: var(--font-weight-medium);
   color: var(--color-text);
@@ -281,6 +289,10 @@
 .term-badge .term-letter {
   line-height: 1;
   pointer-events: none;
+  /* All-caps letter has no descender, so it rides high in the badge. Nudge it
+     down onto the badge's optical center. */
+  position: relative;
+  top: 2px;
 }
 
 .term-badge:hover {
