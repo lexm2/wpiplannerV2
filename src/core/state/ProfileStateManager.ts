@@ -18,9 +18,7 @@ export interface ProfileState {
     hasUnsavedChanges: boolean;
 }
 
-/**
- * Single source of truth for application state with synchronous persistence and event-driven updates
- */
+/** Single source of truth for application state with synchronous persistence and event-driven updates. */
 export class ProfileStateManager {
     private static instance: ProfileStateManager | null = null;
     private storageManager: TransactionalStorageManager;
@@ -87,7 +85,6 @@ export class ProfileStateManager {
         logger.log(`[CATALOG] Course catalog set with ${departments.length} departments`);
     }
 
-    // Public API for state access
     getState(): Readonly<ProfileState> {
         // Explicit copy (not `{...this.state}`): appState is a runes class whose
         // fields are accessors, so spreading would not capture values reliably.
@@ -152,16 +149,13 @@ export class ProfileStateManager {
         return found;
     }
 
-    // Course selection methods
     selectCourse(course: Course, isRequired: boolean = false, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             const existing = this.state.selectedCourses.find(sc => sc.course.id === course.id);
 
             if (existing) {
-                // Update existing selection
                 this.patchSelectedCourse(course.id, sc => ({ ...sc, isRequired }));
             } else {
-                // Add new selection
                 const selectedCourse: SelectedCourse = {
                     course,
                     selectedLecture: null,
@@ -196,10 +190,9 @@ export class ProfileStateManager {
             let patch: Partial<SelectedCourse> | null = null;
 
             if (!sectionNumber) {
-                // Clearing selection
                 patch = { selectedLecture: null, selectedDiscussion: null, selectedLab: null };
             } else if (course.lectures) {
-                // Find the section - check lectures, then their discussions/labs
+                // Check lectures, then their discussions/labs
                 for (const lectureGroup of course.lectures) {
                     if (lectureGroup.section.number === sectionNumber) {
                         patch = { selectedLecture: lectureGroup.section };
@@ -314,7 +307,6 @@ export class ProfileStateManager {
         return selectedCourse?.lockedSections || new Set();
     }
 
-    // Schedule management methods
     getNewestAcademicYear(): number | undefined {
         const years = this.allDepartments
             .flatMap(d => d.courses)
@@ -364,10 +356,8 @@ export class ProfileStateManager {
             this.isLoadingFlag = true;
             this.state.activeScheduleId = scheduleId;
 
-            // Clear undo history when switching schedules
             this.undoRedoManager.clear();
 
-            // Load schedule's courses and resolve section references
             const loadedCourses = [...schedule.selectedCourses];
             this.state.selectedCourses = this.resolveCourseReferences(loadedCourses);
 
@@ -387,7 +377,6 @@ export class ProfileStateManager {
             const updated = { ...this.state.schedules[index], ...updates };
             this.state.schedules = this.state.schedules.map(s => s.id === scheduleId ? updated : s);
 
-            // If this is the active schedule, signal reactivation
             if (scheduleId === this.state.activeScheduleId) {
                 this.signalActivation(source);
             }
@@ -409,7 +398,6 @@ export class ProfileStateManager {
 
             this.state.schedules = this.state.schedules.filter(s => s.id !== scheduleId);
 
-            // Remove from storage
             const deleteResult = await this.storageManager.deleteSchedule(scheduleId);
             if (!deleteResult.success) {
                 logger.warn('Failed to delete schedule from storage:', deleteResult.error);
@@ -448,14 +436,12 @@ export class ProfileStateManager {
         });
     }
 
-    // Preferences management
     updatePreferences(updates: Partial<SchedulePreferences>, _source: string = 'user'): void {
         this.withPersist(() => {
             this.state.preferences = { ...this.state.preferences, ...updates };
         });
     }
 
-    // Bookmark management
     bookmarkCourse(courseId: string, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             const bookmarks = this.state.preferences.bookmarkedCourseIds ?? [];
@@ -489,7 +475,6 @@ export class ProfileStateManager {
         return [...(this.state.preferences.bookmarkedCourseIds ?? [])];
     }
 
-    // Undo/Redo methods
     async undo(): Promise<boolean> {
         const snapshot = this.undoRedoManager.undo();
         if (!snapshot) return false;
@@ -615,29 +600,25 @@ export class ProfileStateManager {
             this.state.isLoading = true;
             this.isLoadingFlag = true;
 
-            // Load preferences first
             const preferencesResult = this.storageManager.loadPreferences();
             if (preferencesResult.valid && preferencesResult.data) {
                 this.state.preferences = preferencesResult.data;
             }
 
-            // Load all schedules
             const schedulesResult = await this.storageManager.loadAllSchedules();
 
             if (schedulesResult.valid && schedulesResult.data) {
-                // Resolve course references for all schedules (immutable rebuild)
                 this.state.schedules = schedulesResult.data
                     .filter(s => !s.id.startsWith('tutorial_'))
                     .map(s => ({ ...s, selectedCourses: this.resolveCourseReferences(s.selectedCourses) }));
             }
 
-            // Load active schedule ID
             const activeIdResult = this.storageManager.loadActiveScheduleId();
             if (activeIdResult.valid && activeIdResult.data) {
                 this.state.activeScheduleId = activeIdResult.data;
             }
 
-            // Load selected courses from active schedule only (no fallback)
+            // Selected courses come from the active schedule only (no fallback)
             let loadedCourses: SelectedCourse[] = [];
             if (this.state.activeScheduleId) {
                 const activeSchedule = this.state.schedules.find(s => s.id === this.state.activeScheduleId);
@@ -646,10 +627,8 @@ export class ProfileStateManager {
                 }
             }
 
-            // Resolve references for active courses (already resolved in schedule, but ensure consistency)
             this.state.selectedCourses = loadedCourses;
 
-            // Log what was loaded
             logger.log('%cLOADED - Parsed Data:', 'color: #2196F3; font-weight: bold');
             const loadedData = {
                 activeScheduleId: this.state.activeScheduleId,
@@ -762,12 +741,10 @@ export class ProfileStateManager {
         }
     }
 
-    // Health check
     isHealthy(): { healthy: boolean; issues: string[] } {
         const storageHealth = this.storageManager.isHealthy();
         const issues = [...storageHealth.issues];
 
-        // Check state consistency
         if (this.state.activeScheduleId && !this.state.schedules.find(s => s.id === this.state.activeScheduleId)) {
             issues.push('Active schedule ID references non-existent schedule');
         }
@@ -803,7 +780,6 @@ export class ProfileStateManager {
             const resolveSection = (section: Section | null): Section | null => {
                 if (!section || !liveCourse) return null;
 
-                // Validate that section has required CRN field
                 if (typeof section.crn !== 'number') {
                     logger.warn(`Section missing CRN field, cannot resolve for course ${courseId}`);
                     return null;
@@ -817,7 +793,6 @@ export class ProfileStateManager {
                     return null;
                 }
 
-                // Verify resolved section has all required fields
                 if (typeof liveSection.computedTerm !== 'string' || !['A', 'B', 'C', 'D'].includes(liveSection.computedTerm)) {
                     logger.error(`Resolved section CRN ${liveSection.crn} has invalid computedTerm: ${liveSection.computedTerm}`);
                 }
@@ -843,7 +818,6 @@ export class ProfileStateManager {
         });
     }
 
-    // Private helper methods
     /** Reset reactive state back to defaults (immutable reassignment). */
     private resetState(): void {
         appState.activeScheduleId = null;
@@ -865,11 +839,11 @@ export class ProfileStateManager {
     }
 
 
+    // In batch mode the trailing save is skipped; withBatch saves once at the end.
     private withStateUpdate(updateFn: () => void): void {
         updateFn();
         this.state.hasUnsavedChanges = true;
 
-        // Skip save if in batch mode - batch will handle save at the end
         if (!this.isBatchUpdate) {
             this.save();
         }
@@ -879,7 +853,6 @@ export class ProfileStateManager {
         const result = await updateFn();
         this.state.hasUnsavedChanges = true;
 
-        // Skip save if in batch mode - batch will handle save at the end
         if (!this.isBatchUpdate) {
             this.save();
         }
@@ -890,7 +863,6 @@ export class ProfileStateManager {
         const result = updateFn();
         this.state.hasUnsavedChanges = true;
 
-        // Skip save if in batch mode - batch will handle save at the end
         if (!this.isBatchUpdate) {
             this.save();
         }
@@ -917,19 +889,8 @@ export class ProfileStateManager {
     }
 
     /**
-     * Execute multiple state updates in batch mode (single save at end).
-     * Automatically manages batch flag, saves once at completion, and emits sync event.
-     *
-     * @param fn - Function containing batch updates
+     * Run multiple state updates in batch mode, saving once at the end.
      * @param skipSnapshot - Skip expensive snapshot capture during save (useful for rapid navigation)
-     * @returns Result of the batch function
-     *
-     * @example
-     * await profileStateManager.withBatch(async () => {
-     *     for (const course of courses) {
-     *         profileStateManager.selectCourse(course);
-     *     }
-     * });
      */
     async withBatch<T>(fn: () => Promise<T>, skipSnapshot = false): Promise<T> {
         const wasBatch = this.isBatchUpdate;
@@ -947,19 +908,7 @@ export class ProfileStateManager {
         }
     }
 
-    /**
-     * Synchronous version of withBatch for non-async batch operations.
-     *
-     * @param fn - Function containing batch updates
-     * @returns Result of the batch function
-     *
-     * @example
-     * profileStateManager.withBatchSync(() => {
-     *     for (const course of courses) {
-     *         profileStateManager.selectCourse(course);
-     *     }
-     * });
-     */
+    /** Synchronous version of withBatch for non-async batch operations. */
     withBatchSync<T>(fn: () => T): T {
         const wasBatch = this.isBatchUpdate;
         if (!wasBatch) {
@@ -991,12 +940,10 @@ export class ProfileStateManager {
         return `schedule_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     }
 
-    // Debug methods
     debugState(): void {
         logger.log('=== PROFILE STATE DEBUG ===');
         logger.log('Active Schedule ID:', this.state.activeScheduleId);
 
-        // Convert to ScheduleState for debugging with utility methods
         const scheduleStates = this.state.schedules.map(s => ({
             id: s.id,
             name: s.name,

@@ -23,12 +23,10 @@ export class AvailabilityFilter implements SectionBasedFilter {
                 return false;
             }
 
-            // Filter by availability
             if (criteria.availableOnly && fs.section.seatsAvailable <= 0) {
                 return false;
             }
 
-            // Filter by minimum available seats
             if (criteria.minAvailable && fs.section.seatsAvailable < criteria.minAvailable) {
                 return false;
             }

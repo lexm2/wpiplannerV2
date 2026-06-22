@@ -31,7 +31,6 @@ export interface SchemaValidationOptions {
 }
 
 export class DataValidator {
-    // Schema validation for core data types
     validateSchedule(schedule: unknown, options: SchemaValidationOptions = {}): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
@@ -48,11 +47,9 @@ export class DataValidator {
 
         const scheduleObj = schedule as Record<string, unknown>;
 
-        // Validate required fields
         this.validateRequiredField(scheduleObj, 'id', 'string', result);
         this.validateRequiredField(scheduleObj, 'name', 'string', result);
-        
-        // Validate arrays
+
         this.validateArray(
             scheduleObj,
             'selectedCourses',
@@ -106,7 +103,6 @@ export class DataValidator {
 
         const selectedCourseObj = selectedCourse as Record<string, unknown>;
 
-        // Validate course object
         if (!selectedCourseObj.course) {
             result.errors.push({
                 field: 'course',
@@ -129,7 +125,6 @@ export class DataValidator {
             result.warnings.push(...courseValidation.warnings);
         }
 
-        // Validate isRequired field
         if (typeof selectedCourseObj.isRequired !== 'boolean') {
             if (options.repairInPlace) {
                 selectedCourseObj.isRequired = false;
@@ -168,12 +163,10 @@ export class DataValidator {
 
         const courseObj = course as Record<string, unknown>;
 
-        // Validate required fields
         this.validateRequiredField(courseObj, 'id', 'string', result);
         this.validateRequiredField(courseObj, 'number', 'string', result);
         this.validateRequiredField(courseObj, 'name', 'string', result);
 
-        // Validate credits
         this.validateRequiredField(courseObj, 'minCredits', 'number', result);
         this.validateRequiredField(courseObj, 'maxCredits', 'number', result);
 
@@ -198,11 +191,9 @@ export class DataValidator {
             }
         }
 
-        // Validate department fields
         this.validateRequiredField(courseObj, 'departmentAbbr', 'string', result);
         this.validateRequiredField(courseObj, 'departmentName', 'string', result);
 
-        // Validate sections (hierarchical structure)
         const allSections = getAllSections(courseObj as unknown as Course);
         if (allSections.length === 0) {
             result.warnings.push({
@@ -260,8 +251,7 @@ export class DataValidator {
             return result;
         }
 
-        // Preferences are minimal now - just theme and bookmarks
-        // No complex validation needed
+        // Preferences are minimal (theme + bookmarks); no further validation needed
         return result;
     }
 
@@ -281,7 +271,6 @@ export class DataValidator {
 
         const userStateObj = userState as Record<string, unknown>;
 
-        // Validate savedSchedules
         this.validateArray(
             userStateObj,
             'savedSchedules',
@@ -301,7 +290,6 @@ export class DataValidator {
             }
         );
 
-        // Validate preferences
         if (userStateObj.preferences) {
             const preferencesValidation = this.validateSchedulePreferences(userStateObj.preferences, options);
             if (!preferencesValidation.valid) {
@@ -319,7 +307,6 @@ export class DataValidator {
         return result;
     }
 
-    // Data integrity checks
     checkDataIntegrity(data: { schedules?: Schedule[], selectedCourses?: SelectedCourse[], activeScheduleId?: string | null }): ValidationResult {
         const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
@@ -384,32 +371,26 @@ export class DataValidator {
         return result;
     }
 
-    // Repair functions
     repairSchedule(schedule: Schedule): void {
-        // Ensure generatedSchedules is an array
         if (!Array.isArray(schedule.generatedSchedules)) {
             schedule.generatedSchedules = [];
         }
 
-        // Ensure selectedCourses is an array
         if (!Array.isArray(schedule.selectedCourses)) {
             schedule.selectedCourses = [];
         }
 
-        // Repair each selected course
         schedule.selectedCourses.forEach(selectedCourse => {
             this.repairSelectedCourse(selectedCourse);
         });
     }
 
     repairSelectedCourse(selectedCourse: SelectedCourse): void {
-        // Ensure isRequired is boolean
         if (typeof selectedCourse.isRequired !== 'boolean') {
             selectedCourse.isRequired = false;
         }
     }
 
-    // Schema migration utilities
     detectSchemaVersion(data: unknown): string {
         if (!data || typeof data !== 'object') return '1.0';
 
@@ -430,7 +411,6 @@ export class DataValidator {
         return '1.0'; // Default to oldest version
     }
 
-    // Helper methods
     private validateRequiredField(obj: Record<string, unknown>, field: string, expectedType: string, result: ValidationResult): void {
         if (obj[field] === undefined || obj[field] === null) {
             result.errors.push({
@@ -472,7 +452,6 @@ export class DataValidator {
         }
     }
 
-    // Batch validation for multiple items
     validateBatch<T>(
         items: T[], 
         validator: (item: T, options?: SchemaValidationOptions) => ValidationResult,

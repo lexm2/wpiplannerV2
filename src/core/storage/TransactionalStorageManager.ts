@@ -47,10 +47,6 @@ export class TransactionalStorageManager {
         this.indexedDBStorage = new IndexedDBStorageManager();
     }
 
-    /**
-     * Ensures IndexedDB is initialized before any schedule operations.
-     * Called automatically by all schedule-related methods.
-     */
     private async ensureInitialized(): Promise<void> {
         if (this.indexedDBInitialized) {
             return;
@@ -81,22 +77,18 @@ export class TransactionalStorageManager {
         this.activeTransactions.set(transactionId, transaction);
 
         try {
-            // Create backup of all keys we might modify
             const keysToBackup = this.extractKeysFromOperations(operations);
             this.createBackup(transaction, keysToBackup);
 
-            // Execute all operations
             for (const operation of operations) {
                 operation();
             }
 
-            // Verify data integrity after operations
             const integrityCheck = this.verifyDataIntegrity();
             if (!integrityCheck.valid) {
                 throw new Error(`Data integrity check failed: ${integrityCheck.error}`);
             }
 
-            // Commit transaction
             this.commitTransaction(transaction);
             
             return {
@@ -275,17 +267,14 @@ export class TransactionalStorageManager {
             const activeScheduleIdResult = this.loadActiveScheduleId();
             const activeScheduleId = activeScheduleIdResult.data;
 
-            // Convert Schedule objects to ScheduleState
             const scheduleStates = fullSchedules.map(s => ScheduleState.fromSchedule(s));
 
-            // Create ApplicationState (with full objects)
             const appState = new ApplicationState(
                 activeScheduleId,
                 scheduleStates,
                 preferences
             );
 
-            // Export as minimal JSON format
             const minimalData = appState.toMinimalFormat();
 
             console.log('[TransactionalStorageManager] Exported minimal data:', {
@@ -310,15 +299,9 @@ export class TransactionalStorageManager {
     }
 
     /**
-     * Import data with full Schedule objects (not IDs)
-     *
-     * NOTE: This method expects full Schedule objects with Course/Section references.
-     * The caller (ProfileStateManager) is responsible for converting from SyncData
-     * (IDs only) to full objects before calling this method.
-     *
-     * @param schedules - Full Schedule objects to import
-     * @param activeScheduleId - ID of active schedule
-     * @param preferences - Optional preferences
+     * Expects full Schedule objects with Course/Section references. The caller
+     * (ProfileStateManager) is responsible for converting from SyncData (IDs only)
+     * to full objects before calling this method.
      */
     async importData(
         schedules: Schedule[],
@@ -326,7 +309,6 @@ export class TransactionalStorageManager {
         preferences?: SchedulePreferences
     ): Promise<TransactionResult> {
         try {
-            // Save preferences if provided
             if (preferences) {
                 localStorage.setItem(
                     TransactionalStorageManager.STORAGE_KEYS.PREFERENCES,
@@ -334,7 +316,6 @@ export class TransactionalStorageManager {
                 );
             }
 
-            // Save schedules to IndexedDB
             if (schedules.length > 0) {
                 await this.ensureInitialized();
                 for (const schedule of schedules) {
@@ -343,7 +324,6 @@ export class TransactionalStorageManager {
                 console.log('[TransactionalStorageManager] All schedules saved');
             }
 
-            // Save active schedule ID
             if (activeScheduleId !== undefined) {
                 this.saveActiveScheduleId(activeScheduleId);
                 console.log('[TransactionalStorageManager] Saved activeScheduleId:', activeScheduleId);
@@ -375,13 +355,10 @@ export class TransactionalStorageManager {
         };
 
         try {
-            // Create backup of current localStorage state
             this.createFullBackup(transaction);
 
-            // Execute operation
             operation();
 
-            // Verify data integrity
             const integrityCheck = this.verifyDataIntegrity();
             if (!integrityCheck.valid) {
                 throw new Error(`Data integrity check failed: ${integrityCheck.error}`);
@@ -475,13 +452,11 @@ export class TransactionalStorageManager {
     }
 
     private commitTransaction(transaction: StorageTransaction): void {
-        // Log successful transaction for debugging
         console.log(`Transaction ${transaction.id} committed successfully`);
     }
 
     private verifyDataIntegrity(): { valid: boolean; error?: string } {
         try {
-            // Check that localStorage is still accessible
             const testKey = 'wpi-integrity-test';
             const testValue = 'test';
             localStorage.setItem(testKey, testValue);
@@ -492,7 +467,7 @@ export class TransactionalStorageManager {
                 return { valid: false, error: 'localStorage read/write test failed' };
             }
 
-            // Verify preferences data can be parsed (schedules are in IndexedDB, checked separately)
+            // Schedules live in IndexedDB and are checked separately
             const preferences = this.loadPreferences();
             if (!preferences.valid) {
                 return { valid: false, error: `Preferences data invalid: ${preferences.error}` };
@@ -508,7 +483,6 @@ export class TransactionalStorageManager {
         const issues: string[] = [];
         
         try {
-            // Test localStorage availability
             const testKey = 'wpi-health-check';
             localStorage.setItem(testKey, 'test');
             localStorage.removeItem(testKey);
@@ -516,13 +490,12 @@ export class TransactionalStorageManager {
             issues.push(`localStorage unavailable: ${error}`);
         }
 
-        // Check data integrity
         const integrityCheck = this.verifyDataIntegrity();
         if (!integrityCheck.valid) {
             issues.push(`Data integrity issue: ${integrityCheck.error}`);
         }
 
-        // Check for active transactions that might be stuck
+        // Flag transactions that may be stuck
         if (this.activeTransactions.size > 0) {
             const stuckTransactions = Array.from(this.activeTransactions.values())
                 .filter(tx => Date.now() - tx.timestamp > 30_000); // 30 seconds

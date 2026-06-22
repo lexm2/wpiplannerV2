@@ -9,23 +9,21 @@
 import type { Section } from '../../types/types';
 import type { WeeklyTimeSlot } from '../../types/schedule';
 
-// Constants for time slot calculation
 const START_HOUR = 7;          // 7:00 AM
 const END_HOUR = 22;           // 10:00 PM
-const SLOT_MINUTES = 5;        // 5-minute granularity
+const SLOT_MINUTES = 5;
 const SLOTS_PER_DAY = ((END_HOUR - START_HOUR) * 60) / SLOT_MINUTES; // 180
 const DAYS_PER_WEEK = 5;       // M, T, W, R, F
 const SLOTS_PER_TERM = SLOTS_PER_DAY * DAYS_PER_WEEK; // 900
 
-// Day to index mapping
 const DAY_INDEX: Record<string, number> = {
-  'M': 0, // Monday
-  'T': 1, // Tuesday
-  'W': 2, // Wednesday
-  'R': 3, // Thursday
-  'F': 4, // Friday
-  'S': 5, // Saturday (not used in main calculation)
-  'U': 6, // Sunday (not used in main calculation)
+  'M': 0,
+  'T': 1,
+  'W': 2,
+  'R': 3,
+  'F': 4,
+  'S': 5, // weekends not used in main calculation
+  'U': 6,
 };
 
 export interface SectionMask {
@@ -74,7 +72,6 @@ export function sectionToMask(section: Section): bigint {
 
       const dayOffset = dayIndex * SLOTS_PER_DAY;
 
-      // Set bits for all slots in this time range on this day
       for (let slot = startSlot; slot < endSlot; slot++) {
         const bitIndex = dayOffset + slot;
         mask |= (1n << BigInt(bitIndex));

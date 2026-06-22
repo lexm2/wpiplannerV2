@@ -164,7 +164,6 @@ export class SectionFilterPipeline {
                     continue;
                 }
 
-                // Find the original lecture group to check required components
                 const originalLg = originalCourse.lectures?.find(
                     ol => String(ol.section.crn) === lectureCrn
                 );

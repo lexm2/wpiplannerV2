@@ -64,9 +64,6 @@ export class RMPRatingFilter implements SectionBasedFilter {
         });
     }
 
-    /**
-     * Validate that the criteria is properly formatted
-     */
     isValidCriteria(criteria: unknown): criteria is RMPRatingFilterCriteria {
         if (!criteria || typeof criteria !== 'object') {
             return false;
@@ -74,7 +71,6 @@ export class RMPRatingFilter implements SectionBasedFilter {
 
         const c = criteria as Record<string, unknown>;
 
-        // Validate rating range if set
         if (c.minRating !== undefined && (typeof c.minRating !== 'number' || c.minRating < 0 || c.minRating > 5)) {
             return false;
         }
@@ -82,7 +78,6 @@ export class RMPRatingFilter implements SectionBasedFilter {
             return false;
         }
 
-        // Validate difficulty range if set
         if (c.minDifficulty !== undefined && (typeof c.minDifficulty !== 'number' || c.minDifficulty < 0 || c.minDifficulty > 5)) {
             return false;
         }
@@ -90,7 +85,6 @@ export class RMPRatingFilter implements SectionBasedFilter {
             return false;
         }
 
-        // Validate "would take again" range if set
         if (c.minWouldTakeAgain !== undefined && (typeof c.minWouldTakeAgain !== 'number' || c.minWouldTakeAgain < 0 || c.minWouldTakeAgain > 100)) {
             return false;
         }
@@ -101,27 +95,21 @@ export class RMPRatingFilter implements SectionBasedFilter {
         return true;
     }
 
-    /**
-     * Get a human-readable display value for the active filter
-     */
     getDisplayValue(criteria: RMPRatingFilterCriteria): string {
         const parts: string[] = [];
 
-        // Show rating range if not at defaults
         const minRating = criteria.minRating ?? 0;
         const maxRating = criteria.maxRating ?? 5;
         if (minRating > 0 || maxRating < 5) {
             parts.push(`${minRating.toFixed(1)}-${maxRating.toFixed(1)} rating`);
         }
 
-        // Show difficulty range if not at defaults
         const minDifficulty = criteria.minDifficulty ?? 0;
         const maxDifficulty = criteria.maxDifficulty ?? 5;
         if (minDifficulty > 0 || maxDifficulty < 5) {
             parts.push(`${minDifficulty.toFixed(1)}-${maxDifficulty.toFixed(1)} difficulty`);
         }
 
-        // Show "would take again" range if not at defaults
         const minRetake = criteria.minWouldTakeAgain ?? 0;
         const maxRetake = criteria.maxWouldTakeAgain ?? 100;
         if (minRetake > 0 || maxRetake < 100) {
