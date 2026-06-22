@@ -2,7 +2,6 @@ import { ThemeDefinition, ThemeId } from './types'
 import { ProfileStateManager } from '../core/state/ProfileStateManager'
 import { uiState } from '../services/ui/uiState.svelte'
 
-// Import theme definitions
 import wpiClassic from './definitions/wpi-classic.json'
 import wpiDark from './definitions/wpi-dark.json'
 import wpiLight from './definitions/wpi-light.json'
@@ -85,7 +84,6 @@ export class ThemeManager {
     }
 
     private initializeThemes(): void {
-        // Register built-in themes
         this.registerTheme(wpiClassic as ThemeDefinition);
         this.registerTheme(wpiDark as ThemeDefinition);
         this.registerTheme(wpiLight as ThemeDefinition);
@@ -97,8 +95,7 @@ export class ThemeManager {
         if (savedTheme && this.themes.has(savedTheme as ThemeId)) {
             this.currentTheme = savedTheme as ThemeId;
         }
-        
-        // Apply the current theme
+
         this.applyTheme(this.currentTheme);
         uiState.currentThemeId = this.currentTheme;
     }
@@ -158,22 +155,18 @@ export class ThemeManager {
 
         const root = document.documentElement;
 
-        // Apply color variables
         Object.entries(theme.colors).forEach(([key, value]) => {
             root.style.setProperty(`--color-${this.kebabCase(key)}`, value);
         });
 
-        // Apply typography variables
         Object.entries(theme.typography).forEach(([key, value]) => {
             root.style.setProperty(`--font-${this.kebabCase(key)}`, value);
         });
 
-        // Apply spacing variables
         Object.entries(theme.spacing).forEach(([key, value]) => {
             root.style.setProperty(`--spacing-${this.kebabCase(key)}`, value);
         });
 
-        // Apply effect variables
         Object.entries(theme.effects).forEach(([key, value]) => {
             root.style.setProperty(`--effect-${this.kebabCase(key)}`, value);
         });
@@ -199,7 +192,6 @@ export class ThemeManager {
         this.storage.saveThemePreference(themeId);
     }
 
-    // System preference detection
     detectSystemPreference(): ThemeId {
         if (typeof window !== 'undefined' && window.matchMedia) {
             if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -217,24 +209,20 @@ export class ThemeManager {
         return this.setTheme(preferredTheme);
     }
 
-    // Theme preview (temporary application without saving)
+    // Temporary application without saving; resetToCurrentTheme() restores on cancel
     previewTheme(themeId: ThemeId): boolean {
         if (!this.themes.has(themeId)) return false;
         this.applyTheme(themeId);
-        // Reflect the previewed (visible) theme so the UI matches what's shown,
-        // even though this.currentTheme / storage are intentionally left unchanged.
-        // resetToCurrentTheme() below restores the rune on cancel.
+        // Reflect the visible theme; currentTheme / storage are intentionally left unchanged.
         uiState.currentThemeId = themeId;
         return true;
     }
 
-    // Reset to current theme (cancel preview)
     resetToCurrentTheme(): void {
         this.applyTheme(this.currentTheme);
         uiState.currentThemeId = this.currentTheme;
     }
 
-    // Export/Import functionality
     exportCurrentTheme(): string {
         const theme = this.getCurrentTheme();
         if (!theme) throw new Error('No current theme to export');
@@ -255,7 +243,6 @@ export class ThemeManager {
         }
     }
 
-    // Theme utilities
     getThemeById(themeId: ThemeId): ThemeDefinition | null {
         return this.themes.get(themeId) || null;
     }

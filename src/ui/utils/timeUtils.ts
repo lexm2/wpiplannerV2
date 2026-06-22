@@ -1,14 +1,13 @@
 import { Time, DayOfWeek } from '../../types/types';
 
 export class TimeUtils {
-    // Schedule grid constants - 8 AM to 8 PM (12 hours)
-    static readonly START_HOUR = 8;  // 8 AM
-    static readonly END_HOUR = 20;   // 8 PM
+    // Schedule grid: 8 AM to 8 PM, hourly slots
+    static readonly START_HOUR = 8;
+    static readonly END_HOUR = 20;
     static readonly TOTAL_HOURS = 12;
-    static readonly SLOTS_PER_HOUR = 1; // 60-minute intervals (hourly)
+    static readonly SLOTS_PER_HOUR = 1;
     static readonly TOTAL_TIME_SLOTS = TimeUtils.TOTAL_HOURS * TimeUtils.SLOTS_PER_HOUR;
 
-    // Days of the week in order
     static readonly DAYS_ORDER = [
         DayOfWeek.MONDAY,
         DayOfWeek.TUESDAY, 
@@ -20,32 +19,24 @@ export class TimeUtils {
     ];
 
 
-    /**
-     * Convert start time to grid row position (rounds DOWN)
-     * Used for class start times - finds the slot the class starts in
-     */
+    /** Convert start time to grid row, rounding DOWN to the slot it starts in */
     static timeToGridRowStart(time: Time): number {
         const totalMinutes = time.hours * 60 + time.minutes;
         const startMinutes = TimeUtils.START_HOUR * 60;
         const relativeMinutes = totalMinutes - startMinutes;
 
-        // Convert to 60-minute slots, round DOWN for start times
         const slot = Math.floor(relativeMinutes / 60);
         const boundedSlot = Math.max(0, Math.min(slot, TimeUtils.TOTAL_TIME_SLOTS - 1));
 
         return boundedSlot;
     }
 
-    /**
-     * Convert end time to grid row position (rounds UP)
-     * Used for class end times - ensures full duration is visually represented
-     */
+    /** Convert end time to grid row, rounding UP so full duration is shown */
     static timeToGridRowEnd(time: Time): number {
         const totalMinutes = time.hours * 60 + time.minutes;
         const startMinutes = TimeUtils.START_HOUR * 60;
         const relativeMinutes = totalMinutes - startMinutes;
 
-        // Convert to 60-minute slots, round UP for end times
         const slot = Math.ceil(relativeMinutes / 60);
         const boundedSlot = Math.max(0, Math.min(slot, TimeUtils.TOTAL_TIME_SLOTS - 1));
 
@@ -53,33 +44,24 @@ export class TimeUtils {
         return boundedSlot;
     }
 
-    /**
-     * Convert day of week to grid column position (0-based)
-     * Monday = 0, Tuesday = 1, etc.
-     */
+    /** Convert day of week to 0-based grid column (Monday = 0) */
     static dayToGridColumn(day: DayOfWeek): number {
         return TimeUtils.DAYS_ORDER.indexOf(day);
     }
 
-    /**
-     * Calculate how many grid rows a time period spans
-     */
+    /** How many grid rows a time period spans */
     static calculateDuration(startTime: Time, endTime: Time): number {
         const startRow = TimeUtils.timeToGridRowStart(startTime);
         const endRow = TimeUtils.timeToGridRowEnd(endTime);
         return Math.max(1, endRow - startRow);
     }
 
-    /**
-     * Check if a time is within the schedule grid bounds (7 AM - 7 PM)
-     */
+    /** Whether a time falls within the schedule grid bounds */
     static isTimeInBounds(time: Time): boolean {
         return time.hours >= TimeUtils.START_HOUR && time.hours < TimeUtils.END_HOUR;
     }
 
-    /**
-     * Format time for display (e.g., "9:00 AM", "2:30 PM")
-     */
+    /** Format time for display, e.g. "9:00 AM", "2:30 PM" */
     static formatTime(time: Time): string {
         if (time.displayTime) {
             return time.displayTime;
@@ -92,9 +74,7 @@ export class TimeUtils {
         return `${hours12}:${minutes} ${ampm}`;
     }
 
-    /**
-     * Format time range for display (e.g., "9:00-9:50 AM")
-     */
+    /** Format time range for display, e.g. "9:00-9:50 AM" */
     static formatTimeRange(startTime: Time, endTime: Time): string {
         const startFormatted = TimeUtils.formatTime(startTime);
         const endFormatted = TimeUtils.formatTime(endTime);
@@ -109,9 +89,7 @@ export class TimeUtils {
         }
     }
 
-    /**
-     * Format days for display (e.g., "MWF", "TR")
-     */
+    /** Format days for display, e.g. "MWF", "TR" */
     static formatDays(days: Set<DayOfWeek>): string {
         const dayAbbreviations: { [key in DayOfWeek]: string } = {
             [DayOfWeek.MONDAY]: 'M',
@@ -129,26 +107,20 @@ export class TimeUtils {
             .join('');
     }
 
-    /**
-     * Generate time labels for the grid (only hourly: 7:00 AM, 8:00 AM, etc.)
-     */
+    /** Generate hourly time labels for the grid */
     static generateTimeLabels(): string[] {
         const labels: string[] = [];
 
         for (let slot = 0; slot < TimeUtils.TOTAL_TIME_SLOTS; slot++) {
             const hour = slot + TimeUtils.START_HOUR;
-            const minutes = 0; // Only show on-the-hour labels
+            const minutes = 0;
 
-            // Show labels for hourly times only
             labels.push(TimeUtils.formatTime({ hours: hour, minutes: minutes, displayTime: '' }));
         }
 
         return labels;
     }
 
-    /**
-     * Get day name for display
-     */
     static getDayName(day: DayOfWeek): string {
         const dayNames: { [key in DayOfWeek]: string } = {
             [DayOfWeek.MONDAY]: 'Monday',
@@ -163,9 +135,6 @@ export class TimeUtils {
         return dayNames[day];
     }
 
-    /**
-     * Get abbreviated day name for display
-     */
     static getDayAbbr(day: DayOfWeek): string {
         const dayAbbrs: { [key in DayOfWeek]: string } = {
             [DayOfWeek.MONDAY]: 'Mon',

@@ -1,9 +1,6 @@
 import type { PeriodType } from '../types/types';
 
-/**
- * Period-type → CSS-class / short-label lookups. Extracted from SectionInfo.svelte
- * (they're pure data tables, not view logic).
- */
+// Period-type → CSS-class / short-label lookups (pure data tables, not view logic).
 
 export function getPeriodTypeClass(type: string | PeriodType): string {
     const typeStr = String(type).toLowerCase();

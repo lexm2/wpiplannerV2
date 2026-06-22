@@ -17,18 +17,8 @@ export function rankCoursesByRelevance(courses: Course[], query: string): Course
 }
 
 /**
- * Calculates a relevance score for a course based on search query
- * Higher score = more relevant
- *
- * Scoring Tiers:
- * - TIER 1: Exact ID/Code matches (1000+ points)
- * - TIER 2: Exact name matches (800+ points)
- * - TIER 3: Prefix matches for ID/Code (700+ points)
- * - TIER 4: Prefix matches for name (600+ points)
- * - TIER 5: Contains matches for ID/Code (500+ points)
- * - TIER 6: Contains matches for name (400+ points)
- * - TIER 7: Department matches (300+ points)
- * - TIER 8: Description matches (1 point only)
+ * Tiered relevance score for a course vs. a search query (higher = more relevant).
+ * Tier weights cascade exact > prefix > contains, code/id > name > department > description.
  */
 export function calculateRelevanceScore(course: Course, queryLower: string): number {
     let score = 0;
@@ -79,8 +69,7 @@ export function calculateRelevanceScore(course: Course, queryLower: string): num
 }
 
 /**
- * Extracts all unique professor names from courses, sorted alphabetically
- * Filters out TBA entries and returns cached result
+ * Unique professor names across all course sections, sorted; TBA entries excluded.
  */
 export function getAvailableProfessors(courses: Course[]): string[] {
     const professors = new Set<string>();

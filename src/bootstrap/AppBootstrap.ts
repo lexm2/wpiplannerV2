@@ -44,10 +44,7 @@ export class AppBootstrap {
         const timestampManager = new TimestampManager();
         const operationManager = new OperationManager();
 
-        // Derived UI services (previously constructed in the MainController ctor).
-        // They depend only on courseSelectionService/filterService, so they belong
-        // in the container alongside everything else — App.svelte (Phase 13C) reads
-        // them for the grid/footer/modal-layer props.
+        // Derived UI services: depend only on courseSelectionService/filterService.
         const colorService = new CourseColorService(courseSelectionService);
         const autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, filterService);
 
@@ -69,9 +66,7 @@ export class AppBootstrap {
     }
 
     // Inject the non-singleton services into the standalone scheduling-service
-    // singletons (componentWizard / localEvent / sectionInfo / autoSchedule).
-    // Previously done in the MainController constructor; now part of bootstrap so
-    // it runs before the tutorial and the component mounts.
+    // singletons. Runs before the tutorial and component mount.
     static initStandaloneServices(services: ServiceContainer): void {
         const {
             courseSelectionService, courseDataService, filterService,
@@ -119,8 +114,8 @@ export class AppBootstrap {
             const profileStateManager = ProfileStateManager.getInstance();
 
             if (profileStateManager.hasPendingSaves()) {
-                // preventDefault() triggers the browser's unload confirmation; the
-                // legacy returnValue mechanism is deprecated and no longer required.
+                // preventDefault() triggers the browser's unload confirmation;
+                // the legacy returnValue mechanism is no longer required.
                 e.preventDefault();
                 return;
             }
@@ -129,18 +124,16 @@ export class AppBootstrap {
         });
     }
 
-    // Async app startup, run after the component shell is mounted (the previous
-    // MainController.init()). Loads data + storage, applies the saved theme, wires
-    // the auto-scheduler's calendar provider, registers the unload handler, and
-    // auto-starts the welcome tutorial on first visit. The mounted Svelte views
-    // show their own loading states until appState.loadedDepartments populates;
-    // App.svelte's $effect on that rune drives the one-time course-data sync.
+    // Async app startup, run after the component shell is mounted. Loads data +
+    // storage, applies the saved theme, wires the auto-scheduler's calendar
+    // provider, registers the unload handler, and auto-starts the welcome
+    // tutorial on first visit. Views show loading states until
+    // appState.loadedDepartments populates (App.svelte's $effect drives the sync).
     static async startApp(services: ServiceContainer): Promise<void> {
         try {
             await AppBootstrap.initializeAsyncServices(services);
 
-            // Apply the saved theme now that storage has loaded — setTheme bumps
-            // uiState.currentThemeId so the mounted ThemeSelector reflects it.
+            // Apply the saved theme now that storage has loaded.
             const savedTheme = services.profileStateManager.getPreferences()?.theme ?? 'wpi-dark';
             services.themeManager.setTheme(savedTheme);
 

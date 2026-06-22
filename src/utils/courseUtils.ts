@@ -1,18 +1,9 @@
-/**
- * Course Utility Functions
- * Helper functions for processing and formatting course data
- */
-
 import { Course, Section } from '../types/types';
 import type { SelectedCourse } from '../types/schedule';
 
 const EXCLUDED_PROFESSORS = new Set(['TBA', 'Not Assigned', '']);
 
-/**
- * Flattens hierarchical lecture structure into a single array of all sections
- * @param course - The course to extract sections from
- * @returns Array of all sections (lectures, discussions, labs, and standalone labs)
- */
+/** Flattens the hierarchical lecture structure into a flat array of all sections. */
 export function getAllSections(course: Course): Section[] {
     const sections: Section[] = [];
 
@@ -31,21 +22,12 @@ export function getAllSections(course: Course): Section[] {
     return sections;
 }
 
-/**
- * Extracts only lecture sections from a course
- * @param course - The course to extract lectures from
- * @returns Array of lecture sections only
- */
 export function getLectureSections(course: Course): Section[] {
     if (!course.lectures) return [];
     return course.lectures.map(lectureGroup => lectureGroup.section);
 }
 
-/**
- * Extracts all lab sections (from lecture groups and standalone)
- * @param course - The course to extract labs from
- * @returns Array of all lab sections
- */
+/** Returns all lab sections, both from lecture groups and standalone. */
 export function getLabSections(course: Course): Section[] {
     const labs: Section[] = [];
 
@@ -62,25 +44,18 @@ export function getLabSections(course: Course): Section[] {
     return labs;
 }
 
-/**
- * Extracts and formats professors grouped by term for a course
- * @param course - The course to extract professors from
- * @returns Formatted string of professors by term (e.g., "A: Smith | B: Lee, Davis")
- */
+/** Formats professors grouped by term, e.g. "A: Smith | B: Lee, Davis". */
 export function getProfessorsByTerm(course: Course): string {
     const termProfessors = new Map<string, Set<string>>();
 
-    // Aggregate professors by term across all sections
     const allSections = getAllSections(course);
     allSections.forEach(section => {
         const term = section.computedTerm;
 
-        // Initialize set for this term if not exists
         if (!termProfessors.has(term)) {
             termProfessors.set(term, new Set<string>());
         }
 
-        // Add professors from all periods in this section
         section.periods.forEach(period => {
             if (period.professor && !EXCLUDED_PROFESSORS.has(period.professor) && period.professor.trim() !== '') {
                 const termSet = termProfessors.get(term);
@@ -91,7 +66,6 @@ export function getProfessorsByTerm(course: Course): string {
         });
     });
 
-    // Format output in term order (A, B, C, D)
     const termOrder = ['A', 'B', 'C', 'D'];
     const parts: string[] = [];
 
@@ -106,11 +80,7 @@ export function getProfessorsByTerm(course: Course): string {
     return parts.length > 0 ? parts.join(' | ') : 'No professors listed';
 }
 
-/**
- * Get all CRNs from a selected course's components
- * @param course - Selected course to extract CRNs from
- * @returns Object with CRN for each component type
- */
+/** Returns the CRN for each selected component (lecture, discussion, lab). */
 export function getCombinedCRNs(course: SelectedCourse): {
     lecture: string | null;
     discussion: string | null;
@@ -123,12 +93,7 @@ export function getCombinedCRNs(course: SelectedCourse): {
     };
 }
 
-/**
- * Get the primary CRN from a selected course
- * Returns the first available CRN (lecture, then discussion, then lab)
- * @param course - Selected course to extract CRN from
- * @returns Primary CRN or null if none available
- */
+/** Returns the first available CRN, preferring lecture, then discussion, then lab. */
 export function getPrimaryCRN(course: SelectedCourse): string | null {
     return course.selectedLecture?.crn?.toString() ??
            course.selectedDiscussion?.crn?.toString() ??
@@ -136,11 +101,7 @@ export function getPrimaryCRN(course: SelectedCourse): string | null {
            null;
 }
 
-/**
- * Encode selected course component CRNs for export
- * @param course - Selected course to encode
- * @returns Array of [courseId, lectureCRN, discussionCRN, labCRN]
- */
+/** Encodes a selection for export as [courseId, lectureCRN, discussionCRN, labCRN]. */
 export function encodeCourseSelection(course: SelectedCourse): [string, string | null, string | null, string | null] {
     return [
         course.course.id,
@@ -150,15 +111,7 @@ export function encodeCourseSelection(course: SelectedCourse): [string, string |
     ];
 }
 
-/**
- * Decode course selection from export format
- * @param courseId - Course ID
- * @param lectureCRN - Lecture section CRN
- * @param discussionCRN - Discussion section CRN
- * @param labCRN - Lab section CRN
- * @param course - Course object from catalog
- * @returns Object with selected sections for each component
- */
+/** Resolves exported CRNs back to section objects from the catalog course. */
 export function decodeCourseSelection(
     lectureCRN: string | null,
     discussionCRN: string | null,
@@ -176,9 +129,6 @@ export function decodeCourseSelection(
     };
 }
 
-/**
- * Helper to find section by CRN in a course
- */
 function findSectionByCRN(course: Course, crn: string): Section | null {
     const allSections = getAllSections(course);
     return allSections.find(s => s.crn.toString() === crn) || null;

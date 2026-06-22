@@ -2,17 +2,11 @@ import type { WeeklyTimeSlot, DisplayableTimeSlot } from '../types/schedule';
 import { AcademicTerm, EventType } from '../types/schedule';
 import type { SimpleTime, DayOfWeek, TimeSlot } from '../types/types';
 
-/**
- * Generate a unique ID for a time slot.
- */
 function generateSlotId(day: DayOfWeek, startTime: SimpleTime, term: AcademicTerm): string {
     return `slot-${day}-${startTime.hours}${startTime.minutes}-${term}`;
 }
 
-/**
- * Expand a multi-day TimeSlot (from UI filters) to individual WeeklyTimeSlots.
- * Creates one WeeklyTimeSlot per day in the TimeSlot.days array.
- */
+/** Expand a multi-day TimeSlot (from UI filters) to one WeeklyTimeSlot per day. */
 export function expandToWeeklySlots(
     slot: TimeSlot,
     term: AcademicTerm = AcademicTerm.ALL
@@ -26,9 +20,7 @@ export function expandToWeeklySlots(
     }));
 }
 
-/**
- * Create a DisplayableTimeSlot from a base WeeklyTimeSlot by adding display metadata.
- */
+/** Add display metadata to a WeeklyTimeSlot. */
 export function toDisplayableSlot(
     slot: WeeklyTimeSlot,
     display: {
@@ -49,9 +41,6 @@ export function toDisplayableSlot(
     };
 }
 
-/**
- * Create a WeeklyTimeSlot from individual parameters.
- */
 export function createWeeklyTimeSlot(params: {
     day: DayOfWeek;
     startTime: SimpleTime;
@@ -68,9 +57,6 @@ export function createWeeklyTimeSlot(params: {
     };
 }
 
-/**
- * Create a DisplayableTimeSlot from individual parameters.
- */
 export function createDisplayableTimeSlot(params: {
     day: DayOfWeek;
     startTime: SimpleTime;
@@ -97,31 +83,24 @@ export function createDisplayableTimeSlot(params: {
     };
 }
 
-/**
- * Check if two time slots overlap on the same day.
- */
+/** Check if two time slots overlap on the same day. */
 export function slotsOverlap(slot1: WeeklyTimeSlot, slot2: WeeklyTimeSlot): boolean {
-    // Must be on the same day
     if (slot1.day !== slot2.day) return false;
 
-    // Must be in compatible terms (same term or one is ALL)
+    // Terms must be compatible: same term, or one is ALL
     if (slot1.term !== slot2.term && slot1.term !== AcademicTerm.ALL && slot2.term !== AcademicTerm.ALL) {
         return false;
     }
 
-    // Convert to minutes for comparison
     const start1 = slot1.startTime.hours * 60 + slot1.startTime.minutes;
     const end1 = slot1.endTime.hours * 60 + slot1.endTime.minutes;
     const start2 = slot2.startTime.hours * 60 + slot2.startTime.minutes;
     const end2 = slot2.endTime.hours * 60 + slot2.endTime.minutes;
 
-    // Check for overlap: slots overlap if one starts before the other ends
     return start1 < end2 && start2 < end1;
 }
 
-/**
- * Convert minutes since midnight to SimpleTime.
- */
+/** Convert minutes since midnight to SimpleTime. */
 export function minutesToSimpleTime(minutes: number): SimpleTime {
     return {
         hours: Math.floor(minutes / 60),
@@ -129,9 +108,7 @@ export function minutesToSimpleTime(minutes: number): SimpleTime {
     };
 }
 
-/**
- * Convert SimpleTime to minutes since midnight.
- */
+/** Convert SimpleTime to minutes since midnight. */
 export function simpleTimeToMinutes(time: SimpleTime): number {
     return time.hours * 60 + time.minutes;
 }

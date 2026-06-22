@@ -84,7 +84,6 @@ export function groupDepartmentsByCategory(departments: Department[]): Record<st
         categories[category].push(dept);
     });
 
-    // Sort departments within each category
     Object.keys(categories).forEach(category => {
         categories[category].sort((a, b) => a.name.localeCompare(b.name));
     });

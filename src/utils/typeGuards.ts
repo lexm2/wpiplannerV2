@@ -1,13 +1,8 @@
 import { SelectedCourse } from '../types/schedule';
 import { Course, Section } from '../types/types';
 
-/**
- * Type guards and validation utilities for runtime data integrity checks
- */
+/** Type guards and validation utilities for runtime data integrity checks. */
 
-/**
- * Validates that a Section object has all required properties
- */
 export function isValidSection(section: unknown): section is Section {
     if (!section || typeof section !== 'object') return false;
 
@@ -25,9 +20,6 @@ export function isValidSection(section: unknown): section is Section {
     );
 }
 
-/**
- * Validates that a SelectedCourse object has valid structure and data
- */
 export function isValidSelectedCourse(sc: unknown): sc is SelectedCourse {
     if (!sc || typeof sc !== 'object') return false;
 
@@ -52,10 +44,7 @@ export function isValidSelectedCourse(sc: unknown): sc is SelectedCourse {
     return true;
 }
 
-/**
- * Validates an array of SelectedCourse objects
- * Automatically attempts to repair invalid courses when possible
- */
+/** Validates an array of SelectedCourse objects, repairing invalid ones when possible. */
 export function validateSelectedCourses(selectedCourses: unknown[], attemptRepair: boolean = true): SelectedCourse[] {
     if (!Array.isArray(selectedCourses)) {
         console.warn('validateSelectedCourses: Expected array, got:', typeof selectedCourses);
@@ -70,7 +59,6 @@ export function validateSelectedCourses(selectedCourses: unknown[], attemptRepai
         if (isValidSelectedCourse(sc)) {
             validCourses.push(sc);
         } else {
-            // Try to repair invalid courses
             if (attemptRepair) {
                 const repaired = repairSelectedCourse(sc);
                 if (repaired && isValidSelectedCourse(repaired)) {
@@ -100,10 +88,7 @@ export function validateSelectedCourses(selectedCourses: unknown[], attemptRepai
     return validCourses;
 }
 
-/**
- * Attempts to repair a SelectedCourse object by fixing common issues
- * Uses getAllSections to properly extract sections from hierarchical course structure
- */
+/** Attempts to repair a SelectedCourse object by fixing common issues. */
 export function repairSelectedCourse(sc: unknown): SelectedCourse | null {
     if (!sc || typeof sc !== 'object') return null;
 
@@ -111,7 +96,6 @@ export function repairSelectedCourse(sc: unknown): SelectedCourse | null {
 
     if (!scObj.course) return null;
 
-    // Create a repaired version with defaults
     const repaired: SelectedCourse = {
         course: scObj.course as Course,
         selectedLecture: null,
@@ -130,7 +114,6 @@ export function repairSelectedCourse(sc: unknown): SelectedCourse | null {
         repaired.selectedLecture = hasLectures ? scObj.selectedSection as Section : null;
     }
 
-    // Try to repair hierarchical selections (selectedLecture, selectedDiscussion, selectedLab)
     if (scObj.selectedLecture && !isValidSection(scObj.selectedLecture)) {
         console.warn(`repairSelectedCourse: Invalid selectedLecture, clearing it for course ${(scObj.course as Course).departmentAbbr}${(scObj.course as Course).number}`);
         repaired.selectedLecture = null;
@@ -155,13 +138,9 @@ export function repairSelectedCourse(sc: unknown): SelectedCourse | null {
     return repaired;
 }
 
-/**
- * Safe getter for computed term from selected course
- * Checks component fields: lecture, discussion, lab
- */
+/** Safe getter for computed term, checking lecture, then discussion, then lab. */
 export function getComputedTerm(sc: SelectedCourse): string | null {
-    // Check component fields: lecture, discussion, lab
-    // Use lecture as primary source since it's typically the main component
+    // Lecture is the primary source since it's typically the main component
     if (sc.selectedLecture?.computedTerm) {
         return sc.selectedLecture.computedTerm;
     }
@@ -177,9 +156,6 @@ export function getComputedTerm(sc: SelectedCourse): string | null {
     return null;
 }
 
-/**
- * Validates that a computed term is valid
- */
 export function isValidComputedTerm(term: unknown): term is string {
     return typeof term === 'string' && ['A', 'B', 'C', 'D', 'F', 'S'].includes(term);
 }

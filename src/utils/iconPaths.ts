@@ -87,49 +87,7 @@ export type IconName =
   | 'WAND'
   | 'X';
 
-/**
- * Icon paths for SVG assets with Vite base path resolution.
- *
- * Available icons:
- * - ADJUSTMENTS_ALT: adjustments-alt.svg
- * - ALERT_CIRCLE: alert-circle.svg
- * - ALERT_SQUARE_ROUNDED: alert-square-rounded.svg
- * - ARROW_BACK_UP: arrow-back-up.svg
- * - ARROW_BAR_LEFT: arrow-bar-left.svg
- * - ARROW_BAR_RIGHT: arrow-bar-right.svg
- * - ARROW_FORWARD_UP: arrow-forward-up.svg
- * - BOOKMARK_FILLED: bookmark-filled.svg
- * - BOOKMARK: bookmark.svg
- * - BRAND_APPLE: brand-apple.svg
- * - BRIGHTNESS: brightness.svg
- * - CALENDAR_DOWN: calendar-down.svg
- * - CALENDAR_PLUS: calendar-plus.svg
- * - CALENDAR_REPEAT: calendar-repeat.svg
- * - CALENDAR_SHARE: calendar-share.svg
- * - CALENDAR_UP: calendar-up.svg
- * - CHECK: check.svg
- * - CHEVRON_DOWN: chevron-down.svg
- * - CLOCK: clock.svg
- * - DOWNLOAD: download.svg
- * - ERASER: eraser.svg
- * - FILE_EXPORT: file-export.svg
- * - FILTER_FILLED: filter-filled.svg
- * - FILTER: filter.svg
- * - HEXAGON_MINUS: hexagon-minus.svg
- * - HEXAGON_PLUS: hexagon-plus.svg
- * - MENU_2: menu-2.svg
- * - MINUS: minus.svg
- * - PLUS: plus.svg
- * - REFRESH: refresh.svg
- * - SCHOOL_FULL: school-full.svg
- * - SCHOOL: school.svg
- * - SETTINGS: settings.svg
- * - TRASH: trash.svg
- * - USER_CHECK: user-check.svg
- * - USER_X: user-x.svg
- * - WAND: wand.svg
- * - X: x.svg
- */
+/** Icon URL paths for SVG assets, with Vite base path resolution (use in img tags). */
 export const ICONS: Record<IconName, string> = {
   ADJUSTMENTS_ALT: adjustmentsAltIcon,
   ALERT_CIRCLE: alertCircleIcon,
@@ -171,10 +129,7 @@ export const ICONS: Record<IconName, string> = {
   X: xIcon,
 } as const;
 
-/**
- * Inline SVG content for icons that need CSS styling support.
- * These use currentColor and can be styled with CSS fill/stroke properties.
- */
+/** Inline SVG markup using currentColor, so icons can be styled via CSS fill/stroke. */
 export const INLINE_SVGS: Record<IconName, string> = {
   ADJUSTMENTS_ALT: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 8h4v4h-4z" /><path d="M6 4l0 4" /><path d="M6 12l0 8" /><path d="M10 14h4v4h-4z" /><path d="M12 4l0 10" /><path d="M12 18l0 2" /><path d="M16 5h4v4h-4z" /><path d="M18 4l0 1" /><path d="M18 9l0 11" /></svg>`,
   ALERT_CIRCLE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" /></svg>`,
@@ -228,12 +183,7 @@ function sanitizeClassName(className: string): string {
 // uncached so its console.warn keeps surfacing the bug.
 const inlineSVGCache = new Map<string, string>();
 
-/**
- * Helper function to create an inline SVG with custom classes.
- * @param iconName The icon to render
- * @param className Optional CSS classes to apply
- * @returns HTML string with inline SVG
- */
+/** Returns inline SVG markup for an icon, optionally with custom CSS classes. */
 export function getInlineSVG(iconName: IconName, className?: string): string {
   const cacheKey = `${iconName}|${className ?? ''}`;
   const cached = inlineSVGCache.get(cacheKey);

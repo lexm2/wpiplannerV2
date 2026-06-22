@@ -18,7 +18,6 @@ export class Validators {
             return false;
         }
 
-        // Validate sections from hierarchical structure
         const sections = getAllSections(courseObj as unknown as Course);
         return sections.every((s: unknown) => this.isValidSection(s));
     }
@@ -30,7 +29,7 @@ export class Validators {
 
         return typeof deptObj.abbreviation === 'string' &&
             typeof deptObj.name === 'string' &&
-            // Make courses array optional - it may not be present in serialized data
+            // courses is optional: may be absent in serialized data
             (deptObj.courses === undefined || Array.isArray(deptObj.courses));
     }
 
@@ -151,16 +150,13 @@ export class Validators {
     }
 
     static validateCourseId(courseId: string): boolean {
-        // Format: DEPT-NUMBER (e.g., CS-1101, AB-1531, RBE-1001) 
-        // Allow 2-4 letter department codes and 3-4 digit course numbers
+        // DEPT-NUMBER: 2-4 letter dept code, 3-4 digit number (e.g. CS-1101, RBE-1001)
         return /^[A-Z]{2,4}-\d{3,4}$/.test(courseId);
     }
 
     static validateSectionNumber(sectionNumber: string): boolean {
-        // Very permissive section number validation - allow most printable characters
-        // WPI has diverse section formats: A01, Lab1, "Interest List-A Term", "AL02/AD02/AX01", etc.
-        // Just ensure it's a non-empty string with reasonable characters
-        return typeof sectionNumber === 'string' && 
+        // Permissive: WPI has diverse formats (A01, Lab1, "Interest List-A Term", "AL02/AD02/AX01")
+        return typeof sectionNumber === 'string' &&
                sectionNumber.trim().length > 0 && 
                /^[\w\s\-/]+$/.test(sectionNumber);
     }

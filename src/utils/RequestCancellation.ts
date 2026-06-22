@@ -45,11 +45,10 @@ export class CancellationTokenSource {
     }
 }
 
-// Utility class for managing cancellable operations
 export class OperationManager {
     private activeOperations = new Map<string, CancellationTokenSource>();
-    
-    // Cancel existing operation and create a new cancellation token
+
+    // Cancels any existing operation with this id before starting a new one
     startOperation(operationId: string, reason?: string): CancellationToken {
         this.cancelOperation(operationId, reason);
         
@@ -59,7 +58,6 @@ export class OperationManager {
         return tokenSource.token;
     }
     
-    // Cancel a specific operation
     cancelOperation(operationId: string, reason?: string): void {
         const existingOperation = this.activeOperations.get(operationId);
         if (existingOperation) {
@@ -68,7 +66,6 @@ export class OperationManager {
         }
     }
     
-    // Cancel all active operations
     cancelAllOperations(reason?: string): void {
         for (const [_id, tokenSource] of this.activeOperations) {
             tokenSource.cancel(reason || 'All operations cancelled');
@@ -76,23 +73,19 @@ export class OperationManager {
         this.activeOperations.clear();
     }
     
-    // Check if an operation is active
     isOperationActive(operationId: string): boolean {
         return this.activeOperations.has(operationId);
     }
-    
-    // Get active operation count
+
     getActiveOperationCount(): number {
         return this.activeOperations.size;
     }
-    
-    // Complete an operation (remove from active list)
+
     completeOperation(operationId: string): void {
         this.activeOperations.delete(operationId);
     }
 }
 
-// Debounced operation helper
 export class DebouncedOperation {
     private timeoutId: number | null = null;
     private operationManager: OperationManager;
@@ -105,12 +98,10 @@ export class DebouncedOperation {
     
     execute<T>(operation: (cancellationToken: CancellationToken) => Promise<T>): Promise<T> {
         return new Promise((resolve, reject) => {
-            // Clear existing timeout
             if (this.timeoutId !== null) {
                 clearTimeout(this.timeoutId);
             }
-            
-            // Set new timeout
+
             this.timeoutId = window.setTimeout(async () => {
                 try {
                     const token = this.operationManager.startOperation(this.operationId, 'Debounced operation');
@@ -141,7 +132,6 @@ export class DebouncedOperation {
     }
 }
 
-// Utility functions for promise-based cancellation
 export function createCancellablePromise<T>(
     executor: (resolve: (value: T) => void, reject: (reason?: unknown) => void, cancellationToken: CancellationToken) => void,
     cancellationToken: CancellationToken

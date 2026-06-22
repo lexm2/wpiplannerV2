@@ -20,7 +20,6 @@ export interface TermBoundsData {
     years: Record<string, YearTermBounds>;
 }
 
-// ISO date format regex (YYYY-MM-DD)
 const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
 const TermBoundInfoSchema = z.object({
