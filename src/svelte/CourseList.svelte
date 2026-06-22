@@ -6,6 +6,7 @@
   import { buildCourseView } from './courseView';
   import { expandedTerm, toggleTerm, termFlip } from './termExpansion.svelte';
   import type { Course } from '../types/types';
+  import type { DepartmentFilterCriteria } from '../types/filters';
   import type { FilterService } from '../services/filtering/FilterService';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
   import type { ProfileStateManager } from '../core/state/ProfileStateManager';
@@ -30,8 +31,7 @@
   // `filterService.getActiveFilters()` (a SvelteMap) are reactive.
   const baseCourses = $derived.by(() => {
     const departments = appState.loadedDepartments;
-    const deptFilter = filterService.getActiveFilters().find(f => f.id === 'department');
-    const deptIds = (deptFilter?.criteria as { departments?: string[] } | undefined)?.departments ?? [];
+    const deptIds = filterService.getCriteria<DepartmentFilterCriteria>('department')?.departments ?? [];
     if (deptIds.length === 1) {
       const targetId = deptIds[0].toLowerCase();
       const dept = departments.find(d => d.abbreviation.toLowerCase() === targetId);

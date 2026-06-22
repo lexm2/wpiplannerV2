@@ -3,6 +3,7 @@
   import { appState } from '../core/state/appState.svelte';
   import { groupDepartmentsByCategory } from '../utils/departmentUtils';
   import type { FilterService } from '../services/filtering/FilterService';
+  import type { DepartmentFilterCriteria } from '../types/filters';
 
   let { filterService }: { filterService: FilterService } = $props();
 
@@ -17,10 +18,9 @@
   const departments = $derived(appState.loadedDepartments);
   const categories = $derived(groupDepartmentsByCategory(departments));
 
-  const activeDepts = $derived.by(() => {
-    const f = filterService.getActiveFilters().find(flt => flt.id === 'department');
-    return (f?.criteria as { departments?: string[] } | undefined)?.departments ?? [];
-  });
+  const activeDepts = $derived(
+    filterService.getCriteria<DepartmentFilterCriteria>('department')?.departments ?? []
+  );
   const activeSet = $derived(new Set(activeDepts));
 
   // Per-department counts reflect what the OTHER active filters allow (the
