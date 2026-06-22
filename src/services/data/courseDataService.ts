@@ -86,16 +86,14 @@ export class CourseDataService {
             department.courses = deptData.courses.map((courseData: RawCourse) => {
                 totalCoursesProcessed++;
                 let courseId = courseData.id;
-                
-                // Check for duplicate ID
+
                 if (seenIds.has(courseId)) {
                     duplicateIds.add(courseId);
 
-                    // Strict validation in development mode
                     const STRICT_VALIDATION = import.meta.env.DEV || import.meta.env.MODE === 'development';
 
                     if (STRICT_VALIDATION) {
-                        // FAIL HARD in development - forces fixing bad data at source
+                        // Fail hard in dev to force fixing bad data at the source
                         throw new Error(
                             `CRITICAL DATA ERROR: Duplicate course ID "${courseId}" detected.\n` +
                             `This indicates a data quality issue in course-data-constructed.json.\n` +
@@ -103,21 +101,20 @@ export class CourseDataService {
                             `Duplicate IDs found so far: ${Array.from(duplicateIds).join(', ')}`
                         );
                     } else {
-                        // Production fallback (for backward compatibility)
+                        // Production fallback: derive a synthetic unique ID
                         const fallbackId = `${department.abbreviation}-${courseData.number}`;
                         console.error(`DUPLICATE ID: "${courseId}" for ${department.abbreviation}${courseData.number}`);
                         console.error(`   Using fallback ID: "${fallbackId}"`);
                         courseId = fallbackId;
                         duplicatesFixed++;
 
-                        // If fallback is also duplicate, add a counter
+                        // If fallback is also a duplicate, append a counter
                         let counter = 2;
                         while (seenIds.has(courseId)) {
                             courseId = `${fallbackId}-${counter}`;
                             counter++;
                         }
 
-                        // Report data quality issue
                         console.error('[Data Quality Issue]', {
                             type: 'duplicate_course_id',
                             originalId: courseId,
@@ -128,8 +125,7 @@ export class CourseDataService {
                 }
                 
                 seenIds.add(courseId);
-                
-                // Parse NEW hierarchical structure (lectures + standaloneLabs)
+
                 const lectures = this.parseLectureGroups(courseData.lectures || []);
                 const standaloneLabs = courseData.standaloneLabs
                     ? this.parseConstructedSections(courseData.standaloneLabs)
@@ -155,8 +151,7 @@ export class CourseDataService {
             
             return department;
         });
-        
-        // Log summary of duplicate ID fixes
+
         if (duplicatesFixed > 0) {
             console.log(`Course ID Deduplication Summary:`);
             console.log(`   Total courses processed: ${totalCoursesProcessed}`);
@@ -189,8 +184,7 @@ export class CourseDataService {
     }
 
     /**
-     * Parses lecture groups from the NEW hierarchical structure
-     * Each lecture group contains a lecture section with compatible discussions and labs
+     * Each lecture group is a lecture section with its compatible discussions and labs.
      */
     private parseLectureGroups(lectureGroups: RawLectureGroup[]): LectureGroup[] {
         return lectureGroups.map(groupData => {
@@ -269,11 +263,10 @@ export class CourseDataService {
         if (!match) {
             return { hours: 0, minutes: 0, displayTime: timeStr };
         }
-        
+
         const hours = parseInt(match[1]);
         const minutes = parseInt(match[2]);
-        
-        // Convert to display format
+
         const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
         const ampm = hours >= 12 ? 'PM' : 'AM';
         const displayTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
@@ -342,20 +335,11 @@ export class CourseDataService {
         return this.scheduleDB?.departments || [];
     }
 
-    /**
-     * Gets all lecture groups for a course
-     * Returns empty array if course uses old flat structure or is lab-only
-     */
+    /** Empty if the course uses the old flat structure or is lab-only. */
     getLecturesForCourse(course: Course): LectureGroup[] {
         return course.lectures || [];
     }
 
-    /**
-     * Gets compatible discussions for a specific lecture section
-     * @param course The course containing the lecture
-     * @param lectureSection The lecture section to get discussions for
-     * @returns Array of compatible discussion sections
-     */
     getDiscussionsForLecture(course: Course, lectureSection: Section): Section[] {
         if (!course.lectures) {
             console.log('[CourseDataService] No lectures array on course');
@@ -382,12 +366,6 @@ export class CourseDataService {
         return lectureGroup.compatibleDiscussions || [];
     }
 
-    /**
-     * Gets compatible labs for a specific lecture section
-     * @param course The course containing the lecture
-     * @param lectureSection The lecture section to get labs for
-     * @returns Array of compatible lab sections
-     */
     getLabsForLecture(course: Course, lectureSection: Section): Section[] {
         if (!course.lectures) {
             console.log('[CourseDataService] No lectures array on course');
@@ -414,34 +392,23 @@ export class CourseDataService {
         return lectureGroup.compatibleLabs || [];
     }
 
-    /**
-     * Gets standalone labs for lab-only courses
-     * Returns empty array if course has lectures or no standalone labs
-     */
+    /** Empty if the course has lectures or no standalone labs. */
     getStandaloneLabs(course: Course): Section[] {
         return course.standaloneLabs || [];
     }
 
-    /**
-     * Checks if a course uses the new hierarchical structure
-     * @returns true if course has lecture groups, false if flat/standalone labs
-     */
+    /** True if the course has lecture groups (vs. flat/standalone-lab structure). */
     isHierarchicalCourse(course: Course): boolean {
         return (course.lectures && course.lectures.length > 0) || false;
     }
 
-    /**
-     * Checks if a course is lab-only (no lectures, only standalone labs)
-     */
+    /** Lab-only: no lectures, only standalone labs. */
     isLabOnlyCourse(course: Course): boolean {
         return (!course.lectures || course.lectures.length === 0) &&
                (course.standaloneLabs && course.standaloneLabs.length > 0) || false;
     }
 
-    /**
-     * Gets all sections for a course regardless of structure (hierarchical or flat)
-     * Useful for backward compatibility and general section iteration
-     */
+    /** All sections for a course regardless of structure (hierarchical or flat). */
     getAllSectionsForCourse(course: Course): Section[] {
         return getAllSections(course);
     }

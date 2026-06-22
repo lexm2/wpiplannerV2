@@ -87,8 +87,8 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
 
     // Auto-cancel the running tutorial when the active schedule changes away from
     // the tutorial's own schedule. Called by an App.svelte $effect keyed on
-    // appState.activeScheduleId (was a bridge watch here before the bridge was
-    // removed). The tutorialScheduleId guard makes this a no-op outside a tutorial.
+    // appState.activeScheduleId. The tutorialScheduleId guard makes this a no-op
+    // outside a tutorial.
     function onActiveScheduleChange(): void {
         if (cleaningUp || !tutorialScheduleId) return;
         if (appState.activeScheduleId !== tutorialScheduleId) {

@@ -34,19 +34,15 @@ export class AutoScheduleOrchestrator {
         this.calendarEventProvider = provider;
     }
 
-    // Publish the result count + applied index the declarative AutoScheduleControls
-    // footer reads. Replaces the old onStateChange single-callback into
-    // ScheduleController.
+    // Publish the result count + applied index the AutoScheduleControls footer reads.
     private notifyStateChange(): void {
         appState.autoScheduleCount = this.generatedSchedules.length;
         appState.autoScheduleIndex = this.currentScheduleIndex;
     }
 
-    // Invalidate generated schedules whenever the selection changes. Driven by an
-    // App.svelte $effect keyed on appState.selectedById (was the
-    // setupCourseSelectionChangeListener watcher before the bridge was removed).
-    // The isApplyingAutoSchedule guard suppresses the self-trigger while a
-    // generated schedule is being applied.
+    // Invalidate generated schedules whenever the selection changes (driven by an
+    // App.svelte $effect keyed on appState.selectedById). The isApplyingAutoSchedule
+    // guard suppresses the self-trigger while a generated schedule is being applied.
     invalidateOnSelectionChange(): void {
         if (this.isApplyingAutoSchedule) return;
         this.generatedSchedules = [];

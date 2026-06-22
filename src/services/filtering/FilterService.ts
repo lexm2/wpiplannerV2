@@ -20,7 +20,6 @@ export class FilterService {
         this.getBookmarkedCourseIds = config?.getBookmarkedCourseIds ?? null;
     }
 
-    // Filter Registration
     registerFilter(filter: SectionBasedFilter): void {
         this.registeredFilters.set(filter.id, filter);
         this.sectionPipeline.registerFilter(filter);
@@ -48,9 +47,8 @@ export class FilterService {
         this.registerFilter(conflictFilter);
     }
 
-    // Filter State Management
     addFilter(filterId: string, criteria: unknown): boolean {
-        // Handle bookmark filter specially (course-level, not in pipeline)
+        // Bookmark filter is course-level, handled outside the section pipeline
         if (filterId === 'bookmark') {
             const bookmarkCriteria = criteria as BookmarkFilterCriteria;
             const displayValue = bookmarkCriteria.showBookmarkedOnly ? 'Bookmarked Only' : 'All Courses';
@@ -128,7 +126,6 @@ export class FilterService {
         }
     }
 
-    // Filter State Queries
     hasFilter(filterId: string): boolean {
         return this.filterState.hasFilter(filterId);
     }
@@ -168,7 +165,6 @@ export class FilterService {
         return `${activeFilters.length} filters active`;
     }
 
-    // Primary filtering — returns FilterableSection[]
     apply(courses: Course[]): FilterableSection[] {
         if (this.isEmpty()) {
             return this.sectionPipeline.flattenCoursesToSections(courses);
@@ -187,7 +183,6 @@ export class FilterService {
         return this.sectionPipeline.applyFilters(sections, criteriaMap);
     }
 
-    // Reconstruct Course[] from FilterableSection[]
     resolveToCourses(sections: FilterableSection[]): Course[] {
         return this.sectionPipeline.reconstructCourses(sections);
     }
@@ -201,7 +196,7 @@ export class FilterService {
         const filteredSections = this.apply(courses);
         let filteredCourses = this.resolveToCourses(filteredSections);
 
-        // Apply bookmark filter at course level
+        // Bookmark filter is applied at course level
         const criteriaMap = this.getCriteriaMap();
         const bookmarkCriteria = criteriaMap.get('bookmark') as BookmarkFilterCriteria | undefined;
         if (bookmarkCriteria && bookmarkCriteria.showBookmarkedOnly && this.getBookmarkedCourseIds) {
@@ -209,7 +204,7 @@ export class FilterService {
             filteredCourses = filteredCourses.filter(course => bookmarkedIds.has(course.id));
         }
 
-        // Apply search text ranking (reorder by relevance)
+        // Reorder remaining courses by search relevance
         const searchCriteria = criteriaMap.get('searchText') as SearchTextFilterCriteria | undefined;
         if (searchCriteria && searchCriteria.query) {
             filteredCourses = rankCoursesByRelevance(filteredCourses, searchCriteria.query);
@@ -218,7 +213,6 @@ export class FilterService {
         return filteredCourses;
     }
 
-    // Apply filters excluding specific filter IDs, resolve to courses
     filterCoursesExcluding(courses: Course[], excludeIds: string[]): Course[] {
         const criteriaMap = this.getCriteriaMap();
         criteriaMap.delete('bookmark');
@@ -235,7 +229,6 @@ export class FilterService {
         return this.sectionPipeline.reconstructCourses(filtered);
     }
 
-    // Filter options for UI
     getFilterOptions(filterId: string, courses: Course[]): string[] | FilterOption[] | null {
         switch (filterId) {
             case 'department':

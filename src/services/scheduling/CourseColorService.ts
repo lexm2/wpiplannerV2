@@ -17,8 +17,7 @@ export class CourseColorService {
     }
 
     // Release colors for courses that are no longer selected. Driven by an
-    // App.svelte $effect keyed on appState.selectedById (was the
-    // setupColorManagement watcher before the reactivity bridge was removed).
+    // App.svelte $effect keyed on appState.selectedById.
     releaseUnselectedColors(): void {
         const selectedIds = new Set(appState.selectedCourses.map(sc => sc.course.id));
         for (const courseId of [...this.courseColorMap.keys()]) {

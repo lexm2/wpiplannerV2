@@ -7,9 +7,8 @@ import type { CalendarEventProvider } from './AutoScheduleOrchestrator'
  * Standalone CalendarEventProvider for the auto-scheduler.
  *
  * Reads the active schedule's local events from the `appState.activeSchedule`
- * rune directly, so it no longer depends on ScheduleController.currentSchedule.
- * These are on-demand getters called during schedule generation; reading the
- * `$derived` here returns its current value (no reactive tracking needed).
+ * rune directly. These are on-demand getters called during schedule generation;
+ * reading the `$derived` here returns its current value (no reactive tracking).
  */
 export const calendarEventProvider: CalendarEventProvider = {
     getAllLocalEventBlockedTimes(): WeeklyTimeSlot[] {

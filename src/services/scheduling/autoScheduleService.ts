@@ -11,17 +11,12 @@ import type { UIStateManager } from '../ui/UIStateManager'
 /**
  * Standalone auto-schedule modal orchestration for the schedule page.
  *
- * Drives the declarative intro → filter modal sequence (plain modalState +
- * continuation callbacks) and generation via AutoScheduleOrchestrator. Reads
- * the selection through CourseSelectionService and surfaces the generating
- * overlay through the `appState.scheduleGenerating` rune (the grid reacts).
- * Replaces ScheduleController's openAutoSchedule / openScheduleFilterModal /
- * openAutoScheduleIntro / updateAutoScheduleIntroTerms / openAutoScheduleFilter /
- * runAutoSchedule / doGenerateSchedules.
+ * Drives the intro → filter modal sequence (modalState + continuation callbacks)
+ * and generation via AutoScheduleOrchestrator. Reads the selection through
+ * CourseSelectionService and surfaces the generating overlay through the
+ * `appState.scheduleGenerating` rune.
  *
- * Needs the non-singleton services (CourseSelectionService, FilterService,
- * CourseColorService, AutoScheduleOrchestrator, UIStateManager), injected once
- * via init() from MainController.
+ * Needs the non-singleton services injected once via init() from MainController.
  */
 class AutoScheduleService {
     private courseSelectionService: CourseSelectionService | null = null
@@ -65,9 +60,7 @@ class AutoScheduleService {
             return
         }
 
-        // Declarative intro modal → its onNext opens the declarative filter
-        // modal with the term-filtered courses. This replaces the old ModalQueue
-        // intro→filter sequencing with plain state + a continuation callback.
+        // Intro modal → its onNext opens the filter modal with the term-filtered courses.
         modalState.autoScheduleIntro = {
             selectedCourses,
             getColor: (id) => this.colorService?.getCourseColor(id) ?? '',
@@ -99,16 +92,15 @@ class AutoScheduleService {
     }
 
     updateAutoScheduleIntroTerms(preferences: Record<string, string[]>): void {
-        // Pushed into the declarative intro modal via a reactive override channel
-        // (the component merges it into its per-course term selection).
+        // Override channel the intro modal merges into its per-course term selection.
         modalState.autoScheduleIntroTermPrefs = preferences
     }
 
     openAutoScheduleFilter(): void {
         if (!this.filterService || !this.courseSelectionService) return
         const selectedCourses = this.courseSelectionService.getSelectedCourses()
-        // Same declarative FilterModal as openScheduleFilterModal, but for the
-        // current selection (direct button / tutorial reopen path).
+        // Same FilterModal as openScheduleFilterModal, but for the current selection
+        // (direct button / tutorial reopen path).
         this.openScheduleFilterModal(selectedCourses)
     }
 
@@ -121,8 +113,7 @@ class AutoScheduleService {
     private async doGenerateSchedules(selectedCourses: SelectedCourse[], settings?: { blockedTimes: WeeklyTimeSlot[] }): Promise<void> {
         if (!this.orchestrator) return
 
-        // Drive the declarative grid's generating overlay via a rune (replaces the
-        // imperative .schedule-generating-overlay create/append).
+        // Drive the grid's generating overlay via a rune.
         appState.scheduleGenerating = true
 
         try {
@@ -132,9 +123,9 @@ class AutoScheduleService {
                 console.warn('[Auto-Schedule] No valid schedules found')
                 alert('Could not generate a valid schedule.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts')
             }
-            // On success the grid re-renders on its own: the orchestrator applied
-            // the schedule via batchSetSelectedComponents (appState.selectedCourses).
-            // The footer (AutoScheduleControls) reacts via appState.autoScheduleCount/Index.
+            // On success the grid and footer re-render on their own: the orchestrator
+            // applied the schedule via batchSetSelectedComponents, and AutoScheduleControls
+            // reacts via appState.autoScheduleCount/Index.
         } catch (error) {
             console.error('[Auto-Schedule] Error generating schedules:', error)
             alert('An error occurred while generating the schedule. Please try again.')

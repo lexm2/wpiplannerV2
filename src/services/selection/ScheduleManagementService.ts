@@ -27,7 +27,7 @@ export interface ScheduleUpdateOptions {
 }
 
 /**
- * Manages multi-schedule lifecycle with CRUD operations, validation, and event-driven UI synchronization
+ * Manages the multi-schedule lifecycle: CRUD operations with validation.
  */
 export class ScheduleManagementService {
     private profileStateManager: ProfileStateManager;
@@ -46,7 +46,6 @@ export class ScheduleManagementService {
         this.dataValidator = dataValidator || new DataValidator();
     }
 
-    // Initialization
     async initialize(): Promise<boolean> {
         if (this.isInitialized) return true;
         if (this.initializationPromise) return this.initializationPromise;
@@ -57,13 +56,8 @@ export class ScheduleManagementService {
 
     private async performInitialization(): Promise<boolean> {
         try {
-            // Initialize dependencies first
             await this.courseSelectionService.initialize();
-
-            // Ensure profile state is loaded
             await this.profileStateManager.loadFromStorage();
-
-            // Initialize default schedule if needed
             await this.initializeDefaultScheduleIfNeeded();
 
             this.isInitialized = true;
@@ -78,7 +72,6 @@ export class ScheduleManagementService {
         }
     }
 
-    // Schedule creation
     async createNewSchedule(name: string, options: ScheduleCreationOptions = {}): Promise<ScheduleOperationResult> {
         await this.ensureInitialized();
 
@@ -91,7 +84,6 @@ export class ScheduleManagementService {
         } = options;
 
         try {
-            // Validate schedule name
             if (!name || name.trim().length === 0) {
                 return {
                     success: false,
@@ -99,17 +91,14 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Auto-generate unique name instead of rejecting duplicates
+            // Auto-generate a unique name instead of rejecting duplicates
             const existingSchedules = this.profileStateManager.getAllSchedules();
             const uniqueName = this.generateUniqueScheduleName(name);
-            
-            // Use the unique name for creation
             name = uniqueName;
 
             let selectedCourses: SelectedCourse[] = [];
 
             if (copyFromSchedule) {
-                // Copy from existing schedule
                 const sourceSchedule = existingSchedules.find(s => s.id === copyFromSchedule);
                 if (!sourceSchedule) {
                     return {
@@ -119,14 +108,11 @@ export class ScheduleManagementService {
                 }
                 selectedCourses = [...sourceSchedule.selectedCourses];
             } else if (includeCurrentCourses) {
-                // Include current course selections
                 selectedCourses = this.profileStateManager.getSelectedCourses();
             }
 
-            // Create the schedule
             const schedule = this.profileStateManager.createSchedule(name, 'api', id);
 
-            // Update with selected courses if needed
             if (selectedCourses.length > 0) {
                 const updateResult = await this.updateScheduleCourses(schedule.id, selectedCourses);
                 if (!updateResult.success) {
@@ -137,7 +123,6 @@ export class ScheduleManagementService {
                 }
             }
 
-            // Activate if requested
             if (autoActivate) {
                 const activateResult = await this.setActiveSchedule(schedule.id);
                 if (!activateResult.success) {
@@ -145,7 +130,6 @@ export class ScheduleManagementService {
                 }
             }
 
-            // Auto-save if requested
             if (autoSave) {
                 this.profileStateManager.save();
             }
@@ -176,7 +160,6 @@ export class ScheduleManagementService {
         return this.createScheduleFromCurrent(name);
     }
 
-    // Schedule loading and activation
     async setActiveSchedule(scheduleId: string): Promise<ScheduleOperationResult> {
         await this.ensureInitialized();
 
@@ -191,7 +174,6 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Validate schedule before activation
             const validation = this.dataValidator.validateSchedule(schedule);
             if (!validation.valid) {
                 return {
@@ -201,7 +183,6 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Activate
             this.profileStateManager.setActiveSchedule(scheduleId, 'api');
 
             return {
@@ -218,7 +199,6 @@ export class ScheduleManagementService {
         }
     }
 
-    // Schedule updates
     async updateSchedule(scheduleId: string, updates: Partial<Schedule>, options: ScheduleUpdateOptions = {}): Promise<ScheduleOperationResult> {
         await this.ensureInitialized();
         const { autoSave = true } = options;
@@ -234,7 +214,6 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Validate updates
             const updatedSchedule = { ...existingSchedule, ...updates };
             const validation = this.dataValidator.validateSchedule(updatedSchedule);
             if (!validation.valid) {
@@ -245,15 +224,12 @@ export class ScheduleManagementService {
                 };
             }
 
-            // Update
             this.profileStateManager.updateSchedule(scheduleId, updates, 'api');
 
-            // Auto-save if requested
             if (autoSave) {
                 this.profileStateManager.save();
             }
 
-            // Get updated schedule
             const finalSchedule = this.profileStateManager.getAllSchedules().find(s => s.id === scheduleId);
 
             return {
@@ -278,7 +254,6 @@ export class ScheduleManagementService {
             };
         }
 
-        // Check for duplicate names
         const existingSchedules = this.profileStateManager.getAllSchedules();
         if (existingSchedules.some(s => s.name === newName && s.id !== scheduleId)) {
             return {
@@ -326,7 +301,6 @@ export class ScheduleManagementService {
         }
     }
 
-    // Schedule deletion
     async deleteSchedule(scheduleId: string, options: { force?: boolean } = {}): Promise<{ success: boolean; error?: string }> {
         await this.ensureInitialized();
         const { force = false } = options;
@@ -365,7 +339,6 @@ export class ScheduleManagementService {
         }
     }
 
-    // Schedule queries
     getActiveSchedule(): Schedule | null {
         if (!this.isInitialized) return null;
         return this.profileStateManager.getActiveSchedule();
@@ -395,10 +368,8 @@ export class ScheduleManagementService {
         return this.save();
     }
 
-    // Course management within schedules
     private async updateScheduleCourses(scheduleId: string, selectedCourses: SelectedCourse[]): Promise<{ success: boolean; error?: string }> {
         try {
-            // Validate all courses first
             const validation = this.dataValidator.validateBatch(
                 selectedCourses,
                 (course) => this.dataValidator.validateSelectedCourse(course)
@@ -451,7 +422,6 @@ export class ScheduleManagementService {
         }
     }
 
-    // Save and persistence
     async save(): Promise<{ success: boolean; error?: string }> {
         try {
             await this.ensureInitialized();
@@ -472,7 +442,6 @@ export class ScheduleManagementService {
         return this.profileStateManager.hasUnsavedChanges();
     }
 
-    // Export/Import
     async exportSchedule(scheduleId: string): Promise<{ success: boolean; data?: string; error?: string }> {
         try {
             const data = await this.profileStateManager.exportData();
@@ -623,12 +592,10 @@ export class ScheduleManagementService {
         }
     }
 
-    // Access to course selection service
     getCourseSelectionService(): CourseSelectionService {
         return this.courseSelectionService;
     }
 
-    // Health check
     async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
         const issues: string[] = [];
 
@@ -637,7 +604,6 @@ export class ScheduleManagementService {
                 issues.push('Service not initialized');
             }
 
-            // Check all schedules
             const schedules = this.getAllSchedules();
             const validation = this.dataValidator.validateBatch(
                 schedules,
@@ -664,7 +630,6 @@ export class ScheduleManagementService {
         };
     }
 
-    // Private helper methods
     private async ensureInitialized(): Promise<void> {
         if (!this.isInitialized) {
             await this.initialize();
@@ -677,13 +642,10 @@ export class ScheduleManagementService {
         if (existingSchedules.length === 0) {
             // Use ProfileStateManager directly to avoid circular dependency
             const defaultSchedule = this.profileStateManager.createSchedule('My Schedule', 'system');
-            
-            // Set as active
             this.profileStateManager.setActiveSchedule(defaultSchedule.id, 'system');
-            
             this.profileStateManager.save();
         } else if (!this.getActiveScheduleId()) {
-            // Activate last schedule if no active one
+            // No active schedule recorded: fall back to the most recent one
             this.profileStateManager.setActiveSchedule(existingSchedules[existingSchedules.length - 1].id, 'system');
         }
     }
@@ -691,13 +653,12 @@ export class ScheduleManagementService {
     private generateUniqueScheduleName(baseName: string): string {
         const existingSchedules = this.getAllSchedules();
         const existingNames = new Set(existingSchedules.map(s => s.name));
-        
-        // If name doesn't conflict, use it as-is
+
         if (!existingNames.has(baseName)) {
             return baseName;
         }
-        
-        // Try appending numbers until we find a unique name
+
+        // Append an incrementing suffix until the name is unique
         let counter = 1;
         let candidateName: string;
         
@@ -709,7 +670,6 @@ export class ScheduleManagementService {
         return candidateName;
     }
 
-    // Debug methods
     debugState(): void {
         console.log('=== SCHEDULE MANAGEMENT SERVICE DEBUG ===');
         console.log('Initialized:', this.isInitialized);

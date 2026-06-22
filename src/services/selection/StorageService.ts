@@ -38,7 +38,6 @@ export class StorageService implements ThemeStorage {
         }
     }
 
-    // Theme operations
     saveThemePreference(themeId: string): void {
         this.profileStateManager.updatePreferences({ theme: themeId }, 'storage-service');
     }
@@ -48,7 +47,6 @@ export class StorageService implements ThemeStorage {
         return preferences.theme || 'wpi-dark';
     }
 
-    // Preferences operations
     savePreferences(preferences: SchedulePreferences): void {
         this.profileStateManager.updatePreferences(preferences, 'storage-service');
     }
@@ -57,7 +55,6 @@ export class StorageService implements ThemeStorage {
         return this.profileStateManager.getPreferences();
     }
 
-    // Schedule operations
     saveSchedule(schedule: Schedule): boolean {
         return this.profileStateManager.updateSchedule(schedule.id, schedule, 'storage-service');
     }
@@ -74,9 +71,8 @@ export class StorageService implements ThemeStorage {
         return this.profileStateManager.deleteSchedule(scheduleId, 'storage-service');
     }
 
-    // Selected courses operations
     saveSelectedCourses(selectedCourses: SelectedCourse[]): void {
-        // Clear all selections first, then add the new ones
+        // Replace semantics: clear existing selections before adding the new set
         this.profileStateManager.clearAllSelections('storage-service');
         selectedCourses.forEach(sc => {
             this.profileStateManager.selectCourse(sc.course, sc.isRequired, 'storage-service');
@@ -91,7 +87,6 @@ export class StorageService implements ThemeStorage {
         this.profileStateManager.clearAllSelections('storage-service');
     }
 
-    // Active schedule operations
     saveActiveScheduleId(scheduleId: string | null): void {
         if (scheduleId) {
             this.profileStateManager.setActiveSchedule(scheduleId, 'storage-service');
@@ -104,14 +99,13 @@ export class StorageService implements ThemeStorage {
     }
 
     clearActiveScheduleId(): void {
-        // Set to the first available schedule or null
+        // Fall back to the first available schedule, if any
         const schedules = this.profileStateManager.getAllSchedules();
         if (schedules.length > 0) {
             this.profileStateManager.setActiveSchedule(schedules[0].id, 'storage-service');
         }
     }
 
-    // Data management
     async save(): Promise<boolean> {
         try {
             this.profileStateManager.save();
@@ -140,12 +134,11 @@ export class StorageService implements ThemeStorage {
         // Note: We don't clear preferences or schedules completely, just reset to defaults
     }
 
-    // Access to underlying ProfileStateManager for advanced operations
+    // Escape hatch for advanced operations not exposed by this facade
     getProfileStateManager(): ProfileStateManager {
         return this.profileStateManager;
     }
 
-    // Health check
     isHealthy(): { healthy: boolean; issues: string[] } {
         return this.profileStateManager.isHealthy();
     }

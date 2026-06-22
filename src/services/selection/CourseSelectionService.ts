@@ -37,7 +37,6 @@ export class CourseSelectionService {
         this.dataValidator = dataValidator || new DataValidator();
     }
 
-    // Initialization
     async initialize(): Promise<boolean> {
         if (this.isInitialized) return true;
         if (this.initializationPromise) return this.initializationPromise;
@@ -55,11 +54,9 @@ export class CourseSelectionService {
 
             this.isInitialized = true;
 
-            // Validate loaded data
             const healthCheck = await this.performHealthCheck();
             if (!healthCheck.healthy) {
                 console.warn('Health check found issues:', healthCheck.issues);
-                // Attempt repairs
                 await this.attemptDataRepair();
             }
 
@@ -75,7 +72,6 @@ export class CourseSelectionService {
         }
     }
 
-    // Core course selection methods
     async selectCourse(course: Course, options: CourseSelectionOptions = {}): Promise<CourseSelectionResult> {
         await this.ensureInitialized();
 
@@ -87,7 +83,6 @@ export class CourseSelectionService {
         try {
             let warnings: string[] | undefined;
 
-            // Validate course if requested
             if (validateBeforeAdd) {
                 const validation = this.dataValidator.validateCourse(course);
                 if (!validation.valid) {
@@ -98,16 +93,13 @@ export class CourseSelectionService {
                     };
                 }
 
-                // Capture warnings even if validation passed
                 if (validation.warnings.length > 0) {
                     warnings = validation.warnings.map(w => w.message);
                 }
             }
 
-            // Call ProfileStateManager directly - synchronous persistence
             this.profileStateManager.selectCourse(course, isRequired, 'service');
 
-            // Get updated course
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
 
             return {
@@ -136,7 +128,6 @@ export class CourseSelectionService {
                 };
             }
 
-            // Call ProfileStateManager directly - synchronous persistence
             this.profileStateManager.unselectCourse(course, 'service');
 
             return {
@@ -173,7 +164,6 @@ export class CourseSelectionService {
                 };
             }
 
-            // Validate section number if provided
             if (sectionNumber !== null && !Validators.validateSectionNumber(sectionNumber)) {
                 return {
                     success: false,
@@ -181,10 +171,8 @@ export class CourseSelectionService {
                 };
             }
 
-            // Call ProfileStateManager directly - synchronous persistence
             this.profileStateManager.setSelectedSection(course, sectionNumber, 'service');
 
-            // Get updated course
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
 
             return {
@@ -205,7 +193,6 @@ export class CourseSelectionService {
         await this.ensureInitialized();
 
         try {
-            // Call ProfileStateManager directly - synchronous persistence
             this.profileStateManager.clearAllSelections('service');
 
             return { success: true };
@@ -277,11 +264,6 @@ export class CourseSelectionService {
         }
     }
 
-    // Component-based selection for hierarchical course structure (lectures, discussions, labs)
-
-    /**
-     * Set selected components (lecture, discussion, lab) for a hierarchical course
-     */
     async setSelectedComponents(
         course: Course,
         lecture: Section | null,
@@ -298,10 +280,8 @@ export class CourseSelectionService {
                 };
             }
 
-            // Call ProfileStateManager directly - synchronous persistence
             this.profileStateManager.setSelectedComponents(course, lecture, discussion, lab, 'service');
 
-            // Get updated course
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
 
             return {
@@ -319,8 +299,7 @@ export class CourseSelectionService {
     }
 
     /**
-     * Batch set selected components for multiple courses
-     * This is optimized for auto-scheduler to avoid triggering listeners on each update
+     * Batch set components for the auto-scheduler, avoiding a reactive update per course.
      */
     async batchSetSelectedComponents(
         selections: CourseComponentSelections[],
@@ -363,9 +342,6 @@ export class CourseSelectionService {
         }
     }
 
-    /**
-     * Get the currently selected components for a course
-     */
     getSelectedComponents(course: Course): ComponentSelections {
         if (!this.isInitialized) {
             return { lecture: null, discussion: null, lab: null };
@@ -399,9 +375,6 @@ export class CourseSelectionService {
         return false;
     }
 
-    /**
-     * Get all courses with incomplete component selections
-     */
     getIncompleteCourses(): SelectedCourse[] {
         if (!this.isInitialized) return [];
 
@@ -488,7 +461,6 @@ export class CourseSelectionService {
         return true;
     }
 
-    // Query methods
     isCourseSelected(course: Course): boolean {
         if (!this.isInitialized) return false;
 
@@ -535,7 +507,6 @@ export class CourseSelectionService {
     }
 
 
-    // Department and section management
     setAllDepartments(departments: Department[]): void {
         // This would typically be handled by a separate service
         // For now, we'll store it in the profile state manager if needed
@@ -550,7 +521,6 @@ export class CourseSelectionService {
     getAllSectionsForCourse(course: Course): Section[] {
         const sections: Section[] = [];
 
-        // Handle hierarchical lecture structure
         if (course.lectures) {
             course.lectures.forEach(lectureGroup => {
                 sections.push(lectureGroup.section);
@@ -559,7 +529,6 @@ export class CourseSelectionService {
             });
         }
 
-        // Handle standalone labs
         if (course.standaloneLabs) {
             sections.push(...course.standaloneLabs);
         }
@@ -567,7 +536,6 @@ export class CourseSelectionService {
         return sections;
     }
 
-    // Data management
     async exportSelections(): Promise<{ success: boolean; data?: string; error?: string }> {
         try {
             await this.ensureInitialized();
@@ -610,23 +578,19 @@ export class CourseSelectionService {
         }
     }
 
-    // Health and diagnostics
     async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
         const issues: string[] = [];
 
         try {
-            // Check if initialized
             if (!this.isInitialized) {
                 issues.push('Service not initialized');
             }
 
-            // Check profile state manager health
             const stateHealth = this.profileStateManager.isHealthy();
             if (!stateHealth.healthy) {
                 issues.push(...stateHealth.issues.map(issue => `State: ${issue}`));
             }
 
-            // Validate current data
             const selectedCourses = this.getSelectedCourses();
             const validation = this.dataValidator.validateBatch(
                 selectedCourses,
@@ -665,14 +629,12 @@ export class CourseSelectionService {
         return this.profileStateManager.hasUnsavedChanges();
     }
 
-    // Backward compatibility methods
     findCourseById(_courseId: string): Course | undefined {
         // This would need to be implemented with access to course data
         console.warn('findCourseById: Course data access not implemented in this service');
         return undefined;
     }
 
-    // Utility methods
     unselectCourseById(_courseId: string): void {
         console.warn('unselectCourseById: Use unselectCourse with course object instead');
     }
@@ -695,7 +657,6 @@ export class CourseSelectionService {
         }
     }
 
-    // Private helper methods
     private async ensureInitialized(): Promise<void> {
         if (!this.isInitialized) {
             await this.initialize();
@@ -708,7 +669,6 @@ export class CourseSelectionService {
             let repairedCount = 0;
 
             selectedCourses.forEach(selectedCourse => {
-                // Repair each selected course
                 this.dataValidator.repairSelectedCourse(selectedCourse);
                 repairedCount++;
             });
@@ -726,7 +686,6 @@ export class CourseSelectionService {
     }
 
 
-    // Debug methods
     debugState(): void {
         console.log('=== COURSE SELECTION SERVICE DEBUG ===');
         console.log('Initialized:', this.isInitialized);

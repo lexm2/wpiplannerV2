@@ -2,9 +2,7 @@ import type { PageId, ViewMode } from '../../types/uiState';
 
 /**
  * Reactive UI state (Svelte 5 runes) — page/view/modal tracking that
- * {@link UIStateManager} reads and writes. Replaces the old hand-rolled
- * `subscribe`/`notify` listener system: consumers `watch` these fields (or read
- * them directly in a component) instead of registering callbacks.
+ * {@link UIStateManager} reads and writes.
  *
  * `openModals` uses `$state.raw` because the manager replaces it wholesale with
  * immutable updates (and it gets JSON-cloned for snapshots).
@@ -16,9 +14,8 @@ import type { PageId, ViewMode } from '../../types/uiState';
 class UiState {
     currentPage = $state<PageId>('planner');
     currentView = $state<ViewMode>('list');
-    // Reflects the *visible* theme. Written by ThemeManager.setTheme/previewTheme/
-    // resetToCurrentTheme (ThemeManager has no listener system, so this rune is how
-    // the Svelte ThemeSelector stays in sync). Default matches ThemeManager's default.
+    // Reflects the *visible* theme. Written by ThemeManager (which has no listener
+    // system, so this rune is how the Svelte ThemeSelector stays in sync).
     currentThemeId = $state<string>('wpi-dark');
     openModals = $state.raw<string[]>([]);
 }

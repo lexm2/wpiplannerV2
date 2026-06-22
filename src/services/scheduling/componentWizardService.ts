@@ -14,15 +14,10 @@ import type { FilterService } from '../filtering/FilterService'
  *
  * Drives the reactive `wizardState` store (WizardHost renders the Svelte
  * ComponentSelectionWizard panel) and pushes the calendar preview through the
- * `schedulePreviewState` rune (the grid reacts). Persists committed selections
- * via CourseSelectionService — the schedule sidebar re-renders on its own.
- * Replaces ScheduleController's openComponentWizard / jumpWizardToStep /
- * closeComponentWizard / onWizardComplete / onWizardSelectionChange /
- * onWizardHoverPreview + getIncompleteSelectionInfo / hasValidTimeSlot, and is
- * the last responsibility lifted off the now-deleted ScheduleController.
+ * `schedulePreviewState` rune. Persists committed selections via
+ * CourseSelectionService — the schedule sidebar re-renders on its own.
  *
- * Needs the non-singleton services (CourseSelectionService, CourseDataService,
- * FilterService), injected once via init() during bootstrap.
+ * Needs the non-singleton services injected once via init() during bootstrap.
  */
 class ComponentWizardService {
     private courseSelectionService: CourseSelectionService | null = null
@@ -39,10 +34,6 @@ class ComponentWizardService {
         this.filterService = filterService
     }
 
-    /**
-     * Open the component selection wizard for a course.
-     * Drives the wizardState store; WizardHost renders the Svelte wizard panel.
-     */
     openComponentWizard(course: Course, existingSelections?: SelectedCourse, initialStep?: WizardStep): void {
         if (!this.courseDataService || !this.courseSelectionService) {
             console.error('CourseDataService not available')
@@ -60,9 +51,6 @@ class ComponentWizardService {
             return
         }
 
-        // Open the wizard via the reactive store; WizardHost renders the Svelte
-        // ComponentSelectionWizard panel. The callbacks below are framework-agnostic
-        // and unchanged from the old vanilla wizard's contract.
         wizardState.open(
             {
                 course: freshCourse,
@@ -81,16 +69,11 @@ class ComponentWizardService {
     closeComponentWizard(): void {
         wizardState.close()
 
-        // Clear the preview rune unconditionally — the grid reacts and drops any
-        // preview blocks on its own.
+        // Clear the preview rune unconditionally — the grid drops preview blocks on its own.
         schedulePreviewState.clear()
     }
 
-    /**
-     * Handle wizard completion - save component selections
-     */
     private async onWizardComplete(course: Course, selections: ComponentSelections): Promise<void> {
-        // Clear preview first
         schedulePreviewState.clear()
 
         if (!this.courseSelectionService) return
@@ -104,9 +87,8 @@ class ComponentWizardService {
             )
 
             if (result.success) {
-                // The schedule sidebar (ScheduleSidebar) is reactive on
-                // appState.selectedCourses, so the updated selection re-renders
-                // on its own — no imperative sidebar refresh needed here.
+                // ScheduleSidebar is reactive on appState.selectedCourses, so the
+                // updated selection re-renders on its own — nothing to do here.
             } else {
                 console.error('Failed to save component selections:', result.error)
                 alert('Failed to save selections. Please try again.')
@@ -119,9 +101,6 @@ class ComponentWizardService {
         this.closeComponentWizard()
     }
 
-    /**
-     * Handle wizard selection changes - update calendar preview
-     */
     private onWizardSelectionChange(course: Course, selections: ComponentSelections): void {
         // Committed wizard selection → solid preview blocks (the grid reacts).
         schedulePreviewState.previewCourse = course
@@ -136,18 +115,13 @@ class ComponentWizardService {
     }
 
     /**
-     * Check if a section has at least one period with a valid time slot
-     * Async sections are valid even with 12:00-12:00 times
-     */
-    /**
      * Check if a selected course has incomplete component selections.
      *
      * "Required components" is delegated to the wizard's own
-     * {@link determineAvailableSteps} — the single source of truth for which
-     * steps the wizard would present for this course given the currently-selected
-     * lecture. This keeps the schedule-sidebar warning exactly in sync with the
-     * wizard (and, unlike the old hand-rolled check, narrows discussion/lab to the
-     * SELECTED lecture rather than "any lecture").
+     * {@link determineAvailableSteps} — the single source of truth for which steps
+     * the wizard would present given the currently-selected lecture. Keeps the
+     * schedule-sidebar warning in sync with the wizard, and narrows discussion/lab
+     * to the SELECTED lecture rather than "any lecture".
      */
     getIncompleteSelectionInfo(selectedCourse: SelectedCourse): { isIncomplete: boolean; message: string } {
         if (!this.courseDataService) return { isIncomplete: false, message: '' }

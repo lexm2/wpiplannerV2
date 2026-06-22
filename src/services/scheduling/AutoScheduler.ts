@@ -150,7 +150,6 @@ export class AutoScheduler {
 
     const allowedTerms = selectedCourse.allowedTerms;
 
-    // Handle standalone lab courses
     if (typeInfo.isStandaloneLab) {
       const labs = course.standaloneLabs || [];
 
@@ -171,7 +170,6 @@ export class AutoScheduler {
       return candidates;
     }
 
-    // Handle hierarchical courses with lectures
     if (!course.lectures || course.lectures.length === 0) {
       return candidates;
     }
@@ -217,7 +215,6 @@ export class AutoScheduler {
 
       if (discussionCandidates.length === 0 || labCandidates.length === 0) continue;
 
-      // Generate all valid combinations with precomputed masks
       for (const disc of discussionCandidates) {
         for (const lab of labCandidates) {
           if (disc.section && lab.section && masksConflict(disc.mask, lab.mask)) continue;
@@ -259,13 +256,9 @@ export class AutoScheduler {
     }
     if (masksConflict(sectionMask, blockedMask)) return false;
 
-    // Check schedule filters
     return this.sectionPassesFilters(section, selectedCourse);
   }
 
-  /**
-   * Detect what types of sections a course has.
-   */
   private detectCourseTypes(course: Course): CourseTypeInfo {
     let hasLectures = false;
     let hasDiscussions = false;
@@ -303,9 +296,6 @@ export class AutoScheduler {
     });
   }
 
-  /**
-   * Check if a section passes schedule filters.
-   */
   private sectionPassesFilters(section: Section, selectedCourse: SelectedCourse): boolean {
     if (!this.hasValidTimeSlot(section)) return false;
 

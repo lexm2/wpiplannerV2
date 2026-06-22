@@ -7,16 +7,14 @@ import type { LocalCalendarEvent } from '../../types/schedule'
 /**
  * Standalone local calendar-event CRUD for the schedule page.
  *
- * Reads the active schedule from the `appState.activeSchedule` rune directly
- * (no ScheduleController.currentSchedule) and persists add/delete by replacing
- * the schedule immutably via ProfileStateManager.updateSchedule — so the
- * `$derived` activeSchedule re-derives and the reactive grid drops/adds the
- * calendar-event blocks on its own. Replaces ScheduleController's
- * openCalendarEventsPanel / openAddLocalEventModal / openDeleteLocalEventModal /
- * addLocalEvent / deleteLocalEvent + its currentSchedule/onScheduleUpdate state.
+ * Reads the active schedule from the `appState.activeSchedule` rune and persists
+ * add/delete by replacing the schedule immutably via
+ * ProfileStateManager.updateSchedule — so the `$derived` activeSchedule
+ * re-derives and the reactive grid drops/adds the calendar-event blocks on its
+ * own.
  *
  * Needs ProfileStateManager (not a singleton) + UIStateManager, injected once via
- * init() from MainController.
+ * init().
  */
 class LocalEventService {
     private profileStateManager: ProfileStateManager | null = null
@@ -27,7 +25,6 @@ class LocalEventService {
         this.uiStateManager = uiStateManager
     }
 
-    /** Open the modal to add a new local event. */
     openAddModal(): void {
         if (!appState.activeSchedule) {
             console.warn('[localEventService] Cannot open add event modal - no active schedule')
@@ -40,10 +37,7 @@ class LocalEventService {
         this.uiStateManager?.modalOpened('local-event')
     }
 
-    /**
-     * Open the delete-confirmation modal for a local event (the grid's
-     * external-event-block click target). Confirming calls delete().
-     */
+    /** Delete-confirmation modal for a local event (the grid's external-event-block click target). */
     openDeleteModal(eventId: string): void {
         const schedule = appState.activeSchedule
         if (!schedule || !this.uiStateManager) return
