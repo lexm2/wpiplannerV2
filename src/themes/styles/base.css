@@ -28,15 +28,14 @@
   --gradient-start: rgba(212, 66, 79, 0.15);
   --gradient-end: rgba(212, 66, 79, 0.35);
 
-  /* Typography - WPI Official */
   --font-family: 'Myriad Pro', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-  
-  /* Font weights for WPI typography hierarchy - Lighter */
+
   --font-weight-light: 300;
   --font-weight-regular: 400;
   --font-weight-medium: 400;
   --font-weight-bold: 600;
+  --font-weight-heavy: 700;
 
   /* Spacing */
   --spacing-base-unit: 1rem;

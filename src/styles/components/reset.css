@@ -13,6 +13,21 @@ body {
   transition: var(--effect-transition);
 }
 
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+h1,
+h2,
+h3,
+.modal-title {
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: 0.01em;
+}
+
 /* Main app layout */
 #app {
   height: 100vh;
