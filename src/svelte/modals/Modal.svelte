@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { Snippet } from 'svelte';
+  import { trapFocus } from './trapFocus';
 
   let {
     typeId,
@@ -93,6 +94,7 @@
     aria-modal="true"
     aria-label={title}
     onclick={stop}
+    use:trapFocus
   >
     <div class="modal-content">
       {#if header}
