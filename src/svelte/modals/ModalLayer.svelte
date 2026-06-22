@@ -76,6 +76,7 @@
     <SchedulePicker
       {scheduleManagementService}
       {uiStateManager}
+      {profileStateManager}
       {getTutorial}
       onRequestClose={() => uiStateManager.modalClosed('schedule-picker')}
     />

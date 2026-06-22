@@ -4,15 +4,18 @@
   import { modalState } from './modalState.svelte';
   import { appState } from '../../core/state/appState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
+  import { ThemeManager } from '../../themes/ThemeManager';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
   import type { UIStateManager } from '../../services/ui/UIStateManager';
+  import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
   import type { Schedule } from '../../types/schedule';
   import styles from '../../styles/components/schedule-picker-modal.module.css';
 
-  let { scheduleManagementService, uiStateManager, getTutorial, onRequestClose }: {
+  let { scheduleManagementService, uiStateManager, profileStateManager, getTutorial, onRequestClose }: {
     scheduleManagementService: ScheduleManagementService;
     uiStateManager: UIStateManager;
+    profileStateManager: ProfileStateManager;
     getTutorial: () => TutorialSetup | undefined;
     onRequestClose: () => void;
   } = $props();
@@ -282,10 +285,24 @@
     refreshTick++;
   }
 
-  // Settings shims that defer to existing app-shell buttons.
-  function toggleTheme(): void { document.getElementById('settings-theme-btn')?.click(); }
-  function undo(): void { document.getElementById('undo-btn')?.click(); }
-  function redo(): void { document.getElementById('redo-btn')?.click(); }
+  // Settings actions — call the real services directly (mirrors App.svelte's
+  // header handlers) instead of synthesizing clicks on app-shell buttons.
+  function toggleTheme(): void {
+    const tm = ThemeManager.getInstance();
+    tm.setTheme(tm.getCurrentThemeId() === 'wpi-dark' ? 'wpi-light' : 'wpi-dark');
+  }
+  function undo(): void {
+    profileStateManager.undo().catch(error => {
+      console.error('Undo failed:', error);
+      uiStateManager.showErrorMessage('Failed to undo. Please try again.');
+    });
+  }
+  function redo(): void {
+    profileStateManager.redo().catch(error => {
+      console.error('Redo failed:', error);
+      uiStateManager.showErrorMessage('Failed to redo. Please try again.');
+    });
+  }
 
   function openChangelog(): void { uiStateManager.modalOpened('changelog'); }
   function openTutorials(close: () => void): void {
@@ -300,16 +317,11 @@
 <Modal
   typeId="schedule-picker"
   title="Schedules"
+  showHeader
   dialogClass="schedule-picker-modal-dialog no-transform"
   {onRequestClose}
 >
   {#snippet children(close)}
-    <div class="modal-header">
-      <h2 class="modal-title">Schedules</h2>
-      <button class="btn btn-primary new-schedule-btn-header" id="new-schedule-btn-header-modal" style="display: none;" onclick={createNewSchedule}>+ New Schedule</button>
-      <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
-    </div>
-
     <div class="modal-body schedule-picker-body">
       <div class="modal-pages-container" bind:this={pagesContainer}>
         <!-- Schedules page -->
