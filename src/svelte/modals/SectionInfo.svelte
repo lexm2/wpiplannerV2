@@ -64,6 +64,7 @@
     typeId="section-info"
     title={`${data.courseCode} - ${data.courseName}`}
     showHeader
+    extraClass="section-info-modal"
     {onRequestClose}
   >
     {#snippet children(close)}
