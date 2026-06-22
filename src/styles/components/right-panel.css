@@ -165,21 +165,15 @@
   transform: rotate(180deg);
 }
 
+/* Expand/collapse is driven by Svelte's `slide` transition (mounts/unmounts the
+   element), which animates height + padding together — no max-height overshoot,
+   no wrapper, no permanent gap. Items fly/fade in staggered on top of it. */
 .selected-courses-content {
-  padding: 0 1.5rem;
-  overflow: hidden;
+  padding: 1rem 1.5rem;
+  max-height: 50vh;
+  overflow-y: auto;
   box-sizing: border-box;
   width: 100%;
-  max-height: 0;
-  opacity: 0;
-  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
-}
-
-.selected-courses-content.expanded {
-  max-height: 50vh;
-  opacity: 1;
-  padding: 1rem 1.5rem;
-  overflow-y: auto;
 }
 
 .course-count {

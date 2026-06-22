@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { slide, fly } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
   import { courseListState } from './courseListState.svelte';
@@ -65,33 +67,40 @@
   <span class="chevron-icon" id="selected-courses-chevron">{@html getInlineSVG('CHEVRON_DOWN')}</span>
 </div>
 
-<div class="selected-courses-content" id="selected-courses-list" class:expanded={isExpanded}>
-  {#if sorted.length === 0}
-    <div class="empty-state">No courses selected yet</div>
-  {:else}
-    {#each sorted as sc (sc.course.id)}
-      {@const course = sc.course}
-      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-      <div
-        class="selected-course-item"
-        data-course-id={course.id}
-        role="button"
-        tabindex="0"
-        onclick={() => handleSelect(course)}
-        onkeydown={(e) => onItemKeydown(e, course)}
-      >
-        <div class="selected-course-info">
-          <div class="selected-course-code">{course.departmentAbbr}{course.number}</div>
-          <div class="selected-course-name">{course.name}</div>
-          <div class="selected-course-credits">{formatCredits(course)}</div>
-        </div>
-        <button
-          class="course-remove-btn"
+{#if isExpanded}
+  <div
+    class="selected-courses-content"
+    id="selected-courses-list"
+    transition:slide={{ duration: 280, easing: cubicOut }}
+  >
+    {#if sorted.length === 0}
+      <div class="empty-state" in:fly={{ y: 8, duration: 250, delay: 80, easing: cubicOut }}>No courses selected yet</div>
+    {:else}
+      {#each sorted as sc, i (sc.course.id)}
+        {@const course = sc.course}
+        <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+        <div
+          class="selected-course-item"
           data-course-id={course.id}
-          title="Remove from selection"
-          onclick={(e) => handleRemove(e, course)}
-        >{@html getInlineSVG('TRASH', 'trash-icon')}</button>
-      </div>
-    {/each}
-  {/if}
-</div>
+          role="button"
+          tabindex="0"
+          in:fly={{ y: 12, duration: 280, delay: 80 + Math.min(i, 8) * 45, easing: cubicOut }}
+          onclick={() => handleSelect(course)}
+          onkeydown={(e) => onItemKeydown(e, course)}
+        >
+          <div class="selected-course-info">
+            <div class="selected-course-code">{course.departmentAbbr}{course.number}</div>
+            <div class="selected-course-name">{course.name}</div>
+            <div class="selected-course-credits">{formatCredits(course)}</div>
+          </div>
+          <button
+            class="course-remove-btn"
+            data-course-id={course.id}
+            title="Remove from selection"
+            onclick={(e) => handleRemove(e, course)}
+          >{@html getInlineSVG('TRASH', 'trash-icon')}</button>
+        </div>
+      {/each}
+    {/if}
+  </div>
+{/if}
