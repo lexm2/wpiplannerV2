@@ -437,6 +437,40 @@ html.is-mobile .modal-icon {
   width: 100%;
 }
 
+/* ===== Change Sections button ===== */
+.section-change-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-primary-contrast, #fff);
+  background: var(--color-primary);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.section-change-btn:hover {
+  background: var(--color-primary-hover, var(--color-primary));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.section-change-btn:active {
+  transform: scale(0.99);
+}
+
+.section-change-btn-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
 /* ===== Card Base Styles ===== */
 .section-card {
   background: var(--color-surface);

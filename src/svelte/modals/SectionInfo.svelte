@@ -4,6 +4,7 @@
   import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
   import { getInlineSVG } from '../../utils/iconPaths';
   import { getPeriodTypeClass, getPeriodTypeLabel } from '../../utils/periodType';
+  import { componentWizardService } from '../../services/scheduling/componentWizardService';
   import type { Period } from '../../types/types';
 
   let { onRequestClose }: { onRequestClose: () => void } = $props();
@@ -57,6 +58,12 @@
   function onColorInput(event: Event): void {
     data?.onColorChange?.((event.target as HTMLInputElement).value);
   }
+
+  function changeSections(close: () => void): void {
+    if (!data) return;
+    componentWizardService.openComponentWizard(data.course);
+    close();
+  }
 </script>
 
 {#if data}
@@ -70,6 +77,11 @@
     {#snippet children(close)}
       <div class="modal-body">
         <div class="section-modal-content">
+          <button class="section-change-btn" onclick={() => changeSections(close)}>
+            {@html getInlineSVG('WAND', 'section-change-btn-icon')}
+            <span>Change Sections</span>
+          </button>
+
           <div class="section-card section-card--primary">
             <div class="section-card-header">
               {@html getInlineSVG('BOOKMARK', 'section-card-header-icon')}
