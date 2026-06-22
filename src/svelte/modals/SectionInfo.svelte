@@ -69,7 +69,6 @@
     {#snippet children(close)}
       <div class="modal-body">
         <div class="section-modal-content">
-          <!-- Primary Card: Section Overview -->
           <div class="section-card section-card--primary">
             <div class="section-card-header">
               {@html getInlineSVG('BOOKMARK', 'section-card-header-icon')}
@@ -130,7 +129,6 @@
             </div>
           </div>
 
-          <!-- Schedule Card: Meeting Times -->
           <div class="section-card section-card--schedule">
             <div class="section-card-header">
               {@html getInlineSVG('CLOCK', 'section-card-header-icon')}

@@ -147,7 +147,6 @@
         <button class="modal-close" onclick={close}>&times;</button>
       </div>
       <div class="modal-body {styles['local-event-form']}" data-type={eventType}>
-        <!-- Title -->
         <div class="form-group">
           <label for="event-title">Title <span class="required">*</span></label>
           <!-- svelte-ignore a11y_autofocus -->
@@ -164,7 +163,6 @@
           />
         </div>
 
-        <!-- Description -->
         <div class="form-group">
           <label for="event-description">Description</label>
           <textarea
@@ -175,7 +173,6 @@
           ></textarea>
         </div>
 
-        <!-- Event Type Selector -->
         <div class="form-group">
           <span class="form-label" id="event-type-label">Event Type</span>
           <div
@@ -205,7 +202,6 @@
         </div>
 
         {#if eventType === EventType.ONE_TIME}
-          <!-- One-time: Date picker -->
           <div class={styles['one-time-fields']}>
             <div class="form-group">
               <label for="event-date">Date</label>
@@ -220,7 +216,6 @@
             </div>
           </div>
         {:else}
-          <!-- Recurring: Day + term selectors -->
           <div class={styles['recurring-fields']}>
             <div class="form-group">
               <span class="form-label" id="event-days-label">Days <span class="required">*</span></span>
@@ -270,7 +265,6 @@
           </div>
         {/if}
 
-        <!-- Time (shared) -->
         <div class="form-group">
           <span class="form-label" id="event-time-label">Time</span>
           <div class={styles['time-row']} role="group" aria-labelledby="event-time-label">

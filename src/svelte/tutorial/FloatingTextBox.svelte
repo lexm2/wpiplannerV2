@@ -47,7 +47,7 @@
     });
   });
 
-  // --- Dragging (header grab) -------------------------------------------------
+  // Dragging (header grab)
   let dragging = false;
   let dragOffsetX = 0;
   let dragOffsetY = 0;

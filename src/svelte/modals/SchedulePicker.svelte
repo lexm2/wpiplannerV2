@@ -57,7 +57,7 @@
     scheduleManagementService.initialize().then(() => { refreshTick++; });
   });
 
-  // --- Tab navigation (horizontal page slide) ---------------------------------
+  // Tab navigation (horizontal page slide)
   let pagesContainer = $state<HTMLElement>();
   let activeTab = $state<'schedules' | 'settings'>('schedules');
 
@@ -79,7 +79,7 @@
     c.scrollLeft = tab === 'settings' ? c.offsetWidth : 0;
   });
 
-  // --- Per-item ⋮ menu --------------------------------------------------------
+  // Per-item ⋮ menu
   let openMenuId = $state<string | null>(null);
   let menuPos = $state<{ left: number; top: number }>({ left: 0, top: 0 });
 
@@ -103,7 +103,7 @@
 
   function closeMenus(): void { openMenuId = null; }
 
-  // --- Inline rename ----------------------------------------------------------
+  // Inline rename
   let editingId = $state<string | null>(null);
   let editValue = $state('');
 
@@ -133,7 +133,7 @@
     node.select();
   }
 
-  // --- Schedule actions -------------------------------------------------------
+  // Schedule actions
   function switchToSchedule(scheduleId: string): void {
     try {
       scheduleManagementService.setActiveSchedule(scheduleId);
@@ -324,7 +324,6 @@
   {#snippet children(close)}
     <div class="modal-body schedule-picker-body">
       <div class="modal-pages-container" bind:this={pagesContainer}>
-        <!-- Schedules page -->
         <div class="modal-page schedules-page">
           <div class="schedule-list">
             {#if schedules.length === 0}
@@ -397,7 +396,6 @@
           </div>
         </div>
 
-        <!-- Settings page -->
         <div class="modal-page settings-page">
           <button class="btn btn-primary" id="new-schedule-btn-settings" onclick={createNewSchedule}>{@html getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')}<span class="btn-text"> New Schedule</span></button>
           <button class="btn btn-secondary" id="import-schedule-btn-settings" onclick={importNewFromSettings}>{@html getInlineSVG('CALENDAR_DOWN', 'modal-footer-icon')}<span class="btn-text"> Import</span></button>
