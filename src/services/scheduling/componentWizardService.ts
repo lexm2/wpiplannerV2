@@ -1,8 +1,9 @@
 import type { WizardStep } from '../../types/uiState'
-import type { Course, Section, Period, LectureGroup } from '../../types/types'
+import type { Course, Section } from '../../types/types'
 import type { SelectedCourse } from '../../types/schedule'
 import type { ComponentSelections } from '../../types/scheduling'
 import { wizardState } from '../../svelte/wizardState.svelte'
+import { determineAvailableSteps } from '../../svelte/wizardLogic'
 import { schedulePreviewState } from '../../svelte/schedule/schedulePreviewState.svelte'
 import type { CourseSelectionService } from '../selection/CourseSelectionService'
 import type { CourseDataService } from '../data/courseDataService'
@@ -138,82 +139,35 @@ class ComponentWizardService {
      * Check if a section has at least one period with a valid time slot
      * Async sections are valid even with 12:00-12:00 times
      */
-    private hasValidTimeSlot(section: Section): boolean {
-        return section.periods.some((period: Period) => {
-            // Async periods are always valid
-            if (period.isAsync) {
-                return true
-            }
-            // Compare actual time values, not object references
-            // A valid time slot has different start and end times
-            return period.startTime.hours !== period.endTime.hours ||
-                   period.startTime.minutes !== period.endTime.minutes
-        })
-    }
-
     /**
-     * Check if a selected course has incomplete component selections
-     * Returns information about what's missing
-     * This logic matches the wizard's determineAvailableSteps() to ensure consistency
+     * Check if a selected course has incomplete component selections.
+     *
+     * "Required components" is delegated to the wizard's own
+     * {@link determineAvailableSteps} — the single source of truth for which
+     * steps the wizard would present for this course given the currently-selected
+     * lecture. This keeps the schedule-sidebar warning exactly in sync with the
+     * wizard (and, unlike the old hand-rolled check, narrows discussion/lab to the
+     * SELECTED lecture rather than "any lecture").
      */
     getIncompleteSelectionInfo(selectedCourse: SelectedCourse): { isIncomplete: boolean; message: string } {
-        const course = selectedCourse.course
+        if (!this.courseDataService) return { isIncomplete: false, message: '' }
 
-        // Skip check for lab-only courses
-        if (this.courseDataService && this.courseDataService.isLabOnlyCourse(course)) {
-            // For lab-only courses, check if a lab section is selected
-            if (!selectedCourse.selectedLab) {
-                const labs = this.courseDataService.getStandaloneLabs(course)
-                const hasValidLabs = labs.some(lab => this.hasValidTimeSlot(lab))
-                if (hasValidLabs) {
-                    return { isIncomplete: true, message: 'Incomplete: Missing lab selection' }
-                }
-            }
-            return { isIncomplete: false, message: '' }
-        }
-
-        // For hierarchical courses, check if lecture groups exist
-        if (!course.lectures || course.lectures.length === 0) {
-            return { isIncomplete: false, message: '' }
-        }
-
-        const missingComponents: string[] = []
-
-        // Check if lectures with valid time slots exist
-        const validLectures = course.lectures.filter((lg: LectureGroup) => this.hasValidTimeSlot(lg.section))
-        if (validLectures.length === 0) {
-            // No valid lectures available, nothing to warn about
-            return { isIncomplete: false, message: '' }
-        }
-
-        // Check lecture selection (only warn if valid lectures exist)
-        if (!selectedCourse.selectedLecture) {
-            missingComponents.push('lecture')
-        }
-
-        // Check if ANY lecture has discussions/labs with valid time slots
-        // This matches the wizard's logic for determining available steps
-        const hasValidDiscussions = course.lectures.some((lg: LectureGroup) =>
-            lg.compatibleDiscussions && lg.compatibleDiscussions.some((d: Section) => this.hasValidTimeSlot(d))
-        )
-        const hasValidLabs = course.lectures.some((lg: LectureGroup) =>
-            lg.compatibleLabs && lg.compatibleLabs.some((l: Section) => this.hasValidTimeSlot(l))
+        const steps = determineAvailableSteps(
+            selectedCourse.course,
+            this.courseDataService,
+            selectedCourse.selectedLecture ?? null,
         )
 
-        // Only warn about missing components if they would appear in the wizard
-        if (hasValidDiscussions && !selectedCourse.selectedDiscussion) {
-            missingComponents.push('discussion')
-        }
-        if (hasValidLabs && !selectedCourse.selectedLab) {
-            missingComponents.push('lab')
+        const selectionForStep: Record<WizardStep, Section | null> = {
+            lecture: selectedCourse.selectedLecture ?? null,
+            discussion: selectedCourse.selectedDiscussion ?? null,
+            lab: selectedCourse.selectedLab ?? null,
         }
 
-        if (missingComponents.length === 0) {
-            return { isIncomplete: false, message: '' }
-        }
+        const missing = steps.filter(step => !selectionForStep[step])
+        if (missing.length === 0) return { isIncomplete: false, message: '' }
 
-        const message = `Incomplete: Missing ${missingComponents.join(', ')} selection`
-        return { isIncomplete: true, message }
+        return { isIncomplete: true, message: `Incomplete: Missing ${missing.join(', ')} selection` }
     }
 }
 
