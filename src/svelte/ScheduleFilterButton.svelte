@@ -8,15 +8,10 @@
     onFilter: () => void;
   } = $props();
 
-  // The schedule-page filter button. Mirrors the planner #filter-btn in
-  // FilterButtons.svelte: the active filters live in a SvelteMap (read via
-  // getActiveFilters()) and appState.activeSchedule is a rune, so reading both
-  // inside these $derived makes the active class + title recompute on their own.
-  // Replaces the two imperative updateScheduleFilterButtonState copies
-  // (MainController + ScheduleController), the filter `watch`/applyFiltersAndRefresh
-  // plumbing that drove them, and the setTimeout(100) initializer.
+  // Schedule-page counterpart to the planner #filter-btn in FilterButtons.svelte.
   // hasNonDefaultFilters / getFilterCount read the SvelteMap-backed FilterState
-  // internally, so these stay reactive without any dependency trick.
+  // (and appState.activeSchedule is a rune), so these $derived recompute on their
+  // own — no dependency trick needed.
   const year = $derived(appState.activeSchedule?.year);
   const hasNonDefault = $derived(filterService.hasNonDefaultFilters(year));
   const filterCount = $derived(filterService.getFilterCount());

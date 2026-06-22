@@ -8,14 +8,9 @@
     onFilter: () => void;
   } = $props();
 
-  // The active filters live in a SvelteMap (read via getActiveFilters()), and
-  // `appState.activeSchedule` is a rune — so reading them inside these $derived
-  // makes the button state recompute on its own. This replaces MainController's
-  // updateFilterButtonState/updateBookmarkFilterButtonState/
-  // updateClearFiltersButtonState imperative DOM updates and the setTimeout(100)
-  // initializer that primed them.
-  // hasNonDefaultFilters / getFilterCount / hasFilter all read the SvelteMap-backed
-  // FilterState internally, so these stay reactive without any dependency trick.
+  // hasNonDefaultFilters / getFilterCount / hasFilter read the SvelteMap-backed
+  // FilterState (and appState.activeSchedule is a rune), so these $derived
+  // recompute on their own — no dependency trick needed.
   const year = $derived(appState.activeSchedule?.year);
   const hasNonDefault = $derived(filterService.hasNonDefaultFilters(year));
   const filterCount = $derived(filterService.getFilterCount());

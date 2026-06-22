@@ -44,7 +44,6 @@
     lab: 'Select Lab',
   };
 
-  // Reactive reads from the store.
   const currentStep = $derived(wizardState.currentStep);
   const selections = $derived(wizardState.selections);
 
@@ -78,8 +77,6 @@
   const isLastStep = $derived(currentIndex === availableSteps.length - 1);
   const hasSelection = $derived(selections[currentStep] !== null);
   const enterClass = $derived(wizardState.direction === 'forward' ? styles['slide-in-right'] : styles['slide-in-left']);
-
-  // --- actions ---------------------------------------------------------------
 
   function selectSection(section: Section): void {
     const step = currentStep;
