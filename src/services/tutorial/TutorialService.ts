@@ -1,9 +1,9 @@
 import type { Tutorial, TutorialStep, TutorialAppState } from '../../types/tutorial';
 import { getInlineSVG } from '../../utils';
+import { tutorialOverlayState } from '../../svelte/tutorial/tutorialOverlayState.svelte';
 
 import type { UIState } from '../../types/uiState';
 
-type StepChangeCallback = (step: TutorialStep | null, index: number, total: number) => void;
 type StepApplyCallback = (index: number) => void;
 type UIStateTransitionCallback = (uiState: Partial<UIState>) => void;
 type AppStateTransitionCallback = (appState: TutorialAppState) => Promise<void>;
@@ -13,7 +13,6 @@ export class TutorialService {
     private tutorials: Map<string, Tutorial> = new Map();
     private activeTutorial: Tutorial | null = null;
     private currentStepIndex = 0;
-    private stepChangeCallback: StepChangeCallback | null = null;
     private stepApplyCallback: StepApplyCallback | null = null;
     private completionCallback: (() => void) | null = null;
     private currentSelector: string | null = null;
@@ -54,14 +53,14 @@ export class TutorialService {
     skip(): void {
         this.cleanup();
         this.activeTutorial = null;
-        this.stepChangeCallback?.(null, 0, 0);
+        tutorialOverlayState.set(null, 0, 0);
         this.completionCallback?.();
     }
 
     cancel(): void {
         this.cleanup();
         this.activeTutorial = null;
-        this.stepChangeCallback?.(null, 0, 0);
+        tutorialOverlayState.set(null, 0, 0);
     }
 
     nextStep(): void {
@@ -70,7 +69,7 @@ export class TutorialService {
         this.currentStepIndex++;
         if (this.currentStepIndex >= this.activeTutorial.steps.length) {
             this.activeTutorial = null;
-            this.stepChangeCallback?.(null, 0, 0);
+            tutorialOverlayState.set(null, 0, 0);
             this.completionCallback?.();
         } else {
             void this.applyStep();
@@ -90,8 +89,6 @@ export class TutorialService {
     getCurrentStepIndex(): number { return this.currentStepIndex; }
 
     getActiveTutorial(): Tutorial | null { return this.activeTutorial; }
-
-    onStepChange(cb: StepChangeCallback): void { this.stepChangeCallback = cb; }
 
     onStepApply(cb: StepApplyCallback): void { this.stepApplyCallback = cb; }
 
@@ -120,7 +117,7 @@ export class TutorialService {
         if (step.uiState) this.uiStateTransitionCallback?.(step.uiState);
         this.postTransitionCallback?.(step.appState);
         this.highlightElement(step.selector, step.scrollArrow ?? false);
-        this.stepChangeCallback?.(step, this.currentStepIndex, this.activeTutorial.steps.length);
+        tutorialOverlayState.set(step, this.currentStepIndex, this.activeTutorial.steps.length);
         if (step.waitFor !== 'manual') this.listenForAction(step);
     }
 
