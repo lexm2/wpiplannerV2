@@ -3,11 +3,8 @@ import type { SelectedCourse, ScheduleCombination, Schedule, LocalCalendarEvent,
 import { getAllSections } from '../utils/courseUtils';
 
 /**
- * Universal schedule data class used throughout the application.
- *
- * This class provides:
- * - Storage of full objects (Course, Section) for app use
- * - Single source of truth for schedule data
+ * Single source of truth for one schedule's data, holding full
+ * Course/Section objects for app use.
  */
 export class ScheduleState {
     readonly id: string;
@@ -37,12 +34,7 @@ export class ScheduleState {
     }
 
 
-    /**
-     * Create a copy with updated fields (immutable update)
-     *
-     * @param updates - Partial updates to apply
-     * @returns New ScheduleState instance with updates
-     */
+    /** Immutable update: copy with the given fields replaced. */
     with(updates: Partial<{
         name: string;
         selectedCourses: SelectedCourse[];
@@ -61,66 +53,28 @@ export class ScheduleState {
         );
     }
 
-    // =========================================================================
-    // Course Query Methods
-    // =========================================================================
-
-    /**
-     * Get the number of selected courses in this schedule
-     *
-     * @returns Course count
-     */
     getCourseCount(): number {
         return this.selectedCourses.length;
     }
 
-    /**
-     * Check if schedule is empty (no courses selected)
-     *
-     * @returns True if no courses selected
-     */
     isEmpty(): boolean {
         return this.selectedCourses.length === 0;
     }
 
-    /**
-     * Check if this schedule contains a specific course
-     *
-     * @param courseId - Course ID to check
-     * @returns True if course is in schedule
-     */
     containsCourse(courseId: string): boolean {
         return this.selectedCourses.some(sc => sc.course.id === courseId);
     }
 
-    /**
-     * Get a specific selected course by ID
-     *
-     * @param courseId - Course ID to find
-     * @returns Selected course or null if not found
-     */
     getCourse(courseId: string): SelectedCourse | null {
         return this.selectedCourses.find(sc => sc.course.id === courseId) || null;
     }
 
-    /**
-     * Extract just the Course objects (not SelectedCourse wrappers)
-     *
-     * @returns Array of Course objects
-     */
+    /** Course objects, unwrapped from their SelectedCourse wrappers. */
     getAllCourses(): Course[] {
         return this.selectedCourses.map(sc => sc.course);
     }
 
-    // =========================================================================
-    // Section Extraction Methods
-    // =========================================================================
-
-    /**
-     * Get all sections from all courses (both available and selected)
-     *
-     * @returns Array of all sections across all courses
-     */
+    /** All sections across all courses (selected and unselected). */
     getAllSections(): Section[] {
         const sections: Section[] = [];
         for (const selectedCourse of this.selectedCourses) {
@@ -129,11 +83,7 @@ export class ScheduleState {
         return sections;
     }
 
-    /**
-     * Get only the currently selected sections
-     *
-     * @returns Array of selected sections (excludes unselected sections)
-     */
+    /** Only the currently selected sections. */
     getSelectedSections(): Section[] {
         const sections: Section[] = [];
         for (const sc of this.selectedCourses) {
@@ -144,56 +94,24 @@ export class ScheduleState {
         return sections;
     }
 
-    /**
-     * Get selected sections for a specific term
-     *
-     * @param term - Term code (A, B, C, D, or E)
-     * @returns Sections for that term
-     */
+    /** Selected sections for a specific term. */
     getSectionsForTerm(term: AcademicTerm): Section[] {
         return this.getSelectedSections().filter(s => s.computedTerm === term);
     }
 
-    // =========================================================================
-    // Filtering Methods
-    // =========================================================================
-
-    /**
-     * Get only required courses
-     *
-     * @returns Array of required selected courses
-     */
     getRequiredCourses(): SelectedCourse[] {
         return this.selectedCourses.filter(sc => sc.isRequired);
     }
 
-    /**
-     * Get only elective courses
-     *
-     * @returns Array of elective selected courses
-     */
     getElectiveCourses(): SelectedCourse[] {
         return this.selectedCourses.filter(sc => !sc.isRequired);
     }
 
-    /**
-     * Get courses that have locked sections
-     *
-     * @returns Array of selected courses with locked sections
-     */
     getCoursesWithLockedSections(): SelectedCourse[] {
         return this.selectedCourses.filter(sc => sc.lockedSections.size > 0);
     }
 
-    // =========================================================================
-    // Statistics & Metadata
-    // =========================================================================
-
-    /**
-     * Group courses by term
-     *
-     * @returns Map of term code to selected courses
-     */
+    /** @returns Map of term code to selected courses. */
     getCoursesByTerm(): Map<string, SelectedCourse[]> {
         const byTerm = new Map<string, SelectedCourse[]>();
 
@@ -217,11 +135,7 @@ export class ScheduleState {
         return byTerm;
     }
 
-    /**
-     * Group courses by department
-     *
-     * @returns Map of department code to selected courses
-     */
+    /** @returns Map of department code to selected courses. */
     getCoursesByDepartment(): Map<string, SelectedCourse[]> {
         const byDept = new Map<string, SelectedCourse[]>();
 
@@ -236,12 +150,7 @@ export class ScheduleState {
         return byDept;
     }
 
-    /**
-     * Create from plain Schedule interface
-     *
-     * @param schedule - Schedule object
-     * @returns ScheduleState instance
-     */
+    /** Create from a plain Schedule interface. */
     static fromSchedule(schedule: Schedule): ScheduleState {
         return new ScheduleState(
             schedule.id,
@@ -254,11 +163,7 @@ export class ScheduleState {
         );
     }
 
-    /**
-     * Convert to plain Schedule interface
-     *
-     * @returns Schedule object
-     */
+    /** Convert to a plain Schedule interface. */
     toSchedule(): Schedule {
         return {
             id: this.id,
@@ -272,13 +177,7 @@ export class ScheduleState {
     }
 }
 
-/**
- * Find course by ID in all departments
- *
- * @param courseId - Course ID to find
- * @param departments - Department catalog
- * @returns Course object or null
- */
+/** Find a course by ID across all departments. */
 export function findCourseById(courseId: string, departments: Department[]): Course | null {
     for (const dept of departments) {
         const course = dept.courses.find(c => c.id === courseId);
@@ -287,13 +186,7 @@ export function findCourseById(courseId: string, departments: Department[]): Cou
     return null;
 }
 
-/**
- * Find section by CRN in course
- *
- * @param course - Course to search
- * @param crn - Section CRN
- * @returns Section object or null
- */
+/** Find a section by CRN within a course. */
 export function findSectionByCRN(course: Course, crn: string): Section | null {
     const allSections = getAllSections(course);
     return allSections.find(s => s.crn.toString() === crn) || null;

@@ -8,10 +8,8 @@ import { encodeCourseSelection, decodeCourseSelection } from '../utils/courseUti
 const APPLICATION_STATE_VERSION: string = '4.3'
 
 /**
- * Application-level state containing multiple schedules and preferences
- *
- * - Provides conversion to/from export format
- * - Represents the complete exportable/importable state
+ * Application-level state: all schedules plus preferences.
+ * The complete exportable/importable unit, with conversion to/from export format.
  */
 export class ApplicationState {
     readonly version: string;
@@ -34,11 +32,7 @@ export class ApplicationState {
         this.preferences = preferences;
     }
 
-    /**
-     * Convert to minimal format for export
-     *
-     * @returns MinimalSyncData
-     */
+    /** Convert to minimal format for export. */
     toMinimalFormat(): MinimalSyncData {
         return {
             v: this.version,
@@ -63,11 +57,7 @@ export class ApplicationState {
 
 
     /**
-     * Create from minimal format
-     *
-     * @param data - Minimal sync data
-     * @param courseCatalog - Department catalog for hydration
-     * @returns ApplicationState with full objects
+     * Hydrate from minimal export format using the department catalog.
      */
     static fromMinimalFormat(
         data: MinimalSyncData,
@@ -127,12 +117,7 @@ export class ApplicationState {
         );
     }
 
-    /**
-     * Create a copy with updated fields (immutable update)
-     *
-     * @param updates - Partial updates to apply
-     * @returns New ApplicationState instance
-     */
+    /** Immutable update: copy with the given fields replaced. */
     with(updates: Partial<{
         activeScheduleId: string | null;
         schedules: ScheduleState[];
@@ -147,43 +132,23 @@ export class ApplicationState {
         );
     }
 
-    /**
-     * Get active schedule
-     *
-     * @returns Active ScheduleState or null
-     */
     getActiveSchedule(): ScheduleState | null {
         if (!this.activeScheduleId) return null;
         return this.schedules.find(s => s.id === this.activeScheduleId) || null;
     }
 
-    /**
-     * Get active schedule index
-     *
-     * @returns Active schedule index or 0 if no active schedule
-     */
+    /** Index of the active schedule, or 0 if none. */
     getActiveScheduleIndex(): number {
         if (!this.activeScheduleId) return 0;
         const index = this.schedules.findIndex(s => s.id === this.activeScheduleId);
         return index >= 0 ? index : 0;
     }
 
-    /**
-     * Get schedule by ID
-     *
-     * @param scheduleId - Schedule ID
-     * @returns ScheduleState or null
-     */
     getSchedule(scheduleId: string): ScheduleState | null {
         return this.schedules.find(s => s.id === scheduleId) || null;
     }
 
-    /**
-     * Add or update schedule
-     *
-     * @param schedule - Schedule to add/update
-     * @returns New ApplicationState with schedule added/updated
-     */
+    /** Add the schedule, or replace the existing one with the same id. */
     upsertSchedule(schedule: ScheduleState): ApplicationState {
         const existingIndex = this.schedules.findIndex(s => s.id === schedule.id);
         const newSchedules = [...this.schedules];
@@ -197,12 +162,6 @@ export class ApplicationState {
         return this.with({ schedules: newSchedules });
     }
 
-    /**
-     * Remove schedule
-     *
-     * @param scheduleId - Schedule ID to remove
-     * @returns New ApplicationState without schedule
-     */
     removeSchedule(scheduleId: string): ApplicationState {
         const newSchedules = this.schedules.filter(s => s.id !== scheduleId);
         const newActiveScheduleId = this.activeScheduleId === scheduleId
@@ -218,68 +177,33 @@ export class ApplicationState {
         );
     }
 
-    // =========================================================================
-    // Schedule Query Methods
-    // =========================================================================
-
-    /**
-     * Get total number of schedules
-     *
-     * @returns Schedule count
-     */
     getScheduleCount(): number {
         return this.schedules.length;
     }
 
-    /**
-     * Check if schedule exists
-     *
-     * @param scheduleId - Schedule ID to check
-     * @returns True if schedule exists
-     */
     hasSchedule(scheduleId: string): boolean {
         return this.schedules.some(s => s.id === scheduleId);
     }
 
-    /**
-     * Find schedule by name
-     *
-     * @param name - Schedule name to find
-     * @returns Schedule or null if not found
-     */
     findScheduleByName(name: string): ScheduleState | null {
         return this.schedules.find(s => s.name === name) || null;
     }
 
-    /**
-     * Get all schedule names
-     *
-     * @returns Array of schedule names
-     */
     getAllScheduleNames(): string[]  {
         return this.schedules.map(s => s.name);
     }
 
-    // =========================================================================
-    // Validation & Naming Utilities
-    // =========================================================================
-
     /**
-     * Check if a schedule name is unique
-     *
-     * @param name - Name to check
-     * @param excludeId - Optional schedule ID to exclude from check (for renames)
-     * @returns True if name is unique
+     * Whether no other schedule has this name.
+     * @param excludeId - Schedule ID to exclude from the check (for renames)
      */
     hasUniqueScheduleName(name: string, excludeId?: string): boolean {
         return !this.schedules.some(s => s.name === name && s.id !== excludeId);
     }
 
     /**
-     * Generate a unique schedule name by appending numbers
-     *
-     * @param baseName - Base name to start with
-     * @returns Unique name (e.g., "My Schedule (1)" if "My Schedule" exists)
+     * Make baseName unique by appending a counter.
+     * e.g. "My Schedule (1)" if "My Schedule" already exists.
      */
     generateUniqueScheduleName(baseName: string): string {
         if (this.hasUniqueScheduleName(baseName)) {
@@ -296,42 +220,22 @@ export class ApplicationState {
         return candidateName;
     }
 
-    // =========================================================================
-    // Statistics & Analytics
-    // =========================================================================
-
-    /**
-     * Get total number of courses across all schedules
-     *
-     * @returns Total course count
-     */
+    /** Total courses across all schedules. */
     getTotalCourseCount(): number {
         return this.schedules.reduce((sum, schedule) => sum + schedule.getCourseCount(), 0);
     }
 
-    /**
-     * Get schedules sorted by name (alphabetically)
-     *
-     * @returns Sorted array of schedules
-     */
+    /** Schedules sorted alphabetically by name. */
     getSchedulesSortedByName(): ScheduleState[] {
         return [...this.schedules].sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    /**
-     * Get schedules sorted by timestamp (most recent first)
-     *
-     * @returns Sorted array of schedules
-     */
+    /** Schedules sorted by timestamp, most recent first. */
     getSchedulesSortedByTimestamp(): ScheduleState[] {
         return [...this.schedules].sort((a, b) => b.timestamp - a.timestamp);
     }
 
-    /**
-     * Get schedules that are empty (no courses)
-     *
-     * @returns Array of empty schedules
-     */
+    /** Schedules with no courses. */
     getEmptySchedules(): ScheduleState[] {
         return this.schedules.filter(s => s.isEmpty());
     }

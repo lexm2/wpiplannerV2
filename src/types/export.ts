@@ -1,12 +1,6 @@
 /**
- * Data export/import format types
- *
- * These types define the compact format used for local data export/import.
- */
-
-/**
- * Minimal format for compact data export (v4)
- * Optimized for size with abbreviated keys
+ * Compact local export/import format (v4).
+ * Keys are abbreviated to minimize size.
  */
 export interface MinimalSyncData {
     v: string;

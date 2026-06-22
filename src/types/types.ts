@@ -1,10 +1,10 @@
 import { AcademicTerm } from "./schedule";
 
-// Hierarchical course structure with lecture groups and compatible discussions/labs.
+// A lecture section with the discussions/labs compatible with it.
 export interface LectureGroup {
-    section: Section;                 // The lecture section itself
-    compatibleDiscussions: Section[]; // Discussions that work with this lecture
-    compatibleLabs: Section[];        // Labs that work with this lecture
+    section: Section;
+    compatibleDiscussions: Section[];
+    compatibleLabs: Section[];
 }
 
 export interface Course {
@@ -38,8 +38,8 @@ export interface Section {
     actualWaitlist: number;
     maxWaitlist: number;
     note?: string;
-    computedTerm: AcademicTerm; // Computed academic term letter (A, B, C, D, E, F)
-    isInterestList?: boolean; // True for interest list placeholder sections
+    computedTerm: AcademicTerm; // A, B, C, D, E, F
+    isInterestList?: boolean; // placeholder section for an interest list
     periods: Period[];
 }
 
