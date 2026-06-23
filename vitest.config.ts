@@ -11,6 +11,6 @@ export default defineConfig({
   test: {
     // flushSync + DOM-dependent rune internals need a DOM-like environment.
     environment: 'jsdom',
-    include: ['src/**/*.test.ts'],
+    include: ['tests/unit/**/*.test.ts'],
   },
 })

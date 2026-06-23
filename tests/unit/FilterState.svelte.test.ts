@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { flushSync, untrack } from 'svelte';
-import { FilterState } from './FilterState';
+import { FilterState } from '../../src/core/filtering/FilterState';
 
 /**
  * Validates the reactive wiring end-to-end: FilterState mutations flow through
