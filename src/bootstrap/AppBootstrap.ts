@@ -22,6 +22,7 @@ import { componentWizardService } from '../services/scheduling/componentWizardSe
 import { localEventService } from '../services/scheduling/localEventService'
 import { sectionInfoService } from '../services/scheduling/sectionInfoService'
 import { autoScheduleService } from '../services/scheduling/autoScheduleService'
+import { degreePlanService } from '../services/degree/degreePlanService'
 import type { ServiceContainer } from './ServiceContainer'
 
 export class AppBootstrap {
@@ -79,12 +80,14 @@ export class AppBootstrap {
         const {
             courseSelectionService, courseDataService, filterService,
             profileStateManager, uiStateManager, colorService, autoScheduleOrchestrator,
+            scheduleManagementService,
         } = services;
 
         componentWizardService.init(courseSelectionService, courseDataService, filterService);
         localEventService.init(profileStateManager, uiStateManager);
         sectionInfoService.init(courseSelectionService, colorService, uiStateManager);
         autoScheduleService.init(courseSelectionService, filterService, colorService, autoScheduleOrchestrator, uiStateManager);
+        degreePlanService.init(scheduleManagementService, profileStateManager, uiStateManager);
     }
 
     static initializeFilters(services: ServiceContainer): void {

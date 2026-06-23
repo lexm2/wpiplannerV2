@@ -33,6 +33,24 @@ test('imports an Academic Progress file and persists it across reload', async ({
     await expect(page.locator('.degree-dropzone')).toHaveCount(0);
 });
 
+test('builds a schedule from the planned courses and swaps to it', async ({ page }) => {
+    await page.goto('/');
+    await page.click('#degree-tab');
+    await page.setInputFiles('.degree-file-input', fixture);
+    await page.locator('.degree-summary-title').waitFor();
+
+    // The fixture has one planned (in-progress) course → the build button appears.
+    const buildBtn = page.locator('.degree-build-btn');
+    await expect(buildBtn).toContainText('planned');
+    await buildBtn.click();
+
+    // Swaps to a new active "Planned Courses" schedule and lands on the schedule page.
+    await expect(page.locator('#schedule-picker-label')).toHaveText('Planned Courses');
+    await expect(page.locator('#schedule-page')).toBeVisible();
+    // The planned course was added to the schedule (shown in the schedule sidebar).
+    await expect(page.locator('#schedule-sidebar-content')).toContainText('2022');
+});
+
 test('keeps all pages mounted when switching to Degree', async ({ page }) => {
     await page.goto('/');
     await page.click('#degree-tab');
