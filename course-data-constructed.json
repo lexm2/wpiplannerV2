@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 23, 2026, 6:46 AM",
+  "generated": "Jun 23, 2026, 10:33 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -73427,7 +73427,7 @@
                 "number": "DL01",
                 "seats": 85,
                 "seatsAvailable": 30,
-                "actualWaitlist": 20,
+                "actualWaitlist": 19,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5401",
                 "computedTerm": "D",
@@ -73444,7 +73444,7 @@
                     "room": "Atwater Kent 219",
                     "seats": 85,
                     "seatsAvailable": 30,
-                    "actualWaitlist": 20,
+                    "actualWaitlist": 19,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
                     "days": [
